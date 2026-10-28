@@ -1,0 +1,38 @@
+# dependencies and build output
+node_modules/
+dist/
+.astro/
+.firebase/
+coverage/
+playwright-report/
+test-results/
+.lighthouseci/
+*.tsbuildinfo
+
+# python
+.venv/
+__pycache__/
+*.pyc
+
+# secrets and local config: never commit
+.env
+.env.*
+!.env.example
+*service-account*.json
+*serviceAccount*.json
+.claude/settings.local.json
+
+# VASP licence: never commit POTCAR content
+POTCAR
+POTCAR.*
+*.potcar
+
+# large local calculation outputs (trim and place under public/examples/ instead)
+data/author/raw/
+
+# OS and editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log

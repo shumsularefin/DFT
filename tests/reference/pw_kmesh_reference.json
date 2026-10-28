@@ -1,0 +1,1328 @@
+{
+ "_meta": {
+  "generator": "scripts/reference/gen_pw_kmesh_reference.py",
+  "hbar2_over_2m_eV_A2_from_scipy_constants": 3.8099821109685843,
+  "scipy_constants_codata": "see scipy.constants version in requirements.txt",
+  "note_vasp_constant": "VASP uses 3.80998 eV*A^2 (RYTOEV*AUTOA^2). Tests should accept either to 1e-4.",
+  "open_question": "KSPACING rounding rule is NOT settled: see docs/OPEN_QUESTIONS.md Q-004"
+ },
+ "plane_wave_counts": [
+  {
+   "cell": "fcc_Cu_a3.61_primitive",
+   "lattice_rows": [
+    [
+     0,
+     1.805,
+     1.805
+    ],
+    [
+     1.805,
+     0,
+     1.805
+    ],
+    [
+     1.805,
+     1.805,
+     0
+    ]
+   ],
+   "encut_eV": 100,
+   "G_cut_1_per_A": 5.123167223161844,
+   "n_pw_exact": 27,
+   "n_pw_continuum_estimate": 26.707068099583328
+  },
+  {
+   "cell": "fcc_Cu_a3.61_primitive",
+   "lattice_rows": [
+    [
+     0,
+     1.805,
+     1.805
+    ],
+    [
+     1.805,
+     0,
+     1.805
+    ],
+    [
+     1.805,
+     1.805,
+     0
+    ]
+   ],
+   "encut_eV": 200,
+   "G_cut_1_per_A": 7.2452525693007885,
+   "n_pw_exact": 65,
+   "n_pw_continuum_estimate": 75.53899583530516
+  },
+  {
+   "cell": "fcc_Cu_a3.61_primitive",
+   "lattice_rows": [
+    [
+     0,
+     1.805,
+     1.805
+    ],
+    [
+     1.805,
+     0,
+     1.805
+    ],
+    [
+     1.805,
+     1.805,
+     0
+    ]
+   ],
+   "encut_eV": 300,
+   "G_cut_1_per_A": 8.873585926187875,
+   "n_pw_exact": 137,
+   "n_pw_continuum_estimate": 138.77399660904092
+  },
+  {
+   "cell": "fcc_Cu_a3.61_primitive",
+   "lattice_rows": [
+    [
+     0,
+     1.805,
+     1.805
+    ],
+    [
+     1.805,
+     0,
+     1.805
+    ],
+    [
+     1.805,
+     1.805,
+     0
+    ]
+   ],
+   "encut_eV": 400,
+   "G_cut_1_per_A": 10.246334446323688,
+   "n_pw_exact": 181,
+   "n_pw_continuum_estimate": 213.65654479666662
+  },
+  {
+   "cell": "fcc_Cu_a3.61_primitive",
+   "lattice_rows": [
+    [
+     0,
+     1.805,
+     1.805
+    ],
+    [
+     1.805,
+     0,
+     1.805
+    ],
+    [
+     1.805,
+     1.805,
+     0
+    ]
+   ],
+   "encut_eV": 520,
+   "G_cut_1_per_A": 11.682618733045052,
+   "n_pw_exact": 331,
+   "n_pw_continuum_estimate": 316.68772432537804
+  },
+  {
+   "cell": "Si_a5.43_primitive",
+   "lattice_rows": [
+    [
+     0,
+     2.715,
+     2.715
+    ],
+    [
+     2.715,
+     0,
+     2.715
+    ],
+    [
+     2.715,
+     2.715,
+     0
+    ]
+   ],
+   "encut_eV": 100,
+   "G_cut_1_per_A": 5.123167223161844,
+   "n_pw_exact": 89,
+   "n_pw_continuum_estimate": 90.88748727857948
+  },
+  {
+   "cell": "Si_a5.43_primitive",
+   "lattice_rows": [
+    [
+     0,
+     2.715,
+     2.715
+    ],
+    [
+     2.715,
+     0,
+     2.715
+    ],
+    [
+     2.715,
+     2.715,
+     0
+    ]
+   ],
+   "encut_eV": 200,
+   "G_cut_1_per_A": 7.2452525693007885,
+   "n_pw_exact": 259,
+   "n_pw_continuum_estimate": 257.0686343187585
+  },
+  {
+   "cell": "Si_a5.43_primitive",
+   "lattice_rows": [
+    [
+     0,
+     2.715,
+     2.715
+    ],
+    [
+     2.715,
+     0,
+     2.715
+    ],
+    [
+     2.715,
+     2.715,
+     0
+    ]
+   ],
+   "encut_eV": 300,
+   "G_cut_1_per_A": 8.873585926187875,
+   "n_pw_exact": 459,
+   "n_pw_continuum_estimate": 472.26523721630906
+  },
+  {
+   "cell": "Si_a5.43_primitive",
+   "lattice_rows": [
+    [
+     0,
+     2.715,
+     2.715
+    ],
+    [
+     2.715,
+     0,
+     2.715
+    ],
+    [
+     2.715,
+     2.715,
+     0
+    ]
+   ],
+   "encut_eV": 400,
+   "G_cut_1_per_A": 10.246334446323688,
+   "n_pw_exact": 725,
+   "n_pw_continuum_estimate": 727.0998982286359
+  },
+  {
+   "cell": "Si_a5.43_primitive",
+   "lattice_rows": [
+    [
+     0,
+     2.715,
+     2.715
+    ],
+    [
+     2.715,
+     0,
+     2.715
+    ],
+    [
+     2.715,
+     2.715,
+     0
+    ]
+   ],
+   "encut_eV": 520,
+   "G_cut_1_per_A": 11.682618733045052,
+   "n_pw_exact": 1067,
+   "n_pw_continuum_estimate": 1077.7278662180872
+  },
+  {
+   "cell": "sc_a4.0",
+   "lattice_rows": [
+    [
+     4,
+     0,
+     0
+    ],
+    [
+     0,
+     4,
+     0
+    ],
+    [
+     0,
+     0,
+     4
+    ]
+   ],
+   "encut_eV": 100,
+   "G_cut_1_per_A": 5.123167223161844,
+   "n_pw_exact": 147,
+   "n_pw_continuum_estimate": 145.32641940520423
+  },
+  {
+   "cell": "sc_a4.0",
+   "lattice_rows": [
+    [
+     4,
+     0,
+     0
+    ],
+    [
+     0,
+     4,
+     0
+    ],
+    [
+     0,
+     0,
+     4
+    ]
+   ],
+   "encut_eV": 200,
+   "G_cut_1_per_A": 7.2452525693007885,
+   "n_pw_exact": 437,
+   "n_pw_continuum_estimate": 411.0451865879207
+  },
+  {
+   "cell": "sc_a4.0",
+   "lattice_rows": [
+    [
+     4,
+     0,
+     0
+    ],
+    [
+     0,
+     4,
+     0
+    ],
+    [
+     0,
+     0,
+     4
+    ]
+   ],
+   "encut_eV": 300,
+   "G_cut_1_per_A": 8.873585926187875,
+   "n_pw_exact": 739,
+   "n_pw_continuum_estimate": 755.1382262756322
+  },
+  {
+   "cell": "sc_a4.0",
+   "lattice_rows": [
+    [
+     4,
+     0,
+     0
+    ],
+    [
+     0,
+     4,
+     0
+    ],
+    [
+     0,
+     0,
+     4
+    ]
+   ],
+   "encut_eV": 400,
+   "G_cut_1_per_A": 10.246334446323688,
+   "n_pw_exact": 1189,
+   "n_pw_continuum_estimate": 1162.6113552416339
+  },
+  {
+   "cell": "sc_a4.0",
+   "lattice_rows": [
+    [
+     4,
+     0,
+     0
+    ],
+    [
+     0,
+     4,
+     0
+    ],
+    [
+     0,
+     0,
+     4
+    ]
+   ],
+   "encut_eV": 520,
+   "G_cut_1_per_A": 11.682618733045052,
+   "n_pw_exact": 1743,
+   "n_pw_continuum_estimate": 1723.2551650440291
+  },
+  {
+   "cell": "hex_a3.0_c5.0",
+   "lattice_rows": [
+    [
+     3.0,
+     0,
+     0
+    ],
+    [
+     -1.5,
+     2.598076211353316,
+     0
+    ],
+    [
+     0,
+     0,
+     5.0
+    ]
+   ],
+   "encut_eV": 100,
+   "G_cut_1_per_A": 5.123167223161844,
+   "n_pw_exact": 99,
+   "n_pw_continuum_estimate": 88.4927608916757
+  },
+  {
+   "cell": "hex_a3.0_c5.0",
+   "lattice_rows": [
+    [
+     3.0,
+     0,
+     0
+    ],
+    [
+     -1.5,
+     2.598076211353316,
+     0
+    ],
+    [
+     0,
+     0,
+     5.0
+    ]
+   ],
+   "encut_eV": 200,
+   "G_cut_1_per_A": 7.2452525693007885,
+   "n_pw_exact": 245,
+   "n_pw_continuum_estimate": 250.29532524969434
+  },
+  {
+   "cell": "hex_a3.0_c5.0",
+   "lattice_rows": [
+    [
+     3.0,
+     0,
+     0
+    ],
+    [
+     -1.5,
+     2.598076211353316,
+     0
+    ],
+    [
+     0,
+     0,
+     5.0
+    ]
+   ],
+   "encut_eV": 300,
+   "G_cut_1_per_A": 8.873585926187875,
+   "n_pw_exact": 465,
+   "n_pw_continuum_estimate": 459.8218738992794
+  },
+  {
+   "cell": "hex_a3.0_c5.0",
+   "lattice_rows": [
+    [
+     3.0,
+     0,
+     0
+    ],
+    [
+     -1.5,
+     2.598076211353316,
+     0
+    ],
+    [
+     0,
+     0,
+     5.0
+    ]
+   ],
+   "encut_eV": 400,
+   "G_cut_1_per_A": 10.246334446323688,
+   "n_pw_exact": 701,
+   "n_pw_continuum_estimate": 707.9420871334056
+  },
+  {
+   "cell": "hex_a3.0_c5.0",
+   "lattice_rows": [
+    [
+     3.0,
+     0,
+     0
+    ],
+    [
+     -1.5,
+     2.598076211353316,
+     0
+    ],
+    [
+     0,
+     0,
+     5.0
+    ]
+   ],
+   "encut_eV": 520,
+   "G_cut_1_per_A": 11.682618733045052,
+   "n_pw_exact": 1075,
+   "n_pw_continuum_estimate": 1049.331621185772
+  }
+ ],
+ "mp_and_gamma_coordinates": {
+  "1": {
+   "monkhorst_pack": [
+    0.0
+   ],
+   "gamma_centred": [
+    0.0
+   ]
+  },
+  "2": {
+   "monkhorst_pack": [
+    -0.25,
+    0.25
+   ],
+   "gamma_centred": [
+    0.0,
+    0.5
+   ]
+  },
+  "3": {
+   "monkhorst_pack": [
+    -0.333333333333,
+    0.0,
+    0.333333333333
+   ],
+   "gamma_centred": [
+    0.0,
+    0.333333333333,
+    -0.333333333333
+   ]
+  },
+  "4": {
+   "monkhorst_pack": [
+    -0.375,
+    -0.125,
+    0.125,
+    0.375
+   ],
+   "gamma_centred": [
+    0.0,
+    0.25,
+    0.5,
+    -0.25
+   ]
+  },
+  "5": {
+   "monkhorst_pack": [
+    -0.4,
+    -0.2,
+    0.0,
+    0.2,
+    0.4
+   ],
+   "gamma_centred": [
+    0.0,
+    0.2,
+    0.4,
+    -0.4,
+    -0.2
+   ]
+  },
+  "6": {
+   "monkhorst_pack": [
+    -0.416666666667,
+    -0.25,
+    -0.083333333333,
+    0.083333333333,
+    0.25,
+    0.416666666667
+   ],
+   "gamma_centred": [
+    0.0,
+    0.166666666667,
+    0.333333333333,
+    0.5,
+    -0.333333333333,
+    -0.166666666667
+   ]
+  }
+ },
+ "irreducible_counts_spglib": [
+  {
+   "system": "fcc_Cu_primitive",
+   "mesh": [
+    2,
+    2,
+    2
+   ],
+   "gamma_centred_irreducible": 3,
+   "shifted_irreducible": 2
+  },
+  {
+   "system": "fcc_Cu_primitive",
+   "mesh": [
+    4,
+    4,
+    4
+   ],
+   "gamma_centred_irreducible": 8,
+   "shifted_irreducible": 10
+  },
+  {
+   "system": "fcc_Cu_primitive",
+   "mesh": [
+    6,
+    6,
+    6
+   ],
+   "gamma_centred_irreducible": 16,
+   "shifted_irreducible": 28
+  },
+  {
+   "system": "fcc_Cu_primitive",
+   "mesh": [
+    8,
+    8,
+    8
+   ],
+   "gamma_centred_irreducible": 29,
+   "shifted_irreducible": 60
+  },
+  {
+   "system": "fcc_Cu_primitive",
+   "mesh": [
+    10,
+    10,
+    10
+   ],
+   "gamma_centred_irreducible": 47,
+   "shifted_irreducible": 110
+  },
+  {
+   "system": "fcc_Cu_primitive",
+   "mesh": [
+    12,
+    12,
+    12
+   ],
+   "gamma_centred_irreducible": 72,
+   "shifted_irreducible": 182
+  }
+ ],
+ "mesh_point_group_symmetry": [
+  {
+   "system": "hcp_Mg_P6_3/mmc",
+   "n": 2,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": false,
+   "monkhorst_pack_contains_gamma": false
+  },
+  {
+   "system": "hcp_Mg_P6_3/mmc",
+   "n": 3,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": true,
+   "monkhorst_pack_contains_gamma": true
+  },
+  {
+   "system": "hcp_Mg_P6_3/mmc",
+   "n": 4,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": false,
+   "monkhorst_pack_contains_gamma": false
+  },
+  {
+   "system": "hcp_Mg_P6_3/mmc",
+   "n": 5,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": true,
+   "monkhorst_pack_contains_gamma": true
+  },
+  {
+   "system": "hcp_Mg_P6_3/mmc",
+   "n": 6,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": false,
+   "monkhorst_pack_contains_gamma": false
+  },
+  {
+   "system": "hcp_Mg_P6_3/mmc",
+   "n": 8,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": false,
+   "monkhorst_pack_contains_gamma": false
+  },
+  {
+   "system": "fcc_Cu_primitive",
+   "n": 2,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": false,
+   "monkhorst_pack_contains_gamma": false
+  },
+  {
+   "system": "fcc_Cu_primitive",
+   "n": 3,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": true,
+   "monkhorst_pack_contains_gamma": true
+  },
+  {
+   "system": "fcc_Cu_primitive",
+   "n": 4,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": false,
+   "monkhorst_pack_contains_gamma": false
+  },
+  {
+   "system": "fcc_Cu_primitive",
+   "n": 5,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": true,
+   "monkhorst_pack_contains_gamma": true
+  },
+  {
+   "system": "fcc_Cu_primitive",
+   "n": 6,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": false,
+   "monkhorst_pack_contains_gamma": false
+  },
+  {
+   "system": "fcc_Cu_primitive",
+   "n": 8,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": false,
+   "monkhorst_pack_contains_gamma": false
+  },
+  {
+   "system": "sc_a4.0",
+   "n": 2,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": true,
+   "monkhorst_pack_contains_gamma": false
+  },
+  {
+   "system": "sc_a4.0",
+   "n": 3,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": true,
+   "monkhorst_pack_contains_gamma": true
+  },
+  {
+   "system": "sc_a4.0",
+   "n": 4,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": true,
+   "monkhorst_pack_contains_gamma": false
+  },
+  {
+   "system": "sc_a4.0",
+   "n": 5,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": true,
+   "monkhorst_pack_contains_gamma": true
+  },
+  {
+   "system": "sc_a4.0",
+   "n": 6,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": true,
+   "monkhorst_pack_contains_gamma": false
+  },
+  {
+   "system": "sc_a4.0",
+   "n": 8,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": true,
+   "monkhorst_pack_contains_gamma": false
+  },
+  {
+   "system": "bcc_Fe_primitive",
+   "n": 2,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": true,
+   "monkhorst_pack_contains_gamma": false
+  },
+  {
+   "system": "bcc_Fe_primitive",
+   "n": 3,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": true,
+   "monkhorst_pack_contains_gamma": true
+  },
+  {
+   "system": "bcc_Fe_primitive",
+   "n": 4,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": true,
+   "monkhorst_pack_contains_gamma": false
+  },
+  {
+   "system": "bcc_Fe_primitive",
+   "n": 5,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": true,
+   "monkhorst_pack_contains_gamma": true
+  },
+  {
+   "system": "bcc_Fe_primitive",
+   "n": 6,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": true,
+   "monkhorst_pack_contains_gamma": false
+  },
+  {
+   "system": "bcc_Fe_primitive",
+   "n": 8,
+   "gamma_centred_symmetric": true,
+   "monkhorst_pack_symmetric": true,
+   "monkhorst_pack_contains_gamma": false
+  }
+ ],
+ "mesh_symmetry_note": "A mesh is symmetric if the point group maps the whole mesh onto itself. Even Monkhorst-Pack meshes are shifted off Gamma; on hexagonal lattices they are NOT symmetric (the author handbook says odd, which is a slip: see docs/OPEN_QUESTIONS.md Q-017).",
+ "kspacing_candidates": [
+  {
+   "cell": "fcc_Cu_a3.61_primitive",
+   "kspacing": 0.15,
+   "reciprocal_lengths_with_2pi": [
+    3.0146249821067332,
+    3.0146249821067332,
+    3.0146249821067332
+   ],
+   "ratio": [
+    20.097499880711556,
+    20.097499880711556,
+    20.097499880711556
+   ],
+   "mesh_rule_ceil": [
+    21,
+    21,
+    21
+   ],
+   "mesh_rule_round_half_up": [
+    20,
+    20,
+    20
+   ],
+   "mesh_rule_int_plus_0p999": [
+    21,
+    21,
+    21
+   ]
+  },
+  {
+   "cell": "fcc_Cu_a3.61_primitive",
+   "kspacing": 0.2,
+   "reciprocal_lengths_with_2pi": [
+    3.0146249821067332,
+    3.0146249821067332,
+    3.0146249821067332
+   ],
+   "ratio": [
+    15.073124910533666,
+    15.073124910533666,
+    15.073124910533666
+   ],
+   "mesh_rule_ceil": [
+    16,
+    16,
+    16
+   ],
+   "mesh_rule_round_half_up": [
+    15,
+    15,
+    15
+   ],
+   "mesh_rule_int_plus_0p999": [
+    16,
+    16,
+    16
+   ]
+  },
+  {
+   "cell": "fcc_Cu_a3.61_primitive",
+   "kspacing": 0.28,
+   "reciprocal_lengths_with_2pi": [
+    3.0146249821067332,
+    3.0146249821067332,
+    3.0146249821067332
+   ],
+   "ratio": [
+    10.766517793238332,
+    10.766517793238332,
+    10.766517793238332
+   ],
+   "mesh_rule_ceil": [
+    11,
+    11,
+    11
+   ],
+   "mesh_rule_round_half_up": [
+    11,
+    11,
+    11
+   ],
+   "mesh_rule_int_plus_0p999": [
+    11,
+    11,
+    11
+   ]
+  },
+  {
+   "cell": "fcc_Cu_a3.61_primitive",
+   "kspacing": 0.3,
+   "reciprocal_lengths_with_2pi": [
+    3.0146249821067332,
+    3.0146249821067332,
+    3.0146249821067332
+   ],
+   "ratio": [
+    10.048749940355778,
+    10.048749940355778,
+    10.048749940355778
+   ],
+   "mesh_rule_ceil": [
+    11,
+    11,
+    11
+   ],
+   "mesh_rule_round_half_up": [
+    10,
+    10,
+    10
+   ],
+   "mesh_rule_int_plus_0p999": [
+    11,
+    11,
+    11
+   ]
+  },
+  {
+   "cell": "fcc_Cu_a3.61_primitive",
+   "kspacing": 0.30145,
+   "reciprocal_lengths_with_2pi": [
+    3.0146249821067332,
+    3.0146249821067332,
+    3.0146249821067332
+   ],
+   "ratio": [
+    10.000414603107425,
+    10.000414603107425,
+    10.000414603107425
+   ],
+   "mesh_rule_ceil": [
+    11,
+    11,
+    11
+   ],
+   "mesh_rule_round_half_up": [
+    10,
+    10,
+    10
+   ],
+   "mesh_rule_int_plus_0p999": [
+    10,
+    10,
+    10
+   ]
+  },
+  {
+   "cell": "fcc_Cu_a3.61_primitive",
+   "kspacing": 0.5,
+   "reciprocal_lengths_with_2pi": [
+    3.0146249821067332,
+    3.0146249821067332,
+    3.0146249821067332
+   ],
+   "ratio": [
+    6.0292499642134665,
+    6.0292499642134665,
+    6.0292499642134665
+   ],
+   "mesh_rule_ceil": [
+    7,
+    7,
+    7
+   ],
+   "mesh_rule_round_half_up": [
+    6,
+    6,
+    6
+   ],
+   "mesh_rule_int_plus_0p999": [
+    7,
+    7,
+    7
+   ]
+  },
+  {
+   "cell": "hex_a3.0_c5.0",
+   "kspacing": 0.15,
+   "reciprocal_lengths_with_2pi": [
+    2.4183991523122903,
+    2.4183991523122903,
+    1.2566370614359172
+   ],
+   "ratio": [
+    16.122661015415268,
+    16.122661015415268,
+    8.377580409572783
+   ],
+   "mesh_rule_ceil": [
+    17,
+    17,
+    9
+   ],
+   "mesh_rule_round_half_up": [
+    16,
+    16,
+    8
+   ],
+   "mesh_rule_int_plus_0p999": [
+    17,
+    17,
+    9
+   ]
+  },
+  {
+   "cell": "hex_a3.0_c5.0",
+   "kspacing": 0.2,
+   "reciprocal_lengths_with_2pi": [
+    2.4183991523122903,
+    2.4183991523122903,
+    1.2566370614359172
+   ],
+   "ratio": [
+    12.091995761561451,
+    12.091995761561451,
+    6.283185307179586
+   ],
+   "mesh_rule_ceil": [
+    13,
+    13,
+    7
+   ],
+   "mesh_rule_round_half_up": [
+    12,
+    12,
+    6
+   ],
+   "mesh_rule_int_plus_0p999": [
+    13,
+    13,
+    7
+   ]
+  },
+  {
+   "cell": "hex_a3.0_c5.0",
+   "kspacing": 0.28,
+   "reciprocal_lengths_with_2pi": [
+    2.4183991523122903,
+    2.4183991523122903,
+    1.2566370614359172
+   ],
+   "ratio": [
+    8.63713982968675,
+    8.63713982968675,
+    4.487989505128276
+   ],
+   "mesh_rule_ceil": [
+    9,
+    9,
+    5
+   ],
+   "mesh_rule_round_half_up": [
+    9,
+    9,
+    4
+   ],
+   "mesh_rule_int_plus_0p999": [
+    9,
+    9,
+    5
+   ]
+  },
+  {
+   "cell": "hex_a3.0_c5.0",
+   "kspacing": 0.3,
+   "reciprocal_lengths_with_2pi": [
+    2.4183991523122903,
+    2.4183991523122903,
+    1.2566370614359172
+   ],
+   "ratio": [
+    8.061330507707634,
+    8.061330507707634,
+    4.188790204786391
+   ],
+   "mesh_rule_ceil": [
+    9,
+    9,
+    5
+   ],
+   "mesh_rule_round_half_up": [
+    8,
+    8,
+    4
+   ],
+   "mesh_rule_int_plus_0p999": [
+    9,
+    9,
+    5
+   ]
+  },
+  {
+   "cell": "hex_a3.0_c5.0",
+   "kspacing": 0.30145,
+   "reciprocal_lengths_with_2pi": [
+    2.4183991523122903,
+    2.4183991523122903,
+    1.2566370614359172
+   ],
+   "ratio": [
+    8.0225548260484,
+    8.0225548260484,
+    4.168641769566818
+   ],
+   "mesh_rule_ceil": [
+    9,
+    9,
+    5
+   ],
+   "mesh_rule_round_half_up": [
+    8,
+    8,
+    4
+   ],
+   "mesh_rule_int_plus_0p999": [
+    9,
+    9,
+    5
+   ]
+  },
+  {
+   "cell": "hex_a3.0_c5.0",
+   "kspacing": 0.5,
+   "reciprocal_lengths_with_2pi": [
+    2.4183991523122903,
+    2.4183991523122903,
+    1.2566370614359172
+   ],
+   "ratio": [
+    4.836798304624581,
+    4.836798304624581,
+    2.5132741228718345
+   ],
+   "mesh_rule_ceil": [
+    5,
+    5,
+    3
+   ],
+   "mesh_rule_round_half_up": [
+    5,
+    5,
+    3
+   ],
+   "mesh_rule_int_plus_0p999": [
+    5,
+    5,
+    3
+   ]
+  },
+  {
+   "cell": "Si_a5.43_primitive",
+   "kspacing": 0.15,
+   "reciprocal_lengths_with_2pi": [
+    2.004198192523998,
+    2.004198192523998,
+    2.004198192523998
+   ],
+   "ratio": [
+    13.36132128349332,
+    13.36132128349332,
+    13.36132128349332
+   ],
+   "mesh_rule_ceil": [
+    14,
+    14,
+    14
+   ],
+   "mesh_rule_round_half_up": [
+    13,
+    13,
+    13
+   ],
+   "mesh_rule_int_plus_0p999": [
+    14,
+    14,
+    14
+   ]
+  },
+  {
+   "cell": "Si_a5.43_primitive",
+   "kspacing": 0.2,
+   "reciprocal_lengths_with_2pi": [
+    2.004198192523998,
+    2.004198192523998,
+    2.004198192523998
+   ],
+   "ratio": [
+    10.020990962619988,
+    10.020990962619988,
+    10.020990962619988
+   ],
+   "mesh_rule_ceil": [
+    11,
+    11,
+    11
+   ],
+   "mesh_rule_round_half_up": [
+    10,
+    10,
+    10
+   ],
+   "mesh_rule_int_plus_0p999": [
+    11,
+    11,
+    11
+   ]
+  },
+  {
+   "cell": "Si_a5.43_primitive",
+   "kspacing": 0.28,
+   "reciprocal_lengths_with_2pi": [
+    2.004198192523998,
+    2.004198192523998,
+    2.004198192523998
+   ],
+   "ratio": [
+    7.1578506875857055,
+    7.1578506875857055,
+    7.1578506875857055
+   ],
+   "mesh_rule_ceil": [
+    8,
+    8,
+    8
+   ],
+   "mesh_rule_round_half_up": [
+    7,
+    7,
+    7
+   ],
+   "mesh_rule_int_plus_0p999": [
+    8,
+    8,
+    8
+   ]
+  },
+  {
+   "cell": "Si_a5.43_primitive",
+   "kspacing": 0.3,
+   "reciprocal_lengths_with_2pi": [
+    2.004198192523998,
+    2.004198192523998,
+    2.004198192523998
+   ],
+   "ratio": [
+    6.68066064174666,
+    6.68066064174666,
+    6.68066064174666
+   ],
+   "mesh_rule_ceil": [
+    7,
+    7,
+    7
+   ],
+   "mesh_rule_round_half_up": [
+    7,
+    7,
+    7
+   ],
+   "mesh_rule_int_plus_0p999": [
+    7,
+    7,
+    7
+   ]
+  },
+  {
+   "cell": "Si_a5.43_primitive",
+   "kspacing": 0.30145,
+   "reciprocal_lengths_with_2pi": [
+    2.004198192523998,
+    2.004198192523998,
+    2.004198192523998
+   ],
+   "ratio": [
+    6.64852609893514,
+    6.64852609893514,
+    6.64852609893514
+   ],
+   "mesh_rule_ceil": [
+    7,
+    7,
+    7
+   ],
+   "mesh_rule_round_half_up": [
+    7,
+    7,
+    7
+   ],
+   "mesh_rule_int_plus_0p999": [
+    7,
+    7,
+    7
+   ]
+  },
+  {
+   "cell": "Si_a5.43_primitive",
+   "kspacing": 0.5,
+   "reciprocal_lengths_with_2pi": [
+    2.004198192523998,
+    2.004198192523998,
+    2.004198192523998
+   ],
+   "ratio": [
+    4.008396385047996,
+    4.008396385047996,
+    4.008396385047996
+   ],
+   "mesh_rule_ceil": [
+    5,
+    5,
+    5
+   ],
+   "mesh_rule_round_half_up": [
+    4,
+    4,
+    4
+   ],
+   "mesh_rule_int_plus_0p999": [
+    5,
+    5,
+    5
+   ]
+  }
+ ]
+}

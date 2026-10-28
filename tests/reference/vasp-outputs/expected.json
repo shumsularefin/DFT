@@ -1,0 +1,430 @@
+{
+ "_meta": {
+  "generator": "scripts/reference/gen_vasp_output_fixtures.py",
+  "warning": "SYNTHETIC numbers. These files test parsers only; never show them as results."
+ },
+ "CHGCAR": {
+  "writer": "pymatgen Chgcar.write_file, read back with Chgcar.from_file",
+  "grid": [
+   20,
+   20,
+   24
+  ],
+  "cell_volume_A3": 150.0,
+  "ispin": 1,
+  "value_order": "VASP writes x fastest, then y, then z (Fortran order); pymatgen's array is [ix][iy][iz]",
+  "samples_raw_rho_times_V": {
+   "0,0,0": 2.7073614035e-13,
+   "10,10,12": 105.22682937,
+   "11,9,13": 78.503997717,
+   "3,17,5": 6.1323314668e-05,
+   "19,0,23": 1.6361841987e-11
+  },
+  "electrons_from_grid_sum_over_N": 1.9999475814074132,
+  "max_density_e_per_A3": 0.7015121958,
+  "analytic_density": "Gaussian, 2 electrons, width 0.8 Angstrom, centred at (2.5, 2.5, 3.0) Angstrom"
+ },
+ "CHGCAR_spin": {
+  "writer": "pymatgen Chgcar.write_file, read back with Chgcar.from_file",
+  "grid": [
+   20,
+   20,
+   24
+  ],
+  "cell_volume_A3": 150.0,
+  "ispin": 2,
+  "value_order": "VASP writes x fastest, then y, then z (Fortran order); pymatgen's array is [ix][iy][iz]",
+  "samples_raw_rho_times_V": {
+   "0,0,0": 2.7073614035e-13,
+   "10,10,12": 105.22682937,
+   "11,9,13": 78.503997717,
+   "3,17,5": 6.1323314668e-05,
+   "19,0,23": 1.6361841987e-11
+  },
+  "electrons_from_grid_sum_over_N": 1.9999475814074132,
+  "max_density_e_per_A3": 0.7015121958,
+  "analytic_density": "Gaussian, 2 electrons, width 0.8 Angstrom, centred at (2.5, 2.5, 3.0) Angstrom",
+  "magnetization_from_grid_sum_over_N": 0.9999737907072671
+ },
+ "EIGENVAL_ispin1": {
+  "reader": "pymatgen Eigenval",
+  "ispin": 1,
+  "nkpt": 3,
+  "nbands": 4,
+  "kpoints": [
+   [
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.25,
+    0.0,
+    0.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.0
+   ]
+  ],
+  "kpoint_weights": [
+   0.125,
+   0.5,
+   0.375
+  ],
+  "eigenvalues_and_occupations_by_spin": {
+   "1": [
+    [
+     [
+      -4.847099,
+      1.0
+     ],
+     [
+      0.751337,
+      0.0
+     ],
+     [
+      2.8596,
+      0.0
+     ],
+     [
+      4.560993,
+      0.0
+     ]
+    ],
+    [
+     [
+      -7.926286,
+      1.0
+     ],
+     [
+      -3.797672,
+      1.0
+     ],
+     [
+      3.497198,
+      0.0
+     ],
+     [
+      4.229748,
+      0.0
+     ]
+    ],
+    [
+     [
+      -4.102041,
+      1.0
+     ],
+     [
+      -3.757546,
+      1.0
+     ],
+     [
+      -1.448911,
+      1.0
+     ],
+     [
+      3.158972,
+      0.0
+     ]
+    ]
+   ]
+  }
+ },
+ "EIGENVAL_ispin2": {
+  "reader": "pymatgen Eigenval",
+  "ispin": 2,
+  "nkpt": 3,
+  "nbands": 4,
+  "kpoints": [
+   [
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.25,
+    0.0,
+    0.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.0
+   ]
+  ],
+  "kpoint_weights": [
+   0.125,
+   0.5,
+   0.375
+  ],
+  "eigenvalues_and_occupations_by_spin": {
+   "1": [
+    [
+     [
+      -4.431826,
+      1.0
+     ],
+     [
+      -1.768932,
+      1.0
+     ],
+     [
+      -0.936324,
+      1.0
+     ],
+     [
+      -0.251037,
+      1.0
+     ]
+    ],
+    [
+     [
+      0.710509,
+      0.0
+     ],
+     [
+      3.097267,
+      0.0
+     ],
+     [
+      5.845442,
+      0.0
+     ],
+     [
+      5.937004,
+      0.0
+     ]
+    ],
+    [
+     [
+      -7.384812,
+      1.0
+     ],
+     [
+      -5.757032,
+      1.0
+     ],
+     [
+      -4.985678,
+      1.0
+     ],
+     [
+      0.575554,
+      0.0
+     ]
+    ]
+   ],
+   "-1": [
+    [
+     [
+      -4.131826,
+      1.0
+     ],
+     [
+      -1.468932,
+      1.0
+     ],
+     [
+      -0.636324,
+      1.0
+     ],
+     [
+      0.048963,
+      0.0
+     ]
+    ],
+    [
+     [
+      1.010509,
+      0.0
+     ],
+     [
+      3.397267,
+      0.0
+     ],
+     [
+      6.145442,
+      0.0
+     ],
+     [
+      6.237004,
+      0.0
+     ]
+    ],
+    [
+     [
+      -7.084812,
+      1.0
+     ],
+     [
+      -5.457032,
+      1.0
+     ],
+     [
+      -4.685678,
+      1.0
+     ],
+     [
+      0.875554,
+      0.0
+     ]
+    ]
+   ]
+  }
+ },
+ "OSZICAR_relax_spin": {
+  "reader": "pymatgen Oszicar",
+  "ionic_steps": [
+   {
+    "F": -23.459,
+    "E0": -23.4585,
+    "dE": -23.459,
+    "mag": 2.0
+   },
+   {
+    "F": -23.4601,
+    "E0": -23.4596,
+    "dE": -0.0011,
+    "mag": 1.9998
+   }
+  ],
+  "n_electronic_steps_per_ionic": [
+   3,
+   2
+  ]
+ },
+ "XDATCAR": {
+  "reader": "pymatgen Xdatcar",
+  "n_frames": 3,
+  "frac_coords": [
+   [
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.25,
+     0.25,
+     0.25
+    ]
+   ],
+   [
+    [
+     0.0,
+     0.0,
+     0.01
+    ],
+    [
+     0.25,
+     0.26,
+     0.25
+    ]
+   ],
+   [
+    [
+     0.0,
+     0.0,
+     0.005
+    ],
+    [
+     0.25,
+     0.255,
+     0.25
+    ]
+   ]
+  ],
+  "species": [
+   "Si",
+   "Si"
+  ]
+ },
+ "DOSCAR_ispin2_lorbit11": {
+  "validated_by_independent_parser": false,
+  "note": "written from the documented layout; confirm with a real DOSCAR from the author (Q-008)",
+  "nions": 2,
+  "nedos": 11,
+  "efermi": 1.5,
+  "ispin": 2,
+  "lorbit": 11,
+  "orbital_order": [
+   "s",
+   "py",
+   "pz",
+   "px",
+   "dxy",
+   "dyz",
+   "dz2",
+   "dxz",
+   "dx2"
+  ],
+  "column_layout": "E, then (up, down) for each orbital in orbital_order",
+  "energies": [
+   -5.0,
+   -4.0,
+   -3.0,
+   -2.0,
+   -1.0,
+   0.0,
+   1.0,
+   2.0,
+   3.0,
+   4.0,
+   5.0
+  ],
+  "total_up": [
+   7.2877e-14,
+   1.6052e-09,
+   4.7851e-06,
+   0.0019305,
+   0.1054,
+   0.7788,
+   0.7788,
+   0.1054,
+   0.0019305,
+   4.7851e-06,
+   1.6052e-09
+  ],
+  "total_down": [
+   1.2842e-09,
+   3.8281e-06,
+   0.0015444,
+   0.084319,
+   0.62304,
+   0.62304,
+   0.084319,
+   0.0015444,
+   3.8281e-06,
+   1.2842e-09,
+   5.8302e-14
+  ],
+  "ion1_s_up": [
+   7.2877e-16,
+   1.6052e-11,
+   4.7851e-08,
+   1.9305e-05,
+   0.001054,
+   0.007788,
+   0.007788,
+   0.001054,
+   1.9305e-05,
+   4.7851e-08,
+   1.6052e-11
+  ],
+  "ion2_dx2_down": [
+   6.559e-15,
+   1.4447e-10,
+   4.3066e-07,
+   0.00017374,
+   0.0094859,
+   0.070092,
+   0.070092,
+   0.0094859,
+   0.00017374,
+   4.3066e-07,
+   1.4447e-10
+  ]
+ }
+}

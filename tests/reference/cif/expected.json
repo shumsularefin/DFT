@@ -1,0 +1,461 @@
+{
+ "_meta": {
+  "generator": "scripts/reference/gen_cif_fixtures.py",
+  "writer": "pymatgen.io.cif.CifWriter",
+  "note": "Symmetrized files must expand to n_atoms_input_cell sites; P1 files list them all. Compare lattice parameters to 1e-4 and atom counts exactly."
+ },
+ "files": {
+  "rocksalt_NaCl.sym.cif": {
+   "spacegroup_number": 225,
+   "spacegroup_symbol": "Fm-3m",
+   "reduced_formula": "NaCl",
+   "n_atoms_input_cell": 8,
+   "n_atoms_conventional": 8,
+   "lattice_abc": [
+    5.64,
+    5.64,
+    5.64
+   ],
+   "lattice_angles": [
+    90.0,
+    90.0,
+    90.0
+   ],
+   "volume": 179.406144,
+   "kind": "symmetrized",
+   "accept": true
+  },
+  "rocksalt_NaCl.p1.cif": {
+   "spacegroup_number": 225,
+   "spacegroup_symbol": "Fm-3m",
+   "reduced_formula": "NaCl",
+   "n_atoms_input_cell": 8,
+   "n_atoms_conventional": 8,
+   "lattice_abc": [
+    5.64,
+    5.64,
+    5.64
+   ],
+   "lattice_angles": [
+    90.0,
+    90.0,
+    90.0
+   ],
+   "volume": 179.406144,
+   "kind": "P1",
+   "accept": true
+  },
+  "diamond_Si.sym.cif": {
+   "spacegroup_number": 227,
+   "spacegroup_symbol": "Fd-3m",
+   "reduced_formula": "Si",
+   "n_atoms_input_cell": 8,
+   "n_atoms_conventional": 8,
+   "lattice_abc": [
+    5.43,
+    5.43,
+    5.43
+   ],
+   "lattice_angles": [
+    90.0,
+    90.0,
+    90.0
+   ],
+   "volume": 160.103007,
+   "kind": "symmetrized",
+   "accept": true
+  },
+  "diamond_Si.p1.cif": {
+   "spacegroup_number": 227,
+   "spacegroup_symbol": "Fd-3m",
+   "reduced_formula": "Si",
+   "n_atoms_input_cell": 8,
+   "n_atoms_conventional": 8,
+   "lattice_abc": [
+    5.43,
+    5.43,
+    5.43
+   ],
+   "lattice_angles": [
+    90.0,
+    90.0,
+    90.0
+   ],
+   "volume": 160.103007,
+   "kind": "P1",
+   "accept": true
+  },
+  "hcp_Mg.sym.cif": {
+   "spacegroup_number": 194,
+   "spacegroup_symbol": "P6_3/mmc",
+   "reduced_formula": "Mg",
+   "n_atoms_input_cell": 2,
+   "n_atoms_conventional": 2,
+   "lattice_abc": [
+    3.21,
+    3.21,
+    5.21
+   ],
+   "lattice_angles": [
+    90.0,
+    90.0,
+    120.0
+   ],
+   "volume": 46.49202,
+   "kind": "symmetrized",
+   "accept": true
+  },
+  "hcp_Mg.p1.cif": {
+   "spacegroup_number": 194,
+   "spacegroup_symbol": "P6_3/mmc",
+   "reduced_formula": "Mg",
+   "n_atoms_input_cell": 2,
+   "n_atoms_conventional": 2,
+   "lattice_abc": [
+    3.21,
+    3.21,
+    5.21
+   ],
+   "lattice_angles": [
+    90.0,
+    90.0,
+    120.0
+   ],
+   "volume": 46.49202,
+   "kind": "P1",
+   "accept": true
+  },
+  "graphite_hex.sym.cif": {
+   "spacegroup_number": 194,
+   "spacegroup_symbol": "P6_3/mmc",
+   "reduced_formula": "C",
+   "n_atoms_input_cell": 4,
+   "n_atoms_conventional": 4,
+   "lattice_abc": [
+    2.46,
+    2.46,
+    6.71
+   ],
+   "lattice_angles": [
+    90.0,
+    90.0,
+    120.0
+   ],
+   "volume": 35.166032,
+   "kind": "symmetrized",
+   "accept": true
+  },
+  "graphite_hex.p1.cif": {
+   "spacegroup_number": 194,
+   "spacegroup_symbol": "P6_3/mmc",
+   "reduced_formula": "C",
+   "n_atoms_input_cell": 4,
+   "n_atoms_conventional": 4,
+   "lattice_abc": [
+    2.46,
+    2.46,
+    6.71
+   ],
+   "lattice_angles": [
+    90.0,
+    90.0,
+    120.0
+   ],
+   "volume": 35.166032,
+   "kind": "P1",
+   "accept": true
+  },
+  "rutile_TiO2_tetragonal_P.sym.cif": {
+   "spacegroup_number": 136,
+   "spacegroup_symbol": "P4_2/mnm",
+   "reduced_formula": "TiO2",
+   "n_atoms_input_cell": 6,
+   "n_atoms_conventional": 6,
+   "lattice_abc": [
+    4.594,
+    4.594,
+    2.959
+   ],
+   "lattice_angles": [
+    90.0,
+    90.0,
+    90.0
+   ],
+   "volume": 62.44921,
+   "kind": "symmetrized",
+   "accept": true
+  },
+  "rutile_TiO2_tetragonal_P.p1.cif": {
+   "spacegroup_number": 136,
+   "spacegroup_symbol": "P4_2/mnm",
+   "reduced_formula": "TiO2",
+   "n_atoms_input_cell": 6,
+   "n_atoms_conventional": 6,
+   "lattice_abc": [
+    4.594,
+    4.594,
+    2.959
+   ],
+   "lattice_angles": [
+    90.0,
+    90.0,
+    90.0
+   ],
+   "volume": 62.44921,
+   "kind": "P1",
+   "accept": true
+  },
+  "pnma_perovskite_like.sym.cif": {
+   "spacegroup_number": 62,
+   "spacegroup_symbol": "Pnma",
+   "reduced_formula": "NdCuO3",
+   "n_atoms_input_cell": 20,
+   "n_atoms_conventional": 20,
+   "lattice_abc": [
+    5.54,
+    7.66,
+    5.38
+   ],
+   "lattice_angles": [
+    90.0,
+    90.0,
+    90.0
+   ],
+   "volume": 228.307832,
+   "kind": "symmetrized",
+   "accept": true
+  },
+  "pnma_perovskite_like.p1.cif": {
+   "spacegroup_number": 62,
+   "spacegroup_symbol": "Pnma",
+   "reduced_formula": "NdCuO3",
+   "n_atoms_input_cell": 20,
+   "n_atoms_conventional": 20,
+   "lattice_abc": [
+    5.54,
+    7.66,
+    5.38
+   ],
+   "lattice_angles": [
+    90.0,
+    90.0,
+    90.0
+   ],
+   "volume": 228.307832,
+   "kind": "P1",
+   "accept": true
+  },
+  "rhombohedral_alpha_Al2O3.sym.cif": {
+   "spacegroup_number": 167,
+   "spacegroup_symbol": "R-3c",
+   "reduced_formula": "Al2O3",
+   "n_atoms_input_cell": 30,
+   "n_atoms_conventional": 30,
+   "lattice_abc": [
+    4.76,
+    4.76,
+    12.99
+   ],
+   "lattice_angles": [
+    90.0,
+    90.0,
+    120.0
+   ],
+   "volume": 254.890523,
+   "kind": "symmetrized",
+   "accept": true
+  },
+  "rhombohedral_alpha_Al2O3.p1.cif": {
+   "spacegroup_number": 167,
+   "spacegroup_symbol": "R-3c",
+   "reduced_formula": "Al2O3",
+   "n_atoms_input_cell": 30,
+   "n_atoms_conventional": 30,
+   "lattice_abc": [
+    4.76,
+    4.76,
+    12.99
+   ],
+   "lattice_angles": [
+    90.0,
+    90.0,
+    120.0
+   ],
+   "volume": 254.890523,
+   "kind": "P1",
+   "accept": true
+  },
+  "monoclinic_P21c_ZrO2_like.sym.cif": {
+   "spacegroup_number": 14,
+   "spacegroup_symbol": "P2_1/c",
+   "reduced_formula": "ZrO2",
+   "n_atoms_input_cell": 12,
+   "n_atoms_conventional": 12,
+   "lattice_abc": [
+    5.15,
+    5.21,
+    5.31
+   ],
+   "lattice_angles": [
+    90.0,
+    99.2,
+    90.0
+   ],
+   "volume": 140.642501,
+   "kind": "symmetrized",
+   "accept": true
+  },
+  "monoclinic_P21c_ZrO2_like.p1.cif": {
+   "spacegroup_number": 14,
+   "spacegroup_symbol": "P2_1/c",
+   "reduced_formula": "ZrO2",
+   "n_atoms_input_cell": 12,
+   "n_atoms_conventional": 12,
+   "lattice_abc": [
+    5.15,
+    5.21,
+    5.31
+   ],
+   "lattice_angles": [
+    90.0,
+    99.2,
+    90.0
+   ],
+   "volume": 140.642501,
+   "kind": "P1",
+   "accept": true
+  },
+  "triclinic_P1bar.sym.cif": {
+   "spacegroup_number": 2,
+   "spacegroup_symbol": "P-1",
+   "reduced_formula": "CaSiO",
+   "n_atoms_input_cell": 6,
+   "n_atoms_conventional": 6,
+   "lattice_abc": [
+    4.1,
+    5.3,
+    6.2
+   ],
+   "lattice_angles": [
+    82.0,
+    95.0,
+    101.0
+   ],
+   "volume": 130.708911,
+   "kind": "symmetrized",
+   "accept": true
+  },
+  "triclinic_P1bar.p1.cif": {
+   "spacegroup_number": 2,
+   "spacegroup_symbol": "P-1",
+   "reduced_formula": "CaSiO",
+   "n_atoms_input_cell": 6,
+   "n_atoms_conventional": 6,
+   "lattice_abc": [
+    4.1,
+    5.3,
+    6.2
+   ],
+   "lattice_angles": [
+    82.0,
+    95.0,
+    101.0
+   ],
+   "volume": 130.708911,
+   "kind": "P1",
+   "accept": true
+  },
+  "edge_uncertainties.cif": {
+   "spacegroup_number": 225,
+   "spacegroup_symbol": "Fm-3m",
+   "reduced_formula": "NaCl",
+   "n_atoms_input_cell": 8,
+   "n_atoms_conventional": 8,
+   "lattice_abc": [
+    5.64,
+    5.64,
+    5.64
+   ],
+   "lattice_angles": [
+    90.0,
+    90.0,
+    90.0
+   ],
+   "volume": 179.406144,
+   "kind": "edit: '(3)' appended to cell lengths",
+   "accept": true
+  },
+  "edge_alternate_symop_tag.cif": {
+   "spacegroup_number": 225,
+   "spacegroup_symbol": "Fm-3m",
+   "reduced_formula": "NaCl",
+   "n_atoms_input_cell": 8,
+   "n_atoms_conventional": 8,
+   "lattice_abc": [
+    5.64,
+    5.64,
+    5.64
+   ],
+   "lattice_angles": [
+    90.0,
+    90.0,
+    90.0
+   ],
+   "volume": 179.406144,
+   "kind": "edit: symmetry-operation loop tag renamed to the other accepted name",
+   "accept": true
+  },
+  "edge_partial_occupancy.cif": {
+   "kind": "edit: first Na occupancy set to 0.5",
+   "accept": false,
+   "reason": "partial occupancy (disorder) cannot be written as a VASP POSCAR"
+  },
+  "edge_two_blocks.cif": {
+   "kind": "concatenation of rocksalt_NaCl.sym.cif and hcp_Mg.sym.cif",
+   "accept": true,
+   "n_blocks": 2,
+   "blocks": [
+    {
+     "spacegroup_number": 225,
+     "spacegroup_symbol": "Fm-3m",
+     "reduced_formula": "NaCl",
+     "n_atoms_input_cell": 8,
+     "n_atoms_conventional": 8,
+     "lattice_abc": [
+      5.64,
+      5.64,
+      5.64
+     ],
+     "lattice_angles": [
+      90.0,
+      90.0,
+      90.0
+     ],
+     "volume": 179.406144,
+     "kind": "symmetrized",
+     "accept": true
+    },
+    {
+     "spacegroup_number": 194,
+     "spacegroup_symbol": "P6_3/mmc",
+     "reduced_formula": "Mg",
+     "n_atoms_input_cell": 2,
+     "n_atoms_conventional": 2,
+     "lattice_abc": [
+      3.21,
+      3.21,
+      5.21
+     ],
+     "lattice_angles": [
+      90.0,
+      90.0,
+      120.0
+     ],
+     "volume": 46.49202,
+     "kind": "symmetrized",
+     "accept": true
+    }
+   ]
+  }
+ }
+}

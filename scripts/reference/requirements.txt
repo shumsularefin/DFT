@@ -1,0 +1,8 @@
+# Pinned versions used to generate tests/reference/*.json (verified 2026-10-27).
+# Run in a virtualenv: python -m venv .venv && .venv/bin/pip install -r scripts/reference/requirements.txt
+numpy==2.5.4
+scipy==1.18.1
+spglib==2.8.0
+seekpath==2.2.2
+pymatgen==2026.10.24
+ase==3.29.0

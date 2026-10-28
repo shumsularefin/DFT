@@ -1,0 +1,38 @@
+{
+ "_meta": {
+  "generator": "scripts/reference/gen_scf1d_reference.py",
+  "units": "hartree and bohr; 1 hartree = 27.211386245988 eV (CODATA 2018, S-031)",
+  "grid": "x in (-15, 15) bohr, 299 interior points, spacing 0.1 bohr, Dirichlet boundaries, 3-point Laplacian",
+  "model": "restricted Hartree-Fock for 2 electrons, soft-Coulomb external potential and interaction (parameter 1)"
+ },
+ "cases": [
+  {
+   "Z": 1.0,
+   "E_HF": -0.6920905321805108,
+   "orbital_energy": -0.05385900517988709,
+   "E_noninteracting": -1.3397191046953476,
+   "J": 0.58437252182072,
+   "iterations": 64,
+   "final_residual": 7.575353806836458e-13,
+   "mixing_alpha": 0.3,
+   "density_integral": 1.9999999999999998,
+   "E_exact_two_electron_same_grid": -0.7308007959342024,
+   "exact_wavefunction_asymmetry": 3.6224740822900784e-14,
+   "E_correlation": -0.03871026375369169
+  },
+  {
+   "Z": 2.0,
+   "E_HF": -2.224499655031374,
+   "orbital_energy": -0.7503215884743364,
+   "E_noninteracting": -2.967326243069299,
+   "J": 0.7238564780826796,
+   "iterations": 64,
+   "final_residual": 8.652979988662568e-13,
+   "mixing_alpha": 0.3,
+   "density_integral": 2.0,
+   "E_exact_two_electron_same_grid": -2.2385498770477987,
+   "exact_wavefunction_asymmetry": 1.172659923785889e-14,
+   "E_correlation": -0.014050222016424918
+  }
+ ]
+}

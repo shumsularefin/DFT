@@ -1,0 +1,56 @@
+name: Deploy to Firebase Hosting
+
+# Runs on every merge to main. Needs the repository secret FIREBASE_SERVICE_ACCOUNT and the
+# repository variable FIREBASE_PROJECT_ID. Without them it does nothing and passes.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      HAS_FIREBASE: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' && vars.FIREBASE_PROJECT_ID != '' }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Detect project
+        id: detect
+        run: |
+          if [ -f package.json ] && [ "$HAS_FIREBASE" = "true" ]; then echo "go=true" >> "$GITHUB_OUTPUT"; else echo "go=false" >> "$GITHUB_OUTPUT"; echo "Skipping deploy (no package.json yet, or Firebase secret/variable not set)."; fi
+      - uses: actions/setup-node@v5
+        if: steps.detect.outputs.go == 'true'
+        with:
+          node-version: 22
+          cache: npm
+      - if: steps.detect.outputs.go == 'true'
+        run: npm ci
+      - if: steps.detect.outputs.go == 'true'
+        run: node scripts/guard/run-all.mjs
+      - if: steps.detect.outputs.go == 'true'
+        run: npm run build
+        env:
+          PUBLIC_SITE_URL: https://${{ vars.FIREBASE_PROJECT_ID }}.web.app
+          PUBLIC_FIREBASE_API_KEY: ${{ vars.PUBLIC_FIREBASE_API_KEY }}
+          PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.PUBLIC_FIREBASE_PROJECT_ID }}
+          PUBLIC_FIREBASE_APP_ID: ${{ vars.PUBLIC_FIREBASE_APP_ID }}
+      - name: Refuse to deploy synthetic Screening Studio data
+        if: steps.detect.outputs.go == 'true'
+        run: node scripts/build/check-real-data.mjs
+      - if: steps.detect.outputs.go == 'true'
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: ${{ vars.FIREBASE_PROJECT_ID }}
+          channelId: live

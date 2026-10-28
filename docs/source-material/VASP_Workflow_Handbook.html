@@ -1,0 +1,1418 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>VASP Workflow Handbook</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: reference-manual spread. Sticky contents rail on the left, one reading column on the right;
+   input files render as dark "file cards", every calculation opens with a Needs / Run / Produces strip. */
+:root{
+  --bg:#F2F4F5; --surface:#FFFFFF; --ink:#14212A; --muted:#55646E; --line:#D3DADF; --line-soft:#E4E9EC;
+  --accent:#0A6A74; --accent-ink:#FFFFFF; --accent-soft:#DCEDEE;
+  --amber:#8E5406; --amber-soft:#FAEED8;
+  --red:#A12F27; --red-soft:#F7E2DF;
+  --green:#2A6A43; --green-soft:#DFEFE5;
+  --code-bg:#0F1A20; --code-ink:#D5E1E8; --code-com:#7E95A2; --code-key:#7BD0D8; --code-val:#F0C36A; --code-bar:#18262E;
+  --font-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --font-body:"IBM Plex Sans","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1519; --surface:#141E24; --ink:#E1E8EC; --muted:#93A3AD; --line:#27343C; --line-soft:#1D2930;
+    --accent:#5CC3CB; --accent-ink:#0B1418; --accent-soft:#16343A;
+    --amber:#E5AA4E; --amber-soft:#33281A;
+    --red:#F0897E; --red-soft:#3A2220;
+    --green:#74C996; --green-soft:#1A3326;
+    --code-bg:#0A1115; --code-ink:#D5E1E8; --code-com:#7590A0; --code-key:#7BD0D8; --code-val:#F0C36A; --code-bar:#121C22;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1519; --surface:#141E24; --ink:#E1E8EC; --muted:#93A3AD; --line:#27343C; --line-soft:#1D2930;
+  --accent:#5CC3CB; --accent-ink:#0B1418; --accent-soft:#16343A;
+  --amber:#E5AA4E; --amber-soft:#33281A;
+  --red:#F0897E; --red-soft:#3A2220;
+  --green:#74C996; --green-soft:#1A3326;
+  --code-bg:#0A1115; --code-ink:#D5E1E8; --code-com:#7590A0; --code-key:#7BD0D8; --code-val:#F0C36A; --code-bar:#121C22;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 16px)}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+a{color:var(--accent);text-underline-offset:2px}
+a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+code,kbd{font-family:var(--font-mono);font-size:.88em;background:var(--line-soft);padding:.08em .35em;border-radius:3px;overflow-wrap:anywhere}
+strong{font-weight:600}
+
+/* ---------- masthead ---------- */
+.mast{max-width:1240px;margin:0 auto;padding-block:40px 28px;border-bottom:1px solid var(--line)}
+.mast .eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mast h1{font-family:var(--font-display);font-weight:800;font-size:clamp(34px,5.4vw,58px);line-height:1.02;letter-spacing:-.02em;margin:10px 0 14px;text-wrap:balance}
+.mast h1 span{color:var(--accent)}
+.mast p.lede{max-width:70ch;color:var(--muted);font-size:17px;margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chips span{font-family:var(--font-mono);font-size:12px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted);background:var(--surface)}
+
+/* ---------- shell ---------- */
+.shell{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:250px minmax(0,1fr);gap:48px;padding-block:28px 80px}
+aside.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);align-self:start;max-height:calc(100vh - 32px);overflow:auto;padding-right:6px}
+.rail details>summary{display:none}
+.rail .grp{font-family:var(--font-mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:18px 0 6px}
+.rail .blk:first-child .grp{margin-top:0}
+.rail ol{list-style:none;margin:0;padding:0;display:grid;gap:1px}
+.rail a{display:flex;gap:8px;align-items:baseline;color:var(--ink);text-decoration:none;font-size:14px;padding:4px 8px;border-radius:5px;border-left:2px solid transparent}
+.rail a .n{font-family:var(--font-mono);font-size:11px;color:var(--muted);min-width:1.6em}
+.rail a:hover{background:var(--line-soft)}
+.rail a.on{border-left-color:var(--accent);background:var(--accent-soft);color:var(--ink)}
+main{min-width:0}
+
+@media (max-width:960px){
+  .shell{grid-template-columns:minmax(0,1fr);gap:20px}
+  aside.rail{position:static;max-height:none;padding:0}
+  .rail details{border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:0 14px}
+  .rail details>summary{display:block;cursor:pointer;padding:12px 0;font-family:var(--font-display);font-weight:700}
+  .rail details[open]>summary{border-bottom:1px solid var(--line-soft);margin-bottom:10px}
+  .rail details .inner{padding-bottom:12px;columns:2;column-gap:20px}
+  .rail .blk{break-inside:avoid}
+}
+@media (max-width:520px){.rail details .inner{columns:1}}
+
+/* ---------- sections ---------- */
+section{padding-block:8px 36px;border-bottom:1px solid var(--line-soft);margin-bottom:28px}
+section:last-of-type{border-bottom:0}
+.kicker{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0 0 4px}
+h2{font-family:var(--font-display);font-weight:800;font-size:clamp(26px,3.4vw,34px);line-height:1.12;letter-spacing:-.01em;margin:0 0 12px;text-wrap:balance}
+h3{font-family:var(--font-display);font-weight:700;font-size:20px;line-height:1.25;margin:30px 0 8px;text-wrap:balance}
+h4{font-family:var(--font-body);font-weight:600;font-size:15px;margin:18px 0 6px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+main p,main li{max-width:74ch}
+main p{margin:0 0 12px}
+main ul,main ol.steps{padding-left:1.3em;margin:0 0 14px}
+main li{margin:3px 0}
+.intro{font-size:17px}
+
+/* Needs / Run / Produces strip */
+.flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--line);border-radius:8px;background:var(--surface);margin:14px 0 18px;overflow:hidden}
+.flow>div{padding:10px 14px;min-width:0;font-size:14px}
+.flow>div+div{border-left:1px solid var(--line-soft)}
+.flow b{display:block;font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+@media (max-width:640px){.flow{grid-template-columns:1fr}.flow>div+div{border-left:0;border-top:1px solid var(--line-soft)}}
+
+/* file cards */
+figure.file{margin:14px 0 18px;border-radius:8px;overflow:hidden;background:var(--code-bg);border:1px solid var(--line)}
+figure.file figcaption{display:flex;align-items:center;gap:10px;padding:7px 10px 7px 14px;background:var(--code-bar);color:var(--code-com);font-family:var(--font-mono);font-size:12px;letter-spacing:.02em}
+figure.file figcaption strong{color:var(--code-ink);font-weight:600}
+figure.file figcaption .sp{flex:1}
+button.copy{font-family:var(--font-mono);font-size:11px;color:var(--code-ink);background:transparent;border:1px solid #33454F;border-radius:4px;padding:3px 9px;cursor:pointer}
+button.copy:hover{border-color:var(--code-key);color:var(--code-key)}
+pre{margin:0;padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;line-height:1.55;color:var(--code-ink);tab-size:4}
+pre .c{color:var(--code-com);font-style:italic}
+pre .k{color:var(--code-key)}
+pre .v{color:var(--code-val)}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.cols>*{min-width:0}
+@media (max-width:760px){.cols{grid-template-columns:1fr}}
+
+/* tables */
+.tbl{overflow-x:auto;margin:12px 0 18px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.45}
+th,td{text-align:left;vertical-align:top;padding:8px 12px;border-bottom:1px solid var(--line-soft)}
+tr:last-child td{border-bottom:0}
+th{font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);background:var(--bg);position:sticky;top:0}
+td code{white-space:nowrap}
+td.wrap code{white-space:normal}
+td:first-child{font-weight:500}
+.num{font-variant-numeric:tabular-nums}
+
+/* callouts */
+.co{border-radius:8px;padding:12px 16px;margin:14px 0 18px;font-size:15px;border:1px solid var(--line)}
+.co>b:first-child{display:block;font-family:var(--font-mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;margin-bottom:4px}
+.co p:last-child,.co ul:last-child{margin-bottom:0}
+.co.tip{background:var(--accent-soft);border-color:transparent}.co.tip>b:first-child{color:var(--accent)}
+.co.warn{background:var(--amber-soft);border-color:transparent}.co.warn>b:first-child{color:var(--amber)}
+.co.bad{background:var(--red-soft);border-color:transparent}.co.bad>b:first-child{color:var(--red)}
+.co.ok{background:var(--green-soft);border-color:transparent}.co.ok>b:first-child{color:var(--green)}
+.verify{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);border:1px solid var(--amber);border-radius:3px;padding:0 4px;margin-left:4px;white-space:nowrap}
+
+/* workflow map */
+.lanes{display:grid;gap:12px;margin:18px 0}
+.lane{display:grid;grid-template-columns:170px minmax(0,1fr);gap:14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.lane .lab{font-size:13px;color:var(--muted);line-height:1.35}
+.lane .lab b{display:block;font-family:var(--font-display);font-size:15px;color:var(--ink)}
+.nodes{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.nodes a{font-size:13.5px;text-decoration:none;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:5px 10px;background:var(--bg);white-space:nowrap}
+.nodes a:hover{border-color:var(--accent);color:var(--accent)}
+.nodes a small{font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-left:6px}
+.nodes .ar{color:var(--muted);font-family:var(--font-mono)}
+.nodes .or{color:var(--muted);font-size:12px}
+@media (max-width:640px){.lane{grid-template-columns:1fr}}
+
+/* annotated user workflow */
+.audit{display:grid;gap:12px;margin:16px 0}
+.audit article{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px}
+.audit .st{font-family:var(--font-display);font-weight:800;font-size:26px;line-height:1;color:var(--accent)}
+.audit h3{margin:0 0 6px;font-size:17px}
+.audit .yours{font-style:italic;color:var(--muted);font-size:14px;margin-bottom:8px}
+.audit ul{margin:0;padding-left:1.1em;font-size:15px}
+.pill{display:inline-block;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border-radius:3px;margin-right:6px;vertical-align:1px}
+.pill.keep{background:var(--green-soft);color:var(--green)}
+.pill.fix{background:var(--amber-soft);color:var(--amber)}
+.pill.add{background:var(--accent-soft);color:var(--accent)}
+
+/* filter boxes */
+.filter{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0 4px}
+.filter input{flex:1;min-width:0;max-width:420px;font:inherit;font-size:15px;padding:9px 12px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink)}
+.filter .count{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+.cat{font-family:var(--font-mono);font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:block;font-weight:400}
+
+/* ladders */
+ol.ladder{list-style:none;counter-reset:l;padding:0;margin:12px 0 18px;display:grid;gap:8px}
+ol.ladder>li{counter-increment:l;display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;max-width:none;background:var(--surface);border:1px solid var(--line-soft);border-radius:7px;padding:10px 12px;font-size:15px}
+ol.ladder>li::before{content:counter(l);font-family:var(--font-display);font-weight:800;font-size:18px;color:var(--accent);line-height:1.3}
+ol.ladder>li>div{min-width:0}
+
+.formula{font-family:var(--font-mono);font-size:13.5px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 14px;margin:10px 0 14px;overflow-x:auto;white-space:pre;line-height:1.7}
+.toplink{font-family:var(--font-mono);font-size:12px;color:var(--muted);text-decoration:none;display:inline-block;margin-top:6px}
+footer{max-width:1240px;margin:0 auto;padding-block:20px 40px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+</style>
+
+<header class="mast" id="top">
+  <div class="eyebrow">Plane-wave DFT · PAW · VASP 5.4 / 6.x · VASPkit 1.3+ · Phonopy 2.x · Bader</div>
+  <h1>VASP Workflow <span>Handbook</span></h1>
+  <p class="lede">From a CIF file to structural, electronic, magnetic, optical, mechanical and vibrational properties. Each calculation lists what it needs, the INCAR to run, why each tag is set the way it is, how to read the result, and what to do when it fails.</p>
+  <div class="chips"><span>relax</span><span>SCF</span><span>DOS / PDOS</span><span>bands</span><span>optics</span><span>elastic</span><span>EOS</span><span>magnetism</span><span>phonons</span><span>Born charges</span><span>Bader</span><span>DFT+U</span><span>meta-GGA</span><span>HSE06</span><span>troubleshooting</span></div>
+</header>
+
+<div class="shell">
+<aside class="rail" aria-label="Contents">
+<details id="tocd" open>
+<summary>Contents</summary>
+<div class="inner">
+  <div class="blk"><div class="grp">Orientation</div>
+  <ol>
+    <li><a href="#map"><span class="n">·</span>Workflow map</a></li>
+    <li><a href="#yours"><span class="n">·</span>Your protocol (fixed)</a></li>
+    <li><a href="#files"><span class="n">·</span>Input &amp; output files</a></li>
+    <li><a href="#restart"><span class="n">·</span>ISTART / ICHARG logic</a></li>
+    <li><a href="#vaspkit"><span class="n">·</span>VASPkit command map</a></li>
+    <li><a href="#dict"><span class="n">·</span>INCAR tag dictionary</a></li>
+  </ol></div>
+  <div class="blk"><div class="grp">Core sequence</div>
+  <ol>
+    <li><a href="#converge"><span class="n">0</span>Convergence tests</a></li>
+    <li><a href="#relax"><span class="n">1</span>Relaxation</a></li>
+    <li><a href="#scf"><span class="n">2</span>Static SCF</a></li>
+    <li><a href="#dos"><span class="n">2</span>TDOS &amp; PDOS</a></li>
+    <li><a href="#band"><span class="n">3</span>Band structure</a></li>
+    <li><a href="#optics"><span class="n">5</span>Optical properties</a></li>
+  </ol></div>
+  <div class="blk"><div class="grp">Lattice &amp; response</div>
+  <ol>
+    <li><a href="#elastic"><span class="n">4</span>Elastic constants</a></li>
+    <li><a href="#eos"><span class="n">·</span>E–V curve &amp; EOS</a></li>
+    <li><a href="#phonon"><span class="n">·</span>Phonons</a></li>
+    <li><a href="#bec"><span class="n">·</span>Dielectric &amp; Born charges</a></li>
+  </ol></div>
+  <div class="blk"><div class="grp">Charge &amp; spin</div>
+  <ol>
+    <li><a href="#bader"><span class="n">·</span>Bader charges</a></li>
+    <li><a href="#magnetic"><span class="n">·</span>Magnetism</a></li>
+  </ol></div>
+  <div class="blk"><div class="grp">Beyond PBE</div>
+  <ol>
+    <li><a href="#dftu"><span class="n">·</span>DFT+U</a></li>
+    <li><a href="#metagga"><span class="n">·</span>meta-GGA</a></li>
+    <li><a href="#hybrid"><span class="n">·</span>Hybrid functionals</a></li>
+  </ol></div>
+  <div class="blk"><div class="grp">Toolbox</div>
+  <ol>
+    <li><a href="#more"><span class="n">·</span>Other calculations</a></li>
+    <li><a href="#trouble"><span class="n">·</span>Troubleshooting</a></li>
+    <li><a href="#errors"><span class="n">·</span>Error message index</a></li>
+    <li><a href="#units"><span class="n">·</span>Units &amp; formulas</a></li>
+    <li><a href="#checklist"><span class="n">·</span>Pre-submit checklist</a></li>
+  </ol></div>
+</div>
+</details>
+</aside>
+
+<main>
+
+<section id="map">
+  <p class="kicker">Orientation</p>
+  <h2>Workflow map</h2>
+  <p class="intro">Every property calculation depends on one of two things: a <strong>relaxed structure</strong>, or a <strong>converged charge density</strong> from a static SCF run on that structure. Knowing which one a calculation needs tells you which files to copy into its folder.</p>
+  <div class="lanes">
+    <div class="lane"><div class="lab"><b>Geometry</b>Run once, in this order</div>
+      <div class="nodes"><a href="#converge">CIF → POSCAR<small>105</small></a><span class="ar">→</span><a href="#converge">ENCUT &amp; k-mesh tests</a><span class="ar">→</span><a href="#relax">Relaxation<small>ISIF=3</small></a><span class="ar">→</span><a href="#relax">Re-relax from CONTCAR</a></div></div>
+    <div class="lane"><div class="lab"><b>Electronic</b>Needs CHGCAR from a static SCF</div>
+      <div class="nodes"><a href="#scf">Static SCF<small>writes CHGCAR</small></a><span class="ar">→</span><a href="#dos">DOS<small>LORBIT=11</small></a><a href="#band">Bands<small>303 KPATH.in</small></a><a href="#optics">Optics<small>LOPTICS</small></a><a href="#bader">Bader<small>LAECHG</small></a></div></div>
+    <div class="lane"><div class="lab"><b>Lattice &amp; response</b>Needs the relaxed structure only</div>
+      <div class="nodes"><a href="#elastic">Elastic<small>IBRION=6</small></a><a href="#eos">E–V / EOS</a><a href="#phonon">Phonons<small>phonopy</small></a><a href="#bec">ε∞, Z*<small>LEPSILON</small></a><a href="#magnetic">Magnetic configs</a></div></div>
+    <div class="lane"><div class="lab"><b>Beyond PBE</b>Changes the functional, then repeat the lanes above</div>
+      <div class="nodes"><a href="#dftu">DFT+U<small>LDAU</small></a><span class="or">or</span><a href="#metagga">r2SCAN / mBJ<small>METAGGA</small></a><span class="or">or</span><a href="#hybrid">HSE06<small>LHFCALC</small></a></div></div>
+  </div>
+  <h3>Suggested project layout</h3>
+  <p>Relaxation and SCF share one folder (protocol step 2); back up OUTCAR and CONTCAR of the relaxation before the SCF overwrites them. Other calculations get their own folder with copies of the files they need.</p>
+  <figure class="file"><figcaption><strong>tree</strong><span class="sp"></span></figcaption><pre>Compound/
+├── 00_conv/      encut_400 … encut_700/   kpt_0.05 … kpt_0.02/
+├── 01_relax/     relax → cp CONTCAR POSCAR → SCF in the same folder (ISTART=1)
+│                 → CHGCAR, WAVECAR, DOSCAR (DOS via LORBIT=11)
+├── 04_band/      SCF without ICHARG=11 + KPATH.in (303) as the band path
+├── 05_optics/    LOPTICS, NBANDS ≈ 3× default
+├── 06_elastic/   IBRION=6, ISIF=3
+├── 07_eos/       s_0.97 … s_1.03/
+├── 08_phonon/    SPOSCAR, disp-001 …   (phonopy)
+├── 09_dielectric/ LEPSILON, IBRION=8   → Born charges, ε∞, ε0
+├── 10_bader/     LAECHG → AECCAR0, AECCAR2
+├── 11_magnetic/  NM/ FM/ AFM1/ AFM2/   (same supercell)
+└── 12_hse/       or 12_dftu/, 12_r2scan/</pre></figure>
+</section>
+
+<section id="yours">
+  <p class="kicker">Orientation</p>
+  <h2>Your protocol (fixed)</h2>
+  <p class="intro">These five steps are the working protocol for this handbook and are reproduced exactly as written. Every INCAR and command in the core sections follows them. The notes under each step say what the VASP wiki (vasp.at/wiki), the VASPKIT 1.5 tutorials and the standard literature say about it.</p>
+  <div class="audit">
+    <article><div class="st">1</div><div>
+      <h3>Relaxation</h3>
+      <div class="yours">“Prepare four INPUT files and changes it as it requires. Run relaxation with encut of 1.3 of Enmax. Ediff, ISPIN, Magmom. INCAR can be prepared from VASPKIT.”</div>
+      <ul>
+        <li><span class="pill keep">verified</span><code>ENCUT = 1.3 × ENMAX</code>: the VASP wiki notes the default cutoff often has to be raised by about 30% to converge the stress tensor (Pulay stress). Use the largest ENMAX among your species: <code>grep ENMAX POTCAR</code>.</li>
+        <li><span class="pill keep">verified</span>Force criterion <code>EDIFFG = -0.005</code> or <code>-0.001</code> eV/Å. A negative EDIFFG stops when every force is below |EDIFFG| (VASP wiki).</li>
+        <li><span class="pill add">note</span><code>ISPIN = 2</code> with one MAGMOM value per atom, in POSCAR order. VASPkit: <code>101 → SR</code> (add <code>MG</code> for spin: <code>SRMG</code>).</li>
+      </ul></div></article>
+    <article><div class="st">2</div><div>
+      <h3>SCF in the same folder</h3>
+      <div class="yours">“Same folder RUN SCF calculation. ISTART should be 1, INCAR will be generated from VASPkit. Try Converge repeatedly. For DOS, LORBIT = 11.”</div>
+      <ul>
+        <li><span class="pill keep">verified</span><code>ISTART = 1</code> reads the WAVECAR left by the relaxation (VASP wiki: ISTART).</li>
+        <li><span class="pill keep">verified</span>IBRION is not written. With <code>NSW = 0</code> VASP’s default is already IBRION = −1 (VASP wiki: IBRION).</li>
+        <li><span class="pill keep">verified</span><code>ISMEAR = 0</code>, <code>SIGMA = 0.05</code> as in the VASPkit template. The wiki recommends Gaussian smearing with a small SIGMA for semiconductors and insulators, and warns against the default ISMEAR = 1 for them.</li>
+        <li><span class="pill keep">verified</span><code>LORBIT = 11</code> writes the projected DOS and PROCAR. The DOS is read from this SCF run with VASPkit 111 / 113.</li>
+      </ul></div></article>
+    <article><div class="st">3</div><div>
+      <h3>Band structure</h3>
+      <div class="yours">“For BAND, Run SCF again without ICHARG=11 in INCAR, then generate KPATH.in which will be KPOINTS vaspkit 3 - 303. For data analyasis, vaspkit 21 211.”</div>
+      <ul>
+        <li><span class="pill keep">verified</span>The SCF without ICHARG = 11 on a uniform k-mesh writes the converged CHGCAR. <code>303</code> writes KPATH.in, which becomes the k-path for the bands, and <code>211</code> reads the result.</li>
+        <li><span class="pill fix">wiki rule</span>The VASP wiki says a line-mode k-path “is not suitable for self-consistent calculations”. So the KPATH.in eigenvalues must come from one of two validated routes (details in <a href="#band">Band structure</a>):
+          <br>(A) VASP ≥ 6.3: one SCF without ICHARG = 11, with the uniform mesh in KPOINTS and KPATH.in copied to <code>KPOINTS_OPT</code>;
+          <br>(B) a run with <code>KPOINTS = KPATH.in</code> that reads the SCF CHGCAR (ICHARG = 11). This is the INCAR in the VASPKIT band tutorial.</li>
+      </ul></div></article>
+    <article><div class="st">4</div><div>
+      <h3>Elastic properties</h3>
+      <div class="yours">“For elastic Properites, Prepare INCAR similar to Relaxation, but IBRION will be 6-8 and ENCUT=620. Comment out NCORE. vaspkit 2 - 203.”</div>
+      <ul>
+        <li><span class="pill keep">verified</span>The VASP wiki states that <code>IBRION = 6</code> with <code>ISIF ≥ 3</code> calculates the elastic constants (six finite lattice distortions, clamped and relaxed ions). Use IBRION = 6, ISIF = 3.</li>
+        <li><span class="pill keep">verified</span><code>ENCUT = 620</code>: stress needs the higher cutoff, as in step 1.</li>
+        <li><span class="pill keep">verified</span>Comment out NCORE. VASP runs IBRION = 6 without band parallelization (NPAR = number of ranks); NCORE in the INCAR can stop the run.</li>
+        <li><span class="pill keep">verified</span><code>203</code> reads TOTAL ELASTIC MODULI from OUTCAR (VASPKIT tutorial).</li>
+      </ul></div></article>
+    <article><div class="st">5</div><div>
+      <h3>Optical properties</h3>
+      <div class="yours">“For Optical Properites, run SCF again up to -06 to -08 and then generate INCAR from vaspkit. After SCF calculate get the grep NBANDS OUTCAR. Then take NBANDS 3 times of it with closest ceiling numbers. Add ISPIN and magmom if requires. For data analysis, vaspkit 71 - 711.”</div>
+      <ul>
+        <li><span class="pill keep">verified</span>VASP wiki (LOPTICS): reasonable results “are usually only obtained if NBANDS is roughly doubled or tripled” with respect to the default. The wiki examples use EDIFF = 1E-8.</li>
+        <li><span class="pill keep">verified</span>“Closest ceiling”: VASP itself increases NBANDS until it is divisible by the number of cores (or by NCORE) (VASP wiki: NBANDS). Round 3 × NBANDS up to that number.</li>
+        <li><span class="pill keep">verified</span>VASPkit: <code>101 → OP</code>, then <code>711</code>. Wiki values: <code>CSHIFT = 0.1</code>, <code>NEDOS ≈ 2000</code>.</li>
+      </ul></div></article>
+  </div>
+</section>
+
+<section id="files">
+  <p class="kicker">Orientation</p>
+  <h2>Input and output files</h2>
+  <h3>The four input files</h3>
+  <div class="tbl"><table>
+    <tr><th>File</th><th>Contains</th><th>How to make it</th><th>Common mistakes</th></tr>
+    <tr><td><code>POSCAR</code></td><td>Lattice vectors, scale factor, species, atom counts, Direct/Cartesian coordinates, optional Selective dynamics</td><td>VASPkit <code>105</code> from CIF; VESTA export; Materials Project</td><td>Species order differs from POTCAR; partially occupied CIF sites; conventional cell used where primitive is cheaper</td></tr>
+    <tr><td><code>POTCAR</code></td><td>PAW datasets, concatenated in POSCAR species order. Holds ENMAX, ZVAL, the functional (PE = PBE)</td><td>VASPkit <code>103</code> (recommended sets) or <code>104</code> (you choose); <code>cat</code> by hand</td><td>Mixing LDA and PBE files; wrong order; using <code>_GW</code> or <code>_h</code> sets without reason</td></tr>
+    <tr><td><code>KPOINTS</code></td><td>Brillouin-zone sampling: Gamma-centred or Monkhorst–Pack mesh, line path, or explicit list</td><td>VASPkit <code>102</code> (mesh), <code>303</code> (band path), <code>251</code> (hybrid bands)</td><td>Odd MP meshes on hexagonal cells (use Gamma-centred); too coarse for metals</td></tr>
+    <tr><td><code>INCAR</code></td><td>Every control tag: what to compute and how precisely</td><td>VASPkit <code>101</code> + task code, then edit</td><td>Leftover tags from another task (e.g. IBRION=6 in a DOS run); MAGMOM count mismatch</td></tr>
+  </table></div>
+  <figure class="file"><figcaption><strong>shell</strong> · inspect POTCAR<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="sh">grep TITEL POTCAR        # which datasets, in which order
+grep ENMAX POTCAR        # recommended cutoff per species; take the largest × 1.3
+grep ZVAL  POTCAR        # valence electrons per species (needed for Bader net charges)</pre></figure>
+
+  <h3>Output files</h3>
+  <div class="tbl"><table>
+    <tr><th>File</th><th>What it holds</th><th>Used by</th></tr>
+    <tr><td><code>OUTCAR</code></td><td>Full log: energies, forces, stress, magnetization per site, E-fermi, NBANDS, elastic and dielectric tensors, Born charges, phonon modes</td><td>grep, VASPkit 203, almost everything</td></tr>
+    <tr><td><code>OSZICAR</code></td><td>One line per electronic step (dE, d eps) and per ionic step (F, E0, mag=)</td><td>Quick convergence check</td></tr>
+    <tr><td><code>CONTCAR</code></td><td>Final structure, same format as POSCAR</td><td>Next calculation’s POSCAR</td></tr>
+    <tr><td><code>CHGCAR</code></td><td>Charge density (and magnetization density if ISPIN=2) plus PAW occupancies</td><td>ICHARG=1/11 restarts, Bader, VESTA, VASPkit 311–314</td></tr>
+    <tr><td><code>WAVECAR</code></td><td>Wavefunctions (large)</td><td>ISTART=1 restarts, hybrids from PBE start</td></tr>
+    <tr><td><code>DOSCAR</code></td><td>Total DOS and, with LORBIT, site-projected DOS</td><td>VASPkit 111/113</td></tr>
+    <tr><td><code>PROCAR</code></td><td>Band- and k-resolved orbital projections (LORBIT=11)</td><td>VASPkit 21x projected bands</td></tr>
+    <tr><td><code>EIGENVAL</code></td><td>Eigenvalues at each k-point</td><td>VASPkit 211, 911, 912</td></tr>
+    <tr><td><code>vasprun.xml</code></td><td>Everything in XML: DOS, eigenvalues, dielectric function, forces</td><td>phonopy, pymatgen, VASPkit 711, p4vasp</td></tr>
+    <tr><td><code>IBZKPT</code></td><td>Irreducible k-points actually used</td><td>Check which k-points VASP actually used</td></tr>
+    <tr><td><code>AECCAR0</code>, <code>AECCAR2</code></td><td>Core and valence all-electron densities (LAECHG)</td><td>Bader reference density</td></tr>
+    <tr><td><code>LOCPOT</code></td><td>Local potential (LVHAR / LVTOT)</td><td>Work function, VASPkit 426</td></tr>
+    <tr><td><code>ELFCAR</code></td><td>Electron localization function (LELF)</td><td>VESTA, bonding analysis</td></tr>
+    <tr><td><code>XDATCAR</code></td><td>Trajectory of every ionic step</td><td>Inspect a relaxation that wandered</td></tr>
+  </table></div>
+</section>
+
+<section id="restart">
+  <p class="kicker">Orientation</p>
+  <h2>ISTART and ICHARG: what is read, what is kept</h2>
+  <p>These two tags decide whether a run starts from scratch or continues from files in the folder. Most “why does my band structure look wrong” problems trace back to them.</p>
+  <div class="cols">
+  <div class="tbl"><table>
+    <tr><th>ISTART</th><th>Meaning</th></tr>
+    <tr><td><code>0</code></td><td>Fresh start, random wavefunctions. Default when no WAVECAR exists.</td></tr>
+    <tr><td><code>1</code></td><td>Read WAVECAR; keep ENCUT constant (basis rebuilt for the new cell). Default when WAVECAR exists. Your SCF-after-relax setting.</td></tr>
+    <tr><td><code>2</code></td><td>Read WAVECAR; keep the basis set constant. Used rarely, e.g. for consistent energies along a strained series.</td></tr>
+  </table></div>
+  <div class="tbl"><table>
+    <tr><th>ICHARG</th><th>Meaning</th></tr>
+    <tr><td><code>0</code></td><td>Density built from the initial wavefunctions. Default when ISTART &gt; 0.</td></tr>
+    <tr><td><code>1</code></td><td>Read CHGCAR and continue self-consistently. Use to restart a stalled SCF.</td></tr>
+    <tr><td><code>2</code></td><td>Superposition of atomic densities. Default for a fresh start.</td></tr>
+    <tr><td><code>11</code></td><td>Read CHGCAR and keep it <em>fixed</em> (non-self-consistent). Band structures and dense-mesh DOS.</td></tr>
+  </table></div>
+  </div>
+  <div class="co warn"><b>Rule</b><p>An ICHARG=11 run inherits its physics from the CHGCAR. Keep ENCUT, ISPIN, MAGMOM, LMAXMIX, the functional and any LDAU tags identical to the SCF that wrote it. The cell must also be identical.</p></div>
+</section>
+
+<section id="vaspkit">
+  <p class="kicker">Orientation</p>
+  <h2>VASPkit command map</h2>
+  <p>VASPkit is menu-driven: type <code>vaspkit</code>, then a group number, then a three-digit task. Every code below is taken from the VASPKIT 1.5 tutorials and feature list. Menus still change between releases, so if a number does nothing, check the menu of your installed version.</p>
+  <figure class="file"><figcaption><strong>shell</strong> · five ways to run a task (102 as example)<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="sh">vaspkit                                   # interactive menus
+vaspkit -task 102 -kpr 0.04               # command-line mode (vaspkit -help lists options)
+echo -e "102\n2\n0.04\n" | vaspkit         # piped answers, in menu order
+(echo 102; echo 2; echo 0.04) | vaspkit
+vaspkit &lt; cmd.in                          # answers stored one per line in a file
+
+# batch over sub-folders, e.g. print every band gap
+for d in */; do (cd $d &amp;&amp; echo -e "911\n" | vaspkit | sed -n '40p' | awk '{print $4}'); done</pre></figure>
+
+  <h3>The ~/.vaspkit settings that matter</h3>
+  <div class="tbl"><table>
+    <tr><th>Setting</th><th>Effect</th></tr>
+    <tr><td><code>PBE_PATH</code>, <code>POTCAR_TYPE</code>, <code>RECOMMENDED_POTCAR</code></td><td>Where your POTCAR library lives, which functional, and whether VASP’s recommended datasets (_pv, _sv …) are used. Required for 102/103.</td></tr>
+    <tr><td><code>SET_INCAR_WRITE_MODE</code></td><td><strong>Default <code>OVERRIDE</code> replaces an existing INCAR when you run 101.</strong> Set <code>BACK-UP-OLD</code> or <code>BACK-UP-NEW</code> (writes INCAR.new) to protect hand-edited files.</td></tr>
+    <tr><td><code>MINI_INCAR</code></td><td><code>.TRUE.</code> writes INCARs without the explanatory comments.</td></tr>
+    <tr><td><code>SET_FERMI_ENERGY_ZERO</code></td><td><code>.TRUE.</code> (default) shifts DOS and band energies so E<sub>F</sub> = 0.</td></tr>
+    <tr><td><code>FERMI_ENERGY.in</code> (file)</td><td>VASPkit reads E<sub>F</sub> from DOSCAR unless this file exists; put your value on its 2nd line to override.</td></tr>
+    <tr><td><code>PYTHON_BIN</code>, <code>PLOT_MATPLOTLIB</code></td><td>Lets 211/252 draw <code>band.png</code> automatically.</td></tr>
+    <tr><td><code>GW_POTCAR</code></td><td><code>.TRUE.</code> picks _GW datasets.</td></tr>
+  </table></div>
+
+  <h3>Input generation (group 01)</h3>
+  <div class="tbl"><table>
+    <tr><th>Code</th><th>Does</th><th>Notes</th></tr>
+    <tr><td><code>101</code></td><td>INCAR template for task codes (table below)</td><td>Codes are joined into one string: <code>STMG</code>, <code>SRPU</code>, <code>STH6D3</code> (static HSE06 + D3)</td></tr>
+    <tr><td><code>102</code></td><td>KPOINTS for SCF (asks 1 = Monkhorst–Pack, 2 = Gamma, then resolution in 2π/Å)</td><td>Gamma-only 0; low 0.06–0.04; medium 0.04–0.03; fine 0.02–0.01. 0.03–0.04 is usually enough. Also writes POTCAR</td></tr>
+    <tr><td><code>103</code> / <code>104</code></td><td>POTCAR with default / user-chosen datasets</td><td>104 asks per element, e.g. <code>Ti_sv</code>, <code>O_h</code></td></tr>
+    <tr><td><code>105</code> / <code>106</code></td><td>POSCAR from CIF (no fractional occupancy) / from Materials Studio .xsd (keeps fixed atoms)</td><td></td></tr>
+    <tr><td><code>107</code></td><td>Reorder elements in POSCAR</td><td>Writes <code>POSCAR_REV</code></td></tr>
+    <tr><td><code>108</code> / <code>109</code></td><td>Generate all inputs in one go / check all input files</td><td>109 fixes INCAR/POSCAR format and checks POTCAR matches POSCAR. Run it before every submission</td></tr>
+  </table></div>
+  <h4>101 task codes (full list in VASPKIT 1.5)</h4>
+  <div class="tbl"><table>
+    <tr><th>Code</th><th>Template</th><th>Code</th><th>Template</th></tr>
+    <tr><td><code>ST</code></td><td>Static calculation</td><td><code>SR</code></td><td>Standard relaxation</td></tr>
+    <tr><td><code>LR</code></td><td>Lattice relaxation (ISIF = 3, commented template)</td><td><code>MG</code></td><td>Magnetic properties</td></tr>
+    <tr><td><code>SO</code></td><td>Spin–orbit coupling</td><td><code>D3</code></td><td>DFT-D3 (zero damping)</td></tr>
+    <tr><td><code>H6</code></td><td>HSE06</td><td><code>PU</code></td><td>DFT+U</td></tr>
+    <tr><td><code>OP</code></td><td>Optical properties</td><td><code>EC</code></td><td>Static dielectric constant</td></tr>
+    <tr><td><code>DC</code></td><td>Elastic constants</td><td><code>BD</code></td><td>Bader charge</td></tr>
+    <tr><td><code>FD</code></td><td>Phonons, finite displacement</td><td><code>DT</code></td><td>Phonons, DFPT</td></tr>
+    <tr><td><code>FQ</code></td><td>Frequency calculation</td><td><code>EL</code></td><td>ELF</td></tr>
+    <tr><td><code>PC</code></td><td>Decomposed (partial) charge density</td><td><code>MD</code></td><td>Molecular dynamics</td></tr>
+    <tr><td><code>GW</code> / <code>BS</code></td><td>GW0 / BSE</td><td><code>NE</code> / <code>DM</code></td><td>NEB / dimer method</td></tr>
+  </table></div>
+  <p>There is no meta-GGA code: add the METAGGA tags to an <code>ST</code> or <code>SR</code> template by hand (see <a href="#metagga">meta-GGA</a>). The templates start from conservative defaults (the LR template has <code>PREC = Normal</code>, <code>LREAL = Auto</code>, ENCUT commented out), so always set ENCUT, EDIFF, ISMEAR and spin yourself.</p>
+
+  <h3>Structure and symmetry (groups 04, 06, 92)</h3>
+  <div class="tbl"><table>
+    <tr><th>Code</th><th>Does</th><th>Output</th></tr>
+    <tr><td><code>601</code></td><td>Space group, lattice, density of POSCAR</td><td>Printed summary</td></tr>
+    <tr><td><code>602</code></td><td>Standardized primitive cell. <strong>Run this before relaxing</strong> so later k-paths match your cell</td><td><code>PRIMCELL.vasp</code></td></tr>
+    <tr><td><code>603</code> / <code>604</code></td><td>Conventional cell / standardized crystal cell (use for elastic constants)</td><td>Structure file</td></tr>
+    <tr><td><code>608</code></td><td>Symmetry summary of the relaxed structure (CONTCAR)</td><td>Check symmetry survived relaxation</td></tr>
+    <tr><td><code>609</code></td><td>Point group of molecules and clusters</td><td>Printed</td></tr>
+    <tr><td><code>400</code> / <code>401</code></td><td>New lattice from integer matrix / supercell <code>2 2 1</code></td><td><code>SC221.vasp</code></td></tr>
+    <tr><td><code>402</code> / <code>403</code></td><td>Fix atoms by layers / by z-range (selective dynamics)</td><td><code>POSCAR_FIX</code></td></tr>
+    <tr><td><code>407</code></td><td>Swap two lattice axes</td><td></td></tr>
+    <tr><td><code>4061</code>–<code>4069</code></td><td>POSCAR to Cartesian/fractional, CIF, xsf, QE, Elk, SIESTA, PDB</td><td>Converted file</td></tr>
+    <tr><td><code>921</code>–<code>923</code></td><td>2D: centre layer at z = 0.5, resize vacuum, standardize 2D cell</td><td><code>POSCAR_NEW</code></td></tr>
+    <tr><td><code>926</code> / <code>927</code></td><td>2D elastic constants / band edges relative to vacuum</td><td></td></tr>
+  </table></div>
+
+  <h3>Electronic structure post-processing</h3>
+  <div class="tbl"><table>
+    <tr><th>Code</th><th>Does</th><th>Main outputs</th></tr>
+    <tr><td><code>301</code> / <code>302</code> / <code>303</code></td><td>k-path for 1D / 2D / bulk (same algorithm as SeeK-path)</td><td><code>KPATH.in</code> (20 points per segment), <code>PRIMCELL.vasp</code>, <code>HIGH_SYMMETRY_POINTS</code></td></tr>
+    <tr><td><code>111</code></td><td>Total DOS</td><td><code>TDOS.dat</code></td></tr>
+    <tr><td><code>112</code></td><td>PDOS of selected atoms, one file per atom</td><td>Per-atom PDOS files</td></tr>
+    <tr><td><code>113</code></td><td>PDOS of every element</td><td><code>PDOS_&lt;El&gt;.dat</code> (_UP/_DW when spin-polarized)</td></tr>
+    <tr><td><code>114</code></td><td>Sum of PDOS over selected atoms (e.g. <code>6 7</code> = a CO molecule)</td><td>One summed file</td></tr>
+    <tr><td><code>115</code></td><td>Sum over chosen atoms and orbitals (e.g. O-s, O-p, Ni-d)</td><td><code>PDOS_USER.dat</code>; LORBIT = 11 allows px, dxy … , LORBIT = 10 only s p d f</td></tr>
+    <tr><td><code>503</code></td><td>d-band centre per atom, in an energy window you choose</td><td><code>D_BAND_CENTER</code> (relative to E<sub>F</sub>)</td></tr>
+    <tr><td><code>211</code></td><td>Band structure (reads EIGENVAL, KPOINTS, E<sub>F</sub> from DOSCAR)</td><td><code>BAND.dat</code>, <code>BAND_REFORMATTED.dat</code>, <code>KLINES.dat</code>, <code>KLABELS</code>, <code>BAND_GAP</code>, <code>band.png</code></td></tr>
+    <tr><td><code>212</code></td><td>Projected bands for selected atoms, one file each</td><td><code>PBAND_A1.dat</code>, <code>PBAND_A2.dat</code> … (s, py, pz, px, d…, tot)</td></tr>
+    <tr><td><code>213</code></td><td>Projected bands for each element</td><td><code>PBAND_&lt;El&gt;.dat</code></td></tr>
+    <tr><td><code>214</code></td><td>Sum of projected bands over selected atoms (surface vs bulk layers)</td><td><code>PBAND_SUM.dat</code></td></tr>
+    <tr><td><code>251</code></td><td>KPOINTS for hybrid bands: weighted SCF mesh + zero-weight path from KPATH.in</td><td>Path resolution 0.02–0.04 (DFT), 0.04–0.06 (hybrid)</td></tr>
+    <tr><td><code>252</code></td><td>Hybrid band structure (needs KPATH.in in the folder)</td><td>Same files as 211</td></tr>
+    <tr><td><code>253</code>–<code>255</code></td><td>Projected hybrid bands: selected atoms / each element / sum</td><td>PBAND files</td></tr>
+    <tr><td><code>261</code> / <code>262</code></td><td>Fermi surface: dense KPOINTS (resolution ≈ 0.01) / extract</td><td><code>FERMISURFACE.bxsf</code> for XCrySDen</td></tr>
+    <tr><td><code>281</code> / <code>282</code></td><td>Band unfolding of supercells: KPOINTS / effective band structure</td><td>EBS data</td></tr>
+    <tr><td><code>911</code></td><td>Band gap, VBM/CBM energies, k-locations, direct/indirect</td><td>Printed summary</td></tr>
+    <tr><td><code>912</code></td><td>Effective masses</td><td>m*/m<sub>e</sub></td></tr>
+    <tr><td><code>511</code></td><td>Real-space wavefunction of one band at one k-point (from WAVECAR)</td><td><code>RWAV_B…_K…_UP.vasp</code> (real), <code>IWAV_…</code> (imaginary)</td></tr>
+  </table></div>
+
+  <h3>Mechanical, optical, density and other tools</h3>
+  <div class="tbl"><table>
+    <tr><th>Code</th><th>Does</th><th>Main outputs</th></tr>
+    <tr><td><code>203</code></td><td>Elastic analysis of OUTCAR from VASP’s IBRION = 6 run. <strong>Your route.</strong></td><td class="wrap">C<sub>ij</sub> and S<sub>ij</sub>; B, E, G, ν (Voigt, Reuss, Hill) and their min/max anisotropy; P-wave modulus; Pugh ratio; two Vickers hardness models (Chen, Tian); Cauchy pressure; Kleinman parameter; universal and Chung–Buessem anisotropy; wave velocities; Debye temperature; stiffness eigenvalues and Born criteria; <code>ELASTIC_TENSOR</code></td></tr>
+    <tr><td><code>201</code></td><td>Energy–strain method: VPKIT.in step 1 makes strain folders, step 2 fits</td><td>Same analysis as 203</td></tr>
+    <tr><td><code>200</code> / <code>202</code></td><td>VASPkit’s own stress–strain workflow / analyse a tensor you supply in <code>ELASTIC_TENSOR.in</code></td><td>Same analysis</td></tr>
+    <tr><td><code>205</code></td><td>Equation-of-state fitting</td><td>E0, V0, B0, B′</td></tr>
+    <tr><td><code>711</code></td><td>Linear optics from vasprun.xml (or REAL.in/IMAG.in); asks for eV, nm or THz. Bulk only</td><td>n, k, α, R, L(ω) files</td></tr>
+    <tr><td><code>712</code> / <code>713</code></td><td>Transition dipole moment at one k-point / along a band path (needs WAVECAR)</td><td><code>TDM.dat</code> (Debye²)</td></tr>
+    <tr><td><code>311</code> / <code>312</code> / <code>313</code></td><td>Charge density / spin density / spin-up and spin-down densities from CHGCAR</td><td><code>CHARGE.vasp</code>, <code>SPIN.vasp</code>, <code>SPIN_UP.vasp</code>, <code>SPIN_DW.vasp</code></td></tr>
+    <tr><td><code>314</code></td><td>Density difference AB − A − B (or A − B); also works for LOCPOT, ELFCAR, PARCHG</td><td><code>CHGDIFF.vasp</code></td></tr>
+    <tr><td><code>318</code> / <code>319</code></td><td>CHGCAR/PARCHG to .xsf / .cube</td><td></td></tr>
+    <tr><td><code>426</code></td><td>Planar-averaged potential from LOCPOT; prints the vacuum level</td><td><code>POTPAVG.dat</code></td></tr>
+    <tr><td><code>427</code></td><td>Planar and macroscopic average (band offsets in heterostructures)</td><td><code>PLANAR_AVERAGE.dat</code>, <code>MACROSCOPIC_AVERAGE.dat</code></td></tr>
+    <tr><td><code>501</code> / <code>502</code></td><td>Thermal free-energy correction from a frequency run: adsorbate / gas molecule (T, P, spin multiplicity)</td><td>ZPE, TS, G corrections</td></tr>
+    <tr><td><code>508</code></td><td>Bader results to .pqr</td><td></td></tr>
+    <tr><td><code>721</code> / <code>722</code></td><td>MD analysis: mean squared displacement / radial distribution function</td><td><code>MSD.dat</code>, RDF data</td></tr>
+  </table></div>
+</section>
+
+<section id="dict">
+  <p class="kicker">Reference</p>
+  <h2>INCAR tag dictionary</h2>
+  <p>The tags you will set most often, what they physically control, and the values that suit each kind of run. Type a tag, a task (“band”, “phonon”) or a symptom (“mixing”) to filter.</p>
+  <div class="filter"><input id="dictq" type="search" placeholder="Filter: EDIFF, smearing, phonon, magnetic…" aria-label="Filter INCAR tags"><span class="count" id="dictn"></span></div>
+  <div class="tbl"><table id="dicttab">
+    <thead><tr><th>Tag</th><th>What it controls</th><th>Typical values</th><th>Why / when</th></tr></thead>
+    <tbody>
+    <tr><td><code>PREC</code><span class="cat">accuracy</span></td><td>FFT grid density and default cutoff</td><td><code>Accurate</code>; <code>Normal</code> for screening</td><td>Accurate avoids wrap-around errors; needed for forces, stress, phonons, elastic.</td></tr>
+    <tr><td><code>ENCUT</code><span class="cat">accuracy basis</span></td><td>Plane-wave kinetic-energy cutoff (eV)</td><td>1.3 × max(ENMAX) for relax/elastic; ≥ max(ENMAX) otherwise</td><td>Stress converges much more slowly than energy, so cell relaxations and elastic runs need the 30% margin to suppress Pulay stress. Keep it identical in every calculation you compare.</td></tr>
+    <tr><td><code>EDIFF</code><span class="cat">convergence electronic</span></td><td>SCF stop: energy change between electronic steps (eV)</td><td>1E-5 relax; 1E-6 SCF/DOS; 1E-7–1E-8 elastic, phonons, optics, ε</td><td>Forces and response properties come from derivatives of the wavefunction, so they need a far tighter SCF than the total energy does. Loose values give noisy forces and imaginary phonon modes.</td></tr>
+    <tr><td><code>EDIFFG</code><span class="cat">convergence ionic relax</span></td><td>Ionic stop. &gt;0: energy change (eV). &lt;0: max force (eV/Å)</td><td><code>-0.005</code> or <code>-0.001</code></td><td>Negative (force) criteria are more reliable. EDIFF should be at least 10× smaller than any energy-based EDIFFG.</td></tr>
+    <tr><td><code>NELM</code><span class="cat">convergence electronic</span></td><td>Max electronic steps per ionic step</td><td>60 default; 100–300 for magnetic, +U, hybrids</td><td>If a step hits NELM the forces are unconverged; fix mixing first rather than just raising NELM.</td></tr>
+    <tr><td><code>NELMIN</code><span class="cat">relax</span></td><td>Min electronic steps per ionic step</td><td>4–8 in relaxations</td><td>Prevents a too-early exit that yields poor forces.</td></tr>
+    <tr><td><code>NELMDL</code><span class="cat">electronic</span></td><td>Non-self-consistent steps at start</td><td>−5 default; −12 for difficult starts</td><td>Lets random wavefunctions settle before the density is updated.</td></tr>
+    <tr><td><code>ALGO</code><span class="cat">electronic mixing</span></td><td>Electronic minimiser</td><td><code>Normal</code> (Davidson), <code>Fast</code>, <code>All</code>, <code>Damped</code></td><td>Normal is robust; Fast is quicker for simple systems; All/Damped for magnetic, +U, hybrids, meta-GGA, and stubborn SCF.</td></tr>
+    <tr><td><code>ISMEAR</code><span class="cat">smearing dos</span></td><td>Partial-occupancy scheme. VASP default is 1 (Methfessel–Paxton)</td><td>0 with SIGMA = 0.05 (VASPkit template; used throughout)</td><td>0 is safe everywhere. 1 for metal relaxations, never for semiconductors. −5 for accurate DOS and total energies on a uniform mesh with ≥ 4 k-points; not for band paths, not for metal forces.</td></tr>
+    <tr><td><code>SIGMA</code><span class="cat">smearing</span></td><td>Smearing width (eV)</td><td>0.01–0.05 insulators; 0.1–0.2 metals with ISMEAR=1</td><td>Check <code>grep EENTRO OUTCAR</code>: the entropy term T·S should be below ~1 meV/atom.</td></tr>
+    <tr><td><code>ISPIN</code><span class="cat">magnetic spin</span></td><td>1 = non-spin-polarized, 2 = collinear spin-polarized</td><td>2 for any open-shell d/f system or radical</td><td>A spin-polarized run started with no initial moment can stay non-magnetic; MAGMOM supplies the seed.</td></tr>
+    <tr><td><code>MAGMOM</code><span class="cat">magnetic spin</span></td><td>Initial moment per atom (μB), POSCAR order</td><td><code>2*5 4*0.6</code>; AFM: <code>5 -5 4*0</code></td><td>Start above the expected moment (3–5 for 3d ions). Count must equal NIONS (3×NIONS for non-collinear).</td></tr>
+    <tr><td><code>NUPDOWN</code><span class="cat">magnetic</span></td><td>Fix N<sub>↑</sub> − N<sub>↓</sub></td><td>unset; integer for fixed-moment runs</td><td>Forces a spin state for comparison; remove it for the final ground state.</td></tr>
+    <tr><td><code>LORBIT</code><span class="cat">dos band output</span></td><td>Projected DOS / PROCAR output</td><td><code>11</code></td><td>11 writes lm-decomposed PDOS and PROCAR and site magnetic moments without needing RWIGS.</td></tr>
+    <tr><td><code>NEDOS</code><span class="cat">dos optics</span></td><td>Points on the DOS energy grid</td><td>2000–3001</td><td>Default 301 is too coarse for clean PDOS and optical spectra.</td></tr>
+    <tr><td><code>EMIN</code> / <code>EMAX</code><span class="cat">dos</span></td><td>DOS energy window (eV, absolute)</td><td>E<sub>F</sub> ± 10–15</td><td>Concentrates NEDOS points where you plot.</td></tr>
+    <tr><td><code>ISTART</code><span class="cat">restart</span></td><td>Read WAVECAR?</td><td>0 / 1</td><td>See <a href="#restart">restart logic</a>.</td></tr>
+    <tr><td><code>ICHARG</code><span class="cat">restart band dos</span></td><td>Initial density source</td><td>2 fresh; 1 continue; 11 non-SCF</td><td>11 for band structures and dense-mesh DOS.</td></tr>
+    <tr><td><code>IBRION</code><span class="cat">ionic relax phonon elastic</span></td><td>How ions move</td><td>2 CG (relax); 6 elastic; not written for SCF (default −1 when NSW = 0)</td><td>2 far from minimum, 1 close to it. 6 + ISIF≥3 gives elastic constants. 8 gives force constants, ε and Z* by DFPT.</td></tr>
+    <tr><td><code>ISIF</code><span class="cat">relax stress elastic</span></td><td>What relaxes and whether stress is computed</td><td>2 ions; 3 ions+shape+volume; 4 ions+shape at fixed V</td><td>3 for equilibrium structures, 4 for E–V points, 2 for slabs and defects. ISIF=3 required with IBRION=6 for Cij.</td></tr>
+    <tr><td><code>NSW</code><span class="cat">ionic</span></td><td>Max ionic steps</td><td>0 static; 100–300 relax; 1 for IBRION 5–8</td><td>Reaching NSW is not convergence; check for “reached required accuracy”.</td></tr>
+    <tr><td><code>POTIM</code><span class="cat">ionic phonon elastic</span></td><td>Step-size scaling (IBRION 1–3) or displacement (Å, IBRION 5/6)</td><td>0.1–0.5 relax; 0.015 finite differences</td><td>Lower it when relaxations oscillate or ZBRENT errors appear.</td></tr>
+    <tr><td><code>NFREE</code><span class="cat">phonon elastic</span></td><td>Displacements per direction (IBRION 5/6)</td><td>2 (±) or 4</td><td>4 is more accurate (cancels anharmonic error), twice the cost.</td></tr>
+    <tr><td><code>LREAL</code><span class="cat">accuracy speed</span></td><td>Projection in real or reciprocal space</td><td><code>.FALSE.</code> small cells; <code>Auto</code> for &gt; ~20 atoms</td><td>Real-space projection introduces small force/energy errors; use .FALSE. for phonons, elastic, final energies.</td></tr>
+    <tr><td><code>ADDGRID</code><span class="cat">accuracy phonon</span></td><td>Extra fine grid for augmentation charges</td><td><code>.TRUE.</code> for phonons</td><td>Reduces force noise; marginal cost.</td></tr>
+    <tr><td><code>LASPH</code><span class="cat">accuracy dftu metagga hybrid</span></td><td>Non-spherical contributions inside PAW spheres</td><td><code>.TRUE.</code></td><td>Required for meta-GGA; recommended for d/f elements, +U and hybrids.</td></tr>
+    <tr><td><code>LMAXMIX</code><span class="cat">dftu magnetic mixing restart</span></td><td>Max l of one-centre densities kept in mixer/CHGCAR</td><td>4 for d; 6 for f</td><td>Default 2 loses d/f occupation information; vital for +U and for ICHARG=11 runs on d/f systems.</td></tr>
+    <tr><td><code>AMIX</code>, <code>BMIX</code><span class="cat">mixing convergence</span></td><td>Pulay/Kerker charge mixing</td><td>0.4 / 1.0 default; 0.1–0.2 / 0.0001 for linear mixing</td><td>Lower AMIX damps charge sloshing in metals, slabs and magnets.</td></tr>
+    <tr><td><code>AMIX_MAG</code>, <code>BMIX_MAG</code><span class="cat">mixing magnetic</span></td><td>Mixing of magnetization density</td><td>1.6 / 1.0 default; 0.8 / 0.0001 for difficult magnets</td><td>Pair with low AMIX/BMIX for oscillating moments.</td></tr>
+    <tr><td><code>NBANDS</code><span class="cat">optics band</span></td><td>Number of bands</td><td>default; 2–3× for optics; extra for band plots</td><td>Optics needs empty bands for transitions; must exceed occupied bands.</td></tr>
+    <tr><td><code>NCORE</code><span class="cat">parallel</span></td><td>Cores per orbital (band parallelization)</td><td>4–√(cores per node)</td><td>Comment out for IBRION = 6 (elastic), IBRION 7/8, LEPSILON, LELF.</td></tr>
+    <tr><td><code>KPAR</code><span class="cat">parallel</span></td><td>k-point parallel groups</td><td>2–8, divides cores</td><td>Large speed-up for many k-points; costs memory.</td></tr>
+    <tr><td><code>LWAVE</code>, <code>LCHARG</code><span class="cat">output restart</span></td><td>Write WAVECAR / CHGCAR</td><td>.TRUE. for SCF; .FALSE. for band, elastic, phonon displacements</td><td>Saves disk; SCF must write CHGCAR for later ICHARG=11 runs.</td></tr>
+    <tr><td><code>LAECHG</code><span class="cat">bader output</span></td><td>Write AECCAR0/1/2</td><td><code>.TRUE.</code></td><td>Bader needs the all-electron reference density.</td></tr>
+    <tr><td><code>LVHAR</code><span class="cat">output workfunction</span></td><td>Write electrostatic (Hartree) potential to LOCPOT</td><td><code>.TRUE.</code></td><td>Work function and band alignment.</td></tr>
+    <tr><td><code>LELF</code><span class="cat">output bonding</span></td><td>Write ELFCAR</td><td><code>.TRUE.</code></td><td>Visualize localization and bonding; use NCORE=1.</td></tr>
+    <tr><td><code>LOPTICS</code><span class="cat">optics</span></td><td>Frequency-dependent dielectric function (independent particle)</td><td><code>.TRUE.</code></td><td>Writes ε(ω) to OUTCAR / vasprun.xml.</td></tr>
+    <tr><td><code>CSHIFT</code><span class="cat">optics</span></td><td>Lorentzian broadening in Kramers–Kronig transform (eV)</td><td>0.1 default</td><td>Smaller sharpens peaks but needs denser k-mesh and NEDOS.</td></tr>
+    <tr><td><code>LEPSILON</code><span class="cat">dielectric born phonon</span></td><td>DFPT static dielectric tensor, Born charges, piezo tensor</td><td><code>.TRUE.</code> with IBRION=8</td><td>Insulators only; NCORE=1; not for hybrids (use LCALCEPS).</td></tr>
+    <tr><td><code>LRPA</code><span class="cat">dielectric</span></td><td>Local-field effects in ε</td><td><code>.FALSE.</code> (default)</td><td>.FALSE. includes exchange-correlation local fields (the “in DFT” values).</td></tr>
+    <tr><td><code>LCALCEPS</code><span class="cat">dielectric born hybrid</span></td><td>ε and Z* by finite electric field</td><td><code>.TRUE.</code></td><td>Works with hybrids and meta-GGA.</td></tr>
+    <tr><td><code>LDAU</code>, <code>LDAUTYPE</code><span class="cat">dftu</span></td><td>Switch on +U; 2 = Dudarev (U<sub>eff</sub> = U − J)</td><td><code>.TRUE.</code>, <code>2</code></td><td>Corrects self-interaction in localized d/f states.</td></tr>
+    <tr><td><code>LDAUL</code>, <code>LDAUU</code>, <code>LDAUJ</code><span class="cat">dftu</span></td><td>Per species: l channel (−1 none, 2 d, 3 f), U, J</td><td><code>2 -1</code>, <code>5.3 0</code>, <code>0 0</code></td><td>One value per species in POSCAR order.</td></tr>
+    <tr><td><code>METAGGA</code><span class="cat">metagga</span></td><td>Meta-GGA functional</td><td><code>R2SCAN</code>, <code>SCAN</code>, <code>MBJ</code></td><td>Remove GGA tag. Needs LASPH and τ-capable POTCARs.</td></tr>
+    <tr><td><code>LMIXTAU</code><span class="cat">metagga mixing</span></td><td>Mix the kinetic-energy density</td><td><code>.TRUE.</code></td><td>Stabilizes meta-GGA SCF.</td></tr>
+    <tr><td><code>LHFCALC</code><span class="cat">hybrid</span></td><td>Hartree–Fock exchange on</td><td><code>.TRUE.</code></td><td>Hybrid functionals.</td></tr>
+    <tr><td><code>HFSCREEN</code>, <code>AEXX</code><span class="cat">hybrid</span></td><td>Screening length (Å⁻¹), exact-exchange fraction</td><td>0.2 and 0.25 = HSE06; 0 and 0.25 = PBE0</td><td>AEXX can be tuned to reproduce a known gap; report it if you do.</td></tr>
+    <tr><td><code>PRECFOCK</code>, <code>NKRED</code><span class="cat">hybrid speed</span></td><td>FFT grid for exchange; k-mesh reduction for exchange</td><td><code>Fast</code>/<code>Normal</code>; <code>NKRED = 2</code></td><td>Cut hybrid cost several-fold; check the gap changes by &lt; ~0.05 eV.</td></tr>
+    <tr><td><code>IVDW</code><span class="cat">vdw relax</span></td><td>Dispersion correction</td><td>11 (D3), 12 (D3-BJ), 20 (TS)</td><td>Layered, molecular and adsorption systems.</td></tr>
+    <tr><td><code>LSORBIT</code>, <code>SAXIS</code><span class="cat">soc magnetic</span></td><td>Spin–orbit coupling; spin quantization axis</td><td><code>.TRUE.</code>; <code>0 0 1</code></td><td>Heavy elements, MAE, topological bands. Needs <code>vasp_ncl</code> and 3 MAGMOM values per atom.</td></tr>
+    <tr><td><code>ISYM</code>, <code>SYMPREC</code><span class="cat">symmetry errors</span></td><td>Symmetry use; tolerance</td><td>default; <code>ISYM = 0</code> to switch off; SYMPREC 1E-4–1E-3</td><td>Change only to fix symmetry errors or for LOBSTER/defects.</td></tr>
+    <tr><td><code>KSPACING</code><span class="cat">kpoints</span></td><td>Automatic mesh without KPOINTS file (Å⁻¹, includes 2π)</td><td>0.15–0.25</td><td>VASPkit resolution × 2π ≈ KSPACING (0.03 → 0.19).</td></tr>
+    <tr><td><code>LDIPOL</code>, <code>IDIPOL</code><span class="cat">slab workfunction</span></td><td>Dipole correction</td><td><code>.TRUE.</code>, <code>3</code> (along z)</td><td>Asymmetric slabs and adsorption.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="converge">
+  <p class="kicker">Core sequence · step 0</p>
+  <h2>Convergence tests: ENCUT and k-points</h2>
+  <div class="flow"><div><b>Needs</b>POSCAR, POTCAR, a static INCAR</div><div><b>Run</b>Series of single-point runs</div><div><b>Produces</b>ENCUT and k-mesh you can defend in a paper</div></div>
+  <p>The total energy itself is never “converged”; what converges is the <em>difference</em> between structures and the derived quantities. Test on the unrelaxed structure with static runs, and pick the smallest setting at which the energy changes by less than <strong>1 meV/atom</strong> from the next step up. For stress-based quantities (elastic, EOS) also watch the pressure.</p>
+  <figure class="file"><figcaption><strong>encut_test.sh</strong><span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="sh">#!/bin/bash
+# static INCAR with an ENCUT line; KPOINTS fixed at a reasonable mesh
+NP=32
+for e in 400 450 500 550 600 650 700; do
+  d=encut_$e; mkdir -p $d; cp POSCAR POTCAR KPOINTS $d/
+  sed "s/^ *ENCUT.*/ENCUT = $e/" INCAR &gt; $d/INCAR
+  (cd $d &amp;&amp; mpirun -np $NP vasp_std &gt; vasp.out)
+  E=$(grep "energy  without entropy" $d/OUTCAR | tail -1 | awk '{print $NF}')
+  echo "$e $E" &gt;&gt; encut.dat
+done
+# divide by number of atoms and look at successive differences</pre></figure>
+  <figure class="file"><figcaption><strong>kpt_test.sh</strong><span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="sh">#!/bin/bash
+# ENCUT fixed at the converged value; VASPkit builds each mesh
+for r in 0.06 0.05 0.04 0.03 0.025 0.02; do
+  d=kpt_$r; mkdir -p $d; cp POSCAR POTCAR INCAR $d/
+  (cd $d &amp;&amp; printf "102\n2\n$r\n" | vaspkit &gt; /dev/null &amp;&amp; mpirun -np 32 vasp_std &gt; vasp.out)
+  E=$(grep "energy  without entropy" $d/OUTCAR | tail -1 | awk '{print $NF}')
+  echo "$r $(sed -n 4p $d/KPOINTS) $E" &gt;&gt; kpt.dat
+done</pre></figure>
+  <div class="co tip"><b>Rules of thumb</b><ul>
+    <li>Insulators converge with coarse meshes (resolution 0.04); metals need 0.02 or finer, plus a smearing test.</li>
+    <li>Use Gamma-centred meshes for hexagonal and trigonal cells.</li>
+    <li>Convergence carries over: a supercell N× larger needs ~N× fewer k-points per direction.</li>
+    <li>Report both the cutoff and the k-mesh (or resolution) in your methods section.</li>
+  </ul></div>
+</section>
+
+<section id="relax">
+  <p class="kicker">Core sequence · step 1</p>
+  <h2>Structural relaxation</h2>
+  <div class="flow"><div><b>Needs</b>POSCAR from CIF, POTCAR, KPOINTS (102, 0.03–0.04), INCAR (101 → SR, + MG)</div><div><b>Run</b>IBRION=2, ISIF=3, repeat from CONTCAR</div><div><b>Produces</b>CONTCAR (equilibrium cell), WAVECAR, CHGCAR</div></div>
+  <p>Every later property is evaluated at this geometry, so errors here propagate everywhere. Experimental lattice constants are not the DFT minimum; PBE typically overestimates them by 1–2%, and using the experimental cell leaves residual stress that spoils elastic and phonon results.</p>
+  <figure class="file"><figcaption><strong>INCAR</strong> · relaxation<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="incar">SYSTEM  = Compound-relax
+# ---- electronic ----
+PREC    = Accurate
+ENCUT   = 520          # 1.3 × largest ENMAX (grep ENMAX POTCAR)
+EDIFF   = 1E-6         # 1E-7 to 1E-8 when EDIFFG = -0.001
+ALGO    = Normal
+NELM    = 120
+NELMIN  = 6
+ISMEAR  = 0            # metals: ISMEAR = 1, SIGMA = 0.1-0.2
+SIGMA   = 0.05
+LREAL   = .FALSE.      # Auto for cells above ~20 atoms
+LASPH   = .TRUE.       # d/f elements
+# ---- spin ----
+ISPIN   = 2
+MAGMOM  = 2*5.0 4*0.6  # one entry per atom, POSCAR order
+LMAXMIX = 4            # d elements (6 for f)
+# ---- ionic ----
+IBRION  = 2            # CG; switch to 1 near the minimum
+ISIF    = 3            # ions + cell shape + volume
+NSW     = 200
+EDIFFG  = -0.005       # max force 0.005 eV/Å; -0.001 for high accuracy
+POTIM   = 0.3
+# ---- output / parallel ----
+LWAVE   = .TRUE.
+LCHARG  = .TRUE.
+NCORE   = 4</pre></figure>
+  <h3>Key parameters and why</h3>
+  <div class="tbl"><table>
+    <tr><th>Tag</th><th>Setting</th><th>Reason</th></tr>
+    <tr><td><code>ENCUT</code></td><td>1.3 × ENMAX</td><td>Cell changes alter the number of plane waves at fixed cutoff; the 30% margin keeps the Pulay stress small.</td></tr>
+    <tr><td><code>ISIF</code></td><td>3</td><td>Full equilibrium. Use 2 for slabs/defects (cell fixed) and 4 for fixed-volume E–V points.</td></tr>
+    <tr><td><code>EDIFFG</code></td><td>−0.005 or −0.001 eV/Å</td><td>Force criterion: stops when every force is below |EDIFFG| (VASP wiki). −0.001 also suits elastic and phonon work.</td></tr>
+    <tr><td><code>EDIFF</code></td><td>1E-6 (1E-7–1E-8 with EDIFFG = −0.001)</td><td>Forces are only as accurate as the SCF; a tight force criterion needs a tight EDIFF.</td></tr>
+    <tr><td><code>IBRION</code></td><td>2 → 1</td><td>CG is robust far from the minimum; RMM-DIIS (1) is faster close to it but can diverge from a bad start.</td></tr>
+  </table></div>
+  <h3>Run and re-run</h3>
+  <figure class="file"><figcaption><strong>shell</strong> · relaxation loop<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="sh">mpirun -np 32 vasp_std &gt; vasp.out
+grep "reached required accuracy" OUTCAR      # must appear
+grep -c "F=" OSZICAR                         # number of ionic steps taken
+grep "external pressure" OUTCAR | tail -1    # should be within ±1-2 kB
+cp POSCAR POSCAR.0; cp CONTCAR POSCAR         # repeat until it converges in 1-3 steps</pre></figure>
+  <h3>Reading the result</h3>
+  <ul>
+    <li>Compare lattice constants with experiment: PBE overestimates by ~1–2%, LDA underestimates by ~1–2%, PBEsol and r2SCAN sit closer. Deviations above ~3% suggest wrong magnetic state, missing vdW (layered materials) or wrong POTCAR.</li>
+    <li>Check symmetry is preserved: compare space groups of POSCAR.0 and CONTCAR (VASPkit <code>601</code> on POSCAR, <code>608</code> on the relaxed structure, or <code>phonopy --symmetry -c CONTCAR</code>).</li>
+    <li>Check moments: <code>grep "mag=" OSZICAR | tail -1</code> and the <code>magnetization (x)</code> table in OUTCAR.</li>
+  </ul>
+</section>
+
+<section id="scf">
+  <p class="kicker">Core sequence · step 2</p>
+  <h2>Static SCF calculation (same folder)</h2>
+  <div class="flow"><div><b>Needs</b>Relaxed structure: <code>cp CONTCAR POSCAR</code> in the relaxation folder; its WAVECAR</div><div><b>Run</b>NSW = 0, ISTART = 1, LORBIT = 11; tighten EDIFF step by step</div><div><b>Produces</b>Total energy, CHGCAR, WAVECAR, DOSCAR (DOS), E-fermi</div></div>
+  <p>The relaxation’s final energy was computed with the basis built for the starting cell. The static run on the final geometry gives the energy you report. It also writes the charge density for the band step and the DOSCAR for the DOS. Back up the relaxation outputs first (<code>cp OUTCAR OUTCAR.relax</code>, <code>cp CONTCAR CONTCAR.relax</code>), because the SCF overwrites them.</p>
+  <figure class="file"><figcaption><strong>INCAR</strong> · SCF (101 → ST, edited)<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="incar">SYSTEM  = Compound-scf
+ISTART  = 1            # read WAVECAR from the relaxation (same folder)
+PREC    = Accurate
+ENCUT   = 520          # same 1.3 × ENMAX as the relaxation
+EDIFF   = 1E-6         # tighten step by step: 1E-5 → 1E-6 (→ 1E-8 before optics)
+ALGO    = Normal
+NELM    = 200
+ISMEAR  = 0            # VASPkit template value
+SIGMA   = 0.05
+LREAL   = .FALSE.
+ISPIN   = 2
+MAGMOM  = 2*5.0 4*0.6
+NSW     = 0            # single point; IBRION then defaults to -1
+LORBIT  = 11           # projected DOS + PROCAR (for DOS)
+NEDOS   = 3001         # fine DOS energy grid
+LWAVE   = .TRUE.
+LCHARG  = .TRUE.       # CHGCAR is needed for the band step
+NCORE   = 4</pre></figure>
+  <h3>Converging repeatedly</h3>
+  <ol class="ladder">
+    <li><div>First pass with <code>EDIFF = 1E-5</code> (or 1E-4 if it oscillates).</div></li>
+    <li><div>Restart in the same folder with <code>ISTART = 1</code>, <code>ICHARG = 1</code> (read the CHGCAR just written) and <code>EDIFF = 1E-6</code>.</div></li>
+    <li><div>For optics, repeat once more at <code>EDIFF = 1E-8</code> (VASP wiki LOPTICS examples).</div></li>
+    <li><div>Converged when the last <code>dE</code> in OSZICAR is below EDIFF before NELM is reached.</div></li>
+  </ol>
+  <figure class="file"><figcaption><strong>shell</strong> · check the SCF<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="sh">tail -3 OSZICAR                          # last dE below EDIFF?
+grep "E-fermi" OUTCAR | tail -1          # Fermi level (eV)
+grep "energy  without entropy" OUTCAR | tail -1
+grep EENTRO OUTCAR | tail -1             # smearing entropy, keep below ~1 meV/atom</pre></figure>
+</section>
+
+<section id="dos">
+  <p class="kicker">Core sequence · step 2 (output)</p>
+  <h2>Total and projected density of states</h2>
+  <div class="flow"><div><b>Needs</b>The SCF run of step 2 with LORBIT = 11</div><div><b>Run</b>No extra VASP run: VASPkit reads DOSCAR</div><div><b>Produces</b>TDOS.dat, PDOS_&lt;El&gt;.dat</div></div>
+  <p>With <code>LORBIT = 11</code> the SCF writes the total and the site- and orbital-projected DOS into DOSCAR. <code>NEDOS = 3001</code> gives a fine energy grid; the default 301 points is too coarse for clean PDOS. For a smoother DOS, use a denser k-mesh in the SCF (VASPkit <code>102</code> with a smaller value, e.g. 0.02).</p>
+  <figure class="file"><figcaption><strong>shell</strong> · DOS analysis in the SCF folder<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="sh">printf "111\n" | vaspkit              # TDOS.dat
+printf "113\n" | vaspkit              # PDOS_&lt;El&gt;.dat, s p d (f) columns
+printf "115\n" | vaspkit              # chosen atoms + orbitals → PDOS_USER.dat</pre></figure>
+  <h3>Interpreting DOS and PDOS</h3>
+  <ul>
+    <li>VASPkit shifts energies so E<sub>F</sub> = 0. In an insulator VASP places E<sub>F</sub> near the valence band maximum, so the gap appears just above 0.</li>
+    <li><strong>Gap.</strong> DOS gaps are blurred by Gaussian broadening (SIGMA); take the number from <code>911</code> or the band structure.</li>
+    <li><strong>Metallic, half-metallic, semiconducting.</strong> Finite DOS at E<sub>F</sub> in both spin channels means metal; finite in one and gapped in the other means half-metal.</li>
+    <li><strong>Bonding character.</strong> Overlapping PDOS peaks of two species in the same energy range (e.g. TM-d with O-p) indicate hybridization; well-separated peaks indicate ionic character.</li>
+    <li><strong>Band edges.</strong> The species/orbital dominating the VBM and CBM tells you which states govern absorption and doping.</li>
+  </ul>
+</section>
+
+<section id="band">
+  <p class="kicker">Core sequence · step 3</p>
+  <h2>Band structure</h2>
+  <div class="flow"><div><b>Needs</b>Relaxed structure in the standardized primitive cell (602 / PRIMCELL.vasp)</div><div><b>Run</b>SCF without ICHARG = 11; KPATH.in from 303 as the band k-path</div><div><b>Produces</b>Eigenvalues on the path → 211: BAND.dat, KLABELS, BAND_GAP</div></div>
+  <div class="co tip"><b>Your step 3</b><p>“For BAND, Run SCF again without ICHARG=11 in INCAR, then generate KPATH.in which will be KPOINTS vaspkit 3 - 303. For data analyasis, vaspkit 21 211.”</p></div>
+  <p>The SCF density must come from a uniform k-mesh covering the whole Brillouin zone. The VASP wiki states that the line-mode mesh “is not suitable for self-consistent calculations”, because points along a path do not sample the zone. So the KPATH.in points are evaluated with the density converged on the uniform mesh. The wiki documents two ways to do that.</p>
+  <h3>Common start</h3>
+  <ol class="ladder">
+    <li><div>New folder; copy the relaxed POSCAR (standardized primitive cell), POTCAR, the uniform-mesh KPOINTS and the SCF INCAR of step 2 (<strong>no ICHARG = 11</strong>).</div></li>
+    <li><div><code>printf "303\n" | vaspkit</code> (2D: <code>302</code>) → <code>KPATH.in</code>, <code>PRIMCELL.vasp</code>, <code>HIGH_SYMMETRY_POINTS</code>. If PRIMCELL.vasp differs from your POSCAR, use it as POSCAR: the path is defined for that cell.</div></li>
+  </ol>
+  <h3>Route A: one SCF run with KPOINTS_OPT (VASP 6.3 or newer)</h3>
+  <ol class="ladder">
+    <li><div>Keep the uniform mesh in <code>KPOINTS</code>; <code>cp KPATH.in KPOINTS_OPT</code>.</div></li>
+    <li><div>Run the SCF without ICHARG = 11. VASP wiki: after SCF convergence, VASP computes the band energies for the k-points of KPOINTS_OPT in the same job.</div></li>
+    <li><div>Analysis: the path eigenvalues are written to vasprun.xml (and vaspout.h5). VASPkit 211 needs <code>EIGENVAL_OPT</code>/<code>PROCAR_OPT</code>, which depend on how VASP was compiled (VASPKIT tutorial, “Single-shot band structure”, VASPkit ≥ 1.3.2).</div></li>
+  </ol>
+  <h3>Route B: KPATH.in as KPOINTS reading the SCF density (VASPkit tutorial INCAR)</h3>
+  <ol class="ladder">
+    <li><div>After the SCF of the common start has converged, keep its CHGCAR in the folder; <code>cp KPATH.in KPOINTS</code>.</div></li>
+    <li><div>Run with the INCAR below: <code>ICHARG = 11</code> reads that CHGCAR and keeps it fixed. This is the band INCAR in the VASPKIT tutorial and the procedure on the VASP wiki.</div></li>
+    <li><div><code>printf "211\n" | vaspkit</code>, then <code>213</code> (projected), <code>911</code> (gap), <code>912</code> (effective mass).</div></li>
+  </ol>
+  <figure class="file"><figcaption><strong>INCAR</strong> · route B run on KPATH.in<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="incar">ICHARG  = 11           # read the SCF CHGCAR and keep it fixed
+PREC    = Accurate
+ENCUT   = 520          # same as the SCF
+EDIFF   = 1E-6
+ISMEAR  = 0
+SIGMA   = 0.05
+LORBIT  = 11           # PROCAR for projected (fat) bands
+ISPIN   = 2            # same spin settings as the SCF
+MAGMOM  = 2*5.0 4*0.6
+NSW     = 0
+LWAVE   = .FALSE.
+LCHARG  = .FALSE.</pre></figure>
+  <h3>Interpreting the band plot</h3>
+  <ul>
+    <li><strong>Fermi level:</strong> the wiki notes that a Fermi energy computed from path k-points is unreliable. Put the SCF value (<code>grep E-fermi OUTCAR</code> of the SCF) on line 2 of <code>FERMI_ENERGY.in</code> before running 211.</li>
+    <li><strong>Labels:</strong> keep the point labels after the coordinates in KPOINTS (KPATH.in has them); otherwise KLABELS shows “Undefined”.</li>
+    <li><strong>Direct vs indirect gap:</strong> VBM and CBM at the same k-point means direct; different k-points means indirect.</li>
+    <li><strong>Dispersion:</strong> steep bands mean light carriers; flat bands mean localized states and heavy masses.</li>
+    <li><strong>Gap accuracy:</strong> PBE underestimates gaps. Use HSE06 or mBJ for quantitative gaps.</li>
+  </ul>
+  <div class="co bad"><b>Common failure</b><p>Jagged bands or a wrong gap usually mean the path eigenvalues were computed self-consistently on the path itself, or from a CHGCAR of another cell or spin setting.</p></div>
+</section>
+
+<section id="optics">
+  <p class="kicker">Core sequence · step 5</p>
+  <h2>Optical properties</h2>
+  <div class="flow"><div><b>Needs</b>Relaxed structure; converged SCF (EDIFF 1E-6 → 1E-8) for NBANDS reference and WAVECAR</div><div><b>Run</b>LOPTICS=.TRUE., NBANDS ≈ 3× default, dense k-mesh</div><div><b>Produces</b>ε<sub>1</sub>(ω), ε<sub>2</sub>(ω) in vasprun.xml / OUTCAR → 711</div></div>
+  <p>VASP computes the imaginary part ε<sub>2</sub>(ω) from transitions between occupied and empty states, and obtains ε<sub>1</sub>(ω) by a Kramers–Kronig transform. Transitions need empty bands, which is why NBANDS is raised well above the default. This is the independent-particle picture: no excitons, no local-field effects.</p>
+  <h3>Sequence</h3>
+  <ol class="ladder">
+    <li><div>Static SCF with tight convergence (EDIFF = 1E-8 is ideal for smooth spectra).</div></li>
+    <li><div>Read the default band count: <code>grep NBANDS OUTCAR</code>.</div></li>
+    <li><div>Set NBANDS ≈ 3× that, rounded up to a multiple of the MPI ranks (script below).</div></li>
+    <li><div><code>101 → OP</code>, then edit: NBANDS, LOPTICS, CSHIFT, NEDOS, ISPIN/MAGMOM. Use a denser k-mesh than the SCF (0.02 or finer).</div></li>
+    <li><div>Run, then <code>printf "711\n1\n" | vaspkit</code> (1 = eV; 2 = nm; 3 = THz). It reads ε(ω) straight from vasprun.xml. VASPkit warns that 711 is not suitable for low-dimensional materials, where the vacuum dilutes ε.</div></li>
+  </ol>
+  <figure class="file"><figcaption><strong>shell</strong> · NBANDS rounded up<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="sh">nb=$(grep -m1 "NBANDS=" OUTCAR | awk '{print $NF}')
+np=32                                    # MPI ranks of the optics run
+echo $(( ( (3*nb + np - 1) / np ) * np ))   # e.g. nb=48 → 144; nb=50 → 160</pre></figure>
+  <figure class="file"><figcaption><strong>INCAR</strong> · optics (101 → OP, edited)<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="incar">ISTART  = 1            # optional: start from SCF WAVECAR
+PREC    = Accurate
+ENCUT   = 520
+EDIFF   = 1E-8
+ALGO    = Normal
+NELM    = 200
+ISMEAR  = 0
+SIGMA   = 0.05
+NBANDS  = 144          # ~3 × default, multiple of cores
+LOPTICS = .TRUE.
+CSHIFT  = 0.100
+NEDOS   = 2001
+ISPIN   = 2            # if magnetic
+MAGMOM  = 2*5.0 4*0.6
+LMAXMIX = 4
+NSW     = 0
+LWAVE   = .FALSE.
+LCHARG  = .FALSE.</pre></figure>
+  <h3>Quantities derived by 711</h3>
+  <div class="formula">|ε| = √(ε₁² + ε₂²)
+n(ω) = √[(|ε| + ε₁)/2]            refractive index
+k(ω) = √[(|ε| − ε₁)/2]            extinction coefficient
+α(ω) = 2ωk/c = √2 (ω/c) √(|ε| − ε₁)   absorption coefficient (cm⁻¹)
+R(ω) = [(n − 1)² + k²] / [(n + 1)² + k²]   normal-incidence reflectivity
+L(ω) = ε₂ / (ε₁² + ε₂²)           energy-loss function (plasmon peaks)
+σ(ω) = ωε₀ε₂                      optical conductivity (real part)</div>
+  <h3>Interpretation</h3>
+  <ul>
+    <li><strong>Absorption onset</strong> ≈ optical gap. If it sits at the PBE gap, it is underestimated: apply a scissor shift (rigidly shift ε<sub>2</sub> by Δ = E<sub>g</sub>(HSE or exp.) − E<sub>g</sub>(PBE), then redo Kramers–Kronig) or run optics with HSE/mBJ. CSHIFT is broadening, not a scissor.</li>
+    <li><strong>ε<sub>1</sub>(0)</strong> is the electronic (high-frequency) dielectric constant ε<sub>∞</sub>, and n(0) = √ε<sub>1</sub>(0). Cross-check with <a href="#bec">LEPSILON</a> (which includes local-field effects).</li>
+    <li><strong>Peaks in ε<sub>2</sub></strong> map to interband transitions; assign them using PDOS (e.g. O-2p → TM-3d).</li>
+    <li><strong>Is the band-edge transition allowed?</strong> A direct gap can still absorb weakly if the transition is dipole-forbidden. VASPkit <code>713</code> computes the transition dipole moment between two bands (e.g. VBM and CBM index) along the band path; run the band calculation with <code>LWAVE = .TRUE.</code>.</li>
+    <li><strong>Anisotropy:</strong> non-cubic crystals have different xx, yy, zz components. Report them separately or state that you averaged.</li>
+    <li><strong>Metals</strong> lack the intraband Drude term in LOPTICS; low-energy spectra of metals are incomplete.</li>
+    <li><strong>Converge NBANDS:</strong> raise it until spectra up to your plotted energy stop changing.</li>
+  </ul>
+</section>
+
+<section id="elastic">
+  <p class="kicker">Lattice &amp; response</p>
+  <h2>Elastic constants and mechanical properties</h2>
+  <div class="flow"><div><b>Needs</b>Structure re-relaxed at the elastic run’s ENCUT, residual pressure ≈ 0</div><div><b>Run</b>IBRION=6, ISIF=3, NFREE=4, POTIM=0.015</div><div><b>Produces</b>“TOTAL ELASTIC MODULI” in OUTCAR → 203</div></div>
+  <p>With IBRION = 6 and ISIF ≥ 3, VASP applies ± strains to the lattice (six independent strain components) and also displaces the ions, then computes the stress response. The result is the clamped-ion elastic tensor plus the correction from internal ionic relaxation; the sum is printed as <code>TOTAL ELASTIC MODULI</code>. Stress is very sensitive to the basis, so a high cutoff and a fully relaxed cell are essential.</p>
+  <figure class="file"><figcaption><strong>INCAR</strong> · elastic (101 → DC, edited)<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="incar">SYSTEM  = Compound-elastic
+PREC    = Accurate
+ENCUT   = 620          # ≥ 1.3 × ENMAX, same as the re-relaxation
+EDIFF   = 1E-8         # 1E-7 minimum
+ALGO    = Normal
+ISMEAR  = 0
+SIGMA   = 0.05
+LREAL   = .FALSE.
+LASPH   = .TRUE.
+ISPIN   = 2            # if magnetic
+MAGMOM  = 2*5.0 4*0.6
+LMAXMIX = 4
+IBRION  = 6            # finite differences with symmetry
+ISIF    = 3            # required for the elastic tensor
+NFREE   = 4            # 2 is cheaper, 4 more accurate
+POTIM   = 0.015        # displacement / strain step
+NSW     = 1
+LWAVE   = .FALSE.
+LCHARG  = .FALSE.
+# NCORE = 4            # commented out: IBRION = 6 runs without band parallelization</pre></figure>
+  <div class="co warn"><b>Before you run</b><ul>
+    <li>Relax with exactly this ENCUT, PREC and k-mesh. Then <code>grep "external pressure" OUTCAR | tail -1</code> should be within about ±1 kB.</li>
+    <li>Use a denser k-mesh than for the relaxation (metals especially); Cij converge slowly with k-points.</li>
+    <li>Use the conventional cell when its axes align with the crystal axes you want Cij in (e.g. cubic), so that VASPkit’s symmetry-specific analysis applies cleanly.</li>
+  </ul></div>
+  <figure class="file"><figcaption><strong>shell</strong> · extract and analyse<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="sh">grep -A 9 "TOTAL ELASTIC MODULI" OUTCAR   # kBar; divide by 10 for GPa
+printf "203\n" | vaspkit                  # reads TOTAL ELASTIC MODULI from OUTCAR</pre></figure>
+  <div class="co tip"><b>Ordering trap</b><p>OUTCAR orders rows and columns as XX YY ZZ <strong>XY YZ ZX</strong>; Voigt notation is 11 22 33 <strong>23 13 12</strong> (YZ ZX XY). VASP’s 4th, 5th, 6th entries map to Voigt 6, 4, 5. VASPkit 203 converts this for you; do it yourself if you parse OUTCAR directly.</p></div>
+  <h3>Stability criteria (Born)</h3>
+  <div class="tbl"><table>
+    <tr><th>Lattice</th><th>Conditions</th></tr>
+    <tr><td>Any</td><td>All six eigenvalues of the 6×6 C matrix positive (general, necessary and sufficient)</td></tr>
+    <tr><td>Cubic</td><td>C₁₁ − C₁₂ &gt; 0; C₁₁ + 2C₁₂ &gt; 0; C₄₄ &gt; 0</td></tr>
+    <tr><td>Hexagonal</td><td>C₁₁ &gt; |C₁₂|; 2C₁₃² &lt; C₃₃(C₁₁ + C₁₂); C₄₄ &gt; 0; C₆₆ = (C₁₁ − C₁₂)/2 &gt; 0</td></tr>
+    <tr><td>Tetragonal (I)</td><td>C₁₁ &gt; |C₁₂|; 2C₁₃² &lt; C₃₃(C₁₁ + C₁₂); C₄₄ &gt; 0; C₆₆ &gt; 0</td></tr>
+  </table></div>
+  <h3>Derived moduli (Voigt–Reuss–Hill)</h3>
+  <div class="formula">B_V = [(C11+C22+C33) + 2(C12+C13+C23)] / 9
+G_V = [(C11+C22+C33) − (C12+C13+C23) + 3(C44+C55+C66)] / 15
+B_R = 1 / [(S11+S22+S33) + 2(S12+S13+S23)]                 S = C⁻¹
+G_R = 15 / [4(S11+S22+S33) − 4(S12+S13+S23) + 3(S44+S55+S66)]
+B_H = (B_V + B_R)/2        G_H = (G_V + G_R)/2
+E   = 9BG / (3B + G)       ν = (3B − 2G) / [2(3B + G)]
+A_U = 5 G_V/G_R + B_V/B_R − 6          universal anisotropy (0 = isotropic)
+v_l = √[(B + 4G/3)/ρ]    v_t = √(G/ρ)    v_m = [(2/v_t³ + 1/v_l³)/3]^(−1/3)
+θ_D = (h/k_B) [3n N_A ρ / (4π M)]^(1/3) v_m                n atoms per formula unit, M molar mass</div>
+  <div class="tbl"><table>
+    <tr><th>Indicator</th><th>Reading</th></tr>
+    <tr><td>Pugh ratio B/G</td><td>&gt; 1.75 ductile; &lt; 1.75 brittle</td></tr>
+    <tr><td>Poisson ratio ν</td><td>&gt; 0.26 ductile; ~0.1 covalent, ~0.25 ionic, ~0.33 metallic bonding</td></tr>
+    <tr><td>Cauchy pressure C₁₂ − C₄₄</td><td>Positive: metallic, ductile; negative: directional/covalent bonding</td></tr>
+    <tr><td>Zener A = 2C₄₄/(C₁₁ − C₁₂)</td><td>Cubic anisotropy; 1 = isotropic</td></tr>
+    <tr><td>Vickers hardness (Chen model)</td><td>H<sub>V</sub> = 2(k²G)<sup>0.585</sup> − 3, k = G/B (GPa); empirical</td></tr>
+  </table></div>
+  <p>Cross-check: B<sub>H</sub> from Cij should agree with B<sub>0</sub> from the <a href="#eos">EOS fit</a> within a few percent. A large disagreement points to unconverged ENCUT/k-points or residual stress.</p>
+  <h3>What 203 reports</h3>
+  <p>203 prints C<sub>ij</sub> (GPa) and the compliance S<sub>ij</sub>; B, E, G and ν as Voigt, Reuss and Hill averages plus their directional minimum and maximum; P-wave modulus; Pugh ratio; Vickers hardness by the Chen and Tian models; Cauchy pressure; Kleinman parameter; universal and Chung–Buessem anisotropy; longitudinal, transverse and average sound velocities; Debye temperature; the six stiffness eigenvalues and the Born criteria. It writes <code>ELASTIC_TENSOR</code>. For the Cauchy pressure, use the interpretation in the table above (positive = metallic/ductile).</p>
+  <h3>Alternative: energy–strain method (VASPkit 201)</h3>
+  <p>The VASPkit authors implement this route because energies are less sensitive to numerical noise than stresses. It needs more runs: for a cubic crystal, 3 strain types × 7 strains.</p>
+  <ol class="ladder">
+    <li><div>Fully relaxed, standardized <strong>conventional</strong> cell (<code>603</code>/<code>604</code>), fine k-mesh (<code>102</code>).</div></li>
+    <li><div>INCAR for every strained cell: <code>PREC = High</code>, <code>EDIFF = 1E-8</code>, <code>ISIF = 2</code> (must be 2: ions relax, cell is fixed by the strain), <code>IBRION = 2</code>, <code>NSW = 100</code>, <code>EDIFFG = -1E-2</code>, <code>LREAL = F</code>, <code>ADDGRID = .TRUE.</code>.</div></li>
+    <li><div>VPKIT.in with first line <code>1</code> (pre-processing), then run <code>201</code>: it creates folders such as <code>C44/strain_-0.015 … strain_+0.015</code>.</div></li>
+    <li><div>Run VASP in every strain folder.</div></li>
+    <li><div>Change line 1 of VPKIT.in to <code>2</code> and run <code>201</code> again for the fit and the same analysis as 203.</div></li>
+  </ol>
+  <figure class="file"><figcaption><strong>VPKIT.in</strong> · bulk, 7 strains<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="sh">1                       ! 1 for pre-processing; 2 for post-processing
+3D                      ! 2D for two-dimensional, 3D for bulk
+7                       ! number of strain cases
+-0.015 -0.010 -0.005 0.000 0.005 0.010 0.015   ! strain range</pre></figure>
+  <p><strong>Other routes.</strong> <code>200</code> is VASPkit’s own stress–strain workflow; <code>202</code> analyses a tensor you type into <code>ELASTIC_TENSOR.in</code> (handy for literature values); <code>926</code> handles 2D materials.</p>
+</section>
+
+<section id="eos">
+  <p class="kicker">Lattice &amp; response</p>
+  <h2>Energy–volume curve and equation of state</h2>
+  <div class="flow"><div><b>Needs</b>Relaxed structure</div><div><b>Run</b>7–11 fixed-volume calculations (ISIF=4 or 2), ±5–10% in volume</div><div><b>Produces</b>E(V) → E₀, V₀, B₀, B′₀; phase stability vs pressure</div></div>
+  <p>An E–V curve gives the equilibrium volume and bulk modulus independently of the stress tensor, so it is free of Pulay stress at fixed cutoff. It is also how you compare polymorphs or magnetic states over a range of volumes, and how you get transition pressures.</p>
+  <figure class="file"><figcaption><strong>ev_scan.sh</strong><span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="sh">#!/bin/bash
+# INCAR: ISIF = 4 (shape + ions relax at fixed volume; use ISIF = 2 for cubic), IBRION = 2,
+#        NSW = 100, EDIFF = 1E-6, EDIFFG = -0.005, same ENCUT and k-mesh everywhere
+for s in 0.97 0.98 0.99 1.00 1.01 1.02 1.03; do        # lattice scale → ≈ ±9% volume
+  d=s_$s; mkdir -p $d; cp INCAR KPOINTS POTCAR $d/
+  awk -v s=$s 'NR==2{print $1*s; next}1' POSCAR &gt; $d/POSCAR
+  (cd $d &amp;&amp; mpirun -np 32 vasp_std &gt; vasp.out)
+  V=$(grep "volume of cell" $d/OUTCAR | tail -1 | awk '{print $NF}')
+  E=$(grep "energy  without entropy" $d/OUTCAR | tail -1 | awk '{print $NF}')
+  echo "$V $E" &gt;&gt; ev.dat
+done</pre></figure>
+  <h3>Birch–Murnaghan fit (3rd order)</h3>
+  <div class="formula">E(V) = E₀ + (9V₀B₀/16) { [(V₀/V)^(2/3) − 1]³ B′₀ + [(V₀/V)^(2/3) − 1]² [6 − 4(V₀/V)^(2/3)] }
+B₀ [GPa] = B₀ [eV/Å³] × 160.2177</div>
+  <figure class="file"><figcaption><strong>fit_eos.py</strong><span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="sh">import numpy as np
+from scipy.optimize import curve_fit
+
+V, E = np.loadtxt("ev.dat", unpack=True)          # Å^3, eV (per cell)
+
+def bm3(V, E0, V0, B0, Bp):
+    x = (V0 / V) ** (2.0 / 3.0)
+    return E0 + 9.0 * V0 * B0 / 16.0 * ((x - 1) ** 3 * Bp + (x - 1) ** 2 * (6 - 4 * x))
+
+a, b, c = np.polyfit(V, E, 2)                     # parabola for initial guesses
+V0g = -b / (2 * a)
+p, _ = curve_fit(bm3, V, E, p0=[E.min(), V0g, 2 * a * V0g, 4.0])
+E0, V0, B0, Bp = p
+print(f"E0 = {E0:.5f} eV  V0 = {V0:.3f} A^3  B0 = {B0 * 160.2177:.1f} GPa  B' = {Bp:.2f}")</pre></figure>
+  <ul>
+    <li>Make sure the minimum lies inside the scanned range; if the lowest point is at an edge, extend the scan.</li>
+    <li>B′<sub>0</sub> is usually 3.5–5. Values far outside suggest too few points, too narrow a range or noisy energies.</li>
+    <li>VASPkit task <code>205</code> fits the EOS directly; pymatgen’s <code>EOS(eos_name="birch_murnaghan")</code> and ASE’s <code>EquationOfState</code> are alternatives.</li>
+    <li><strong>Polymorphs / pressure:</strong> plot E(V) for each phase; the common tangent gives the transition pressure, or compare enthalpies H = E + PV with P = −dE/dV.</li>
+  </ul>
+</section>
+
+<section id="phonon">
+  <p class="kicker">Lattice &amp; response</p>
+  <h2>Phonons and vibrational properties</h2>
+  <div class="flow"><div><b>Needs</b>Tightly relaxed structure (EDIFFG ≈ −0.001, EDIFF 1E-8)</div><div><b>Run</b>Phonopy finite displacements in a supercell, or DFPT (IBRION=8)</div><div><b>Produces</b>Phonon dispersion, phonon DOS, free energy, heat capacity, entropy</div></div>
+  <p>Phonons test dynamical stability (no imaginary modes means the structure is a local minimum) and give vibrational thermodynamics. The force constants come from forces on atoms when one atom is displaced; a supercell is needed so that a displaced atom does not interact with its own periodic images.</p>
+  <h3>Route A: phonopy with finite displacements (recommended)</h3>
+  <ol class="ladder">
+    <li><div><strong>Re-relax tightly.</strong> EDIFF = 1E-8, EDIFFG = −0.001. Residual forces show up as spurious imaginary modes.</div></li>
+    <li><div><strong>Generate displacements:</strong> <code>phonopy -d --dim 2 2 2 -c POSCAR</code>. Writes <code>SPOSCAR</code> (perfect supercell), <code>POSCAR-001</code>…, <code>phonopy_disp.yaml</code>. Choose DIM so each supercell edge is ≳ 10 Å.</div></li>
+    <li><div><strong>Run one static VASP job per displacement</strong> with the INCAR below and a k-mesh reduced in proportion to the supercell.</div></li>
+    <li><div><strong>Collect forces:</strong> <code>phonopy -f disp-*/vasprun.xml</code> → <code>FORCE_SETS</code>.</div></li>
+    <li><div><strong>Dispersion and DOS</strong> with <code>band.conf</code> and <code>mesh.conf</code>, then thermal properties.</div></li>
+  </ol>
+  <div class="cols">
+  <figure class="file"><figcaption><strong>INCAR</strong> · each displacement<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="incar">PREC    = Accurate
+ENCUT   = 520
+EDIFF   = 1E-8
+ISMEAR  = 0
+SIGMA   = 0.02
+LREAL   = .FALSE.
+ADDGRID = .TRUE.
+LASPH   = .TRUE.
+ISPIN   = 2           # magnetic: MAGMOM for the SUPERCELL
+NSW     = 0
+LWAVE   = .FALSE.
+LCHARG  = .FALSE.</pre></figure>
+  <figure class="file"><figcaption><strong>shell</strong> · phonopy pipeline<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="sh">phonopy -d --dim 2 2 2 -c POSCAR
+for f in POSCAR-*; do
+  n=${f#POSCAR-}; mkdir -p disp-$n
+  cp $f disp-$n/POSCAR
+  cp INCAR KPOINTS POTCAR disp-$n/
+  (cd disp-$n &amp;&amp; mpirun -np 32 vasp_std &gt; vasp.out)
+done
+phonopy -f disp-*/vasprun.xml        # FORCE_SETS
+phonopy -p -s band.conf              # band.yaml, band.pdf
+phonopy-bandplot --gnuplot band.yaml &gt; phonon_band.dat
+phonopy -t -p -s mesh.conf           # DOS + thermal_properties.yaml</pre></figure>
+  </div>
+  <div class="cols">
+  <figure class="file"><figcaption><strong>band.conf</strong> · e.g. FCC path<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="incar">DIM = 2 2 2
+PRIMITIVE_AXES = AUTO
+BAND = 0 0 0  0.5 0 0.5  0.5 0.25 0.75  0.375 0.375 0.75  0 0 0  0.5 0.5 0.5
+BAND_LABELS = $\Gamma$ X W K $\Gamma$ L
+BAND_POINTS = 101
+# BAND = AUTO   (needs seekpath installed)
+# NAC = .TRUE.  (polar crystals, needs BORN file)</pre></figure>
+  <figure class="file"><figcaption><strong>mesh.conf</strong><span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="incar">DIM = 2 2 2
+PRIMITIVE_AXES = AUTO
+MP = 24 24 24
+TPROP = .TRUE.
+TMIN = 0
+TMAX = 1000
+TSTEP = 10
+# PDOS = 1 2, 3 4 5   (atom indices grouped per species)</pre></figure>
+  </div>
+  <h3>Route B: DFPT force constants (IBRION = 8)</h3>
+  <p>Run one VASP job on the perfect supercell (<code>cp SPOSCAR POSCAR</code>) with <code>IBRION = 8</code>, <code>EDIFF = 1E-8</code>, NCORE removed. Then <code>phonopy --fc vasprun.xml</code> writes <code>FORCE_CONSTANTS</code>; add <code>FORCE_CONSTANTS = READ</code> to band.conf and mesh.conf. DFPT is one job instead of many, but it does not support every functional (no hybrids, limited +U support) and scales poorly for large supercells.</p>
+  <h3>Polar materials: LO–TO splitting</h3>
+  <p>In ionic insulators the long-range dipole field splits longitudinal and transverse optical modes at Γ. Without a correction the Γ-point optical branches are wrong. Compute ε<sub>∞</sub> and Born charges in the <em>unit cell</em> (<a href="#bec">next section</a>), then <code>phonopy-vasp-born vasprun.xml &gt; BORN</code> and set <code>NAC = .TRUE.</code>.</p>
+  <h3>Γ-point modes only</h3>
+  <p>For IR/Raman assignment you only need Γ frequencies: run IBRION = 5–8 on the unit cell (<code>101 → FQ</code>). OUTCAR lists each mode as <code>f</code> (real) or <code>f/i</code> (imaginary) in THz, 2πTHz, cm⁻¹ and meV. Three near-zero modes are the acoustic translations.</p>
+  <h3>Interpreting phonons</h3>
+  <ul>
+    <li><strong>No imaginary branches:</strong> dynamically stable at 0 K.</li>
+    <li><strong>Small imaginary acoustic dip near Γ</strong> (a few cm⁻¹): numerical noise. Tighten EDIFF, add ADDGRID, increase ENCUT/k-mesh or supercell, re-relax tighter.</li>
+    <li><strong>Large imaginary modes at a zone-boundary point:</strong> genuine instability. Displace atoms along that eigenvector in the matching supercell and re-relax to find the lower-symmetry phase.</li>
+    <li><strong>Gap between acoustic and optical branches</strong> follows from mass contrast; flat, low-lying optical modes (rattlers) suppress thermal conductivity.</li>
+    <li><strong>Thermal properties:</strong> heat capacity C<sub>V</sub> approaches 3Nk<sub>B</sub> per cell at high T (Dulong–Petit); vibrational free energy F<sub>vib</sub>(T) adds to E<sub>DFT</sub> for finite-temperature phase stability. Quasi-harmonic (phonopy-qha) adds thermal expansion.</li>
+  </ul>
+</section>
+
+<section id="bec">
+  <p class="kicker">Lattice &amp; response</p>
+  <h2>Dielectric tensor and Born effective charges</h2>
+  <div class="flow"><div><b>Needs</b>Relaxed unit cell; insulator or semiconductor</div><div><b>Run</b>LEPSILON=.TRUE., IBRION=8 (or LCALCEPS with IBRION=6)</div><div><b>Produces</b>ε∞, ionic ε, ε₀, Born effective charges Z*, piezoelectric tensor</div></div>
+  <p>The Born effective charge Z*<sub>κ,αβ</sub> is the polarization change in direction α when atom κ moves in direction β. It measures dynamical charge, which can greatly exceed the nominal ionic charge in materials with strong covalent/ferroelectric character. ε<sub>∞</sub> is the electronic screening; adding the ionic contribution gives the static ε<sub>0</sub>.</p>
+  <figure class="file"><figcaption><strong>INCAR</strong> · DFPT dielectric (101 → EC, edited)<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="incar">PREC     = Accurate
+ENCUT    = 520
+EDIFF    = 1E-8
+ISMEAR   = 0
+SIGMA    = 0.01
+LREAL    = .FALSE.
+LASPH    = .TRUE.
+IBRION   = 8            # DFPT: also gives ionic contribution and Γ phonons
+LEPSILON = .TRUE.
+LRPA     = .FALSE.      # include local-field effects in DFT
+NSW      = 1
+LWAVE    = .FALSE.
+LCHARG   = .FALSE.
+# NCORE  : not set (DFPT needs NCORE = 1)
+# Hybrid / meta-GGA: replace IBRION=8 + LEPSILON by IBRION=6 + LCALCEPS=.TRUE.</pre></figure>
+  <figure class="file"><figcaption><strong>shell</strong> · read the tensors<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="sh">grep -A 5 "MACROSCOPIC STATIC DIELECTRIC TENSOR (including local field effects in DFT)" OUTCAR | tail -4  # ε∞
+grep -A 5 "MACROSCOPIC STATIC DIELECTRIC TENSOR IONIC CONTRIBUTION" OUTCAR                            # ionic part
+grep -A 40 "BORN EFFECTIVE CHARGES" OUTCAR | head -45                                                 # Z* per ion, 3×3
+phonopy-vasp-born vasprun.xml &gt; BORN                                                               # for phonopy NAC</pre></figure>
+  <ul>
+    <li><strong>Acoustic sum rule:</strong> Σ<sub>κ</sub> Z*<sub>κ</sub> should be ≈ 0 for each tensor component. A sum above ~0.1 means the k-mesh or EDIFF is too loose.</li>
+    <li><strong>Anomalous Z*</strong> (e.g. Ti ≈ +7 in BaTiO₃ vs nominal +4) signals strong p–d hybridization and proximity to a ferroelectric instability.</li>
+    <li><strong>ε<sub>0</sub> = ε<sub>∞</sub> + ε<sub>ion</sub>.</strong> Compare ε<sub>∞</sub> with ε<sub>1</sub>(0) from LOPTICS; LEPSILON includes local-field effects and is usually slightly smaller.</li>
+    <li>ε, Z* and polarization are ill-defined in metals; do not run this on a metallic state.</li>
+  </ul>
+</section>
+
+<section id="bader">
+  <p class="kicker">Charge &amp; spin</p>
+  <h2>Bader charge analysis</h2>
+  <div class="flow"><div><b>Needs</b>Relaxed structure; Henkelman <code>bader</code> code and <code>chgsum.pl</code> (VTST scripts)</div><div><b>Run</b>Static run with LAECHG=.TRUE.</div><div><b>Produces</b>ACF.dat: electrons per atom → net atomic charges</div></div>
+  <p>Bader partitions space along zero-flux surfaces of the charge density and integrates the electrons in each atom’s basin. PAW CHGCAR files contain only the pseudo valence density, which has no maxima at the nuclei, so the partition is done on the all-electron reference (core + valence) and the valence charge is integrated inside those basins.</p>
+  <figure class="file"><figcaption><strong>INCAR</strong> · Bader (101 → BD, edited)<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="incar">PREC    = Accurate
+ENCUT   = 520
+EDIFF   = 1E-6
+ISMEAR  = 0
+SIGMA   = 0.05
+NSW     = 0
+LAECHG  = .TRUE.       # writes AECCAR0 (core) and AECCAR2 (valence)
+LCHARG  = .TRUE.
+LWAVE   = .FALSE.
+ISPIN   = 2
+MAGMOM  = 2*5.0 4*0.6
+# For accurate charges, refine the FFT grid, e.g. NGXF/NGYF/NGZF ≈ 2× default (see OUTCAR)</pre></figure>
+  <figure class="file"><figcaption><strong>shell</strong> · Bader workflow<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="sh">chgsum.pl AECCAR0 AECCAR2           # → CHGCAR_sum (reference density)
+bader CHGCAR -ref CHGCAR_sum        # → ACF.dat, BCF.dat, AVF.dat
+grep ZVAL POTCAR                    # valence electrons per species
+cat ACF.dat                         # columns: # X Y Z CHARGE MIN_DIST ATOMIC_VOL
+# net charge of atom i  =  ZVAL(species of i) − CHARGE(i)</pre></figure>
+  <ul>
+    <li><strong>Sign:</strong> positive net charge means electrons lost (cation-like). Bader charges are always smaller than formal oxidation states (e.g. O ≈ −1.0 to −1.3 in oxides); compare trends, not absolute values.</li>
+    <li><strong>Check:</strong> the total of the CHARGE column equals the total valence electrons; vacuum charge at the bottom of ACF.dat should be ≈ 0 for bulk.</li>
+    <li><strong>Grid convergence:</strong> repeat with a finer FFT grid; charges should change by &lt; 0.01 e.</li>
+    <li><strong>Charge transfer at interfaces/adsorbates:</strong> sum the Bader charges of each fragment and compare with the isolated fragments; combine with charge-density difference plots (Δρ = ρ<sub>AB</sub> − ρ<sub>A</sub> − ρ<sub>B</sub>, same grid and cell).</li>
+  </ul>
+</section>
+
+<section id="magnetic">
+  <p class="kicker">Charge &amp; spin</p>
+  <h2>Magnetic properties and ground-state search</h2>
+  <div class="flow"><div><b>Needs</b>Relaxed structure; supercell that can hold the AFM orders you want</div><div><b>Run</b>NM, FM and several AFM configurations, each relaxed, same cell and settings</div><div><b>Produces</b>Ground-state order, moments, exchange energies, MAE</div></div>
+  <p>A spin-polarized calculation finds the nearest local minimum to the starting MAGMOM, not necessarily the ground state. You find the ground state by explicitly computing all plausible orders and comparing their energies per formula unit.</p>
+  <h3>Configuration comparison</h3>
+  <ol class="ladder">
+    <li><div>Build a supercell that accommodates each order (e.g. doubling along c for layered A-type AFM, √2×√2 or 2×2×2 for checkerboard G-type). Use the <strong>same supercell for every configuration</strong>, including FM and NM, so k-point and basis errors cancel.</div></li>
+    <li><div>Set MAGMOM per configuration (below) and relax each one (ISIF=3), since magnetic order changes the volume.</div></li>
+    <li><div>Run a static SCF for each; compare <code>energy without entropy</code> per formula unit.</div></li>
+    <li><div>Check that each run kept its intended pattern: if an AFM start ended FM, that configuration is unstable or the start was poor.</div></li>
+  </ol>
+  <div class="cols">
+  <figure class="file"><figcaption><strong>MAGMOM</strong> · 4 TM + 8 O supercell<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="incar">ISPIN  = 2
+# NM : ISPIN = 1
+# FM
+MAGMOM = 4*4.0 8*0.0
+# AFM-1 (layered)
+MAGMOM = 4.0 4.0 -4.0 -4.0 8*0.0
+# AFM-2 (checkerboard)
+MAGMOM = 4.0 -4.0 -4.0 4.0 8*0.0</pre></figure>
+  <figure class="file"><figcaption><strong>shell</strong> · read moments<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="sh">grep "mag=" OSZICAR | tail -1                 # total cell moment (μB)
+N=12                                           # number of atoms
+grep -A $((N+6)) "magnetization (x)" OUTCAR | tail -$((N+6))
+                                               # per-site s p d tot (LORBIT=11)
+grep "number of electron" OUTCAR | tail -1     # electrons and magnetization</pre></figure>
+  </div>
+  <h3>Interpretation</h3>
+  <ul>
+    <li><strong>ΔE = E<sub>AFM</sub> − E<sub>FM</sub></strong> per formula unit: positive → FM ground state; negative → AFM. Differences below a few meV/f.u. are within DFT uncertainty and depend strongly on U.</li>
+    <li><strong>Moments</strong> per site are integrated inside PAW spheres and slightly smaller than the formal value (e.g. high-spin Fe³⁺ ≈ 4.2–4.3 μB vs 5 μB). The <em>total</em> cell moment is integer for half-metals and insulators.</li>
+    <li><strong>Exchange constants:</strong> map the energies of three or more configurations onto a Heisenberg model E = E₀ − Σ J<sub>ij</sub> S<sub>i</sub>·S<sub>j</sub> and solve for J₁, J₂… Count bonds carefully per configuration.</li>
+    <li><strong>Mean-field T<sub>C</sub> estimate:</strong> k<sub>B</sub>T<sub>C</sub> ≈ (2/3) ΔE per magnetic atom. It overestimates; Monte Carlo on the fitted J is more reliable.</li>
+    <li><strong>Half-metallicity:</strong> one spin channel gapped at E<sub>F</sub> in the spin-resolved DOS, with an integer total moment.</li>
+  </ul>
+  <h3>Magnetocrystalline anisotropy (SOC)</h3>
+  <ol class="ladder">
+    <li><div>Collinear SCF with <code>vasp_std</code>, LMAXMIX = 4 (6 for f), tight EDIFF; keep CHGCAR and WAVECAR.</div></li>
+    <li><div>Non-collinear runs with <code>vasp_ncl</code>: <code>LSORBIT = .TRUE.</code>, <code>ICHARG = 11</code>, <code>ISYM = -1</code>, <code>LORBMOM = .TRUE.</code>, MAGMOM as 3 components per atom, one run per spin direction (e.g. MAGMOM = 0 0 4 … for [001], 4 0 0 … for [100]).</div></li>
+    <li><div>MAE = E[100] − E[001] (μeV–meV per atom). Converge the k-mesh hard: MAE needs very dense sampling.</div></li>
+  </ol>
+</section>
+
+<section id="dftu">
+  <p class="kicker">Beyond PBE</p>
+  <h2>DFT+U</h2>
+  <div class="flow"><div><b>Needs</b>System with localized d or f electrons (TM oxides, fluorides, rare earths)</div><div><b>Run</b>LDAU tags in every step: relax, SCF, DOS, bands</div><div><b>Produces</b>Corrected localization, gaps, moments, magnetic ordering</div></div>
+  <p>Semilocal functionals over-delocalize d/f electrons because of self-interaction error, which often turns Mott insulators into metals and underestimates moments. The Hubbard U penalty favours integer occupation of the chosen orbitals. In the Dudarev scheme only U<sub>eff</sub> = U − J matters.</p>
+  <figure class="file"><figcaption><strong>INCAR</strong> · +U block (101 → PU)  ·  POSCAR species: Fe O<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="incar">LDAU      = .TRUE.
+LDAUTYPE  = 2          # Dudarev: only U - J enters
+LDAUL     = 2 -1       # per species: 2 = d, 3 = f, -1 = none
+LDAUU     = 5.3 0.0
+LDAUJ     = 0.0 0.0
+LDAUPRINT = 1          # print occupation matrices to OUTCAR
+LMAXMIX   = 4          # 6 for f elements; also in all ICHARG=11 runs
+LASPH     = .TRUE.
+ISPIN     = 2
+MAGMOM    = 2*5.0 3*0.6
+ALGO      = Normal     # All if SCF struggles
+NELM      = 200</pre></figure>
+  <div class="tbl"><table>
+    <tr><th>Element (oxides/fluorides)</th><th>Co</th><th>Cr</th><th>Fe</th><th>Mn</th><th>Mo</th><th>Ni</th><th>V</th><th>W</th></tr>
+    <tr><td>U<sub>eff</sub> (eV), Materials Project</td><td class="num">3.32</td><td class="num">3.7</td><td class="num">5.3</td><td class="num">3.9</td><td class="num">4.38</td><td class="num">6.2</td><td class="num">3.25</td><td class="num">6.2</td></tr>
+  </table></div>
+  <h3>Choosing U</h3>
+  <ul>
+    <li><strong>Literature / database values</strong> (above) keep your energies compatible with Materials Project-style phase diagrams.</li>
+    <li><strong>Linear response</strong> (Cococcioni–de Gironcoli): compute the response of d-occupation to small potential shifts (LDAUTYPE = 3) and derive U self-consistently for your compound.</li>
+    <li><strong>Empirical fit</strong> to an experimental gap, moment or oxidation enthalpy. State which property you fitted.</li>
+    <li>Scan U (e.g. 0–7 eV) and report how your conclusions (gap, magnetic ground state) depend on it.</li>
+  </ul>
+  <div class="co warn"><b>Pitfalls</b><ul>
+    <li>Total energies with different U are not comparable. Formation energies mixing +U and plain GGA compounds need a correction scheme (e.g. MP2020).</li>
+    <li>+U creates metastable states: different MAGMOM or starting occupations can converge to different energies. Try several starts and keep the lowest; occupation-matrix control or U-ramping (0 → U in steps, reading WAVECAR) help.</li>
+    <li>LDAUL/LDAUU/LDAUJ need one entry per species, in POSCAR order. A missing entry silently shifts values to the wrong element.</li>
+    <li>Check the d-occupations (<code>LDAUPRINT = 1</code>) and moments make chemical sense for the expected oxidation state.</li>
+  </ul></div>
+</section>
+
+<section id="metagga">
+  <p class="kicker">Beyond PBE</p>
+  <h2>Meta-GGA: SCAN, r2SCAN, mBJ</h2>
+  <div class="flow"><div><b>Needs</b>POTCARs carrying kinetic-energy-density data (PBE.52/.54/.64 sets); PBE WAVECAR as a start</div><div><b>Run</b>METAGGA tag, LASPH, ALGO=All</div><div><b>Produces</b>Better structures and energetics (r2SCAN); better gaps (mBJ)</div></div>
+  <p>Meta-GGAs add the kinetic-energy density τ to the functional. SCAN satisfies all known exact constraints of a semilocal functional and improves lattice constants, formation energies and intermediate-range bonding over PBE at moderate cost. r2SCAN keeps most of that accuracy with much better numerical stability. mBJ is a model potential designed for band gaps.</p>
+  <div class="cols">
+  <figure class="file"><figcaption><strong>INCAR</strong> · r2SCAN (add to a 101 → ST template)<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="incar">METAGGA = R2SCAN       # or SCAN; remove any GGA tag
+LASPH   = .TRUE.       # mandatory
+LMIXTAU = .TRUE.       # mix τ for stable SCF
+ALGO    = All
+ENCUT   = 600          # meta-GGAs need higher cutoffs
+PREC    = Accurate
+EDIFF   = 1E-6
+ISTART  = 1            # start from a converged PBE WAVECAR
+ISMEAR  = 0
+SIGMA   = 0.05
+# + rVV10 dispersion (SCAN): LUSE_VDW = .TRUE.
+#   BPARAM = 15.7 for SCAN+rVV10, 11.95 for r2SCAN+rVV10</pre></figure>
+  <figure class="file"><figcaption><strong>INCAR</strong> · mBJ band gap<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="incar">METAGGA = MBJ
+LASPH   = .TRUE.
+ALGO    = All          # or Normal
+NELM    = 300
+ISTART  = 1            # from PBE WAVECAR
+ISMEAR  = 0
+SIGMA   = 0.05
+NSW     = 0            # mBJ is a potential: no total energy or forces → use the PBE geometry
+# CMBJ  = fixed c (optional); by default c is computed self-consistently</pre></figure>
+  </div>
+  <ul>
+    <li><strong>Band structures</strong> with meta-GGA: the safest route is the zero-weight k-point method used for hybrids (<code>251</code> → SCF with that KPOINTS → <code>252</code>), since non-self-consistent ICHARG = 11 runs need τ, which is not stored in CHGCAR in older VASP versions.</li>
+    <li>SCAN is sensitive to the integration grid; if energies jump between runs, use r2SCAN.</li>
+    <li>Do not mix meta-GGA and PBE energies in one formation-energy calculation; every reference must use the same functional.</li>
+  </ul>
+</section>
+
+<section id="hybrid">
+  <p class="kicker">Beyond PBE</p>
+  <h2>Hybrid functionals: HSE06 and PBE0</h2>
+  <div class="flow"><div><b>Needs</b>PBE-relaxed structure, converged PBE WAVECAR (same k-mesh)</div><div><b>Run</b>LHFCALC, HFSCREEN, ALGO=Damped/All, from WAVECAR</div><div><b>Produces</b>Accurate gaps, band edges, defect levels; costly</div></div>
+  <p>Hybrids replace part of the semilocal exchange with exact (Fock) exchange, reducing self-interaction error. HSE06 screens the long-range part (HFSCREEN = 0.2 Å⁻¹), making it practical for solids. Gaps typically come within ~10–20% of experiment for sp semiconductors, but cost rises 10–100×, mostly with the number of k-points.</p>
+  <figure class="file"><figcaption><strong>INCAR</strong> · HSE06 SCF (101 → H6)<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="incar">ISTART   = 1           # from converged PBE WAVECAR
+PREC     = Accurate
+ENCUT    = 520
+EDIFF    = 1E-6
+LHFCALC  = .TRUE.
+HFSCREEN = 0.2         # HSE06; 0.0 → PBE0
+AEXX     = 0.25        # exact-exchange fraction
+ALGO     = Damped      # or All / Normal
+TIME     = 0.4
+PRECFOCK = Normal      # Fast to save time
+# NKRED  = 2           # halves the exchange k-mesh (even meshes only)
+ISMEAR   = 0
+SIGMA    = 0.05
+LASPH    = .TRUE.
+NSW      = 0
+LORBIT   = 11
+NEDOS    = 3001</pre></figure>
+  <h3>Hybrid band structure (no ICHARG = 11)</h3>
+  <p>Exact exchange needs wavefunctions on a uniform mesh, so a frozen-density band run is not possible. Instead, the path points are added to the SCF k-point list with zero weight: they do not contribute to the density but get correct eigenvalues.</p>
+  <ol class="ladder">
+    <li><div>PBE SCF on a uniform mesh; keep WAVECAR to start the hybrid run.</div></li>
+    <li><div><code>303</code> for KPATH.in, then <code>251</code>: give the SCF mesh type and resolution, then the path resolution (0.04–0.06). VASPkit writes a KPOINTS with the weighted irreducible mesh first and the zero-weight path points after it.</div></li>
+    <li><div>HSE run with that KPOINTS (it is one SCF calculation; cost grows with the extra points, so use ~10–20 per segment).</div></li>
+    <li><div><code>252</code> extracts the band structure (<code>253</code>–<code>255</code> for projected hybrid bands); <code>911</code> for the gap.</div></li>
+  </ol>
+  <ul>
+    <li>Relaxing with HSE is rarely worth it; PBE (or PBEsol/r2SCAN) geometries plus HSE electronic structure is standard. Say which you used.</li>
+    <li>Optics with HSE: LOPTICS works in the HSE SCF, but it is expensive. A scissor shift of PBE spectra to the HSE gap is a common compromise.</li>
+    <li>If the SCF diverges: converge PBE first, use ALGO = All or Damped with smaller TIME (0.2), and avoid starting from random wavefunctions.</li>
+  </ul>
+</section>
+
+<section id="more">
+  <p class="kicker">Toolbox</p>
+  <h2>Other calculations for a complete picture</h2>
+  <div class="tbl"><table>
+    <tr><th>Property</th><th>How</th><th>Key settings / formula</th></tr>
+    <tr><td>Formation enthalpy</td><td class="wrap">Total energies of compound and elemental reference phases, same functional, ENCUT and POTCARs</td><td class="wrap">ΔH<sub>f</sub> = [E(A<sub>x</sub>B<sub>y</sub>) − x E(A) − y E(B)] / (x + y), per atom. Negative = stable relative to the elements. Gas references (O₂) need corrections.</td></tr>
+    <tr><td>Thermodynamic stability</td><td class="wrap">Energy above convex hull vs all competing phases (pymatgen PhaseDiagram)</td><td class="wrap">E<sub>hull</sub> = 0 stable; &lt; ~50 meV/atom possibly synthesizable</td></tr>
+    <tr><td>Cohesive energy</td><td class="wrap">Isolated atoms in a large asymmetric box (e.g. 15×15.5×16 Å), Γ-only, spin-polarized, ISYM = 0</td><td class="wrap">E<sub>coh</sub> = [Σ n<sub>i</sub>E<sub>atom,i</sub> − E<sub>bulk</sub>] / N</td></tr>
+    <tr><td>Work function</td><td class="wrap">Slab with ≥ 15 Å vacuum, LVHAR = .TRUE., dipole correction for asymmetric slabs; LVHAR = .TRUE. (electrostatic potential reaches the vacuum level faster than LVTOT’s total potential), IDIPOL = 3; then <code>426</code>, direction z, which prints the vacuum level and writes POTPAVG.dat. Check the vacuum level is converged with vacuum thickness</td><td class="wrap">Φ = E<sub>vac</sub> − E<sub>F</sub> (E<sub>F</sub> from <code>grep E-fermi OUTCAR</code>). VASPkit example: Au(111), 6.695 − 1.520 = 5.18 eV</td></tr>
+    <tr><td>Surface energy</td><td class="wrap">Symmetric slabs of increasing thickness, ISIF = 2</td><td class="wrap">γ = [E<sub>slab</sub> − N E<sub>bulk/atom</sub>] / (2A)</td></tr>
+    <tr><td>Effective mass</td><td class="wrap">Fine k-grid around VBM/CBM; VASPkit 912</td><td class="wrap">1/m* = (1/ħ²) ∂²E/∂k²</td></tr>
+    <tr><td>ELF</td><td class="wrap">Static run with LELF = .TRUE., NCORE = 1; view ELFCAR in VESTA</td><td class="wrap">ELF ≈ 1 localized (covalent bond, lone pair); ≈ 0.5 electron-gas-like (metallic)</td></tr>
+    <tr><td>Charge density difference</td><td class="wrap">Relax AB; then static runs of fragments A and B <strong>at their positions in the relaxed AB</strong> (do not relax the fragments), same cell and grid. <code>314</code> with <code>./CHGCAR ./A/CHGCAR ./B/CHGCAR</code></td><td class="wrap">Δρ = ρ<sub>AB</sub> − ρ<sub>A</sub> − ρ<sub>B</sub> → <code>CHGDIFF.vasp</code> for VESTA. Same tool gives deformation density (SCF − atomic superposition) and field-induced Δρ (EFIELD)</td></tr>
+    <tr><td>Spin density</td><td class="wrap">Spin-polarized CHGCAR → <code>312</code> (<code>SPIN.vasp</code>) or <code>313</code> (up/down)</td><td class="wrap">Shows which orbitals and sites carry the moment</td></tr>
+    <tr><td>Band offsets</td><td class="wrap">Heterostructure with LVHAR; <code>427</code> with period ≈ the layer repeat length</td><td class="wrap">Step in the macroscopic average across the interface</td></tr>
+    <tr><td>d-band centre</td><td class="wrap">DOS run with LORBIT = 11; <code>503</code>, window up to E<sub>F</sub></td><td class="wrap">ε<sub>d</sub> = ∫n<sub>d</sub>ε dε / ∫n<sub>d</sub> dε; trends predict adsorption strength on metals</td></tr>
+    <tr><td>Fermi surface</td><td class="wrap">Primitive cell, <code>261</code> (resolution ≈ 0.01) → run → <code>262</code></td><td class="wrap"><code>FERMISURFACE.bxsf</code>, view in XCrySDen</td></tr>
+    <tr><td>Wavefunction plots</td><td class="wrap">Static run with LWAVE; <code>511</code>, choose k-point and band (e.g. VBM/CBM index from EIGENVAL)</td><td class="wrap">Real part <code>RWAV_*.vasp</code> shows orbital character of band edges</td></tr>
+    <tr><td>Free-energy corrections</td><td class="wrap">Frequency run (IBRION = 5, only the molecule/adsorbate free); <code>502</code> gas (T, P, spin multiplicity) or <code>501</code> adsorbate (T)</td><td class="wrap">ZPE and TS for catalysis free energies; modes below 50 cm⁻¹ are raised to 50 cm⁻¹</td></tr>
+    <tr><td>Spin–orbit bands</td><td class="wrap"><code>vasp_ncl</code>, LSORBIT, from collinear CHGCAR</td><td class="wrap">Splittings for heavy elements; Rashba; topological band inversions</td></tr>
+    <tr><td>van der Waals</td><td class="wrap">IVDW = 11 / 12 in relaxation (101 → D3)</td><td class="wrap">Essential for layered (c-axis) and molecular crystals</td></tr>
+    <tr><td>Bonding (COHP)</td><td class="wrap">LOBSTER after a static run with ISYM = 0 (or −1), LWAVE = .TRUE., enough NBANDS</td><td class="wrap">−COHP &gt; 0 bonding, &lt; 0 antibonding; ICOHP measures bond strength</td></tr>
+    <tr><td>Defects</td><td class="wrap">Supercell with vacancy/substitution, charged states with NELECT, finite-size corrections</td><td class="wrap">E<sub>f</sub> = E<sub>def</sub> − E<sub>bulk</sub> − Σ n<sub>i</sub>μ<sub>i</sub> + q(E<sub>F</sub> + E<sub>VBM</sub>) + E<sub>corr</sub></td></tr>
+    <tr><td>Ab initio MD</td><td class="wrap">IBRION = 0, MDALGO, TEBEG, POTIM ≈ 1 fs, NSW thousands (101 → MD)</td><td class="wrap">Thermal stability at finite T: structure intact, energy fluctuates around a constant. <code>721</code> MSD (diffusion), <code>722</code> RDF</td></tr>
+  </table></div>
+</section>
+
+<section id="trouble">
+  <p class="kicker">Toolbox</p>
+  <h2>Troubleshooting convergence</h2>
+  <p>First decide which loop is failing. In <code>OSZICAR</code>, the lines starting with <code>DAV:</code> / <code>RMM:</code> are electronic steps; the lines with <code>F=</code> are ionic steps. If each ionic step burns all NELM electronic steps, fix the electronic problem first; ionic convergence cannot happen on unconverged forces.</p>
+  <figure class="file"><figcaption><strong>shell</strong> · diagnose<span class="sp"></span><button class="copy">Copy</button></figcaption><pre class="sh">tail -30 OSZICAR                               # dE oscillating or slowly decreasing?
+grep -B1 "F=" OSZICAR | grep -E "DAV|RMM" | awk '{print $2}'   # electronic steps used per ionic step
+grep "reached required accuracy" OUTCAR        # ionic convergence reached?
+grep -A $((N+1)) "TOTAL-FORCE" OUTCAR | tail -$N   # set N = number of atoms; forces on last step
+grep "external pressure" OUTCAR | tail -3      # stress trend during ISIF=3</pre></figure>
+
+  <h3>Electronic (SCF) ladder</h3>
+  <p>Work down the list; stop at the first rung that fixes it.</p>
+  <ol class="ladder">
+    <li><div><strong>Check the input.</strong> Atoms too close, POSCAR/POTCAR species order mismatch, MAGMOM count wrong, unreasonable starting moment.</div></li>
+    <li><div><strong>Progressive EDIFF.</strong> Run with <code>EDIFF = 1E-4</code> until stable, then restart from the result with <code>ISTART = 1</code>, <code>ICHARG = 1</code> and <code>EDIFF = 1E-5</code>, then 1E-6 (and 1E-8 for response). Each stage starts closer to the solution, so the tight stage converges in a few steps instead of wandering from random wavefunctions. Your “converge repeatedly” step is this ladder.</div></li>
+    <li><div><strong>Change the algorithm.</strong> <code>ALGO = Normal</code> (most robust Davidson) → <code>All</code> → <code>Damped</code> with <code>TIME = 0.4</code>. Avoid <code>Fast</code>/<code>VeryFast</code> for magnetic or +U systems.</div></li>
+    <li><div><strong>Damp the mixing.</strong> <code>AMIX = 0.1</code>, <code>BMIX = 0.0001</code>, <code>AMIX_MAG = 0.4</code>, <code>BMIX_MAG = 0.0001</code> (linear mixing). For charge sloshing in metals/slabs reduce AMIX and BMIX gradually.</div></li>
+    <li><div><strong>More steps and warm-up.</strong> <code>NELM = 200–300</code>, <code>NELMDL = -12</code>.</div></li>
+    <li><div><strong>Smearing.</strong> Temporarily larger SIGMA (0.1–0.2) for metals or near-degenerate states, then reduce and restart from CHGCAR.</div></li>
+    <li><div><strong>Spin strategy.</strong> Converge non-spin-polarized first, then restart spin-polarized from that CHGCAR (ICHARG = 1) with MAGMOM; or fix the moment with NUPDOWN, converge, then release it.</div></li>
+    <li><div><strong>DFT+U / hybrids.</strong> Converge plain PBE first and restart from its WAVECAR; ramp U in steps; set LMAXMIX = 4/6.</div></li>
+    <li><div><strong>Numerics.</strong> Change NCORE/KPAR or the core count; <code>LREAL = .FALSE.</code>; <code>PREC = Accurate</code>; small odd behaviour can come from parallel round-off.</div></li>
+  </ol>
+
+  <h3>Ionic (relaxation) ladder</h3>
+  <ol class="ladder">
+    <li><div><strong>Relax in stages.</strong> ISIF = 2 (ions only) first, then ISIF = 3 from that CONTCAR. Large initial stress plus bad positions is the usual cause of runaway relaxations.</div></li>
+    <li><div><strong>Loose then tight EDIFFG.</strong> Start with an energy criterion (<code>EDIFFG = 1E-3</code>) or −0.05 eV/Å, then tighten to −0.005 → −0.001. Keep EDIFF at least 10× smaller than any energy EDIFFG; with force criteria use EDIFF ≤ 1E-6.</div></li>
+    <li><div><strong>Step size.</strong> Reduce POTIM (0.1–0.2) if energy oscillates or ZBRENT complains.</div></li>
+    <li><div><strong>Switch optimizer.</strong> IBRION = 2 (CG) far from minimum; 1 (RMM-DIIS) close to it; 3 (damped MD, POTIM ≈ 0.1) for very rough landscapes or soft modes.</div></li>
+    <li><div><strong>Restart cleanly.</strong> <code>cp CONTCAR POSCAR</code>; delete WAVECAR/CHGCAR if the cell changed a lot. Re-run until converged in 1–3 steps (removes Pulay stress).</div></li>
+    <li><div><strong>Check symmetry.</strong> A symmetric starting point is a saddle point if the true minimum breaks symmetry. Rattle positions slightly (0.01–0.05 Å) or set ISYM = 0 to let it escape.</div></li>
+    <li><div><strong>Fix what should not move.</strong> Selective dynamics for slab bottom layers; ISIF = 2 for defects in a fixed host cell.</div></li>
+  </ol>
+  <div class="co ok"><b>Signs of a good calculation</b><ul>
+    <li>Every ionic step converged electronically in fewer than NELM steps.</li>
+    <li>“reached required accuracy” in OUTCAR; final forces below |EDIFFG|; pressure within ±1–2 kB.</li>
+    <li>Moments and symmetry are what you intended, or the change is understood.</li>
+    <li>Smearing entropy (EENTRO) below ~1 meV/atom.</li>
+  </ul></div>
+</section>
+
+<section id="errors">
+  <p class="kicker">Toolbox</p>
+  <h2>Error message index</h2>
+  <div class="filter"><input id="errq" type="search" placeholder="Paste part of the error, e.g. ZBRENT, hermitian, BRMIX" aria-label="Filter error messages"><span class="count" id="errn"></span></div>
+  <div class="tbl"><table id="errtab">
+    <thead><tr><th>Message (abridged)</th><th>Usual cause</th><th>Fix</th></tr></thead>
+    <tbody>
+    <tr><td><code>ZBRENT: fatal error in bracketing</code></td><td class="wrap">Line minimization in CG failed; poor forces or step</td><td class="wrap">cp CONTCAR POSCAR and restart; lower POTIM; tighten EDIFF; IBRION = 1 near minimum</td></tr>
+    <tr><td><code>Sub-Space-Matrix is not hermitian in DAV</code></td><td class="wrap">Davidson instability (ALGO = Fast/Normal)</td><td class="wrap">ALGO = All or Normal; change core count/NCORE; check geometry</td></tr>
+    <tr><td><code>EDDDAV: Call to ZHEGV failed</code></td><td class="wrap">Ill-conditioned subspace, often bad geometry or random start</td><td class="wrap">ALGO = All / Damped; delete WAVECAR; check interatomic distances; change parallelization</td></tr>
+    <tr><td><code>EDDRMM: call to ZHEGV failed</code></td><td class="wrap">RMM-DIIS failed</td><td class="wrap">ALGO = Normal instead of Fast/VeryFast</td></tr>
+    <tr><td><code>LAPACK: Routine ZPOTRF failed</code></td><td class="wrap">Overlap matrix not positive definite; distorted structure or corrupt WAVECAR</td><td class="wrap">Delete WAVECAR; lower POTIM; ALGO = Normal; check POSCAR</td></tr>
+    <tr><td><code>BRMIX: very serious problems</code></td><td class="wrap">Mixer confused, e.g. CHGCAR/WAVECAR from a different structure</td><td class="wrap">Remove old CHGCAR/WAVECAR; restart; adjust AMIX/BMIX</td></tr>
+    <tr><td><code>VERY BAD NEWS! internal error in subroutine SGRCON</code></td><td class="wrap">Symmetry detection inconsistent with coordinates</td><td class="wrap">Symmetrize POSCAR; change SYMPREC (1E-4 → 1E-3); ISYM = 0</td></tr>
+    <tr><td><code>inverse of rotation matrix was not found (increase SYMPREC)</code></td><td class="wrap">Positions slightly off symmetric sites</td><td class="wrap">SYMPREC = 1E-4 or larger; symmetrize structure</td></tr>
+    <tr><td><code>PRICEL: found a more primitive cell</code></td><td class="wrap">Cell is a supercell of a smaller one</td><td class="wrap">Use the primitive cell, or ignore deliberately (supercell intended); ISYM = 0 if it breaks things</td></tr>
+    <tr><td><code>TOO FEW BANDS</code> / <code>NBANDS too small</code></td><td class="wrap">Partially filled top band</td><td class="wrap">Increase NBANDS by 20–30%</td></tr>
+    <tr><td><code>Tetrahedron method fails (number of k-points &lt; 4)</code></td><td class="wrap">ISMEAR = −5 set somewhere (e.g. copied INCAR)</td><td class="wrap">ISMEAR = 0, SIGMA = 0.05 as in this workflow</td></tr>
+    <tr><td><code>Error reading item 'MAGMOM'</code></td><td class="wrap">Count does not match NIONS</td><td class="wrap">One value per atom (3 per atom for ncl)</td></tr>
+    <tr><td><code>The distance between some ions is very small</code></td><td class="wrap">Overlapping atoms; wrong scale or coordinate type</td><td class="wrap">Check POSCAR line 2, Direct vs Cartesian, duplicate sites from CIF</td></tr>
+    <tr><td><code>REAL_OPTLAY: internal error</code> / <code>RSPHER</code></td><td class="wrap">Real-space projection problem</td><td class="wrap">LREAL = .FALSE.</td></tr>
+    <tr><td><code>WARNING: CNORMN: search vector ill defined</code></td><td class="wrap">Ionic step too large or poor SCF</td><td class="wrap">Lower POTIM; tighten EDIFF; switch IBRION</td></tr>
+        <tr><td><code>ERROR: the number of k-points / bands changed, WAVECAR mismatch</code></td><td class="wrap">Reading WAVECAR from a different setup</td><td class="wrap">ISTART = 0 or delete WAVECAR</td></tr>
+    <tr><td><code>LEPSILON / IBRION=7,8 not supported with NCORE/NPAR</code></td><td class="wrap">Band parallelization in DFPT</td><td class="wrap">Remove NCORE and NPAR</td></tr>
+    <tr><td>Moment collapses to 0</td><td class="wrap">Starting MAGMOM too small, or NM state really lower</td><td class="wrap">Start at 3–5 μB; compare energies; check ISPIN = 2 is set</td></tr>
+    <tr><td>Imaginary phonon modes</td><td class="wrap">Loose relax/EDIFF, small supercell, or genuine instability</td><td class="wrap">EDIFF 1E-8, EDIFFG −0.001, ADDGRID, larger DIM; follow eigenvector if persistent</td></tr>
+    <tr><td>Negative or odd elastic constants</td><td class="wrap">Residual stress, low ENCUT, coarse k-mesh, wrong Voigt mapping</td><td class="wrap">Re-relax at elastic ENCUT; denser k; EDIFF 1E-8; use VASPkit 203 conversion</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="units">
+  <p class="kicker">Toolbox</p>
+  <h2>Units, conversions and quick formulas</h2>
+  <div class="cols">
+  <div class="tbl"><table>
+    <tr><th>From</th><th>To</th></tr>
+    <tr><td>1 kBar (OUTCAR stress, Cij)</td><td class="num">0.1 GPa</td></tr>
+    <tr><td>1 eV/Å³</td><td class="num">160.2177 GPa</td></tr>
+    <tr><td>1 THz</td><td class="num">33.356 cm⁻¹ = 4.1357 meV</td></tr>
+    <tr><td>1 cm⁻¹</td><td class="num">0.12398 meV</td></tr>
+    <tr><td>1 Ry</td><td class="num">13.6057 eV</td></tr>
+    <tr><td>1 Hartree</td><td class="num">27.2114 eV</td></tr>
+    <tr><td>1 eV/atom</td><td class="num">96.485 kJ/mol per atom</td></tr>
+    <tr><td>1 eV/Å</td><td class="num">1.602 nN</td></tr>
+    <tr><td>k<sub>B</sub></td><td class="num">8.617 × 10⁻⁵ eV/K</td></tr>
+    <tr><td>VASPkit k-resolution r (2π/Å)</td><td class="num">KSPACING ≈ 2πr Å⁻¹</td></tr>
+  </table></div>
+  <div class="tbl"><table>
+    <tr><th>Quantity</th><th>Where to read it</th></tr>
+    <tr><td>Total energy</td><td><code>energy  without entropy</code> (OUTCAR)</td></tr>
+    <tr><td>Fermi level</td><td><code>E-fermi</code> (OUTCAR)</td></tr>
+    <tr><td>Volume</td><td><code>volume of cell</code> (OUTCAR)</td></tr>
+    <tr><td>Pressure</td><td><code>external pressure</code> (kB)</td></tr>
+    <tr><td>Forces</td><td><code>TOTAL-FORCE</code> block</td></tr>
+    <tr><td>Moments</td><td><code>mag=</code> (OSZICAR), <code>magnetization (x)</code></td></tr>
+    <tr><td>Elastic tensor</td><td><code>TOTAL ELASTIC MODULI</code></td></tr>
+    <tr><td>ε∞, Z*</td><td><code>MACROSCOPIC STATIC DIELECTRIC</code>, <code>BORN EFFECTIVE CHARGES</code></td></tr>
+    <tr><td>Bands, electrons</td><td><code>NBANDS=</code>, <code>NELECT</code></td></tr>
+  </table></div>
+  </div>
+</section>
+
+<section id="checklist">
+  <p class="kicker">Toolbox</p>
+  <h2>Pre-submit checklist</h2>
+  <div class="tbl"><table>
+    <tr><th>Calculation</th><th>Must have</th><th>Must not have</th></tr>
+    <tr><td>Relax</td><td class="wrap">ENCUT 1.3 × ENMAX, ISIF = 3, IBRION = 2, NSW &gt; 0, EDIFFG = −0.005 / −0.001, ISPIN, MAGMOM</td><td class="wrap">LREAL = Auto on tiny cells</td></tr>
+    <tr><td>SCF</td><td class="wrap">Same folder, <code>cp CONTCAR POSCAR</code>, ISTART = 1, NSW = 0, LCHARG = .TRUE., LORBIT = 11, tight EDIFF</td><td class="wrap">ICHARG = 11; leftover IBRION = 2 / ISIF from relax</td></tr>
+    <tr><td>DOS</td><td class="wrap">From the SCF: LORBIT = 11, NEDOS ≥ 2000; VASPkit 111/113</td><td class="wrap">Reading the gap off the DOS (use 911)</td></tr>
+    <tr><td>Bands</td><td class="wrap">SCF without ICHARG = 11 on a uniform mesh; KPATH.in (303) via KPOINTS_OPT or a run reading that CHGCAR; ISMEAR = 0</td><td class="wrap">An SCF run directly on the line-mode KPATH</td></tr>
+    <tr><td>Optics</td><td class="wrap">LOPTICS, NBANDS ≈ 3× (multiple of cores), CSHIFT, NEDOS, dense k</td><td class="wrap">Default NBANDS; coarse mesh</td></tr>
+    <tr><td>Elastic</td><td class="wrap">IBRION = 6, ISIF = 3, ENCUT = 620, NFREE, POTIM = 0.015, EDIFF ≤ 1E-7, relaxed at same ENCUT</td><td class="wrap">NCORE (comment out); residual stress</td></tr>
+    <tr><td>Phonon</td><td class="wrap">EDIFF 1E-8, EDIFFG −0.001 relax, supercell ≥ 10 Å, ADDGRID</td><td class="wrap">LREAL = Auto; leftover NSW/IBRION in displacement runs</td></tr>
+    <tr><td>Dielectric / Z*</td><td class="wrap">LEPSILON, IBRION = 8, insulator, dense k</td><td class="wrap">NCORE/NPAR; metallic state; hybrid functional</td></tr>
+    <tr><td>Bader</td><td class="wrap">LAECHG, LCHARG, fine FFT grid</td><td class="wrap">Analysing CHGCAR without the AECCAR reference</td></tr>
+    <tr><td>DFT+U</td><td class="wrap">LDAUL/U/J per species in POSCAR order, LMAXMIX = 4/6, same U everywhere</td><td class="wrap">Comparing energies across different U</td></tr>
+    <tr><td>Hybrid</td><td class="wrap">PBE WAVECAR start, ALGO = Damped/All, zero-weight band path</td><td class="wrap">ICHARG = 11 band runs</td></tr>
+  </table></div>
+  <a class="toplink" href="#top">↑ back to top</a>
+</section>
+</main>
+</div>
+
+<footer>
+  VASP Workflow Handbook · INCAR values are starting points; converge them for your material. VASPkit codes and outputs follow the VASPKIT 1.5 tutorials and feature list (vaspkit.com).
+</footer>
+
+<script>
+(function(){
+  function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+  // INCAR-style highlighting: TAG = value # comment
+  document.querySelectorAll("pre.incar").forEach(function(pre){
+    var out = pre.textContent.split("\n").map(function(line){
+      var ci = line.search(/[#!]/), code = ci >= 0 ? line.slice(0, ci) : line, com = ci >= 0 ? line.slice(ci) : "";
+      var m = code.match(/^(\s*)([A-Za-z_][A-Za-z0-9_]*)(\s*=\s*)(.*)$/);
+      var h = m ? esc(m[1]) + '<span class="k">' + esc(m[2]) + '</span>' + esc(m[3]) + '<span class="v">' + esc(m[4]) + '</span>' : esc(code);
+      return h + (com ? '<span class="c">' + esc(com) + '</span>' : "");
+    });
+    pre.innerHTML = out.join("\n");
+  });
+  // shell / python: comments only
+  document.querySelectorAll("pre.sh").forEach(function(pre){
+    var out = pre.textContent.split("\n").map(function(line){
+      var m = line.match(/^(.*?)(^|\s)(#(?![!]).*)$/);
+      if (line.indexOf("#!") === 0) return '<span class="c">' + esc(line) + '</span>';
+      return m ? esc(m[1] + m[2]) + '<span class="c">' + esc(m[3]) + '</span>' : esc(line);
+    });
+    pre.innerHTML = out.join("\n");
+  });
+  // copy buttons
+  document.querySelectorAll("button.copy").forEach(function(b){
+    b.addEventListener("click", function(){
+      var pre = b.closest("figure").querySelector("pre"), txt = pre.textContent;
+      function done(t){ b.textContent = t; setTimeout(function(){ b.textContent = "Copy"; }, 1400); }
+      function fallback(){ var r = document.createRange(); r.selectNodeContents(pre); var s = getSelection(); s.removeAllRanges(); s.addRange(r); done("Selected"); }
+      try { navigator.clipboard.writeText(txt).then(function(){ done("Copied"); }, fallback); } catch(e){ fallback(); }
+    });
+  });
+  // table filters
+  function wire(inputId, tableId, countId){
+    var q = document.getElementById(inputId), rows = document.querySelectorAll("#" + tableId + " tbody tr"), n = document.getElementById(countId);
+    function run(){
+      var v = q.value.trim().toLowerCase(), shown = 0;
+      rows.forEach(function(r){ var hit = !v || r.textContent.toLowerCase().indexOf(v) >= 0; r.hidden = !hit; if (hit) shown++; });
+      n.textContent = shown + " of " + rows.length;
+    }
+    q.addEventListener("input", run); run();
+  }
+  wire("dictq", "dicttab", "dictn");
+  wire("errq", "errtab", "errn");
+  // contents: collapsed on small screens, scroll-spy on large
+  var d = document.getElementById("tocd"), mq = matchMedia("(max-width:960px)");
+  function syncToc(){ if (mq.matches) d.open = false; else d.open = true; }
+  syncToc(); mq.addEventListener ? mq.addEventListener("change", syncToc) : mq.addListener(syncToc);
+  document.querySelectorAll(".rail a").forEach(function(a){ a.addEventListener("click", function(){ if (mq.matches) d.open = false; }); });
+  var links = {}; document.querySelectorAll(".rail a").forEach(function(a){ links[a.getAttribute("href").slice(1)] = a; });
+  if ("IntersectionObserver" in window){
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if (e.isIntersecting){ Object.values(links).forEach(function(a){ a.classList.remove("on"); }); var a = links[e.target.id]; if (a) a.classList.add("on"); } });
+    }, {rootMargin: "-20% 0px -70% 0px"});
+    document.querySelectorAll("main section[id]").forEach(function(s){ io.observe(s); });
+  }
+})();
+</script>
+
+</body></html>

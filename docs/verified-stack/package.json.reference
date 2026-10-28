@@ -1,0 +1,50 @@
+{
+  "_comment": "VERIFIED 2026-10-27 in a scratch spike (build, test, astro check, eslint, pagefind, lhci all ran). Exact pins. Add packages only when the stage that needs them starts (see docs/DECISIONS.md D-002).",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "dependencies": {
+    "@astrojs/markdown-remark": "7.3.4",
+    "@astrojs/mdx": "8.1.1",
+    "@astrojs/react": "7.1.1",
+    "@astrojs/sitemap": "3.7.4",
+    "astro": "7.3.8",
+    "katex": "0.19.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "rehype-katex": "7.0.1",
+    "remark-math": "6.0.0",
+    "zustand": "5.0.16"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.12",
+    "@axe-core/playwright": "4.14.0",
+    "@eslint/js": "10.0.1",
+    "@lhci/cli": "0.15.1",
+    "@playwright/test": "1.64.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "eslint": "10.13.0",
+    "eslint-plugin-astro": "3.2.1",
+    "pagefind": "1.5.2",
+    "prettier": "3.9.10",
+    "prettier-plugin-astro": "1.1.2",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1",
+    "vitest": "5.0.5",
+    "workbox-build": "7.4.1"
+  },
+  "addLater": {
+    "three": "0.186.1 (M2.1)",
+    "@types/three": "0.186.0 (M2.1)",
+    "fflate": "0.8.3 (M3.5)",
+    "d3-scale/d3-shape/d3-axis/d3-selection": "3.x (M4.3)",
+    "@spglib/moyo-wasm": "0.21.0 (M5.1)",
+    "@rdkit/rdkit": "2026.9.1 (M10.3)",
+    "firebase": "13.1.0 (M6.5)",
+    "@firebase/rules-unit-testing": "6.0.0 (M6.5, dev)",
+    "firebase-tools": "15.34.1 (M0.2, run through npx, not a dependency)",
+    "@fontsource/ibm-plex-sans": "5.3.0 (M1.1)",
+    "@fontsource-variable/jetbrains-mono": "5.3.0 (M1.1)"
+  }
+}

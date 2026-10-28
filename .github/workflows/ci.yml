@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  guards:
+    name: Guards (no secrets, no POTCAR, no em dashes, sources, links, stages)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: node --test scripts/guard/guard.test.mjs
+      - run: node scripts/guard/run-all.mjs
+
+  verify:
+    name: Verify (format, lint, typecheck, test, build, size)
+    runs-on: ubuntu-latest
+    needs: guards
+    steps:
+      - uses: actions/checkout@v5
+      - name: Detect project
+        id: detect
+        run: |
+          if [ -f package.json ]; then echo "present=true" >> "$GITHUB_OUTPUT"; else echo "present=false" >> "$GITHUB_OUTPUT"; echo "No package.json yet (bootstrap stage). Skipping."; fi
+      - uses: actions/setup-node@v5
+        if: steps.detect.outputs.present == 'true'
+        with:
+          node-version: 22
+          cache: npm
+      - if: steps.detect.outputs.present == 'true'
+        run: npm ci
+      - if: steps.detect.outputs.present == 'true'
+        run: npm run verify
+      - name: Upload build
+        if: steps.detect.outputs.present == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          retention-days: 3
+
+  e2e:
+    name: End-to-end (Playwright, axe)
+    runs-on: ubuntu-latest
+    needs: guards
+    steps:
+      - uses: actions/checkout@v5
+      - name: Detect Playwright config
+        id: detect
+        run: |
+          if [ -f playwright.config.ts ]; then echo "present=true" >> "$GITHUB_OUTPUT"; else echo "present=false" >> "$GITHUB_OUTPUT"; echo "No Playwright config yet. Skipping."; fi
+      - uses: actions/setup-node@v5
+        if: steps.detect.outputs.present == 'true'
+        with:
+          node-version: 22
+          cache: npm
+      - if: steps.detect.outputs.present == 'true'
+        run: npm ci
+      - if: steps.detect.outputs.present == 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.detect.outputs.present == 'true'
+        run: npm run test:e2e
+      - name: Upload report
+        if: failure() && steps.detect.outputs.present == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7
+
+  lighthouse:
+    name: Lighthouse CI
+    runs-on: ubuntu-latest
+    needs: verify
+    # Starts as warnings (see lighthouserc.json); stage M11.2 turns the thresholds into errors.
+    steps:
+      - uses: actions/checkout@v5
+      - name: Detect config
+        id: detect
+        run: |
+          if [ -f lighthouserc.json ]; then echo "present=true" >> "$GITHUB_OUTPUT"; else echo "present=false" >> "$GITHUB_OUTPUT"; echo "No lighthouserc.json yet. Skipping."; fi
+      - uses: actions/setup-node@v5
+        if: steps.detect.outputs.present == 'true'
+        with:
+          node-version: 22
+          cache: npm
+      - if: steps.detect.outputs.present == 'true'
+        run: npm ci
+      - if: steps.detect.outputs.present == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - if: steps.detect.outputs.present == 'true'
+        run: npx lhci autorun

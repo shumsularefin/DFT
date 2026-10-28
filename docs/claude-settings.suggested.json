@@ -1,0 +1,56 @@
+{
+  "_README": "SUGGESTION ONLY, not active. Copy this file to .claude/settings.json yourself if you want it. It pre-approves the commands a build session needs, blocks edits to the protected folders, and runs the em dash check after each edit. Review every line first: it changes what the builder may do without asking you.",
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(npm ci)",
+      "Bash(npm install *)",
+      "Bash(npm test*)",
+      "Bash(npm ls*)",
+      "Bash(npx vitest*)",
+      "Bash(npx playwright*)",
+      "Bash(npx astro*)",
+      "Bash(npx lhci*)",
+      "Bash(npx prettier*)",
+      "Bash(npx eslint*)",
+      "Bash(npx tsc*)",
+      "Bash(node scripts/*)",
+      "Bash(node --test*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git fetch*)",
+      "Bash(git checkout*)",
+      "Bash(git merge*)",
+      "Bash(git push -u origin*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Write(**/POTCAR*)",
+      "Edit(/docs/source-material/**)",
+      "Write(/docs/source-material/**)",
+      "Edit(/tests/reference/*.json)",
+      "Write(/tests/reference/*.json)",
+      "Edit(/docs/verified-stack/**)",
+      "Write(/docs/verified-stack/**)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/scripts/guard/hook-posttooluse.mjs\""
+          }
+        ]
+      }
+    ]
+  }
+}

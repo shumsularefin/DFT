@@ -1,0 +1,687 @@
+{
+ "_meta": {
+  "generator": "scripts/reference/gen_element_reference.py",
+  "sources": {
+   "electronegativity_mass_vdw": "pymatgen (Pauling X)",
+   "covalent_radius": "Cordero 2008 via ase 3.29.0",
+   "oxidation_frequency": "SMACT 4.0.2 oxidation_states_icsd24_counts.json"
+  },
+  "share_definition": "count of a non-zero oxidation state / sum over non-zero states for that element"
+ },
+ "elements": {
+  "H": {
+   "Z": 1,
+   "mass": 1.00794,
+   "pauling_x": 2.2,
+   "vdw_radius": 1.1,
+   "covalent_radius_cordero": 0.31,
+   "oxidation_share_icsd24": {
+    "1": 0.9086,
+    "-1": 0.0914,
+    "2": 0.0001,
+    "3": 0.0
+   },
+   "oxidation_counts_icsd24": {
+    "-1": 3442,
+    "0": 2738,
+    "1": 34232,
+    "2": 2,
+    "3": 1
+   }
+  },
+  "C": {
+   "Z": 6,
+   "mass": 12.0107,
+   "pauling_x": 2.55,
+   "vdw_radius": 1.7,
+   "covalent_radius_cordero": 0.76,
+   "oxidation_share_icsd24": {
+    "4": 0.4733,
+    "2": 0.2259,
+    "3": 0.1011,
+    "-2": 0.0931,
+    "-4": 0.0572,
+    "-1": 0.0208,
+    "1": 0.0168,
+    "-3": 0.0118
+   },
+   "oxidation_counts_icsd24": {
+    "-4": 758,
+    "-3": 157,
+    "-2": 1233,
+    "-1": 275,
+    "0": 5787,
+    "1": 222,
+    "2": 2993,
+    "3": 1340,
+    "4": 6271
+   }
+  },
+  "N": {
+   "Z": 7,
+   "mass": 14.0067,
+   "pauling_x": 3.04,
+   "vdw_radius": 1.55,
+   "covalent_radius_cordero": 0.71,
+   "oxidation_share_icsd24": {
+    "-3": 0.7933,
+    "5": 0.0732,
+    "3": 0.042,
+    "-1": 0.0367,
+    "-2": 0.0245,
+    "1": 0.0212,
+    "2": 0.0068,
+    "4": 0.0012,
+    "-5": 0.0006,
+    "-4": 0.0004
+   },
+   "oxidation_counts_icsd24": {
+    "-5": 10,
+    "-4": 7,
+    "-3": 13983,
+    "-2": 431,
+    "-1": 647,
+    "0": 2223,
+    "1": 374,
+    "2": 120,
+    "3": 741,
+    "4": 22,
+    "5": 1291
+   }
+  },
+  "O": {
+   "Z": 8,
+   "mass": 15.9994,
+   "pauling_x": 3.44,
+   "vdw_radius": 1.52,
+   "covalent_radius_cordero": 0.66,
+   "oxidation_share_icsd24": {
+    "-2": 0.9955,
+    "-1": 0.0044,
+    "2": 0.0,
+    "1": 0.0,
+    "-3": 0.0
+   },
+   "oxidation_counts_icsd24": {
+    "-3": 1,
+    "-2": 116910,
+    "-1": 517,
+    "0": 1689,
+    "1": 2,
+    "2": 3
+   }
+  },
+  "F": {
+   "Z": 9,
+   "mass": 18.9984032,
+   "pauling_x": 3.98,
+   "vdw_radius": 1.47,
+   "covalent_radius_cordero": 0.57,
+   "oxidation_share_icsd24": {
+    "-1": 0.9998,
+    "1": 0.0001,
+    "2": 0.0001
+   },
+   "oxidation_counts_icsd24": {
+    "-1": 11626,
+    "0": 201,
+    "1": 1,
+    "2": 1
+   }
+  },
+  "Na": {
+   "Z": 11,
+   "mass": 22.98976928,
+   "pauling_x": 0.93,
+   "vdw_radius": 2.27,
+   "covalent_radius_cordero": 1.66,
+   "oxidation_share_icsd24": {
+    "1": 0.9999,
+    "-1": 0.0001
+   },
+   "oxidation_counts_icsd24": {
+    "-1": 2,
+    "0": 707,
+    "1": 17539
+   }
+  },
+  "Mg": {
+   "Z": 12,
+   "mass": 24.305,
+   "pauling_x": 1.31,
+   "vdw_radius": 1.73,
+   "covalent_radius_cordero": 1.41,
+   "oxidation_share_icsd24": {
+    "2": 0.9998,
+    "3": 0.0002
+   },
+   "oxidation_counts_icsd24": {
+    "0": 2203,
+    "2": 11318,
+    "3": 2
+   }
+  },
+  "Al": {
+   "Z": 13,
+   "mass": 26.9815386,
+   "pauling_x": 1.61,
+   "vdw_radius": 1.84,
+   "covalent_radius_cordero": 1.21,
+   "oxidation_share_icsd24": {
+    "3": 0.9996,
+    "-3": 0.0002,
+    "2": 0.0001,
+    "1": 0.0001
+   },
+   "oxidation_counts_icsd24": {
+    "-3": 3,
+    "0": 6660,
+    "1": 1,
+    "2": 2,
+    "3": 15020
+   }
+  },
+  "Si": {
+   "Z": 14,
+   "mass": 28.0855,
+   "pauling_x": 1.9,
+   "vdw_radius": 2.1,
+   "covalent_radius_cordero": 1.11,
+   "oxidation_share_icsd24": {
+    "4": 0.9779,
+    "-4": 0.0118,
+    "2": 0.0039,
+    "-1": 0.0022,
+    "3": 0.0021,
+    "-3": 0.001,
+    "-2": 0.0009,
+    "1": 0.0002
+   },
+   "oxidation_counts_icsd24": {
+    "-4": 221,
+    "-3": 19,
+    "-2": 17,
+    "-1": 41,
+    "0": 7775,
+    "1": 3,
+    "2": 73,
+    "3": 39,
+    "4": 18248
+   }
+  },
+  "P": {
+   "Z": 15,
+   "mass": 30.973762,
+   "pauling_x": 2.19,
+   "vdw_radius": 1.8,
+   "covalent_radius_cordero": 1.07,
+   "oxidation_share_icsd24": {
+    "5": 0.8189,
+    "-3": 0.0856,
+    "3": 0.036,
+    "4": 0.03,
+    "-1": 0.0118,
+    "-2": 0.0109,
+    "1": 0.0046,
+    "2": 0.0017,
+    "-4": 0.0003,
+    "6": 0.0001
+   },
+   "oxidation_counts_icsd24": {
+    "-4": 5,
+    "-3": 1298,
+    "-2": 166,
+    "-1": 179,
+    "0": 2103,
+    "1": 69,
+    "2": 26,
+    "3": 546,
+    "4": 455,
+    "5": 12418,
+    "6": 2
+   }
+  },
+  "S": {
+   "Z": 16,
+   "mass": 32.065,
+   "pauling_x": 2.58,
+   "vdw_radius": 1.8,
+   "covalent_radius_cordero": 1.05,
+   "oxidation_share_icsd24": {
+    "-2": 0.6737,
+    "6": 0.2465,
+    "4": 0.0353,
+    "-1": 0.0306,
+    "2": 0.007,
+    "5": 0.0031,
+    "3": 0.0021,
+    "1": 0.0016,
+    "-3": 0.0001
+   },
+   "oxidation_counts_icsd24": {
+    "-3": 1,
+    "-2": 13417,
+    "-1": 610,
+    "0": 1580,
+    "1": 32,
+    "2": 140,
+    "3": 42,
+    "4": 702,
+    "5": 62,
+    "6": 4908
+   }
+  },
+  "Cl": {
+   "Z": 17,
+   "mass": 35.453,
+   "pauling_x": 3.16,
+   "vdw_radius": 1.75,
+   "covalent_radius_cordero": 1.02,
+   "oxidation_share_icsd24": {
+    "-1": 0.9439,
+    "7": 0.0375,
+    "5": 0.012,
+    "3": 0.005,
+    "1": 0.0007,
+    "4": 0.0005,
+    "2": 0.0002,
+    "-4": 0.0001
+   },
+   "oxidation_counts_icsd24": {
+    "-4": 1,
+    "-1": 8890,
+    "0": 414,
+    "1": 7,
+    "2": 2,
+    "3": 47,
+    "4": 5,
+    "5": 113,
+    "7": 353
+   }
+  },
+  "K": {
+   "Z": 19,
+   "mass": 39.0983,
+   "pauling_x": 0.82,
+   "vdw_radius": 2.75,
+   "covalent_radius_cordero": 2.03,
+   "oxidation_share_icsd24": {
+    "1": 1.0
+   },
+   "oxidation_counts_icsd24": {
+    "0": 500,
+    "1": 13748
+   }
+  },
+  "Ca": {
+   "Z": 20,
+   "mass": 40.078,
+   "pauling_x": 1,
+   "vdw_radius": 2.31,
+   "covalent_radius_cordero": 1.76,
+   "oxidation_share_icsd24": {
+    "2": 0.9998,
+    "1": 0.0002,
+    "-1": 0.0001
+   },
+   "oxidation_counts_icsd24": {
+    "-1": 1,
+    "0": 1593,
+    "1": 3,
+    "2": 16605
+   }
+  },
+  "Ti": {
+   "Z": 22,
+   "mass": 47.867,
+   "pauling_x": 1.54,
+   "vdw_radius": 2.11,
+   "covalent_radius_cordero": 1.6,
+   "oxidation_share_icsd24": {
+    "4": 0.9224,
+    "3": 0.0622,
+    "2": 0.0146,
+    "1": 0.0005,
+    "5": 0.0002,
+    "6": 0.0001
+   },
+   "oxidation_counts_icsd24": {
+    "0": 2867,
+    "1": 5,
+    "2": 160,
+    "3": 680,
+    "4": 10080,
+    "5": 2,
+    "6": 1
+   }
+  },
+  "Mn": {
+   "Z": 25,
+   "mass": 54.938045,
+   "pauling_x": 1.55,
+   "vdw_radius": 2.05,
+   "covalent_radius_cordero": 1.39,
+   "oxidation_share_icsd24": {
+    "2": 0.5909,
+    "3": 0.2536,
+    "4": 0.1353,
+    "7": 0.007,
+    "1": 0.0062,
+    "5": 0.0049,
+    "6": 0.0015,
+    "-1": 0.0007
+   },
+   "oxidation_counts_icsd24": {
+    "-1": 8,
+    "0": 4920,
+    "1": 75,
+    "2": 7110,
+    "3": 3051,
+    "4": 1628,
+    "5": 59,
+    "6": 18,
+    "7": 84
+   }
+  },
+  "Fe": {
+   "Z": 26,
+   "mass": 55.845,
+   "pauling_x": 1.83,
+   "vdw_radius": 2.04,
+   "covalent_radius_cordero": 1.32,
+   "oxidation_share_icsd24": {
+    "3": 0.6107,
+    "2": 0.3729,
+    "4": 0.0118,
+    "1": 0.0032,
+    "5": 0.0008,
+    "6": 0.0004,
+    "-4": 0.0002,
+    "-1": 0.0001,
+    "-2": 0.0001
+   },
+   "oxidation_counts_icsd24": {
+    "-4": 3,
+    "-2": 1,
+    "-1": 2,
+    "0": 8030,
+    "1": 63,
+    "2": 7276,
+    "3": 11917,
+    "4": 230,
+    "5": 15,
+    "6": 7
+   }
+  },
+  "Co": {
+   "Z": 27,
+   "mass": 58.933195,
+   "pauling_x": 1.88,
+   "vdw_radius": 2.0,
+   "covalent_radius_cordero": 1.26,
+   "oxidation_share_icsd24": {
+    "2": 0.6306,
+    "3": 0.3408,
+    "4": 0.0168,
+    "1": 0.0082,
+    "-1": 0.0028,
+    "5": 0.0007
+   },
+   "oxidation_counts_icsd24": {
+    "-1": 20,
+    "0": 6247,
+    "1": 58,
+    "2": 4456,
+    "3": 2408,
+    "4": 119,
+    "5": 5
+   }
+  },
+  "Ni": {
+   "Z": 28,
+   "mass": 58.6934,
+   "pauling_x": 1.91,
+   "vdw_radius": 1.97,
+   "covalent_radius_cordero": 1.24,
+   "oxidation_share_icsd24": {
+    "2": 0.809,
+    "3": 0.1505,
+    "1": 0.0284,
+    "4": 0.0118,
+    "-2": 0.0002
+   },
+   "oxidation_counts_icsd24": {
+    "-2": 1,
+    "0": 8004,
+    "1": 166,
+    "2": 4724,
+    "3": 879,
+    "4": 69
+   }
+  },
+  "Cu": {
+   "Z": 29,
+   "mass": 63.546,
+   "pauling_x": 1.9,
+   "vdw_radius": 1.96,
+   "covalent_radius_cordero": 1.32,
+   "oxidation_share_icsd24": {
+    "2": 0.5639,
+    "1": 0.4061,
+    "3": 0.0297,
+    "4": 0.0004
+   },
+   "oxidation_counts_icsd24": {
+    "0": 3911,
+    "1": 4451,
+    "2": 6180,
+    "3": 325,
+    "4": 4
+   }
+  },
+  "Zn": {
+   "Z": 30,
+   "mass": 65.409,
+   "pauling_x": 1.65,
+   "vdw_radius": 2.01,
+   "covalent_radius_cordero": 1.22,
+   "oxidation_share_icsd24": {
+    "2": 0.9973,
+    "3": 0.0017,
+    "4": 0.0006,
+    "1": 0.0004
+   },
+   "oxidation_counts_icsd24": {
+    "0": 2140,
+    "1": 3,
+    "2": 7106,
+    "3": 12,
+    "4": 4
+   }
+  },
+  "Sr": {
+   "Z": 38,
+   "mass": 87.62,
+   "pauling_x": 0.95,
+   "vdw_radius": 2.49,
+   "covalent_radius_cordero": 1.95,
+   "oxidation_share_icsd24": {
+    "2": 0.9994,
+    "4": 0.0005,
+    "-2": 0.0001
+   },
+   "oxidation_counts_icsd24": {
+    "-2": 1,
+    "0": 1071,
+    "2": 13104,
+    "4": 7
+   }
+  },
+  "Zr": {
+   "Z": 40,
+   "mass": 91.224,
+   "pauling_x": 1.33,
+   "vdw_radius": 2.23,
+   "covalent_radius_cordero": 1.75,
+   "oxidation_share_icsd24": {
+    "4": 0.9596,
+    "3": 0.0201,
+    "2": 0.0176,
+    "1": 0.0025,
+    "6": 0.0002
+   },
+   "oxidation_counts_icsd24": {
+    "0": 2770,
+    "1": 11,
+    "2": 76,
+    "3": 87,
+    "4": 4154,
+    "6": 1
+   }
+  },
+  "Nb": {
+   "Z": 41,
+   "mass": 92.90638,
+   "pauling_x": 1.6,
+   "vdw_radius": 2.18,
+   "covalent_radius_cordero": 1.64,
+   "oxidation_share_icsd24": {
+    "5": 0.8792,
+    "4": 0.075,
+    "3": 0.0333,
+    "2": 0.01,
+    "1": 0.0015,
+    "6": 0.0011
+   },
+   "oxidation_counts_icsd24": {
+    "0": 1681,
+    "1": 8,
+    "2": 55,
+    "3": 183,
+    "4": 413,
+    "5": 4838,
+    "6": 6
+   }
+  },
+  "Ba": {
+   "Z": 56,
+   "mass": 137.327,
+   "pauling_x": 0.89,
+   "vdw_radius": 2.68,
+   "covalent_radius_cordero": 2.15,
+   "oxidation_share_icsd24": {
+    "2": 0.9999,
+    "1": 0.0001
+   },
+   "oxidation_counts_icsd24": {
+    "0": 1443,
+    "1": 1,
+    "2": 14917
+   }
+  },
+  "La": {
+   "Z": 57,
+   "mass": 138.90547,
+   "pauling_x": 1.1,
+   "vdw_radius": 2.43,
+   "covalent_radius_cordero": 2.07,
+   "oxidation_share_icsd24": {
+    "3": 0.9919,
+    "2": 0.0064,
+    "4": 0.0011,
+    "1": 0.0006
+   },
+   "oxidation_counts_icsd24": {
+    "0": 2975,
+    "1": 7,
+    "2": 74,
+    "3": 11447,
+    "4": 13
+   }
+  },
+  "Nd": {
+   "Z": 60,
+   "mass": 144.242,
+   "pauling_x": 1.14,
+   "vdw_radius": 2.39,
+   "covalent_radius_cordero": 2.01,
+   "oxidation_share_icsd24": {
+    "3": 0.9779,
+    "2": 0.0149,
+    "4": 0.0059,
+    "5": 0.0009,
+    "1": 0.0002
+   },
+   "oxidation_counts_icsd24": {
+    "0": 2615,
+    "1": 1,
+    "2": 63,
+    "3": 4124,
+    "4": 25,
+    "5": 4
+   }
+  },
+  "Pb": {
+   "Z": 82,
+   "mass": 207.2,
+   "pauling_x": 2.33,
+   "vdw_radius": 2.02,
+   "covalent_radius_cordero": 1.46,
+   "oxidation_share_icsd24": {
+    "2": 0.9316,
+    "4": 0.0625,
+    "3": 0.0031,
+    "-4": 0.0011,
+    "-1": 0.001,
+    "1": 0.0007
+   },
+   "oxidation_counts_icsd24": {
+    "-4": 7,
+    "-1": 6,
+    "0": 882,
+    "1": 4,
+    "2": 5690,
+    "3": 19,
+    "4": 382
+   }
+  },
+  "I": {
+   "Z": 53,
+   "mass": 126.90447,
+   "pauling_x": 2.66,
+   "vdw_radius": 1.98,
+   "covalent_radius_cordero": 1.39,
+   "oxidation_share_icsd24": {
+    "-1": 0.7753,
+    "5": 0.1668,
+    "7": 0.0397,
+    "1": 0.0091,
+    "3": 0.0086,
+    "-2": 0.0005
+   },
+   "oxidation_counts_icsd24": {
+    "-2": 2,
+    "-1": 2971,
+    "0": 392,
+    "1": 35,
+    "3": 33,
+    "5": 639,
+    "7": 152
+   }
+  },
+  "Cs": {
+   "Z": 55,
+   "mass": 132.9054519,
+   "pauling_x": 0.79,
+   "vdw_radius": 3.43,
+   "covalent_radius_cordero": 2.44,
+   "oxidation_share_icsd24": {
+    "1": 1.0
+   },
+   "oxidation_counts_icsd24": {
+    "0": 317,
+    "1": 6266
+   }
+  }
+ }
+}
