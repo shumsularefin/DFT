@@ -1,0 +1,33 @@
+---
+import '../styles/global.css';
+import { SITE } from '../lib/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title, description = SITE.tagline } = Astro.props;
+const fullTitle = title ? `${title} | ${SITE.name}` : SITE.name;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="data:," />
+    <link rel="canonical" href={canonical.href} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">
+      Skip to main content
+    </a>
+    <main id="main">
+      <slot />
+    </main>
+  </body>
+</html>
