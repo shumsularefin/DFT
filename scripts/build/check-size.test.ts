@@ -58,6 +58,16 @@ describe('checkSize', () => {
     expect(checkSize(dist, budgets).violations).toEqual([]);
   });
 
+  it('counts island component and renderer chunks', () => {
+    const dist = fixture({
+      'index.html':
+        '<html data-page-class="content"><body><astro-island component-url="/_astro/c.js" renderer-url="/_astro/r.js"></astro-island></body></html>',
+      '_astro/c.js': noise(600),
+      '_astro/r.js': noise(600),
+    });
+    expect(checkSize(dist, budgets).violations[0]).toMatch(/JS .* > 1 KB/);
+  });
+
   it('fails when CSS exceeds the budget', () => {
     const dist = fixture({
       'index.html':

@@ -1,0 +1,156 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Button from '../../components/ui/Button.astro';
+import LinkButton from '../../components/ui/LinkButton.astro';
+import Tabs from '../../components/ui/Tabs.astro';
+import Callout from '../../components/ui/Callout.astro';
+import Disclosure from '../../components/ui/Disclosure.astro';
+import Card from '../../components/ui/Card.astro';
+import Badge from '../../components/ui/Badge.astro';
+import Kbd from '../../components/ui/Kbd.astro';
+import CodeBlock from '../../components/ui/CodeBlock.astro';
+import Slider from '../../components/ui/Slider';
+import Toggle from '../../components/ui/Toggle';
+import Readout from '../../components/ui/Readout.astro';
+import ProgressBar from '../../components/ui/ProgressBar.astro';
+import Stepper from '../../components/ui/Stepper.astro';
+
+const incar = `SYSTEM = Si bulk   # example only
+ENCUT  = 520       ! plane-wave cutoff, eV
+ISMEAR = 0
+SIGMA  = 0.05`;
+const kpoints = `Automatic mesh
+0
+Gamma
+6 6 6
+0 0 0`;
+const poscar = `Si2 example cell
+1.0
+ 0.0 2.7 2.7
+ 2.7 0.0 2.7
+ 2.7 2.7 0.0
+Si
+2
+Direct
+0.00 0.00 0.00
+0.25 0.25 0.25`;
+---
+
+<BaseLayout
+  title="Design gallery"
+  description="Design tokens and UI primitives used across the handbook."
+  pageClass="island"
+>
+  <div class="container">
+    <h1>Design gallery</h1>
+    <p>Every UI primitive, in the current theme. This page is for developers and is not indexed.</p>
+    <p>
+      <button type="button" class="btn btn-secondary" id="theme-switch" aria-pressed="false">
+        Theme: <span id="theme-name">light</span>
+      </button>
+    </p>
+
+    <h2>Buttons</h2>
+    <p class="row">
+      <Button variant="primary">Primary</Button>
+      <Button>Secondary</Button>
+      <Button variant="ghost">Ghost</Button>
+      <Button disabled>Disabled</Button>
+      <LinkButton href="#badges">Link button</LinkButton>
+    </p>
+
+    <h2 id="badges">Badges</h2>
+    <p class="row">
+      <Badge variant="illustrative" />
+      <Badge variant="heuristic" />
+      <Badge variant="toy-model" />
+      <Badge variant="draft" />
+      <Badge variant="verified" />
+    </p>
+
+    <h2>Tabs</h2>
+    <Tabs
+      label="Example input files"
+      tabs={[
+        { id: 'incar', label: 'INCAR' },
+        { id: 'kpoints', label: 'KPOINTS' },
+        { id: 'poscar', label: 'POSCAR' },
+      ]}
+    >
+      <p slot="incar">The INCAR file holds the calculation settings.</p>
+      <p slot="kpoints">The KPOINTS file sets how the Brillouin zone is sampled.</p>
+      <p slot="poscar">The POSCAR file holds the atomic structure.</p>
+    </Tabs>
+
+    <h2>Callouts</h2>
+    <Callout variant="note">A note adds context without interrupting the flow.</Callout>
+    <Callout variant="tip">A tip shows a shortcut that is safe to take.</Callout>
+    <Callout variant="warning">A warning marks something that can cost time or a wrong result.</Callout>
+    <Callout variant="mistake">A common mistake describes what people do wrong and why it fails.</Callout>
+
+    <h2>Disclosure</h2>
+    <Disclosure summary="Why does this matter?">
+      <p>Native details element: Enter and Space open it, no script needed.</p>
+    </Disclosure>
+
+    <h2>Card, Kbd, Readout, Progress, Stepper</h2>
+    <Card title="A card">
+      <p>
+        Use <Kbd>Tab</Kbd> to move and <Kbd>Space</Kbd> to activate.
+      </p>
+    </Card>
+    <p class="row">
+      <Readout label="Cutoff" value={520} unit="eV" />
+      <Readout label="k-mesh" value="6 x 6 x 6" />
+    </p>
+    <ProgressBar label="Module progress" value={40} />
+    <Stepper steps={['Structure', 'Settings', 'k-points', 'Run']} current={3} label="Input builder steps" />
+
+    <h2>Slider and toggle</h2>
+    <Slider client:load label="Energy cutoff" min={200} max={800} step={20} defaultValue={520} unit="eV" />
+    <Toggle client:load label="Spin polarised" />
+
+    <h2>Code blocks</h2>
+    <CodeBlock lang="incar" filename="INCAR" code={incar} annotations={{ 2: 'higher is safer, slower' }} />
+    <CodeBlock lang="kpoints" filename="KPOINTS" code={kpoints} />
+    <CodeBlock lang="poscar" filename="POSCAR" code={poscar} />
+    <CodeBlock lang="shell" filename="run.sh" code={'mpirun -np 4 vasp_std  # four cores'} />
+  </div>
+</BaseLayout>
+
+<style is:global>
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    align-items: center;
+    max-width: none;
+  }
+</style>
+
+<script>
+  import { getJSON, setJSON } from '../../lib/storage';
+
+  const root = document.documentElement;
+  const btn = document.getElementById('theme-switch');
+  const name = document.getElementById('theme-name');
+  function current(): 'light' | 'dark' {
+    return root.dataset.theme === 'dark' ||
+      (!root.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches)
+      ? 'dark'
+      : 'light';
+  }
+  function show() {
+    if (name) name.textContent = current();
+    btn?.setAttribute('aria-pressed', String(current() === 'dark'));
+  }
+  const stored = getJSON<string>('theme', '');
+  if (stored === 'light' || stored === 'dark') root.dataset.theme = stored;
+  show();
+  btn?.addEventListener('click', () => {
+    const next = current() === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    setJSON('theme', next);
+    show();
+  });
+</script>

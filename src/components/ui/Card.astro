@@ -1,0 +1,29 @@
+---
+interface Props {
+  title?: string;
+  as?: 'div' | 'section' | 'article';
+}
+const { title, as: Tag = 'div' } = Astro.props;
+---
+
+<Tag class="card">
+  {title && <h3 class="card-title">{title}</h3>}
+  <slot />
+</Tag>
+
+<style is:global>
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4) var(--space-5);
+    box-shadow: var(--shadow-1);
+  }
+  .card-title {
+    margin: 0 0 var(--space-2);
+    font-size: var(--step-1);
+  }
+  .card > :last-child {
+    margin-bottom: 0;
+  }
+</style>

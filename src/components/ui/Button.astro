@@ -1,0 +1,56 @@
+---
+interface Props {
+  variant?: 'primary' | 'secondary' | 'ghost';
+  type?: 'button' | 'submit' | 'reset';
+  disabled?: boolean;
+  [attr: string]: unknown;
+}
+const { variant = 'secondary', type = 'button', disabled = false, class: cls, ...rest } = Astro.props;
+---
+
+<button class:list={['btn', `btn-${variant}`, cls]} type={type} disabled={disabled} {...rest}>
+  <slot />
+</button>
+
+<style is:global>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: var(--target);
+    min-width: var(--target);
+    padding: 0 var(--space-4);
+    font: inherit;
+    font-weight: 600;
+    line-height: 1;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--dur-fast);
+  }
+  .btn:hover:not(:disabled) {
+    background: var(--surface-2);
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--accent-contrast);
+    border-color: var(--accent);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: var(--accent);
+    filter: brightness(0.92);
+  }
+  .btn-ghost {
+    background: transparent;
+    border-color: transparent;
+    color: var(--accent);
+  }
+  .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+</style>
