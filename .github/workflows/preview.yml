@@ -1,7 +1,7 @@
 name: Preview deploy
 
 # Deploys every same-repository pull request to a temporary Firebase Hosting preview channel.
-# Needs the repository secret FIREBASE_SERVICE_ACCOUNT and variable FIREBASE_PROJECT_ID.
+# Needs the repository secret FIREBASE_SERVICE_ACCOUNT and variable (or secret) FIREBASE_PROJECT_ID.
 # Without them this workflow does nothing and passes (see docs/SETUP_FIREBASE.md).
 
 on:
@@ -17,7 +17,7 @@ jobs:
     if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     env:
-      HAS_FIREBASE: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' && vars.FIREBASE_PROJECT_ID != '' }}
+      HAS_FIREBASE: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' && (vars.FIREBASE_PROJECT_ID || secrets.FIREBASE_PROJECT_ID) != '' }}
     steps:
       - uses: actions/checkout@v5
       - name: Detect project
@@ -34,7 +34,7 @@ jobs:
       - if: steps.detect.outputs.go == 'true'
         run: npm run build
         env:
-          PUBLIC_SITE_URL: https://${{ vars.FIREBASE_PROJECT_ID }}.web.app
+          PUBLIC_SITE_URL: https://${{ vars.FIREBASE_PROJECT_ID || secrets.FIREBASE_PROJECT_ID }}.web.app
           PUBLIC_FIREBASE_API_KEY: ${{ vars.PUBLIC_FIREBASE_API_KEY }}
           PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.PUBLIC_FIREBASE_AUTH_DOMAIN }}
           PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.PUBLIC_FIREBASE_PROJECT_ID }}
@@ -44,5 +44,5 @@ jobs:
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          projectId: ${{ vars.FIREBASE_PROJECT_ID }}
+          projectId: ${{ vars.FIREBASE_PROJECT_ID || secrets.FIREBASE_PROJECT_ID }}
           expires: 7d
