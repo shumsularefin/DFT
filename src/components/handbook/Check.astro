@@ -1,0 +1,16 @@
+---
+import Section from './Section.astro';
+import Badge from '../ui/Badge.astro';
+// Placeholder until the practice UI (M6.4). ids are question ids from src/data/questions.
+interface Props {
+  ids: string[];
+}
+const { ids } = Astro.props;
+---
+
+<Section id="check" heading="Check your understanding">
+  <p>
+    <Badge variant="draft" /> Practice questions arrive with the adaptive engine.
+  </p>
+  <p class="check-ids">Planned questions: {ids.join(', ')}</p>
+</Section>

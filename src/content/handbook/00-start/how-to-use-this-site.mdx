@@ -1,0 +1,103 @@
+---
+id: how-to-use-this-site
+title: How to use this site
+module: 1
+order: 0
+summary: A short tour of how each handbook page is built, so you know where to look for the idea, the math and the VASP settings.
+concepts: [reading-a-topic-page]
+requires: []
+vaspTags: [ENCUT]
+sources: [S-031, S-019]
+status: draft
+updated: 2026-10-28
+---
+
+<Why>
+
+Learning density functional theory (<Term id="dft">DFT</Term>) from scattered forum posts is slow. Every page here follows the same nine parts, so once you have read one you know where to find the idea, the math, the VASP settings and the usual mistakes on all of them.
+
+</Why>
+
+<Intuition>
+
+Think of a page as a staircase. The first steps use pictures and everyday comparisons. Later steps add the equations and the file settings. You can stop at any step and still have a correct, if simpler, picture.
+
+Words in a dotted underline, like <Term id="wavefunction">wavefunction</Term>, are defined the first time they appear. Hover, focus or click one to read its short definition without leaving the page.
+
+<Level max="beginner">
+
+At the Beginner level you see the simplest correct version of every idea. Switch level to see more.
+
+</Level>
+
+<Level min="intermediate">
+
+At the Intermediate level and above you also see practical depth: how the idea shows up in real calculations and what usually goes wrong.
+
+</Level>
+
+<Level min="pro">
+
+At the Pro level you also see the equations in full, edge cases and pointers to the literature.
+
+</Level>
+
+</Intuition>
+
+<Lab id="how-to-use-this-site-demo" title="Example lab slot" />
+
+<TheMath>
+
+Equations stay folded until you ask for them. Every symbol is explained in words the first time it appears. As an example, the energy of one packet of light (a <Term id="photon">photon</Term>) is
+
+$$E = h\nu$$
+
+where $E$ is the energy, $\nu$ (the Greek letter nu) is the <Term id="frequency">frequency</Term> of the light, and $h$ is the <Term id="planck-constant">Planck constant</Term>, whose value is fixed exactly by how the SI units are defined <Cite id="S-031" />.
+
+<Level min="intermediate">
+
+A moving particle also behaves like a wave. Its wavelength is $\lambda = h/p$, where $p$ is the particle's momentum. This is the <Term id="de-broglie-wavelength">de Broglie wavelength</Term>.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+Each topic ends its practical part with the VASP settings that matter. They appear in a copyable block like this one. The values are an example of the format, not a recommendation:
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM = format example   # a comment
+ENCUT  = 520              ! plane-wave cutoff in eV
+ISMEAR = 0`}
+  annotations={{ 2: 'tag, equals sign, value' }}
+/>
+
+The VASP wiki page named for each tag is the reference for its meaning and default <Cite id="S-019" />. We name the page so you can check it yourself.
+
+</InVasp>
+
+<WhatChanges>
+
+Each page also answers three questions about every setting: why you are setting it, why that value, and what happens if you skip it or get it wrong. If a rule is only a rule of thumb, the page says so.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Skipping the folded parts">
+
+Reading only the Intuition part is fine for a first pass, but the settings in the VASP part are what protect you from a wrong result. Come back to them before you run a calculation.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-how-to-use-1', 'q-how-to-use-2']} />
+
+<GoDeeper>
+
+Textbooks and the VASP wiki are cited, never copied. Every source is listed with an honest status on the [references page](/references/), and every term is in the [glossary](/glossary/).
+
+</GoDeeper>

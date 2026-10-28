@@ -1,0 +1,90 @@
+---
+import glossary from '../../data/glossary.json';
+// First-use glossary term. Without JavaScript it is a link to /glossary/#id with the definition as its title.
+interface Props {
+  id: string;
+}
+const { id } = Astro.props;
+const term = glossary.find((t) => t.id === id);
+if (!term) throw new Error(`<Term id="${id}">: no such glossary entry in src/data/glossary.json`);
+Astro.locals.termCount = (Astro.locals.termCount ?? 0) + 1;
+const uid = `${id}-${Astro.locals.termCount}`;
+---
+
+<span class="term" data-term>
+  <a class="term-link" href={`/glossary/#${id}`} title={term.short} aria-describedby={`pop-${uid}`}>
+    <slot />
+  </a>
+  <span class="term-pop" role="tooltip" id={`pop-${uid}`} hidden>
+    <strong>{term.label}.</strong> {term.short} <a href={`/glossary/#${id}`}>Full entry</a>
+  </span>
+</span>
+
+<script>
+  // Opens on focus or click, closes on Escape or when focus or a click leaves it.
+  document.querySelectorAll<HTMLElement>('[data-term]').forEach((root) => {
+    const link = root.querySelector<HTMLAnchorElement>('.term-link');
+    const pop = root.querySelector<HTMLElement>('.term-pop');
+    if (!link || !pop) return;
+    link.removeAttribute('title'); // the popover replaces the native tooltip
+    let pinned = false;
+    const open = () => (pop.hidden = false);
+    const close = () => {
+      pop.hidden = true;
+      pinned = false;
+    };
+    link.addEventListener('focus', open);
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (pinned) close();
+      else {
+        pinned = true;
+        open();
+      }
+    });
+    root.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !pop.hidden) {
+        close();
+        link.focus();
+      }
+    });
+    root.addEventListener('focusout', (e) => {
+      if (!root.contains(e.relatedTarget as Node | null)) close();
+    });
+    document.addEventListener('click', (e) => {
+      if (!root.contains(e.target as Node)) close();
+    });
+  });
+</script>
+
+<style is:global>
+  .term {
+    position: relative;
+  }
+  .term-link {
+    color: inherit;
+    text-decoration: underline dotted var(--accent);
+    text-underline-offset: 0.25em;
+  }
+  .term-pop {
+    position: absolute;
+    z-index: 5;
+    left: 0;
+    top: 100%;
+    width: min(20rem, 80vw);
+    padding: var(--space-3) var(--space-4);
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-2);
+    font-size: var(--step--1);
+    line-height: 1.45;
+  }
+  .term-pop[hidden] {
+    display: none;
+  }
+  .cite a {
+    text-decoration: none;
+  }
+</style>
