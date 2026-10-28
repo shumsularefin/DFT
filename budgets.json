@@ -1,0 +1,9 @@
+{
+  "_comment": "Gzip budgets, docs/ARCHITECTURE.md section 8. Page class comes from data-page-class on <html>. Initial JS counts the page's scripts plus statically imported chunks plus inline scripts.",
+  "pageClasses": {
+    "content": { "initialJsKB": 15, "cssKB": 30 },
+    "island": { "initialJsKB": 200, "cssKB": 30 },
+    "tool": { "initialJsKB": 200, "cssKB": 30 }
+  },
+  "lazyChunks": {}
+}

@@ -6,8 +6,8 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 
 | Stage | Title | Status | Depends on | Size | Branch | PR | Updated | Note |
 |---|---|---|---|---|---|---|---|---|
-| M0.1 | Scaffold the project | todo | none | M | | | | [work order](milestones/M0-scaffold.md) |
-| M0.2 | Hosting, CI/CD, budgets and first deploy | todo | M0.1 | M | | | | [work order](milestones/M0-scaffold.md) |
+| M0.1 | Scaffold the project | done | none | M | claude/vigilant-newton-ws593b | | 2026-10-28 | [work order](milestones/M0-scaffold.md) |
+| M0.2 | Hosting, CI/CD, budgets and first deploy | done | M0.1 | M | claude/vigilant-newton-ws593b | [#1](https://github.com/shumsularefin/DFT/pull/1) | 2026-10-28 | [work order](milestones/M0-scaffold.md) |
 | M1.1 | Design tokens, themes and UI primitives | todo | M0.2 | M | | | | [work order](milestones/M1-design-and-shell.md) |
 | M1.2 | Content system and topic anatomy | todo | M1.1 | L | | | | [work order](milestones/M1-design-and-shell.md) |
 | M1.3 | Handbook shell, level switch, progress, search and SEO | todo | M1.2 | M | | | | [work order](milestones/M1-design-and-shell.md) |
@@ -64,6 +64,8 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 
 Newest first. One line per session: date, stage, outcome, branch.
 
+- 2026-10-28, M0.2: sw, manifest, size budgets, headers check (emulator, 18 pass), Lighthouse 100/100/100; preview pending Q-015. Same branch and PR as M0.1.
+- 2026-10-28, M0.1: scaffold done, verify and e2e green. Branch `claude/vigilant-newton-ws593b`.
 - 2026-10-27, planning: environment created (rules, SPEC v2, workflow, 53 work orders, guards, CI, hosting config, golden reference data). Branch `claude/great-dijkstra-oj0kbx`.
 
 ## Author actions outstanding

@@ -1,0 +1,55 @@
+{
+  "name": "dft-handbook",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build && node scripts/build/postbuild.mjs",
+    "preview": "astro preview",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "typecheck": "astro check",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "guard": "node --test scripts/guard/guard.test.mjs && node scripts/guard/run-all.mjs",
+    "size": "node scripts/build/check-size.mjs",
+    "lhci": "lhci autorun",
+    "verify": "npm run format:check && npm run lint && npm run typecheck && npm run test && npm run guard && npm run build && npm run size"
+  },
+  "dependencies": {
+    "@astrojs/markdown-remark": "7.3.4",
+    "@astrojs/mdx": "8.1.1",
+    "@astrojs/react": "7.1.1",
+    "@astrojs/sitemap": "3.7.4",
+    "astro": "7.3.8",
+    "katex": "0.19.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "rehype-katex": "7.0.1",
+    "remark-math": "6.0.0",
+    "zustand": "5.0.16"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.12",
+    "@axe-core/playwright": "4.14.0",
+    "@eslint/js": "10.0.1",
+    "@lhci/cli": "0.15.1",
+    "@playwright/test": "1.64.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "eslint": "10.13.0",
+    "eslint-plugin-astro": "3.2.1",
+    "pagefind": "1.5.2",
+    "prettier": "3.9.10",
+    "prettier-plugin-astro": "1.1.2",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1",
+    "vitest": "5.0.5",
+    "workbox-build": "7.4.1"
+  }
+}

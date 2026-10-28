@@ -1,0 +1,53 @@
+#!/usr/bin/env node
+// Static server for Playwright and local checks. Becomes scripts/build/serve.mjs in M0.1.
+// Why: Astro 7's `astro preview` detaches into a background daemon when it is not attached to a
+// terminal (as under Playwright's webServer), so Playwright reports "exited early". VERIFIED 2026-10-27.
+// Mimics Firebase Hosting with cleanUrls + trailingSlash: /about redirects to /about/, directories serve
+// index.html, unknown paths serve 404.html with status 404. Usage: node scripts/build/serve.mjs dist 4321
+import http from 'node:http';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const root = path.resolve(process.argv[2] ?? 'dist');
+const port = Number(process.argv[3] ?? 4321);
+const TYPES = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'text/javascript',
+  '.mjs': 'text/javascript',
+  '.css': 'text/css',
+  '.json': 'application/json',
+  '.svg': 'image/svg+xml',
+  '.png': 'image/png',
+  '.webp': 'image/webp',
+  '.woff2': 'font/woff2',
+  '.wasm': 'application/wasm',
+  '.xml': 'application/xml',
+  '.txt': 'text/plain; charset=utf-8',
+  '.webmanifest': 'application/manifest+json',
+  '.pf_meta': 'application/octet-stream',
+  '.pf_index': 'application/octet-stream',
+  '.pf_fragment': 'application/octet-stream',
+  '.pagefind': 'application/octet-stream',
+};
+
+function send(res, status, file) {
+  res.writeHead(status, { 'content-type': TYPES[path.extname(file)] ?? 'application/octet-stream' });
+  fs.createReadStream(file).pipe(res);
+}
+
+http
+  .createServer((req, res) => {
+    const url = new URL(req.url ?? '/', 'http://localhost');
+    const rel = decodeURIComponent(url.pathname);
+    const abs = path.join(root, rel);
+    if (!abs.startsWith(root)) return res.writeHead(403).end();
+    if (fs.existsSync(abs) && fs.statSync(abs).isFile()) return send(res, 200, abs);
+    if (fs.existsSync(path.join(abs, 'index.html'))) {
+      if (!rel.endsWith('/')) return res.writeHead(301, { location: rel + '/' + url.search }).end();
+      return send(res, 200, path.join(abs, 'index.html'));
+    }
+    const notFound = path.join(root, '404.html');
+    if (fs.existsSync(notFound)) return send(res, 404, notFound);
+    res.writeHead(404).end('not found');
+  })
+  .listen(port, () => console.log(`serving ${root} on http://localhost:${port}`));

@@ -55,3 +55,20 @@ node --test scripts/guard/guard.test.mjs
 ```
 
 The application's `npm` scripts appear after stage M0.1 (a "Development" section is appended to this README then).
+
+## Development
+
+Node 22.12 or newer. Install with `npm ci`.
+
+| Script                                    | What it does                                                           |
+| ----------------------------------------- | ---------------------------------------------------------------------- |
+| `npm run dev`                             | Astro dev server                                                       |
+| `npm run build`                           | `astro build`, then `scripts/build/postbuild.mjs`                      |
+| `npm run preview`                         | Preview the build                                                      |
+| `npm run format` / `npm run format:check` | Prettier write / check                                                 |
+| `npm run lint`                            | ESLint                                                                 |
+| `npm run typecheck`                       | `astro check`                                                          |
+| `npm test`                                | Vitest unit tests                                                      |
+| `npm run test:e2e`                        | Playwright (builds first; set `PW_CHROMIUM_PATH` in cloud sessions)    |
+| `npm run guard`                           | Repository guards (secrets, POTCAR, em dashes, sources, links, stages) |
+| `npm run verify`                          | format:check, lint, typecheck, test, guard, build                      |
