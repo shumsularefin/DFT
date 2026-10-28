@@ -1,0 +1,418 @@
+[
+  {
+    "id": "S-001",
+    "citation": "R. D. Shannon, \"Revised effective ionic radii and systematic studies of interatomic distances in halides and chalcogenides\", Acta Cryst. A32, 751-767 (1976)",
+    "usedFor": "Ionic radii (M8, M10)",
+    "access": "paywalled; table widely mirrored",
+    "status": "cited-from-memory",
+    "notes": "34 textbook anchor values agree with pymatgen's table (`tests/reference/perovskite_reference.json`), but the anchors were not independent of pymatgen output (several had been seen first), so this is a consistency check only. Independent check and completeness: Q-002"
+  },
+  {
+    "id": "S-002",
+    "citation": "V. M. Goldschmidt, \"Die Gesetze der Krystallochemie\", Naturwissenschaften 14, 477-485 (1926)",
+    "usedFor": "Tolerance factor t",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": "t = (rA + rX) / (sqrt(2)(rB + rX)); values reproduce textbook t for SrTiO3 (1.00), BaTiO3 (1.06), CaTiO3 (0.97)"
+  },
+  {
+    "id": "S-003",
+    "citation": "C. J. Bartel, C. Sutton, B. R. Goldsmith, R. Ouyang, C. B. Musgrave, L. M. Ghiringhelli, M. Scheffler, \"New tolerance factor to predict the stability of perovskite oxides and halides\", Science Advances 5, eaav0693 (2019); arXiv:1801.07700",
+    "usedFor": "tau tolerance factor",
+    "access": "open access",
+    "status": "cited-from-memory",
+    "notes": "Title, authors and journal confirmed by a web search; the equation and 4.18 threshold are NOT yet confirmed: Q-003"
+  },
+  {
+    "id": "S-004",
+    "citation": "C. Li, K. C. K. Soh, P. Wu, \"Formability of ABO3 perovskites\", J. Alloys Compd. 372, 40-48 (2004)",
+    "usedFor": "Formability windows for t and mu",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": "Citation unverified; see Q-005"
+  },
+  {
+    "id": "S-005",
+    "citation": "W. Setyawan, S. Curtarolo, \"High-throughput electronic band structure calculations: Challenges and tools\", Comput. Mater. Sci. 49, 299-312 (2010); arXiv:1004.2974",
+    "usedFor": "Setyawan-Curtarolo k-paths",
+    "access": "open access (arXiv)",
+    "status": "cross-checked",
+    "notes": "fcc points agree with seekpath (`tests/reference/kpaths.json`); tables to be checked against the paper in M5.4"
+  },
+  {
+    "id": "S-006",
+    "citation": "Y. Hinuma, G. Pizzi, Y. Kumagai, F. Oba, I. Tanaka, \"Band structure diagram paths based on crystallography\", Comput. Mater. Sci. 128, 140-184 (2017); arXiv:1602.06402",
+    "usedFor": "HPKOT k-paths and standardization",
+    "access": "open access (arXiv)",
+    "status": "cross-checked",
+    "notes": "Reference output from seekpath 2.2.2 in `tests/reference/kpaths.json`"
+  },
+  {
+    "id": "S-007",
+    "citation": "H. J. Monkhorst, J. D. Pack, \"Special points for Brillouin-zone integrations\", Phys. Rev. B 13, 5188 (1976)",
+    "usedFor": "Monkhorst-Pack meshes",
+    "access": "paywalled",
+    "status": "cross-checked",
+    "notes": "Coordinates in `tests/reference/pw_kmesh_reference.json` follow the paper's formula"
+  },
+  {
+    "id": "S-008",
+    "citation": "P. E. Blochl, \"Projector augmented-wave method\", Phys. Rev. B 50, 17953 (1994)",
+    "usedFor": "PAW",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-009",
+    "citation": "G. Kresse, D. Joubert, \"From ultrasoft pseudopotentials to the projector augmented-wave method\", Phys. Rev. B 59, 1758 (1999)",
+    "usedFor": "PAW in VASP",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-010",
+    "citation": "G. Kresse, J. Furthmuller, \"Efficient iterative schemes for ab initio total-energy calculations using a plane-wave basis set\", Phys. Rev. B 54, 11169 (1996)",
+    "usedFor": "VASP algorithms",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": "Also G. Kresse, J. Hafner, Phys. Rev. B 47, 558 (1993)"
+  },
+  {
+    "id": "S-011",
+    "citation": "P. Hohenberg, W. Kohn, \"Inhomogeneous electron gas\", Phys. Rev. 136, B864 (1964)",
+    "usedFor": "Hohenberg-Kohn theorems",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-012",
+    "citation": "W. Kohn, L. J. Sham, \"Self-consistent equations including exchange and correlation effects\", Phys. Rev. 140, A1133 (1965)",
+    "usedFor": "Kohn-Sham equations",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-013",
+    "citation": "J. P. Perdew, K. Burke, M. Ernzerhof, \"Generalized gradient approximation made simple\", Phys. Rev. Lett. 77, 3865 (1996)",
+    "usedFor": "PBE",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-014",
+    "citation": "S. L. Dudarev, G. A. Botton, S. Y. Savrasov, C. J. Humphreys, A. P. Sutton, \"Electron-energy-loss spectra and the structural stability of nickel oxide: An LSDA+U study\", Phys. Rev. B 57, 1505 (1998)",
+    "usedFor": "DFT+U (LDAUTYPE=2)",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": "E_U = (U-J)/2 sum Tr[n(1-n)]"
+  },
+  {
+    "id": "S-015",
+    "citation": "M. Methfessel, A. T. Paxton, \"High-precision sampling for Brillouin-zone integration in metals\", Phys. Rev. B 40, 3616 (1989)",
+    "usedFor": "Methfessel-Paxton smearing",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-016",
+    "citation": "N. Marzari, D. Vanderbilt, A. De Vita, M. C. Payne, \"Thermal contraction and disordering of the Al(110) surface\", Phys. Rev. Lett. 82, 3296 (1999)",
+    "usedFor": "Cold (Marzari-Vanderbilt) smearing",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-017",
+    "citation": "P. E. Blochl, O. Jepsen, O. K. Andersen, \"Improved tetrahedron method for Brillouin-zone integrations\", Phys. Rev. B 49, 16223 (1994)",
+    "usedFor": "Tetrahedron method",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-018",
+    "citation": "D. S. Sholl, J. A. Steckel, \"Density Functional Theory: A Practical Introduction\", Wiley (2009; 2nd ed. 2022)",
+    "usedFor": "Go-deeper pointer only; never reproduced",
+    "access": "book",
+    "status": "cited-from-memory",
+    "notes": "Cite, never copy"
+  },
+  {
+    "id": "S-019",
+    "citation": "VASP Wiki, https://www.vasp.at/wiki (pages cited by name, e.g. ENCUT, ISMEAR, KSPACING, IBRION, LOPTICS)",
+    "usedFor": "Tag meaning, defaults, rules",
+    "access": "web; unreachable from the build sandbox",
+    "status": "cited-from-memory",
+    "notes": "The author's handbooks quote it; direct checks pending (Q-007). Always cite the page name"
+  },
+  {
+    "id": "S-020",
+    "citation": "V. Wang, N. Xu, J.-C. Liu, G. Tang, W.-T. Geng, \"VASPKIT: A user-friendly interface facilitating high-throughput computing and analysis using VASP code\", Comput. Phys. Commun. 267, 108033 (2021)",
+    "usedFor": "VASPKIT command map",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-021",
+    "citation": "B. Cordero et al., \"Covalent radii revisited\", Dalton Trans. 2832-2838 (2008)",
+    "usedFor": "Covalent radii (M10)",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-022",
+    "citation": "L. Pauling, \"The principles determining the structure of complex ionic crystals\", J. Am. Chem. Soc. 51, 1010-1026 (1929)",
+    "usedFor": "Pauling's rules (M10)",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-023",
+    "citation": "D. W. Davies, K. T. Butler, A. J. Jackson, et al., \"SMACT: Semiconducting Materials by Analogy and Chemical Theory\", J. Open Source Softw. 4, 1361 (2019); and Chem 1, 617 (2016)",
+    "usedFor": "Charge-neutrality screening idea (M10)",
+    "access": "open access",
+    "status": "cited-from-memory",
+    "notes": "Method is reimplemented, not copied; data provenance: Q-012"
+  },
+  {
+    "id": "S-024",
+    "citation": "A. Jain et al., \"Commentary: The Materials Project: A materials genome approach to accelerating materials innovation\", APL Mater. 1, 011002 (2013)",
+    "usedFor": "Materials Project attribution (M9)",
+    "access": "open access",
+    "status": "cited-from-memory",
+    "notes": "Licence and terms: Q-009"
+  },
+  {
+    "id": "S-025",
+    "citation": "J. Heyd, G. E. Scuseria, M. Ernzerhof, \"Hybrid functionals based on a screened Coulomb potential\", J. Chem. Phys. 118, 8207 (2003); A. V. Krukau et al., J. Chem. Phys. 125, 224106 (2006)",
+    "usedFor": "HSE06",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-026",
+    "citation": "J. Sun, A. Ruzsinszky, J. P. Perdew, \"Strongly constrained and appropriately normed semilocal density functional\", Phys. Rev. Lett. 115, 036402 (2015); J. W. Furness et al., J. Phys. Chem. Lett. 11, 8208 (2020)",
+    "usedFor": "SCAN, r2SCAN",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-027",
+    "citation": "F. Tran, P. Blaha, \"Accurate band gaps of semiconductors and insulators with a semilocal exchange-correlation potential\", Phys. Rev. Lett. 102, 226401 (2009)",
+    "usedFor": "mBJ",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-028",
+    "citation": "S. Grimme, J. Antony, S. Ehrlich, H. Krieg, J. Chem. Phys. 132, 154104 (2010); S. Grimme, S. Ehrlich, L. Goerigk, J. Comput. Chem. 32, 1456 (2011)",
+    "usedFor": "DFT-D3 and D3(BJ)",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-029",
+    "citation": "G. Henkelman, A. Arnaldsson, H. Jonsson, \"A fast and robust algorithm for Bader decomposition of charge density\", Comput. Mater. Sci. 36, 354 (2006)",
+    "usedFor": "Bader analysis pointer",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-030",
+    "citation": "W. E. Lorensen, H. E. Cline, \"Marching cubes: A high resolution 3D surface construction algorithm\", Comput. Graph. 21, 163 (1987)",
+    "usedFor": "Isosurfaces (M7.5)",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-031",
+    "citation": "E. Tiesinga, P. J. Mohr, D. B. Newell, B. N. Taylor, \"CODATA recommended values of the fundamental physical constants: 2018\", Rev. Mod. Phys. 93, 025010 (2021)",
+    "usedFor": "hbar, m_e, e",
+    "access": "open access",
+    "status": "cross-checked",
+    "notes": "hbar^2/2m_e = 3.80998 eV Angstrom^2 from scipy.constants, matches VASP's value to 6 digits"
+  },
+  {
+    "id": "S-032",
+    "citation": "A. Togo, K. Shinohara, I. Tanaka, \"Spglib: a software library for crystal symmetry search\", Sci. Technol. Adv. Mater.: Methods 4, 2384822 (2024); Moyo, https://github.com/spglib/moyo",
+    "usedFor": "Symmetry analysis",
+    "access": "open access",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-033",
+    "citation": "seekpath (Hinuma, Pizzi et al.), https://github.com/giovannipizzi/seekpath (MIT)",
+    "usedFor": "HPKOT reference implementation to port and test against",
+    "access": "open source",
+    "status": "cross-checked",
+    "notes": "seekpath 2.2.2 used for golden data"
+  },
+  {
+    "id": "S-034",
+    "citation": "pymatgen, https://github.com/materialsproject/pymatgen (MIT); S. P. Ong et al., Comput. Mater. Sci. 68, 314 (2013)",
+    "usedFor": "Setyawan-Curtarolo reference, data, golden files",
+    "access": "open source",
+    "status": "cross-checked",
+    "notes": "pymatgen 2026.10.24 used for golden data"
+  },
+  {
+    "id": "S-035",
+    "citation": "RDKit, https://www.rdkit.org (BSD-3-Clause), JavaScript build `@rdkit/rdkit`",
+    "usedFor": "Molecule 2D layout and sanitization",
+    "access": "open source",
+    "status": "cross-checked",
+    "notes": "API inspected for D-004"
+  },
+  {
+    "id": "S-036",
+    "citation": "N. W. Ashcroft, N. D. Mermin, \"Solid State Physics\", Holt, Rinehart and Winston (1976)",
+    "usedFor": "Reciprocal lattice, Brillouin zone, Wigner-Seitz construction",
+    "access": "book",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-037",
+    "citation": "A. T. Corbett, J. R. Anderson, \"Knowledge tracing: Modeling the acquisition of procedural knowledge\", User Model. User-Adap. Inter. 4, 253-278 (1994)",
+    "usedFor": "Bayesian knowledge tracing",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-038",
+    "citation": "P. A. Wozniak, SuperMemo SM-2 algorithm (1990), https://super-memory.com/english/ol/sm2.htm",
+    "usedFor": "Spaced repetition",
+    "access": "web",
+    "status": "cited-from-memory",
+    "notes": "Update rules are fully specified in M6.2 and tested"
+  },
+  {
+    "id": "S-039",
+    "citation": "W. R. Thompson, \"On the likelihood that one unknown probability exceeds another in view of the evidence of two samples\", Biometrika 25, 285-294 (1933)",
+    "usedFor": "Thompson sampling",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-040",
+    "citation": "G. Francis, M. C. Payne, \"Finite basis set corrections to total energy pseudopotential calculations\", J. Phys.: Condens. Matter 2, 4395 (1990)",
+    "usedFor": "Pulay stress",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-041",
+    "citation": "The author's \"VASP Field Handbook\", `docs/source-material/VASP_Field_Handbook.html` (VASP 5.4 / 6.x)",
+    "usedFor": "Seed for file, tag, problem and recipe content",
+    "access": "in repo",
+    "status": "cross-checked",
+    "notes": "Hand-verified by the author against the VASP wiki; its \"Corrected\" entries override the original notes (D-018)"
+  },
+  {
+    "id": "S-042",
+    "citation": "The author's \"VASP Workflow Handbook\", `docs/source-material/VASP_Workflow_Handbook.html` (VASP 5.4 / 6.x, VASPKit 1.3+, Phonopy 2.x)",
+    "usedFor": "Seed for the protocol, INCARs per task, troubleshooting, error index",
+    "access": "in repo",
+    "status": "cross-checked",
+    "notes": "Includes the author's fixed 5-step protocol, reproduced as written"
+  },
+  {
+    "id": "S-043",
+    "citation": "K. Momma, F. Izumi, \"VESTA 3 for three-dimensional visualization of crystal, volumetric and morphology data\", J. Appl. Cryst. 44, 1272 (2011)",
+    "usedFor": "Visualization conventions, CHGCAR viewing",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-044",
+    "citation": "Materials Project documentation, https://docs.materialsproject.org and `mp-api` (BSD-3-Clause-LBNL)",
+    "usedFor": "Data pipeline fields and terms",
+    "access": "web",
+    "status": "cited-from-memory",
+    "notes": "Field names confirmed by reading `mp_api 0.47.0` source (Q-009 for terms)"
+  },
+  {
+    "id": "S-045",
+    "citation": "W. Hume-Rothery, R. E. Smallman, C. W. Haworth, \"The Structure of Metals and Alloys\" (1969)",
+    "usedFor": "Hume-Rothery rules",
+    "access": "book",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-046",
+    "citation": "J. P. Perdew, K. Schmidt, \"Jacob's ladder of density functional approximations for the exchange-correlation energy\", AIP Conf. Proc. 577, 1 (2001)",
+    "usedFor": "Functional ladder",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-047",
+    "citation": "D. J. Griffiths, D. F. Schroeter, \"Introduction to Quantum Mechanics\", 3rd ed., Cambridge University Press (2018)",
+    "usedFor": "Particle in a box, harmonic oscillator, hydrogen atom formulas (M2, M7)",
+    "access": "book",
+    "status": "cited-from-memory",
+    "notes": "Closed-form results; tests also use independent numerical quadrature"
+  },
+  {
+    "id": "S-048",
+    "citation": "A. Szabo, N. S. Ostlund, \"Modern Quantum Chemistry: Introduction to Advanced Electronic Structure Theory\", Dover (1996)",
+    "usedFor": "Many-electron problem, Hartree-Fock, scaling (M2.4, M7.1)",
+    "access": "book",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-049",
+    "citation": "R. M. Martin, \"Electronic Structure: Basic Theory and Practical Methods\", Cambridge University Press (2004)",
+    "usedFor": "Plane waves, pseudopotentials, k-point sampling, DFT practice (M4, M7)",
+    "access": "book",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-050",
+    "citation": "C. Kittel, \"Introduction to Solid State Physics\", 8th ed., Wiley (2005)",
+    "usedFor": "Reciprocal lattice, Brillouin zones, free-electron and Kronig-Penney models (M4.4, M5)",
+    "access": "book",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-051",
+    "citation": "SMACT 4.0.2 data file `oxidation_states_icsd24_counts.json` (MIT code; counts of ICSD 2024 entries per element and oxidation state), https://github.com/WMD-group/SMACT",
+    "usedFor": "Oxidation-state frequency classification (M8.2, M10.1)",
+    "access": "open source",
+    "status": "cross-checked",
+    "notes": "Shares in `tests/reference/element_reference.json`; Cu: +2 0.564, +1 0.406, +3 0.030. Licence of the derived statistics: Q-012"
+  },
+  {
+    "id": "S-052",
+    "citation": "ASE (Atomic Simulation Environment) 3.29.0 data module, https://wiki.fysik.dtu.dk/ase (LGPL-2.1-or-later), used only as the transcription of Cordero's covalent radii (S-021)",
+    "usedFor": "Covalent radii values (M10)",
+    "access": "open source",
+    "status": "cross-checked",
+    "notes": "7 recalled Cordero values match (H 0.31, C 0.76, N 0.71, O 0.66, Si 1.11, Fe 1.32, Cu 1.32)"
+  }
+]

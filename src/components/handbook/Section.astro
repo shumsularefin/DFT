@@ -1,0 +1,23 @@
+---
+// One anatomy section with a stable id (docs/CONTENT_GUIDE.md section 3). Wrapped by Why, Intuition, etc.
+interface Props {
+  id: string;
+  heading: string;
+}
+const { id, heading } = Astro.props;
+---
+
+<section class="topic-section" id={id} aria-labelledby={`${id}-h`}>
+  <h2 id={`${id}-h`}>{heading}</h2>
+  <slot />
+</section>
+
+<style is:global>
+  .topic-section {
+    margin-block: var(--space-6);
+    scroll-margin-top: var(--space-4);
+  }
+  .topic-section > h2 {
+    margin-top: 0;
+  }
+</style>

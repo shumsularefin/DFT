@@ -25,7 +25,15 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="robots" content="noindex" />
     <link rel="preload" href={plexRegular} as="font" type="font/woff2" crossorigin />
     <script is:inline>
-      // Set the stored theme before first paint. Without storage or JS, prefers-color-scheme decides.
+      // Set the stored theme and level before first paint. Without storage or JS, prefers-color-scheme decides.
+      // Reading level (D-011): same envelope, key dft:level. Missing or invalid means Beginner (no attribute).
+      try {
+        const l = JSON.parse(localStorage.getItem('dft:level'));
+        if (l && l.v === 1 && ['beginner', 'intermediate', 'pro'].includes(l.data))
+          document.documentElement.dataset.level = l.data;
+      } catch {
+        /* storage unavailable: Beginner */
+      }
       try {
         // Same envelope as src/lib/storage.ts: { v: 1, data: 'light' | 'dark' }
         const e = JSON.parse(localStorage.getItem('dft:theme'));

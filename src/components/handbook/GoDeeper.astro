@@ -1,0 +1,41 @@
+---
+import Section from './Section.astro';
+import sources from '../../data/sources.json';
+// The page route stores the citation order in Astro.locals.cites (order of first <Cite> use, per page).
+interface Props {
+  /** Front matter sources not cited inline; listed after the numbered ones. */
+  extra?: string[];
+}
+const { extra = [] } = Astro.props;
+const cites: string[] = Astro.locals.cites ?? [];
+const byId = new Map(sources.map((s) => [s.id, s]));
+const others = extra.filter((id) => !cites.includes(id));
+---
+
+<Section id="go-deeper" heading="Go deeper">
+  <slot />
+  {cites.length > 0 && (
+    <>
+      <h3 id="references-h">References</h3>
+      <ol class="cite-list" aria-labelledby="references-h">
+        {cites.map((id) => (
+          <li id={`ref-${id}`}>
+            {byId.get(id)?.citation ?? id} <a href={`/references/#${id}`}>[{id}]</a>
+          </li>
+        ))}
+      </ol>
+    </>
+  )}
+  {others.length > 0 && (
+    <>
+      <h3 id="also-used-h">Also used</h3>
+      <ul aria-labelledby="also-used-h">
+        {others.map((id) => (
+          <li>
+            {byId.get(id)?.citation ?? id} <a href={`/references/#${id}`}>[{id}]</a>
+          </li>
+        ))}
+      </ul>
+    </>
+  )}
+</Section>

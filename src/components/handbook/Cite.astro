@@ -1,0 +1,16 @@
+---
+// Numbered in order of first use on the page. The route computes the order from the topic source and
+// puts it in Astro.locals.cites, so numbering does not depend on render order.
+interface Props {
+  id: string;
+}
+const { id } = Astro.props;
+const cites: string[] = Astro.locals.cites ?? [];
+const n = cites.indexOf(id) + 1;
+---
+
+<sup class="cite">
+  <a href={`#ref-${id}`} aria-label={`Reference ${n}, ${id}`}>
+    [{n > 0 ? n : id}]
+  </a>
+</sup>

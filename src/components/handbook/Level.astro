@@ -1,0 +1,27 @@
+---
+import { visibleLevels, type Level } from '../../lib/levels';
+// Both branches are rendered; CSS keyed on html[data-level] shows or hides them (D-011).
+interface Props {
+  min?: Level;
+  max?: Level;
+}
+const { min, max } = Astro.props;
+if (!min && !max) throw new Error('<Level> needs a min or a max prop');
+const visible = visibleLevels({ min, max }).join(' ');
+---
+
+<div class="level" data-min={min} data-max={max} data-visible={visible}>
+  <slot />
+</div>
+
+<style is:global>
+  .level {
+    display: none;
+  }
+  html:not([data-level]) .level[data-visible~='beginner'],
+  html[data-level='beginner'] .level[data-visible~='beginner'],
+  html[data-level='intermediate'] .level[data-visible~='intermediate'],
+  html[data-level='pro'] .level[data-visible~='pro'] {
+    display: contents;
+  }
+</style>

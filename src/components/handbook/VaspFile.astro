@@ -1,0 +1,27 @@
+---
+import CodeBlock from '../ui/CodeBlock.astro';
+// Wraps CodeBlock for VASP input files. Never use it for POTCAR content (CLAUDE.md).
+interface Props {
+  name: 'INCAR' | 'KPOINTS' | 'POSCAR' | 'CONTCAR' | 'OUTCAR' | 'shell';
+  code: string;
+  annotations?: Record<number, string>;
+}
+const { name, code, annotations } = Astro.props;
+const lang =
+  name === 'INCAR'
+    ? 'incar'
+    : name === 'KPOINTS'
+      ? 'kpoints'
+      : name === 'POSCAR' || name === 'CONTCAR'
+        ? 'poscar'
+        : name === 'shell'
+          ? 'shell'
+          : 'text';
+---
+
+<CodeBlock
+  lang={lang}
+  filename={name === 'shell' ? 'terminal' : name}
+  code={code}
+  annotations={annotations}
+/>

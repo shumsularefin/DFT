@@ -98,10 +98,10 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   const dist = path.resolve(process.argv[2] ?? 'dist');
   const budgets = JSON.parse(fs.readFileSync(process.argv[3] ?? 'budgets.json', 'utf8'));
   const { rows, violations } = checkSize(dist, budgets);
-  console.log('page'.padEnd(24) + 'class'.padEnd(10) + 'JS gz KB'.padEnd(18) + 'CSS gz KB');
+  console.log('page'.padEnd(52) + 'class'.padEnd(10) + 'JS gz KB'.padEnd(18) + 'CSS gz KB');
   for (const r of rows) {
     console.log(
-      r.page.padEnd(24) +
+      r.page.padEnd(52) +
         r.cls.padEnd(10) +
         `${r.jsKB.toFixed(2)}/${r.jsMax}`.padEnd(18) +
         `${r.cssKB.toFixed(2)}/${r.cssMax}`,
