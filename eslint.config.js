@@ -27,7 +27,13 @@ export default [
   {
     files: ['*.config.{js,mjs,ts}', 'scripts/**/*.{js,mjs,ts}'],
     languageOptions: {
-      globals: { process: 'readonly', console: 'readonly', URL: 'readonly', Buffer: 'readonly' },
+      globals: {
+        process: 'readonly',
+        console: 'readonly',
+        URL: 'readonly',
+        fetch: 'readonly',
+        Buffer: 'readonly',
+      },
     },
   },
 ];
