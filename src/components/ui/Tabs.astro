@@ -1,0 +1,109 @@
+---
+// Named slots hold the panels: <Tabs label="..." tabs={[{ id: 'a', label: 'A' }]}><div slot="a">...</div></Tabs>
+// Without JavaScript every panel is shown in order; the script adds the tab behaviour.
+interface Props {
+  label: string;
+  tabs: { id: string; label: string }[];
+}
+const { label, tabs } = Astro.props;
+const uid = Math.random().toString(36).slice(2, 8);
+const panels = await Promise.all(tabs.map((t) => Astro.slots.render(t.id)));
+---
+
+<div class="tabs" data-tabs>
+  <div class="tablist" role="tablist" aria-label={label}>
+    {tabs.map((t, i) => (
+      <button
+        type="button"
+        role="tab"
+        class="tab"
+        id={`tab-${uid}-${t.id}`}
+        aria-controls={`panel-${uid}-${t.id}`}
+        aria-selected={i === 0 ? 'true' : 'false'}
+        tabindex={i === 0 ? 0 : -1}
+      >
+        {t.label}
+      </button>
+    ))}
+  </div>
+  {tabs.map((t, i) => (
+    <div
+      class="tabpanel"
+      role="tabpanel"
+      id={`panel-${uid}-${t.id}`}
+      aria-labelledby={`tab-${uid}-${t.id}`}
+      tabindex="0"
+      set:html={panels[i]}
+    />
+  ))}
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-tabs]').forEach((root) => {
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const panels = [...root.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
+    function select(i: number, focus: boolean) {
+      tabs.forEach((t, j) => {
+        t.setAttribute('aria-selected', String(i === j));
+        t.tabIndex = i === j ? 0 : -1;
+      });
+      panels.forEach((p, j) => (p.hidden = i !== j));
+      if (focus) tabs[i]?.focus();
+    }
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => select(i, false));
+      t.addEventListener('keydown', (e) => {
+        const n = tabs.length;
+        const next =
+          e.key === 'ArrowRight'
+            ? (i + 1) % n
+            : e.key === 'ArrowLeft'
+              ? (i - 1 + n) % n
+              : e.key === 'Home'
+                ? 0
+                : e.key === 'End'
+                  ? n - 1
+                  : -1;
+        if (next < 0) return;
+        e.preventDefault();
+        select(next, true);
+      });
+    });
+    root.dataset.ready = '';
+    select(0, false);
+  });
+</script>
+
+<style is:global>
+  .tabs:not([data-ready]) .tablist {
+    display: none;
+  }
+  .tablist {
+    display: flex;
+    gap: var(--space-1);
+    border-bottom: 1px solid var(--border-strong);
+    overflow-x: auto;
+  }
+  .tab {
+    min-height: var(--target);
+    padding: 0 var(--space-4);
+    font: inherit;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: transparent;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .tab[aria-selected='true'] {
+    color: var(--text);
+    border-bottom-color: var(--accent);
+  }
+  .tabpanel {
+    padding: var(--space-4) 0;
+  }
+  .tabpanel[hidden] {
+    display: none;
+  }
+</style>

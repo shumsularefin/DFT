@@ -1,0 +1,70 @@
+---
+// Static progress through numbered steps; the current step is announced with aria-current.
+interface Props {
+  steps: string[];
+  current: number; // 1-based
+  label?: string;
+}
+const { steps, current, label = 'Steps' } = Astro.props;
+---
+
+<nav aria-label={label}>
+  <ol class="stepper">
+    {steps.map((s, i) => (
+      <li
+        class:list={['step', { done: i + 1 < current, current: i + 1 === current }]}
+        aria-current={i + 1 === current ? 'step' : undefined}
+      >
+        <span class="step-num" aria-hidden="true">
+          {i + 1 < current ? '✓' : i + 1}
+        </span>
+        <span class="step-label">
+          {s}
+          {i + 1 < current && <span class="sr-only"> (done)</span>}
+        </span>
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<style is:global>
+  .stepper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-5);
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0;
+    max-width: none;
+  }
+  .step {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-muted);
+  }
+  .step-num {
+    display: inline-grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    border: 2px solid var(--border-strong);
+    font-weight: 600;
+    font-size: var(--step--1);
+  }
+  .step.done .step-num {
+    background: var(--ok);
+    border-color: var(--ok);
+    color: var(--bg);
+  }
+  .step.current {
+    color: var(--text);
+    font-weight: 600;
+  }
+  .step.current .step-num {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-contrast);
+  }
+</style>

@@ -1,0 +1,35 @@
+---
+interface Props {
+  summary: string;
+  open?: boolean;
+}
+const { summary, open = false } = Astro.props;
+---
+
+<details class="disclosure" open={open}>
+  <summary>{summary}</summary>
+  <div class="disclosure-body">
+    <slot />
+  </div>
+</details>
+
+<style is:global>
+  .disclosure {
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    background: var(--surface);
+    margin: var(--space-4) 0;
+    max-width: var(--measure);
+  }
+  .disclosure > summary {
+    min-height: var(--target);
+    padding: var(--space-2) var(--space-4);
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .disclosure-body {
+    padding: 0 var(--space-4) var(--space-3);
+  }
+</style>

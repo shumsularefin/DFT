@@ -1,0 +1,56 @@
+---
+interface Props {
+  variant?: 'note' | 'tip' | 'warning' | 'mistake';
+  title?: string;
+}
+const { variant = 'note', title } = Astro.props;
+const defaults = { note: 'Note', tip: 'Tip', warning: 'Warning', mistake: 'Common mistake' } as const;
+---
+
+<aside class={`callout callout-${variant}`} aria-label={title ?? defaults[variant]}>
+  <p class="callout-title">{title ?? defaults[variant]}</p>
+  <div class="callout-body">
+    <slot />
+  </div>
+</aside>
+
+<style is:global>
+  .callout {
+    margin: var(--space-4) 0;
+    padding: var(--space-3) var(--space-4);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: var(--radius);
+    max-width: var(--measure);
+  }
+  .callout-title {
+    margin: 0 0 var(--space-1);
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .callout-tip {
+    border-left-color: var(--ok);
+  }
+  .callout-tip .callout-title {
+    color: var(--ok);
+  }
+  .callout-warning {
+    border-left-color: var(--warn);
+  }
+  .callout-warning .callout-title {
+    color: var(--warn);
+  }
+  .callout-mistake {
+    border-left-color: var(--danger);
+  }
+  .callout-mistake .callout-title {
+    color: var(--danger);
+  }
+  .callout-body > :first-child {
+    margin-top: 0;
+  }
+  .callout-body > :last-child {
+    margin-bottom: 0;
+  }
+</style>

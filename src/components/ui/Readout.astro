@@ -1,0 +1,40 @@
+---
+interface Props {
+  label: string;
+  value: string | number;
+  unit?: string;
+}
+const { label, value, unit } = Astro.props;
+---
+
+<div class="readout">
+  <span class="readout-label">{label}</span>
+  <span class="readout-value">
+    {value}
+    {unit && <span class="readout-unit"> {unit}</span>}
+  </span>
+</div>
+
+<style is:global>
+  .readout {
+    display: inline-flex;
+    flex-direction: column;
+    padding: var(--space-2) var(--space-4);
+    background: var(--surface-2);
+    border-radius: var(--radius);
+  }
+  .readout-label {
+    font-size: var(--step--1);
+    color: var(--text-muted);
+  }
+  .readout-value {
+    font-family: var(--font-mono);
+    font-size: var(--step-1);
+    font-weight: 600;
+  }
+  .readout-unit {
+    font-size: var(--step--1);
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+</style>

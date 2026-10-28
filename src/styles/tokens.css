@@ -1,0 +1,100 @@
+/* Design tokens. Light is the default; dark applies via data-theme="dark" or, without a stored choice,
+   prefers-color-scheme. scripts/build/contrast.mjs reads the three colour blocks below, so keep their
+   selectors exactly as written and keep the media block identical to the data-theme="dark" block. */
+:root {
+  color-scheme: light;
+  --bg: #ffffff;
+  --surface: #f5f6f8;
+  --surface-2: #e9ecf1;
+  --text: #131821;
+  --text-muted: #4b5563;
+  --border: #d3d8e0;
+  --border-strong: #7b8494;
+  --accent: #1d4ed8;
+  --accent-contrast: #ffffff;
+  --danger: #b42318;
+  --warn: #8a4b00;
+  --ok: #17653a;
+  --focus: #1d4ed8;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg: #0e1218;
+    --surface: #161b23;
+    --surface-2: #202733;
+    --text: #e7eaf0;
+    --text-muted: #a4aebd;
+    --border: #2c3542;
+    --border-strong: #7a8596;
+    --accent: #8ab0ff;
+    --accent-contrast: #0b1020;
+    --danger: #ff8f85;
+    --warn: #f5b942;
+    --ok: #62d58f;
+    --focus: #8ab0ff;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0e1218;
+  --surface: #161b23;
+  --surface-2: #202733;
+  --text: #e7eaf0;
+  --text-muted: #a4aebd;
+  --border: #2c3542;
+  --border-strong: #7a8596;
+  --accent: #8ab0ff;
+  --accent-contrast: #0b1020;
+  --danger: #ff8f85;
+  --warn: #f5b942;
+  --ok: #62d58f;
+  --focus: #8ab0ff;
+}
+
+:root {
+  --font-sans: 'IBM Plex Sans', 'IBM Plex Sans Fallback', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'JetBrains Mono Fallback', ui-monospace, monospace;
+
+  /* Fluid type scale, steps -1 to 5 (viewport 360px to 1200px). */
+  --step--1: clamp(0.8rem, 0.77rem + 0.15vw, 0.875rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --step-1: clamp(1.2rem, 1.12rem + 0.4vw, 1.4rem);
+  --step-2: clamp(1.44rem, 1.3rem + 0.7vw, 1.75rem);
+  --step-3: clamp(1.73rem, 1.5rem + 1.15vw, 2.2rem);
+  --step-4: clamp(2.07rem, 1.7rem + 1.85vw, 2.8rem);
+  --step-5: clamp(2.49rem, 1.9rem + 2.95vw, 3.6rem);
+  --leading-tight: 1.2;
+  --leading-body: 1.6;
+  --measure: 68ch;
+
+  /* Spacing, 4px base. */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+
+  --radius-sm: 4px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.08);
+  --shadow-2: 0 4px 12px rgb(0 0 0 / 0.12);
+  --target: 2.75rem; /* 44px touch target */
+
+  /* Motion is off unless the user allows it. */
+  --dur-fast: 0ms;
+  --dur: 0ms;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root {
+    --dur-fast: 120ms;
+    --dur: 200ms;
+  }
+}

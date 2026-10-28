@@ -1,0 +1,126 @@
+---
+import { highlight, type Lang } from '../../lib/highlight';
+
+interface Props {
+  code: string;
+  lang?: Lang;
+  filename?: string;
+  /** 1-based line number to short note, shown after the line and never copied. */
+  annotations?: Record<number, string>;
+}
+const { code, lang = 'text', filename, annotations = {} } = Astro.props;
+const raw = code.replace(/\n$/, '');
+const lines = highlight(lang, raw);
+---
+
+<figure class="codeblock" data-codeblock>
+  <figcaption class="codeblock-bar">
+    <span class="codeblock-name">{filename ?? lang}</span>
+    <button type="button" class="codeblock-copy" data-copy data-raw={raw} hidden>
+      Copy
+    </button>
+    <span class="sr-only" role="status" aria-live="polite" data-copy-status></span>
+  </figcaption>
+  <pre tabindex="0" aria-label={`${filename ?? lang} code`}><code>{
+    lines.map((tokens, i) => (
+      <span class="cl">
+        {tokens.map((t) => (t.type === 'plain' ? t.text : <span class={`tok-${t.type}`}>{t.text}</span>))}
+        {annotations[i + 1] && <span class="cl-note">{`  <- ${annotations[i + 1]}`}</span>}
+        {'\n'}
+      </span>
+    ))
+  }</code></pre>
+</figure>
+
+<script>
+  // Progressive enhancement: the copy button only appears when JavaScript runs.
+  document.querySelectorAll<HTMLElement>('[data-codeblock]').forEach((block) => {
+    const btn = block.querySelector<HTMLButtonElement>('[data-copy]');
+    const status = block.querySelector<HTMLElement>('[data-copy-status]');
+    if (!btn || !status || !navigator.clipboard) return;
+    btn.hidden = false;
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.raw ?? '');
+        btn.textContent = 'Copied';
+        status.textContent = 'Copied to clipboard';
+      } catch {
+        btn.textContent = 'Copy failed';
+        status.textContent = 'Copy failed';
+      }
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        status.textContent = '';
+      }, 2000);
+    });
+  });
+</script>
+
+<style is:global>
+  .codeblock {
+    margin: var(--space-4) 0;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    background: var(--surface);
+    overflow: hidden;
+    max-width: 100%;
+  }
+  .codeblock-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: 0 var(--space-2) 0 var(--space-4);
+    min-height: var(--target);
+    background: var(--surface-2);
+    font-size: var(--step--1);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+  .codeblock-copy {
+    min-height: var(--target);
+    min-width: var(--target);
+    padding: 0 var(--space-3);
+    font: inherit;
+    color: var(--accent);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .codeblock-copy[hidden] {
+    display: none;
+  }
+  .codeblock pre {
+    margin: 0;
+    padding: var(--space-3) var(--space-4);
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+  .codeblock code {
+    font-family: var(--font-mono);
+  }
+  .tok-comment {
+    color: var(--text-muted);
+    font-style: italic;
+  }
+  .tok-tag {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .tok-number {
+    color: var(--ok);
+  }
+  .tok-keyword {
+    color: var(--warn);
+  }
+  .tok-punct {
+    color: var(--text-muted);
+  }
+  .cl-note {
+    color: var(--text-muted);
+    font-family: var(--font-sans);
+    user-select: none;
+  }
+</style>

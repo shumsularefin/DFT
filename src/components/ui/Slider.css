@@ -1,0 +1,25 @@
+.slider {
+  max-width: 28rem;
+}
+.slider-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: var(--space-1);
+}
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+.slider input[type='range'] {
+  flex: 1;
+  min-height: var(--target);
+  accent-color: var(--accent);
+  margin: 0;
+}
+.slider-value {
+  min-width: 5ch;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-weight: 600;
+}

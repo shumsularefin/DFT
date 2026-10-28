@@ -1,0 +1,49 @@
+---
+interface Props {
+  label: string;
+  value: number;
+  max?: number;
+}
+const { label, value, max = 100 } = Astro.props;
+const pct = Math.max(0, Math.min(100, (value / max) * 100));
+---
+
+<div class="progress">
+  <div class="progress-head">
+    <span>{label}</span>
+    <span class="progress-pct">{Math.round(pct)}%</span>
+  </div>
+  <div
+    class="progress-track"
+    role="progressbar"
+    aria-label={label}
+    aria-valuemin="0"
+    aria-valuemax={max}
+    aria-valuenow={value}
+  >
+    <div class="progress-fill" style={`width:${pct}%`}></div>
+  </div>
+</div>
+
+<style is:global>
+  .progress {
+    max-width: 24rem;
+  }
+  .progress-head {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--step--1);
+  }
+  .progress-track {
+    height: 0.6rem;
+    border-radius: 999px;
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width var(--dur);
+  }
+</style>

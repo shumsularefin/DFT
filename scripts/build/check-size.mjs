@@ -64,6 +64,11 @@ export function checkSize(dist, budgets) {
       const abs = resolveAsset(dist, file, m[1]);
       if (abs) staticImports(abs, jsFiles);
     }
+    // Astro islands load their component and renderer chunks as soon as they hydrate
+    for (const m of html.matchAll(/\s(?:component-url|renderer-url)="([^"]+)"/g)) {
+      const abs = resolveAsset(dist, file, m[1]);
+      if (abs) staticImports(abs, jsFiles);
+    }
     let js = inlineJs;
     for (const f of jsFiles) js += gz(fs.readFileSync(f));
     let css = 0;
