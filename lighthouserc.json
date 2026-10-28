@@ -1,0 +1,43 @@
+{
+  "ci": {
+    "collect": {
+      "staticDistDir": "./dist",
+      "numberOfRuns": 1,
+      "settings": {
+        "chromeFlags": "--no-sandbox --headless=new"
+      }
+    },
+    "assert": {
+      "assertions": {
+        "categories:performance": [
+          "warn",
+          {
+            "minScore": 0.95
+          }
+        ],
+        "categories:accessibility": [
+          "warn",
+          {
+            "minScore": 0.95
+          }
+        ],
+        "categories:best-practices": [
+          "warn",
+          {
+            "minScore": 0.95
+          }
+        ],
+        "categories:seo": "off",
+        "document-title": "warn",
+        "meta-description": "warn",
+        "http-status-code": "warn",
+        "link-text": "warn",
+        "crawlable-anchors": "warn",
+        "canonical": "warn",
+        "robots-txt": "warn",
+        "image-alt": "warn",
+        "is-crawlable": "off"
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
 // Post-build step. Runs Pagefind over dist/ only if any page carries data-pagefind-body.
-// The service worker is added in M0.2.
+// Then generates the service worker (sw.mjs). Pagefind runs first so its files exist before the worker.
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -20,3 +20,5 @@ if (indexable) {
 } else {
   console.log('postbuild: no data-pagefind-body pages, skipping Pagefind');
 }
+
+await import('./sw.mjs');
