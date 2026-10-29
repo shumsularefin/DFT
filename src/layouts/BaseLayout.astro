@@ -3,7 +3,10 @@ import '../styles/fonts.css';
 import '../styles/tokens.css';
 import '../styles/base.css';
 import plexRegular from '@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-400-normal.woff2?url';
-import { SITE } from '../lib/site';
+import { getCollection } from 'astro:content';
+import { INDEXING_ENABLED, SITE } from '../lib/site';
+import Header from '../components/chrome/Header.astro';
+import Footer from '../components/chrome/Footer.astro';
 
 interface Props {
   title?: string;
@@ -13,6 +16,14 @@ interface Props {
 const { title, description = SITE.tagline, pageClass = 'content' } = Astro.props;
 const fullTitle = title ? `${title} | ${SITE.name}` : SITE.name;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const topicIds = (await getCollection('handbook')).map((e) => e.id);
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: SITE.name,
+  url: new URL('/', Astro.site).href,
+  description: SITE.tagline,
+});
 ---
 
 <!doctype html>
@@ -22,11 +33,21 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    <meta name="robots" content="noindex" />
+    {!INDEXING_ENABLED && <meta name="robots" content="noindex" />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical.href} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <script type="application/ld+json" is:inline set:html={jsonLd} />
     <link rel="preload" href={plexRegular} as="font" type="font/woff2" crossorigin />
     <script is:inline>
       // Set the stored theme and level before first paint. Without storage or JS, prefers-color-scheme decides.
       // Reading level (D-011): same envelope, key dft:level. Missing or invalid means Beginner (no attribute).
+      document.documentElement.classList.add('js');
       try {
         const l = JSON.parse(localStorage.getItem('dft:level'));
         if (l && l.v === 1 && ['beginner', 'intermediate', 'pro'].includes(l.data))
@@ -52,11 +73,17 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <a class="skip-link" href="#main">
       Skip to main content
     </a>
+    <Header topicIds={topicIds} />
     <main id="main">
       <slot />
     </main>
+    <Footer />
   </body>
 </html>
+
+<script>
+  import '../scripts/chrome';
+</script>
 
 <script>
   // Production only, after load, and only where service workers exist (D-010).

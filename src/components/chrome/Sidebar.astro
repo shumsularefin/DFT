@@ -1,0 +1,98 @@
+---
+import { moduleName } from '../../lib/site';
+
+interface Topic {
+  id: string;
+  title: string;
+}
+interface Props {
+  groups: { module: number; topics: Topic[] }[];
+  currentId?: string;
+  currentModule?: number;
+}
+const { groups, currentId, currentModule } = Astro.props;
+---
+
+<nav class="sidebar" aria-label="Handbook modules">
+  <details class="sidebar-details" data-sidebar>
+    <summary>All topics</summary>
+    <ul class="sidebar-modules">
+      {groups.map((g) => (
+        <li>
+          <details open={g.module === currentModule} data-module-details>
+            <summary>
+              <span>
+                {g.module}. {moduleName(g.module)}
+              </span>
+              <span
+                class="module-pct"
+                data-module-pct={g.module}
+                data-module-ids={g.topics.map((t) => t.id).join(',')}
+              />
+            </summary>
+            <ul>
+              {g.topics.map((t) => (
+                <li data-topic-item={t.id}>
+                  <a href={`/handbook/${t.id}/`} aria-current={t.id === currentId ? 'page' : undefined}>
+                    {t.title}
+                  </a>
+                  <span class="tick" hidden>
+                    <span aria-hidden="true">✓</span>
+                    <span class="sr-only">completed</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </details>
+        </li>
+      ))}
+    </ul>
+  </details>
+</nav>
+
+<style is:global>
+  .sidebar summary {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-2);
+    align-items: center;
+    min-height: var(--target);
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .sidebar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: none;
+  }
+  .sidebar ul ul {
+    padding-inline-start: var(--space-4);
+  }
+  .sidebar li[data-topic-item] {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+  .sidebar li[data-topic-item] a {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-height: var(--target);
+    text-decoration: none;
+    color: var(--text);
+  }
+  .sidebar li[data-topic-item] a[aria-current='page'] {
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .sidebar .tick {
+    color: var(--ok);
+  }
+  .module-pct {
+    color: var(--text-muted);
+    font-weight: 400;
+    font-size: var(--step--1);
+  }
+</style>

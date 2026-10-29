@@ -1,9 +1,96 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Card from '../components/ui/Card.astro';
+import LinkButton from '../components/ui/LinkButton.astro';
+import Callout from '../components/ui/Callout.astro';
 import { SITE } from '../lib/site';
 ---
 
 <BaseLayout>
-  <h1>{SITE.name}</h1>
-  <p>{SITE.tagline}</p>
+  <div class="container home">
+    <section class="hero" aria-labelledby="hero-title">
+      <h1 id="hero-title">{SITE.name}</h1>
+      <p class="lede">
+        Most people meet density functional theory the hard way: a forum thread, an old spreadsheet and an
+        INCAR file nobody can explain. This site is the guide that student wished for. It starts from why you
+        are running the calculation, then shows what each setting does and what goes wrong when you get it
+        wrong.
+      </p>
+      <p>
+        <LinkButton href="/handbook/" variant="primary">
+          Start reading
+        </LinkButton>
+        <LinkButton href="/tools/">See the tools</LinkButton>
+      </p>
+      <Callout variant="note" title="Under construction">
+        Only a short sample topic is written so far, and it is marked Draft: it has not yet been checked
+        against its sources. Pages marked Verified will say so.
+      </Callout>
+    </section>
+
+    <section aria-labelledby="do-title">
+      <h2 id="do-title">What you can do here</h2>
+      <div class="home-grid">
+        <Card title="Learn">
+          <p>
+            Read short topics that answer three questions for every setting: why am I doing this, why this
+            value, what happens if I skip it.
+          </p>
+        </Card>
+        <Card title="Try">
+          <p>
+            Small interactive labs let you change a number and watch what happens. Anything simplified is
+            labelled Illustrative or Toy model.
+          </p>
+        </Card>
+        <Card title="Build">
+          <p>
+            Planned tools help you prepare VASP input files and plot convergence tests. They run in your
+            browser and nothing is uploaded.
+          </p>
+        </Card>
+      </div>
+    </section>
+
+    <section aria-labelledby="levels-title">
+      <h2 id="levels-title">Pick a level, change it any time</h2>
+      <p>The page stays the same. The level switch in the header shows or hides the extra depth.</p>
+      <div class="home-grid">
+        <Card title="Beginner">
+          <p>Plain language and analogies. No equations needed. This is the default.</p>
+        </Card>
+        <Card title="Intermediate">
+          <p>Adds practical detail: typical values, trade-offs and the mistakes people make.</p>
+        </Card>
+        <Card title="Pro">
+          <p>Adds the equations, edge cases and references to the literature.</p>
+        </Card>
+      </div>
+    </section>
+
+    <section aria-labelledby="tools-title">
+      <h2 id="tools-title">Tools on the way</h2>
+      <p>
+        A tolerance-factor explorer, an input builder, a convergence plotter and a Brillouin-zone viewer are
+        planned. None is available yet. The <a href="/tools/">tools page</a> lists what each will do.
+      </p>
+    </section>
+  </div>
 </BaseLayout>
+
+<style is:global>
+  .hero {
+    padding-block: var(--space-6) var(--space-4);
+  }
+  .hero .btn {
+    margin: 0 var(--space-2) var(--space-2) 0;
+  }
+  .lede {
+    font-size: var(--step-1);
+  }
+  .home-grid {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  }
+</style>

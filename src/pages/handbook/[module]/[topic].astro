@@ -1,6 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content';
-import BaseLayout from '../../../layouts/BaseLayout.astro';
+import HandbookLayout from '../../../layouts/HandbookLayout.astro';
 import Badge from '../../../components/ui/Badge.astro';
 import Why from '../../../components/handbook/Why.astro';
 import Intuition from '../../../components/handbook/Intuition.astro';
@@ -16,7 +16,8 @@ import Term from '../../../components/handbook/Term.astro';
 import Cite from '../../../components/handbook/Cite.astro';
 import VaspFile from '../../../components/handbook/VaspFile.astro';
 import Callout from '../../../components/ui/Callout.astro';
-import { citeOrder, moduleLabel, presentSections, splitId } from '../../../lib/topic';
+import { citeOrder, levelNotes, presentSections, splitId } from '../../../lib/topic';
+import { moduleName } from '../../../lib/site';
 
 export async function getStaticPaths() {
   const entries = await getCollection('handbook');
@@ -31,7 +32,6 @@ const { Content } = await render(entry);
 const body = entry.body ?? '';
 Astro.locals.cites = citeOrder(body);
 const sections = presentSections(body);
-const { module } = splitId(entry.id);
 const components = {
   Why,
   Intuition,
@@ -53,11 +53,19 @@ const statusLabel = { draft: 'Draft', review: 'Awaiting verification', verified:
 ];
 ---
 
-<BaseLayout title={entry.data.title} description={entry.data.summary}>
-  <div class="container topic">
-    <p class="topic-crumbs">
-      <a href="/handbook/">Handbook</a> / {moduleLabel(module)}
-    </p>
+<HandbookLayout
+  id={entry.id}
+  title={entry.data.title}
+  description={entry.data.summary}
+  module={entry.data.module}
+  moduleTitle={moduleName(entry.data.module)}
+>
+  <div
+    class="topic"
+    data-pagefind-body
+    data-pagefind-meta={`module:${entry.data.module}. ${moduleName(entry.data.module)}`}
+  >
+    <span hidden data-pagefind-meta={`levels:${levelNotes(body)}`}></span>
     <h1>{entry.data.title}</h1>
     <p class="topic-summary">{entry.data.summary}</p>
     <p>
@@ -80,10 +88,9 @@ const statusLabel = { draft: 'Draft', review: 'Awaiting verification', verified:
       <Content components={components} />
     </article>
   </div>
-</BaseLayout>
+</HandbookLayout>
 
 <style is:global>
-  .topic-crumbs,
   .topic-status,
   .topic-summary {
     color: var(--text-muted);

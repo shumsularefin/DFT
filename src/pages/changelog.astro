@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Content } from '../../CHANGELOG.md';
+---
+
+<BaseLayout title="Changelog" description="What has changed on the DFT Handbook, newest first.">
+  <div class="container prose-page changelog">
+    <Content />
+  </div>
+</BaseLayout>

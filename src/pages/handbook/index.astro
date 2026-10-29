@@ -3,46 +3,79 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Card from '../../components/ui/Card.astro';
 import Badge from '../../components/ui/Badge.astro';
-import { moduleLabel, splitId } from '../../lib/topic';
+import { MODULES } from '../../lib/site';
 
 const entries = (await getCollection('handbook')).sort(
-  (a, b) => a.data.module - b.data.module || a.data.order - b.data.order || a.id.localeCompare(b.id),
+  (a, b) => a.data.order - b.data.order || a.id.localeCompare(b.id),
 );
-const groups = new Map<string, typeof entries>();
-for (const e of entries) {
-  const { module } = splitId(e.id);
-  groups.set(module, [...(groups.get(module) ?? []), e]);
-}
+const modules = MODULES.map((title, i) => ({
+  number: i + 1,
+  title,
+  topics: entries.filter((e) => e.data.module === i + 1),
+}));
 ---
 
-<BaseLayout title="Handbook" description="All handbook topics, by module.">
+<BaseLayout
+  title="Handbook"
+  description="The eleven handbook modules, from why DFT exists to a worked example."
+>
   <div class="container">
     <h1>Handbook</h1>
-    {[...groups].map(([module, topics]) => (
-      <section aria-labelledby={`m-${module}`}>
-        <h2 id={`m-${module}`}>{moduleLabel(module)}</h2>
-        <div class="grid">
-          {topics.map((t) => (
-            <Card>
-              <h3 class="card-title">
-                <a href={`/handbook/${t.id}/`}>{t.data.title}</a>
-              </h3>
-              <p>{t.data.summary}</p>
-              <p>
-                <Badge variant={t.data.status === 'verified' ? 'verified' : 'draft'} />
+    <p>
+      Eleven modules, meant to be read in order. Each topic starts with plain language and adds depth when you
+      switch to Intermediate or Pro. Modules without topics are still being written.
+    </p>
+    <ol class="module-map">
+      {modules.map((m) => (
+        <li>
+          <Card as="section">
+            <h2 class="card-title" id={`module-${m.number}`}>
+              <span class="module-no">Module {m.number}</span>
+              {m.title}
+            </h2>
+            {m.topics.length === 0 ? (
+              <p class="muted">
+                <Badge variant="draft" /> Not written yet.
               </p>
-            </Card>
-          ))}
-        </div>
-      </section>
-    ))}
+            ) : (
+              <>
+                <p class="muted">
+                  {m.topics.length} {m.topics.length === 1 ? 'topic' : 'topics'}
+                </p>
+                <ul>
+                  {m.topics.map((t) => (
+                    <li>
+                      <a href={`/handbook/${t.id}/`}>{t.data.title}</a>{' '}
+                      <Badge variant={t.data.status === 'verified' ? 'verified' : 'draft'} />
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </Card>
+        </li>
+      ))}
+    </ol>
   </div>
 </BaseLayout>
 
 <style is:global>
-  .grid {
+  .module-map {
     display: grid;
     gap: var(--space-4);
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    list-style: none;
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    max-width: none;
+  }
+  .module-no {
+    display: block;
+    font-size: var(--step--1);
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+  .muted {
+    color: var(--text-muted);
   }
 </style>

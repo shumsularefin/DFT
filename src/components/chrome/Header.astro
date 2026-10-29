@@ -1,0 +1,166 @@
+---
+import { NAV, SITE } from '../../lib/site';
+import LevelSwitch from './LevelSwitch.astro';
+import ThemeToggle from './ThemeToggle.astro';
+import ProgressTracker from './ProgressTracker.astro';
+import SearchBox from './SearchBox.astro';
+
+interface Props {
+  topicIds: string[];
+}
+const { topicIds } = Astro.props;
+const path = Astro.url.pathname;
+const current = (href: string) => {
+  const base = href.split('#')[0]!;
+  if (href.includes('#')) return false;
+  return base === '/' ? path === '/' : path.startsWith(base);
+};
+---
+
+<header class="site-header">
+  <div class="container header-row">
+    <a class="brand" href="/">
+      {SITE.name}
+    </a>
+    <button
+      type="button"
+      class="menu-btn js-only"
+      aria-expanded="false"
+      aria-controls="site-menu"
+      data-menu-button
+    >
+      Menu
+    </button>
+    <div class="site-menu" id="site-menu" data-menu>
+      <nav aria-label="Main">
+        <ul class="nav-list">
+          {NAV.map((item) => (
+            <li>
+              <a href={item.href} aria-current={current(item.href) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <div class="header-tools">
+        <SearchBox />
+        <LevelSwitch />
+        <ProgressTracker ids={topicIds} />
+        <ThemeToggle />
+      </div>
+    </div>
+  </div>
+</header>
+
+<style is:global>
+  .site-header {
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .header-row {
+    width: min(100% - 2rem, 80rem);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
+    padding-block: var(--space-2);
+  }
+  .brand {
+    font-weight: 700;
+    font-size: var(--step-1);
+    color: var(--text);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--target);
+  }
+  .menu-btn {
+    margin-left: auto;
+    min-height: var(--target);
+    min-width: var(--target);
+    padding: 0 var(--space-4);
+    font: inherit;
+    font-weight: 600;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+  .site-menu {
+    flex-basis: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  html.js .site-menu:not([data-open]) {
+    display: none;
+  }
+  .nav-list {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .nav-list a {
+    display: flex;
+    align-items: center;
+    min-height: var(--target);
+    padding: 0 var(--space-3);
+    color: var(--text);
+    text-decoration: none;
+    border-bottom: 3px solid transparent;
+  }
+  .nav-list a[aria-current='page'] {
+    border-bottom-color: var(--accent);
+    font-weight: 600;
+  }
+  .nav-list a:hover {
+    background: var(--surface);
+  }
+  .header-tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  @media (min-width: 64rem) {
+    .menu-btn {
+      display: none;
+    }
+    html.js .site-menu:not([data-open]),
+    .site-menu {
+      display: flex;
+      flex-direction: row;
+      flex-basis: auto;
+      flex: 1;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+    }
+    .nav-list {
+      flex-direction: row;
+    }
+    .header-tools {
+      flex-wrap: nowrap;
+      gap: var(--space-2);
+    }
+    .search-form input {
+      min-width: 7rem;
+      width: 9rem;
+    }
+  }
+  html:not(.js) .js-only {
+    display: none !important;
+  }
+</style>
+
+<style is:global>
+  .level-switch button,
+  .progress-btn,
+  .nav-list a {
+    white-space: nowrap;
+  }
+</style>

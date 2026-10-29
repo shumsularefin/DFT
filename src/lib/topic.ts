@@ -28,3 +28,25 @@ export function moduleLabel(slug: string): string {
   const name = slug.replace(/^\d+-/, '').replace(/-/g, ' ');
   return name.charAt(0).toUpperCase() + name.slice(1);
 }
+
+export interface OrderedTopic {
+  id: string;
+  title: string;
+}
+
+/** Previous and next topic in reading order; `null` at either end or for an unknown id. */
+export function neighbors<T extends OrderedTopic>(
+  ordered: readonly T[],
+  id: string,
+): { prev: T | null; next: T | null } {
+  const i = ordered.findIndex((t) => t.id === id);
+  if (i < 0) return { prev: null, next: null };
+  return { prev: ordered[i - 1] ?? null, next: ordered[i + 1] ?? null };
+}
+
+/** Short note for search results about which extra levels a topic has, from its `<Level min=...>` blocks. */
+export function levelNotes(body: string): string {
+  const has = (l: string) => new RegExp(`<Level\\s[^>]*min=["']${l}["']`).test(body);
+  const parts = [has('intermediate') && 'Intermediate', has('pro') && 'Pro'].filter(Boolean);
+  return parts.length ? `Has ${parts.join(' and ')} notes` : '';
+}

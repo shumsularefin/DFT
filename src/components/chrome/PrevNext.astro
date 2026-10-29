@@ -1,0 +1,56 @@
+---
+interface Item {
+  id: string;
+  title: string;
+}
+interface Props {
+  prev: Item | null;
+  next: Item | null;
+}
+const { prev, next } = Astro.props;
+---
+
+{(prev || next) && (
+  <nav class="prev-next" aria-label="Previous and next topic">
+    {prev ? (
+      <a rel="prev" href={`/handbook/${prev.id}/`}>
+        <span class="pn-dir">Previous</span>
+        {prev.title}
+      </a>
+    ) : (
+      <span />
+    )}
+    {next && (
+      <a rel="next" href={`/handbook/${next.id}/`} class="pn-next">
+        <span class="pn-dir">Next</span>
+        {next.title}
+      </a>
+    )}
+  </nav>
+)}
+
+<style is:global>
+  .prev-next {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-top: var(--space-7);
+  }
+  .prev-next a {
+    display: block;
+    min-height: var(--target);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    text-decoration: none;
+  }
+  .pn-next {
+    margin-inline-start: auto;
+    text-align: right;
+  }
+  .pn-dir {
+    display: block;
+    color: var(--text-muted);
+    font-size: var(--step--1);
+  }
+</style>

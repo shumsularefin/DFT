@@ -1,0 +1,26 @@
+---
+---
+
+<button type="button" class="theme-toggle js-only" aria-pressed="false" data-theme-toggle>
+  <span aria-hidden="true" data-theme-icon>
+    ◐
+  </span>
+  <span class="sr-only">Dark theme</span>
+</button>
+
+<style is:global>
+  .theme-toggle {
+    min-height: var(--target);
+    min-width: var(--target);
+    font: inherit;
+    font-size: var(--step-1);
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+  .theme-toggle[aria-pressed='true'] {
+    background: var(--surface-2);
+  }
+</style>
