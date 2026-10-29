@@ -1,0 +1,107 @@
+---
+id: the-ladder-of-methods
+title: The ladder of methods
+module: 1
+order: 2
+summary: Methods for simulating materials trade accuracy against cost. See where density functional theory sits and why its cost grows the way it does.
+concepts: [method-ladder, scaling]
+requires: [simulation]
+vaspTags: [GGA, LHFCALC]
+sources: [S-048, S-049, S-046, S-011, S-012, S-025, S-041]
+status: draft
+updated: 2026-10-29
+---
+
+<Why>
+
+There is no single best way to simulate a material. Cheap methods can handle thousands of atoms and miss important physics. Careful methods are trustworthy and can only handle a few atoms. Knowing the options, and what each one costs, explains why DFT is the usual choice for crystals and why it still has limits.
+
+</Why>
+
+<Intuition>
+
+Picture a ladder. The bottom rungs are quick and rough, the top rungs are accurate and slow.
+
+- **<Term id="force-field">Force fields</Term>.** No electrons at all. The atoms push and pull each other by fixed, simple rules. Very fast, and only as good as the rules someone wrote down.
+- **<Term id="hartree-fock">Hartree-Fock</Term>.** Electrons are included, but each one only feels the average of the others <Cite id="S-048" />.
+- **Higher methods such as <Term id="coupled-cluster">coupled cluster</Term>.** They add back, step by step, the ways electrons avoid each other. Accurate, and the cost climbs steeply with the number of electrons <Cite id="S-048" />.
+- **Exact solution.** Every electron tracked together. Possible only for the smallest systems.
+- **<Term id="dft">Density functional theory</Term>.** Instead of tracking every electron, it works with how much electron charge sits at each point in space. That is a much smaller thing to keep track of, and it is why DFT can reach the sizes that crystals need <Cite id="S-049" />.
+
+The word to hold on to is <Term id="scaling">scaling</Term>: how much more work the computer does when the system grows. A method that costs size cubed is eight times as expensive for a system twice as big. A method that costs size to the seventh is 128 times as expensive.
+
+<Level min="intermediate">
+
+DFT is exact in principle: the Hohenberg-Kohn and Kohn-Sham results show that the ground-state energy can be found from the density <Cite id="S-011" /> <Cite id="S-012" />. The approximation is in one ingredient, the <Term id="exchange-correlation">exchange-correlation</Term> <Term id="functional">functional</Term>, which nobody knows exactly. This is why the next page, and modules 4 and 5, spend so long on which functional to use.
+
+</Level>
+
+<Level min="pro">
+
+Within DFT, functionals form their own ladder of increasing sophistication and cost, often drawn as "Jacob's ladder" <Cite id="S-046" />. A hybrid functional such as HSE06 mixes in part of the Hartree-Fock treatment <Cite id="S-025" />, which makes each calculation more expensive than with a semilocal functional. Module 5 covers the choice.
+
+</Level>
+
+</Intuition>
+
+<Lab id="cost-of-exactness" title="Cost of exactness" />
+
+<TheMath>
+
+If the cost of a method grows as a power $p$ of the system size $N$ (for example the number of electrons or basis functions), then
+
+$$\text{cost} \propto N^{p}$$
+
+Doubling the size multiplies the cost by $2^{p}$, because $(2N)^{p}/N^{p} = 2^{p}$. On a chart with both axes logarithmic, a power law is a straight line whose steepness is $p$.
+
+The textbook (formal) exponents used in the lab are: Kohn-Sham DFT $p = 3$ <Cite id="S-049" />, Hartree-Fock $p = 4$, second-order perturbation theory (MP2) $p = 5$, coupled cluster with singles and doubles (CCSD) $p = 6$, and CCSD with perturbative triples, CCSD(T), $p = 7$ <Cite id="S-048" />. The exact solution grows faster than any power of $N$ <Cite id="S-048" />.
+
+These are asymptotic, worst-case statements for the plain textbook versions of each method. Real programs can do better or worse for a given system, so read them as a guide to the trend, not as a prediction of run time. The lab sets every prefactor equal and plots relative cost only. The force-field and exact curves are drawn qualitatively, to show a shape, not a number.
+
+</TheMath>
+
+<InVasp>
+
+VASP is a DFT code <Cite id="S-010" />. Which functional it uses is normally read from the POTCAR files, unless the INCAR tag `GGA` (or `METAGGA`, `LHFCALC` for hybrids) overrides it. Keep the POTCAR family and the INCAR consistent <Cite id="S-041" />. A hybrid run (`LHFCALC`) is the "mix in Hartree-Fock" rung of the ladder and costs more than a plain GGA run.
+
+Module 5 explains the functional choice. The point for now: the method is a setting you choose, and a more expensive setting is not automatically a better one for your question.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...          | ...the cost                                          | ...the accuracy                                       |
+| ------------------------- | ---------------------------------------------------- | ----------------------------------------------------- |
+| The method, up the ladder | Rises, steeply for the top rungs                     | Can improve, but not always for the property you want |
+| The number of atoms       | Rises as a power of the size, set by the method      | Not directly, but bigger models can describe more     |
+| The functional within DFT | Usually small for semilocal ones, larger for hybrids | Depends on the material and the property              |
+
+Why climb the ladder: to answer a question the lower rungs cannot. Why stop early: you rarely need more accuracy than your question requires. What happens if you ignore cost: a calculation that does not finish in the time you have is worth nothing.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Reading the lab as a stopwatch">
+
+The lab shows relative cost with all prefactors equal. It does not say that CCSD(T) is faster than DFT at any size, and it does not predict seconds. Compare steepness, not heights.
+
+</Callout>
+
+<Callout variant="mistake" title="Assuming more expensive means more accurate">
+
+Climbing the ladder can improve accuracy, but a costly method with a poor setup can be worse than a cheap, well-converged one. Accuracy also depends on the property you ask for.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-ladder-1', 'q-ladder-2', 'q-ladder-3', 'q-ladder-4', 'q-ladder-5']} />
+
+<GoDeeper>
+
+- Szabo and Ostlund, _Modern Quantum Chemistry_, on Hartree-Fock and the methods built on it <Cite id="S-048" />.
+- Martin, _Electronic Structure_, on density functional theory in practice <Cite id="S-049" />.
+- Perdew and Schmidt on the ladder of functionals <Cite id="S-046" />.
+
+</GoDeeper>

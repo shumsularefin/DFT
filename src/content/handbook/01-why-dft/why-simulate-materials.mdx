@@ -1,0 +1,112 @@
+---
+id: why-simulate-materials
+title: Why simulate materials at all
+module: 1
+order: 1
+summary: Why scientists compute what a material will do before they make it, and what a computer needs to know about a material to do that.
+concepts: [simulation, materials-from-atoms]
+requires: []
+vaspTags: []
+sources: [S-018, S-047, S-048, S-010, S-042, S-024]
+status: draft
+updated: 2026-10-29
+noLab: true
+---
+
+<Why>
+
+Batteries, solar cells, steel beams and the glass in a phone are all materials, and better ones are found by trying many candidates. Making and testing each candidate in a laboratory is slow and costly. A <Term id="simulation">simulation</Term> lets you try an idea on a computer first, so you can choose the few candidates that are worth making. It also lets you look at things that are hard to see in an experiment, such as where each electron spends its time.
+
+This page explains what a simulation of a material actually computes, and why that computation needs quantum mechanics.
+
+</Why>
+
+<Intuition>
+
+A material is a very large crowd of <Term id="atom">atoms</Term>. Each atom is a tiny, heavy <Term id="nucleus">nucleus</Term> with lighter <Term id="electron">electrons</Term> around it. The nuclei mostly sit where they are. The electrons are what glue the crowd together: they decide whether atoms bond, whether the material conducts electricity, and which colours of light it absorbs <Cite id="S-018" />.
+
+Electrons are far too small and light to follow the everyday rules of balls and springs. Their behaviour is described by <Term id="quantum-mechanics">quantum mechanics</Term> <Cite id="S-047" />. So "simulating a material" really means: put the nuclei where you think they are, then work out what the electrons do around them, and read off what you care about.
+
+Think of a wind tunnel. Engineers test a model aircraft in a tunnel to learn how the real one will fly. A material simulation is a tunnel made of mathematics: a model of the material, a set of rules, and a list of questions (a <Term id="property">property</Term> is any one of those answers, such as the energy, the shape of the crystal, or whether it conducts).
+
+<Level min="intermediate">
+
+In practice you describe the material to the program as a repeating block of atoms (a <Term id="supercell">supercell</Term>), choose how the electrons will be treated, and ask for properties such as the total energy, the forces on each atom and the electronic structure. The tutorials in later modules walk through each of these choices.
+
+Public databases of already-computed properties exist, for example the Materials Project <Cite id="S-024" />, which is why a computed result is often a starting point and not the end of a search.
+
+</Level>
+
+<Level min="pro">
+
+The split between slow, heavy nuclei and fast, light electrons is the <Term id="born-oppenheimer-approximation">Born-Oppenheimer approximation</Term>. It lets you solve for the electrons with the nuclei held fixed, and then treat the resulting energy, as a function of the nuclear positions, as the landscape the nuclei move on <Cite id="S-048" />. Nearly every calculation on this site rests on it.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+The central equation is the <Term id="schrodinger-equation">Schrödinger equation</Term>,
+
+$$\hat{H}\,\Psi = E\,\Psi$$
+
+Here $\hat{H}$ (the <Term id="hamiltonian">Hamiltonian</Term>) is a recipe that contains the energy of every moving electron, the attraction of electrons to nuclei and the repulsion between electrons. $\Psi$ is the <Term id="wavefunction">wavefunction</Term> of all the electrons together and $E$ is the energy that goes with it. In the usual non-relativistic picture, solving this for a material would give you every property you could ask about <Cite id="S-048" />.
+
+The catch is that for more than a couple of electrons nobody can solve it exactly. Every practical method is therefore an <Term id="approximation">approximation</Term> of some kind. The next page lines those methods up by cost.
+
+</TheMath>
+
+<InVasp>
+
+<Term id="vasp">VASP</Term> is a program that carries out such a calculation for solids, using density
+functional theory with plane waves <Cite id="S-010" />. You describe the material to VASP in four input files
+<Cite id="S-042" />:
+
+- `POSCAR`: where the atoms are (the structure).
+- `KPOINTS`: how finely to sample the repeating pattern of the crystal.
+- `INCAR`: which calculation to run and how carefully.
+- `POTCAR`: a description of how the electrons interact with each type of atom. You get it under your own VASP licence. This site never shows its contents.
+
+Module 6 explains each file. For now, only remember that the structure you give VASP is your model: whatever you leave out of it, the simulation does not know about.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...                | ...this happens                                                                     |
+| ------------------------------- | ----------------------------------------------------------------------------------- |
+| The positions of the atoms      | You are simulating a different structure, and the energy and forces change.         |
+| The kind of atoms               | You are simulating a different material.                                            |
+| How many atoms are in the model | The calculation gets slower, and you can describe bigger features such as a defect. |
+| How the electrons are treated   | The answer and the cost both change. This is the subject of the next page.          |
+
+Why you simulate: to learn something cheaply before an experiment. Why a model and not the real thing: a real sample has more atoms than any computer can handle. What happens if you skip the simulation: you rely on trial and error in the lab, which is sometimes the right choice, and slower when many candidates must be screened.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Treating a result as a measurement">
+
+A simulation answers the question you gave it, for the model you built. If the model leaves out a defect, a surface or the temperature, the answer leaves it out too. Treat a computed number as a prediction to be checked, not as a fact about the real sample.
+
+</Callout>
+
+<Callout variant="mistake" title="Thinking the computer knows the material">
+
+The program only knows the atoms and positions you gave it. A wrong structure gives a precise answer about the wrong material.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-why-sim-1', 'q-why-sim-2', 'q-why-sim-3', 'q-why-sim-4']} />
+
+<GoDeeper>
+
+- Sholl and Steckel, _Density Functional Theory: A Practical Introduction_, opening chapters <Cite id="S-018" />.
+- Griffiths and Schroeter, _Introduction to Quantum Mechanics_, for the Schrödinger equation <Cite id="S-047" />.
+- Szabo and Ostlund, _Modern Quantum Chemistry_, for the many-electron problem <Cite id="S-048" />.
+
+</GoDeeper>

@@ -1,0 +1,126 @@
+---
+id: your-roadmap-to-a-first-vasp-project
+title: Your roadmap to a first VASP project
+module: 1
+order: 4
+summary: The route from zero to a first sensible VASP project, what each part of this site is for, and an honest word about the effort involved.
+concepts: [roadmap, vasp-workflow]
+requires: [dft-scope]
+vaspTags: [ENCUT, ISTART, ICHARG, LORBIT, IBRION, NBANDS]
+sources: [S-042, S-041, S-010, S-018]
+status: draft
+updated: 2026-10-29
+noLab: true
+---
+
+<Why>
+
+DFT and VASP are learned best in an order, and most people who learn them from scattered forum posts and old spreadsheets lose weeks to the wrong order. This page gives you the map: what comes first, what each module is for, and which tools on this site will help along the way.
+
+</Why>
+
+<Intuition>
+
+You do not need to master quantum mechanics before running a calculation. You need three things, in this order: a picture of what the calculation does, the practical choices that control it, and the habit of checking your own results.
+
+The route on this site:
+
+1. **Why DFT exists** (this module): what the method is for and where it stops.
+2. **Quantum basics without math**, then **the many-electron problem and why density helps**: the ideas behind the method, in plain language.
+3. **Hohenberg-Kohn, Kohn-Sham and the self-consistent loop**: how the method actually works.
+4. **Practical choices**: plane waves and the cutoff, k-points, pseudopotentials, functionals, smearing, spin and DFT+U.
+5. **VASP files** and **running a calculation**: the four inputs, job scripts, and how to read the output.
+6. **Convergence testing and common errors**: how to know a number can be trusted.
+7. **Analysis** and a **worked example** on a perovskite oxide: energies, forces, density of states, bands and charge density.
+
+You can jump around. Every page says what it assumes you already know.
+
+<Callout variant="note" title="Why this site exists">
+
+The author of this site learned DFT and VASP the hard way, from scattered forum posts, old spreadsheets and visually dated utilities, and found it much harder than it needed to be. This site is the guide that would have saved that struggle. It is one person's account of what helped, written down so the next student does not have to repeat it.
+
+</Callout>
+
+<Level min="intermediate">
+
+The author's own working protocol for a first project has five steps <Cite id="S-042" />, and the later modules follow it:
+
+1. **Relaxation.** Prepare the four input files and relax the structure, with the plane-wave cutoff raised above the default and the force criterion set.
+2. **SCF in the same folder.** Run a self-consistent calculation that reads what the relaxation left, and write the information needed for the density of states.
+3. **Band structure.** Generate a k-path and compute the bands from the converged charge density.
+4. **Elastic properties.** A relaxation-like run with a higher cutoff and the elastic-constant option.
+5. **Optical properties.** An SCF run with more bands than usual, then the optical option.
+
+Module 7 and module 9 give the exact settings. Where the protocol differs from other common practice, the page says so neutrally.
+
+</Level>
+
+<Level min="pro">
+
+Treat the protocol as a path for a first project, not a universal recipe. Different systems (metals, magnets, large cells) need different choices, and the pages on convergence and on common errors are where those differences are collected <Cite id="S-041" />.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+There is no equation on this page. The one formula to take away from this module is the scaling rule from the previous page: if the cost grows as the size to the power $p$, doubling the system multiplies the cost by $2^{p}$. It is the reason the last step of every plan is "start with the smallest model that answers the question".
+
+</TheMath>
+
+<InVasp>
+
+A first VASP project is four input files and one command <Cite id="S-042" />:
+
+- `POSCAR`: the structure.
+- `KPOINTS`: the sampling of the crystal's repeating pattern.
+- `INCAR`: what to run and how.
+- `POTCAR`: how the electrons interact with each atom type. You obtain it under your own VASP licence, and this site never reproduces its contents.
+
+VASP is a commercial program <Cite id="S-010" />. You need access to a copy and to a computer that can run it, such as a university cluster. This site does not run VASP for you. It runs entirely in your browser, and your files are read on your own computer and never uploaded.
+
+Tools that are planned on this site (see the [tools page](/tools/), where each one is marked as available or not yet): an input builder, a convergence plotter, a Brillouin-zone and k-path viewer, a tolerance-factor explorer, a Material Builder and the Screening Studio. At the time of writing none of them is released, and the tools page is the place to check.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                                       | ...then                                                                                                    |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Skip the concept modules                        | You can follow recipes, but you will not know why a setting matters or what to change when something fails |
+| Skip convergence testing                        | You cannot say how much a number can be trusted                                                            |
+| Start with a large model                        | Runs are slow and failures are hard to read, so start small                                                |
+| Start from a copied INCAR you do not understand | It may contain settings that do not suit your system                                                       |
+
+Why follow an order: each stage gives you the vocabulary for the next. Why start small: failed runs cost less. What happens if you skip the checks: you may build on a number that was never converged.
+
+**An honest word about effort.** Expect your first project to take real time and to fail a few times before it works. That is normal, and it is not a sign that you are doing it wrong. Reading error messages is a skill you will build along the way.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Copying an INCAR from a forum">
+
+A copied INCAR carries someone else's choices. Always check each tag against what you need, and look it up on the VASP wiki page of the same name <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Jumping straight to the exciting result">
+
+A band structure or a gap is the last step, not the first. It is only worth reading if the earlier steps were done and checked.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-roadmap-1', 'q-roadmap-2', 'q-roadmap-3', 'q-roadmap-4']} />
+
+<GoDeeper>
+
+- Sholl and Steckel for a book-length path through the same ground <Cite id="S-018" />.
+- The VASP wiki, one page per tag, cited by page name throughout this site.
+- Return to the [handbook index](/handbook/) to see all eleven modules.
+
+</GoDeeper>
