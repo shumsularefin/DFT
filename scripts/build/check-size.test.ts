@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { checkSize } from './check-size.mjs';
+import { checkLazyChunks, checkSize } from './check-size.mjs';
 
 const budgets = {
   pageClasses: { content: { initialJsKB: 1, cssKB: 1 } },
@@ -80,5 +80,26 @@ describe('checkSize', () => {
   it('fails a page without data-page-class', () => {
     const dist = fixture({ 'x/index.html': '<html lang="en"><body>x</body></html>' });
     expect(checkSize(dist, budgets).violations[0]).toMatch(/missing data-page-class/);
+  });
+});
+
+describe('checkLazyChunks', () => {
+  const lazy = { pageClasses: {}, lazyChunks: { three: { contains: 'WebGLRenderer', maxKB: 1 } } };
+
+  it('passes a lazy chunk under its cap', () => {
+    const dist = fixture({ '_astro/t.js': 'class WebGLRenderer{}' });
+    const { rows, violations } = checkLazyChunks(dist, lazy);
+    expect(violations).toEqual([]);
+    expect(rows[0]?.matched).toBe(1);
+  });
+
+  it('fails a chunk over its cap', () => {
+    const dist = fixture({ '_astro/t.js': Buffer.concat([Buffer.from('WebGLRenderer'), noise(3000)]) });
+    expect(checkLazyChunks(dist, lazy).violations[0]).toMatch(/lazy chunk "three": .* > 1 KB/);
+  });
+
+  it('fails when no file matches, so a renamed chunk cannot slip through', () => {
+    const dist = fixture({ '_astro/t.js': 'nothing here' });
+    expect(checkLazyChunks(dist, lazy).violations[0]).toMatch(/no file contains/);
   });
 });

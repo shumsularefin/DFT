@@ -1,28 +1,11 @@
 ---
 // Carries a text label and a distinct shape, so meaning never depends on colour alone.
+import './Badge.css';
+import { BADGE_LABELS, BADGE_SHAPES, type BadgeVariant } from '../../lib/badges';
 interface Props {
-  variant: 'illustrative' | 'heuristic' | 'toy-model' | 'draft' | 'verified';
+  variant: BadgeVariant;
 }
 const { variant } = Astro.props;
-const labels = {
-  illustrative: 'Illustrative',
-  heuristic: 'Heuristic',
-  'toy-model': 'Toy model',
-  draft: 'Draft',
-  verified: 'Verified',
-} as const;
-// one shape per variant: dashed circle, triangle, square, open diamond, check
-const shapes = {
-  illustrative:
-    '<circle cx="6" cy="6" r="4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2.2 1.6"/>',
-  heuristic:
-    '<path d="M6 1.5 11 10.5H1Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
-  'toy-model': '<rect x="1.8" y="1.8" width="8.4" height="8.4" fill="currentColor"/>',
-  draft:
-    '<path d="M6 1 11 6 6 11 1 6Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
-  verified:
-    '<path d="M1.5 6.5 4.5 9.5 10.5 2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
-} as const;
 ---
 
 <span class={`badge badge-${variant}`}>
@@ -32,37 +15,7 @@ const shapes = {
     height="12"
     aria-hidden="true"
     focusable="false"
-    set:html={shapes[variant]}
+    set:html={BADGE_SHAPES[variant]}
   />
-  {labels[variant]}
+  {BADGE_LABELS[variant]}
 </span>
-
-<style is:global>
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35em;
-    padding: 0.1rem 0.55rem;
-    font-size: var(--step--1);
-    font-weight: 600;
-    line-height: 1.5;
-    border-radius: 999px;
-    background: var(--surface-2);
-    border: 1px solid var(--border-strong);
-    color: var(--text);
-    white-space: nowrap;
-  }
-  .badge-verified {
-    color: var(--ok);
-  }
-  .badge-heuristic {
-    color: var(--warn);
-  }
-  .badge-illustrative,
-  .badge-toy-model {
-    color: var(--accent);
-  }
-  .badge-draft {
-    color: var(--text-muted);
-  }
-</style>

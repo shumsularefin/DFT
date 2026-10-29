@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LabDemo from '../../components/labs/LabDemo';
+---
+
+<BaseLayout
+  title="Lab framework demo"
+  description="Demo of the lab framework: lazy 3D, fallback and reduced motion."
+  pageClass="island"
+>
+  <div class="container">
+    <h1>Lab framework demo</h1>
+    <p>
+      This page exercises the shared lab frame. It contains no science and is not indexed. The 3D code is not
+      downloaded until you press the start button.
+    </p>
+    <LabDemo client:load />
+  </div>
+</BaseLayout>

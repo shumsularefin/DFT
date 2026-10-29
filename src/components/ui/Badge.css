@@ -1,0 +1,28 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.1rem 0.55rem;
+  font-size: var(--step--1);
+  font-weight: 600;
+  line-height: 1.5;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  white-space: nowrap;
+}
+.badge-verified,
+.badge-computed {
+  color: var(--ok);
+}
+.badge-heuristic {
+  color: var(--warn);
+}
+.badge-illustrative,
+.badge-toy-model {
+  color: var(--accent);
+}
+.badge-draft {
+  color: var(--text-muted);
+}
