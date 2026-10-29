@@ -76,3 +76,13 @@ pre {
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+.prose-page {
+  padding-bottom: var(--space-5);
+}
+.prose-page :is(ul, ol) {
+  padding-inline-start: var(--space-5);
+}
+.prose-page li {
+  margin-block: var(--space-2);
+}

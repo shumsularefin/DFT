@@ -23,6 +23,8 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-017 | open | author (confirm erratum) |
 | Q-018 | open | builder (M3.2, needs vasp.at) or author (one run) |
 | Q-019 | open | author |
+| Q-020 | open | author or auditor (before any glossary or topic is marked verified) |
+| Q-021 | open | builder (M11.2) |
 
 ## Q-001. Repository licence
 Which licence for the code and which for the written content and data (a common split: MIT for code, CC BY 4.0 for original text)? Affects `LICENSE`, the footer and the references page. Until decided: no LICENSE file; `THIRD_PARTY_NOTICES.md` lists upstream licences. **Owner: author.**
@@ -80,3 +82,9 @@ The planned formula `N_i = max(1, int(R_k |b_i| + 0.5))`, with |b_i| the recipro
 
 ## Q-019. LMAXMIX missing from the handbook's SCF and band INCARs
 The Workflow Handbook's dictionary says LMAXMIX = 4 (d) or 6 (f) is "vital for +U and for ICHARG = 11 runs on d/f systems", and its "ISTART and ICHARG" rule says LMAXMIX must be identical between the SCF and the ICHARG = 11 run. Its relaxation INCAR sets `LMAXMIX = 4`, but the "SCF (101 -> ST, edited)" and "route B run on KPATH.in" INCARs, written for the same magnetic d-element example (`MAGMOM = 2*5.0 4*0.6`), do not. Either the omission is deliberate (and the dictionary is too strong), or both INCARs should carry `LMAXMIX = 4`. The site's validator (V018) warns on the band INCAR either way. **Close:** the author decides; the presets and the content follow.
+
+## Q-020. Glossary definitions and the sample topic are unverified
+The 41 glossary terms in `src/data/glossary.json` (modules 1 to 3) were written in plain language from general textbook knowledge and each points at a register source (S-011, S-012, S-018, S-031, S-047 to S-050, S-008, S-010), but no source has been read for these specific wordings: the register marks most of them `cited-from-memory`. The sample topic's one factual claim (the Planck constant is fixed exactly by the definition of the SI units) cites S-031 (`cross-checked` for hbar and m_e only). **Close:** the author or auditor reads the definitions against the cited books, edits wording where needed, and upgrades the sources' status in `docs/SCIENCE_SOURCES.md`. Until then the glossary page says its definitions are drafts.
+
+## Q-021. MathML fonts
+Build-time MathML (D-008) renders correctly in Chromium on the build machine, but the Greek letter nu in $E = h\nu$ looks like a Latin v in the body font. The topic stylesheet lists math fonts (Cambria Math, STIX Two Math, Latin Modern Math, Noto Sans Math) that were not available to test. **Close:** M11.2 checks MathML in WebKit and Firefox, and per D-008 switches a formula to `htmlAndMathml` with the needed KaTeX fonts if one renders poorly.

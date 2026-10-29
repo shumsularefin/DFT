@@ -1,0 +1,145 @@
+---
+import { FOOTER_LINKS, SITE } from '../../lib/site';
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <nav aria-label="Footer">
+      <ul class="footer-links">
+        {FOOTER_LINKS.map((l) => (
+          <li>
+            <a href={l.href}>{l.label}</a>
+          </li>
+        ))}
+        <li>
+          <button type="button" class="link-btn js-only" data-help-open>
+            Keyboard shortcuts
+          </button>
+        </li>
+      </ul>
+    </nav>
+    <p class="footer-note">
+      {SITE.name} is learning material, not a substitute for the VASP manual or the published literature. It
+      is under construction: pages marked Draft have not yet been checked against their sources.
+    </p>
+    <dialog class="help-dialog" aria-labelledby="help-title" data-help-dialog>
+      <h2 id="help-title">Keyboard shortcuts</h2>
+      <table>
+        <caption class="sr-only">Keyboard shortcuts</caption>
+        <thead>
+          <tr>
+            <th scope="col">Key</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <kbd>/</kbd>
+            </td>
+            <td>Focus the search box</td>
+          </tr>
+          <tr>
+            <td>
+              <kbd>?</kbd>
+            </td>
+            <td>Show this list</td>
+          </tr>
+          <tr>
+            <td>
+              <kbd>t</kbd>
+            </td>
+            <td>Switch between light and dark theme</td>
+          </tr>
+          <tr>
+            <td>
+              <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd>
+            </td>
+            <td>Beginner, Intermediate, Pro</td>
+          </tr>
+          <tr>
+            <td>
+              <kbd>m</kbd>
+            </td>
+            <td>Mark the current topic complete (or undo)</td>
+          </tr>
+          <tr>
+            <td>
+              <kbd>Esc</kbd>
+            </td>
+            <td>Close search, menu or this dialog</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        <button type="button" data-help-close>
+          Close
+        </button>
+      </p>
+    </dialog>
+  </div>
+</footer>
+
+<style is:global>
+  .site-footer {
+    margin-top: var(--space-8);
+    padding-block: var(--space-5);
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-4);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .footer-links a,
+  .link-btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--target);
+    font: inherit;
+  }
+  .link-btn {
+    padding: 0;
+    color: var(--accent);
+    background: none;
+    border: 0;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+  }
+  .footer-note {
+    color: var(--text-muted);
+    font-size: var(--step--1);
+  }
+  .help-dialog {
+    max-width: min(32rem, 100vw - 2rem);
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+  }
+  .help-dialog table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  .help-dialog th,
+  .help-dialog td {
+    padding: var(--space-2);
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .help-dialog button {
+    min-height: var(--target);
+    padding: 0 var(--space-4);
+    font: inherit;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+</style>

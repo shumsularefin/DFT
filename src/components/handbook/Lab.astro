@@ -1,0 +1,29 @@
+---
+import Section from './Section.astro';
+import Badge from '../ui/Badge.astro';
+// Placeholder until the lab framework (M2.1). The id is the lab's registry key.
+interface Props {
+  id: string;
+  title?: string;
+}
+const { id, title } = Astro.props;
+---
+
+<Section id="lab" heading="Lab">
+  <div class="lab-placeholder" data-lab-id={id}>
+    <p>
+      <Badge variant="draft" /> <strong>{title ?? id}</strong>
+    </p>
+    <p>The interactive lab for this topic is not built yet. It arrives with the lab framework.</p>
+    <slot />
+  </div>
+</Section>
+
+<style is:global>
+  .lab-placeholder {
+    border: 2px dashed var(--border-strong);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4) var(--space-5);
+    background: var(--surface);
+  }
+</style>

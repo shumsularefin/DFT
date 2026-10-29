@@ -9,8 +9,8 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 | M0.1 | Scaffold the project | done | none | M | claude/vigilant-newton-ws593b | | 2026-10-28 | [work order](milestones/M0-scaffold.md) |
 | M0.2 | Hosting, CI/CD, budgets and first deploy | done | M0.1 | M | claude/vigilant-newton-ws593b | [#1](https://github.com/shumsularefin/DFT/pull/1) | 2026-10-28 | [work order](milestones/M0-scaffold.md) |
 | M1.1 | Design tokens, themes and UI primitives | done | M0.2 | M | claude/vigilant-newton-ws593b | | 2026-10-28 | [work order](milestones/M1-design-and-shell.md) |
-| M1.2 | Content system and topic anatomy | todo | M1.1 | L | | | | [work order](milestones/M1-design-and-shell.md) |
-| M1.3 | Handbook shell, level switch, progress, search and SEO | todo | M1.2 | M | | | | [work order](milestones/M1-design-and-shell.md) |
+| M1.2 | Content system and topic anatomy | done | M1.1 | L | claude/vigilant-newton-ws593b | | 2026-10-28 | [work order](milestones/M1-design-and-shell.md) |
+| M1.3 | Handbook shell, level switch, progress, search and SEO | done | M1.2 | M | claude/vigilant-newton-ws593b | | 2026-10-29 | [work order](milestones/M1-design-and-shell.md) |
 | M2.1 | Lab framework | todo | M1.3 | M | | | | [work order](milestones/M2-modules-1-3.md) |
 | M2.2 | Module 1: Why DFT exists | todo | M1.3 | M | | | | [work order](milestones/M2-modules-1-3.md) |
 | M2.3 | Module 2: Quantum basics without math (with labs) | todo | M2.1, M2.2 | L | | | | [work order](milestones/M2-modules-1-3.md) |
@@ -64,6 +64,8 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 
 Newest first. One line per session: date, stage, outcome, branch.
 
+- 2026-10-29, M1.3: chrome, stores, progress, search, landing/about/privacy/tools/changelog, link check; 114 e2e pass; Lighthouse 100/100/100 (SEO 66, noindex). Branch `claude/vigilant-newton-ws593b`.
+- 2026-10-28, M1.2: collection, anatomy components, Level, Term, Cite, glossary (41), references (52), content linter in verify; 48 e2e pass; Q-020, Q-021 raised. Branch `claude/vigilant-newton-ws593b`.
 - 2026-10-28, M1.1: tokens, themes, 14 primitives, /design/ gallery, contrast gate; axe clean both themes; fonts 87 KB. Branch `claude/vigilant-newton-ws593b`.
 - 2026-10-28, M0.2: sw, manifest, size budgets, headers check (emulator, 18 pass), Lighthouse 100/100/100; preview pending Q-015. Same branch and PR as M0.1.
 - 2026-10-28, M0.1: scaffold done, verify and e2e green. Branch `claude/vigilant-newton-ws593b`.

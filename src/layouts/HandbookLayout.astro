@@ -1,0 +1,77 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from './BaseLayout.astro';
+import Sidebar from '../components/chrome/Sidebar.astro';
+import Breadcrumbs from '../components/chrome/Breadcrumbs.astro';
+import PrevNext from '../components/chrome/PrevNext.astro';
+import { neighbors } from '../lib/topic';
+
+interface Props {
+  id: string;
+  title: string;
+  description: string;
+  module: number;
+  moduleTitle: string;
+}
+const { id, title, description, module, moduleTitle } = Astro.props;
+
+const ordered = (await getCollection('handbook'))
+  .sort((a, b) => a.data.module - b.data.module || a.data.order - b.data.order || a.id.localeCompare(b.id))
+  .map((e) => ({ id: e.id, title: e.data.title, module: e.data.module }));
+const groups = [...new Set(ordered.map((t) => t.module))].map((m) => ({
+  module: m,
+  topics: ordered.filter((t) => t.module === m),
+}));
+const { prev, next } = neighbors(ordered, id);
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="container handbook-layout">
+    <Sidebar groups={groups} currentId={id} currentModule={module} />
+    <div class="handbook-main" data-topic-id={id}>
+      <Breadcrumbs
+        items={[
+          { label: 'Handbook', href: '/handbook/' },
+          { label: `${module}. ${moduleTitle}` },
+          { label: title },
+        ]}
+      />
+      <slot />
+      <p class="mark-complete js-only">
+        <button type="button" class="btn btn-primary" aria-pressed="false" data-mark-complete>
+          Mark complete
+        </button>
+      </p>
+      <PrevNext prev={prev} next={next} />
+    </div>
+  </div>
+</BaseLayout>
+
+<style is:global>
+  .handbook-layout {
+    display: grid;
+    gap: var(--space-5);
+    align-items: start;
+  }
+  .handbook-main {
+    min-width: 0;
+  }
+  .sidebar {
+    margin-top: var(--space-3);
+  }
+  @media (min-width: 64rem) {
+    .handbook-layout {
+      grid-template-columns: 16rem minmax(0, 1fr);
+      gap: var(--space-6);
+    }
+    .sidebar {
+      position: sticky;
+      top: var(--space-3);
+      max-height: calc(100vh - 2rem);
+      overflow-y: auto;
+    }
+  }
+  .mark-complete {
+    margin-top: var(--space-6);
+  }
+</style>

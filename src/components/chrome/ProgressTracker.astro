@@ -1,0 +1,102 @@
+---
+interface Props {
+  ids: string[];
+}
+const { ids } = Astro.props;
+const total = ids.length;
+---
+
+<div class="progress-tracker js-only" data-progress-tracker data-total={total} data-ids={ids.join(',')}>
+  <button type="button" class="progress-btn" popovertarget="progress-pop">
+    <span class="progress-track" aria-hidden="true">
+      <span class="progress-fill" data-progress-fill></span>
+    </span>
+    <span class="sr-only">Progress:</span>
+    <span class="progress-count" data-progress-count>
+      0 of {total}
+    </span>
+  </button>
+  <div id="progress-pop" popover class="progress-pop">
+    <p class="progress-pop-title">Your progress</p>
+    <p data-progress-summary>0 of {total} topics completed.</p>
+    <p class="progress-note">Saved only in this browser. Nothing is sent anywhere.</p>
+    <div class="progress-actions">
+      <button type="button" class="progress-reset" data-progress-reset>
+        Reset progress
+      </button>
+      <span data-progress-confirm hidden>
+        <span>Erase all progress on this device?</span>
+        <button type="button" data-progress-reset-yes>
+          Yes, reset
+        </button>
+        <button type="button" data-progress-reset-no>
+          Cancel
+        </button>
+      </span>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  .progress-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--target);
+    padding: 0 var(--space-3);
+    font: inherit;
+    font-size: var(--step--1);
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+  .progress-track {
+    width: 3.5rem;
+    height: 6px;
+    background: var(--surface-2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--accent);
+  }
+  .progress-pop {
+    margin: var(--space-2) 0 0;
+    padding: var(--space-4);
+    max-width: min(22rem, 100vw - 2rem);
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-2);
+  }
+  .progress-pop-title {
+    margin: 0 0 var(--space-2);
+    font-weight: 600;
+  }
+  .progress-note {
+    color: var(--text-muted);
+    font-size: var(--step--1);
+  }
+  .progress-actions button {
+    min-height: var(--target);
+    padding: 0 var(--space-3);
+    font: inherit;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+  .progress-actions [data-progress-confirm]:not([hidden]) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+  }
+</style>

@@ -1,0 +1,79 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import sources from '../data/sources.json';
+
+// What each status in docs/SCIENCE_SOURCES.md means, in the register's own words.
+const meaning: Record<string, string> = {
+  'cited-from-memory':
+    'The citation was written from memory and has not been checked against the publisher or DOI page.',
+  'cross-checked':
+    'The numbers or formulas agree with an independent implementation or golden file (see the notes).',
+  read: 'A builder or the author read the source and confirmed the specific use.',
+};
+const statuses = [...new Set(sources.map((s) => s.status))];
+---
+
+<BaseLayout
+  title="References"
+  description="Every source the handbook and its tools rely on, with an honest verification status."
+>
+  <div class="container">
+    <h1>References</h1>
+    <p>
+      {sources.length} sources. Each carries a status that says how far it has been checked. We would rather
+      show "cited from memory" than imply a check that did not happen.
+    </p>
+    <h2>Status meanings</h2>
+    <dl>
+      {statuses.map((s) => (
+        <>
+          <dt>
+            <code>{s}</code>
+          </dt>
+          <dd>{meaning[s] ?? 'See the register for this status.'}</dd>
+        </>
+      ))}
+    </dl>
+    <h2>Sources</h2>
+    <ul class="refs">
+      {sources.map((s) => (
+        <li id={s.id}>
+          <strong>{s.id}</strong>
+          <span class="ref-status">{s.status}</span>
+          <p>{s.citation}</p>
+          <p class="ref-meta">
+            Used for: {s.usedFor}. Access: {s.access}.{s.notes && ` Notes: ${s.notes}`}
+          </p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</BaseLayout>
+
+<style is:global>
+  .refs {
+    list-style: none;
+    padding: 0;
+    max-width: var(--measure);
+  }
+  .refs li {
+    margin-block: var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--border);
+    scroll-margin-top: var(--space-4);
+  }
+  .refs p {
+    margin: var(--space-1) 0 0;
+  }
+  .ref-status {
+    margin-left: var(--space-2);
+    padding: 0 var(--space-2);
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    font-size: var(--step--1);
+  }
+  .ref-meta {
+    color: var(--text-muted);
+    font-size: var(--step--1);
+  }
+</style>

@@ -1,0 +1,101 @@
+---
+---
+
+<div class="search js-only" data-search>
+  <form role="search" class="search-form" data-search-form>
+    <label class="sr-only" for="site-search">
+      Search the handbook
+    </label>
+    <input
+      id="site-search"
+      type="search"
+      name="q"
+      placeholder="Search"
+      autocomplete="off"
+      spellcheck="false"
+      aria-controls="search-results"
+      data-search-input
+    />
+  </form>
+  <div id="search-results" class="search-results" hidden data-search-results>
+    <p class="search-status" role="status" data-search-status></p>
+    <div data-search-list></div>
+  </div>
+</div>
+
+<style is:global>
+  .search {
+    position: relative;
+  }
+  .search-form input {
+    min-height: var(--target);
+    width: 100%;
+    min-width: 9rem;
+    padding: 0 var(--space-3);
+    font: inherit;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+  }
+  .search-results {
+    position: absolute;
+    z-index: 20;
+    inset-inline-start: 0;
+    top: calc(100% + var(--space-1));
+    width: min(26rem, 100vw - 2rem);
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: var(--space-3);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-2);
+  }
+  .search-results[hidden] {
+    display: none;
+  }
+  .search-status {
+    margin: 0 0 var(--space-2);
+    color: var(--text-muted);
+    font-size: var(--step--1);
+  }
+  .search-group {
+    margin: var(--space-3) 0 var(--space-1);
+    font-size: var(--step--1);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+  }
+  .search-hit {
+    display: block;
+    padding: var(--space-2);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    text-decoration: none;
+  }
+  .search-hit:hover {
+    background: var(--surface-2);
+  }
+  .search-hit strong {
+    display: block;
+    color: var(--accent);
+  }
+  .search-hit small {
+    display: block;
+    color: var(--text-muted);
+  }
+  .search-hit mark {
+    background: transparent;
+    color: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+  }
+  @media (min-width: 64rem) {
+    .search-results {
+      inset-inline-start: auto;
+      inset-inline-end: 0;
+    }
+  }
+</style>

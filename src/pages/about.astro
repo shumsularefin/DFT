@@ -1,0 +1,71 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Badge from '../components/ui/Badge.astro';
+---
+
+<BaseLayout title="About" description="How this handbook is made, what it covers and where its limits are.">
+  <div class="container prose-page">
+    <h1>About</h1>
+    <p>
+      The DFT Handbook teaches density functional theory and the VASP code to people starting from zero. It is
+      written for a student who has not met quantum mechanics and still wants to run a sensible first
+      calculation.
+    </p>
+
+    <h2>How it is made</h2>
+    <p>
+      Every topic follows the same shape: why it matters, an intuition, an optional lab, the math, what to put
+      in VASP, what changes if you change it, common mistakes, a short check and further reading. Facts,
+      formulas and constants carry a source from the <a href="/references/">reference list</a>, and the code
+      that computes anything is tested against reference values from independent libraries.
+    </p>
+
+    <h2>Honest labels</h2>
+    <ul>
+      <li>
+        <Badge variant="draft" /> The text has not yet been checked against its sources.
+      </li>
+      <li>
+        <Badge variant="verified" /> The text and its numbers have been checked against the cited sources.
+      </li>
+      <li>
+        <Badge variant="illustrative" /> An animation that shows an idea and is not a real result.
+      </li>
+      <li>
+        <Badge variant="heuristic" /> A rule of thumb, useful but not a guarantee.
+      </li>
+      <li>
+        <Badge variant="toy-model" /> A simplified model that runs in your browser.
+      </li>
+    </ul>
+
+    <h2>Limits you should know about</h2>
+    <ul>
+      <li>
+        This is learning material. It does not replace the VASP manual, the code's own documentation or the
+        published literature. When they disagree with this site, trust them and tell us.
+      </li>
+      <li>
+        Heuristic checks, such as a suggested cutoff, tell you where to start looking. They cannot tell you
+        your calculation is converged. Only your own tests can.
+      </li>
+      <li>
+        Any estimate that comes from a statistical or machine-learning model would be marked as an estimate,
+        and no such model ships today.
+      </li>
+      <li>
+        The site is under construction. Most modules are not written yet, and the pages that exist are drafts.
+      </li>
+      <li>
+        The site never hosts or generates pseudopotential (POTCAR) files. They are licensed with VASP, and you
+        get them from your VASP installation.
+      </li>
+    </ul>
+
+    <h2>Reporting a mistake</h2>
+    <p>
+      Corrections are welcome. Open an issue in the project's repository on GitHub, naming the page and the
+      sentence.
+    </p>
+  </div>
+</BaseLayout>

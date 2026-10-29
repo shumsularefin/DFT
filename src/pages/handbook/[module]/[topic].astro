@@ -1,0 +1,129 @@
+---
+import { getCollection, render } from 'astro:content';
+import HandbookLayout from '../../../layouts/HandbookLayout.astro';
+import Badge from '../../../components/ui/Badge.astro';
+import Why from '../../../components/handbook/Why.astro';
+import Intuition from '../../../components/handbook/Intuition.astro';
+import Lab from '../../../components/handbook/Lab.astro';
+import TheMath from '../../../components/handbook/TheMath.astro';
+import InVasp from '../../../components/handbook/InVasp.astro';
+import WhatChanges from '../../../components/handbook/WhatChanges.astro';
+import Mistakes from '../../../components/handbook/Mistakes.astro';
+import Check from '../../../components/handbook/Check.astro';
+import GoDeeper from '../../../components/handbook/GoDeeper.astro';
+import Level from '../../../components/handbook/Level.astro';
+import Term from '../../../components/handbook/Term.astro';
+import Cite from '../../../components/handbook/Cite.astro';
+import VaspFile from '../../../components/handbook/VaspFile.astro';
+import Callout from '../../../components/ui/Callout.astro';
+import { citeOrder, levelNotes, presentSections, splitId } from '../../../lib/topic';
+import { moduleName } from '../../../lib/site';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('handbook');
+  return entries.map((entry) => {
+    const { module, topic } = splitId(entry.id);
+    return { params: { module, topic }, props: { entry } };
+  });
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const body = entry.body ?? '';
+Astro.locals.cites = citeOrder(body);
+const sections = presentSections(body);
+const components = {
+  Why,
+  Intuition,
+  Lab,
+  TheMath,
+  InVasp,
+  WhatChanges,
+  Mistakes,
+  Check,
+  GoDeeper,
+  Level,
+  Term,
+  Cite,
+  VaspFile,
+  Callout,
+};
+const statusLabel = { draft: 'Draft', review: 'Awaiting verification', verified: 'Verified' }[
+  entry.data.status
+];
+---
+
+<HandbookLayout
+  id={entry.id}
+  title={entry.data.title}
+  description={entry.data.summary}
+  module={entry.data.module}
+  moduleTitle={moduleName(entry.data.module)}
+>
+  <div
+    class="topic"
+    data-pagefind-body
+    data-pagefind-meta={`module:${entry.data.module}. ${moduleName(entry.data.module)}`}
+  >
+    <span hidden data-pagefind-meta={`levels:${levelNotes(body)}`}></span>
+    <h1>{entry.data.title}</h1>
+    <p class="topic-summary">{entry.data.summary}</p>
+    <p>
+      <Badge variant={entry.data.status === 'verified' ? 'verified' : 'draft'} />
+      <span class="topic-status">
+        {statusLabel}. Updated {entry.data.updated}.
+      </span>
+    </p>
+    <nav class="toc" aria-label="On this page">
+      <p class="toc-title">On this page</p>
+      <ul>
+        {sections.map((s) => (
+          <li>
+            <a href={`#${s.id}`}>{s.heading}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <article class="prose">
+      <Content components={components} />
+    </article>
+  </div>
+</HandbookLayout>
+
+<style is:global>
+  .topic-status,
+  .topic-summary {
+    color: var(--text-muted);
+  }
+  .toc {
+    margin: var(--space-5) 0;
+    padding: var(--space-3) var(--space-4);
+    border-left: 3px solid var(--border-strong);
+    max-width: var(--measure);
+  }
+  .toc-title {
+    margin: 0 0 var(--space-2);
+    font-weight: 600;
+  }
+  .toc ul {
+    margin: 0;
+    padding-left: var(--space-4);
+  }
+  .toc a {
+    display: inline-block;
+    padding-block: var(--space-1);
+  }
+  .prose {
+    max-width: var(--measure);
+  }
+  .prose math {
+    font-family: 'Cambria Math', 'STIX Two Math', 'Latin Modern Math', 'Noto Sans Math', math, serif;
+    font-size: 1.1em;
+  }
+  .prose math[display='block'] {
+    margin-block: var(--space-4);
+  }
+  .cite-list {
+    padding-left: var(--space-5);
+  }
+</style>

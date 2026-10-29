@@ -13,7 +13,7 @@ export default defineConfig({
   site: process.env.PUBLIC_SITE_URL ?? 'https://example.invalid',
   trailingSlash: 'always',
   build: { format: 'directory' },
-  integrations: [react(), mdx(), sitemap()],
+  integrations: [react(), mdx(), sitemap({ filter: (page) => !/\/(design|offline)\/$/.test(page) })],
   markdown: {
     processor: unified({
       remarkPlugins: [remarkMath],

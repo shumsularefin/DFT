@@ -1,0 +1,91 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Card from '../components/ui/Card.astro';
+import Badge from '../components/ui/Badge.astro';
+
+const tools = [
+  {
+    id: 'tolerance',
+    title: 'Tolerance-factor explorer',
+    text: 'Check whether a chosen set of ions is likely to form a perovskite, with the radii and the formula shown.',
+  },
+  {
+    id: 'input-builder',
+    title: 'Input builder',
+    text: 'Prepare POSCAR, KPOINTS and INCAR files with plain-language explanations and warnings for risky combinations.',
+  },
+  {
+    id: 'convergence',
+    title: 'Convergence plotter',
+    text: 'Paste results from a series of runs and see whether the energy has settled.',
+  },
+  {
+    id: 'kpath',
+    title: 'Brillouin zone and k-path viewer',
+    text: 'See the Brillouin zone of your structure in 3D and export a k-path for a band-structure run.',
+  },
+];
+const more = [
+  {
+    id: 'studio',
+    title: 'Screening Studio',
+    text: 'Explore a table of candidate materials and turn a shortlist into a first project.',
+  },
+  {
+    id: 'builder',
+    title: 'Material Builder',
+    text: 'Edit a crystal or molecule and export a structure file.',
+  },
+  {
+    id: 'practice',
+    title: 'Practice',
+    text: 'Short questions that adapt to what you already know and bring topics back at spaced intervals.',
+  },
+];
+---
+
+<BaseLayout title="Tools" description="Research tools planned for the DFT Handbook. None is available yet.">
+  <div class="container">
+    <h1>Tools</h1>
+    <p>
+      These tools will run entirely in your browser. None of them is built yet, so none has a link. Each card
+      says what it will do.
+    </p>
+    <h2>Research tools</h2>
+    <div class="tool-grid">
+      {tools.map((t) => (
+        <Card as="section">
+          <h3 class="card-title" id={t.id}>
+            {t.title}
+          </h3>
+          <p>{t.text}</p>
+          <p>
+            <Badge variant="draft" /> Coming soon
+          </p>
+        </Card>
+      ))}
+    </div>
+    <h2>Also planned</h2>
+    <div class="tool-grid">
+      {more.map((t) => (
+        <Card as="section">
+          <h3 class="card-title" id={t.id}>
+            {t.title}
+          </h3>
+          <p>{t.text}</p>
+          <p>
+            <Badge variant="draft" /> Coming soon
+          </p>
+        </Card>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style is:global>
+  .tool-grid {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  }
+</style>

@@ -1,0 +1,50 @@
+---
+import { LEVELS } from '../../lib/levels';
+const labels = { beginner: 'Beginner', intermediate: 'Intermediate', pro: 'Pro' } as const;
+---
+
+<div class="level-switch js-only" role="radiogroup" aria-label="Reading level" data-level-switch>
+  {LEVELS.map((l) => (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={l === 'beginner' ? 'true' : 'false'}
+      tabindex={l === 'beginner' ? 0 : -1}
+      data-level-option={l}
+    >
+      {labels[l]}
+    </button>
+  ))}
+</div>
+
+<style is:global>
+  .level-switch {
+    display: inline-flex;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .level-switch button {
+    min-height: var(--target);
+    min-width: var(--target);
+    padding: 0 var(--space-3);
+    font: inherit;
+    font-size: var(--step--1);
+    color: var(--text);
+    background: var(--bg);
+    border: 0;
+    border-inline-start: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .level-switch button:first-child {
+    border-inline-start: 0;
+  }
+  .level-switch button[aria-checked='true'] {
+    background: var(--accent);
+    color: var(--accent-contrast);
+    font-weight: 600;
+  }
+  .level-switch button:focus-visible {
+    outline-offset: -3px;
+  }
+</style>

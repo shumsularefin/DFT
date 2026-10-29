@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import glossary from '../data/glossary.json';
+
+const terms = [...glossary].sort((a, b) => a.label.localeCompare(b.label));
+const levelName = { beginner: 'Beginner', intermediate: 'Intermediate', pro: 'Pro' } as const;
+---
+
+<BaseLayout title="Glossary" description="Plain-language definitions of the terms used in the handbook.">
+  <div class="container">
+    <h1>Glossary</h1>
+    <p>
+      Short definitions in plain language. They are drafts written for this site and have not yet been
+      verified against the cited sources.
+    </p>
+    <dl class="glossary">
+      {terms.map((t) => (
+        <div class="glossary-item" id={t.id}>
+          <dt>
+            {t.label} <span class="glossary-level">({levelName[t.level as keyof typeof levelName]})</span>
+          </dt>
+          <dd>
+            {t.short}
+            {t.sources.length > 0 && (
+              <span class="glossary-src">
+                {' '}
+                Sources:{' '}
+                {t.sources.map((s, i) => (
+                  <>
+                    {i > 0 && ', '}
+                    <a href={`/references/#${s}`}>{s}</a>
+                  </>
+                ))}
+              </span>
+            )}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</BaseLayout>
+
+<style is:global>
+  .glossary-item {
+    margin-block: var(--space-4);
+    scroll-margin-top: var(--space-4);
+    max-width: var(--measure);
+  }
+  .glossary-item dt {
+    font-weight: 600;
+  }
+  .glossary-item dd {
+    margin: var(--space-1) 0 0;
+  }
+  .glossary-level,
+  .glossary-src {
+    color: var(--text-muted);
+    font-size: var(--step--1);
+    font-weight: 400;
+  }
+  .glossary-item:target {
+    outline: 2px solid var(--focus);
+    outline-offset: 4px;
+  }
+</style>
