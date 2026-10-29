@@ -94,10 +94,41 @@ export function checkSize(dist, budgets) {
   return { rows, violations };
 }
 
+/**
+ * Lazy chunks: each budgets.lazyChunks entry names a string that identifies its JS files (for example
+ * "WebGLRenderer" for three) and a gzip cap. Files under dist/ that contain the string are summed.
+ * An entry that matches nothing is a violation, so a renamed or dropped chunk cannot pass silently.
+ */
+export function checkLazyChunks(dist, budgets) {
+  const rows = [];
+  const violations = [];
+  const jsDir = path.join(dist, '_astro');
+  const files = fs.existsSync(jsDir) ? fs.readdirSync(jsDir).filter((f) => f.endsWith('.js')) : [];
+  for (const [name, { contains, maxKB }] of Object.entries(budgets.lazyChunks ?? {})) {
+    let bytes = 0;
+    let matched = 0;
+    for (const f of files) {
+      const buf = fs.readFileSync(path.join(jsDir, f));
+      if (buf.includes(contains)) {
+        bytes += gz(buf);
+        matched++;
+      }
+    }
+    const kb = bytes / 1024;
+    rows.push({ name, kb, maxKB, matched });
+    if (!matched) violations.push(`lazy chunk "${name}": no file contains "${contains}"`);
+    else if (kb > maxKB) violations.push(`lazy chunk "${name}": ${kb.toFixed(1)} KB > ${maxKB} KB`);
+  }
+  return { rows, violations };
+}
+
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   const dist = path.resolve(process.argv[2] ?? 'dist');
   const budgets = JSON.parse(fs.readFileSync(process.argv[3] ?? 'budgets.json', 'utf8'));
-  const { rows, violations } = checkSize(dist, budgets);
+  const size = checkSize(dist, budgets);
+  const lazy = checkLazyChunks(dist, budgets);
+  const { rows } = size;
+  const violations = [...size.violations, ...lazy.violations];
   console.log('page'.padEnd(52) + 'class'.padEnd(10) + 'JS gz KB'.padEnd(18) + 'CSS gz KB');
   for (const r of rows) {
     console.log(
@@ -107,6 +138,8 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
         `${r.cssKB.toFixed(2)}/${r.cssMax}`,
     );
   }
+  for (const r of lazy.rows)
+    console.log(`lazy chunk ${r.name}: ${r.kb.toFixed(1)}/${r.maxKB} KB gz (${r.matched} file(s))`);
   if (violations.length) {
     console.error('\nSize budget violations:\n' + violations.map((v) => '  ' + v).join('\n'));
     process.exit(1);
