@@ -12,7 +12,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 | M1.2 | Content system and topic anatomy | done | M1.1 | L | claude/vigilant-newton-ws593b | | 2026-10-28 | [work order](milestones/M1-design-and-shell.md) |
 | M1.3 | Handbook shell, level switch, progress, search and SEO | done | M1.2 | M | claude/vigilant-newton-ws593b | | 2026-10-29 | [work order](milestones/M1-design-and-shell.md) |
 | M2.1 | Lab framework | done | M1.3 | M | claude/vigilant-newton-ws593b | | 2026-10-29 | [work order](milestones/M2-modules-1-3.md) |
-| M2.2 | Module 1: Why DFT exists | todo | M1.3 | M | | | | [work order](milestones/M2-modules-1-3.md) |
+| M2.2 | Module 1: Why DFT exists | done | M1.3 | M | claude/vigilant-newton-ws593b | | 2026-10-29 | [work order](milestones/M2-modules-1-3.md) |
 | M2.3 | Module 2: Quantum basics without math (with labs) | todo | M2.1, M2.2 | L | | | | [work order](milestones/M2-modules-1-3.md) |
 | M2.4 | Module 3: The many-electron problem and why density helps (with labs) | todo | M2.3 | L | | | | [work order](milestones/M2-modules-1-3.md) |
 | M3.1 | Structure core: lattice math and POSCAR | todo | M0.2 | M | | | | [work order](milestones/M3-input-builder.md) |
@@ -64,6 +64,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 
 Newest first. One line per session: date, stage, outcome, branch.
 
+- 2026-10-29, M2.2: Module 1 (4 topics, 17 questions, 14 glossary terms), cost-of-exactness lab, scaling.ts; Lighthouse mobile 100/100/100; 145 e2e pass. Branch `claude/vigilant-newton-ws593b`
 - 2026-10-29, M2.1: SceneController, capabilities, LabShell, Lazy3D, Fallback2D, demo page; three chunk 135 KB gz lazy; e2e incl. no-WebGL and reduced motion. Branch `claude/vigilant-newton-ws593b`.
 - 2026-10-29, M1.3: chrome, stores, progress, search, landing/about/privacy/tools/changelog, link check; 114 e2e pass; Lighthouse 100/100/100 (SEO 66, noindex). Branch `claude/vigilant-newton-ws593b`.
 - 2026-10-28, M1.2: collection, anatomy components, Level, Term, Cite, glossary (41), references (52), content linter in verify; 48 e2e pass; Q-020, Q-021 raised. Branch `claude/vigilant-newton-ws593b`.

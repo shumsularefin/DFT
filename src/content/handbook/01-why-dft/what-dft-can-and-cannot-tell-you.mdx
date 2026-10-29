@@ -1,0 +1,124 @@
+---
+id: what-dft-can-and-cannot-tell-you
+title: What DFT can and cannot tell you
+module: 1
+order: 3
+summary: A clear list of the questions DFT answers well, the ones it answers only with care, and the ones it was never built to answer.
+concepts: [dft-scope, ground-state]
+requires: [method-ladder]
+vaspTags: [GGA, METAGGA, LHFCALC]
+sources: [S-011, S-012, S-013, S-014, S-025, S-027, S-028, S-041, S-048]
+status: draft
+updated: 2026-10-29
+noLab: true
+---
+
+<Why>
+
+A result is only useful if you know what question it answers. Most disappointments with DFT come from asking it something it was not built to answer, or from forgetting that an approximation sits inside it. Knowing the limits in advance saves weeks.
+
+</Why>
+
+<Intuition>
+
+DFT is a theory of the <Term id="ground-state">ground state</Term>: the arrangement of electrons with the lowest energy for a given set of atoms <Cite id="S-011" />. Once you have that, you can read off useful things.
+
+**Questions DFT is good at.**
+
+- What is the energy of this arrangement of atoms, and which of two arrangements is lower?
+- How strongly is each atom pushed (the forces), so the structure can be relaxed to a stable shape?
+- How do the electrons spread out in the material?
+
+**Questions that need care.**
+
+- The band gap of a semiconductor or insulator. Common approximate functionals are known to underestimate it, which is a main reason other functionals were developed <Cite id="S-027" /> <Cite id="S-025" />.
+- Materials where the electrons interact strongly, such as many compounds of transition metals. A correction called DFT+U is often added <Cite id="S-014" />.
+- Weak attraction between layers or molecules (van der Waals forces), which simple functionals miss. Corrections exist <Cite id="S-028" />.
+
+**Questions it is not built for.**
+
+- Anything about excited states, such as exactly how a material absorbs light, is outside the ground-state theory <Cite id="S-011" />. The theory says nothing directly about them.
+- A standard calculation holds the nuclei still at zero temperature. Heat, motion and time need extra steps.
+
+<Level min="intermediate">
+
+Notice where the problem sits. The theory itself is exact in principle: the ground-state energy is fixed by the electron density <Cite id="S-011" /> <Cite id="S-012" />. The approximation lives in the <Term id="exchange-correlation">exchange-correlation</Term> <Term id="functional">functional</Term>. A discrepancy with experiment is therefore a question about the functional, the model, or both.
+
+</Level>
+
+<Level min="pro">
+
+The band-gap issue is often discussed as a difference between the gap of the Kohn-Sham system and the true fundamental gap. It is one reason a result from a standard functional should be read as a trend and not as a measured value. Check the literature for your material class before trusting any gap, and compare at least two functionals when the gap matters.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+The result that makes DFT possible is the Hohenberg-Kohn theorem <Cite id="S-011" />: the ground-state density $n(\mathbf{r})$, the amount of electron charge at each point $\mathbf{r}$, determines everything about the ground state. The total energy can be written as a <Term id="functional">functional</Term> of that density,
+
+$$E[n] = T_s[n] + E_{\text{H}}[n] + E_{\text{ext}}[n] + E_{\text{xc}}[n]$$
+
+where $T_s$ is the kinetic energy of non-interacting electrons that have the same density, $E_{\text{H}}$ is the classical electrostatic repulsion of the density with itself, $E_{\text{ext}}$ is the attraction to the nuclei, and $E_{\text{xc}}$ is the exchange-correlation energy, the only part that must be approximated <Cite id="S-012" />.
+
+<Level min="intermediate">
+
+Common approximations for $E_{\text{xc}}$ include the generalized gradient approximation PBE <Cite id="S-013" />. Everything that DFT gets wrong for a given material is, in practice, a statement about the quality of this one term, together with the model you built.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+In VASP the functional is taken from the POTCAR unless the INCAR tags `GGA`, `METAGGA` or `LHFCALC` override it <Cite id="S-041" />. Keep the POTCAR family and the INCAR consistent. The extra corrections mentioned above (+U, van der Waals) are further INCAR choices that module 5 introduces.
+
+When a number matters, such as a band gap, plan to say which functional produced it. A gap without its functional is not a complete result.
+
+</InVasp>
+
+<WhatChanges>
+
+| If your question is...                         | ...then                                                                                          |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Which structure has lower energy               | A standard calculation is a reasonable tool, if both models are built and converged the same way |
+| What is the band gap                           | Report the functional, and expect the common choices to underestimate it                         |
+| Does it stick to a surface or a layer          | Check that the functional includes van der Waals forces                                          |
+| What happens at high temperature, or over time | A single ground-state calculation does not answer this                                           |
+
+Why you ask the scope question first: it decides which tags you will set. Why not skip it: a perfect calculation of the wrong quantity is still wrong. What happens if you ignore the limits: you publish or build on a number the method cannot support.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Comparing a gap straight to experiment">
+
+A band gap from a common functional is a model result. If it disagrees with an experiment, that is not automatically a mistake in your setup. Say which functional you used, and look for a published comparison for similar materials.
+
+</Callout>
+
+<Callout variant="mistake" title="Forgetting the model is at zero temperature">
+
+A relaxed structure from DFT describes the nuclei held still. Do not read it as a statement about a hot, vibrating crystal without further work.
+
+</Callout>
+
+<Callout variant="warning" title="Heuristic">
+
+"Check against experiment or a second functional" is a rule of thumb for judging a result. It is a habit of good practice, not a guarantee.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-scope-1', 'q-scope-2', 'q-scope-3', 'q-scope-4']} />
+
+<GoDeeper>
+
+- Hohenberg and Kohn <Cite id="S-011" /> and Kohn and Sham <Cite id="S-012" />, the two papers behind DFT.
+- Tran and Blaha on a functional designed for band gaps <Cite id="S-027" />.
+- Szabo and Ostlund for the wider context of electronic structure methods <Cite id="S-048" />.
+
+</GoDeeper>

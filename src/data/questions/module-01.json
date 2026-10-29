@@ -1,0 +1,567 @@
+[
+  {
+    "id": "q-why-sim-1",
+    "concepts": [
+      "simulation"
+    ],
+    "type": "single",
+    "prompt": "What is the main reason to simulate a material before making it?",
+    "options": [
+      {
+        "text": "To choose which few candidates are worth the time and cost of making",
+        "correct": true,
+        "why": "Simulation is cheap compared with synthesis, so it is used to narrow a long list of ideas."
+      },
+      {
+        "text": "Because a simulation gives exactly the same answer as a measurement",
+        "correct": false,
+        "why": "Tempting because computed numbers look precise, but a simulation answers for the model you built, which may leave things out."
+      },
+      {
+        "text": "Because experiments are never useful",
+        "correct": false,
+        "why": "Tempting if you only think about cost, but experiments are still how predictions are checked."
+      }
+    ],
+    "hints": [
+      "Think about the cost of making and testing each candidate."
+    ],
+    "difficulty": -2,
+    "level": "beginner",
+    "sources": [
+      "S-018"
+    ]
+  },
+  {
+    "id": "q-why-sim-2",
+    "concepts": [
+      "materials-from-atoms"
+    ],
+    "type": "single",
+    "prompt": "Which part of an atom mainly decides how atoms bond and whether a material conducts electricity?",
+    "options": [
+      {
+        "text": "The electrons",
+        "correct": true,
+        "why": "The light electrons around the nuclei are what hold atoms together and carry current."
+      },
+      {
+        "text": "The nucleus alone",
+        "correct": false,
+        "why": "Tempting because the nucleus holds most of the mass, but the nuclei mostly stay put in a material."
+      },
+      {
+        "text": "The colour of the atom",
+        "correct": false,
+        "why": "Atoms are not coloured in this sense; colour of a material comes from how its electrons absorb light."
+      }
+    ],
+    "hints": [
+      "Which part moves and rearranges when bonds form?"
+    ],
+    "difficulty": -2,
+    "level": "beginner",
+    "sources": [
+      "S-018",
+      "S-047"
+    ]
+  },
+  {
+    "id": "q-why-sim-3",
+    "concepts": [
+      "quantum-mechanics"
+    ],
+    "type": "single",
+    "prompt": "Why does simulating a material need quantum mechanics?",
+    "options": [
+      {
+        "text": "Electrons are too small and light to follow everyday rules for balls and springs",
+        "correct": true,
+        "why": "Their behaviour is described by quantum mechanics, so the calculation must use its rules."
+      },
+      {
+        "text": "Because atoms are made of light",
+        "correct": false,
+        "why": "Tempting because light can also be quantum, but the reason is the behaviour of electrons, not what atoms are made of."
+      },
+      {
+        "text": "Because computers can only do quantum calculations",
+        "correct": false,
+        "why": "The computer is ordinary. The physics being modelled is quantum."
+      }
+    ],
+    "hints": [
+      "Which particle decides the material properties, and what rules does it follow?"
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-047"
+    ]
+  },
+  {
+    "id": "q-why-sim-4",
+    "concepts": [
+      "simulation"
+    ],
+    "type": "single",
+    "prompt": "A relaxed structure comes out of a simulation. What is the most accurate way to describe it?",
+    "options": [
+      {
+        "text": "A prediction for the model you built, to be checked against experiment",
+        "correct": true,
+        "why": "It depends on the atoms, positions and approximations you chose."
+      },
+      {
+        "text": "A measurement of the real sample",
+        "correct": false,
+        "why": "Tempting because it looks like data, but no sample was measured."
+      },
+      {
+        "text": "Always wrong, so it should be ignored",
+        "correct": false,
+        "why": "Tempting after hearing about approximations, but a model can be informative when its limits are known."
+      }
+    ],
+    "hints": [
+      "Where did the number come from?"
+    ],
+    "difficulty": -0.5,
+    "level": "beginner",
+    "sources": [
+      "S-018"
+    ]
+  },
+  {
+    "id": "q-ladder-1",
+    "concepts": [
+      "scaling"
+    ],
+    "type": "single",
+    "prompt": "A method costs size to the power 3. By what factor does the cost grow when the system size doubles?",
+    "options": [
+      {
+        "text": "8",
+        "correct": true,
+        "why": "Doubling multiplies the cost by 2 to the power 3, which is 8."
+      },
+      {
+        "text": "6",
+        "correct": false,
+        "why": "Tempting because 2 times 3 is 6, but a power means repeated multiplication, not multiplying by 3."
+      },
+      {
+        "text": "3",
+        "correct": false,
+        "why": "Tempting because the exponent is 3, but the factor is 2 raised to that exponent."
+      }
+    ],
+    "hints": [
+      "Cost goes as N to the p. Compare (2N) to the p with N to the p."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-048",
+      "S-049"
+    ]
+  },
+  {
+    "id": "q-ladder-2",
+    "concepts": [
+      "method-ladder"
+    ],
+    "type": "single",
+    "prompt": "Which method uses no electrons in the calculation at all?",
+    "options": [
+      {
+        "text": "A force field",
+        "correct": true,
+        "why": "A force field uses fixed rules for the forces between atoms."
+      },
+      {
+        "text": "Hartree-Fock",
+        "correct": false,
+        "why": "Tempting because it is called a simple method, but it treats the electrons, only in an average way."
+      },
+      {
+        "text": "DFT",
+        "correct": false,
+        "why": "DFT works with the electron density, so electrons are included."
+      }
+    ],
+    "hints": [
+      "Which rung has no electrons, only atoms pushing on atoms?"
+    ],
+    "difficulty": -2,
+    "level": "beginner",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-ladder-3",
+    "concepts": [
+      "scaling"
+    ],
+    "type": "single",
+    "prompt": "The lab shows a straight line on a chart with both axes logarithmic. What does a steeper line mean?",
+    "options": [
+      {
+        "text": "The cost grows with a higher power of the size",
+        "correct": true,
+        "why": "On a log-log chart the steepness of a straight line is the exponent."
+      },
+      {
+        "text": "The method takes more seconds at every size",
+        "correct": false,
+        "why": "Tempting, but the lab plots relative cost with equal prefactors, not time."
+      },
+      {
+        "text": "The method is more accurate",
+        "correct": false,
+        "why": "Steepness is about cost growth, not accuracy."
+      }
+    ],
+    "hints": [
+      "What does the slope of a line on a log-log chart measure?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-ladder-4",
+    "concepts": [
+      "method-ladder"
+    ],
+    "type": "single",
+    "prompt": "What is the one approximate ingredient in practical DFT?",
+    "options": [
+      {
+        "text": "The exchange-correlation functional",
+        "correct": true,
+        "why": "The theory is exact in principle, and this one term must be approximated."
+      },
+      {
+        "text": "The idea of using the density",
+        "correct": false,
+        "why": "Tempting because the density sounds like a shortcut, but the theory shows it carries all ground-state information."
+      },
+      {
+        "text": "The laws of electrostatics",
+        "correct": false,
+        "why": "Electrostatics is treated exactly in the standard formulation."
+      }
+    ],
+    "hints": [
+      "Which part of the energy has no known exact form?"
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-011",
+      "S-012"
+    ]
+  },
+  {
+    "id": "q-ladder-5",
+    "concepts": [
+      "method-ladder"
+    ],
+    "type": "single",
+    "prompt": "The lab draws every curve starting at the same point. What does that let you conclude?",
+    "options": [
+      {
+        "text": "Nothing about which method is cheaper at a small size",
+        "correct": true,
+        "why": "All prefactors are set equal by construction, so only the steepness carries information."
+      },
+      {
+        "text": "That all methods cost the same for small systems",
+        "correct": false,
+        "why": "Tempting because the curves meet, but they meet by construction."
+      },
+      {
+        "text": "That DFT is the cheapest method in practice",
+        "correct": false,
+        "why": "The lab does not compare absolute costs."
+      }
+    ],
+    "hints": [
+      "Read the \"What to notice\" box in the lab."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-scope-1",
+    "concepts": [
+      "ground-state"
+    ],
+    "type": "single",
+    "prompt": "DFT is mainly a theory of which state?",
+    "options": [
+      {
+        "text": "The ground state, the lowest-energy arrangement of the electrons",
+        "correct": true,
+        "why": "The Hohenberg-Kohn theorem is a statement about the ground state."
+      },
+      {
+        "text": "Excited states, such as light absorption",
+        "correct": false,
+        "why": "Tempting because optical properties matter, but they go beyond the ground-state theory."
+      },
+      {
+        "text": "The state at high temperature",
+        "correct": false,
+        "why": "A standard calculation holds the nuclei still at zero temperature."
+      }
+    ],
+    "hints": [
+      "Which state has the lowest energy?"
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-011"
+    ]
+  },
+  {
+    "id": "q-scope-2",
+    "concepts": [
+      "dft-scope"
+    ],
+    "type": "single",
+    "prompt": "A band gap from a common functional disagrees with an experiment. What is the best first reading?",
+    "options": [
+      {
+        "text": "It may be a known limitation of the functional, so check which functional was used and compare with published results",
+        "correct": true,
+        "why": "Common functionals are known to underestimate gaps, which is why others exist."
+      },
+      {
+        "text": "Your VASP installation is certainly broken",
+        "correct": false,
+        "why": "Tempting because the gap looks wrong, but the disagreement is usually about the functional."
+      },
+      {
+        "text": "DFT has been proven useless",
+        "correct": false,
+        "why": "The limitation is specific and has known remedies."
+      }
+    ],
+    "hints": [
+      "Where does the approximation sit in DFT?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-027",
+      "S-025"
+    ]
+  },
+  {
+    "id": "q-scope-3",
+    "concepts": [
+      "dft-scope"
+    ],
+    "type": "single",
+    "prompt": "Which question is DFT not built to answer directly?",
+    "options": [
+      {
+        "text": "Exactly how a material absorbs light, which involves excited states",
+        "correct": true,
+        "why": "Ground-state theory says nothing directly about excited states."
+      },
+      {
+        "text": "Which of two structures has lower energy",
+        "correct": false,
+        "why": "Comparing ground-state energies is what DFT is good at."
+      },
+      {
+        "text": "What the forces on the atoms are",
+        "correct": false,
+        "why": "Forces come from the ground-state energy and are routinely computed."
+      }
+    ],
+    "hints": [
+      "Does the question involve states above the ground state?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-011"
+    ]
+  },
+  {
+    "id": "q-scope-4",
+    "concepts": [
+      "dft-scope"
+    ],
+    "type": "single",
+    "prompt": "Why should you report the functional with a computed band gap?",
+    "options": [
+      {
+        "text": "The number depends on it, so the result is incomplete without it",
+        "correct": true,
+        "why": "Different functionals can give different gaps for the same structure."
+      },
+      {
+        "text": "Because VASP refuses to run without a report",
+        "correct": false,
+        "why": "This is a matter of good practice, not a program requirement."
+      },
+      {
+        "text": "Because the functional only changes the file name",
+        "correct": false,
+        "why": "The functional changes the physics of the calculation."
+      }
+    ],
+    "hints": [
+      "Where does the exchange-correlation approximation enter?"
+    ],
+    "difficulty": -0.5,
+    "level": "beginner",
+    "sources": [
+      "S-012"
+    ]
+  },
+  {
+    "id": "q-roadmap-1",
+    "concepts": [
+      "roadmap"
+    ],
+    "type": "single",
+    "prompt": "What is a sensible order for learning?",
+    "options": [
+      {
+        "text": "A picture of the method, then practical choices, then checking your results",
+        "correct": true,
+        "why": "Each stage gives the vocabulary needed for the next."
+      },
+      {
+        "text": "Start with the largest model and a copied INCAR",
+        "correct": false,
+        "why": "Tempting because it looks fast, but failures in a large model are hard to read."
+      },
+      {
+        "text": "Skip straight to the band gap",
+        "correct": false,
+        "why": "A gap is only worth reading after the earlier steps were done and checked."
+      }
+    ],
+    "hints": [
+      "Think about what each stage lets you understand next."
+    ],
+    "difficulty": -1.5,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-roadmap-2",
+    "concepts": [
+      "vasp-workflow"
+    ],
+    "type": "single",
+    "prompt": "Which four files does a VASP calculation need?",
+    "options": [
+      {
+        "text": "POSCAR, KPOINTS, INCAR and POTCAR",
+        "correct": true,
+        "why": "Structure, k-point sampling, run settings and the electron-ion description."
+      },
+      {
+        "text": "OUTCAR, CONTCAR, WAVECAR and CHGCAR",
+        "correct": false,
+        "why": "Tempting because these are well-known files, but they are outputs."
+      },
+      {
+        "text": "INCAR and POSCAR only",
+        "correct": false,
+        "why": "Two more inputs are needed to run."
+      }
+    ],
+    "hints": [
+      "Four inputs describe structure, sampling, settings and the atoms."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-roadmap-3",
+    "concepts": [
+      "vasp-workflow"
+    ],
+    "type": "single",
+    "prompt": "Does this site run VASP for you?",
+    "options": [
+      {
+        "text": "No. It runs in your browser, and your files stay on your computer",
+        "correct": true,
+        "why": "VASP needs a licence and a computer to run on; the site runs no server."
+      },
+      {
+        "text": "Yes, upload your files and it runs them",
+        "correct": false,
+        "why": "Tempting for convenience, but no files are uploaded and no server exists."
+      },
+      {
+        "text": "Yes, but only for small cells",
+        "correct": false,
+        "why": "The site never runs VASP."
+      }
+    ],
+    "hints": [
+      "Where does the computation on this site happen?"
+    ],
+    "difficulty": -1.5,
+    "level": "beginner",
+    "sources": [
+      "S-010"
+    ]
+  },
+  {
+    "id": "q-roadmap-4",
+    "concepts": [
+      "roadmap"
+    ],
+    "type": "single",
+    "prompt": "Your first project fails a few times. What is the right reading?",
+    "options": [
+      {
+        "text": "This is normal. Read the error messages and fix one thing at a time",
+        "correct": true,
+        "why": "Reading errors is a skill that builds with practice."
+      },
+      {
+        "text": "You are not suited to this",
+        "correct": false,
+        "why": "Tempting if you expect it to work first time, but early failures are common."
+      },
+      {
+        "text": "Copy a different INCAR until it runs",
+        "correct": false,
+        "why": "A run that starts is not a run you understand or can trust."
+      }
+    ],
+    "hints": [
+      "What did the page say about the effort involved?"
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ]
+  }
+]

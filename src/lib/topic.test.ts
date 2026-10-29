@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { citeOrder, moduleLabel, levelNotes, neighbors, presentSections, splitId } from './topic';
+import {
+  citeOrder,
+  moduleLabel,
+  levelNotes,
+  neighbors,
+  presentSections,
+  splitId,
+  topicPageClass,
+} from './topic';
 
 describe('topic helpers', () => {
   it('splits an entry id into module and topic', () => {
@@ -47,5 +55,13 @@ describe('levelNotes', () => {
     );
     expect(levelNotes('<Level max="beginner">x</Level>')).toBe('');
     expect(levelNotes('plain')).toBe('');
+  });
+});
+
+describe('topicPageClass', () => {
+  it('is island only when a registered lab is embedded', () => {
+    expect(topicPageClass('<Lab id="cost-of-exactness" title="x" />')).toBe('island');
+    expect(topicPageClass('<Lab id="how-to-use-this-site-demo" />')).toBe('content');
+    expect(topicPageClass('no lab here')).toBe('content');
   });
 });

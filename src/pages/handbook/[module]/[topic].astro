@@ -16,7 +16,7 @@ import Term from '../../../components/handbook/Term.astro';
 import Cite from '../../../components/handbook/Cite.astro';
 import VaspFile from '../../../components/handbook/VaspFile.astro';
 import Callout from '../../../components/ui/Callout.astro';
-import { citeOrder, levelNotes, presentSections, splitId } from '../../../lib/topic';
+import { citeOrder, levelNotes, presentSections, splitId, topicPageClass } from '../../../lib/topic';
 import { moduleName } from '../../../lib/site';
 
 export async function getStaticPaths() {
@@ -59,6 +59,7 @@ const statusLabel = { draft: 'Draft', review: 'Awaiting verification', verified:
   description={entry.data.summary}
   module={entry.data.module}
   moduleTitle={moduleName(entry.data.module)}
+  pageClass={topicPageClass(body)}
 >
   <div
     class="topic"

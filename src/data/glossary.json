@@ -372,5 +372,131 @@
       "S-049",
       "S-008"
     ]
+  },
+  {
+    "id": "simulation",
+    "label": "Simulation",
+    "short": "A calculation on a computer that imitates a real system, so you can study it without building it.",
+    "level": "beginner",
+    "sources": [
+      "S-018"
+    ]
+  },
+  {
+    "id": "atom",
+    "label": "Atom",
+    "short": "The basic building block of ordinary matter: a tiny, heavy nucleus surrounded by a cloud of lighter electrons.",
+    "level": "beginner",
+    "sources": [
+      "S-047"
+    ]
+  },
+  {
+    "id": "electron",
+    "label": "Electron",
+    "short": "A very light particle with negative charge. Electrons around the nuclei decide how atoms bond and how a material conducts electricity and absorbs light.",
+    "level": "beginner",
+    "sources": [
+      "S-047"
+    ]
+  },
+  {
+    "id": "nucleus",
+    "label": "Nucleus",
+    "short": "The tiny, heavy centre of an atom, made of protons and neutrons. In most calculations here the nuclei are treated as fixed points.",
+    "level": "beginner",
+    "sources": [
+      "S-047"
+    ]
+  },
+  {
+    "id": "quantum-mechanics",
+    "label": "Quantum mechanics",
+    "short": "The set of rules that describes how very small things such as electrons behave. It replaces the everyday picture of tiny balls on tracks.",
+    "level": "beginner",
+    "sources": [
+      "S-047"
+    ]
+  },
+  {
+    "id": "approximation",
+    "label": "Approximation",
+    "short": "A deliberate simplification that makes a calculation possible at the cost of some accuracy. Every practical method uses some.",
+    "level": "beginner",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "basis-set",
+    "label": "Basis set",
+    "short": "A fixed collection of simple building-block functions that are added together to describe a wavefunction or a density. A bigger set describes it better and costs more.",
+    "level": "beginner",
+    "sources": [
+      "S-049"
+    ]
+  },
+  {
+    "id": "supercell",
+    "label": "Supercell",
+    "short": "A block of several unit cells joined together and repeated through space, used to model defects, surfaces or bigger arrangements of atoms.",
+    "level": "beginner",
+    "sources": [
+      "S-049"
+    ]
+  },
+  {
+    "id": "property",
+    "label": "Property",
+    "short": "Anything you can measure or compute about a material, such as its energy, its shape, its band gap or how much it conducts.",
+    "level": "beginner",
+    "sources": [
+      "S-018"
+    ]
+  },
+  {
+    "id": "scaling",
+    "label": "Scaling",
+    "short": "How the cost of a calculation grows as the system gets bigger. Cost proportional to size to the power 3 is called cubic scaling.",
+    "level": "beginner",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "force-field",
+    "label": "Force field",
+    "short": "A set of fixed, simple rules for the forces between atoms, without any electrons in the calculation. Very fast, and only as good as the rules.",
+    "level": "beginner",
+    "sources": [
+      "S-018"
+    ]
+  },
+  {
+    "id": "hartree-fock",
+    "label": "Hartree-Fock",
+    "short": "A method that treats each electron as moving in the average field of all the others. It leaves out part of how electrons avoid each other.",
+    "level": "intermediate",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "coupled-cluster",
+    "label": "Coupled cluster",
+    "short": "A family of high-accuracy methods that add electron-electron effects step by step. Accurate for small molecules and expensive for large systems.",
+    "level": "intermediate",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "vasp",
+    "label": "VASP",
+    "short": "The Vienna Ab initio Simulation Package, a program that computes the energy and electronic structure of atoms, molecules and solids using DFT with plane waves.",
+    "level": "beginner",
+    "sources": [
+      "S-010"
+    ]
   }
 ]

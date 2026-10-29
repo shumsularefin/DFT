@@ -50,3 +50,12 @@ export function levelNotes(body: string): string {
   const parts = [has('intermediate') && 'Intermediate', has('pro') && 'Pro'].filter(Boolean);
   return parts.length ? `Has ${parts.join(' and ')} notes` : '';
 }
+
+/** Lab ids that have a React island. Topics using one are built as "island" pages (size budget 200 KB). */
+export const REGISTERED_LABS = ['cost-of-exactness'] as const;
+
+/** Page class for a topic: "island" if its body embeds a registered lab, else "content". */
+export function topicPageClass(body: string): 'content' | 'island' {
+  const ids = [...body.matchAll(/<Lab\s[^>]*\bid=["']([^"']+)["']/g)].map((m) => m[1]);
+  return ids.some((i) => (REGISTERED_LABS as readonly string[]).includes(i!)) ? 'island' : 'content';
+}

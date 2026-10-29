@@ -12,8 +12,9 @@ interface Props {
   description: string;
   module: number;
   moduleTitle: string;
+  pageClass?: 'content' | 'island';
 }
-const { id, title, description, module, moduleTitle } = Astro.props;
+const { id, title, description, module, moduleTitle, pageClass = 'content' } = Astro.props;
 
 const ordered = (await getCollection('handbook'))
   .sort((a, b) => a.data.module - b.data.module || a.data.order - b.data.order || a.id.localeCompare(b.id))
@@ -25,7 +26,7 @@ const groups = [...new Set(ordered.map((t) => t.module))].map((m) => ({
 const { prev, next } = neighbors(ordered, id);
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} pageClass={pageClass}>
   <div class="container handbook-layout">
     <Sidebar groups={groups} currentId={id} currentModule={module} />
     <div class="handbook-main" data-topic-id={id}>
