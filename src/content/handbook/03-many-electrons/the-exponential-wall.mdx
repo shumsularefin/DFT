@@ -1,0 +1,106 @@
+---
+id: the-exponential-wall
+title: The exponential wall
+module: 3
+order: 2
+summary: Count exactly how many numbers the many-electron wavefunction needs, and see why no computer can store it for more than a few electrons.
+concepts: [exponential-wall]
+requires: [many-electron-problem]
+vaspTags: []
+sources: [S-048, S-047]
+status: draft
+updated: 2026-11-03
+---
+
+<Why>
+
+It is one thing to be told the exact problem is hard. It is another to see by how much. This page lets you count, so that the rest of the course makes sense: the whole reason for density functional theory is that the exact route is closed.
+
+</Why>
+
+<Intuition>
+
+Build the many-electron state out of one-electron building blocks, the <Term id="spin-orbital">spin orbitals</Term>. Each spin orbital is an orbital plus a spin direction. Pick which spin orbitals the $N$ electrons occupy, and you have one <Term id="slater-determinant">Slater determinant</Term>. An exact treatment can mix every possible choice <Cite id="S-048" />.
+
+So the question is: how many ways are there to choose $N$ occupied spin orbitals from $M$ available? The answer is a binomial coefficient, written $\binom{M}{N}$. Try it in the lab. Slide the number of electrons up and watch the count.
+
+Two things stand out:
+
+- The count does not grow by adding. Each extra electron brings extra orbitals with it, and the count multiplies.
+- Storing one number per determinant at 8 bytes each soon needs more memory than any computer has.
+
+This is called the exponential wall. It is not a hardware limit that will be solved next year. It is a property of the exact method.
+
+<Level min="intermediate">
+
+The lab counts all determinants and ignores symmetry. Real exact calculations use symmetry to reduce the count, but the growth stays steep. The lab is therefore an upper picture, honest about what it counts, and not a prediction for any particular program.
+
+</Level>
+
+<Level min="pro">
+
+The method that includes every determinant is called full configuration interaction <Cite id="S-048" />. Its determinant count is the number in the lab. The statement on this page is about that exact route, and about storing the full coefficient list. Approximate methods that avoid the full list exist, and they are the subject of the ladder of methods in module 1.
+
+</Level>
+
+</Intuition>
+
+<Lab id="exponential-wall" title="The exponential wall" />
+
+<TheMath>
+
+The number of ways to choose $N$ occupied spin orbitals from $M$ is
+
+$$\binom{M}{N} = \frac{M!}{N!\,(M-N)!}$$
+
+<Cite id="S-048" />. Three exact values to check your intuition: $\binom{10}
+{5} = 252$, $\binom{20}
+{10} = 184\,756$ and $\binom{40}
+{20} = 137\,846\,528\,820$. Storing the last as double-precision numbers takes $8 \times 137\,846\,528\,820 =
+1\,102\,772\,230\,560$ bytes, about 1.1 terabytes, for just 20 electrons in 40 spin orbitals.
+
+The lab uses exact integer arithmetic, so even $\binom{100}{50} = 100\,891\,344\,545\,564\,193\,334\,812\,497\,256$ is computed without rounding. The site tests these values.
+
+</TheMath>
+
+<InVasp>
+
+VASP is not solving this problem exactly, and nothing you set in an INCAR file asks it to. The lesson of this page is exactly why. A typical VASP cell holds tens to hundreds of valence electrons, far beyond the wall.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...           | ...the count               | ...the memory          |
+| -------------------------- | -------------------------- | ---------------------- |
+| More electrons, same basis | Grows quickly              | Grows with it          |
+| More orbitals per electron | Grows quickly              | Grows with it          |
+| Use symmetry               | Smaller by a modest factor | Smaller by that factor |
+
+Why count in determinants: that is the size of the exact answer. What happens if you ignore the wall: you plan a calculation that cannot finish or even be stored.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Reading the lab as a run time">
+
+It counts numbers to store, not seconds. Run time depends on the program, though it too becomes impossible.
+
+</Callout>
+
+<Callout variant="mistake" title="Thinking the wall means quantum mechanics fails">
+
+Quantum mechanics is fine. What fails is exact solution by brute force for many electrons.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-wall-1', 'q-wall-2', 'q-wall-3', 'q-wall-4', 'q-wall-5']} />
+
+<GoDeeper>
+
+- Szabo and Ostlund, _Modern Quantum Chemistry_, on configuration interaction <Cite id="S-048" />.
+
+</GoDeeper>

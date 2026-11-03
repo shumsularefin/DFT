@@ -4,6 +4,8 @@ import Badge from '../ui/Badge.astro';
 import CostOfExactness from '../labs/CostOfExactness';
 import BoxLab from '../labs/BoxLab';
 import OrbitalsLab from '../labs/OrbitalsLab';
+import ExponentialWall from '../labs/ExponentialWall';
+import DensityMap from '../labs/DensityMap';
 // Labs are registered by id. An id with no component yet shows the placeholder, so topics can be written ahead of their labs.
 interface Props {
   id: string;
@@ -24,6 +26,14 @@ const { id, title } = Astro.props;
   ) : id === 'orbitals' ? (
     <div data-lab-id={id}>
       <OrbitalsLab client:visible />
+    </div>
+  ) : id === 'exponential-wall' ? (
+    <div data-lab-id={id}>
+      <ExponentialWall client:visible />
+    </div>
+  ) : id === 'density-as-a-map' ? (
+    <div data-lab-id={id}>
+      <DensityMap client:visible />
     </div>
   ) : (
     <div class="lab-placeholder" data-lab-id={id}>

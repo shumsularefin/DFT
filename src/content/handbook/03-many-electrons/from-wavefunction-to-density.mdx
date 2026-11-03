@@ -1,0 +1,93 @@
+---
+id: from-wavefunction-to-density
+title: From wavefunction to density
+module: 3
+order: 4
+summary: The idea behind the Hohenberg-Kohn theorems, in words, and why it lets us trade the wavefunction for the density.
+concepts: [density-to-potential]
+requires: [electron-density-meaning]
+vaspTags: []
+sources: [S-011, S-048]
+status: draft
+updated: 2026-11-03
+noLab: true
+---
+
+<Why>
+
+The previous page showed, for one electron, that the density points to a single potential. The remarkable claim of density functional theory is that the same is true for any number of electrons. This page states the idea in words. The formal statement and its consequences come in module 4.
+
+</Why>
+
+<Intuition>
+
+Think of the chain of information. The arrangement of the nuclei sets the <Term id="external-potential">external potential</Term>. That potential fixes the lowest-energy state, so it fixes the wavefunction, and so it fixes the density. This direction is easy to believe: set up the atoms and the electrons follow.
+
+The surprise is the reverse. Hohenberg and Kohn showed that for the lowest-energy state the chain also runs backwards <Cite id="S-011" />. If you know the <Term id="ground-state-density">ground-state density</Term>, there is only one external potential that could have produced it, up to a constant. Knowing the potential, you can in principle recover the wavefunction and every property.
+
+So the density, a function of three variables, holds the same information as a wavefunction of $3N$ variables. This is the content of the <Term id="hohenberg-kohn-theorems">Hohenberg-Kohn theorems</Term>.
+
+A second idea completes the picture: the true density is the one that gives the lowest energy. The energy can therefore be treated as a <Term id="functional">functional</Term> of the density, and in principle we find the answer by searching over densities.
+
+<Level min="intermediate">
+
+The theorem says _that_ a recipe exists, not _what_ the recipe is. The energy as a functional of the density exists, but its exact form is unknown. That gap is the subject of the next page.
+
+</Level>
+
+<Level min="pro">
+
+The original statement assumes a non-degenerate ground state. Extensions to degenerate states and other cases exist and are not covered here <Cite id="S-011" />.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+No new equation is needed beyond the last page. In symbols, the statement is that the map $v \mapsto n_v$ from external potentials (up to a constant) to ground-state densities is one-to-one <Cite id="S-011" />, and that the ground-state energy can be written $E[n] = F[n] + \int v(\mathbf{r})\,n(\mathbf{r})\,d\mathbf{r}$, where $F[n]$ is the same for every system and is not known exactly. The proof and its limits are for module 4.
+
+</TheMath>
+
+<InVasp>
+
+VASP's whole procedure rests on this idea. It searches for the density that lowers the energy, iterating until the density stops changing, which is the self-consistent loop you will meet in module 4.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...       | ...what the theorem says                      |
+| ---------------------- | --------------------------------------------- |
+| The atoms' positions   | A different potential, so a different density |
+| Add a constant to V    | Same density (not a different potential)      |
+| Use a non-ground state | The theorem does not apply as stated          |
+
+Why this matters: it justifies working with the density. What happens if you ignore the limits: you may apply the statement to excited states, where it is not guaranteed.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Thinking the theorem tells you the energy formula">
+
+It proves a formula exists. It does not provide it.
+
+</Callout>
+
+<Callout variant="mistake" title="Applying it to any state">
+
+The statement is about the lowest-energy state.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-hk-1', 'q-hk-2', 'q-hk-3', 'q-hk-4', 'q-hk-5']} />
+
+<GoDeeper>
+
+- Hohenberg and Kohn, _Inhomogeneous electron gas_ <Cite id="S-011" />.
+- Szabo and Ostlund on the electronic structure problem <Cite id="S-048" />.
+
+</GoDeeper>
