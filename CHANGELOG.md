@@ -7,6 +7,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- Input builder tool: paste a POSCAR, pick a task, edit and check an INCAR with plain-language explanations, choose k-points, write a SLURM or PBS job script, and download a zip of the input files (never a POTCAR). Runs in your browser; nothing is uploaded.
 - INCAR validation engine: 33 sourced rules that catch risky settings, with one-click fixes (no UI yet).
 - INCAR library and data: parser and writer, 71 documented tags and 16 starting presets built from the two handbooks (no UI yet).
 - KPOINTS library: k-mesh sizes from KSPACING, resolution or length, mesh coordinates, file writers and a parser (no UI yet).

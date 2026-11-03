@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import InputBuilder from '../../components/tools/input-builder/InputBuilder';
+---
+
+<BaseLayout
+  title="Input builder"
+  description="Build VASP INCAR, KPOINTS, POSCAR and job script files in your browser, with plain-language explanations and checks."
+  pageClass="tool"
+>
+  <div class="container">
+    <h1>Input builder</h1>
+    <p>
+      Prepare a set of VASP input files step by step. Each setting is explained, and risky combinations are
+      flagged before you submit a job.
+    </p>
+    <InputBuilder client:load />
+  </div>
+</BaseLayout>

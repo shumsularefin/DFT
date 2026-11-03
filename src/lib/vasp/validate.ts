@@ -5,7 +5,7 @@ import { makeView } from './rules/helpers';
 import { ALL_RULES } from './rules';
 import type { Issue, Rule, Severity, ValidateContext } from './rules/types';
 
-export type { Issue, Rule, Severity, ValidateContext, Fix } from './rules/types';
+export type { Issue, Rule, Severity, ValidateContext, Fix, SystemType, VaspVersion } from './rules/types';
 export { ALL_RULES } from './rules';
 
 const ORDER: Record<Severity, number> = { error: 0, warn: 1, info: 2 };
