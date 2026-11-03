@@ -1,0 +1,1762 @@
+{
+ "OUT": [
+  {
+   "id": "chg",
+   "name": "CHG",
+   "summary": "Charge density in a compact format, meant for visualization only.",
+   "facts": [
+    "Lattice and atomic positions (POSCAR-like header), then the fine-grid size NGXF NGYF NGZF and the values of ρ(r)·V<sub>cell</sub> on that grid.",
+    "Written when <code>LCHARG = .TRUE.</code> (the default). During relaxations and MD it is refreshed periodically (every NBLOCK × KBLOCK steps).",
+    "Values carry fewer digits than CHGCAR, and the PAW one-centre occupancies are missing."
+   ],
+   "use": [
+    "3D isosurfaces and 2D slices in VESTA",
+    "A quick look at the density when CHGCAR is inconveniently large"
+   ],
+   "watch": [
+    "Cannot restart a run (<code>ICHARG = 1</code> or <code>11</code>) and should not be used for Bader analysis. Use CHGCAR for both."
+   ],
+   "fixed": [
+    {
+     "was": "Described as storing the plain total charge density.",
+     "now": "Like CHGCAR, CHG stores ρ(r)·V<sub>cell</sub>. Divide by the cell volume to get e/Å³."
+    }
+   ],
+   "rel": [
+    "chgcar",
+    "lcharg"
+   ]
+  },
+  {
+   "id": "chgcar",
+   "name": "CHGCAR",
+   "summary": "The full, restart-quality charge density of the last electronic step.",
+   "facts": [
+    "Header with lattice and positions, then ρ(r)·V<sub>cell</sub> on the fine FFT grid (high precision, 5 values per line), then the PAW one-centre (augmentation) occupancies.",
+    "ISPIN = 2: two data sets, total ρ↑+ρ↓ followed by magnetization ρ↑−ρ↓. Non-collinear runs: four sets (total, m<sub>x</sub>, m<sub>y</sub>, m<sub>z</sub>).",
+    "Divide every grid value by V<sub>cell</sub> (Å³) to obtain the density in e/Å³.",
+    "The grid holds the pseudo-density plus compensation charge, not the true all-electron density close to the nuclei."
+   ],
+   "use": [
+    "<code>ICHARG = 1</code>: read it and continue the self-consistent cycle",
+    "<code>ICHARG = 11</code>: keep it fixed for non-self-consistent DOS and band-structure runs. It must come from a converged SCF run with the same structure, ENCUT and POTCAR.",
+    "Bader charges, charge-density differences, 3D plots in VESTA"
+   ],
+   "watch": [
+    "For reliable Bader charges set <code>LAECHG = .TRUE.</code> in the SCF run, use AECCAR0 + AECCAR2 as the reference density and integrate CHGCAR.",
+    "A non-self-consistent (ICHARG = 11) run does not improve the density. Keep a backup copy of the SCF CHGCAR before running NSCF jobs in the same folder.",
+    "Bader integration needs a fine grid; increase NGXF/NGYF/NGZF if charges change with grid size."
+   ],
+   "fixed": [
+    {
+     "was": "It is significantly larger than CHG because it includes augmentation charges.",
+     "now": "The size difference comes mostly from writing each value with more digits. The augmentation-occupancy block adds comparatively little."
+    },
+    {
+     "was": "It is the standard input for Bader analysis, which needs the full density including augmentation.",
+     "now": "CHGCAR lacks the core charge. The Bader code's authors recommend LAECHG = .TRUE. and AECCAR0 + AECCAR2 as the reference density for finding zero-flux surfaces."
+    }
+   ],
+   "rel": [
+    "chg",
+    "icharg",
+    "lcharg",
+    "others"
+   ]
+  },
+  {
+   "id": "contcar",
+   "name": "CONTCAR",
+   "summary": "The most recent geometry, in POSCAR format: the structure you restart from.",
+   "facts": [
+    "Same format as POSCAR. Rewritten after every ionic step, so it holds the latest structure even if the job stops early.",
+    "MD (IBRION = 0): also contains the ionic velocities and predictor-corrector data needed for a seamless restart.",
+    "Selective-dynamics flags (T/F) are preserved.",
+    "Static run: the structure equals the POSCAR, though the formatting may differ (for example, coordinates rewritten in Direct mode)."
+   ],
+   "use": [
+    "Restart a relaxation that ran out of time or NSW steps: <code>cp CONTCAR POSCAR</code>",
+    "The final relaxed structure for static, DOS and band-structure runs"
+   ],
+   "watch": [
+    "If the job was killed while writing, CONTCAR can be empty or truncated. Look at it before copying.",
+    "After an ISIF = 3 relaxation, repeat the run from CONTCAR until the cell no longer changes (Pulay stress, see ENCUT)."
+   ],
+   "rel": [
+    "poscar",
+    "xdatcar",
+    "isif",
+    "nsw"
+   ]
+  },
+  {
+   "id": "doscar",
+   "name": "DOSCAR",
+   "summary": "Total density of states, plus atom- and orbital-projected DOS when LORBIT is set.",
+   "code": {
+    "cap": "DOSCAR header (first 6 lines)",
+    "txt": "    2    2    1    0          ! number of ions (twice), PDOS flag, NCDIJ\n  ...                          ! cell-size information and POTIM\n  ...                          ! TEBEG\n  CAR\n  Si bulk                      ! SYSTEM\n   12.00  -10.00  3001  5.6843  1.0000   ! EMAX  EMIN  NEDOS  E_Fermi  weight"
+   },
+   "facts": [
+    "Line 6 gives EMAX, EMIN, NEDOS and E<sub>Fermi</sub>. Energies in the file are absolute; subtract E<sub>Fermi</sub> to plot E − E<sub>F</sub>.",
+    "Total-DOS block: energy, DOS (states/eV per cell), integrated DOS. With ISPIN = 2: E, DOS↑, DOS↓, int↑, int↓.",
+    "With LORBIT = 10, 11 or 12, one projected block per atom follows, each preceded by a copy of line 6.",
+    "Values refer to the whole simulation cell. Divide by the number of atoms or formula units (or by V<sub>cell</sub>) to compare cells of different size."
+   ],
+   "use": [
+    "Total and projected DOS plots",
+    "Orbital character of the valence-band top or conduction-band bottom",
+    "A first estimate of the band gap"
+   ],
+   "watch": [
+    "Take E-fermi from the self-consistent run (OUTCAR). The value written by an ICHARG = 11 run can be shifted. For insulators, align to the VBM instead.",
+    "Projected DOS summed over all atoms is smaller than the total DOS, because the projection spheres do not fill the cell.",
+    "For a smooth DOS: static or NSCF run on the relaxed structure, dense k-mesh, ISMEAR = −5, NEDOS ≈ 2000–5000, EMIN/EMAX framing the window of interest."
+   ],
+   "rel": [
+    "lorbit",
+    "ismear",
+    "nedos",
+    "r-dos"
+   ]
+  },
+  {
+   "id": "eigenval",
+   "name": "EIGENVAL",
+   "summary": "Band energies and occupations at every k-point.",
+   "facts": [
+    "Header line 6: number of electrons, number of k-points, number of bands.",
+    "Then one block per k-point: k<sub>x</sub> k<sub>y</sub> k<sub>z</sub> (fractional reciprocal coordinates) and weight, followed by one line per band: index, energy, occupation.",
+    "ISPIN = 2: index, E↑, E↓, occ↑, occ↓.",
+    "Occupations are listed from 0 to 1 per state and spin channel."
+   ],
+   "use": [
+    "Band-structure plots (NSCF run with <code>ICHARG = 11</code> and a line-mode KPOINTS)",
+    "Locating the VBM and CBM and computing the gap",
+    "Checking whether bands are partially filled"
+   ],
+   "watch": [
+    "On a uniform mesh the VBM or CBM can fall between k-points. Confirm the gap on a band path or a denser mesh.",
+    "With smearing, small fractional occupations near the gap do not prove the system is a metal. Look at the gap itself.",
+    "Hybrid functionals (HSE) cannot use ICHARG = 11. Use IBZKPT plus zero-weight path k-points instead (see IBZKPT)."
+   ],
+   "fixed": [
+    {
+     "was": "Listed as \"ELGENVAL\".",
+     "now": "The file is called EIGENVAL."
+    },
+    {
+     "was": "Filled bands have occupancy 1 or 2.",
+     "now": "EIGENVAL lists occupations from 0 to 1. The band listing in OUTCAR shows 0 to 2 for non-spin-polarized runs."
+    }
+   ],
+   "rel": [
+    "kpoints",
+    "icharg",
+    "ibzkpt",
+    "r-bands"
+   ]
+  },
+  {
+   "id": "ibzkpt",
+   "name": "IBZKPT",
+   "summary": "The symmetry-reduced k-point list VASP actually computed.",
+   "code": {
+    "cap": "KPOINTS for HSE bands: IBZKPT + zero-weight path",
+    "txt": "Explicit k-points (IBZKPT mesh + path)\n   12                          ! total = mesh points + path points\nReciprocal\n  0.000  0.000  0.000   1      ! mesh points: keep IBZKPT weights\n  0.250  0.000  0.000   8\n  ...\n  0.000  0.000  0.000   0      ! path points: weight 0\n  0.050  0.000  0.050   0\n  ..."
+   },
+   "facts": [
+    "VASP reduces the full k-mesh to the irreducible Brillouin zone using the crystal's point group (plus time reversal).",
+    "Each k-point carries a weight equal to the number of equivalent points it stands for in the full zone (VASP normalizes the weights).",
+    "The format is an explicit-mode KPOINTS file: fractional reciprocal coordinates and weights."
+   ],
+   "use": [
+    "Copy to KPOINTS to keep exactly the same mesh in later runs",
+    "Hybrid-functional band structures: append path k-points with weight 0",
+    "Seeing which k-points VASP samples"
+   ],
+   "watch": [
+    "An unexpected number of k-points means VASP found a different symmetry than you intended. Common causes: MAGMOM breaking or raising symmetry, a slightly distorted POSCAR, the wrong cell."
+   ],
+   "fixed": [
+    {
+     "was": "To stop VASP reducing the k-points, set ISYM = −1 or 0.",
+     "now": "Only ISYM = −1 switches symmetry off completely. ISYM = 0 still applies time-reversal symmetry, so k and −k are merged and the list is roughly halved."
+    }
+   ],
+   "rel": [
+    "kpoints",
+    "isym",
+    "kpar"
+   ]
+  },
+  {
+   "id": "oszicar",
+   "name": "OSZICAR",
+   "summary": "A compact log of electronic and ionic convergence, ideal for watching a run live.",
+   "code": {
+    "cap": "OSZICAR excerpt",
+    "txt": "       N       E                     dE             d eps       ncg     rms          rms(c)\nDAV:   1     0.425437171850E+02    0.42544E+02   -0.15040E+03   992   0.267E+02\nRMM:   9    -0.108706468020E+02   -0.11384E-04   -0.13017E-05  1021   0.107E-02   0.247E-03\n   1 F= -.10870647E+02 E0= -.10870647E+02  d E =-.108706E+02  mag=     2.0012"
+   },
+   "facts": [
+    "One line per electronic step. DAV = blocked Davidson, RMM = RMM-DIIS, CG = conjugate gradient. Columns: N, E (free energy), dE (change from previous step), d eps (change in band-structure energy), ncg, rms (residual), rms(c) (charge-density residual).",
+    "One summary line per ionic step: F (free energy TOTEN), E0 (energy extrapolated to σ → 0), d E (change from previous ionic step), mag (total moment, ISPIN = 2).",
+    "MD runs add T (temperature), E (total energy including kinetic and thermostat terms, the conserved quantity), EK, SP, SK."
+   ],
+   "use": [
+    "<code>tail -f OSZICAR</code> to follow a running job",
+    "Quick convergence check and final energy",
+    "Drift of E during MD to judge whether POTIM is small enough"
+   ],
+   "watch": [
+    "An ionic step that used NELM electronic steps (default 60) did not converge. VASP continues anyway, and the forces from that step are unreliable.",
+    "Oscillating or stagnant dE: see \"Electronic loop does not converge\"."
+   ],
+   "fixed": [
+    {
+     "was": "The column \"dps\" is the change in the Hamiltonian.",
+     "now": "The column is \"d eps\", the change of the band-structure energy (sum of eigenvalues) between steps. The SCF loop stops when both dE and d eps fall below EDIFF."
+    }
+   ],
+   "rel": [
+    "outcar",
+    "ediff",
+    "nelm",
+    "t-scf"
+   ]
+  },
+  {
+   "id": "outcar",
+   "name": "OUTCAR",
+   "summary": "The complete log of the run: setup, symmetry, every electronic and ionic step, forces, stress, timing.",
+   "code": {
+    "cap": "Useful greps",
+    "txt": "grep \"E-fermi\" OUTCAR | tail -1                 # Fermi level\ngrep \"TOTEN\" OUTCAR | tail -1                    # final free energy\ngrep -A 10 \"TOTAL-FORCE\" OUTCAR | tail -10       # last forces (use NIONS+2 lines)\ngrep \"in kB\" OUTCAR | tail -1                    # stress tensor\ngrep \"external pressure\" OUTCAR | tail -1        # pressure and Pulay stress\ngrep -A 8 \"magnetization (x)\" OUTCAR | tail -8   # site moments (LORBIT >= 10)\ngrep \"reached required accuracy\" OUTCAR          # relaxation converged\ngrep \"Elapsed time\" OUTCAR                       # run finished normally"
+   },
+   "facts": [
+    "Lists the detected point group and space group: compare with what you intended to build.",
+    "After every ionic step: forces on each atom (eV/Å, TOTAL-FORCE table) and the stress tensor (kB).",
+    "States E-fermi, needed to shift DOS and band structures.",
+    "With ISPIN = 2 and LORBIT ≥ 10, \"magnetization (x)\" lists the moment integrated inside a sphere around each atom.",
+    "Echoes every parameter VASP actually used: the place to check whether a tag was read correctly."
+   ],
+   "use": [
+    "Final energies, forces, stress, Fermi level, site moments",
+    "Verifying symmetry and parameters",
+    "Timing and memory statistics for tuning parallelization"
+   ],
+   "watch": [
+    "Site moments and charges are sphere integrals. They depend on the sphere radius (RWIGS) and are not Bader values."
+   ],
+   "fixed": [
+    {
+     "was": "If the forces are below the EDIFFG value, the relaxation is done.",
+     "now": "That applies only to a negative EDIFFG (force criterion). With a positive EDIFFG, VASP stops on the energy change. Confirm with the line \"reached required accuracy\"."
+    },
+    {
+     "was": "If VASP crashes without a terminal error, the reason is hidden in the last 20 lines of OUTCAR.",
+     "now": "The end of OUTCAR shows where the run stopped. The error message itself is usually printed to standard output, so check the job's output or scheduler log first."
+    }
+   ],
+   "rel": [
+    "oszicar",
+    "ediffg",
+    "lorbit",
+    "t-crash"
+   ]
+  },
+  {
+   "id": "pcdat",
+   "name": "PCDAT",
+   "summary": "Pair-correlation function g(r) averaged over an MD run.",
+   "facts": [
+    "Written for molecular dynamics (IBRION = 0). It holds the total g(r) summed over all atom pairs.",
+    "Sampling is controlled by NBLOCK (how often), NPACO (number of radial bins) and APACO (maximum distance, default 16 Å).",
+    "g(r) is the probability of finding an atom at distance r from another atom, relative to an ideal gas of the same density."
+   ],
+   "use": [
+    "Distinguishing liquid, amorphous and crystalline states",
+    "Average first-shell bond lengths in disordered systems",
+    "Following structural change with temperature"
+   ],
+   "watch": [
+    "For element-resolved g<sub>AB</sub>(r) compute it from XDATCAR (OVITO, VMD, ASE, pymatgen).",
+    "Discard the equilibration part of the trajectory before averaging."
+   ],
+   "rel": [
+    "xdatcar",
+    "ibrion",
+    "r-md"
+   ]
+  },
+  {
+   "id": "procar",
+   "name": "PROCAR",
+   "summary": "Band- and orbital-resolved projections at every k-point. Not in the original notes.",
+   "facts": [
+    "Written when LORBIT ≥ 10. For each k-point and band: energy, occupation, and the weight on each atom and orbital.",
+    "LORBIT = 10: s, p, d. LORBIT = 11: resolved into p<sub>x</sub>, p<sub>y</sub>, d<sub>xy</sub> and so on. LORBIT = 12: as 11, plus complex phase factors."
+   ],
+   "use": [
+    "\"Fat-band\" and orbital-coloured band structures",
+    "Which atom or orbital dominates a given band"
+   ],
+   "watch": [
+    "Very large for big cells and many k-points.",
+    "Weights are sphere projections; they do not sum to exactly 1 per band."
+   ],
+   "rel": [
+    "lorbit",
+    "doscar",
+    "r-bands"
+   ]
+  },
+  {
+   "id": "report",
+   "name": "REPORT",
+   "summary": "Detailed log of advanced MD algorithms and machine-learned force-field runs (VASP 6).",
+   "facts": [
+    "Written for MD with MDALGO-based features: thermostat records, constrained or biased MD (collective variables, constraint forces for blue-moon sampling, metadynamics bias), and on-the-fly MLFF learning (Bayesian error estimates, when ab initio steps are triggered).",
+    "The standard per-step temperature and energies are also in OSZICAR (T, E, EK, F); the pressure is in OUTCAR (\"external pressure\")."
+   ],
+   "use": [
+    "Free-energy methods and constrained MD analysis",
+    "Monitoring MLFF training quality"
+   ],
+   "watch": [
+    "To judge whether POTIM is small enough, the drift of the conserved energy E in OSZICAR is the simplest check."
+   ],
+   "note": [
+    {
+     "was": "Presented as the general thermodynamic log of every MD run (temperature, energies, pressure, drift).",
+     "now": "REPORT records algorithm-specific output. For a plain MD run, OSZICAR (energies, temperature) and OUTCAR (pressure) remain the primary sources."
+    }
+   ],
+   "rel": [
+    "oszicar",
+    "r-md",
+    "potim"
+   ]
+  },
+  {
+   "id": "vaspouth5",
+   "name": "vaspout.h5",
+   "summary": "All results in one structured binary HDF5 file (VASP 6).",
+   "facts": [
+    "Written only when VASP was compiled with HDF5 support (precompiler flag -DVASP_HDF5).",
+    "Holds structure, eigenvalues, DOS, forces, stress and input parameters in a tree (e.g. /results/electron_dos).",
+    "Binary: it cannot be read in a text editor."
+   ],
+   "use": [
+    "<b>py4vasp</b>, the official Python package for VASP output, reads it directly",
+    "<b>h5py</b> for custom analysis; <b>HDFView</b> to browse the tree"
+   ],
+   "note": [
+    {
+     "was": "Described as a standard output.",
+     "now": "It appears only with HDF5-enabled builds of VASP 6. If you don't see it, your build lacks HDF5, and vasprun.xml remains the machine-readable output."
+    }
+   ],
+   "rel": [
+    "vasprunxml"
+   ]
+  },
+  {
+   "id": "vasprunxml",
+   "name": "vasprun.xml",
+   "summary": "Machine-readable XML record of inputs, structures, energies, forces, eigenvalues and DOS.",
+   "facts": [
+    "Contains most of what OUTCAR, EIGENVAL and DOSCAR contain, in tagged XML (e.g. <code>&lt;varray name=\"forces\"&gt;</code>), so parsers do not break when text formatting changes.",
+    "Records the energy of every electronic and ionic step, so relaxation histories are easy to plot."
+   ],
+   "use": [
+    "Input for pymatgen, ASE, AiiDA, sumo, VASPKIT and similar tools"
+   ],
+   "watch": [
+    "If the job crashed, the XML is not closed and strict parsers fail. Some tools can read a truncated file; otherwise rerun.",
+    "Can be very large with many k-points, bands or projections."
+   ],
+   "rel": [
+    "vaspouth5",
+    "outcar"
+   ]
+  },
+  {
+   "id": "wavecar",
+   "name": "WAVECAR",
+   "summary": "The wavefunctions (plane-wave coefficients of the Kohn–Sham orbitals): the most valuable restart file.",
+   "facts": [
+    "Binary. Read on start-up when <code>ISTART = 1</code> or <code>2</code> (ISTART defaults to 1 when a WAVECAR exists).",
+    "Starting from a converged WAVECAR usually cuts the number of electronic steps sharply.",
+    "Required as input for GW and BSE, band-decomposed charge densities (LPARD), Wannier90 interfaces and similar post-processing.",
+    "Writing is controlled by LWAVE (default .TRUE.)."
+   ],
+   "use": [
+    "Continuing a relaxation that timed out",
+    "Moving from a coarse to an accurate run",
+    "Giving hard magnetic or metallic systems a good starting state"
+   ],
+   "watch": [
+    "The k-points and spin setting must match the earlier run for the file to be reused; otherwise VASP starts from random wavefunctions.",
+    "A 0-byte WAVECAR (killed during writing) causes \"Error reading WAVECAR\". Delete it or set ISTART = 0.",
+    "vasp_std, vasp_gam and vasp_ncl write incompatible files.",
+    "Can reach tens of GB: set LWAVE = .FALSE. when you do not need it."
+   ],
+   "fixed": [
+    {
+     "was": "Only compatible if the k-point grid and NBANDS remain identical.",
+     "now": "The k-mesh and spin setting must match. Changes in ENCUT or cell shape are explicitly supported when reading (ISTART = 1 keeps the cutoff, ISTART = 2 keeps the basis set)."
+    },
+    {
+     "was": "A WAVECAR from an Intel cluster might not be readable on an ARM cluster because of different binary formats.",
+     "now": "x86 and ARM are both little-endian, so architecture is rarely the issue. Real incompatibilities come from different builds: vasp_gam vs vasp_std vs vasp_ncl, or different precision or record-length settings."
+    }
+   ],
+   "rel": [
+    "istart",
+    "lwave",
+    "t-wavecar"
+   ]
+  },
+  {
+   "id": "xdatcar",
+   "name": "XDATCAR",
+   "summary": "The trajectory: atomic positions at every ionic step.",
+   "facts": [
+    "MD: one frame per sampled time step (interval set by NBLOCK).",
+    "Relaxation: the path from the initial POSCAR to the final CONTCAR.",
+    "Variable-cell runs (ISIF ≥ 3) write the lattice for each frame. Positions are in Direct coordinates."
+   ],
+   "use": [
+    "Mean-square displacement and diffusion coefficients",
+    "Partial g(r), phase transitions, defect analysis",
+    "Animation in OVITO (strong for defects and trajectory analysis) or VMD"
+   ],
+   "watch": [
+    "Direct coordinates are wrapped into the cell. Unwrap periodic jumps before computing MSD."
+   ],
+   "rel": [
+    "pcdat",
+    "contcar",
+    "r-md"
+   ]
+  },
+  {
+   "id": "others",
+   "name": "Other outputs",
+   "summary": "Files you will meet once you go beyond the basics.",
+   "facts": [
+    "<b>AECCAR0 / AECCAR2</b>: core and valence all-electron densities (LAECHG = .TRUE.). Their sum is the reference for Bader analysis.",
+    "<b>LOCPOT</b>: local potential (LVTOT = .TRUE.; LVHAR = .TRUE. for the electrostatic part only). Used for work functions and band alignment.",
+    "<b>ELFCAR</b>: electron localization function (LELF = .TRUE.).",
+    "<b>PARCHG</b>: band- or energy-decomposed charge density (LPARD = .TRUE.), e.g. for STM images or orbital plots.",
+    "<b>WAVEDER</b>: wavefunction derivatives from LOPTICS = .TRUE.; input for later optics and GW steps.",
+    "<b>Standard output</b> (your job's .out / .log): where VASP prints warnings and error messages."
+   ],
+   "rel": [
+    "chgcar",
+    "t-crash"
+   ]
+  }
+ ],
+ "INP": [
+  {
+   "id": "incar",
+   "name": "INCAR",
+   "summary": "Tagged text file that tells VASP what to calculate and how.",
+   "facts": [
+    "One <code>TAG = value</code> per line. <code>!</code> or <code>#</code> starts a comment; <code>;</code> separates tags on one line.",
+    "Any tag you leave out takes its default. Many defaults depend on other tags (e.g. IBRION depends on NSW)."
+   ],
+   "watch": [
+    "A misspelled tag may be ignored. Check the parameter echo at the top of OUTCAR to confirm what VASP used."
+   ],
+   "rel": [
+    "tagtable",
+    "recipes"
+   ]
+  },
+  {
+   "id": "kpoints",
+   "name": "KPOINTS",
+   "summary": "Defines how the Brillouin zone is sampled.",
+   "code": {
+    "cap": "Automatic Γ-centred mesh",
+    "txt": "Automatic mesh\n0              ! 0 = generate automatically\nGamma          ! or Monkhorst-Pack\n  8  8  8      ! subdivisions along b1 b2 b3\n  0  0  0      ! optional shift"
+   },
+   "facts": [
+    "<b>Γ-centred</b>: required for hexagonal cells and a safe default for any lattice; also preferable for small meshes.",
+    "<b>Monkhorst-Pack</b>: with even subdivisions the mesh is shifted off Γ. Efficient for cubic and orthorhombic cells, but it can break the symmetry of fcc, bcc or hexagonal lattices.",
+    "Subdivisions per direction scale inversely with the cell length: N<sub>i</sub> × a<sub>i</sub> ≈ constant. Larger supercells need fewer k-points.",
+    "Line mode generates band-structure paths; explicit mode lists points and weights. Without a KPOINTS file, VASP builds a mesh from the INCAR tag KSPACING."
+   ],
+   "use": [
+    "Convergence-test the mesh (e.g. 4×4×4 → 6×6×6 → 8×8×8) until the energy changes by less than about 1 meV/atom"
+   ],
+   "watch": [
+    "Metals need denser meshes than insulators to resolve the Fermi surface.",
+    "A mesh that does not respect the lattice symmetry triggers \"Reciprocal lattice and k-lattice belong to different class of lattices\"."
+   ],
+   "note": [
+    {
+     "was": "Monkhorst-Pack is standard for cubic or orthorhombic cells.",
+     "now": "True for simple cubic and orthorhombic. For fcc and bcc an even, shifted MP mesh can break symmetry, so many groups default to Γ-centred meshes everywhere."
+    }
+   ],
+   "rel": [
+    "ibzkpt",
+    "kpar",
+    "r-bands",
+    "t-ibzkpt"
+   ]
+  },
+  {
+   "id": "poscar",
+   "name": "POSCAR",
+   "summary": "The structure: lattice, species, number of atoms and positions.",
+   "code": {
+    "cap": "POSCAR, line by line (remove the ! notes before use)",
+    "txt": "Si diamond              ! 1  comment\n5.43                    ! 2  scaling factor (Å); a negative value is the cell volume\n  0.0  0.5  0.5         ! 3  lattice vector a1\n  0.5  0.0  0.5         ! 4  lattice vector a2\n  0.5  0.5  0.0         ! 5  lattice vector a3\nSi                      ! 6  element symbols: same order as POTCAR\n2                       ! 7  number of atoms of each species\nSelective dynamics      ! 8  optional; only the first letter \"S\" is read\nDirect                  !    Direct (fractional) or Cartesian\n  0.00  0.00  0.00  T T T   ! T = may move along x, y, z\n  0.25  0.25  0.25  F F F   ! F = frozen"
+   },
+   "facts": [
+    "Defines which atoms are present, where they are and how large the simulation cell is.",
+    "Lattice vectors are multiplied by the scaling factor; Cartesian coordinates are too.",
+    "With \"Selective dynamics\", each coordinate gets three flags controlling which directions may relax."
+   ],
+   "watch": [
+    "The species order on line 6 must match the order of the potentials in POTCAR, and MAGMOM follows the atom order.",
+    "Mixing up Direct and Cartesian puts atoms on top of each other (\"distance between some ions is very small\")."
+   ],
+   "fixed": [
+    {
+     "was": "The order of elements in POSCAR (line 4) must match POTCAR.",
+     "now": "Element symbols are on line 6 (VASP 5 and later); line 7 gives the counts. Line 4 is the second lattice vector."
+    },
+    {
+     "was": "\"Selected dynamics\".",
+     "now": "The keyword is \"Selective dynamics\"."
+    }
+   ],
+   "rel": [
+    "potcar",
+    "contcar",
+    "magmom"
+   ]
+  },
+  {
+   "id": "potcar",
+   "name": "POTCAR",
+   "summary": "The PAW datasets: how valence electrons interact with each ion core.",
+   "code": {
+    "cap": "Build and inspect",
+    "txt": "cat Si/POTCAR O/POTCAR > POTCAR    # same order as POSCAR line 6\ngrep TITEL  POTCAR                 # which datasets\ngrep ENMAX  POTCAR                 # default cutoffs\ngrep ZVAL   POTCAR                 # valence electrons\ngrep LEXCH  POTCAR                 # PE = PBE, CA = LDA"
+   },
+   "facts": [
+    "Mandatory. VASP uses the projector augmented-wave (PAW) method: frozen-core datasets that reconstruct the all-electron behaviour near the nucleus.",
+    "A multi-element POTCAR is the individual files concatenated in POSCAR order.",
+    "Each dataset lists the atomic mass (POMASS), the recommended cutoff (ENMAX), valence electrons (ZVAL), RWIGS and the functional (LEXCH).",
+    "Variants such as _pv, _sv (semicore states in valence), _h (hard), _s (soft) and _GW trade accuracy against cost."
+   ],
+   "watch": [
+    "VASP takes the exchange-correlation functional from LEXCH unless the INCAR tag GGA (or METAGGA, LHFCALC) overrides it. Keep POTCAR family and INCAR consistent."
+   ],
+   "fixed": [
+    {
+     "was": "ENCUT should generally be at least 1.25 to 1.5 × the highest ENMAX.",
+     "now": "For fixed-cell runs the largest ENMAX is already a usable minimum (still convergence-test it). The 1.3 × ENMAX rule is for variable-cell relaxations (ISIF ≥ 3) to reduce Pulay stress."
+    }
+   ],
+   "rel": [
+    "encut",
+    "poscar"
+   ]
+  }
+ ],
+ "TAGS": [
+  {
+   "id": "istart",
+   "name": "ISTART",
+   "def": "1 if WAVECAR exists, else 0",
+   "common": "0, 1",
+   "summary": "Whether to start from random wavefunctions or read WAVECAR.",
+   "facts": [
+    "<b>0</b>: new start, random wavefunctions. Use it when WAVECAR is corrupted or belongs to a different system.",
+    "<b>1</b>: continuation, read WAVECAR. The plane-wave basis is regenerated for the current cell at constant ENCUT. Use it after timeouts, when moving from coarse to accurate settings, or to start hard magnetic and metallic systems from a converged state.",
+    "<b>2</b>: continuation with a constant basis set (same plane waves as before). The effective cutoff changes with the cell. Used for energy-volume curves without Pulay-stress contamination.",
+    "<b>3</b>: full restart including wavefunction and charge-density extrapolation for MD (also reads TMPCAR)."
+   ],
+   "fixed": [
+    {
+     "was": "ISTART = 2: same as 1 but adjusts the basis set to a changed cell after ISIF = 3.",
+     "now": "It is the reverse: ISTART = 1 rebuilds the basis for the new cell at constant cutoff. ISTART = 2 keeps the old basis set fixed."
+    },
+    {
+     "was": "ISTART = 3: internal debugging.",
+     "now": "ISTART = 3 is a full restart for MD that also reuses the wavefunction and charge prediction from TMPCAR."
+    }
+   ],
+   "rel": [
+    "wavecar",
+    "icharg",
+    "lwave"
+   ]
+  },
+  {
+   "id": "icharg",
+   "name": "ICHARG",
+   "def": "2 if ISTART = 0, else 0",
+   "common": "1, 2, 11",
+   "summary": "How the initial charge density is built. Not in the original notes, but central to DOS and band workflows.",
+   "facts": [
+    "<b>0</b>: from the initial wavefunctions (WAVECAR).",
+    "<b>1</b>: read CHGCAR and continue self-consistency.",
+    "<b>2</b>: superposition of atomic charge densities (the usual fresh start).",
+    "<b>+10</b> (11, 12): the density is kept fixed (non-self-consistent). <b>11</b> reads CHGCAR: the standard setting for band structures and DOS."
+   ],
+   "watch": [
+    "ICHARG = 11 does not work with hybrid functionals; use zero-weight k-points instead.",
+    "The CHGCAR must come from the same structure, ENCUT, POTCAR and ISPIN."
+   ],
+   "rel": [
+    "chgcar",
+    "r-dos",
+    "r-bands"
+   ]
+  },
+  {
+   "id": "ispin",
+   "name": "ISPIN",
+   "def": "1",
+   "common": "1, 2",
+   "summary": "Spin polarization on (2) or off (1).",
+   "facts": [
+    "<b>1</b>: non-spin-polarized; each orbital holds two electrons. Faster, half the memory. Fine for non-magnetic materials (Si, water).",
+    "<b>2</b>: separate spin-up and spin-down wavefunctions. Needed for ferromagnets (Fe, Co, Ni), antiferromagnets, radicals, many defects and surfaces.",
+    "With ISPIN = 2, CHGCAR, DOSCAR and EIGENVAL hold two spin channels; OSZICAR reports the total moment (mag), and OUTCAR the site moments (LORBIT ≥ 10). CPU time and memory roughly double."
+   ],
+   "watch": [
+    "Without a sensible MAGMOM, VASP may converge to a non-magnetic or wrong magnetic state."
+   ],
+   "fixed": [
+    {
+     "was": "If ISPIN = 2 is set, MAGMOM must also be set.",
+     "now": "MAGMOM is not mandatory: it defaults to 1.0 μB on every atom (ferromagnetic). Set it explicitly for antiferromagnets, strongly magnetic ions or any specific ordering."
+    }
+   ],
+   "rel": [
+    "magmom",
+    "lorbit",
+    "r-mag",
+    "t-moment"
+   ]
+  },
+  {
+   "id": "magmom",
+   "name": "MAGMOM",
+   "def": "NIONS*1.0 (ISPIN = 2)",
+   "common": "e.g. 4*3.0  2*3.0 2*-3.0",
+   "summary": "Initial magnetic moment on each atom (μB), the starting guess for the spin density.",
+   "code": {
+    "cap": "Formats",
+    "txt": "MAGMOM = 8*2.2              ! 8 atoms, all 2.2 μB\nMAGMOM = 2*4.0 2*-4.0        ! collinear AFM: 2 up, 2 down\nMAGMOM = 0 0 4.0  0 0 -4.0   ! non-collinear: x y z per atom (LNONCOLLINEAR or LSORBIT)"
+   },
+   "facts": [
+    "One value per atom, in POSCAR order. Final moments (OSZICAR, OUTCAR) usually differ from the input; VASP relaxes them.",
+    "Start slightly above the expected moment, e.g. Fe ≈ 3, Co ≈ 2, Ni ≈ 1, high-spin Mn²⁺/Fe³⁺ ≈ 5.",
+    "VASP includes MAGMOM in its symmetry analysis, so an AFM pattern automatically lowers the symmetry."
+   ],
+   "watch": [
+    "If spins are forced to stay equivalent, check that the MAGMOM pattern distinguishes the sites. For non-collinear runs or spontaneous symmetry breaking beyond the starting pattern, use ISYM = 0 or slightly distort the structure."
+   ],
+   "note": [
+    {
+     "was": "VASP forces equal moments even when MAGMOM differs, because the crystal symmetry is too high.",
+     "now": "In collinear runs VASP lowers the symmetry according to MAGMOM, so differing moments are normally kept apart. Equal moments usually mean the MAGMOM pattern did not distinguish the sites, or the state relaxed back."
+    }
+   ],
+   "rel": [
+    "ispin",
+    "isym",
+    "r-mag",
+    "t-afm"
+   ]
+  },
+  {
+   "id": "lorbit",
+   "name": "LORBIT",
+   "def": "not set (no projections)",
+   "common": "10, 11",
+   "summary": "Writes atom- and orbital-projected DOS (DOSCAR) and band projections (PROCAR).",
+   "facts": [
+    "<b>10</b>: projections onto s, p, d (f) per atom.",
+    "<b>11</b>: as 10, further resolved into p<sub>x</sub>, p<sub>y</sub>, p<sub>z</sub>, d<sub>xy</sub>… The usual choice.",
+    "<b>12</b>: as 11, plus complex phase factors in PROCAR.",
+    "For 10–12 the sphere radii come from the POTCAR (RWIGS there); for LORBIT = 0–2 RWIGS must be set in INCAR.",
+    "Also prints site-resolved charges and magnetic moments (s, p, d) in OUTCAR."
+   ],
+   "use": [
+    "Is a DOS peak metal-d or oxygen-p?",
+    "Which atoms carry the magnetic moment?",
+    "What dominates the top of the valence band?"
+   ],
+   "fixed": [
+    {
+     "was": "LORBIT = 11 includes phase information.",
+     "now": "Phase factors come only with LORBIT = 12."
+    },
+    {
+     "was": "LORBIT = 12 uses a different projection grid for symmetry-based analysis.",
+     "now": "LORBIT = 12 uses the same projections as 11 and adds the phase factors to PROCAR."
+    }
+   ],
+   "rel": [
+    "doscar",
+    "procar",
+    "outcar"
+   ]
+  },
+  {
+   "id": "lreal",
+   "name": "LREAL",
+   "def": ".FALSE.",
+   "common": ".FALSE., Auto",
+   "summary": "Evaluate the non-local projectors in reciprocal (accurate) or real space (fast for large cells).",
+   "facts": [
+    "<b>.FALSE.</b>: reciprocal space. Most accurate; cost grows faster with system size. Preferred for small cells, phonons, linear response and exact exchange.",
+    "<b>Auto</b>: real space with automatically optimized projectors. Recommended for cells above roughly 20 atoms.",
+    "<b>On</b>: real space with optimized projectors, precision set manually through ROPT. <b>.TRUE.</b>: real space with non-optimized projectors (legacy)."
+   ],
+   "watch": [
+    "Avoid real-space projection for small cells (< ~20 atoms), very tight force/stress convergence, and linear-response calculations (LEPSILON, IBRION = 7/8).",
+    "Real-space projection adds small errors to forces; VASP prints a warning when it thinks they are significant."
+   ],
+   "rel": [
+    "prec",
+    "ncore",
+    "t-slow"
+   ]
+  },
+  {
+   "id": "encut",
+   "name": "ENCUT",
+   "def": "largest ENMAX in POTCAR",
+   "common": "400–600 eV",
+   "summary": "Plane-wave kinetic-energy cutoff (eV): size of the basis set, the main accuracy-versus-cost knob.",
+   "facts": [
+    "Higher ENCUT means more plane waves, a more complete basis, more memory and CPU time.",
+    "If ENCUT is too low, stress and pressure suffer from Pulay stress: the basis set is not converged with respect to volume changes.",
+    "Default: largest ENMAX of the POTCAR datasets (PREC = Normal/Accurate); PREC = High sets 1.3 × ENMAX."
+   ],
+   "use": [
+    "Convergence test: static runs at e.g. 400, 450, 500, 550 eV until the property you care about stops changing.",
+    "Variable-cell relaxations: use ≈ 1.3 × max ENMAX."
+   ],
+   "watch": [
+    "Use the same ENCUT for every calculation whose energies you compare."
+   ],
+   "rel": [
+    "potcar",
+    "prec",
+    "isif",
+    "t-pulay"
+   ]
+  },
+  {
+   "id": "prec",
+   "name": "PREC",
+   "def": "Normal",
+   "common": "Normal, Accurate",
+   "summary": "Sets FFT-grid density (and the cutoff, when ENCUT is not given) for a consistent precision level.",
+   "facts": [
+    "<b>Normal</b>: standard for relaxations and MD; small wrap-around errors are possible.",
+    "<b>Accurate</b>: denser grids that avoid wrap-around errors. Recommended for production forces, stress, phonons.",
+    "<b>High</b>: legacy; like Accurate with ENCUT = 1.3 × ENMAX. Prefer Accurate plus an explicit ENCUT.",
+    "<b>Low</b>: coarse grids for rough pre-relaxation of large systems.",
+    "<b>Single</b> (VASP 6): like Accurate, but the augmentation grid equals the coarse grid (one grid instead of two), saving memory."
+   ],
+   "fixed": [
+    {
+     "was": "PREC = Single uses single-precision FFTs.",
+     "now": "\"Single\" refers to using a single FFT grid (the fine augmentation grid equals the coarse grid), not single-precision arithmetic."
+    }
+   ],
+   "rel": [
+    "encut",
+    "addgrid"
+   ]
+  },
+  {
+   "id": "lwave",
+   "name": "LWAVE",
+   "def": ".TRUE.",
+   "common": ".TRUE., .FALSE.",
+   "summary": "Whether WAVECAR is written at the end of the run.",
+   "facts": [
+    "<b>.TRUE.</b>: write WAVECAR, for restarts and wavefunction-based post-processing (GW, BSE, LPARD, Wannier90).",
+    "<b>.FALSE.</b>: skip it to save disk space and I/O; common in large relaxations, MD and high-throughput work."
+   ],
+   "use": [
+    "After relaxation, run a final static step with LWAVE = .TRUE. when later steps need wavefunctions."
+   ],
+   "rel": [
+    "wavecar",
+    "lcharg"
+   ]
+  },
+  {
+   "id": "lcharg",
+   "name": "LCHARG",
+   "def": ".TRUE.",
+   "common": ".TRUE., .FALSE.",
+   "summary": "Whether CHG and CHGCAR are written.",
+   "facts": [
+    "<b>.TRUE.</b>: write the density, needed for restarts, non-self-consistent DOS and band runs, Bader and density-difference analysis.",
+    "<b>.FALSE.</b>: skip it to save disk and I/O, e.g. in long MD runs or screening."
+   ],
+   "use": [
+    "Set it in the static SCF run that feeds your DOS, bands or Bader analysis."
+   ],
+   "watch": [
+    "Lost CHGCAR but still have the WAVECAR? Rerun with ISTART = 1, ICHARG = 0, NSW = 0; it converges within a few steps and writes a fresh CHGCAR."
+   ],
+   "note": [
+    {
+     "was": "Regenerate CHGCAR by a single electronic step (NSW = 0) with ISTART = 1.",
+     "now": "NSW = 0 means one ionic step, not one electronic step. Use ISTART = 1 with ICHARG = 0 and let the short SCF finish so the density is consistent."
+    }
+   ],
+   "rel": [
+    "chgcar",
+    "chg",
+    "icharg"
+   ]
+  },
+  {
+   "id": "addgrid",
+   "name": "ADDGRID",
+   "def": ".FALSE.",
+   "common": ".FALSE., .TRUE.",
+   "summary": "An extra, finer grid for evaluating augmentation charges.",
+   "facts": [
+    "<b>.TRUE.</b>: augmentation charges are evaluated on a grid twice as dense in each direction. This can reduce noise in forces and the egg-box effect (energy varying as an atom moves relative to the grid).",
+    "With PREC = Accurate the gain is usually small. It is most often used for finite-difference phonons and very tight force criteria."
+   ],
+   "watch": [
+    "Do not treat it as a general convergence fix; test whether it actually changes your forces."
+   ],
+   "fixed": [
+    {
+     "was": "It is particularly helpful for HSE06 calculations to stabilize electronic convergence.",
+     "now": "ADDGRID has no established role in hybrid-functional SCF convergence. For difficult HSE runs, adjust ALGO (Damped/All) and start from a converged PBE WAVECAR."
+    }
+   ],
+   "rel": [
+    "prec",
+    "ediffg",
+    "algo"
+   ]
+  },
+  {
+   "id": "kpar",
+   "name": "KPAR",
+   "def": "1",
+   "common": "2, 4, number of nodes",
+   "summary": "Parallelization over k-points.",
+   "facts": [
+    "KPAR = 1: all MPI ranks work on each k-point in turn.",
+    "KPAR > 1: ranks split into KPAR groups, each handling its own subset of k-points at the same time. Little communication between groups, so speed-up is often close to linear.",
+    "Memory grows with KPAR, since each group holds its own copies of large arrays."
+   ],
+   "watch": [
+    "The number of MPI ranks must be divisible by KPAR. For good load balance choose KPAR so the irreducible k-points (IBZKPT) divide evenly among the groups."
+   ],
+   "fixed": [
+    {
+     "was": "KPAR must be a divisor of the total number of k-points.",
+     "now": "That is not required; uneven division only causes load imbalance. The hard requirement is that the number of MPI ranks is divisible by KPAR."
+    }
+   ],
+   "rel": [
+    "ncore",
+    "ibzkpt",
+    "t-slow"
+   ]
+  },
+  {
+   "id": "ncore",
+   "name": "NCORE",
+   "def": "1",
+   "common": "4–16 (≈ cores per socket)",
+   "summary": "Number of cores that work together on one orbital (band).",
+   "facts": [
+    "NCORE and the older NPAR describe the same split (NPAR = ranks / NCORE). NCORE is easier because it does not depend on the total number of ranks.",
+    "Typical good values lie between 4 and the number of cores per socket; on a 32-core node try 4, 8 and 16 and time a few electronic steps.",
+    "Reduces communication between nodes; most valuable for large supercells with few k-points."
+   ],
+   "watch": [
+    "GPU (OpenACC) builds require NCORE = 1. With OpenMP threading, NCORE is set automatically."
+   ],
+   "fixed": [
+    {
+     "was": "NCORE was added to replace NPAR and is more efficient because it scales better.",
+     "now": "Both tags still exist and set the same parallel layout. NCORE is simply more convenient to set; neither is more efficient for the same layout."
+    },
+    {
+     "was": "Setting NCORE equal to cores per node (e.g. 32) is the sweet spot.",
+     "now": "The optimum is usually smaller (cores per socket or less). Benchmark rather than assume."
+    }
+   ],
+   "rel": [
+    "kpar",
+    "lreal",
+    "t-slow"
+   ]
+  },
+  {
+   "id": "algo",
+   "name": "ALGO",
+   "def": "Normal",
+   "common": "Normal, Fast, All, Damped",
+   "summary": "Electronic minimization algorithm. Not in the original notes; the first knob for SCF problems.",
+   "facts": [
+    "<b>Normal</b>: blocked Davidson. Robust.",
+    "<b>Fast</b>: Davidson for the first steps, then RMM-DIIS. Faster; good default for most bulk work.",
+    "<b>VeryFast</b>: RMM-DIIS only. Fast but fragile.",
+    "<b>All</b> (Conjugate): all bands updated together. Robust for difficult metals, magnetic systems and hybrids.",
+    "<b>Damped</b>: damped MD of the wavefunctions; recommended for hybrid functionals and hard cases."
+   ],
+   "rel": [
+    "nelm",
+    "t-scf",
+    "r-hse"
+   ]
+  },
+  {
+   "id": "ismear",
+   "name": "ISMEAR / SIGMA",
+   "def": "ISMEAR = 1, SIGMA = 0.2",
+   "common": "0 / 0.05;  1 / 0.2;  −5",
+   "summary": "How partial occupancies near the Fermi level are smeared, and the smearing width (eV).",
+   "facts": [
+    "<b>−5</b>, tetrahedron with Blöchl corrections: accurate total energies and DOS for bulk. Needs at least 4 k-points. Do not use for relaxations of metals (forces are inaccurate). SIGMA is not used for the occupations.",
+    "<b>0</b>, Gaussian: safe for any system and for few k-points. Use SIGMA ≈ 0.03–0.05 for semiconductors and insulators; quote E0 (σ → 0).",
+    "<b>1</b> or <b>2</b>, Methfessel–Paxton: good for metals, SIGMA ≈ 0.1–0.2.",
+    "<b>−1</b>, Fermi–Dirac: physical electronic temperature (finite-temperature DFT).",
+    "Check the entropy term T·S in OUTCAR: divided by the number of atoms it should stay below about 1 meV/atom. If larger, reduce SIGMA."
+   ],
+   "use": [
+    "Metals: relax with ISMEAR = 1, then a final static run with ISMEAR = −5.",
+    "Unknown or mixed system: ISMEAR = 0, SIGMA = 0.05."
+   ],
+   "watch": [
+    "Never use Methfessel–Paxton (ISMEAR > 0) for semiconductors or insulators: occupations can become unphysical and energies wrong.",
+    "The default ISMEAR = 1, SIGMA = 0.2 is wrong for insulators. Always set ISMEAR explicitly."
+   ],
+   "fixed": [
+    {
+     "was": "If ISMEAR = 0, 1 or 2 is used, SIGMA must also be set.",
+     "now": "SIGMA has a default (0.2 eV), but that default suits metals only. Set it explicitly every time."
+    }
+   ],
+   "rel": [
+    "doscar",
+    "t-tetra",
+    "t-entropy"
+   ]
+  },
+  {
+   "id": "nelm",
+   "name": "NELM / NELMIN",
+   "def": "NELM = 60, NELMIN = 2",
+   "common": "NELM 100–200; NELMIN 4–8",
+   "summary": "Maximum and minimum number of electronic steps per ionic step.",
+   "facts": [
+    "<b>NELM</b>: hard limit on electronic steps. Reaching it means the step is unconverged, but VASP proceeds to the next ionic step anyway.",
+    "<b>NELMIN</b>: forces at least this many steps, so the loop cannot stop \"by accident\" after the ions move. 4–8 is recommended for relaxations and MD; 8 or more for difficult systems and hybrids.",
+    "If forces in OUTCAR look noisy or inconsistent between steps, raising NELMIN (and tightening EDIFF) helps."
+   ],
+   "rel": [
+    "ediff",
+    "algo",
+    "oszicar",
+    "t-scf"
+   ]
+  },
+  {
+   "id": "ediff",
+   "name": "EDIFF",
+   "def": "1E-4",
+   "common": "1E-5 – 1E-7",
+   "summary": "Stopping criterion (eV) for the electronic self-consistency loop.",
+   "facts": [
+    "The SCF loop stops when both the total free energy and the band-structure energy change by less than EDIFF between steps.",
+    "EDIFF is a total-energy criterion, not per atom, so large cells effectively need a tighter value.",
+    "Too loose → noisy forces and stress, which confuse the ionic optimizer. If a relaxation won't converge, tighten EDIFF first.",
+    "EDIFF = 0 makes VASP always run exactly NELM steps."
+   ],
+   "tbl": {
+    "head": [
+     "Purpose",
+     "EDIFF (eV)"
+    ],
+    "rows": [
+     [
+      "Standard relaxation",
+      "1E-4 – 1E-5"
+     ],
+     [
+      "Production energies",
+      "1E-6"
+     ],
+     [
+      "Phonons, finite differences",
+      "1E-7 – 1E-8"
+     ],
+     [
+      "NMR, chemical shielding",
+      "1E-8"
+     ]
+    ]
+   },
+   "rel": [
+    "ediffg",
+    "nelm",
+    "oszicar"
+   ]
+  },
+  {
+   "id": "nsw",
+   "name": "NSW",
+   "def": "0",
+   "common": "0, 100–300, MD length",
+   "summary": "Maximum number of ionic steps.",
+   "facts": [
+    "<b>0</b>: one ionic step, no movement. Static energies, DOS, bands.",
+    "<b>Relaxation</b> (IBRION = 1, 2, 3): upper limit on steps. If reached before EDIFFG is met, copy CONTCAR to POSCAR and restart.",
+    "<b>MD</b> (IBRION = 0): exactly the number of time steps."
+   ],
+   "watch": [
+    "Setting NSW > 1 without IBRION gives IBRION = 0, i.e. molecular dynamics, not a relaxation."
+   ],
+   "fixed": [
+    {
+     "was": "VASP exits immediately if NSW is not given for an MD run.",
+     "now": "With the default NSW = 0, IBRION = 0 simply performs no MD steps. Always set NSW for MD."
+    }
+   ],
+   "rel": [
+    "ibrion",
+    "ediffg",
+    "t-md"
+   ]
+  },
+  {
+   "id": "ibrion",
+   "name": "IBRION",
+   "def": "−1 if NSW ≤ 1, else 0 (MD!)",
+   "common": "−1, 0, 1, 2, 5, 6",
+   "summary": "How the ions move: static, molecular dynamics, relaxation algorithm, or phonons.",
+   "facts": [
+    "<b>−1</b>: no ionic movement (static).",
+    "<b>0</b>: ab initio MD. Set POTIM (time step) and NSW; choose a thermostat with MDALGO and TEBEG/TEEND.",
+    "<b>1</b>: RMM-DIIS quasi-Newton. Efficient close to the minimum, can be unstable when forces are large.",
+    "<b>2</b>: conjugate gradient. Robust standard for starting relaxations from rough structures.",
+    "<b>3</b>: damped MD. Useful for poor starting geometries and NEB.",
+    "<b>5 / 6</b>: finite-difference force constants (phonons, Γ-point frequencies). 5 displaces every atom in every direction; 6 uses symmetry to reduce displacements and, with ISIF ≥ 3, also gives elastic constants.",
+    "<b>7 / 8</b>: the same via density-functional perturbation theory."
+   ],
+   "use": [
+    "Difficult relaxation: IBRION = 2 for the first ~50 steps, then IBRION = 1 to finish."
+   ],
+   "rel": [
+    "nsw",
+    "potim",
+    "isif",
+    "ediffg"
+   ]
+  },
+  {
+   "id": "potim",
+   "name": "POTIM",
+   "def": "0.5 (IBRION 1–3); none for MD",
+   "common": "MD: 0.5–2 fs; relax: 0.1–0.5",
+   "summary": "MD time step (fs), or step-width scaling for relaxations. Not in the original notes.",
+   "facts": [
+    "MD: the time step in fs. About 0.5 fs with hydrogen, 1–2 fs for heavier atoms. Check the drift of E in OSZICAR.",
+    "IBRION = 1, 2, 3: scales the trial step. Reduce it (e.g. 0.1) when a relaxation oscillates.",
+    "IBRION = 5, 6: the displacement amplitude (default 0.015 Å)."
+   ],
+   "rel": [
+    "ibrion",
+    "r-md",
+    "t-relax"
+   ]
+  },
+  {
+   "id": "isif",
+   "name": "ISIF",
+   "def": "2 (relax), 0 (MD)",
+   "common": "2, 3, 4",
+   "summary": "Which degrees of freedom relax (ions, cell shape, volume) and whether stress is computed.",
+   "tbl": {
+    "cls": "tbl-isif",
+    "head": [
+     "ISIF",
+     "Stress",
+     "Ions",
+     "Shape",
+     "Volume",
+     "Typical use"
+    ],
+    "rows": [
+     [
+      "0",
+      "no",
+      "yes",
+      "no",
+      "no",
+      "MD without stress (fastest)"
+     ],
+     [
+      "1",
+      "trace",
+      "yes",
+      "no",
+      "no",
+      "Rarely used"
+     ],
+     [
+      "2",
+      "yes",
+      "yes",
+      "no",
+      "no",
+      "Fixed-cell relaxation: defects, surfaces, slabs"
+     ],
+     [
+      "3",
+      "yes",
+      "yes",
+      "yes",
+      "yes",
+      "Full relaxation of bulk crystals"
+     ],
+     [
+      "4",
+      "yes",
+      "yes",
+      "yes",
+      "no",
+      "Relax at fixed volume; energy-volume curves"
+     ],
+     [
+      "5",
+      "yes",
+      "no",
+      "yes",
+      "no",
+      "Cell shape only"
+     ],
+     [
+      "6",
+      "yes",
+      "no",
+      "yes",
+      "yes",
+      "Cell shape and volume, ions fixed"
+     ],
+     [
+      "7",
+      "yes",
+      "no",
+      "no",
+      "yes",
+      "Isotropic volume change only"
+     ],
+     [
+      "8",
+      "yes",
+      "yes",
+      "no",
+      "yes",
+      "Ions + volume (VASP 6)"
+     ]
+    ]
+   },
+   "facts": [
+    "Needs IBRION > 0 and NSW > 0 to move anything.",
+    "Slabs and surfaces: ISIF = 2. ISIF = 3 would shrink the vacuum.",
+    "ISIF = 3 keeps the initial space group (a cubic cell stays cubic) unless the symmetry is broken in the input."
+   ],
+   "watch": [
+    "With ISIF ≥ 3 use ENCUT ≈ 1.3 × ENMAX and re-relax from CONTCAR until the cell is stable; see \"Lattice keeps changing\"."
+   ],
+   "fixed": [
+    {
+     "was": "ISIF = 7 is used for fitting an equation of state.",
+     "now": "An equation of state is usually fitted from a series of fixed-volume calculations (ISIF = 4, or ISIF = 2 for cubic cells at scaled volumes). ISIF = 7 relaxes the volume isotropically."
+    }
+   ],
+   "rel": [
+    "ibrion",
+    "encut",
+    "t-pulay",
+    "t-slab"
+   ]
+  },
+  {
+   "id": "ediffg",
+   "name": "EDIFFG",
+   "def": "EDIFF × 10",
+   "common": "−0.01 to −0.05",
+   "summary": "Stopping criterion for the ionic relaxation.",
+   "facts": [
+    "<b>Positive</b>: stop when the total-energy change between ionic steps is below EDIFFG (eV).",
+    "<b>Negative</b>: stop when the force on every atom is below |EDIFFG| (eV/Å). More reliable for finding the true minimum.",
+    "The force criterion ignores stress. In ISIF = 3 runs, check the stress (OUTCAR \"in kB\") separately.",
+    "A tight EDIFFG needs a tight EDIFF (e.g. −0.005 with 1E-7); otherwise noisy forces keep the ions \"chattering\" around the minimum."
+   ],
+   "tbl": {
+    "head": [
+     "Precision",
+     "EDIFFG (eV/Å)",
+     "Typical application"
+    ],
+    "rows": [
+     [
+      "Screening",
+      "−0.03 – −0.05",
+      "Bulk, rough relaxations"
+     ],
+     [
+      "Standard",
+      "−0.01 – −0.02",
+      "Publication-quality structures"
+     ],
+     [
+      "Tight",
+      "−0.001 – −0.005",
+      "Phonons, finite differences"
+     ],
+     [
+      "NEB",
+      "−0.01 – −0.05",
+      "Transition states (VTST)"
+     ]
+    ]
+   },
+   "use": [
+    "Forces stuck just above the limit? Tighten EDIFF, set POTIM ≈ 0.1, switch IBRION 2 → 1 for the last steps, then optionally try ADDGRID."
+   ],
+   "fixed": [
+    {
+     "was": "Ultra-high −0.001 for phonons and NEB.",
+     "now": "−0.001 is typical before phonon calculations. NEB runs normally use −0.01 to −0.05; −0.001 is rarely reachable on a band of images."
+    }
+   ],
+   "rel": [
+    "ediff",
+    "ibrion",
+    "outcar",
+    "t-relax"
+   ]
+  },
+  {
+   "id": "isym",
+   "name": "ISYM",
+   "def": "2 (PAW); 3 with hybrids",
+   "common": "2, 0, −1",
+   "summary": "How VASP uses symmetry.",
+   "facts": [
+    "<b>2</b>: full symmetry; k-points reduced to the IBZ, densities symmetrized.",
+    "<b>0</b>: no space-group symmetry, but time reversal is still used (k and −k equivalent).",
+    "<b>−1</b>: no symmetry at all, including time reversal; full k-mesh."
+   ],
+   "use": [
+    "MD: set ISYM = 0, because atoms leave the initial symmetry immediately.",
+    "Spontaneous symmetry breaking (magnetic, Jahn–Teller, distortions): ISYM = 0.",
+    "Troubleshooting some HSE runs with shifted meshes: ISYM = 0.",
+    "Phonopy and similar codes: generate displacements with the external code and keep VASP's symmetry handling consistent with its documentation."
+   ],
+   "fixed": [
+    {
+     "was": "ISYM = −1: no k-point reduction, but symmetry still used elsewhere.",
+     "now": "ISYM = −1 switches off all symmetry, including time reversal. ISYM = 0 is the setting that drops space-group symmetry but keeps time reversal."
+    }
+   ],
+   "rel": [
+    "ibzkpt",
+    "magmom",
+    "t-afm"
+   ]
+  },
+  {
+   "id": "nedos",
+   "name": "NEDOS / EMIN / EMAX",
+   "def": "NEDOS = 301",
+   "common": "2000–5000",
+   "summary": "Energy grid of the DOS.",
+   "facts": [
+    "NEDOS: number of energy points. The default 301 is far too coarse for publication plots.",
+    "EMIN, EMAX: absolute energy window (eV). Choose it around the Fermi level of the SCF run."
+   ],
+   "rel": [
+    "doscar",
+    "r-dos"
+   ]
+  }
+ ],
+ "TROUBLE": [
+  {
+   "phase": "Starting a run",
+   "items": [
+    {
+     "id": "t-crash",
+     "symptom": "The job died. Where do I look first?",
+     "signs": "tail -30 vasp.out    (standard output / scheduler log)\ntail -5  OSZICAR     (electronic or ionic phase?)\ntail -40 OUTCAR      (last thing VASP did)",
+     "cause": "VASP prints errors to standard output, not to OUTCAR. OSZICAR tells you whether the run stopped during an electronic loop or between ionic steps.",
+     "fix": [
+      "Read the error text in standard output and search this handbook for its keyword.",
+      "No message at all: usually wall-time limit or out of memory. Check the scheduler log.",
+      "Before restarting, check CONTCAR and WAVECAR are not empty."
+     ],
+     "rel": [
+      "outcar",
+      "oszicar",
+      "others"
+     ]
+    },
+    {
+     "id": "t-wavecar",
+     "symptom": "\"Error reading WAVECAR\" or the run stops right after start-up",
+     "signs": "ls -l WAVECAR     → 0 bytes",
+     "cause": "The previous job was killed while writing WAVECAR, or it comes from a different build, k-mesh or spin setting.",
+     "fix": [
+      "Delete the WAVECAR, or set ISTART = 0.",
+      "Restart from CONTCAR (copied to POSCAR) if the geometry is worth keeping."
+     ],
+     "rel": [
+      "wavecar",
+      "istart"
+     ]
+    },
+    {
+     "id": "t-ions",
+     "symptom": "\"The distance between some ions is very small\"",
+     "signs": "Warning in standard output / OUTCAR",
+     "cause": "Coordinates in the wrong mode (Cartesian read as Direct or vice versa), a wrong scaling factor, or duplicated atoms.",
+     "fix": [
+      "Open POSCAR in VESTA and look at it.",
+      "Check the Direct/Cartesian line and line 2 (scale).",
+      "Check the atom counts on line 7 match the coordinates."
+     ],
+     "rel": [
+      "poscar"
+     ]
+    },
+    {
+     "id": "t-ibzkpt",
+     "symptom": "\"VERY BAD NEWS! internal error in subroutine IBZKPT: Reciprocal lattice and k-lattice belong to different class of lattices\"",
+     "signs": "Appears during setup",
+     "cause": "The k-mesh does not share the lattice's symmetry: typically a shifted Monkhorst-Pack mesh on a hexagonal or fcc cell, or unequal subdivisions on equivalent axes.",
+     "fix": [
+      "Switch to a Γ-centred mesh.",
+      "Use the same subdivision along symmetry-equivalent directions.",
+      "Last resort: ISYM = 0."
+     ],
+     "rel": [
+      "kpoints",
+      "isym"
+     ]
+    },
+    {
+     "id": "t-tetra",
+     "symptom": "\"Tetrahedron method fails for NKPT<4\"",
+     "signs": "Error at start-up",
+     "cause": "ISMEAR = −5 needs at least 4 irreducible k-points; large supercells or Γ-only runs have fewer.",
+     "fix": [
+      "Use ISMEAR = 0 with SIGMA = 0.05.",
+      "Or increase the k-mesh if the cell is small."
+     ],
+     "rel": [
+      "ismear",
+      "kpoints"
+     ]
+    },
+    {
+     "id": "t-md",
+     "symptom": "I asked for a relaxation but OSZICAR shows temperatures (T=) and the atoms fly around",
+     "signs": "OSZICAR lines like:  1 T= 312. E= ... EK= ...",
+     "cause": "NSW > 1 was set without IBRION, so IBRION defaulted to 0 (molecular dynamics).",
+     "fix": [
+      "Set IBRION = 2 (or 1) explicitly in every relaxation INCAR."
+     ],
+     "rel": [
+      "ibrion",
+      "nsw"
+     ]
+    },
+    {
+     "id": "t-prim",
+     "symptom": "\"Found a more primitive cell\" / Bravais-lattice warnings",
+     "signs": "Warning in standard output / OUTCAR",
+     "cause": "Your supercell has a smaller primitive cell, or the lattice symmetry VASP detects differs from the one you set.",
+     "fix": [
+      "Usually harmless for intended supercells.",
+      "If unexpected, compare the space group in OUTCAR with the one you meant to build."
+     ],
+     "rel": [
+      "outcar",
+      "isym"
+     ]
+    }
+   ]
+  },
+  {
+   "phase": "Electronic convergence",
+   "items": [
+    {
+     "id": "t-scf",
+     "symptom": "Electronic loop does not converge (NELM reached, dE oscillates or stalls)",
+     "signs": "OSZICAR: 60 DAV/RMM lines per ionic step, dE jumping by ±1E-2",
+     "cause": "Charge sloshing in metals, slabs or large cells; a poor starting guess; a magnetic state flipping between solutions; too few empty bands; an unsuitable algorithm.",
+     "fix": [
+      "Check the structure first: overlapping atoms or a broken geometry cause most \"unconvergeable\" cases.",
+      "ALGO = All (or Damped), and raise NELM to 150–200.",
+      "Reduce mixing: AMIX = 0.1, BMIX = 0.0001 (linear mixing for slabs and charge sloshing); for magnets also AMIX_MAG = 0.4, BMIX_MAG = 0.0001.",
+      "Slightly larger smearing for metals (SIGMA 0.1–0.2) during the hard phase.",
+      "Increase NBANDS by ~20% when the highest bands are occupied.",
+      "Start from a converged WAVECAR of a simpler setting (e.g. PBE before HSE, or non-magnetic before magnetic)."
+     ],
+     "rel": [
+      "algo",
+      "nelm",
+      "ediff",
+      "oszicar"
+     ]
+    },
+    {
+     "id": "t-zhegv",
+     "symptom": "\"Sub-Space-Matrix is not hermitian in DAV\" or \"Error EDDDAV: Call to ZHEGV failed\"",
+     "signs": "Error in standard output during the Davidson step",
+     "cause": "Numerical breakdown of the Davidson diagonalization, often from a bad geometry, an unstable start, or aggressive settings.",
+     "fix": [
+      "Check the geometry for very short distances.",
+      "Change ALGO (e.g. Normal → Fast, or All).",
+      "Restart without WAVECAR (ISTART = 0).",
+      "Try a different NCORE or fewer ranks to rule out parallel issues."
+     ],
+     "rel": [
+      "algo",
+      "ncore"
+     ]
+    },
+    {
+     "id": "t-brmix",
+     "symptom": "\"BRMIX: very serious problems the old and the new charge density differ\"",
+     "signs": "Warning in standard output",
+     "cause": "The density read or mixed is inconsistent with the current setup, often after restarting with a changed structure, cell or symmetry.",
+     "fix": [
+      "Restart without CHGCAR/WAVECAR (ICHARG = 2, ISTART = 0).",
+      "Set ISYM = 0 if symmetry changes between steps.",
+      "Reduce AMIX/BMIX if it recurs during normal SCF."
+     ],
+     "rel": [
+      "icharg",
+      "isym"
+     ]
+    },
+    {
+     "id": "t-entropy",
+     "symptom": "Large \"entropy T*S\" in OUTCAR",
+     "signs": "grep \"EENTRO\" OUTCAR | tail -1",
+     "cause": "SIGMA is too large for the system, so the smeared energy is far from the zero-smearing energy.",
+     "fix": [
+      "Reduce SIGMA until |T·S| / atoms < 1 meV/atom.",
+      "For insulators use ISMEAR = 0 with SIGMA = 0.05, or ISMEAR = −5 for static runs."
+     ],
+     "rel": [
+      "ismear"
+     ]
+    }
+   ]
+  },
+  {
+   "phase": "Ionic relaxation",
+   "items": [
+    {
+     "id": "t-relax",
+     "symptom": "Relaxation does not finish in NSW steps, or forces oscillate just above EDIFFG",
+     "signs": "OSZICAR energies go up and down; OUTCAR never prints \"reached required accuracy\"",
+     "cause": "Noisy forces from loose electronic convergence, a step size too large near the minimum, or a very flat energy surface.",
+     "fix": [
+      "Copy CONTCAR to POSCAR and continue.",
+      "Tighten EDIFF (1E-6 or 1E-7) and set NELMIN = 4–6.",
+      "Reduce POTIM to ~0.1.",
+      "Switch IBRION = 2 → 1 for the final steps (or 3 for poor starts).",
+      "Use PREC = Accurate and LREAL = .FALSE. for small cells; test ADDGRID."
+     ],
+     "rel": [
+      "ediffg",
+      "ediff",
+      "potim",
+      "ibrion"
+     ]
+    },
+    {
+     "id": "t-zbrent",
+     "symptom": "\"ZBRENT: fatal error in bracketing\"",
+     "signs": "Error in standard output during an IBRION = 2 relaxation",
+     "cause": "The conjugate-gradient line search could not bracket a minimum, usually because forces are noisy or the structure is already near the minimum.",
+     "fix": [
+      "Copy CONTCAR to POSCAR and restart.",
+      "Tighten EDIFF.",
+      "Switch to IBRION = 1, or reduce POTIM.",
+      "If forces are already below your target, the structure may simply be converged."
+     ],
+     "rel": [
+      "ibrion",
+      "ediff",
+      "contcar"
+     ]
+    },
+    {
+     "id": "t-pulay",
+     "symptom": "Lattice keeps changing when I rerun ISIF = 3, or static energy disagrees with the relaxation",
+     "signs": "OUTCAR \"external pressure\" and \"Pulay stress\"; volume differs between successive runs",
+     "cause": "Pulay stress. The plane-wave basis is set up for the starting cell; as the volume changes, the effective cutoff changes and the stress is biased.",
+     "fix": [
+      "Use ENCUT ≈ 1.3 × max ENMAX for cell relaxations.",
+      "Rerun from CONTCAR until the volume no longer changes (normally 2–3 rounds).",
+      "Finish with a static run at the final structure."
+     ],
+     "rel": [
+      "encut",
+      "isif",
+      "istart"
+     ]
+    },
+    {
+     "id": "t-slab",
+     "symptom": "My slab's vacuum layer disappeared",
+     "signs": "c lattice vector shrinks in CONTCAR",
+     "cause": "ISIF = 3 relaxes the cell; the vacuum has no stress to resist compression.",
+     "fix": [
+      "Use ISIF = 2 for slabs, surfaces and molecules in a box."
+     ],
+     "rel": [
+      "isif"
+     ]
+    }
+   ]
+  },
+  {
+   "phase": "Magnetism",
+   "items": [
+    {
+     "id": "t-moment",
+     "symptom": "The magnetic moment collapses to zero",
+     "signs": "OSZICAR \"mag=\" tends to 0.000",
+     "cause": "ISPIN = 1 by mistake, an initial moment too small to reach the magnetic minimum, or a genuinely non-magnetic ground state.",
+     "fix": [
+      "Check ISPIN = 2.",
+      "Set MAGMOM somewhat above the expected value.",
+      "Compare energies of magnetic and non-magnetic solutions to see which is lower."
+     ],
+     "rel": [
+      "ispin",
+      "magmom"
+     ]
+    },
+    {
+     "id": "t-afm",
+     "symptom": "An antiferromagnetic start ends ferromagnetic, or moments are forced equal",
+     "signs": "OUTCAR \"magnetization (x)\" shows equal signs on all sites",
+     "cause": "MAGMOM does not encode the AFM pattern in POSCAR order, or the cell is too small to hold the AFM order.",
+     "fix": [
+      "Check the MAGMOM order against POSCAR.",
+      "Use a supercell that accommodates the ordering.",
+      "ISYM = 0 if you need symmetry breaking beyond the starting pattern."
+     ],
+     "rel": [
+      "magmom",
+      "isym"
+     ]
+    }
+   ]
+  },
+  {
+   "phase": "Post-processing",
+   "items": [
+    {
+     "id": "t-fermi",
+     "symptom": "Bands or DOS seem shifted; the gap appears in the wrong place",
+     "signs": "Different E-fermi values in SCF and NSCF OUTCARs",
+     "cause": "The Fermi level of an ICHARG = 11 run is less reliable than the SCF value; for insulators E<sub>F</sub> can sit anywhere in the gap.",
+     "fix": [
+      "Shift by the E-fermi of the SCF run.",
+      "For semiconductors and insulators align E = 0 to the VBM."
+     ],
+     "rel": [
+      "doscar",
+      "eigenval"
+     ]
+    },
+    {
+     "id": "t-bands",
+     "symptom": "The band structure looks wrong or noisy",
+     "signs": "Jagged bands, unexpected gap",
+     "cause": "ICHARG = 11 missing (density re-converged on the path), a CHGCAR from a different structure or ENCUT, or too few bands.",
+     "fix": [
+      "Copy CHGCAR from the SCF of the same structure; set ICHARG = 11.",
+      "Raise NBANDS to see the conduction bands.",
+      "Hybrids: use IBZKPT + zero-weight path points instead."
+     ],
+     "rel": [
+      "icharg",
+      "eigenval",
+      "r-bands"
+     ]
+    },
+    {
+     "id": "t-bader",
+     "symptom": "Bader charges change with settings or don't make sense",
+     "signs": "Sum of charges ≠ number of electrons; values change with grid size",
+     "cause": "CHGCAR alone lacks the core density, and a coarse FFT grid makes integration inaccurate.",
+     "fix": [
+      "Set LAECHG = .TRUE.; use AECCAR0 + AECCAR2 as the reference.",
+      "Increase the fine grid (NGXF, NGYF, NGZF) until charges converge."
+     ],
+     "rel": [
+      "chgcar",
+      "others"
+     ]
+    },
+    {
+     "id": "t-xml",
+     "symptom": "pymatgen / ASE fails to read vasprun.xml",
+     "signs": "XML parse error",
+     "cause": "The job did not finish, so the XML was never closed.",
+     "fix": [
+      "Check \"Elapsed time\" in OUTCAR; rerun if the job did not finish.",
+      "Some parsers can read truncated files; otherwise use OUTCAR/OSZICAR."
+     ],
+     "rel": [
+      "vasprunxml"
+     ]
+    }
+   ]
+  },
+  {
+   "phase": "Performance",
+   "items": [
+    {
+     "id": "t-slow",
+     "symptom": "The run is far slower than expected, or runs out of memory",
+     "signs": "OUTCAR \"LOOP:\" times per electronic step; scheduler memory errors",
+     "cause": "Unsuitable parallel layout, reciprocal-space projection in a large cell, or too many k-point groups for the memory.",
+     "fix": [
+      "Large cells (> ~20 atoms): LREAL = Auto.",
+      "Many k-points: raise KPAR (watch memory).",
+      "Few k-points, large cell: tune NCORE (try 4, 8, 16).",
+      "Out of memory: lower KPAR, use more nodes, or use vasp_gam for Γ-only runs.",
+      "Set LWAVE and LCHARG to .FALSE. when the files are not needed."
+     ],
+     "rel": [
+      "kpar",
+      "ncore",
+      "lreal"
+     ]
+    }
+   ]
+  }
+ ],
+ "RECIPES": [
+  {
+   "id": "r-relax",
+   "title": "Relax a bulk crystal",
+   "when": "Lattice constants and positions unknown. Use ISIF = 2 instead for slabs and defects.",
+   "incar": "SYSTEM  = bulk relaxation\nPREC    = Accurate\nENCUT   = 520        ! ~1.3 x max ENMAX for cell relaxation\nEDIFF   = 1E-6\nEDIFFG  = -0.01      ! force criterion, eV/A\nNSW     = 100\nIBRION  = 2          ! always set it explicitly\nISIF    = 3          ! ions + shape + volume (bulk only)\nISMEAR  = 0          ! safe for metals and insulators\nSIGMA   = 0.05\nLREAL   = .FALSE.\nLWAVE   = .FALSE.\nLCHARG  = .FALSE.",
+   "notes": [
+    "Repeat from CONTCAR until the volume stops changing.",
+    "Metals: ISMEAR = 1, SIGMA = 0.1–0.2 and a denser k-mesh."
+   ]
+  },
+  {
+   "id": "r-scf",
+   "title": "Static SCF run",
+   "when": "Accurate total energy on the relaxed structure; produces CHGCAR for DOS, bands and Bader.",
+   "incar": "SYSTEM  = static SCF\nPREC    = Accurate\nENCUT   = 520        ! keep identical for all downstream runs\nEDIFF   = 1E-6\nNSW     = 0\nIBRION  = -1\nISMEAR  = -5         ! needs >= 4 k-points; else ISMEAR = 0\nLREAL   = .FALSE.\nLWAVE   = .TRUE.\nLCHARG  = .TRUE.     ! CHGCAR for the next steps\nLAECHG  = .TRUE.     ! optional: AECCAR0/2 for Bader",
+   "notes": [
+    "Use CONTCAR of the relaxation as POSCAR."
+   ]
+  },
+  {
+   "id": "r-dos",
+   "title": "Density of states (non-self-consistent)",
+   "when": "After the static SCF run. Copy its CHGCAR into the new folder.",
+   "incar": "SYSTEM  = DOS\nICHARG  = 11         ! read and freeze CHGCAR\nPREC    = Accurate\nENCUT   = 520        ! same as SCF\nNSW     = 0\nISMEAR  = -5\nNEDOS   = 3001\nEMIN    = -15        ! absolute energies (eV), around E-fermi\nEMAX    = 10\nLORBIT  = 11         ! projected DOS\nLWAVE   = .FALSE.\nLCHARG  = .FALSE.",
+   "notes": [
+    "Use a denser k-mesh than in the SCF run.",
+    "Keep ISPIN and MAGMOM identical to the SCF run.",
+    "Shift energies by the E-fermi of the SCF run."
+   ]
+  },
+  {
+   "id": "r-bands",
+   "title": "Band structure (non-self-consistent)",
+   "when": "After the static SCF run, along a high-symmetry path. Example path for fcc.",
+   "incar": "SYSTEM  = bands\nICHARG  = 11\nPREC    = Accurate\nENCUT   = 520\nNSW     = 0\nISMEAR  = 0          ! tetrahedron is not meaningful on a line\nSIGMA   = 0.05\nLORBIT  = 11         ! PROCAR for fat bands\nLWAVE   = .FALSE.\nLCHARG  = .FALSE.",
+   "kpoints": "k-path fcc G-X-W-K-G-L\n40\nLine-mode\nReciprocal\n0.000 0.000 0.000  G\n0.500 0.000 0.500  X\n\n0.500 0.000 0.500  X\n0.500 0.250 0.750  W\n\n0.500 0.250 0.750  W\n0.375 0.375 0.750  K\n\n0.375 0.375 0.750  K\n0.000 0.000 0.000  G\n\n0.000 0.000 0.000  G\n0.500 0.500 0.500  L",
+   "notes": [
+    "Line 2 is the number of points per segment.",
+    "Path coordinates depend on the cell setting; generate them with SeeK-path or VASPKIT for your exact cell.",
+    "Add NBANDS if you need more conduction bands."
+   ]
+  },
+  {
+   "id": "r-mag",
+   "title": "Spin-polarized / magnetic",
+   "when": "Fe, Co, Ni, magnetic oxides, radicals, many defects. Add to any recipe above.",
+   "incar": "ISPIN   = 2\nMAGMOM  = 2*3.0 2*-3.0   ! one value per atom, POSCAR order (AFM example)\nLORBIT  = 11             ! site moments in OUTCAR\nISMEAR  = 0\nSIGMA   = 0.05\nEDIFF   = 1E-6\nNELM    = 120\nLASPH   = .TRUE.         ! recommended for d/f elements, DFT+U, meta-GGA",
+   "notes": [
+    "Compare FM, AFM and non-magnetic energies in the same cell.",
+    "Hard cases: AMIX_MAG = 0.4, BMIX_MAG = 0.0001, ALGO = All."
+   ]
+  },
+  {
+   "id": "r-md",
+   "title": "Ab initio MD (NVT)",
+   "when": "Liquids, amorphous phases, diffusion, finite-temperature behaviour.",
+   "incar": "SYSTEM  = AIMD NVT\nIBRION  = 0\nMDALGO  = 2          ! Nose-Hoover thermostat\nSMASS   = 1.0        ! Nose mass; tune for the T oscillation period\nTEBEG   = 300\nTEEND   = 300\nPOTIM   = 1.0        ! fs; 0.5 with H\nNSW     = 5000\nISIF    = 0          ! no stress -> faster (ISIF = 2 to monitor pressure)\nISYM    = 0\nPREC    = Normal\nLREAL   = Auto\nISMEAR  = 0\nSIGMA   = 0.05\nNELMIN  = 4\nNBLOCK  = 1          ! sampling interval for XDATCAR / PCDAT\nLWAVE   = .FALSE.\nLCHARG  = .FALSE.",
+   "notes": [
+    "Γ-only (vasp_gam) is common for large MD cells.",
+    "Discard the equilibration period before analysis."
+   ]
+  },
+  {
+   "id": "r-hse",
+   "title": "Hybrid functional (HSE06) SCF",
+   "when": "Better band gaps. Expensive: start from a converged PBE WAVECAR.",
+   "incar": "SYSTEM   = HSE06\nLHFCALC  = .TRUE.\nHFSCREEN = 0.2       ! HSE06\nAEXX     = 0.25      ! default\nALGO     = Damped    ! or All\nTIME     = 0.4\nPRECFOCK = Normal    ! Fast for screening\nISMEAR   = 0\nSIGMA    = 0.05\nEDIFF    = 1E-6\nNSW      = 0",
+   "notes": [
+    "Band structure: IBZKPT mesh + zero-weight path points, not ICHARG = 11.",
+    "NKRED can reduce cost for large meshes."
+   ]
+  }
+ ],
+ "counts": {
+  "OUT": 16,
+  "INP": 4,
+  "TAGS": 24,
+  "TROUBLE": 22,
+  "RECIPES": 7
+ },
+ "fixedCounts": {
+  "OUT": 11,
+  "INP": 3,
+  "TAGS": 15,
+  "TROUBLE": 0,
+  "RECIPES": 0
+ }
+}

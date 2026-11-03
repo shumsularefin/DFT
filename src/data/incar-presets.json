@@ -1,0 +1,1509 @@
+{
+ "_meta": {
+  "sources": [
+   "S-019",
+   "S-041",
+   "S-042"
+  ],
+  "generator": "scripts/build/build-vasp-data.mjs",
+  "version": 1
+ },
+ "presets": [
+  {
+   "id": "relax",
+   "title": "Relax a bulk crystal",
+   "summary": "Step 1 of the protocol: find the equilibrium cell and positions.",
+   "protocolStage": 1,
+   "fragment": false,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "notes": [
+    "Use ISIF = 2 instead of 3 for slabs and defects (no cell change).",
+    "For metals the handbook suggests ISMEAR = 1, SIGMA = 0.1 to 0.2."
+   ],
+   "variants": [
+    {
+     "id": "default",
+     "title": "Bulk cell relaxation",
+     "requires": [
+      "POSCAR",
+      "POTCAR",
+      "KPOINTS"
+     ],
+     "entries": [
+      {
+       "name": "SYSTEM",
+       "value": "Compound-relax"
+      },
+      {
+       "name": "PREC",
+       "value": "Accurate"
+      },
+      {
+       "name": "ENCUT",
+       "value": "520",
+       "comment": "1.3 × largest ENMAX (grep ENMAX POTCAR)",
+       "placeholder": "<1.3 x largest ENMAX in your POTCAR>"
+      },
+      {
+       "name": "EDIFF",
+       "value": "1E-6",
+       "comment": "1E-7 to 1E-8 when EDIFFG = -0.001"
+      },
+      {
+       "name": "ALGO",
+       "value": "Normal"
+      },
+      {
+       "name": "NELM",
+       "value": "120"
+      },
+      {
+       "name": "NELMIN",
+       "value": "6"
+      },
+      {
+       "name": "ISMEAR",
+       "value": "0",
+       "comment": "metals: ISMEAR = 1, SIGMA = 0.1-0.2"
+      },
+      {
+       "name": "SIGMA",
+       "value": "0.05"
+      },
+      {
+       "name": "LREAL",
+       "value": ".FALSE.",
+       "comment": "Auto for cells above ~20 atoms"
+      },
+      {
+       "name": "LASPH",
+       "value": ".TRUE.",
+       "comment": "d/f elements"
+      },
+      {
+       "name": "ISPIN",
+       "value": "2"
+      },
+      {
+       "name": "MAGMOM",
+       "value": "2*5.0 4*0.6",
+       "comment": "one entry per atom, POSCAR order",
+       "placeholder": "<one value per atom, in POSCAR order>"
+      },
+      {
+       "name": "LMAXMIX",
+       "value": "4",
+       "comment": "d elements (6 for f)"
+      },
+      {
+       "name": "IBRION",
+       "value": "2",
+       "comment": "CG; switch to 1 near the minimum"
+      },
+      {
+       "name": "ISIF",
+       "value": "3",
+       "comment": "ions + cell shape + volume"
+      },
+      {
+       "name": "NSW",
+       "value": "200"
+      },
+      {
+       "name": "EDIFFG",
+       "value": "-0.005",
+       "comment": "max force 0.005 eV/Å; -0.001 for high accuracy"
+      },
+      {
+       "name": "POTIM",
+       "value": "0.3"
+      },
+      {
+       "name": "LWAVE",
+       "value": ".TRUE."
+      },
+      {
+       "name": "LCHARG",
+       "value": ".TRUE."
+      },
+      {
+       "name": "NCORE",
+       "value": "4"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "static",
+   "title": "Static SCF in the same folder",
+   "summary": "Step 2 of the protocol: one converged single-point run that reads the relaxation WAVECAR.",
+   "protocolStage": 2,
+   "fragment": false,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "notes": [
+    "IBRION is not written: with NSW = 0 its default is already -1.",
+    "Tighten EDIFF step by step: 1E-5, then 1E-6 (then 1E-8 before optics)."
+   ],
+   "variants": [
+    {
+     "id": "default",
+     "title": "Static run",
+     "requires": [
+      "POSCAR",
+      "POTCAR",
+      "KPOINTS",
+      "WAVECAR from the relaxation (ISTART = 1)"
+     ],
+     "entries": [
+      {
+       "name": "SYSTEM",
+       "value": "Compound-scf"
+      },
+      {
+       "name": "ISTART",
+       "value": "1",
+       "comment": "read WAVECAR from the relaxation (same folder)"
+      },
+      {
+       "name": "PREC",
+       "value": "Accurate"
+      },
+      {
+       "name": "ENCUT",
+       "value": "520",
+       "comment": "same 1.3 × ENMAX as the relaxation",
+       "placeholder": "<1.3 x largest ENMAX in your POTCAR>"
+      },
+      {
+       "name": "EDIFF",
+       "value": "1E-6",
+       "comment": "tighten step by step: 1E-5 → 1E-6 (→ 1E-8 before optics)"
+      },
+      {
+       "name": "ALGO",
+       "value": "Normal"
+      },
+      {
+       "name": "NELM",
+       "value": "200"
+      },
+      {
+       "name": "ISMEAR",
+       "value": "0",
+       "comment": "VASPkit template value"
+      },
+      {
+       "name": "SIGMA",
+       "value": "0.05"
+      },
+      {
+       "name": "LREAL",
+       "value": ".FALSE."
+      },
+      {
+       "name": "ISPIN",
+       "value": "2"
+      },
+      {
+       "name": "MAGMOM",
+       "value": "2*5.0 4*0.6",
+       "placeholder": "<one value per atom, in POSCAR order>"
+      },
+      {
+       "name": "NSW",
+       "value": "0",
+       "comment": "single point; IBRION then defaults to -1"
+      },
+      {
+       "name": "LWAVE",
+       "value": ".TRUE."
+      },
+      {
+       "name": "LCHARG",
+       "value": ".TRUE.",
+       "comment": "CHGCAR is needed for the band step"
+      },
+      {
+       "name": "NCORE",
+       "value": "4"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "dos",
+   "title": "Total and projected density of states",
+   "summary": "The step 2 SCF run with projections switched on; the DOS is read from DOSCAR.",
+   "protocolStage": 2,
+   "fragment": false,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "notes": [
+    "No extra VASP run: the DOS comes from the SCF run with LORBIT = 11.",
+    "A denser k-mesh in the SCF gives a smoother DOS."
+   ],
+   "variants": [
+    {
+     "id": "default",
+     "title": "SCF with projections",
+     "requires": [
+      "POSCAR",
+      "POTCAR",
+      "KPOINTS",
+      "WAVECAR from the relaxation (ISTART = 1)"
+     ],
+     "entries": [
+      {
+       "name": "SYSTEM",
+       "value": "Compound-scf"
+      },
+      {
+       "name": "ISTART",
+       "value": "1",
+       "comment": "read WAVECAR from the relaxation (same folder)"
+      },
+      {
+       "name": "PREC",
+       "value": "Accurate"
+      },
+      {
+       "name": "ENCUT",
+       "value": "520",
+       "comment": "same 1.3 × ENMAX as the relaxation",
+       "placeholder": "<1.3 x largest ENMAX in your POTCAR>"
+      },
+      {
+       "name": "EDIFF",
+       "value": "1E-6",
+       "comment": "tighten step by step: 1E-5 → 1E-6 (→ 1E-8 before optics)"
+      },
+      {
+       "name": "ALGO",
+       "value": "Normal"
+      },
+      {
+       "name": "NELM",
+       "value": "200"
+      },
+      {
+       "name": "ISMEAR",
+       "value": "0",
+       "comment": "VASPkit template value"
+      },
+      {
+       "name": "SIGMA",
+       "value": "0.05"
+      },
+      {
+       "name": "LREAL",
+       "value": ".FALSE."
+      },
+      {
+       "name": "ISPIN",
+       "value": "2"
+      },
+      {
+       "name": "MAGMOM",
+       "value": "2*5.0 4*0.6",
+       "placeholder": "<one value per atom, in POSCAR order>"
+      },
+      {
+       "name": "NSW",
+       "value": "0",
+       "comment": "single point; IBRION then defaults to -1"
+      },
+      {
+       "name": "LORBIT",
+       "value": "11",
+       "comment": "projected DOS + PROCAR (for DOS)"
+      },
+      {
+       "name": "NEDOS",
+       "value": "3001",
+       "comment": "fine DOS energy grid"
+      },
+      {
+       "name": "LWAVE",
+       "value": ".TRUE."
+      },
+      {
+       "name": "LCHARG",
+       "value": ".TRUE.",
+       "comment": "CHGCAR is needed for the band step"
+      },
+      {
+       "name": "NCORE",
+       "value": "4"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "band",
+   "title": "Band structure",
+   "summary": "Step 3 of the protocol. A line-mode path cannot be self-consistent, so the path eigenvalues come from one of two routes.",
+   "protocolStage": 3,
+   "fragment": false,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "notes": [
+    "The SCF density must come from a uniform k-mesh, not from the path.",
+    "Use the standardized primitive cell from the k-path tool for the POSCAR."
+   ],
+   "variants": [
+    {
+     "id": "route-a",
+     "title": "Route A: one SCF with KPOINTS_OPT (VASP 6.3 or newer)",
+     "requires": [
+      "POSCAR",
+      "POTCAR",
+      "KPOINTS (uniform mesh)",
+      "KPOINTS_OPT (a copy of KPATH.in)"
+     ],
+     "vaspMin": "6.3",
+     "note": "Same INCAR as the SCF run, without ICHARG = 11.",
+     "entries": [
+      {
+       "name": "SYSTEM",
+       "value": "Compound-scf"
+      },
+      {
+       "name": "ISTART",
+       "value": "1",
+       "comment": "read WAVECAR from the relaxation (same folder)"
+      },
+      {
+       "name": "PREC",
+       "value": "Accurate"
+      },
+      {
+       "name": "ENCUT",
+       "value": "520",
+       "comment": "same 1.3 × ENMAX as the relaxation",
+       "placeholder": "<1.3 x largest ENMAX in your POTCAR>"
+      },
+      {
+       "name": "EDIFF",
+       "value": "1E-6",
+       "comment": "tighten step by step: 1E-5 → 1E-6 (→ 1E-8 before optics)"
+      },
+      {
+       "name": "ALGO",
+       "value": "Normal"
+      },
+      {
+       "name": "NELM",
+       "value": "200"
+      },
+      {
+       "name": "ISMEAR",
+       "value": "0",
+       "comment": "VASPkit template value"
+      },
+      {
+       "name": "SIGMA",
+       "value": "0.05"
+      },
+      {
+       "name": "LREAL",
+       "value": ".FALSE."
+      },
+      {
+       "name": "ISPIN",
+       "value": "2"
+      },
+      {
+       "name": "MAGMOM",
+       "value": "2*5.0 4*0.6",
+       "placeholder": "<one value per atom, in POSCAR order>"
+      },
+      {
+       "name": "NSW",
+       "value": "0",
+       "comment": "single point; IBRION then defaults to -1"
+      },
+      {
+       "name": "LORBIT",
+       "value": "11",
+       "comment": "projected DOS + PROCAR (for DOS)"
+      },
+      {
+       "name": "NEDOS",
+       "value": "3001",
+       "comment": "fine DOS energy grid"
+      },
+      {
+       "name": "LWAVE",
+       "value": ".TRUE."
+      },
+      {
+       "name": "LCHARG",
+       "value": ".TRUE.",
+       "comment": "CHGCAR is needed for the band step"
+      },
+      {
+       "name": "NCORE",
+       "value": "4"
+      }
+     ]
+    },
+    {
+     "id": "route-b",
+     "title": "Route B: path as KPOINTS, reading the SCF density",
+     "requires": [
+      "POSCAR",
+      "POTCAR",
+      "KPOINTS (the path, KPATH.in)",
+      "CHGCAR from the SCF run (keep a backup)"
+     ],
+     "entries": [
+      {
+       "name": "ICHARG",
+       "value": "11",
+       "comment": "read the SCF CHGCAR and keep it fixed"
+      },
+      {
+       "name": "PREC",
+       "value": "Accurate"
+      },
+      {
+       "name": "ENCUT",
+       "value": "520",
+       "comment": "same as the SCF",
+       "placeholder": "<1.3 x largest ENMAX in your POTCAR>"
+      },
+      {
+       "name": "EDIFF",
+       "value": "1E-6"
+      },
+      {
+       "name": "ISMEAR",
+       "value": "0"
+      },
+      {
+       "name": "SIGMA",
+       "value": "0.05"
+      },
+      {
+       "name": "LORBIT",
+       "value": "11",
+       "comment": "PROCAR for projected (fat) bands"
+      },
+      {
+       "name": "ISPIN",
+       "value": "2",
+       "comment": "same spin settings as the SCF"
+      },
+      {
+       "name": "MAGMOM",
+       "value": "2*5.0 4*0.6",
+       "placeholder": "<one value per atom, in POSCAR order>"
+      },
+      {
+       "name": "NSW",
+       "value": "0"
+      },
+      {
+       "name": "LWAVE",
+       "value": ".FALSE."
+      },
+      {
+       "name": "LCHARG",
+       "value": ".FALSE."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "convergence",
+   "title": "Convergence test (ENCUT and k-points)",
+   "summary": "Step 0: single-point runs that change one setting at a time.",
+   "protocolStage": 0,
+   "fragment": false,
+   "sources": [
+    "S-042"
+   ],
+   "notes": [
+    "Test on the unrelaxed structure. Pick the smallest setting where the energy changes by less than 1 meV/atom from the next step up.",
+    "Keep ENCUT fixed while you scan k-points, and the reverse."
+   ],
+   "variants": [
+    {
+     "id": "default",
+     "title": "Static run for a scan",
+     "requires": [
+      "POSCAR",
+      "POTCAR",
+      "KPOINTS"
+     ],
+     "entries": [
+      {
+       "name": "PREC",
+       "value": "Accurate"
+      },
+      {
+       "name": "ENCUT",
+       "value": "520",
+       "comment": "the value being tested",
+       "placeholder": "<1.3 x largest ENMAX in your POTCAR>"
+      },
+      {
+       "name": "EDIFF",
+       "value": "1E-6",
+       "comment": "tighten step by step: 1E-5 → 1E-6 (→ 1E-8 before optics)"
+      },
+      {
+       "name": "ALGO",
+       "value": "Normal"
+      },
+      {
+       "name": "NELM",
+       "value": "200"
+      },
+      {
+       "name": "ISMEAR",
+       "value": "0",
+       "comment": "VASPkit template value"
+      },
+      {
+       "name": "SIGMA",
+       "value": "0.05"
+      },
+      {
+       "name": "LREAL",
+       "value": ".FALSE."
+      },
+      {
+       "name": "ISPIN",
+       "value": "2"
+      },
+      {
+       "name": "MAGMOM",
+       "value": "2*5.0 4*0.6",
+       "placeholder": "<one value per atom, in POSCAR order>"
+      },
+      {
+       "name": "NSW",
+       "value": "0",
+       "comment": "single point; IBRION then defaults to -1"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "spin",
+   "title": "Magnetic configurations",
+   "summary": "Compare non-magnetic, ferromagnetic and antiferromagnetic starts in the same supercell.",
+   "protocolStage": null,
+   "fragment": true,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "notes": [
+    "Merge into a relax or static template. The examples are for a 4 transition-metal plus 8 oxygen supercell.",
+    "Use the same supercell for every configuration, and check each run kept its intended pattern."
+   ],
+   "variants": [
+    {
+     "id": "nm",
+     "title": "Non-magnetic",
+     "requires": [],
+     "entries": [
+      {
+       "name": "ISPIN",
+       "value": "1"
+      }
+     ]
+    },
+    {
+     "id": "fm",
+     "title": "Ferromagnetic",
+     "requires": [],
+     "entries": [
+      {
+       "name": "ISPIN",
+       "value": "2"
+      },
+      {
+       "name": "MAGMOM",
+       "value": "4*4.0 8*0.0",
+       "placeholder": "<one value per atom, in POSCAR order>"
+      }
+     ]
+    },
+    {
+     "id": "afm-1",
+     "title": "Antiferromagnetic, layered",
+     "requires": [],
+     "entries": [
+      {
+       "name": "ISPIN",
+       "value": "2"
+      },
+      {
+       "name": "MAGMOM",
+       "value": "4.0 4.0 -4.0 -4.0 8*0.0",
+       "placeholder": "<one value per atom, in POSCAR order>"
+      }
+     ]
+    },
+    {
+     "id": "afm-2",
+     "title": "Antiferromagnetic, checkerboard",
+     "requires": [],
+     "entries": [
+      {
+       "name": "ISPIN",
+       "value": "2"
+      },
+      {
+       "name": "MAGMOM",
+       "value": "4.0 -4.0 -4.0 4.0 8*0.0",
+       "placeholder": "<one value per atom, in POSCAR order>"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "dftu",
+   "title": "DFT+U",
+   "summary": "Hubbard U for localized d or f electrons (Dudarev scheme).",
+   "protocolStage": null,
+   "fragment": true,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "notes": [
+    "Put the same LDAU tags in every step: relax, SCF, DOS and bands.",
+    "LDAUL, LDAUU and LDAUJ need one entry per species in POSCAR order; a missing entry silently shifts values to the wrong element.",
+    "Total energies with different U are not comparable."
+   ],
+   "variants": [
+    {
+     "id": "default",
+     "title": "Dudarev +U block (example for Fe O)",
+     "requires": [],
+     "entries": [
+      {
+       "name": "LDAU",
+       "value": ".TRUE."
+      },
+      {
+       "name": "LDAUTYPE",
+       "value": "2",
+       "comment": "Dudarev: only U - J enters"
+      },
+      {
+       "name": "LDAUL",
+       "value": "2 -1",
+       "comment": "per species: 2 = d, 3 = f, -1 = none",
+       "placeholder": "<one value per species, in POSCAR order>"
+      },
+      {
+       "name": "LDAUU",
+       "value": "5.3 0.0",
+       "placeholder": "<one value per species, in POSCAR order>"
+      },
+      {
+       "name": "LDAUJ",
+       "value": "0.0 0.0",
+       "placeholder": "<one value per species, in POSCAR order>"
+      },
+      {
+       "name": "LDAUPRINT",
+       "value": "1",
+       "comment": "print occupation matrices to OUTCAR"
+      },
+      {
+       "name": "LMAXMIX",
+       "value": "4",
+       "comment": "6 for f elements; also in all ICHARG=11 runs"
+      },
+      {
+       "name": "LASPH",
+       "value": ".TRUE."
+      },
+      {
+       "name": "ISPIN",
+       "value": "2"
+      },
+      {
+       "name": "MAGMOM",
+       "value": "2*5.0 3*0.6",
+       "placeholder": "<one value per atom, in POSCAR order>"
+      },
+      {
+       "name": "ALGO",
+       "value": "Normal",
+       "comment": "All if SCF struggles"
+      },
+      {
+       "name": "NELM",
+       "value": "200"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hybrid",
+   "title": "Hybrid functional (HSE06)",
+   "summary": "Screened exact exchange for better gaps, at a much higher cost.",
+   "protocolStage": null,
+   "fragment": false,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "notes": [
+    "Start from a converged PBE WAVECAR.",
+    "ICHARG = 11 does not work with hybrids; band paths need zero-weight k-points instead."
+   ],
+   "variants": [
+    {
+     "id": "default",
+     "title": "HSE06 SCF",
+     "requires": [
+      "POSCAR",
+      "POTCAR",
+      "KPOINTS",
+      "WAVECAR from a converged PBE run"
+     ],
+     "entries": [
+      {
+       "name": "ISTART",
+       "value": "1",
+       "comment": "from converged PBE WAVECAR"
+      },
+      {
+       "name": "PREC",
+       "value": "Accurate"
+      },
+      {
+       "name": "ENCUT",
+       "value": "520",
+       "placeholder": "<1.3 x largest ENMAX in your POTCAR>"
+      },
+      {
+       "name": "EDIFF",
+       "value": "1E-6"
+      },
+      {
+       "name": "LHFCALC",
+       "value": ".TRUE."
+      },
+      {
+       "name": "HFSCREEN",
+       "value": "0.2",
+       "comment": "HSE06; 0.0 → PBE0"
+      },
+      {
+       "name": "AEXX",
+       "value": "0.25",
+       "comment": "exact-exchange fraction"
+      },
+      {
+       "name": "ALGO",
+       "value": "Damped",
+       "comment": "or All / Normal"
+      },
+      {
+       "name": "TIME",
+       "value": "0.4"
+      },
+      {
+       "name": "PRECFOCK",
+       "value": "Normal",
+       "comment": "Fast to save time"
+      },
+      {
+       "name": "ISMEAR",
+       "value": "0"
+      },
+      {
+       "name": "SIGMA",
+       "value": "0.05"
+      },
+      {
+       "name": "LASPH",
+       "value": ".TRUE."
+      },
+      {
+       "name": "NSW",
+       "value": "0"
+      },
+      {
+       "name": "LORBIT",
+       "value": "11"
+      },
+      {
+       "name": "NEDOS",
+       "value": "3001"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "vdw",
+   "title": "van der Waals correction",
+   "summary": "A dispersion correction for layered, molecular and adsorption systems.",
+   "protocolStage": null,
+   "fragment": true,
+   "sources": [
+    "S-042"
+   ],
+   "notes": [
+    "Add to a relaxation template. The handbook lists 11 (D3), 12 (D3-BJ) and 20 (TS) as common values."
+   ],
+   "variants": [
+    {
+     "id": "d3",
+     "title": "D3",
+     "requires": [],
+     "entries": [
+      {
+       "name": "IVDW",
+       "value": "11",
+       "comment": "D3"
+      }
+     ]
+    },
+    {
+     "id": "d3-bj",
+     "title": "D3 with Becke-Johnson damping",
+     "requires": [],
+     "entries": [
+      {
+       "name": "IVDW",
+       "value": "12",
+       "comment": "D3-BJ"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "elastic",
+   "title": "Elastic constants",
+   "summary": "Step 4 of the protocol: finite distortions with IBRION = 6 and ISIF = 3.",
+   "protocolStage": 4,
+   "fragment": false,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "notes": [
+    "NCORE is commented out on purpose: IBRION = 6 runs without band parallelization.",
+    "Re-relax with the same ENCUT first."
+   ],
+   "variants": [
+    {
+     "id": "default",
+     "title": "Finite-difference elastic tensor",
+     "requires": [
+      "POSCAR (relaxed)",
+      "POTCAR",
+      "KPOINTS"
+     ],
+     "entries": [
+      {
+       "name": "SYSTEM",
+       "value": "Compound-elastic"
+      },
+      {
+       "name": "PREC",
+       "value": "Accurate"
+      },
+      {
+       "name": "ENCUT",
+       "value": "620",
+       "comment": "≥ 1.3 × ENMAX, same as the re-relaxation",
+       "placeholder": "<1.3 x largest ENMAX in your POTCAR>"
+      },
+      {
+       "name": "EDIFF",
+       "value": "1E-8",
+       "comment": "1E-7 minimum"
+      },
+      {
+       "name": "ALGO",
+       "value": "Normal"
+      },
+      {
+       "name": "ISMEAR",
+       "value": "0"
+      },
+      {
+       "name": "SIGMA",
+       "value": "0.05"
+      },
+      {
+       "name": "LREAL",
+       "value": ".FALSE."
+      },
+      {
+       "name": "LASPH",
+       "value": ".TRUE."
+      },
+      {
+       "name": "ISPIN",
+       "value": "2",
+       "comment": "if magnetic"
+      },
+      {
+       "name": "MAGMOM",
+       "value": "2*5.0 4*0.6",
+       "placeholder": "<one value per atom, in POSCAR order>"
+      },
+      {
+       "name": "LMAXMIX",
+       "value": "4"
+      },
+      {
+       "name": "IBRION",
+       "value": "6",
+       "comment": "finite differences with symmetry"
+      },
+      {
+       "name": "ISIF",
+       "value": "3",
+       "comment": "required for the elastic tensor"
+      },
+      {
+       "name": "NFREE",
+       "value": "4",
+       "comment": "2 is cheaper, 4 more accurate"
+      },
+      {
+       "name": "POTIM",
+       "value": "0.015",
+       "comment": "displacement / strain step"
+      },
+      {
+       "name": "NSW",
+       "value": "1"
+      },
+      {
+       "name": "LWAVE",
+       "value": ".FALSE."
+      },
+      {
+       "name": "LCHARG",
+       "value": ".FALSE."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "optics",
+   "title": "Optical properties",
+   "summary": "Step 5 of the protocol: dielectric function from an SCF run with extra empty bands.",
+   "protocolStage": 5,
+   "fragment": false,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "notes": [
+    "Converge the SCF to EDIFF 1E-6 to 1E-8 first, read NBANDS from its OUTCAR, then use about three times that, rounded up to a multiple of the core count."
+   ],
+   "variants": [
+    {
+     "id": "default",
+     "title": "LOPTICS run",
+     "requires": [
+      "POSCAR",
+      "POTCAR",
+      "KPOINTS",
+      "WAVECAR from the SCF run (optional)"
+     ],
+     "entries": [
+      {
+       "name": "ISTART",
+       "value": "1",
+       "comment": "optional: start from SCF WAVECAR"
+      },
+      {
+       "name": "PREC",
+       "value": "Accurate"
+      },
+      {
+       "name": "ENCUT",
+       "value": "520",
+       "placeholder": "<1.3 x largest ENMAX in your POTCAR>"
+      },
+      {
+       "name": "EDIFF",
+       "value": "1E-8"
+      },
+      {
+       "name": "ALGO",
+       "value": "Normal"
+      },
+      {
+       "name": "NELM",
+       "value": "200"
+      },
+      {
+       "name": "ISMEAR",
+       "value": "0"
+      },
+      {
+       "name": "SIGMA",
+       "value": "0.05"
+      },
+      {
+       "name": "NBANDS",
+       "value": "144",
+       "comment": "~3 × default, multiple of cores",
+       "placeholder": "<about 3 x the NBANDS of the SCF run, rounded up to a multiple of the core count>"
+      },
+      {
+       "name": "LOPTICS",
+       "value": ".TRUE."
+      },
+      {
+       "name": "CSHIFT",
+       "value": "0.100"
+      },
+      {
+       "name": "NEDOS",
+       "value": "2001"
+      },
+      {
+       "name": "ISPIN",
+       "value": "2",
+       "comment": "if magnetic"
+      },
+      {
+       "name": "MAGMOM",
+       "value": "2*5.0 4*0.6",
+       "placeholder": "<one value per atom, in POSCAR order>"
+      },
+      {
+       "name": "LMAXMIX",
+       "value": "4"
+      },
+      {
+       "name": "NSW",
+       "value": "0"
+      },
+      {
+       "name": "LWAVE",
+       "value": ".FALSE."
+      },
+      {
+       "name": "LCHARG",
+       "value": ".FALSE."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "phonon-finite-displacement",
+   "title": "Phonons: each displacement",
+   "summary": "The INCAR used for every displaced supercell in the phonopy route.",
+   "protocolStage": null,
+   "fragment": false,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "notes": [
+    "For magnetic systems set MAGMOM for the supercell, not the primitive cell."
+   ],
+   "variants": [
+    {
+     "id": "default",
+     "title": "Single displacement",
+     "requires": [
+      "POSCAR-xxx (displaced supercell)",
+      "POTCAR",
+      "KPOINTS (scaled for the supercell)"
+     ],
+     "entries": [
+      {
+       "name": "PREC",
+       "value": "Accurate"
+      },
+      {
+       "name": "ENCUT",
+       "value": "520",
+       "placeholder": "<1.3 x largest ENMAX in your POTCAR>"
+      },
+      {
+       "name": "EDIFF",
+       "value": "1E-8"
+      },
+      {
+       "name": "ISMEAR",
+       "value": "0"
+      },
+      {
+       "name": "SIGMA",
+       "value": "0.02"
+      },
+      {
+       "name": "LREAL",
+       "value": ".FALSE."
+      },
+      {
+       "name": "ADDGRID",
+       "value": ".TRUE."
+      },
+      {
+       "name": "LASPH",
+       "value": ".TRUE."
+      },
+      {
+       "name": "ISPIN",
+       "value": "2",
+       "comment": "magnetic: MAGMOM for the SUPERCELL"
+      },
+      {
+       "name": "NSW",
+       "value": "0"
+      },
+      {
+       "name": "LWAVE",
+       "value": ".FALSE."
+      },
+      {
+       "name": "LCHARG",
+       "value": ".FALSE."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "dielectric",
+   "title": "Dielectric tensor and Born charges (DFPT)",
+   "summary": "Static dielectric tensor, Born effective charges and Gamma phonons by perturbation theory.",
+   "protocolStage": null,
+   "fragment": false,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "notes": [
+    "Insulators only. NCORE must not be set.",
+    "For hybrid or meta-GGA functionals use IBRION = 6 with LCALCEPS = .TRUE. instead."
+   ],
+   "variants": [
+    {
+     "id": "default",
+     "title": "DFPT",
+     "requires": [
+      "POSCAR (relaxed)",
+      "POTCAR",
+      "KPOINTS"
+     ],
+     "entries": [
+      {
+       "name": "PREC",
+       "value": "Accurate"
+      },
+      {
+       "name": "ENCUT",
+       "value": "520",
+       "placeholder": "<1.3 x largest ENMAX in your POTCAR>"
+      },
+      {
+       "name": "EDIFF",
+       "value": "1E-8"
+      },
+      {
+       "name": "ISMEAR",
+       "value": "0"
+      },
+      {
+       "name": "SIGMA",
+       "value": "0.01"
+      },
+      {
+       "name": "LREAL",
+       "value": ".FALSE."
+      },
+      {
+       "name": "LASPH",
+       "value": ".TRUE."
+      },
+      {
+       "name": "IBRION",
+       "value": "8",
+       "comment": "DFPT: also gives ionic contribution and Γ phonons"
+      },
+      {
+       "name": "LEPSILON",
+       "value": ".TRUE."
+      },
+      {
+       "name": "LRPA",
+       "value": ".FALSE.",
+       "comment": "include local-field effects in DFT"
+      },
+      {
+       "name": "NSW",
+       "value": "1"
+      },
+      {
+       "name": "LWAVE",
+       "value": ".FALSE."
+      },
+      {
+       "name": "LCHARG",
+       "value": ".FALSE."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "bader",
+   "title": "Bader charge analysis",
+   "summary": "An SCF run that also writes the all-electron reference density.",
+   "protocolStage": null,
+   "fragment": false,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "notes": [
+    "Refine the FFT grid for accurate charges (about twice the default; see OUTCAR)."
+   ],
+   "variants": [
+    {
+     "id": "default",
+     "title": "LAECHG run",
+     "requires": [
+      "POSCAR",
+      "POTCAR",
+      "KPOINTS"
+     ],
+     "entries": [
+      {
+       "name": "PREC",
+       "value": "Accurate"
+      },
+      {
+       "name": "ENCUT",
+       "value": "520",
+       "placeholder": "<1.3 x largest ENMAX in your POTCAR>"
+      },
+      {
+       "name": "EDIFF",
+       "value": "1E-6"
+      },
+      {
+       "name": "ISMEAR",
+       "value": "0"
+      },
+      {
+       "name": "SIGMA",
+       "value": "0.05"
+      },
+      {
+       "name": "NSW",
+       "value": "0"
+      },
+      {
+       "name": "LAECHG",
+       "value": ".TRUE.",
+       "comment": "writes AECCAR0 (core) and AECCAR2 (valence)"
+      },
+      {
+       "name": "LCHARG",
+       "value": ".TRUE."
+      },
+      {
+       "name": "LWAVE",
+       "value": ".FALSE."
+      },
+      {
+       "name": "ISPIN",
+       "value": "2"
+      },
+      {
+       "name": "MAGMOM",
+       "value": "2*5.0 4*0.6",
+       "placeholder": "<one value per atom, in POSCAR order>"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "r2scan",
+   "title": "r2SCAN meta-GGA",
+   "summary": "A meta-GGA functional, started from a converged PBE run.",
+   "protocolStage": null,
+   "fragment": false,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "notes": [
+    "Add to a static template and remove any GGA tag.",
+    "The handbook adds rVV10 dispersion for SCAN with LUSE_VDW = .TRUE. and BPARAM = 15.7 (11.95 for r2SCAN)."
+   ],
+   "variants": [
+    {
+     "id": "default",
+     "title": "r2SCAN SCF",
+     "requires": [
+      "POSCAR",
+      "POTCAR (meta-GGA capable)",
+      "KPOINTS",
+      "WAVECAR from a converged PBE run"
+     ],
+     "entries": [
+      {
+       "name": "METAGGA",
+       "value": "R2SCAN",
+       "comment": "or SCAN; remove any GGA tag"
+      },
+      {
+       "name": "LASPH",
+       "value": ".TRUE.",
+       "comment": "mandatory"
+      },
+      {
+       "name": "LMIXTAU",
+       "value": ".TRUE.",
+       "comment": "mix τ for stable SCF"
+      },
+      {
+       "name": "ALGO",
+       "value": "All"
+      },
+      {
+       "name": "ENCUT",
+       "value": "600",
+       "comment": "meta-GGAs need higher cutoffs"
+      },
+      {
+       "name": "PREC",
+       "value": "Accurate"
+      },
+      {
+       "name": "EDIFF",
+       "value": "1E-6"
+      },
+      {
+       "name": "ISTART",
+       "value": "1",
+       "comment": "start from a converged PBE WAVECAR"
+      },
+      {
+       "name": "ISMEAR",
+       "value": "0"
+      },
+      {
+       "name": "SIGMA",
+       "value": "0.05"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "mbj",
+   "title": "Modified Becke-Johnson band gap",
+   "summary": "A potential-only functional for band gaps. It gives no total energy or forces.",
+   "protocolStage": null,
+   "fragment": false,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "notes": [
+    "Use the PBE geometry. By default the parameter c is computed self-consistently; CMBJ fixes it."
+   ],
+   "variants": [
+    {
+     "id": "default",
+     "title": "mBJ SCF",
+     "requires": [
+      "POSCAR (PBE geometry)",
+      "POTCAR",
+      "KPOINTS",
+      "WAVECAR from a PBE run"
+     ],
+     "entries": [
+      {
+       "name": "METAGGA",
+       "value": "MBJ"
+      },
+      {
+       "name": "LASPH",
+       "value": ".TRUE."
+      },
+      {
+       "name": "ALGO",
+       "value": "All",
+       "comment": "or Normal"
+      },
+      {
+       "name": "NELM",
+       "value": "300"
+      },
+      {
+       "name": "ISTART",
+       "value": "1",
+       "comment": "from PBE WAVECAR"
+      },
+      {
+       "name": "ISMEAR",
+       "value": "0"
+      },
+      {
+       "name": "SIGMA",
+       "value": "0.05"
+      },
+      {
+       "name": "NSW",
+       "value": "0",
+       "comment": "mBJ is a potential: no total energy or forces → use the PBE geometry"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

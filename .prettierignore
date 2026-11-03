@@ -19,3 +19,4 @@ scripts/guard/
 scripts/reference/
 scripts/build/check-real-data.mjs
 README.md
+scripts/__generated__/
