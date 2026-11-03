@@ -7,6 +7,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- INCAR validation engine: 33 sourced rules that catch risky settings, with one-click fixes (no UI yet).
 - INCAR library and data: parser and writer, 71 documented tags and 16 starting presets built from the two handbooks (no UI yet).
 - KPOINTS library: k-mesh sizes from KSPACING, resolution or length, mesh coordinates, file writers and a parser (no UI yet).
 - Structure core library: lattice math, POSCAR reader and writer, composition and density helpers, and the tool hand-off store (no UI yet).

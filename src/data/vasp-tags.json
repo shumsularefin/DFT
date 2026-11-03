@@ -1515,7 +1515,7 @@
     "pro": "Visualize localization and bonding; use NCORE=1."
    },
    "why": "Visualize localization and bonding; use NCORE=1.",
-   "breaks": "Must run with NCORE = 1, or the run can fail.",
+   "breaks": "NCORE must be commented out, or the run can fail.",
    "tasks": [],
    "related": [
     "NCORE"
@@ -1606,7 +1606,7 @@
     "pro": "Insulators only; NCORE=1; not for hybrids (use LCALCEPS)."
    },
    "why": "Insulators only; NCORE=1; not for hybrids (use LCALCEPS).",
-   "breaks": "Insulators only, needs NCORE = 1, and is not for hybrid functionals (use LCALCEPS).",
+   "breaks": "Insulators only. NCORE must be commented out, and it is not for hybrid functionals (use LCALCEPS).",
    "tasks": [
     "dielectric"
    ],
