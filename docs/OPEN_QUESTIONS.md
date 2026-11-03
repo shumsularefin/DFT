@@ -34,6 +34,7 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-028 | open | author |
 | Q-029 | open | author |
 | Q-030 | open | author |
+| Q-031 | open | author |
 
 ## Q-001. Repository licence
 Which licence for the code and which for the written content and data (a common split: MIT for code, CC BY 4.0 for original text)? Affects `LICENSE`, the footer and the references page. Until decided: no LICENSE file; `THIRD_PARTY_NOTICES.md` lists upstream licences. **Owner: author.**
@@ -76,6 +77,8 @@ The Workflow Handbook says VASPKIT 303 uses the same algorithm as SeeK-path (HPK
 
 ## Q-014. Pulay stress warning threshold
 The convergence plotter warns when pressure is not converged where energy is. The threshold (default 5 kB) is a heuristic with no cited basis. **Close:** M4.1 either finds a citable guideline or keeps it adjustable and labelled "heuristic".
+
+**M4.1 update:** no citable guideline was found (the VASP wiki was unreachable). `pressureThresholdKb` defaults to 5 and is an option; the explanation text calls it heuristic. The question stays open until the author supplies a basis.
 
 ## Q-015. Firebase and GitHub wiring state
 Is the Firebase project created, the GitHub repository variable `FIREBASE_PROJECT_ID` and secret `FIREBASE_SERVICE_ACCOUNT` set, and is the repository connected to the Firebase console? See `docs/SETUP_FIREBASE.md`. M0.2 cannot show a live deploy without them. **Owner: author.**
@@ -124,3 +127,6 @@ Statements in `src/content/handbook/03-many-electrons/` that rest on general kno
 
 ## Q-030. M3.6 file explorer: statements to confirm against the VASP wiki
 (1) ENMIN: the work order lists it for the POTCAR header panel, but neither handbook describes it, so the panel says it is not explained yet. Provide a sourced sentence. (2) The POSCAR, KPOINTS and INCAR line explanations in `src/lib/vasp/annotate.ts` follow the VASP wiki file-format pages from memory (S-019 is cited-from-memory, Q-007). Check in particular: a negative scale means target volume; three scale values scale x, y, z; Auto-mode length gives a denser mesh when larger (the formula itself is Q-018). (3) OSZICAR and OUTCAR-excerpt kinds have no default annotations until M4.1 supplies parsers; callers can pass their own.
+
+## Q-031. M4.1 judgement calls and unvalidated formats
+(1) Every OSZICAR and OUTCAR line pattern was written from the handbooks and the work order and tested on hand-written fixtures plus the generated OSZICAR golden file; none was run on a real VASP output (Q-008). Please supply real trimmed files in `data/author/`. (2) D-014 says a series with no earlier qualifying point is "only-last-point". Read literally, that case is exactly "not converged" (the last index always qualifies vacuously), so `analyzeSeries` returns `not-converged` and the `only-last-point` status is never produced; it stays in the type. Confirm, or say what distinction was meant (for example, converged at the second-to-last point, which currently gives `converged` plus a warning that one later point confirms it). (3) `monotonic` means the distance to the final value never grows from one point to the next. (4) Series with no `natoms` are treated as per atom as given, with a warning. (5) A noncollinear `mag=` line with three numbers keeps only the first.

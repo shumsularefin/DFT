@@ -1,0 +1,10 @@
+ vasp.6.3.2 20Jan22 (build Feb 10 2022 10:00:00) complex
+ 
+   ENMAX  =  400.000; ENMIN  =  300.000 eV
+   ENCUT  =  450.0 eV
+   number of ions     NIONS =      8
+   k-points           NKPTS =     29   k-points in BZ     NKDIM =     29   number of bands    NBANDS=     24
+ aborting loop EDIFF was not reached (unconverged)
+  free  energy   TOTEN  =       -34.12345678 eV
+  energy  without entropy=      -34.20000000  energy(sigma->0) =      -34.00000000
+  external pressure =        2.00 kB  Pullay stress =        1.00 kB
