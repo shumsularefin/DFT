@@ -1,0 +1,94 @@
+---
+id: spin-and-the-pauli-principle
+title: Spin and the Pauli principle
+module: 2
+order: 5
+summary: Why every orbital holds at most two electrons, and how that one rule builds the periodic table and fills energy levels.
+concepts: [spin-pauli]
+requires: [orbital-shapes]
+vaspTags: [ISPIN]
+sources: [S-047]
+status: draft
+updated: 2026-11-03
+noLab: true
+---
+
+<Why>
+
+Why do electrons not all pile into the lowest level? Why does the periodic table have the shape it has? The answer is a rule about electrons that has nothing to do with their charge. Without it, there would be no chemistry, and no metals or insulators in any later module.
+
+</Why>
+
+<Intuition>
+
+Besides its position, an electron carries a built-in property called <Term id="spin">spin</Term>. For our purposes it has two possible values, often called up and down <Cite id="S-047" />. It behaves like a tiny magnet, but it is not a ball spinning; there is no ordinary picture for it, and that is fine.
+
+Electrons are <Term id="fermion">fermions</Term>, and fermions obey the <Term id="pauli-exclusion-principle">Pauli exclusion principle</Term>: no two electrons can be in exactly the same state <Cite id="S-047" />. An orbital, plus a choice of spin, defines a state. So each orbital holds at most two electrons, one up and one down.
+
+Think of seats in a theater where each seat takes two people of opposite spin. Once a level is full, the next electron must sit in a higher one. Counting orbitals gives the shell sizes: s has 1 orbital, p has 3, d has 5 and f has 7, so they hold 2, 6, 10 and 14 electrons. A whole shell with quantum number $n$ holds $2n^2$ electrons.
+
+<Level min="intermediate">
+
+When a level is degenerate, electrons spread over it with parallel spins before pairing, because that lowers their repulsion. This is the rule behind magnetic atoms. In a solid it is why some materials, such as iron, can be magnetic.
+
+</Level>
+
+<Level min="pro">
+
+The exclusion principle follows from the requirement that the many-electron wavefunction change sign when two electrons are swapped. That requirement is made concrete later in the course, where it leads to exchange effects in the many-electron problem.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+Counting follows directly. For a given $l$ there are $2l + 1$ orbitals, so $2(2l + 1)$ electrons fit. Summing over $l = 0, \dots, n - 1$ gives
+
+$$\sum_{l=0}^{n-1} 2(2l+1) = 2n^2$$
+
+which equals 2, 8, 18 and 32 for $n = 1$ to 4. This is arithmetic, not a model, and the site tests the count against the orbital list used in the orbitals lab.
+
+</TheMath>
+
+<InVasp>
+
+By default VASP assumes each orbital is filled with one up and one down electron, so spin does not need to be tracked. Set `ISPIN = 2` to let up and down electrons differ, which you need for magnetic systems. The tag increases the cost of the run, so use it when the physics requires it.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...               | ...the filling                    | ...the consequence                |
+| ------------------------------ | --------------------------------- | --------------------------------- |
+| Number of electrons up         | Higher levels start to fill       | Different chemistry               |
+| Allow up and down to differ    | Unequal numbers of up and down    | A net magnetic moment is possible |
+| Remove the exclusion principle | All electrons in the lowest level | No shells, no periodic table      |
+
+Why two per orbital: two spin values and one electron per state. What happens if you ignore spin where it matters: a magnetic material is computed as non-magnetic.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Imagining spin as a literally spinning ball">
+
+Spin is a quantum property with no classical picture. The word is historical.
+
+</Callout>
+
+<Callout variant="mistake" title="Thinking the exclusion principle is a force">
+
+Nothing pushes electrons apart. It is a rule about which states can be occupied, and it comes from how identical fermions are described.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-spin-1', 'q-spin-2', 'q-spin-3', 'q-spin-4', 'q-spin-5']} />
+
+<GoDeeper>
+
+- Griffiths and Schroeter, _Introduction to Quantum Mechanics_, the chapters on spin and on identical particles <Cite id="S-047" />.
+
+</GoDeeper>

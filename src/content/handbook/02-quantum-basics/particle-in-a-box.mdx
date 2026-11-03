@@ -1,0 +1,106 @@
+---
+id: particle-in-a-box
+title: The particle in a box
+module: 2
+order: 3
+summary: The simplest model that shows why energy comes in steps, with exact formulas and a lab where you change the box.
+concepts: [quantization-box]
+requires: [wavefunction-meaning]
+vaspTags: []
+sources: [S-047, S-031]
+status: draft
+updated: 2026-11-03
+---
+
+<Why>
+
+Why do atoms emit light of only certain colors, and why do materials have gaps in the energies electrons can have? The answer starts with the simplest case: one electron trapped in a one-dimensional box. The model is a toy, but the two lessons it teaches, that confinement forces energies into steps and that smaller boxes cost more energy, show up everywhere in materials.
+
+</Why>
+
+<Intuition>
+
+Picture a guitar string held at both ends. Only waves that fit between the ends can ring: one hump, two humps, three humps, and so on. A wave with a hump and a half cannot exist, because the string must stay still at both ends.
+
+An electron in a box is the same. The walls force the wavefunction to be zero at both ends. This requirement is a <Term id="boundary-condition">boundary condition</Term>. Only waves that fit are allowed, and each allowed wave is a <Term id="standing-wave">standing wave</Term> with its own energy. That is <Term id="quantization">quantization</Term> <Cite id="S-047" />.
+
+Three things to notice in the lab below:
+
+- The lowest state, $n = 1$, has one hump and no <Term id="node">nodes</Term> inside the box. Each step up adds one node.
+- Higher states have more bends, so they cost more energy.
+- Shrink the box and every energy rises, steeply. Squeezing a wave raises its energy.
+
+That last point is worth remembering. It is the reason atoms have a size, and it will return when we ask why a smaller cutoff or a smaller cell changes a result.
+
+<Level min="intermediate">
+
+The lowest energy is not zero. Even in its lowest state the electron has energy, because a wave that must fit in a box cannot be perfectly still. Compare the lab at $L = 5$ Å, where the lowest energy is about 1.5 eV, with $L = 1$ Å, where it is about 38 eV.
+
+</Level>
+
+<Level min="pro">
+
+When you mix two neighboring states the density oscillates, and the period is $T = h/(E_{n+1} - E_n)$ <Cite id="S-047" />. A bigger energy gap means a faster beat. The lab reports this in femtoseconds, and its playback is slowed by a stated factor so that you can see it. The real motion is far too fast to watch.
+
+</Level>
+
+</Intuition>
+
+<Lab id="particle-in-a-box" title="One electron in a box" />
+
+<TheMath>
+
+For a box of length $L$ with walls where the wavefunction must vanish, the allowed states and energies are <Cite id="S-047" />
+
+$$\psi_n(x) = \sqrt{\frac{2}{L}}\,\sin\!\left(\frac{n\pi x}{L}\right), \qquad E_n = \frac{n^2\pi^2}{L^2}\,\frac{\hbar^2}{2m}$$
+
+with $n = 1, 2, 3, \dots$ and $0 \le x \le L$. Using $\hbar^2/2m = 3.80998\ \text{eV Å}^2$ <Cite id="S-031" /> and $L$ in ångström gives energies in electron volts. Three useful checks: $E_1 = 37.603$ eV at $L = 1$ Å, $E_1 = 1.5041$ eV at $L = 5$ Å, and $E_n = n^2 E_1$.
+
+The state $\psi_n$ has $n - 1$ interior nodes. States with different $n$ are orthogonal, and each is normalized. For a mix of two states the density oscillates with period $T = h/(E_m - E_n)$. At $L = 5$ Å, $n = 1$ and $m = 2$, the gap is $E_2 - E_1 = 4.5124$ eV and the period is about 0.92 fs.
+
+The site tests these values against an independent numerical integration and against stored reference values.
+
+</TheMath>
+
+<InVasp>
+
+VASP does not put electrons in a one-dimensional box, but it does put them in a box: the periodic simulation cell. The same logic applies. Waves that fit the cell are the allowed ones, and a smaller cell pushes the energies up. That is one reason cell size matters in later modules.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...   | ...the energy                | ...the wave                    |
+| ------------------ | ---------------------------- | ------------------------------ |
+| The box length up  | Falls, as 1 over L squared   | Longer wavelength, more room   |
+| The state n up     | Rises, as n squared          | One more node                  |
+| The mix above zero | The mix has no single energy | The density oscillates in time |
+
+Why a box: it is the simplest model with a boundary condition. Why it is only a model: a real electron feels attraction to nuclei and repulsion from other electrons, not a hard wall.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Treating the box as a real material">
+
+The lab shows one electron in one dimension with hard walls. It teaches the idea of quantization and the cost of confinement. It does not predict the energies of any real system.
+
+</Callout>
+
+<Callout variant="mistake" title="Expecting zero energy in the lowest state">
+
+A confined wave always has some energy. The lowest state has $n = 1$, not $n = 0$.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-box-1', 'q-box-2', 'q-box-3', 'q-box-4', 'q-box-5', 'q-box-6']} />
+
+<GoDeeper>
+
+- Griffiths and Schroeter, _Introduction to Quantum Mechanics_, the infinite square well <Cite id="S-047" />.
+- Tiesinga and others, CODATA values used for the energy scale <Cite id="S-031" />.
+
+</GoDeeper>
