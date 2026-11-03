@@ -36,4 +36,19 @@ export default [
       },
     },
   },
+  // The handbook extractor runs part of its code inside the handbook pages (page.evaluate), so it uses
+  // browser globals and the pages' own data constants.
+  {
+    files: ['scripts/build/extract-handbooks.mjs'],
+    languageOptions: {
+      globals: {
+        document: 'readonly',
+        OUT: 'readonly',
+        INP: 'readonly',
+        TAGS: 'readonly',
+        TROUBLE: 'readonly',
+        RECIPES: 'readonly',
+      },
+    },
+  },
 ];

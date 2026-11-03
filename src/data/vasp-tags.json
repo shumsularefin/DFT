@@ -1,0 +1,2478 @@
+{
+ "_meta": {
+  "sources": [
+   "S-019",
+   "S-041",
+   "S-042"
+  ],
+  "generator": "scripts/build/build-vasp-data.mjs",
+  "version": 1
+ },
+ "tags": [
+  {
+   "name": "PREC",
+   "group": "accuracy",
+   "type": "string",
+   "default": "Normal",
+   "typical": "Accurate; Normal for screening",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Picks how fine the calculation grids are. Use Accurate for anything that needs forces or stress.",
+    "intermediate": "FFT grid density and default cutoff",
+    "pro": "Normal: standard for relaxations and MD; small wrap-around errors are possible. Accurate: denser grids that avoid wrap-around errors. Recommended for production forces, stress, phonons. High: legacy; like Accurate with ENCUT = 1.3 × ENMAX. Prefer Accurate plus an explicit ENCUT. Low: coarse grids for rough pre-relaxation of large systems. Single (VASP 6): like Accurate, but the augmentation grid equals the coarse grid (one grid instead of two), saving memory."
+   },
+   "why": "Accurate avoids wrap-around errors; needed for forces, stress, phonons, elastic.",
+   "breaks": "Normal can give wrap-around errors and noisy forces or stress.",
+   "tasks": [
+    "bader",
+    "band",
+    "convergence",
+    "dielectric",
+    "dos",
+    "elastic",
+    "hybrid",
+    "optics",
+    "phonon-finite-displacement",
+    "r2scan",
+    "relax",
+    "static"
+   ],
+   "related": [
+    "ENCUT",
+    "ADDGRID",
+    "LREAL"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "corrections": [
+    {
+     "was": "PREC = Single uses single-precision FFTs.",
+     "now": "\"Single\" refers to using a single FFT grid (the fine augmentation grid equals the coarse grid), not single-precision arithmetic."
+    }
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "ENCUT",
+   "group": "accuracy",
+   "type": "real",
+   "default": "largest ENMAX in POTCAR",
+   "typical": "1.3 × max(ENMAX) for relax/elastic; ≥ max(ENMAX) otherwise",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "The size of the plane-wave basis, set as an energy in eV. Bigger is more accurate and slower.",
+    "intermediate": "Plane-wave kinetic-energy cutoff (eV)",
+    "pro": "Higher ENCUT means more plane waves, a more complete basis, more memory and CPU time. If ENCUT is too low, stress and pressure suffer from Pulay stress: the basis set is not converged with respect to volume changes. Default: largest ENMAX of the POTCAR datasets (PREC = Normal/Accurate); PREC = High sets 1.3 × ENMAX."
+   },
+   "why": "Stress converges much more slowly than energy, so cell relaxations and elastic runs need the 30% margin to suppress Pulay stress. Keep it identical in every calculation you compare.",
+   "breaks": "Too low gives wrong stress and lattice constants. Changing it between runs you compare makes the energies incomparable.",
+   "tasks": [
+    "bader",
+    "band",
+    "convergence",
+    "dielectric",
+    "dos",
+    "elastic",
+    "hybrid",
+    "optics",
+    "phonon-finite-displacement",
+    "r2scan",
+    "relax",
+    "static"
+   ],
+   "related": [
+    "PREC",
+    "ISIF",
+    "EDIFF"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "EDIFF",
+   "group": "electronic",
+   "type": "real",
+   "default": "1E-4",
+   "typical": "1E-5 relax; 1E-6 SCF/DOS; 1E-7–1E-8 elastic, phonons, optics, ε",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "How tightly each electronic loop must converge. Smaller means more accurate forces and response properties.",
+    "intermediate": "SCF stop: energy change between electronic steps (eV)",
+    "pro": "The SCF loop stops when both the total free energy and the band-structure energy change by less than EDIFF between steps. EDIFF is a total-energy criterion, not per atom, so large cells effectively need a tighter value. Too loose → noisy forces and stress, which confuse the ionic optimizer. If a relaxation won't converge, tighten EDIFF first. EDIFF = 0 makes VASP always run exactly NELM steps."
+   },
+   "why": "Forces and response properties come from derivatives of the wavefunction, so they need a far tighter SCF than the total energy does. Loose values give noisy forces and imaginary phonon modes.",
+   "breaks": "Too loose gives noisy forces and false imaginary phonon modes.",
+   "tasks": [
+    "bader",
+    "band",
+    "convergence",
+    "dielectric",
+    "dos",
+    "elastic",
+    "hybrid",
+    "optics",
+    "phonon-finite-displacement",
+    "r2scan",
+    "relax",
+    "static"
+   ],
+   "related": [
+    "EDIFFG",
+    "NELM",
+    "ALGO"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "EDIFFG",
+   "group": "ionic",
+   "type": "real",
+   "default": "EDIFF × 10",
+   "typical": "-0.005 or -0.001",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "When to stop a relaxation. A negative number means: stop when every force is smaller than that many eV per angstrom.",
+    "intermediate": "Ionic stop. >0: energy change (eV). <0: max force (eV/Å)",
+    "pro": "Positive: stop when the total-energy change between ionic steps is below EDIFFG (eV). Negative: stop when the force on every atom is below |EDIFFG| (eV/Å). More reliable for finding the true minimum. The force criterion ignores stress. In ISIF = 3 runs, check the stress (OUTCAR \"in kB\") separately. A tight EDIFFG needs a tight EDIFF (e.g. −0.005 with 1E-7); otherwise noisy forces keep the ions \"chattering\" around the minimum."
+   },
+   "why": "Negative (force) criteria are more reliable. EDIFF should be at least 10× smaller than any energy-based EDIFFG.",
+   "breaks": "A positive value stops on energy change, which can end a relaxation too early. EDIFF should be at least 10 times smaller than any energy-based EDIFFG.",
+   "tasks": [
+    "relax"
+   ],
+   "related": [
+    "EDIFF",
+    "IBRION",
+    "NSW"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "corrections": [
+    {
+     "was": "Ultra-high −0.001 for phonons and NEB.",
+     "now": "−0.001 is typical before phonon calculations. NEB runs normally use −0.01 to −0.05; −0.001 is rarely reachable on a band of images."
+    }
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "NELM",
+   "group": "electronic",
+   "type": "int",
+   "default": "NELM = 60, NELMIN = 2",
+   "typical": "60 default; 100–300 for magnetic, +U, hybrids",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "The most electronic steps allowed for each ionic step.",
+    "intermediate": "Max electronic steps per ionic step",
+    "pro": "NELM: hard limit on electronic steps. Reaching it means the step is unconverged, but VASP proceeds to the next ionic step anyway. NELMIN: forces at least this many steps, so the loop cannot stop \"by accident\" after the ions move. 4–8 is recommended for relaxations and MD; 8 or more for difficult systems and hybrids. If forces in OUTCAR look noisy or inconsistent between steps, raising NELMIN (and tightening EDIFF) helps."
+   },
+   "why": "If a step hits NELM the forces are unconverged; fix mixing first rather than just raising NELM.",
+   "breaks": "If a step reaches NELM, the forces are not converged. Fix the mixing first rather than only raising NELM.",
+   "tasks": [
+    "band",
+    "convergence",
+    "dftu",
+    "dos",
+    "mbj",
+    "optics",
+    "relax",
+    "static"
+   ],
+   "related": [
+    "EDIFF",
+    "ALGO",
+    "NELMIN"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "NELMIN",
+   "group": "electronic",
+   "type": "int",
+   "default": "NELM = 60, NELMIN = 2",
+   "typical": "4–8 in relaxations",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "The fewest electronic steps allowed for each ionic step.",
+    "intermediate": "Min electronic steps per ionic step",
+    "pro": "NELM: hard limit on electronic steps. Reaching it means the step is unconverged, but VASP proceeds to the next ionic step anyway. NELMIN: forces at least this many steps, so the loop cannot stop \"by accident\" after the ions move. 4–8 is recommended for relaxations and MD; 8 or more for difficult systems and hybrids. If forces in OUTCAR look noisy or inconsistent between steps, raising NELMIN (and tightening EDIFF) helps."
+   },
+   "why": "Prevents a too-early exit that yields poor forces.",
+   "breaks": "Too small can end the electronic loop too early and give poor forces.",
+   "tasks": [
+    "relax"
+   ],
+   "related": [
+    "NELM",
+    "EDIFF"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "NELMDL",
+   "group": "electronic",
+   "type": "int",
+   "default": "-5 (as stated in the Workflow Handbook dictionary)",
+   "typical": "−5 default; −12 for difficult starts",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "How many start-up steps let the random starting wavefunctions settle before the density is updated. The value is negative: -5 by default, -12 for difficult starts.",
+    "intermediate": "Non-self-consistent steps at start",
+    "pro": "Lets random wavefunctions settle before the density is updated."
+   },
+   "why": "Lets random wavefunctions settle before the density is updated.",
+   "breaks": "A bad start can make the first steps wander; the handbook uses a more negative value for difficult starts.",
+   "tasks": [],
+   "related": [
+    "NELM",
+    "ALGO"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "ALGO",
+   "group": "electronic",
+   "type": "string",
+   "default": "Normal",
+   "typical": "Normal (Davidson), Fast, All, Damped",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Chooses the method used to find the electron states. Normal is the safe choice; All or Damped help hard cases.",
+    "intermediate": "Electronic minimiser",
+    "pro": "Normal: blocked Davidson. Robust. Fast: Davidson for the first steps, then RMM-DIIS. Faster; good default for most bulk work. VeryFast: RMM-DIIS only. Fast but fragile. All (Conjugate): all bands updated together. Robust for difficult metals, magnetic systems and hybrids. Damped: damped MD of the wavefunctions; recommended for hybrid functionals and hard cases."
+   },
+   "why": "Normal is robust; Fast is quicker for simple systems; All/Damped for magnetic, +U, hybrids, meta-GGA, and stubborn SCF.",
+   "breaks": "The wrong choice can stall or oscillate in magnetic, +U, hybrid and meta-GGA runs.",
+   "tasks": [
+    "band",
+    "convergence",
+    "dftu",
+    "dos",
+    "elastic",
+    "hybrid",
+    "mbj",
+    "optics",
+    "r2scan",
+    "relax",
+    "static"
+   ],
+   "related": [
+    "NELM",
+    "LMIXTAU",
+    "TIME"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "ISMEAR",
+   "group": "smearing",
+   "type": "int",
+   "default": "ISMEAR = 1, SIGMA = 0.2",
+   "typical": "0 with SIGMA = 0.05 (VASPkit template; used throughout)",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "How electrons are spread over energy levels near the Fermi level. 0 with a small SIGMA is the safe default for this handbook.",
+    "intermediate": "Partial-occupancy scheme. VASP default is 1 (Methfessel–Paxton)",
+    "pro": "−5, tetrahedron with Blöchl corrections: accurate total energies and DOS for bulk. Needs at least 4 k-points. Do not use for relaxations of metals (forces are inaccurate). SIGMA is not used for the occupations. 0, Gaussian: safe for any system and for few k-points. Use SIGMA ≈ 0.03–0.05 for semiconductors and insulators; quote E0 (σ → 0). 1 or 2, Methfessel–Paxton: good for metals, SIGMA ≈ 0.1–0.2. −1, Fermi–Dirac: physical electronic temperature (finite-temperature DFT). Check the entropy term T·S in OUTCAR: divided by the number of atoms it should stay below about 1 meV/atom. If larger, ..."
+   },
+   "why": "0 is safe everywhere. 1 for metal relaxations, never for semiconductors. −5 for accurate DOS and total energies on a uniform mesh with ≥ 4 k-points; not for band paths, not for metal forces.",
+   "breaks": "Method 1 on a semiconductor gives wrong energies. Method -5 should not be used for band paths or metal forces.",
+   "tasks": [
+    "bader",
+    "band",
+    "convergence",
+    "dielectric",
+    "dos",
+    "elastic",
+    "hybrid",
+    "mbj",
+    "optics",
+    "phonon-finite-displacement",
+    "r2scan",
+    "relax",
+    "static"
+   ],
+   "related": [
+    "SIGMA",
+    "NEDOS",
+    "KSPACING"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "corrections": [
+    {
+     "was": "If ISMEAR = 0, 1 or 2 is used, SIGMA must also be set.",
+     "now": "SIGMA has a default (0.2 eV), but that default suits metals only. Set it explicitly every time."
+    }
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "SIGMA",
+   "group": "smearing",
+   "type": "real",
+   "default": "ISMEAR = 1, SIGMA = 0.2",
+   "typical": "0.01–0.05 insulators; 0.1–0.2 metals with ISMEAR=1",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "The width of that spreading, in eV. Small for insulators, larger for metals.",
+    "intermediate": "Smearing width (eV)",
+    "pro": "−5, tetrahedron with Blöchl corrections: accurate total energies and DOS for bulk. Needs at least 4 k-points. Do not use for relaxations of metals (forces are inaccurate). SIGMA is not used for the occupations. 0, Gaussian: safe for any system and for few k-points. Use SIGMA ≈ 0.03–0.05 for semiconductors and insulators; quote E0 (σ → 0). 1 or 2, Methfessel–Paxton: good for metals, SIGMA ≈ 0.1–0.2. −1, Fermi–Dirac: physical electronic temperature (finite-temperature DFT). Check the entropy term T·S in OUTCAR: divided by the number of atoms it should stay below about 1 meV/atom. If larger, ..."
+   },
+   "why": "Check grep EENTRO OUTCAR: the entropy term T·S should be below ~1 meV/atom.",
+   "breaks": "Too wide blurs gaps and adds an entropy error; check the T*S term in OUTCAR is below about 1 meV per atom.",
+   "tasks": [
+    "bader",
+    "band",
+    "convergence",
+    "dielectric",
+    "dos",
+    "elastic",
+    "hybrid",
+    "mbj",
+    "optics",
+    "phonon-finite-displacement",
+    "r2scan",
+    "relax",
+    "static"
+   ],
+   "related": [
+    "ISMEAR",
+    "NEDOS"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "ISPIN",
+   "group": "spin",
+   "type": "int",
+   "default": "1",
+   "typical": "2 for any open-shell d/f system or radical",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Turns spin polarization on (2) or off (1). Use 2 for magnetic materials and open-shell atoms.",
+    "intermediate": "1 = non-spin-polarized, 2 = collinear spin-polarized",
+    "pro": "1: non-spin-polarized; each orbital holds two electrons. Faster, half the memory. Fine for non-magnetic materials (Si, water). 2: separate spin-up and spin-down wavefunctions. Needed for ferromagnets (Fe, Co, Ni), antiferromagnets, radicals, many defects and surfaces. With ISPIN = 2, CHGCAR, DOSCAR and EIGENVAL hold two spin channels; OSZICAR reports the total moment (mag), and OUTCAR the site moments (LORBIT ≥ 10). CPU time and memory roughly double."
+   },
+   "why": "A spin-polarized run started with no initial moment can stay non-magnetic; MAGMOM supplies the seed.",
+   "breaks": "A spin-polarized run with no starting moment can stay non-magnetic.",
+   "tasks": [
+    "bader",
+    "band",
+    "convergence",
+    "dftu",
+    "dos",
+    "elastic",
+    "optics",
+    "phonon-finite-displacement",
+    "relax",
+    "spin",
+    "static"
+   ],
+   "related": [
+    "MAGMOM",
+    "NUPDOWN",
+    "LORBIT"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "corrections": [
+    {
+     "was": "If ISPIN = 2 is set, MAGMOM must also be set.",
+     "now": "MAGMOM is not mandatory: it defaults to 1.0 μB on every atom (ferromagnetic). Set it explicitly for antiferromagnets, strongly magnetic ions or any specific ordering."
+    }
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "MAGMOM",
+   "group": "spin",
+   "type": "real-array",
+   "default": "NIONS*1.0 (ISPIN = 2)",
+   "typical": "2*5 4*0.6; AFM: 5 -5 4*0",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "The starting magnetic moment of each atom, in the same order as the POSCAR. Write 4*3.0 for four atoms at 3.0.",
+    "intermediate": "Initial moment per atom (μB), POSCAR order",
+    "pro": "One value per atom, in POSCAR order. Final moments (OSZICAR, OUTCAR) usually differ from the input; VASP relaxes them. Start slightly above the expected moment, e.g. Fe ≈ 3, Co ≈ 2, Ni ≈ 1, high-spin Mn²⁺/Fe³⁺ ≈ 5. VASP includes MAGMOM in its symmetry analysis, so an AFM pattern automatically lowers the symmetry."
+   },
+   "why": "Start above the expected moment (3–5 for 3d ions). Count must equal NIONS (3×NIONS for non-collinear).",
+   "breaks": "The count must equal the number of atoms; a wrong count or order starts the wrong magnetic state.",
+   "tasks": [
+    "bader",
+    "band",
+    "convergence",
+    "dftu",
+    "dos",
+    "elastic",
+    "optics",
+    "relax",
+    "spin",
+    "static"
+   ],
+   "related": [
+    "ISPIN",
+    "ISYM",
+    "NUPDOWN"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "NUPDOWN",
+   "group": "spin",
+   "type": "int",
+   "default": "Not stated in the handbooks. See the VASP wiki page for NUPDOWN.",
+   "typical": "unset; integer for fixed-moment runs",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Forces the difference between spin-up and spin-down electrons to a fixed number.",
+    "intermediate": "Fix N↑ − N↓",
+    "pro": "Forces a spin state for comparison; remove it for the final ground state."
+   },
+   "why": "Forces a spin state for comparison; remove it for the final ground state.",
+   "breaks": "Left on by mistake it holds the system in a spin state that is not the ground state.",
+   "tasks": [],
+   "related": [
+    "ISPIN",
+    "MAGMOM"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LORBIT",
+   "group": "dos",
+   "type": "int",
+   "default": "not set (no projections)",
+   "typical": "11",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Asks VASP to also write the density of states split by atom and orbital. Use 11.",
+    "intermediate": "Projected DOS / PROCAR output",
+    "pro": "10: projections onto s, p, d (f) per atom. 11: as 10, further resolved into px, py, pz, dxy… The usual choice. 12: as 11, plus complex phase factors in PROCAR. For 10–12 the sphere radii come from the POTCAR (RWIGS there); for LORBIT = 0–2 RWIGS must be set in INCAR. Also prints site-resolved charges and magnetic moments (s, p, d) in OUTCAR."
+   },
+   "why": "11 writes lm-decomposed PDOS and PROCAR and site magnetic moments without needing RWIGS.",
+   "breaks": "Without it there is no projected DOS or PROCAR for plots by atom or orbital.",
+   "tasks": [
+    "band",
+    "dos",
+    "hybrid"
+   ],
+   "related": [
+    "NEDOS",
+    "ISPIN"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "corrections": [
+    {
+     "was": "LORBIT = 11 includes phase information.",
+     "now": "Phase factors come only with LORBIT = 12."
+    },
+    {
+     "was": "LORBIT = 12 uses a different projection grid for symmetry-based analysis.",
+     "now": "LORBIT = 12 uses the same projections as 11 and adds the phase factors to PROCAR."
+    }
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "NEDOS",
+   "group": "dos",
+   "type": "int",
+   "default": "301",
+   "typical": "2000–3001",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "The number of energy points in the density of states. More points give a smoother curve.",
+    "intermediate": "Points on the DOS energy grid",
+    "pro": "NEDOS: number of energy points. The default 301 is far too coarse for publication plots. EMIN, EMAX: absolute energy window (eV). Choose it around the Fermi level of the SCF run."
+   },
+   "why": "Default 301 is too coarse for clean PDOS and optical spectra.",
+   "breaks": "The default is too coarse for clean projected DOS and optical spectra.",
+   "tasks": [
+    "band",
+    "dos",
+    "hybrid",
+    "optics"
+   ],
+   "related": [
+    "EMIN",
+    "EMAX",
+    "LORBIT",
+    "LOPTICS"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "EMIN",
+   "group": "dos",
+   "type": "real",
+   "default": "NEDOS = 301",
+   "typical": "EF ± 10–15",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "The lowest energy of the DOS window, in eV on VASP absolute scale.",
+    "intermediate": "DOS energy window (eV, absolute)",
+    "pro": "NEDOS: number of energy points. The default 301 is far too coarse for publication plots. EMIN, EMAX: absolute energy window (eV). Choose it around the Fermi level of the SCF run."
+   },
+   "why": "Concentrates NEDOS points where you plot.",
+   "breaks": "A window that misses the Fermi level wastes points where you do not plot.",
+   "tasks": [],
+   "related": [
+    "EMAX",
+    "NEDOS"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "EMAX",
+   "group": "dos",
+   "type": "real",
+   "default": "NEDOS = 301",
+   "typical": "EF ± 10–15",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "The highest energy of the DOS window, in eV on VASP absolute scale.",
+    "intermediate": "DOS energy window (eV, absolute)",
+    "pro": "NEDOS: number of energy points. The default 301 is far too coarse for publication plots. EMIN, EMAX: absolute energy window (eV). Choose it around the Fermi level of the SCF run."
+   },
+   "why": "Concentrates NEDOS points where you plot.",
+   "breaks": "A window that misses the Fermi level wastes points where you do not plot.",
+   "tasks": [],
+   "related": [
+    "EMIN",
+    "NEDOS"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "ISTART",
+   "group": "restart",
+   "type": "int",
+   "default": "1 if WAVECAR exists, else 0",
+   "typical": "0 / 1",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Whether to start from random wavefunctions (0) or read the saved WAVECAR (1).",
+    "intermediate": "Read WAVECAR?",
+    "pro": "0: new start, random wavefunctions. Use it when WAVECAR is corrupted or belongs to a different system. 1: continuation, read WAVECAR. The plane-wave basis is regenerated for the current cell at constant ENCUT. Use it after timeouts, when moving from coarse to accurate settings, or to start hard magnetic and metallic systems from a converged state. 2: continuation with a constant basis set (same plane waves as before). The effective cutoff changes with the cell. Used for energy-volume curves without Pulay-stress contamination. 3: full restart including wavefunction and charge-density ..."
+   },
+   "why": "See restart logic.",
+   "breaks": "Reading a corrupted or mismatched WAVECAR stops the run at start-up.",
+   "tasks": [
+    "band",
+    "dos",
+    "hybrid",
+    "mbj",
+    "optics",
+    "r2scan",
+    "static"
+   ],
+   "related": [
+    "ICHARG",
+    "LWAVE"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "corrections": [
+    {
+     "was": "ISTART = 2: same as 1 but adjusts the basis set to a changed cell after ISIF = 3.",
+     "now": "It is the reverse: ISTART = 1 rebuilds the basis for the new cell at constant cutoff. ISTART = 2 keeps the old basis set fixed."
+    },
+    {
+     "was": "ISTART = 3: internal debugging.",
+     "now": "ISTART = 3 is a full restart for MD that also reuses the wavefunction and charge prediction from TMPCAR."
+    }
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "ICHARG",
+   "group": "restart",
+   "type": "int",
+   "default": "2 if ISTART = 0, else 0",
+   "typical": "2 fresh; 1 continue; 11 non-SCF",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Where the starting electron density comes from. 2 builds it from atoms, 1 reads CHGCAR, 11 reads CHGCAR and keeps it fixed.",
+    "intermediate": "Initial density source",
+    "pro": "0: from the initial wavefunctions (WAVECAR). 1: read CHGCAR and continue self-consistency. 2: superposition of atomic charge densities (the usual fresh start). +10 (11, 12): the density is kept fixed (non-self-consistent). 11 reads CHGCAR: the standard setting for band structures and DOS."
+   },
+   "why": "11 for band structures and dense-mesh DOS.",
+   "breaks": "11 needs a CHGCAR from the same structure, ENCUT, POTCAR and spin setting, and does not work with hybrids.",
+   "tasks": [
+    "band"
+   ],
+   "related": [
+    "ISTART",
+    "LCHARG",
+    "LMAXMIX"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "IBRION",
+   "group": "ionic",
+   "type": "int",
+   "default": "−1 if NSW ≤ 1, else 0 (MD!)",
+   "typical": "2 CG (relax); 6 elastic; not written for SCF (default −1 when NSW = 0)",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Chooses what VASP does with the ions: nothing, relax them, or displace them to get force constants.",
+    "intermediate": "How ions move",
+    "pro": "−1: no ionic movement (static). 0: ab initio MD. Set POTIM (time step) and NSW; choose a thermostat with MDALGO and TEBEG/TEEND. 1: RMM-DIIS quasi-Newton. Efficient close to the minimum, can be unstable when forces are large. 2: conjugate gradient. Robust standard for starting relaxations from rough structures. 3: damped MD. Useful for poor starting geometries and NEB. 5 / 6: finite-difference force constants (phonons, Γ-point frequencies). 5 displaces every atom in every direction; 6 uses symmetry to reduce displacements and, with ISIF ≥ 3, also gives elastic constants. 7 / 8: the same via ..."
+   },
+   "why": "2 far from minimum, 1 close to it. 6 + ISIF≥3 gives elastic constants. 8 gives force constants, ε and Z* by DFPT.",
+   "breaks": "Left unset with NSW above 1 it defaults to molecular dynamics. Always set it explicitly for relaxations.",
+   "tasks": [
+    "dielectric",
+    "elastic",
+    "relax"
+   ],
+   "related": [
+    "NSW",
+    "ISIF",
+    "POTIM",
+    "NFREE"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "ISIF",
+   "group": "ionic",
+   "type": "int",
+   "default": "2 (relax), 0 (MD)",
+   "typical": "2 ions; 3 ions+shape+volume; 4 ions+shape at fixed V",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Chooses what may change in a relaxation: only ions (2), ions and the whole cell (3), or ions and cell shape at fixed volume (4).",
+    "intermediate": "What relaxes and whether stress is computed",
+    "pro": "Needs IBRION > 0 and NSW > 0 to move anything. Slabs and surfaces: ISIF = 2. ISIF = 3 would shrink the vacuum. ISIF = 3 keeps the initial space group (a cubic cell stays cubic) unless the symmetry is broken in the input."
+   },
+   "why": "3 for equilibrium structures, 4 for E–V points, 2 for slabs and defects. ISIF=3 required with IBRION=6 for Cij.",
+   "breaks": "ISIF = 3 on a slab changes the vacuum. ISIF = 3 is required with IBRION = 6 for elastic constants.",
+   "tasks": [
+    "elastic",
+    "relax"
+   ],
+   "related": [
+    "IBRION",
+    "ENCUT",
+    "NSW"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "corrections": [
+    {
+     "was": "ISIF = 7 is used for fitting an equation of state.",
+     "now": "An equation of state is usually fitted from a series of fixed-volume calculations (ISIF = 4, or ISIF = 2 for cubic cells at scaled volumes). ISIF = 7 relaxes the volume isotropically."
+    }
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "NSW",
+   "group": "ionic",
+   "type": "int",
+   "default": "0",
+   "typical": "0 static; 100–300 relax; 1 for IBRION 5–8",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "The most ionic steps allowed. 0 means a single calculation with no ion movement.",
+    "intermediate": "Max ionic steps",
+    "pro": "0: one ionic step, no movement. Static energies, DOS, bands. Relaxation (IBRION = 1, 2, 3): upper limit on steps. If reached before EDIFFG is met, copy CONTCAR to POSCAR and restart. MD (IBRION = 0): exactly the number of time steps."
+   },
+   "why": "Reaching NSW is not convergence; check for “reached required accuracy”.",
+   "breaks": "Reaching NSW is not convergence. Check the output for the message that the required accuracy was reached.",
+   "tasks": [
+    "bader",
+    "band",
+    "convergence",
+    "dielectric",
+    "dos",
+    "elastic",
+    "hybrid",
+    "mbj",
+    "optics",
+    "phonon-finite-displacement",
+    "relax",
+    "static"
+   ],
+   "related": [
+    "IBRION",
+    "EDIFFG"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "corrections": [
+    {
+     "was": "VASP exits immediately if NSW is not given for an MD run.",
+     "now": "With the default NSW = 0, IBRION = 0 simply performs no MD steps. Always set NSW for MD."
+    }
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "POTIM",
+   "group": "ionic",
+   "type": "real",
+   "default": "0.5 (IBRION 1–3); none for MD",
+   "typical": "0.1–0.5 relax; 0.015 finite differences",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "The step size for moving ions, or the displacement size for finite differences, in angstrom.",
+    "intermediate": "Step-size scaling (IBRION 1–3) or displacement (Å, IBRION 5/6)",
+    "pro": "MD: the time step in fs. About 0.5 fs with hydrogen, 1–2 fs for heavier atoms. Check the drift of E in OSZICAR. IBRION = 1, 2, 3: scales the trial step. Reduce it (e.g. 0.1) when a relaxation oscillates. IBRION = 5, 6: the displacement amplitude (default 0.015 Å)."
+   },
+   "why": "Lower it when relaxations oscillate or ZBRENT errors appear.",
+   "breaks": "Too large makes relaxations oscillate or fail with ZBRENT errors.",
+   "tasks": [
+    "elastic",
+    "relax"
+   ],
+   "related": [
+    "IBRION",
+    "NFREE"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "NFREE",
+   "group": "ionic",
+   "type": "int",
+   "default": "Not stated in the handbooks. See the VASP wiki page for NFREE.",
+   "typical": "2 (±) or 4",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "How many displacements per direction in finite-difference runs. 4 is more accurate and costs twice as much as 2.",
+    "intermediate": "Displacements per direction (IBRION 5/6)",
+    "pro": "4 is more accurate (cancels anharmonic error), twice the cost."
+   },
+   "why": "4 is more accurate (cancels anharmonic error), twice the cost.",
+   "breaks": "Too few displacements leave more anharmonic error in force constants and elastic constants.",
+   "tasks": [
+    "elastic"
+   ],
+   "related": [
+    "IBRION",
+    "POTIM"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LREAL",
+   "group": "accuracy",
+   "type": "string",
+   "default": ".FALSE.",
+   "typical": ".FALSE. small cells; Auto for > ~20 atoms",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Chooses whether some projections are done in real space (faster) or reciprocal space (more exact).",
+    "intermediate": "Projection in real or reciprocal space",
+    "pro": ".FALSE.: reciprocal space. Most accurate; cost grows faster with system size. Preferred for small cells, phonons, linear response and exact exchange. Auto: real space with automatically optimized projectors. Recommended for cells above roughly 20 atoms. On: real space with optimized projectors, precision set manually through ROPT. .TRUE.: real space with non-optimized projectors (legacy)."
+   },
+   "why": "Real-space projection introduces small force/energy errors; use .FALSE. for phonons, elastic, final energies.",
+   "breaks": "Real-space projection adds small errors; use .FALSE. for phonons, elastic constants and final energies.",
+   "tasks": [
+    "band",
+    "convergence",
+    "dielectric",
+    "dos",
+    "elastic",
+    "phonon-finite-displacement",
+    "relax",
+    "static"
+   ],
+   "related": [
+    "PREC",
+    "ADDGRID"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "ADDGRID",
+   "group": "accuracy",
+   "type": "bool",
+   "default": ".FALSE.",
+   "typical": ".TRUE. for phonons",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Adds an extra fine grid for some charges. It lowers noise in forces at little cost.",
+    "intermediate": "Extra fine grid for augmentation charges",
+    "pro": ".TRUE.: augmentation charges are evaluated on a grid twice as dense in each direction. This can reduce noise in forces and the egg-box effect (energy varying as an atom moves relative to the grid). With PREC = Accurate the gain is usually small. It is most often used for finite-difference phonons and very tight force criteria."
+   },
+   "why": "Reduces force noise; marginal cost.",
+   "breaks": "Without it, phonon force constants can be noisier.",
+   "tasks": [
+    "phonon-finite-displacement"
+   ],
+   "related": [
+    "PREC",
+    "LREAL"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "corrections": [
+    {
+     "was": "It is particularly helpful for HSE06 calculations to stabilize electronic convergence.",
+     "now": "ADDGRID has no established role in hybrid-functional SCF convergence. For difficult HSE runs, adjust ALGO (Damped/All) and start from a converged PBE WAVECAR."
+    }
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LASPH",
+   "group": "accuracy",
+   "type": "bool",
+   "default": "Not stated in the handbooks. See the VASP wiki page for LASPH.",
+   "typical": ".TRUE.",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Includes small non-spherical effects inside the atoms. Turn it on for d and f elements.",
+    "intermediate": "Non-spherical contributions inside PAW spheres",
+    "pro": "Required for meta-GGA; recommended for d/f elements, +U and hybrids."
+   },
+   "why": "Required for meta-GGA; recommended for d/f elements, +U and hybrids.",
+   "breaks": "Missing it for +U, hybrids or d/f elements gives less accurate results; meta-GGA runs require it.",
+   "tasks": [
+    "dftu",
+    "dielectric",
+    "elastic",
+    "hybrid",
+    "mbj",
+    "phonon-finite-displacement",
+    "r2scan",
+    "relax"
+   ],
+   "related": [
+    "LMAXMIX",
+    "METAGGA",
+    "LDAU"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LMAXMIX",
+   "group": "mixing",
+   "type": "int",
+   "default": "2 (as stated in the Workflow Handbook dictionary)",
+   "typical": "4 for d; 6 for f",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "How much detail about d and f electrons is kept when mixing densities. Use 4 for d elements, 6 for f.",
+    "intermediate": "Max l of one-centre densities kept in mixer/CHGCAR",
+    "pro": "Default 2 loses d/f occupation information; vital for +U and for ICHARG=11 runs on d/f systems."
+   },
+   "why": "Default 2 loses d/f occupation information; vital for +U and for ICHARG=11 runs on d/f systems.",
+   "breaks": "The low default loses d/f occupation information, which matters for +U and for ICHARG = 11 runs.",
+   "tasks": [
+    "dftu",
+    "elastic",
+    "optics",
+    "relax"
+   ],
+   "related": [
+    "LASPH",
+    "LDAU",
+    "ICHARG"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "AMIX",
+   "group": "mixing",
+   "type": "real",
+   "default": "0.4 (as stated in the Workflow Handbook dictionary)",
+   "typical": "0.4 / 1.0 default; 0.1–0.2 / 0.0001 for linear mixing",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "How strongly new density is mixed in each step. Lower values calm unstable runs.",
+    "intermediate": "Pulay/Kerker charge mixing",
+    "pro": "Lower AMIX damps charge sloshing in metals, slabs and magnets."
+   },
+   "why": "Lower AMIX damps charge sloshing in metals, slabs and magnets.",
+   "breaks": "Too high can cause charge sloshing in metals, slabs and magnets.",
+   "tasks": [],
+   "related": [
+    "BMIX",
+    "AMIX_MAG"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "BMIX",
+   "group": "mixing",
+   "type": "real",
+   "default": "1.0 (as stated in the Workflow Handbook dictionary)",
+   "typical": "0.4 / 1.0 default; 0.1–0.2 / 0.0001 for linear mixing",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "A second mixing parameter that works with AMIX.",
+    "intermediate": "Pulay/Kerker charge mixing",
+    "pro": "Lower AMIX damps charge sloshing in metals, slabs and magnets."
+   },
+   "why": "Lower AMIX damps charge sloshing in metals, slabs and magnets.",
+   "breaks": "Poor values slow or stall the SCF loop.",
+   "tasks": [],
+   "related": [
+    "AMIX",
+    "BMIX_MAG"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "AMIX_MAG",
+   "group": "mixing",
+   "type": "real",
+   "default": "1.6 (as stated in the Workflow Handbook dictionary)",
+   "typical": "1.6 / 1.0 default; 0.8 / 0.0001 for difficult magnets",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "The same as AMIX, but for the magnetization density.",
+    "intermediate": "Mixing of magnetization density",
+    "pro": "Pair with low AMIX/BMIX for oscillating moments."
+   },
+   "why": "Pair with low AMIX/BMIX for oscillating moments.",
+   "breaks": "Wrong values can make magnetic moments oscillate between steps.",
+   "tasks": [],
+   "related": [
+    "AMIX",
+    "BMIX_MAG",
+    "MAGMOM"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "BMIX_MAG",
+   "group": "mixing",
+   "type": "real",
+   "default": "1.0 (as stated in the Workflow Handbook dictionary)",
+   "typical": "1.6 / 1.0 default; 0.8 / 0.0001 for difficult magnets",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "The same as BMIX, but for the magnetization density.",
+    "intermediate": "Mixing of magnetization density",
+    "pro": "Pair with low AMIX/BMIX for oscillating moments."
+   },
+   "why": "Pair with low AMIX/BMIX for oscillating moments.",
+   "breaks": "Wrong values can make magnetic moments oscillate between steps.",
+   "tasks": [],
+   "related": [
+    "AMIX_MAG",
+    "BMIX",
+    "MAGMOM"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "NBANDS",
+   "group": "electronic",
+   "type": "int",
+   "default": "Not stated in the handbooks. See the VASP wiki page for NBANDS.",
+   "typical": "default; 2–3× for optics; extra for band plots",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "How many electron states (bands) are calculated, including empty ones.",
+    "intermediate": "Number of bands",
+    "pro": "Optics needs empty bands for transitions; must exceed occupied bands."
+   },
+   "why": "Optics needs empty bands for transitions; must exceed occupied bands.",
+   "breaks": "Optics gives poor results without extra empty bands. It must exceed the number of occupied bands.",
+   "tasks": [
+    "optics"
+   ],
+   "related": [
+    "LOPTICS",
+    "NCORE"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "NCORE",
+   "group": "parallel",
+   "type": "int",
+   "default": "1",
+   "typical": "4–√(cores per node)",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "How many cores work together on one band. It tunes speed only.",
+    "intermediate": "Cores per orbital (band parallelization)",
+    "pro": "NCORE and the older NPAR describe the same split (NPAR = ranks / NCORE). NCORE is easier because it does not depend on the total number of ranks. Typical good values lie between 4 and the number of cores per socket; on a 32-core node try 4, 8 and 16 and time a few electronic steps. Reduces communication between nodes; most valuable for large supercells with few k-points."
+   },
+   "why": "Comment out for IBRION = 6 (elastic), IBRION 7/8, LEPSILON, LELF.",
+   "breaks": "Must be commented out for IBRION = 6, IBRION 7/8, LEPSILON and LELF runs, or the run can fail.",
+   "tasks": [
+    "band",
+    "dos",
+    "relax",
+    "static"
+   ],
+   "related": [
+    "KPAR",
+    "LREAL"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "corrections": [
+    {
+     "was": "NCORE was added to replace NPAR and is more efficient because it scales better.",
+     "now": "Both tags still exist and set the same parallel layout. NCORE is simply more convenient to set; neither is more efficient for the same layout."
+    },
+    {
+     "was": "Setting NCORE equal to cores per node (e.g. 32) is the sweet spot.",
+     "now": "The optimum is usually smaller (cores per socket or less). Benchmark rather than assume."
+    }
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "KPAR",
+   "group": "parallel",
+   "type": "int",
+   "default": "1",
+   "typical": "2–8, divides cores",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Splits the k-points into groups that run side by side. It tunes speed only.",
+    "intermediate": "k-point parallel groups",
+    "pro": "KPAR = 1: all MPI ranks work on each k-point in turn. KPAR > 1: ranks split into KPAR groups, each handling its own subset of k-points at the same time. Little communication between groups, so speed-up is often close to linear. Memory grows with KPAR, since each group holds its own copies of large arrays."
+   },
+   "why": "Large speed-up for many k-points; costs memory.",
+   "breaks": "A value that does not divide the core count wastes cores; more groups use more memory.",
+   "tasks": [],
+   "related": [
+    "NCORE"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "corrections": [
+    {
+     "was": "KPAR must be a divisor of the total number of k-points.",
+     "now": "That is not required; uneven division only causes load imbalance. The hard requirement is that the number of MPI ranks is divisible by KPAR."
+    }
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LWAVE",
+   "group": "restart",
+   "type": "bool",
+   "default": ".TRUE.",
+   "typical": ".TRUE. for SCF; .FALSE. for band, elastic, phonon displacements",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Whether to save the wavefunctions to WAVECAR at the end.",
+    "intermediate": "Write WAVECAR / CHGCAR",
+    "pro": ".TRUE.: write WAVECAR, for restarts and wavefunction-based post-processing (GW, BSE, LPARD, Wannier90). .FALSE.: skip it to save disk space and I/O; common in large relaxations, MD and high-throughput work."
+   },
+   "why": "Saves disk; SCF must write CHGCAR for later ICHARG=11 runs.",
+   "breaks": "Turned off in a run you later want to restart from, the WAVECAR is missing. Left on, it uses disk space.",
+   "tasks": [
+    "bader",
+    "band",
+    "dielectric",
+    "dos",
+    "elastic",
+    "optics",
+    "phonon-finite-displacement",
+    "relax",
+    "static"
+   ],
+   "related": [
+    "ISTART",
+    "LCHARG"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LCHARG",
+   "group": "restart",
+   "type": "bool",
+   "default": ".TRUE.",
+   "typical": ".TRUE. for SCF; .FALSE. for band, elastic, phonon displacements",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Whether to save the charge density to CHGCAR at the end.",
+    "intermediate": "Write WAVECAR / CHGCAR",
+    "pro": ".TRUE.: write the density, needed for restarts, non-self-consistent DOS and band runs, Bader and density-difference analysis. .FALSE.: skip it to save disk and I/O, e.g. in long MD runs or screening."
+   },
+   "why": "Saves disk; SCF must write CHGCAR for later ICHARG=11 runs.",
+   "breaks": "An SCF run must write CHGCAR if a later run uses ICHARG = 11.",
+   "tasks": [
+    "bader",
+    "band",
+    "dielectric",
+    "dos",
+    "elastic",
+    "optics",
+    "phonon-finite-displacement",
+    "relax",
+    "static"
+   ],
+   "related": [
+    "ICHARG",
+    "LWAVE"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LAECHG",
+   "group": "output",
+   "type": "bool",
+   "default": "Not stated in the handbooks. See the VASP wiki page for LAECHG.",
+   "typical": ".TRUE.",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Writes the extra files needed for accurate Bader charge analysis.",
+    "intermediate": "Write AECCAR0/1/2",
+    "pro": "Bader needs the all-electron reference density."
+   },
+   "why": "Bader needs the all-electron reference density.",
+   "breaks": "Without the all-electron reference density the Bader charges are less reliable.",
+   "tasks": [
+    "bader"
+   ],
+   "related": [
+    "LCHARG"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LVHAR",
+   "group": "output",
+   "type": "bool",
+   "default": "Not stated in the handbooks. See the VASP wiki page for LVHAR.",
+   "typical": ".TRUE.",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Writes the electrostatic potential to LOCPOT, used for work functions and band alignment.",
+    "intermediate": "Write electrostatic (Hartree) potential to LOCPOT",
+    "pro": "Work function and band alignment."
+   },
+   "why": "Work function and band alignment.",
+   "breaks": "Not set, there is no LOCPOT to read the vacuum level from.",
+   "tasks": [],
+   "related": [
+    "LDIPOL",
+    "IDIPOL"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LELF",
+   "group": "output",
+   "type": "bool",
+   "default": "Not stated in the handbooks. See the VASP wiki page for LELF.",
+   "typical": ".TRUE.",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Writes the electron localization function to ELFCAR for plots of bonding.",
+    "intermediate": "Write ELFCAR",
+    "pro": "Visualize localization and bonding; use NCORE=1."
+   },
+   "why": "Visualize localization and bonding; use NCORE=1.",
+   "breaks": "Must run with NCORE = 1, or the run can fail.",
+   "tasks": [],
+   "related": [
+    "NCORE"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LOPTICS",
+   "group": "optics",
+   "type": "bool",
+   "default": "Not stated in the handbooks. See the VASP wiki page for LOPTICS.",
+   "typical": ".TRUE.",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Calculates how the material responds to light (the dielectric function) from the electron states.",
+    "intermediate": "Frequency-dependent dielectric function (independent particle)",
+    "pro": "Writes ε(ω) to OUTCAR / vasprun.xml."
+   },
+   "why": "Writes ε(ω) to OUTCAR / vasprun.xml.",
+   "breaks": "Without enough empty bands (NBANDS) the spectrum is unreliable.",
+   "tasks": [
+    "optics"
+   ],
+   "related": [
+    "NBANDS",
+    "CSHIFT",
+    "NEDOS"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "CSHIFT",
+   "group": "optics",
+   "type": "real",
+   "default": "0.1 (as stated in the Workflow Handbook dictionary)",
+   "typical": "0.1 default",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "The smoothing width used when computing the optical spectrum, in eV.",
+    "intermediate": "Lorentzian broadening in Kramers–Kronig transform (eV)",
+    "pro": "Smaller sharpens peaks but needs denser k-mesh and NEDOS."
+   },
+   "why": "Smaller sharpens peaks but needs denser k-mesh and NEDOS.",
+   "breaks": "Smaller values sharpen peaks but need a denser k-mesh and more NEDOS points.",
+   "tasks": [
+    "optics"
+   ],
+   "related": [
+    "LOPTICS",
+    "NEDOS"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LEPSILON",
+   "group": "dielectric",
+   "type": "bool",
+   "default": "Not stated in the handbooks. See the VASP wiki page for LEPSILON.",
+   "typical": ".TRUE. with IBRION=8",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Calculates the static dielectric tensor and Born effective charges by perturbation theory.",
+    "intermediate": "DFPT static dielectric tensor, Born charges, piezo tensor",
+    "pro": "Insulators only; NCORE=1; not for hybrids (use LCALCEPS)."
+   },
+   "why": "Insulators only; NCORE=1; not for hybrids (use LCALCEPS).",
+   "breaks": "Insulators only, needs NCORE = 1, and is not for hybrid functionals (use LCALCEPS).",
+   "tasks": [
+    "dielectric"
+   ],
+   "related": [
+    "IBRION",
+    "LRPA",
+    "LCALCEPS"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LRPA",
+   "group": "dielectric",
+   "type": "bool",
+   "default": ".FALSE. (as stated in the Workflow Handbook dictionary)",
+   "typical": ".FALSE. (default)",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Chooses whether local-field effects use only the Hartree part or include exchange-correlation.",
+    "intermediate": "Local-field effects in ε",
+    "pro": ".FALSE. includes exchange-correlation local fields (the “in DFT” values)."
+   },
+   "why": ".FALSE. includes exchange-correlation local fields (the “in DFT” values).",
+   "breaks": "The wrong setting changes the dielectric values you report; the default includes exchange-correlation.",
+   "tasks": [
+    "dielectric"
+   ],
+   "related": [
+    "LEPSILON"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LCALCEPS",
+   "group": "dielectric",
+   "type": "bool",
+   "default": "Not stated in the handbooks. See the VASP wiki page for LCALCEPS.",
+   "typical": ".TRUE.",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Calculates the dielectric tensor and Born charges with a small applied electric field.",
+    "intermediate": "ε and Z* by finite electric field",
+    "pro": "Works with hybrids and meta-GGA."
+   },
+   "why": "Works with hybrids and meta-GGA.",
+   "breaks": "Needed instead of LEPSILON for hybrid and meta-GGA functionals.",
+   "tasks": [],
+   "related": [
+    "LEPSILON",
+    "IBRION"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LDAU",
+   "group": "dftu",
+   "type": "bool",
+   "default": "Not stated in the handbooks. See the VASP wiki page for LDAU.",
+   "typical": ".TRUE., 2",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Switches on the Hubbard U correction for localized d or f electrons.",
+    "intermediate": "Switch on +U; 2 = Dudarev (Ueff = U − J)",
+    "pro": "Corrects self-interaction in localized d/f states."
+   },
+   "why": "Corrects self-interaction in localized d/f states.",
+   "breaks": "Without it, semilocal functionals tend to over-spread d and f electrons and can make insulators look like metals.",
+   "tasks": [
+    "dftu"
+   ],
+   "related": [
+    "LDAUTYPE",
+    "LDAUL",
+    "LDAUU",
+    "LDAUJ"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LDAUTYPE",
+   "group": "dftu",
+   "type": "int",
+   "default": "Not stated in the handbooks. See the VASP wiki page for LDAUTYPE.",
+   "typical": ".TRUE., 2",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Chooses the flavour of +U. 2 is the Dudarev form where only U minus J matters.",
+    "intermediate": "Switch on +U; 2 = Dudarev (Ueff = U − J)",
+    "pro": "Corrects self-interaction in localized d/f states."
+   },
+   "why": "Corrects self-interaction in localized d/f states.",
+   "breaks": "A different type changes what U and J mean, so values from papers may not transfer.",
+   "tasks": [
+    "dftu"
+   ],
+   "related": [
+    "LDAU",
+    "LDAUU",
+    "LDAUJ"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LDAUL",
+   "group": "dftu",
+   "type": "int-array",
+   "default": "Not stated in the handbooks. See the VASP wiki page for LDAUL.",
+   "typical": "2 -1, 5.3 0, 0 0",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "For each species, which orbital gets U: 2 for d, 3 for f, -1 for none.",
+    "intermediate": "Per species: l channel (−1 none, 2 d, 3 f), U, J",
+    "pro": "One value per species in POSCAR order."
+   },
+   "why": "One value per species in POSCAR order.",
+   "breaks": "One entry per species in POSCAR order is required; a missing entry silently shifts values to the wrong element.",
+   "tasks": [
+    "dftu"
+   ],
+   "related": [
+    "LDAU",
+    "LDAUU",
+    "LDAUJ"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LDAUU",
+   "group": "dftu",
+   "type": "real-array",
+   "default": "Not stated in the handbooks. See the VASP wiki page for LDAUU.",
+   "typical": "2 -1, 5.3 0, 0 0",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "For each species, the U value in eV.",
+    "intermediate": "Per species: l channel (−1 none, 2 d, 3 f), U, J",
+    "pro": "One value per species in POSCAR order."
+   },
+   "why": "One value per species in POSCAR order.",
+   "breaks": "One entry per species in POSCAR order is required. Energies with different U are not comparable.",
+   "tasks": [
+    "dftu"
+   ],
+   "related": [
+    "LDAU",
+    "LDAUL",
+    "LDAUJ"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LDAUJ",
+   "group": "dftu",
+   "type": "real-array",
+   "default": "Not stated in the handbooks. See the VASP wiki page for LDAUJ.",
+   "typical": "2 -1, 5.3 0, 0 0",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "For each species, the J value in eV.",
+    "intermediate": "Per species: l channel (−1 none, 2 d, 3 f), U, J",
+    "pro": "One value per species in POSCAR order."
+   },
+   "why": "One value per species in POSCAR order.",
+   "breaks": "One entry per species in POSCAR order is required.",
+   "tasks": [
+    "dftu"
+   ],
+   "related": [
+    "LDAU",
+    "LDAUL",
+    "LDAUU"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LDAUPRINT",
+   "group": "dftu",
+   "type": "int",
+   "default": "Not stated in the handbooks. See the VASP wiki page for LDAUPRINT.",
+   "typical": "Not stated in the handbooks.",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Prints the occupation matrices of the +U orbitals to OUTCAR so you can check them.",
+    "intermediate": "Prints the occupation matrices of the +U orbitals to OUTCAR so you can check them."
+   },
+   "why": "The handbooks show this tag only inside the example INCAR files; they do not give a separate reason.",
+   "breaks": "Without it you cannot easily check that the d occupations make chemical sense.",
+   "tasks": [
+    "dftu"
+   ],
+   "related": [
+    "LDAU"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "METAGGA",
+   "group": "metagga",
+   "type": "string",
+   "default": "Not stated in the handbooks. See the VASP wiki page for METAGGA.",
+   "typical": "R2SCAN, SCAN, MBJ",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Chooses a meta-GGA functional such as R2SCAN, SCAN or MBJ.",
+    "intermediate": "Meta-GGA functional",
+    "pro": "Remove GGA tag. Needs LASPH and τ-capable POTCARs."
+   },
+   "why": "Remove GGA tag. Needs LASPH and τ-capable POTCARs.",
+   "breaks": "Needs LASPH and compatible POTCARs; remove any GGA tag.",
+   "tasks": [
+    "mbj",
+    "r2scan"
+   ],
+   "related": [
+    "LASPH",
+    "LMIXTAU",
+    "ALGO"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LMIXTAU",
+   "group": "metagga",
+   "type": "bool",
+   "default": "Not stated in the handbooks. See the VASP wiki page for LMIXTAU.",
+   "typical": ".TRUE.",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Also mixes the kinetic-energy density, which steadies meta-GGA runs.",
+    "intermediate": "Mix the kinetic-energy density",
+    "pro": "Stabilizes meta-GGA SCF."
+   },
+   "why": "Stabilizes meta-GGA SCF.",
+   "breaks": "Missing it can make meta-GGA SCF loops unstable.",
+   "tasks": [
+    "r2scan"
+   ],
+   "related": [
+    "METAGGA"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LHFCALC",
+   "group": "hybrid",
+   "type": "bool",
+   "default": "Not stated in the handbooks. See the VASP wiki page for LHFCALC.",
+   "typical": ".TRUE.",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Switches on exact exchange, which makes the functional a hybrid.",
+    "intermediate": "Hartree–Fock exchange on",
+    "pro": "Hybrid functionals."
+   },
+   "why": "Hybrid functionals.",
+   "breaks": "Hybrid runs are far more expensive and ICHARG = 11 does not work with them.",
+   "tasks": [
+    "hybrid"
+   ],
+   "related": [
+    "HFSCREEN",
+    "AEXX",
+    "PRECFOCK"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "HFSCREEN",
+   "group": "hybrid",
+   "type": "real",
+   "default": "Not stated in the handbooks. See the VASP wiki page for HFSCREEN.",
+   "typical": "0.2 and 0.25 = HSE06; 0 and 0.25 = PBE0",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "The screening length of the exchange. 0.2 with AEXX 0.25 is HSE06; 0 is PBE0.",
+    "intermediate": "Screening length (Å⁻¹), exact-exchange fraction",
+    "pro": "AEXX can be tuned to reproduce a known gap; report it if you do."
+   },
+   "why": "AEXX can be tuned to reproduce a known gap; report it if you do.",
+   "breaks": "The wrong value runs a different functional than the one you report.",
+   "tasks": [
+    "hybrid"
+   ],
+   "related": [
+    "AEXX",
+    "LHFCALC"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "AEXX",
+   "group": "hybrid",
+   "type": "real",
+   "default": "Not stated in the handbooks. See the VASP wiki page for AEXX.",
+   "typical": "0.2 and 0.25 = HSE06; 0 and 0.25 = PBE0",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "The fraction of exact exchange mixed in. 0.25 is standard.",
+    "intermediate": "Screening length (Å⁻¹), exact-exchange fraction",
+    "pro": "AEXX can be tuned to reproduce a known gap; report it if you do."
+   },
+   "why": "AEXX can be tuned to reproduce a known gap; report it if you do.",
+   "breaks": "If you tune it to match a known gap, you must report the value.",
+   "tasks": [
+    "hybrid"
+   ],
+   "related": [
+    "HFSCREEN",
+    "LHFCALC"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "PRECFOCK",
+   "group": "hybrid",
+   "type": "string",
+   "default": "Not stated in the handbooks. See the VASP wiki page for PRECFOCK.",
+   "typical": "Fast/Normal; NKRED = 2",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Sets how fine the grid for the exchange part is. Fast saves time.",
+    "intermediate": "FFT grid for exchange; k-mesh reduction for exchange",
+    "pro": "Cut hybrid cost several-fold; check the gap changes by < ~0.05 eV."
+   },
+   "why": "Cut hybrid cost several-fold; check the gap changes by < ~0.05 eV.",
+   "breaks": "Cheaper settings can shift the gap; check the change is below about 0.05 eV.",
+   "tasks": [
+    "hybrid"
+   ],
+   "related": [
+    "NKRED",
+    "LHFCALC"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "NKRED",
+   "group": "hybrid",
+   "type": "int",
+   "default": "Not stated in the handbooks. See the VASP wiki page for NKRED.",
+   "typical": "Fast/Normal; NKRED = 2",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Reduces the k-mesh used for the exchange part, cutting cost.",
+    "intermediate": "FFT grid for exchange; k-mesh reduction for exchange",
+    "pro": "Cut hybrid cost several-fold; check the gap changes by < ~0.05 eV."
+   },
+   "why": "Cut hybrid cost several-fold; check the gap changes by < ~0.05 eV.",
+   "breaks": "Works for even meshes only, and can shift the gap; check it changes by less than about 0.05 eV.",
+   "tasks": [],
+   "related": [
+    "PRECFOCK",
+    "LHFCALC"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "IVDW",
+   "group": "vdw",
+   "type": "int",
+   "default": "Not stated in the handbooks. See the VASP wiki page for IVDW.",
+   "typical": "11 (D3), 12 (D3-BJ), 20 (TS)",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Adds a correction for weak van der Waals forces. 11 is D3 and 12 is D3 with Becke-Johnson damping.",
+    "intermediate": "Dispersion correction",
+    "pro": "Layered, molecular and adsorption systems."
+   },
+   "why": "Layered, molecular and adsorption systems.",
+   "breaks": "Without it layered and molecular crystals and adsorption systems are described poorly.",
+   "tasks": [
+    "vdw"
+   ],
+   "related": [
+    "LUSE_VDW"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LSORBIT",
+   "group": "soc",
+   "type": "bool",
+   "default": "Not stated in the handbooks. See the VASP wiki page for LSORBIT.",
+   "typical": ".TRUE.; 0 0 1",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Switches on spin-orbit coupling, which matters for heavy elements.",
+    "intermediate": "Spin–orbit coupling; spin quantization axis",
+    "pro": "Heavy elements, MAE, topological bands. Needs vasp_ncl and 3 MAGMOM values per atom."
+   },
+   "why": "Heavy elements, MAE, topological bands. Needs vasp_ncl and 3 MAGMOM values per atom.",
+   "breaks": "Needs the non-collinear VASP build and three MAGMOM values per atom.",
+   "tasks": [],
+   "related": [
+    "SAXIS",
+    "MAGMOM"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "SAXIS",
+   "group": "soc",
+   "type": "real-array",
+   "default": "Not stated in the handbooks. See the VASP wiki page for SAXIS.",
+   "typical": ".TRUE.; 0 0 1",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "The direction chosen as the spin axis, for example 0 0 1.",
+    "intermediate": "Spin–orbit coupling; spin quantization axis",
+    "pro": "Heavy elements, MAE, topological bands. Needs vasp_ncl and 3 MAGMOM values per atom."
+   },
+   "why": "Heavy elements, MAE, topological bands. Needs vasp_ncl and 3 MAGMOM values per atom.",
+   "breaks": "Needs LSORBIT; a wrong axis changes magnetic-anisotropy results.",
+   "tasks": [],
+   "related": [
+    "LSORBIT"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "ISYM",
+   "group": "symmetry",
+   "type": "int",
+   "default": "2 (PAW); 3 with hybrids",
+   "typical": "default; ISYM = 0 to switch off; SYMPREC 1E-4–1E-3",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Controls whether VASP uses crystal symmetry to save work. 0 switches it off.",
+    "intermediate": "Symmetry use; tolerance",
+    "pro": "2: full symmetry; k-points reduced to the IBZ, densities symmetrized. 0: no space-group symmetry, but time reversal is still used (k and −k equivalent). −1: no symmetry at all, including time reversal; full k-mesh."
+   },
+   "why": "Change only to fix symmetry errors or for LOBSTER/defects.",
+   "breaks": "Leaving it on can fight a hand-built antiferromagnetic MAGMOM pattern; changing it is only for fixing symmetry errors.",
+   "tasks": [],
+   "related": [
+    "SYMPREC",
+    "MAGMOM"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "field",
+    "workflow"
+   ],
+   "corrections": [
+    {
+     "was": "ISYM = −1: no k-point reduction, but symmetry still used elsewhere.",
+     "now": "ISYM = −1 switches off all symmetry, including time reversal. ISYM = 0 is the setting that drops space-group symmetry but keeps time reversal."
+    }
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "SYMPREC",
+   "group": "symmetry",
+   "type": "real",
+   "default": "Not stated in the handbooks. See the VASP wiki page for SYMPREC.",
+   "typical": "default; ISYM = 0 to switch off; SYMPREC 1E-4–1E-3",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "How precisely atoms must sit on symmetry positions for VASP to see the symmetry.",
+    "intermediate": "Symmetry use; tolerance",
+    "pro": "Change only to fix symmetry errors or for LOBSTER/defects."
+   },
+   "why": "Change only to fix symmetry errors or for LOBSTER/defects.",
+   "breaks": "Too tight misses symmetry and too loose invents it; change only to fix symmetry errors.",
+   "tasks": [],
+   "related": [
+    "ISYM"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "KSPACING",
+   "group": "kpoints",
+   "type": "real",
+   "default": "Not stated in the handbooks. See the VASP wiki page for KSPACING.",
+   "typical": "0.15–0.25",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Builds the k-mesh from a spacing, without a KPOINTS file. Smaller spacing means more k-points.",
+    "intermediate": "Automatic mesh without KPOINTS file (Å⁻¹, includes 2π)",
+    "pro": "VASPkit resolution × 2π ≈ KSPACING (0.03 → 0.19)."
+   },
+   "why": "VASPkit resolution × 2π ≈ KSPACING (0.03 → 0.19).",
+   "breaks": "Too large gives an under-sampled zone. Compare it with a VASPKIT resolution: spacing is about 2 pi times the resolution.",
+   "tasks": [],
+   "related": [
+    "ISMEAR",
+    "EDIFF"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042",
+    "S-020"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LDIPOL",
+   "group": "slab",
+   "type": "bool",
+   "default": "Not stated in the handbooks. See the VASP wiki page for LDIPOL.",
+   "typical": ".TRUE., 3 (along z)",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Adds a dipole correction for slabs that are not the same on both sides.",
+    "intermediate": "Dipole correction",
+    "pro": "Asymmetric slabs and adsorption."
+   },
+   "why": "Asymmetric slabs and adsorption.",
+   "breaks": "Without it an asymmetric slab sees a false field across the vacuum.",
+   "tasks": [],
+   "related": [
+    "IDIPOL",
+    "LVHAR"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "IDIPOL",
+   "group": "slab",
+   "type": "int",
+   "default": "Not stated in the handbooks. See the VASP wiki page for IDIPOL.",
+   "typical": ".TRUE., 3 (along z)",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "The direction of the dipole correction; 3 means along z.",
+    "intermediate": "Dipole correction",
+    "pro": "Asymmetric slabs and adsorption."
+   },
+   "why": "Asymmetric slabs and adsorption.",
+   "breaks": "The wrong direction applies the correction across the wrong axis.",
+   "tasks": [],
+   "related": [
+    "LDIPOL",
+    "LVHAR"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "SYSTEM",
+   "group": "output",
+   "type": "string",
+   "default": "Not stated in the handbooks. See the VASP wiki page for SYSTEM.",
+   "typical": "Not stated in the handbooks.",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "A free-text name for the calculation, written into the output.",
+    "intermediate": "A free-text name for the calculation, written into the output."
+   },
+   "why": "The handbooks show this tag only inside the example INCAR files; they do not give a separate reason.",
+   "breaks": "It has no effect on the physics.",
+   "tasks": [
+    "band",
+    "dos",
+    "elastic",
+    "relax",
+    "static"
+   ],
+   "related": [],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "TIME",
+   "group": "electronic",
+   "type": "real",
+   "default": "Not stated in the handbooks. See the VASP wiki page for TIME.",
+   "typical": "Not stated in the handbooks.",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "A step size used by the damped electronic algorithm.",
+    "intermediate": "A step size used by the damped electronic algorithm."
+   },
+   "why": "The handbooks show this tag only inside the example INCAR files; they do not give a separate reason.",
+   "breaks": "The handbooks only show 0.4 with ALGO = Damped for HSE06; other uses are not described there.",
+   "tasks": [
+    "hybrid"
+   ],
+   "related": [
+    "ALGO",
+    "LHFCALC"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "LUSE_VDW",
+   "group": "vdw",
+   "type": "bool",
+   "default": "Not stated in the handbooks. See the VASP wiki page for LUSE_VDW.",
+   "typical": "Not stated in the handbooks.",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Turns on the rVV10 dispersion add-on used with SCAN-type functionals.",
+    "intermediate": "Turns on the rVV10 dispersion add-on used with SCAN-type functionals."
+   },
+   "why": "The handbooks show this tag only inside the example INCAR files; they do not give a separate reason.",
+   "breaks": "Needs BPARAM set to match the functional.",
+   "tasks": [],
+   "related": [
+    "BPARAM",
+    "METAGGA"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "BPARAM",
+   "group": "vdw",
+   "type": "real",
+   "default": "Not stated in the handbooks. See the VASP wiki page for BPARAM.",
+   "typical": "Not stated in the handbooks.",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "A parameter of the rVV10 dispersion add-on: 15.7 for SCAN, 11.95 for r2SCAN.",
+    "intermediate": "A parameter of the rVV10 dispersion add-on: 15.7 for SCAN, 11.95 for r2SCAN."
+   },
+   "why": "The handbooks show this tag only inside the example INCAR files; they do not give a separate reason.",
+   "breaks": "A value for the wrong functional gives wrong dispersion energy.",
+   "tasks": [],
+   "related": [
+    "LUSE_VDW"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "CMBJ",
+   "group": "metagga",
+   "type": "real",
+   "default": "Not stated in the handbooks. See the VASP wiki page for CMBJ.",
+   "typical": "Not stated in the handbooks.",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Fixes the c parameter of the mBJ functional. Normally left unset.",
+    "intermediate": "Fixes the c parameter of the mBJ functional. Normally left unset."
+   },
+   "why": "The handbooks show this tag only inside the example INCAR files; they do not give a separate reason.",
+   "breaks": "By default c is computed self-consistently; a fixed value changes the gap.",
+   "tasks": [],
+   "related": [
+    "METAGGA"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-042"
+   ],
+   "fromHandbook": [
+    "workflow"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  }
+ ]
+}

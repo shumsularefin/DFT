@@ -31,6 +31,7 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-025 | open | builder (M6.4 or when module 1 questions are revised) |
 | Q-026 | open | author or auditor |
 | Q-027 | open | author or auditor |
+| Q-028 | open | author |
 
 ## Q-001. Repository licence
 Which licence for the code and which for the written content and data (a common split: MIT for code, CC BY 4.0 for original text)? Affects `LICENSE`, the footer and the references page. Until decided: no LICENSE file; `THIRD_PARTY_NOTICES.md` lists upstream licences. **Owner: author.**
@@ -112,3 +113,6 @@ Statements in `src/content/handbook/03-many-electrons/` that rest on general kno
 
 ## Q-027. M3.1 inputs that could not be verified, and one work-order number that is wrong
 (1) The work order (M3-input-builder.md, M3.1 tests) says an fcc primitive cell with a = 3.61 has volume 11.7607 A^3 "(a^3/4)". But 3.61^3 / 4 = 11.76147. The test uses a^3/4 computed in code and 11.76147 to 4 decimals, not 11.7607; the tolerance was not loosened to fit the stated number. **Close:** the author corrects the work order. (2) `src/data/atomic-masses.json` is generated from pymatgen's element table (S-034), which derives from IUPAC standard atomic weights; it was not compared with the IUPAC publication (offline), and conventional single values stand in for weight intervals. Density in g/cm^3 uses CODATA 2018 u in grams (S-031). **Close:** compare a handful of elements against the IUPAC table and upgrade the register status.
+
+## Q-028. M3.3 tag data the handbooks do not state
+(1) About 40 of the 71 tags have default "Not stated in the handbooks" and every tag has vaspVersion "6.x" with a note that the minimum version was not checked; the vasp.at wiki was not read. The author should fill these from the wiki (S-019). (2) Tag `handbook` links are null until the handbook pages exist. (3) The beginner and "what breaks" texts are new wording and need author review. (4) Left out on purpose: the two phonopy config blocks (band.conf, mesh.conf; not INCAR), the Field Handbook OUT, INP, TROUBLE and RECIPES records (belong to M4 and later stages), and the 20 Workflow error rows (M3.4 rules).
