@@ -2,6 +2,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import q1 from './module-01.json';
 import q2 from './module-02.json';
+import q3 from './module-03.json';
 
 interface Q {
   id: string;
@@ -18,6 +19,7 @@ interface Q {
 }
 const MODULES = [
   { name: 'module 1', perConcept: false, dir: 'src/content/handbook/01-why-dft', questions: q1 as Q[] },
+  { name: 'module 3', perConcept: true, dir: 'src/content/handbook/03-many-electrons', questions: q3 as Q[] },
   { name: 'module 2', perConcept: true, dir: 'src/content/handbook/02-quantum-basics', questions: q2 as Q[] },
 ];
 const sourceIds = new Set([...readFileSync('docs/SCIENCE_SOURCES.md', 'utf8').matchAll(/^\| (S-\d{3}) /gm)].map((m) => m[1]));

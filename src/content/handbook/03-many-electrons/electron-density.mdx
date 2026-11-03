@@ -1,0 +1,105 @@
+---
+id: electron-density
+title: Electron density
+module: 3
+order: 3
+summary: A single function of three variables that says where the electrons are, and a lab where a density determines its potential.
+concepts: [electron-density-meaning]
+requires: [exponential-wall]
+vaspTags: [CHGCAR]
+sources: [S-011, S-047, S-048]
+status: draft
+updated: 2026-11-03
+---
+
+<Why>
+
+The exact wavefunction needs $3N$ coordinates and cannot be stored. The <Term id="electron-density">electron density</Term> needs three, whatever the number of electrons. If the density can stand in for the wavefunction, the wall disappears. This page introduces the density and lets you try the surprising claim that it carries all the information.
+
+</Why>
+
+<Intuition>
+
+The density is a number at every point in space that tells you how much electron charge is there. Where it is large, electrons are likely to be found. It comes from the wavefunction: pick a point, and add up the chance of finding any electron there, over everything the other electrons might be doing. It integrates to the number of electrons <Cite id="S-048" />.
+
+You can picture it as a map, like a population map of a country. It does not say who lives where, only how many are in each place. A lot of detail is thrown away. The remarkable fact, which the next page explains, is that for the lowest-energy state not enough is thrown away to lose the answer.
+
+The lab has two parts.
+
+- **Part 1, one electron.** Reshape a density with the dots. The lab computes the potential that this density comes from, then solves the Schrödinger equation for that potential, and overlays the result. The curves coincide: one density, one potential, up to adding a constant <Cite id="S-011" />.
+- **Part 2, several electrons.** Fill a well with electrons, two per orbital as the Pauli principle allows, and watch the densities of the filled orbitals add up to the total.
+
+<Level min="intermediate">
+
+Adding a constant to a potential changes every energy by that constant and changes no density. That is why the map from density to potential is only defined up to a constant, not exactly.
+
+</Level>
+
+<Level min="pro">
+
+In part 1 the potential is found by turning the Schrödinger equation around: for the lowest state $\psi = \sqrt{n}$, so $V = E + \frac{\hbar^2}{2m}\psi''/\psi$. The lab uses the same finite-difference second derivative in both directions, so the round trip matches to rounding error. Treat the match as a check of the arithmetic, and the idea as the point: it is the one-electron case of a general theorem <Cite id="S-011" />.
+
+</Level>
+
+</Intuition>
+
+<Lab id="density-as-a-map" title="Density as a map" />
+
+<TheMath>
+
+For $N$ electrons with wavefunction $\Psi$, the density is
+
+$$n(\mathbf{r}) = N\int |\Psi(\mathbf{r}, \mathbf{r}_2, \dots, \mathbf{r}_N)|^2\, d\mathbf{r}_2 \cdots d\mathbf{r}_N, \qquad \int n(\mathbf{r})\,d\mathbf{r} = N$$
+
+<Cite id="S-048" />. For non-interacting electrons in orbitals $\psi_i$ with occupation $f_i$ (2 for a filled
+spatial orbital), $n(x) = \sum_i f_i\,|\psi_i(x)|^2$. For a single electron in its lowest state, the potential
+is fixed by the density up to a constant:
+
+$$V(x) = E + \frac{\hbar^2}{2m}\,\frac{\psi''(x)}{\psi(x)}, \qquad \psi = \sqrt{n}$$
+
+<Cite id="S-011" />. For a Gaussian density $n \propto e^{-x^2/\sigma^2}$ this gives a parabola with curvature $2(\hbar^2/2m)/\sigma^4$; the site tests that against the solver. The lab is one-dimensional, so it is a toy, not a calculation for real materials.
+
+</TheMath>
+
+<InVasp>
+
+The density is VASP's central object. After a run, `CHGCAR` holds the electron density on a grid, and you can plot it or integrate it to check the electron count. The number of electrons is `NELECT`, which VASP sets from the valence electrons of your POTCAR files unless you override it.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...          | ...the density         | ...the potential               |
+| ------------------------- | ---------------------- | ------------------------------ |
+| Make the bump narrower    | More concentrated      | Steeper, with higher curvature |
+| Add a constant to V       | Nothing                | Shifted everywhere             |
+| Add an electron to a well | Fills the next orbital | Unchanged (non-interacting)    |
+
+Why a map: it keeps the question "where are the electrons" and drops the unmanageable detail. What happens if you forget the constant: you may think two potentials differ when they give the same density.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Thinking the density is a single electron's wavefunction">
+
+It is the combined charge distribution of all the electrons, which is why it integrates to $N$.
+
+</Callout>
+
+<Callout variant="mistake" title="Assuming part 2 shows how real electrons behave">
+
+In part 2 the electrons ignore each other. Real electrons repel each other; handling that is the job of the next pages.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-dens-1', 'q-dens-2', 'q-dens-3', 'q-dens-4', 'q-dens-5']} />
+
+<GoDeeper>
+
+- Hohenberg and Kohn, the original paper on the inhomogeneous electron gas <Cite id="S-011" />.
+- Szabo and Ostlund on the electron density and reduced density matrices <Cite id="S-048" />.
+
+</GoDeeper>

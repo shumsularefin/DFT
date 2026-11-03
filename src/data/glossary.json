@@ -581,5 +581,60 @@
       "S-050",
       "S-036"
     ]
+  },
+  {
+    "id": "hilbert-space",
+    "label": "Hilbert space",
+    "short": "The space of all possible states of a quantum system. Each state is a point, and adding two states gives another state.",
+    "level": "intermediate",
+    "sources": [
+      "S-047",
+      "S-048"
+    ]
+  },
+  {
+    "id": "slater-determinant",
+    "label": "Slater determinant",
+    "short": "A way to write a many-electron wavefunction from one-electron orbitals so that swapping two electrons flips the sign, as the Pauli principle requires.",
+    "level": "intermediate",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "spin-orbital",
+    "label": "Spin orbital",
+    "short": "An orbital together with a choice of spin up or spin down. Each electron occupies one spin orbital.",
+    "level": "intermediate",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "correlation",
+    "label": "Correlation",
+    "short": "The way electrons avoid each other because they repel, beyond what the simplest average-field picture captures.",
+    "level": "intermediate",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "external-potential",
+    "label": "External potential",
+    "short": "The push or pull on the electrons that comes from outside the electrons themselves, in a solid mainly the attraction of the nuclei.",
+    "level": "intermediate",
+    "sources": [
+      "S-011"
+    ]
+  },
+  {
+    "id": "ground-state-density",
+    "label": "Ground-state density",
+    "short": "The electron density of the lowest-energy state of a system.",
+    "level": "intermediate",
+    "sources": [
+      "S-011"
+    ]
   }
 ]

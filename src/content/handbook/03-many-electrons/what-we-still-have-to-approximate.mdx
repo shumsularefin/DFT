@@ -1,0 +1,100 @@
+---
+id: what-we-still-have-to-approximate
+title: What we still have to approximate
+module: 3
+order: 5
+summary: The density route removes the wall, but it leaves one ingredient unknown. See what it is and why it needs a model.
+concepts: [approximations-needed]
+requires: [density-to-potential]
+vaspTags: [GGA]
+sources: [S-011, S-012, S-048, S-049]
+status: draft
+updated: 2026-11-03
+noLab: true
+---
+
+<Why>
+
+If the density holds all the information, are we done? Not quite. The theorem says the answer exists in terms of the density but does not tell us the recipe. Knowing which part is missing explains why DFT has choices, and why those choices matter.
+
+</Why>
+
+<Intuition>
+
+Split the energy of the electrons into pieces:
+
+- The attraction to the nuclei. This is simple in terms of the density.
+- The energy of the electrons pushing on themselves, as if the density were a smooth cloud of charge repelling itself. Also simple.
+- The kinetic energy of the electrons. In terms of the density alone, this is hard to write down.
+- Everything else: two quantum effects. The Pauli principle keeps same-spin electrons apart (<Term id="exchange-correlation">exchange</Term>), and repulsion makes all electrons dodge one another (<Term id="correlation">correlation</Term>) <Cite id="S-048" />.
+
+Kohn and Sham found a clever way around the kinetic-energy problem, using a helper system of non-interacting electrons <Cite id="S-012" />. That is module 4. After their step, a single leftover term remains that collects exchange and correlation, the <Term id="exchange-correlation">exchange-correlation</Term> energy. Its exact form is unknown, so it has to be approximated. This is where the different "functionals" come from.
+
+This is the honest summary of DFT. In principle exact, in practice approximate, and all the approximation sits in one place <Cite id="S-049" />.
+
+<Level min="intermediate">
+
+Because the approximation is in one term, errors are not random. They are systematic, and they depend on the material and the property. This is why checking a result against another functional or an experiment is a normal part of the work.
+
+</Level>
+
+<Level min="pro">
+
+Common approximations in practice include local and semilocal forms (LDA, GGA), which use the density and its gradient at each point, and hybrid forms that add some exact exchange. How accurate each is varies by property <Cite id="S-049" />.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+Written out, the Kohn-Sham energy has the form <Cite id="S-012" />
+
+$$E[n] = T_s[n] + \int v\,n\,d\mathbf{r} + E_H[n] + E_{xc}[n]$$
+
+with $T_s$ the kinetic energy of the helper electrons, $E_H$ the self-repulsion of the density, and $E_{xc}$ the exchange-correlation energy. Only $E_{xc}$ is unknown. Deriving this is module 4; here it only shows where the approximation lives.
+
+</TheMath>
+
+<InVasp>
+
+In VASP the choice of approximation is the functional, usually fixed by the POTCAR files and optionally changed with the `GGA` tag. Choosing it is a decision you make for every project; module 5 returns to it.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...            | ...the approximation                      | ...what to expect                      |
+| --------------------------- | ----------------------------------------- | -------------------------------------- |
+| The functional              | The treatment of exchange and correlation | Different energies, gaps, bond lengths |
+| Add exact exchange (hybrid) | A more elaborate recipe                   | Often better gaps, higher cost         |
+| Nothing but the cell size   | Not the approximation                     | Convergence, not physics               |
+
+Why one term: everything else is exact. What happens if you forget it: you treat a computed number as exact when it carries an approximation.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Calling DFT exact because the theorem is exact">
+
+The theorem is exact. Every practical calculation uses an approximate functional.
+
+</Callout>
+
+<Callout variant="mistake" title="Treating all functionals as interchangeable">
+
+They agree for some properties and disagree for others. Testing is part of the method.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-approx-1', 'q-approx-2', 'q-approx-3', 'q-approx-4']} />
+
+<GoDeeper>
+
+- Kohn and Sham, the paper on self-consistent equations <Cite id="S-012" />.
+- Martin, _Electronic Structure_, on functionals in practice <Cite id="S-049" />.
+
+</GoDeeper>

@@ -1,0 +1,742 @@
+[
+  {
+    "id": "q-many-1",
+    "concepts": [
+      "many-electron-problem"
+    ],
+    "type": "single",
+    "prompt": "What makes a many-electron atom or solid so much harder than hydrogen?",
+    "options": [
+      {
+        "text": "The electrons repel each other, so their motions are tied together",
+        "correct": true,
+        "why": "That coupling stops the problem from splitting into one-electron pieces."
+      },
+      {
+        "text": "The nuclei are heavier",
+        "correct": false,
+        "why": "Tempting because heavier atoms are bigger, but the nuclear mass is not the difficulty."
+      },
+      {
+        "text": "Electrons have no wavefunction",
+        "correct": false,
+        "why": "Tempting from the word many, but each electron is described by quantum mechanics."
+      }
+    ],
+    "hints": [
+      "Think about what happens when you add a second electron."
+    ],
+    "difficulty": -2,
+    "level": "beginner",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-many-2",
+    "concepts": [
+      "many-electron-problem"
+    ],
+    "type": "single",
+    "prompt": "How many coordinates does the exact wavefunction of N electrons depend on (ignoring spin)?",
+    "options": [
+      {
+        "text": "3N",
+        "correct": true,
+        "why": "Three coordinates for each electron."
+      },
+      {
+        "text": "3",
+        "correct": false,
+        "why": "Tempting because space has three directions, but that is the density, not the wavefunction."
+      },
+      {
+        "text": "N",
+        "correct": false,
+        "why": "Tempting from counting electrons, but each electron needs three coordinates."
+      }
+    ],
+    "hints": [
+      "Three per electron."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-many-3",
+    "concepts": [
+      "many-electron-problem"
+    ],
+    "type": "numeric",
+    "prompt": "A wavefunction is stored on a grid of 10 points along each axis. How many values does it need for 4 electrons? Give the exponent of 10.",
+    "answer": 12,
+    "tolerance": 0.001,
+    "unit": "",
+    "hints": [
+      "Number of coordinates is 3N, and each takes 10 values."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-many-4",
+    "concepts": [
+      "many-electron-problem"
+    ],
+    "type": "single",
+    "prompt": "What does the Born-Oppenheimer approximation let us do?",
+    "options": [
+      {
+        "text": "Treat the nuclei as fixed while the electrons move",
+        "correct": true,
+        "why": "The nuclei are much heavier, so they move far more slowly."
+      },
+      {
+        "text": "Ignore the electrons",
+        "correct": false,
+        "why": "Tempting because it is an approximation, but the electrons are the point."
+      },
+      {
+        "text": "Remove electron repulsion",
+        "correct": false,
+        "why": "Tempting because it simplifies, but repulsion stays in the problem."
+      }
+    ],
+    "hints": [
+      "Think about heavy versus light."
+    ],
+    "difficulty": -1,
+    "level": "intermediate",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-many-5",
+    "concepts": [
+      "many-electron-problem"
+    ],
+    "type": "single",
+    "prompt": "If electron repulsion were switched off, what would happen to the problem?",
+    "options": [
+      {
+        "text": "It would split into separate one-electron problems",
+        "correct": true,
+        "why": "The coupling term is what ties them together."
+      },
+      {
+        "text": "It would become harder",
+        "correct": false,
+        "why": "Tempting because repulsion sounds physical, but removing it simplifies the maths."
+      },
+      {
+        "text": "Nothing would change",
+        "correct": false,
+        "why": "Tempting if you think repulsion is small, but it is the whole difficulty."
+      }
+    ],
+    "hints": [
+      "The coupling is between pairs."
+    ],
+    "difficulty": 0,
+    "level": "pro",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-wall-1",
+    "concepts": [
+      "exponential-wall"
+    ],
+    "type": "single",
+    "prompt": "What does the number of Slater determinants count?",
+    "options": [
+      {
+        "text": "The ways to choose which spin orbitals the electrons occupy",
+        "correct": true,
+        "why": "It is a binomial coefficient."
+      },
+      {
+        "text": "The number of atoms",
+        "correct": false,
+        "why": "Tempting because counting is involved, but it counts choices of orbitals."
+      },
+      {
+        "text": "The number of electrons",
+        "correct": false,
+        "why": "Tempting because N appears, but N is an input."
+      }
+    ],
+    "hints": [
+      "Choose N orbitals from M."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-wall-2",
+    "concepts": [
+      "exponential-wall"
+    ],
+    "type": "numeric",
+    "prompt": "How many ways are there to choose 5 occupied spin orbitals from 10?",
+    "answer": 252,
+    "tolerance": 0.5,
+    "unit": "",
+    "hints": [
+      "The binomial coefficient C(10, 5)."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-wall-3",
+    "concepts": [
+      "exponential-wall"
+    ],
+    "type": "numeric",
+    "prompt": "For 20 electrons in 40 spin orbitals there are 137 846 528 820 determinants. At 8 bytes each, how much memory is needed, in terabytes (10^12 bytes)?",
+    "answer": 1.1028,
+    "tolerance": 0.01,
+    "unit": "TB",
+    "hints": [
+      "Multiply by 8, then divide by 10^12."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-wall-4",
+    "concepts": [
+      "exponential-wall"
+    ],
+    "type": "single",
+    "prompt": "Why will a faster computer not remove the exponential wall?",
+    "options": [
+      {
+        "text": "The size of the exact problem multiplies with each added electron",
+        "correct": true,
+        "why": "Hardware improves by modest factors, the problem grows much faster."
+      },
+      {
+        "text": "Computers cannot do quantum mechanics",
+        "correct": false,
+        "why": "Tempting but wrong: the issue is size, not whether the physics applies."
+      },
+      {
+        "text": "The wall is only a rule of thumb",
+        "correct": false,
+        "why": "Tempting because it is a metaphor, but the counting is exact."
+      }
+    ],
+    "hints": [
+      "Compare the growth of the problem with the growth of hardware."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-wall-5",
+    "concepts": [
+      "exponential-wall"
+    ],
+    "type": "single",
+    "prompt": "What does the lab count?",
+    "options": [
+      {
+        "text": "Numbers to store for the full exact wavefunction, ignoring symmetry",
+        "correct": true,
+        "why": "It is a count, not a run time."
+      },
+      {
+        "text": "Seconds of computing time",
+        "correct": false,
+        "why": "Tempting because costs are often time, but the lab counts numbers."
+      },
+      {
+        "text": "The energy of the electrons",
+        "correct": false,
+        "why": "Tempting from the topic, but nothing about energy is computed."
+      }
+    ],
+    "hints": [
+      "It is exact counting."
+    ],
+    "difficulty": -1,
+    "level": "intermediate",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-dens-1",
+    "concepts": [
+      "electron-density-meaning"
+    ],
+    "type": "single",
+    "prompt": "How many variables does the electron density depend on, for any number of electrons?",
+    "options": [
+      {
+        "text": "Three",
+        "correct": true,
+        "why": "A number at each point of 3D space."
+      },
+      {
+        "text": "3N",
+        "correct": false,
+        "why": "Tempting from the wavefunction, but the density does not grow with N."
+      },
+      {
+        "text": "One",
+        "correct": false,
+        "why": "Tempting from the 1D lab, but real densities are 3D."
+      }
+    ],
+    "hints": [
+      "A map over space."
+    ],
+    "difficulty": -2,
+    "level": "beginner",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-dens-2",
+    "concepts": [
+      "electron-density-meaning"
+    ],
+    "type": "single",
+    "prompt": "What does the density integrate to?",
+    "options": [
+      {
+        "text": "The number of electrons",
+        "correct": true,
+        "why": "Adding up the charge everywhere gives N."
+      },
+      {
+        "text": "One, always",
+        "correct": false,
+        "why": "Tempting because a single electron gives one, but with N electrons it gives N."
+      },
+      {
+        "text": "Zero",
+        "correct": false,
+        "why": "Tempting from the node picture, but the density is not negative anywhere."
+      }
+    ],
+    "hints": [
+      "Add up the electrons everywhere."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-dens-3",
+    "concepts": [
+      "electron-density-meaning"
+    ],
+    "type": "single",
+    "prompt": "In part 1 of the lab, what do you learn when you add a constant to the potential?",
+    "options": [
+      {
+        "text": "The energies shift and the density stays the same",
+        "correct": true,
+        "why": "A constant moves every level equally."
+      },
+      {
+        "text": "The density shifts",
+        "correct": false,
+        "why": "Tempting because the picture moves, but the density depends on differences in V."
+      },
+      {
+        "text": "The electron escapes",
+        "correct": false,
+        "why": "Tempting if you think of a potential as a trap, but only differences matter."
+      }
+    ],
+    "hints": [
+      "Think about what the constant does to all energies."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-011"
+    ]
+  },
+  {
+    "id": "q-dens-4",
+    "concepts": [
+      "electron-density-meaning"
+    ],
+    "type": "single",
+    "prompt": "In part 2, how does the total density come from the orbitals?",
+    "options": [
+      {
+        "text": "Add the squares of the occupied orbitals, each weighted by its occupation",
+        "correct": true,
+        "why": "With two electrons per filled orbital."
+      },
+      {
+        "text": "Multiply the orbitals together",
+        "correct": false,
+        "why": "Tempting from the word product, but densities add."
+      },
+      {
+        "text": "Take the highest orbital only",
+        "correct": false,
+        "why": "Tempting because it is the outermost, but all occupied orbitals count."
+      }
+    ],
+    "hints": [
+      "Sum over occupied orbitals."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-dens-5",
+    "concepts": [
+      "electron-density-meaning"
+    ],
+    "type": "numeric",
+    "prompt": "A density integrates to the number of electrons. For 6 electrons, what should its integral be?",
+    "answer": 6,
+    "tolerance": 0.001,
+    "unit": "",
+    "hints": [
+      "Density counts electrons."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-hk-1",
+    "concepts": [
+      "density-to-potential"
+    ],
+    "type": "single",
+    "prompt": "What do the Hohenberg-Kohn theorems say, in words?",
+    "options": [
+      {
+        "text": "The ground-state density fixes the external potential, up to a constant",
+        "correct": true,
+        "why": "So it carries all the information about the ground state."
+      },
+      {
+        "text": "The density equals the wavefunction",
+        "correct": false,
+        "why": "Tempting because both describe electrons, but they are different objects."
+      },
+      {
+        "text": "Exact energies are easy to compute",
+        "correct": false,
+        "why": "Tempting from the word theorem, but the theorem says nothing about ease."
+      }
+    ],
+    "hints": [
+      "One density, one potential."
+    ],
+    "difficulty": -1,
+    "level": "intermediate",
+    "sources": [
+      "S-011"
+    ]
+  },
+  {
+    "id": "q-hk-2",
+    "concepts": [
+      "density-to-potential"
+    ],
+    "type": "single",
+    "prompt": "Why is the density, not the wavefunction, a good thing to work with?",
+    "options": [
+      {
+        "text": "It depends on three variables whatever the number of electrons",
+        "correct": true,
+        "why": "The wavefunction needs 3N."
+      },
+      {
+        "text": "It is always smaller than the wavefunction in value",
+        "correct": false,
+        "why": "Tempting from the units, but size of values is not the point."
+      },
+      {
+        "text": "It ignores the Pauli principle",
+        "correct": false,
+        "why": "Tempting because it is simpler, but the principle is still in the physics."
+      }
+    ],
+    "hints": [
+      "Count the variables."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-011"
+    ]
+  },
+  {
+    "id": "q-hk-3",
+    "concepts": [
+      "density-to-potential"
+    ],
+    "type": "single",
+    "prompt": "Which state does the theorem, as stated here, apply to?",
+    "options": [
+      {
+        "text": "The lowest-energy state",
+        "correct": true,
+        "why": "This is why it is called the ground-state density."
+      },
+      {
+        "text": "Any excited state",
+        "correct": false,
+        "why": "Tempting because states are all similar, but the statement is for the ground state."
+      },
+      {
+        "text": "Only atoms",
+        "correct": false,
+        "why": "Tempting from the examples, but it applies to molecules and solids."
+      }
+    ],
+    "hints": [
+      "Look at the name."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-011"
+    ]
+  },
+  {
+    "id": "q-hk-4",
+    "concepts": [
+      "density-to-potential"
+    ],
+    "type": "single",
+    "prompt": "Does the theorem give a formula for the energy in terms of the density?",
+    "options": [
+      {
+        "text": "No, it proves that one exists but does not provide it",
+        "correct": true,
+        "why": "Finding good approximations is the practical work."
+      },
+      {
+        "text": "Yes, an exact simple formula",
+        "correct": false,
+        "why": "Tempting because proofs usually give formulas, but this one does not."
+      },
+      {
+        "text": "Only for hydrogen",
+        "correct": false,
+        "why": "Tempting from module 2, but hydrogen is not special here."
+      }
+    ],
+    "hints": [
+      "Existence versus recipe."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-011"
+    ]
+  },
+  {
+    "id": "q-hk-5",
+    "concepts": [
+      "density-to-potential"
+    ],
+    "type": "single",
+    "prompt": "In what direction is the new information in the theorem?",
+    "options": [
+      {
+        "text": "From the density back to the potential",
+        "correct": true,
+        "why": "The forward direction, potential to density, was already clear."
+      },
+      {
+        "text": "From the potential to the density",
+        "correct": false,
+        "why": "Tempting because it is the natural order, but that direction was already known."
+      },
+      {
+        "text": "From the electron to the nucleus",
+        "correct": false,
+        "why": "Tempting from the words, but the statement is about potential and density."
+      }
+    ],
+    "hints": [
+      "What was new?"
+    ],
+    "difficulty": 1,
+    "level": "pro",
+    "sources": [
+      "S-011"
+    ]
+  },
+  {
+    "id": "q-approx-1",
+    "concepts": [
+      "approximations-needed"
+    ],
+    "type": "single",
+    "prompt": "Where does the approximation in practical DFT sit?",
+    "options": [
+      {
+        "text": "In the exchange-correlation term",
+        "correct": true,
+        "why": "All the other pieces are known exactly in terms of the density."
+      },
+      {
+        "text": "In the nuclear positions",
+        "correct": false,
+        "why": "Tempting because they are inputs, but they are chosen, not approximated."
+      },
+      {
+        "text": "In the number of electrons",
+        "correct": false,
+        "why": "Tempting because it matters, but it is exact."
+      }
+    ],
+    "hints": [
+      "One unknown term."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-012",
+      "S-049"
+    ]
+  },
+  {
+    "id": "q-approx-2",
+    "concepts": [
+      "approximations-needed"
+    ],
+    "type": "single",
+    "prompt": "What are exchange and correlation?",
+    "options": [
+      {
+        "text": "Quantum effects from the Pauli principle and from electrons avoiding each other",
+        "correct": true,
+        "why": "Both go beyond a smooth charge cloud repelling itself."
+      },
+      {
+        "text": "Two kinds of chemical bond",
+        "correct": false,
+        "why": "Tempting from the words, but they are energy contributions."
+      },
+      {
+        "text": "Two types of pseudopotential",
+        "correct": false,
+        "why": "Tempting from VASP vocabulary, but they are not file types."
+      }
+    ],
+    "hints": [
+      "Pauli plus repulsion."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-012",
+      "S-049"
+    ]
+  },
+  {
+    "id": "q-approx-3",
+    "concepts": [
+      "approximations-needed"
+    ],
+    "type": "single",
+    "prompt": "Is DFT exact?",
+    "options": [
+      {
+        "text": "In principle yes, but practical calculations use an approximate functional",
+        "correct": true,
+        "why": "The theorem is exact, the functional is not."
+      },
+      {
+        "text": "Yes, always",
+        "correct": false,
+        "why": "Tempting from the theorem, but the unknown term must be approximated."
+      },
+      {
+        "text": "No, the theorem is wrong",
+        "correct": false,
+        "why": "Tempting from the approximation, but the theorem is correct."
+      }
+    ],
+    "hints": [
+      "Theorem versus recipe."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-012",
+      "S-049"
+    ]
+  },
+  {
+    "id": "q-approx-4",
+    "concepts": [
+      "approximations-needed"
+    ],
+    "type": "single",
+    "prompt": "Why is it good practice to test a result with a second functional?",
+    "options": [
+      {
+        "text": "Errors are systematic and depend on the material and the property",
+        "correct": true,
+        "why": "Different approximations fail in different places."
+      },
+      {
+        "text": "Because the first one is always wrong",
+        "correct": false,
+        "why": "Tempting from caution, but it may be fine."
+      },
+      {
+        "text": "Because the second is always better",
+        "correct": false,
+        "why": "Tempting from cost, but no functional wins everywhere."
+      }
+    ],
+    "hints": [
+      "Think about where the error comes from."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-012",
+      "S-049"
+    ]
+  }
+]

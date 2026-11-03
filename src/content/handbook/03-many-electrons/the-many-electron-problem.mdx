@@ -1,0 +1,97 @@
+---
+id: the-many-electron-problem
+title: The many-electron problem
+module: 3
+order: 1
+summary: Why a solid is far harder than a hydrogen atom, and where the difficulty really comes from.
+concepts: [many-electron-problem]
+requires: [levels-to-bands]
+vaspTags: []
+sources: [S-047, S-048]
+status: draft
+updated: 2026-11-03
+noLab: true
+---
+
+<Why>
+
+In module 2 you solved the hydrogen atom exactly. A solid has something like $10^{23}$ electrons. You might hope to repeat the same steps with a bigger computer. This page explains why that hope fails, and why the failure is not about computer speed.
+
+</Why>
+
+<Intuition>
+
+Hydrogen is easy because there is one electron. It only feels the nucleus. Add a second electron and a new thing appears: the two electrons repel each other, so where one goes depends on where the other is. Their motions are tied together. This is the <Term id="many-body-problem">many-body problem</Term> <Cite id="S-048" />.
+
+Here is the central difficulty, in plain words. For one electron, the wavefunction is a number at every point in 3D space. For two electrons, it is a number for every _pair_ of points, which is six coordinates. For $N$ electrons it needs $3N$ coordinates. You cannot split it into $N$ separate pictures, because the electrons are linked.
+
+A quick count shows the scale. Suppose you note the wavefunction on a grid of 10 points along each direction. One electron needs $10^3$ numbers. Ten electrons need $10^{30}$. This is arithmetic, not a model: ten electrons, thirty coordinates, ten values each.
+
+We make one simplification right away: treat the heavy nuclei as fixed while the light electrons move. This is the <Term id="born-oppenheimer-approximation">Born-Oppenheimer approximation</Term> <Cite id="S-048" />. It is usually very good, and it is what lets us talk about "the electrons in a fixed arrangement of atoms".
+
+<Level min="intermediate">
+
+The wavefunction also has to change sign when two electrons swap places, which is the Pauli principle from module 2. Putting this into a many-electron state is why <Term id="slater-determinant">Slater determinants</Term> exist; the next page counts them.
+
+</Level>
+
+<Level min="pro">
+
+The electronic <Term id="hamiltonian">Hamiltonian</Term> for fixed nuclei has three parts: the kinetic energy of each electron, the attraction of each electron to the nuclei, and the repulsion between every pair of electrons <Cite id="S-048" />. Without the last term the problem would split into $N$ one-electron problems and be easy. That single term, which couples all pairs, is the entire difficulty.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+For electrons at positions $\mathbf{r}_1, \dots, \mathbf{r}_N$ in the field of fixed nuclei, in atomic-style notation <Cite id="S-048" />,
+
+$$\hat H = \sum_{i}\left[-\frac{\hbar^2}{2m}\nabla_i^2 + v(\mathbf{r}_i)\right] + \sum_{i<j}\frac{e^2}{4\pi\varepsilon_0\,|\mathbf{r}_i-\mathbf{r}_j|}$$
+
+where $v$ is the attraction to the nuclei. The first sum treats each electron on its own. The second sum couples every pair, and is the part that makes the wavefunction a function of all $3N$ coordinates at once. A grid with $g$ points per axis needs $g^{3N}$ values, which is $10^{30}$ for $g = 10$ and $N = 10$.
+
+</TheMath>
+
+<InVasp>
+
+VASP does not attempt the exact many-electron wavefunction. Instead of $3N$ coordinates it works with the electron density, which depends on three, as the next pages explain. It also treats only the valence electrons explicitly; the core electrons are folded into the POTCAR files you supply.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...              | ...the difficulty                    | ...why                                        |
+| ----------------------------- | ------------------------------------ | --------------------------------------------- |
+| Add one electron              | Multiplies the size of the problem   | Three more coordinates in the wavefunction    |
+| Switch off electron repulsion | Becomes easy                         | The problem splits into one-electron problems |
+| Freeze the nuclei             | Removes nuclear motion from the task | Born-Oppenheimer                              |
+
+Why the repulsion matters: it is real and large. What happens if you drop it: you compute a much simpler problem whose answers are not those of the material.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Blaming the difficulty on computer speed">
+
+Faster computers help, but the size of the exact problem grows multiplicatively with each added electron. Waiting for hardware does not close that gap. The next page shows the numbers.
+
+</Callout>
+
+<Callout variant="mistake" title="Thinking each electron has its own wavefunction">
+
+Orbitals are a useful picture, but the exact state belongs to all the electrons together.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-many-1', 'q-many-2', 'q-many-3', 'q-many-4', 'q-many-5']} />
+
+<GoDeeper>
+
+- Szabo and Ostlund, _Modern Quantum Chemistry_, chapter 1 and the electronic Hamiltonian <Cite id="S-048" />.
+- Griffiths and Schroeter, _Introduction to Quantum Mechanics_, the chapter on identical particles <Cite id="S-047" />.
+
+</GoDeeper>

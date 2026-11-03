@@ -52,7 +52,13 @@ export function levelNotes(body: string): string {
 }
 
 /** Lab ids that have a React island. Topics using one are built as "island" pages (size budget 200 KB). */
-export const REGISTERED_LABS = ['cost-of-exactness', 'particle-in-a-box', 'orbitals'] as const;
+export const REGISTERED_LABS = [
+  'cost-of-exactness',
+  'particle-in-a-box',
+  'orbitals',
+  'exponential-wall',
+  'density-as-a-map',
+] as const;
 
 /** Page class for a topic: "island" if its body embeds a registered lab, else "content". */
 export function topicPageClass(body: string): 'content' | 'island' {
