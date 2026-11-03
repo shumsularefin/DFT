@@ -1,0 +1,102 @@
+.fx {
+  margin: var(--space-5) 0;
+  display: grid;
+  gap: var(--space-4);
+}
+@media (min-width: 52rem) {
+  .fx {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    align-items: start;
+  }
+}
+.fx-file {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg, 0.5rem);
+  background: var(--surface);
+  overflow-x: auto;
+  min-width: 0;
+}
+.fx-name {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+.fx-lines {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-2) 0;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.875rem;
+}
+.fx-row {
+  display: flex;
+  gap: var(--space-3);
+  align-items: baseline;
+  padding: 0 var(--space-3);
+  min-height: 1.5rem;
+  white-space: pre;
+}
+.fx-num {
+  color: var(--text-muted);
+  min-width: 2ch;
+  text-align: right;
+  user-select: none;
+}
+button.fx-row {
+  width: 100%;
+  background: none;
+  border: 0;
+  border-left: 4px solid var(--accent);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  min-height: 2.75rem;
+  align-items: center;
+  padding-block: 0.25rem;
+}
+button.fx-row:hover {
+  background: var(--surface-2);
+}
+button.fx-row[aria-expanded='true'] {
+  background: var(--surface-2);
+  border-left-width: 8px;
+}
+button.fx-row.is-unknown {
+  border-left-color: var(--warn);
+}
+button.fx-row:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: -3px;
+}
+.fx-panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg, 0.5rem);
+  padding: var(--space-4);
+  background: var(--bg);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.fx-panel h3 {
+  margin-top: 0;
+}
+.fx-panel dt {
+  font-weight: 600;
+  margin-top: var(--space-2);
+}
+.fx-panel dd {
+  margin: 0;
+}
+.fx-hint {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+.fx-close {
+  margin-top: var(--space-3);
+  min-height: 2.75rem;
+}
+.fx-potcar dt {
+  font-family: var(--font-mono, monospace);
+}

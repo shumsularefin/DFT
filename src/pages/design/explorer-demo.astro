@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FileExplorer from '../../components/labs/FileExplorer';
+import PseudopotentialHeader from '../../components/labs/PseudopotentialHeader';
+
+const poscar = `fcc Cu
+3.61
+0 0.5 0.5
+0.5 0 0.5
+0.5 0.5 0
+Cu
+1
+Direct
+0 0 0
+`;
+const incar = `SYSTEM = demo
+ENCUT = 520
+ISMEAR = 1
+SIGMA = 0.1
+FOOBAR = 3
+`;
+---
+
+<BaseLayout
+  title="File explorer demo"
+  description="Demo of the clickable VASP file explorer. Not indexed."
+  pageClass="island"
+>
+  <div class="container">
+    <h1>File explorer demo</h1>
+    <p>This page exercises the file explorer and the POTCAR header panel. It is not indexed.</p>
+    <h2>POSCAR</h2>
+    <FileExplorer client:load kind="POSCAR" text={poscar} />
+    <h2>INCAR</h2>
+    <FileExplorer client:load kind="INCAR" text={incar} />
+    <h2>POTCAR header</h2>
+    <PseudopotentialHeader client:load />
+  </div>
+</BaseLayout>
