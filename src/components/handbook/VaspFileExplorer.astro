@@ -1,0 +1,11 @@
+---
+import FileExplorer from '../labs/FileExplorer';
+// Clickable, explained view of a VASP file. Never use it for POTCAR content (CLAUDE.md); use <PseudopotentialHeader /> instead.
+interface Props {
+  kind: 'POSCAR' | 'KPOINTS' | 'INCAR' | 'OSZICAR' | 'OUTCAR-excerpt';
+  code: string;
+}
+const { kind, code } = Astro.props;
+---
+
+<FileExplorer client:visible kind={kind} text={code} />

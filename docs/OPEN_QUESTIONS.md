@@ -33,6 +33,7 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-027 | open | author or auditor |
 | Q-028 | open | author |
 | Q-029 | open | author |
+| Q-030 | open | author |
 
 ## Q-001. Repository licence
 Which licence for the code and which for the written content and data (a common split: MIT for code, CC BY 4.0 for original text)? Affects `LICENSE`, the footer and the references page. Until decided: no LICENSE file; `THIRD_PARTY_NOTICES.md` lists upstream licences. **Owner: author.**
@@ -120,3 +121,6 @@ Statements in `src/content/handbook/03-many-electrons/` that rest on general kno
 
 ## Q-029. M3.4 judgement calls to confirm
 (1) V010: the work order says NSW > 0 with IBRION absent is an error, but the Field Handbook states the default is -1 when NSW <= 1 (no molecular dynamics). The rule fires for NSW > 1 only. (2) V013: any NCORE value counts as set, including NCORE = 1; the handbooks say to comment it out. Confirm NCORE = 1 is also unwanted. (3) V003, V018: the d and f element lists are standard chemistry, not taken from a handbook; confirm Lu, Lr and group 12 are classed as you want. (4) V004 counts the full k-mesh, not the symmetry-reduced count, so a mesh just at 4 points can still fail in VASP. (5) V007 treats an absent SIGMA as 0.2 as the handbooks state. (6) V027 does not judge AEXX or HFSCREEN when absent because the handbooks do not state their defaults. (7) While writing M3.4, the M3.3 tag text for LEPSILON and LELF said NCORE = 1; the handbook says to comment NCORE out, so the text was corrected.
+
+## Q-030. M3.6 file explorer: statements to confirm against the VASP wiki
+(1) ENMIN: the work order lists it for the POTCAR header panel, but neither handbook describes it, so the panel says it is not explained yet. Provide a sourced sentence. (2) The POSCAR, KPOINTS and INCAR line explanations in `src/lib/vasp/annotate.ts` follow the VASP wiki file-format pages from memory (S-019 is cited-from-memory, Q-007). Check in particular: a negative scale means target volume; three scale values scale x, y, z; Auto-mode length gives a denser mesh when larger (the formula itself is Q-018). (3) OSZICAR and OUTCAR-excerpt kinds have no default annotations until M4.1 supplies parsers; callers can pass their own.

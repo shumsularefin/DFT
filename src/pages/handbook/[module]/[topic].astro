@@ -15,6 +15,8 @@ import Level from '../../../components/handbook/Level.astro';
 import Term from '../../../components/handbook/Term.astro';
 import Cite from '../../../components/handbook/Cite.astro';
 import VaspFile from '../../../components/handbook/VaspFile.astro';
+import VaspFileExplorer from '../../../components/handbook/VaspFileExplorer.astro';
+import PseudopotentialHeader from '../../../components/handbook/PseudopotentialHeader.astro';
 import Callout from '../../../components/ui/Callout.astro';
 import { citeOrder, levelNotes, presentSections, splitId, topicPageClass } from '../../../lib/topic';
 import { moduleName } from '../../../lib/site';
@@ -46,6 +48,8 @@ const components = {
   Term,
   Cite,
   VaspFile,
+  VaspFileExplorer,
+  PseudopotentialHeader,
   Callout,
 };
 const statusLabel = { draft: 'Draft', review: 'Awaiting verification', verified: 'Verified' }[
