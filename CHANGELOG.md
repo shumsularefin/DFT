@@ -7,6 +7,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- KPOINTS library: k-mesh sizes from KSPACING, resolution or length, mesh coordinates, file writers and a parser (no UI yet).
 - Structure core library: lattice math, POSCAR reader and writer, composition and density helpers, and the tool hand-off store (no UI yet).
 - Site shell: header with navigation, search, level switch, progress tracker and theme toggle, plus a footer
   and a keyboard-shortcut list.
