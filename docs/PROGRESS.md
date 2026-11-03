@@ -19,7 +19,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 | M3.2 | KPOINTS generation | done | M3.1 | M | claude/vigilant-newton-ws593b | | 2026-11-03 | [report](reports/M3.2.md), [work order](milestones/M3-input-builder.md) |
 | M3.3 | INCAR data model, presets and handbook extraction | done | M3.1 | L | claude/vigilant-newton-ws593b | | 2026-11-03 | [report](reports/M3.3.md), [work order](milestones/M3-input-builder.md) |
 | M3.4 | INCAR validation rules engine | done | M3.2, M3.3 | L | claude/vigilant-newton-ws593b | | 2026-11-03 | [report](reports/M3.4.md), [work order](milestones/M3-input-builder.md) |
-| M3.5 | Input Builder UI | todo | M3.4, M1.3 | L | | | | [work order](milestones/M3-input-builder.md) |
+| M3.5 | Input Builder UI | done | M3.4, M1.3 | L | claude/vigilant-newton-ws593b | | 2026-11-03 | [report](reports/M3.5.md), [work order](milestones/M3-input-builder.md) |
 | M3.6 | Clickable file explorer | todo | M3.3, M1.2 | S | | | | [work order](milestones/M3-input-builder.md) |
 | M4.1 | Output parsers and convergence analysis | todo | M3.2 | L | | | | [work order](milestones/M4-convergence.md) |
 | M4.2 | Convergence series generator | todo | M3.5, M4.1 | M | | | | [work order](milestones/M4-convergence.md) |
@@ -82,3 +82,4 @@ See `docs/SETUP_FIREBASE.md` and the "author" rows of `docs/OPEN_QUESTIONS.md` (
 - 2026-11-03, M3.2: KPOINTS library (`src/lib/vasp/kpoints.ts`): meshes from KSPACING, resolution and length with three rounding rules (default ceil), mesh coordinates, writers, parser, symmetry risk and centring advice; all golden comparisons pass. Q-004 and Q-018 remain open. Branch `claude/vigilant-newton-ws593b`.
 - 2026-11-03, M3.3: INCAR parser and writer (`src/lib/vasp/incar.ts`), handbook extractor (`scripts/build/extract-handbooks.mjs`), generator (`scripts/build/build-vasp-data.mjs`), 71 tags and 16 presets as JSON, schema and count tests. Defaults the handbooks do not state are marked so (Q-028).
 - 2026-11-03, M3.4: validation engine (`src/lib/vasp/validate.ts`, `rules/*.ts`): 33 rules, each sourced, tested both ways, with pure fixes; zero errors on the author's own INCARs. Judgement calls in Q-029.
+- 2026-11-03, M3.5: Input Builder UI at `/tools/input-builder/` (six steps, zip download via fflate, share link, job scripts). Lighthouse mobile 98/100/100, tool JS 118.4/200 KB gzip. Judgement calls in D-038.

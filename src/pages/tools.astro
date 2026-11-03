@@ -44,12 +44,15 @@ const more = [
 ];
 ---
 
-<BaseLayout title="Tools" description="Research tools planned for the DFT Handbook. None is available yet.">
+<BaseLayout
+  title="Tools"
+  description="Research tools for the DFT Handbook. The input builder is available; the others are planned."
+>
   <div class="container">
     <h1>Tools</h1>
     <p>
-      These tools will run entirely in your browser. None of them is built yet, so none has a link. Each card
-      says what it will do.
+      These tools run entirely in your browser. The input builder is available now. The others are not built
+      yet, so they have no link. Each card says what it will do.
     </p>
     <h2>Research tools</h2>
     <div class="tool-grid">
@@ -59,9 +62,15 @@ const more = [
             {t.title}
           </h3>
           <p>{t.text}</p>
-          <p>
-            <Badge variant="draft" /> Coming soon
-          </p>
+          {t.id === 'input-builder' ? (
+            <p>
+              <a href="/tools/input-builder/">Open the input builder</a>
+            </p>
+          ) : (
+            <p>
+              <Badge variant="draft" /> Coming soon
+            </p>
+          )}
         </Card>
       ))}
     </div>
