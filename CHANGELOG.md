@@ -7,6 +7,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- Structure core library: lattice math, POSCAR reader and writer, composition and density helpers, and the tool hand-off store (no UI yet).
 - Site shell: header with navigation, search, level switch, progress tracker and theme toggle, plus a footer
   and a keyboard-shortcut list.
 - Landing page, handbook module map, About, Privacy and Tools pages.

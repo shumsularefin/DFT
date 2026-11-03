@@ -30,6 +30,7 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-024 | open | author or auditor |
 | Q-025 | open | builder (M6.4 or when module 1 questions are revised) |
 | Q-026 | open | author or auditor |
+| Q-027 | open | author or auditor |
 
 ## Q-001. Repository licence
 Which licence for the code and which for the written content and data (a common split: MIT for code, CC BY 4.0 for original text)? Affects `LICENSE`, the footer and the references page. Until decided: no LICENSE file; `THIRD_PARTY_NOTICES.md` lists upstream licences. **Owner: author.**
@@ -108,3 +109,6 @@ Statements in `src/content/handbook/02-quantum-basics/` that rest on general kno
 
 ## Q-026. Module 3 wording that needs a human check
 Statements in `src/content/handbook/03-many-electrons/` that rest on general knowledge and the `cited-from-memory` register (S-011, S-048, S-049, S-012, S-047), not on a page that was read: (1) the electronic Hamiltonian written in the many-electron page and the role of the pair repulsion term; (2) the Born-Oppenheimer wording; (3) "full configuration interaction mixes all determinants and its count is C(M, N)" (S-048), and that symmetry only reduces the count by a modest factor; (4) the density definition n(r) = N times the integral over the other coordinates (S-048); (5) the one-electron formula V = E + (hbar^2/2m) psi''/psi (derived from the Schrodinger equation, tested numerically, but the statement that it is the one-electron case of Hohenberg-Kohn is from S-011 memory); (6) Hohenberg-Kohn stated for a non-degenerate ground state; (7) the Kohn-Sham energy split E = T_s + int v n + E_H + E_xc (S-012) and that only E_xc is unknown; (8) VASP facts: `CHGCAR` holds the density, `NELECT` defaults from POTCAR valence electrons, only valence electrons explicit, `GGA` tag. **Close:** the author or auditor reads these against the cited books and the VASP wiki, and upgrades the register status.
+
+## Q-027. M3.1 inputs that could not be verified, and one work-order number that is wrong
+(1) The work order (M3-input-builder.md, M3.1 tests) says an fcc primitive cell with a = 3.61 has volume 11.7607 A^3 "(a^3/4)". But 3.61^3 / 4 = 11.76147. The test uses a^3/4 computed in code and 11.76147 to 4 decimals, not 11.7607; the tolerance was not loosened to fit the stated number. **Close:** the author corrects the work order. (2) `src/data/atomic-masses.json` is generated from pymatgen's element table (S-034), which derives from IUPAC standard atomic weights; it was not compared with the IUPAC publication (offline), and conventional single values stand in for weight intervals. Density in g/cm^3 uses CODATA 2018 u in grams (S-031). **Close:** compare a handful of elements against the IUPAC table and upgrade the register status.
