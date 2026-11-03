@@ -1,0 +1,91 @@
+---
+id: why-energy-levels-matter-for-materials
+title: Why energy levels matter for materials
+module: 2
+order: 6
+summary: How the energy steps of one atom turn into the bands and gaps that decide whether a material conducts.
+concepts: [levels-to-bands]
+requires: [spin-pauli]
+vaspTags: []
+sources: [S-047, S-050, S-036, S-049]
+status: draft
+updated: 2026-11-03
+noLab: true
+---
+
+<Why>
+
+Whether a material is a metal, a semiconductor or an insulator depends on what energies its electrons are allowed to have and which of those are filled. This page connects the single-atom ideas of this module to that bigger picture, and tells you where the course goes next.
+
+</Why>
+
+<Intuition>
+
+One atom has separate energy levels, like the steps in the box. Bring two atoms close and each level splits into two. Bring many atoms together, as in a crystal, and each level spreads into a crowd of closely spaced levels that looks like a continuous stripe. That stripe is a <Term id="band">band</Term> <Cite id="S-050" />.
+
+Between bands there may be a range of energies with no allowed states: a <Term id="band-gap">band gap</Term>. Electrons fill levels from the bottom, two per level, as the last page described. If the top filled band is completely full and a gap lies above it, small pushes cannot move electrons, and the material is an insulator or a semiconductor. If a band is partly filled, electrons move easily, and the material is a metal <Cite id="S-036" />.
+
+How many states sit at each energy is called the <Term id="density-of-states">density of states</Term>. You will meet bands, the gap and the density of states in modules 4 and 5, and they are among the main things a DFT calculation reports.
+
+<Level min="intermediate">
+
+The size of the gap sets whether a semiconductor absorbs visible light, and which dopants are useful. This is why predicting a gap correctly is a standard test of a method, and why the next modules spend so much time on approximations.
+
+</Level>
+
+<Level min="pro">
+
+The unit of energy used for all this is the <Term id="electron-volt">electron volt</Term>, and lengths in the crystal are given in <Term id="angstrom">ångström</Term>. Band gaps of materials range from a fraction of an electron volt to several electron volts. Common DFT approximations are known to underestimate gaps <Cite id="S-049" />, a point that comes back later.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+No new formula is needed for this page. The key relation is the one from the box: confinement sets $E_n \propto n^2/L^2$ <Cite id="S-047" />. In a crystal the allowed waves are labeled by a wave number $k$, and the energy of an electron as a function of $k$ draws out the bands <Cite id="S-050" />. The simplest case, a free electron, is $E = \hbar^2k^2/2m$ from the first page of this module.
+
+</TheMath>
+
+<InVasp>
+
+VASP reports the energies of electrons at many $k$ points, and the tools around it turn those into band structures and a density of states. The occupation of levels is controlled by settings you meet later, such as `ISMEAR` and `SIGMA`. The picture from this page is how to read their output.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...      | ...the bands                  | ...the material               |
+| --------------------- | ----------------------------- | ----------------------------- |
+| Atoms closer together | Bands get wider               | Easier electron movement      |
+| Number of electrons   | Where the filling stops moves | Could turn metal to insulator |
+| Atom type             | Level positions change        | Different gap                 |
+
+Why this matters: the band picture lets us answer practical questions about materials without following every electron.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Thinking a band is a single orbit">
+
+A band is a huge number of closely spaced levels spread over the whole crystal, not one state.
+
+</Callout>
+
+<Callout variant="mistake" title="Treating this page as the full theory of solids">
+
+It is a sketch to give you the vocabulary. The proper treatment comes in later modules.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-levels-1', 'q-levels-2', 'q-levels-3', 'q-levels-4']} />
+
+<GoDeeper>
+
+- Kittel, _Introduction to Solid State Physics_, the chapters on energy bands <Cite id="S-050" />.
+- Ashcroft and Mermin, _Solid State Physics_, on Bloch electrons and band structure <Cite id="S-036" />.
+
+</GoDeeper>

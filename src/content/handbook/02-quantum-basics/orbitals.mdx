@@ -1,0 +1,110 @@
+---
+id: orbitals
+title: Orbitals of the hydrogen atom
+module: 2
+order: 4
+summary: Explore the shapes of the s, p, d and f orbitals of hydrogen and learn what the quantum numbers n, l and m describe.
+concepts: [orbital-shapes]
+requires: [quantization-box]
+vaspTags: []
+sources: [S-047, S-031]
+status: draft
+updated: 2026-11-03
+---
+
+<Why>
+
+Chemistry vocabulary such as s, p and d electrons, bonding directions and shells all come from the shapes of orbitals. Hydrogen is the one atom we can solve exactly, so it gives us the shapes cleanly. Later modules use the same words, so it is worth learning them here, with the right caveat about what hydrogen can and cannot tell us.
+
+</Why>
+
+<Intuition>
+
+An <Term id="orbital">orbital</Term> is a one-electron wavefunction for an atom. It is a standing wave around the nucleus, in the same spirit as the box, but in three dimensions and with the nucleus pulling in the electron. The lab draws it as a cloud of dots: where dots are dense, the electron is likely to be found.
+
+Each orbital has three <Term id="quantum-number">quantum numbers</Term> <Cite id="S-047" />:
+
+- $n$ sets the size and the energy. Bigger $n$ means a bigger orbital and higher energy.
+- $l$ sets the shape. $l = 0, 1, 2, 3$ are called s, p, d and f (<Term id="spdf-orbitals">s, p, d, f</Term>).
+- $m$ picks the orientation, for example p along x, y or z. For each $l$ there are $2l + 1$ choices.
+
+Look for two kinds of node in the lab. A <Term id="radial-node">radial node</Term> is a spherical shell where the density drops to zero. An <Term id="angular-node">angular node</Term> is a flat or cone-shaped surface through the nucleus. The 2p orbital has none of the first kind and one of the second.
+
+The orange and blue colors show the sign of the wavefunction, not charge. Two lobes of opposite sign matter when orbitals overlap in bonds.
+
+Caution: real atoms have many electrons. Everything in this lab is a one-electron orbital of hydrogen. Many-electron atoms borrow the vocabulary but the orbitals are not exactly these.
+
+<Level min="intermediate">
+
+Hydrogen has a curiosity: the energy depends only on $n$, so all orbitals with the same $n$ share one energy. They are <Term id="degenerate">degenerate</Term>. In atoms with more electrons this is lifted, because electrons repel each other.
+
+</Level>
+
+<Level min="pro">
+
+The number of radial nodes is $n - l - 1$, and the number of angular nodes is $l$, so the total is $n - 1$ <Cite id="S-047" />. The lab picks the real combinations of the complex orbitals, which is why the labels read $2p_z$ or $3d_{xy}$ and not by the value of $m$.
+
+</Level>
+
+</Intuition>
+
+<Lab id="orbitals" title="Hydrogen orbitals" />
+
+<TheMath>
+
+An orbital is a product of a radial part and an angular part, $\psi_{nlm} = R_{nl}(r)\,Y_{lm}(\theta,\phi)$ <Cite id="S-047" />. The energy is
+
+$$E_n = -\frac{13.6057\ \text{eV}}{n^2}$$
+
+where 13.6057 eV is the Rydberg energy <Cite id="S-031" />. The average distance of the electron from the nucleus is
+
+$$\langle r\rangle = \frac{a_0}{2}\left[3n^2 - l(l+1)\right]$$
+
+with Bohr radius $a_0 = 0.529177$ Å <Cite id="S-031" />. For 1s this is $1.5\,a_0$, for 2p it is $5\,a_0$ and for 3d it is $10.5\,a_0$. The most probable distance for 1s is exactly $a_0$.
+
+The radial functions use associated Laguerre polynomials, and the angular parts are spherical harmonics. The site checks that each radial function is normalized, that different ones are orthogonal, and that the formulas above hold. The dots come from a seeded random sampler that runs in a background worker, so the page stays responsive.
+
+</TheMath>
+
+<InVasp>
+
+VASP does not use hydrogen orbitals to describe electrons. It uses plane waves, which are explained in module 5. Orbital labels still appear in VASP output, for example when it projects the result onto s, p and d character, so the vocabulary you learn here stays useful.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change... | ...the orbital                             | ...the energy                |
+| ---------------- | ------------------------------------------ | ---------------------------- |
+| n up             | Larger, more radial nodes                  | Rises toward zero from below |
+| l up             | More angular structure, fewer radial nodes | Same in hydrogen             |
+| m                | Different orientation                      | Same                         |
+
+Why the energy is negative: zero means a free electron far from the nucleus, and a bound electron has less energy than that. What happens at n = infinity: the electron is barely bound.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Thinking the dots are tracks of a moving electron">
+
+The dots are random samples drawn from the probability density. They show where the electron is likely to be, not a path.
+
+</Callout>
+
+<Callout variant="mistake" title="Using hydrogen orbitals as the answer for other atoms">
+
+They are one-electron results. Other atoms are close in spirit but not identical, and the many-electron problem comes later in the course.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-orb-1', 'q-orb-2', 'q-orb-3', 'q-orb-4', 'q-orb-5', 'q-orb-6']} />
+
+<GoDeeper>
+
+- Griffiths and Schroeter, _Introduction to Quantum Mechanics_, the hydrogen atom <Cite id="S-047" />.
+- CODATA values of the Rydberg energy and the Bohr radius <Cite id="S-031" />.
+
+</GoDeeper>

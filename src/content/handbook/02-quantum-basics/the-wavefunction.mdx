@@ -1,0 +1,100 @@
+---
+id: the-wavefunction
+title: The wavefunction and probability
+module: 2
+order: 2
+summary: What the wavefunction is, why its square gives the chance of finding an electron, and what superposition means.
+concepts: [wavefunction-meaning]
+requires: [wave-nature]
+vaspTags: []
+sources: [S-047]
+status: draft
+updated: 2026-11-03
+noLab: true
+---
+
+<Why>
+
+If an electron is a wave, we need a way to say where it is. The <Term id="wavefunction">wavefunction</Term> is that description. Almost everything a DFT program computes can be traced back to wavefunctions or to the density they produce, so it pays to be clear about what they mean and what they do not.
+
+</Why>
+
+<Intuition>
+
+The wavefunction, written with the Greek letter psi, is a number at each point in space. It is not a thing you can measure directly. What you can measure comes from its square: the <Term id="probability-density">probability density</Term> tells you how likely it is to find the electron near each point <Cite id="S-047" />.
+
+Think of a weather map showing the chance of rain. The map is not rain itself. It tells you where rain is likely. Where the wavefunction is large, the electron is likely to be found. Where it is zero, the electron will never be found.
+
+Two features are worth knowing now:
+
+- <Term id="normalization">Normalization</Term>. The electron is somewhere, so the chances over all of space
+  must add up to one. A wavefunction is scaled so that this is true.
+- <Term id="superposition">Superposition</Term>. A wavefunction can be a mix of two simpler ones, just as two
+  waves on a rope can be added. The mix can change with time, and the probability can slosh back and forth.
+  The particle-in-a-box lab on the next page lets you see this.
+
+<Level min="intermediate">
+
+The wavefunction can be negative or even complex, but the probability density cannot. This is why the sign of a wavefunction has no direct meaning on its own. What matters physically is the sign of one part relative to another, because that decides whether waves reinforce or cancel when they are added.
+
+</Level>
+
+<Level min="pro">
+
+For a state with definite energy, the probability density does not change in time, which is why such states are called stationary. A mix of two energy states is not stationary: its density oscillates at a frequency set by the energy difference, $\nu = (E_2 - E_1)/h$ <Cite id="S-047" />. The next page computes this for a box.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+The probability of finding the electron between $x$ and $x + dx$ is $|\psi(x)|^2\,dx$. Normalization requires
+
+$$\int |\psi(x)|^2\,dx = 1$$
+
+over all space <Cite id="S-047" />. For a superposition $\Psi = a\,\psi_1 + b\,\psi_2$ with real $a$ and $b$ and $a^2 + b^2 = 1$, the density contains a cross term $2ab\,\psi_1\psi_2$ that is responsible for interference. If the two states are orthogonal, that cross term integrates to zero, so the total probability stays one.
+
+</TheMath>
+
+<InVasp>
+
+In a VASP run the program finds one-electron wavefunctions (called orbitals or bands) and sums their squares into the electron density. The density is written to files such as `CHGCAR`. The wavefunctions themselves are written to `WAVECAR`, which can be large. Which of these you keep depends on what you want to analyze later.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...                     | ...the wavefunction         | ...the probability density |
+| ------------------------------------ | --------------------------- | -------------------------- |
+| Multiply psi by -1                   | Flips sign everywhere       | Unchanged                  |
+| Squeeze the electron into less space | Becomes narrower and taller | More concentrated          |
+| Add a second state (mix)             | Becomes a sum               | Gains an interference term |
+
+Why we normalize: so that probabilities add to one. What happens if you forget: the numbers still look reasonable, but every energy and density you derive is off by a factor.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Reading the wavefunction as the electron's charge cloud">
+
+The wavefunction itself can be negative or complex. The cloud you draw is its square. Do not read the sign as a charge.
+
+</Callout>
+
+<Callout variant="mistake" title="Thinking the electron smears out into pieces">
+
+A measurement finds the whole electron at one place. The density tells you the odds, not that the electron is divided.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-wavefn-1', 'q-wavefn-2', 'q-wavefn-3', 'q-wavefn-4', 'q-wavefn-5']} />
+
+<GoDeeper>
+
+- Griffiths and Schroeter, _Introduction to Quantum Mechanics_, the chapter on the wavefunction and its statistical interpretation <Cite id="S-047" />.
+
+</GoDeeper>

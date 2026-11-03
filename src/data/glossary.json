@@ -498,5 +498,88 @@
     "sources": [
       "S-010"
     ]
+  },
+  {
+    "id": "standing-wave",
+    "label": "Standing wave",
+    "short": "A wave that does not travel. It stays in place with fixed points of no motion, like a plucked guitar string.",
+    "level": "beginner",
+    "sources": [
+      "S-047"
+    ]
+  },
+  {
+    "id": "normalization",
+    "label": "Normalization",
+    "short": "Scaling a wavefunction so that the probabilities over all of space add up to exactly one.",
+    "level": "intermediate",
+    "sources": [
+      "S-047"
+    ]
+  },
+  {
+    "id": "radial-node",
+    "label": "Radial node",
+    "short": "A spherical shell around the nucleus where an orbital's wavefunction is zero, so the electron is never found there.",
+    "level": "intermediate",
+    "sources": [
+      "S-047"
+    ]
+  },
+  {
+    "id": "angular-node",
+    "label": "Angular node",
+    "short": "A flat or cone-shaped surface through the nucleus where an orbital's wavefunction is zero. The number of angular nodes equals l.",
+    "level": "intermediate",
+    "sources": [
+      "S-047"
+    ]
+  },
+  {
+    "id": "electron-volt",
+    "label": "Electron volt (eV)",
+    "short": "The energy an electron gains when it moves through one volt. The usual unit of energy for electrons in atoms and solids.",
+    "level": "beginner",
+    "sources": [
+      "S-031"
+    ]
+  },
+  {
+    "id": "angstrom",
+    "label": "Angstrom",
+    "short": "A unit of length equal to 10^-10 meters. Atoms are a few angstrom apart in a solid.",
+    "level": "beginner",
+    "sources": [
+      "S-031"
+    ]
+  },
+  {
+    "id": "band",
+    "label": "Band",
+    "short": "A range of closely spaced electron energies that forms when many atoms are brought together in a crystal.",
+    "level": "beginner",
+    "sources": [
+      "S-050"
+    ]
+  },
+  {
+    "id": "band-gap",
+    "label": "Band gap",
+    "short": "A range of energies between two bands where no electron states exist. Its size helps decide whether a material conducts.",
+    "level": "beginner",
+    "sources": [
+      "S-050",
+      "S-036"
+    ]
+  },
+  {
+    "id": "density-of-states",
+    "label": "Density of states",
+    "short": "How many electron states are available at each energy, per unit energy.",
+    "level": "intermediate",
+    "sources": [
+      "S-050",
+      "S-036"
+    ]
   }
 ]

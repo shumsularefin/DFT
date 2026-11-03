@@ -1,0 +1,95 @@
+---
+id: particles-and-waves
+title: Particles and waves
+module: 2
+order: 1
+summary: Why an electron is not a tiny ball, and what it means for something small to behave like a wave.
+concepts: [wave-nature]
+requires: []
+vaspTags: []
+sources: [S-047, S-031]
+status: draft
+updated: 2026-11-03
+noLab: true
+---
+
+<Why>
+
+Every later idea in this course, from energy levels to bands to the plane waves VASP uses, rests on one surprising fact: at the scale of atoms, electrons behave like waves. If you carry the picture of an electron as a tiny ball orbiting a nucleus, the rest of the course will not make sense. This page replaces that picture with a better one.
+
+</Why>
+
+<Intuition>
+
+Start with something familiar. A <Term id="wave">wave</Term> on a rope is a pattern that repeats along the rope. Three numbers describe it: how tall it is (<Term id="amplitude">amplitude</Term>), how many times per second it repeats (<Term id="frequency">frequency</Term>), and how far apart the peaks are (the wavelength).
+
+Now the surprise. Light, which we usually think of as a wave, also arrives in lumps called <Term id="photon">photons</Term>. And electrons, which we usually think of as particles, also show wave patterns: fired at a thin crystal, they scatter into the same kind of ring pattern that waves make <Cite id="S-047" />. This is called <Term id="wave-particle-duality">wave-particle duality</Term>.
+
+A helpful way to hold both ideas: an electron is neither a ball nor a ripple. It is a third kind of thing that sometimes looks like one and sometimes like the other. When it is squeezed into a small space, the wave side dominates. That is exactly the situation of an electron in a material.
+
+<Level min="intermediate">
+
+The wavelength of a particle is set by its momentum. This is the <Term id="de-broglie-wavelength">de Broglie wavelength</Term>, $\lambda = h/p$, where $h$ is the <Term id="planck-constant">Planck constant</Term> <Cite id="S-047" />. A faster or heavier particle has a shorter wavelength, which is why a thrown ball shows no wave behavior at all while an electron does.
+
+</Level>
+
+<Level min="pro">
+
+For a free electron with kinetic energy $E$, $p^2 = 2mE$, so $\lambda = 2\pi/\sqrt{E/(\hbar^2/2m)}$. With $\hbar^2/2m = 3.80998\ \text{eV Å}^2$ <Cite id="S-031" />, an electron with 100 eV of kinetic energy has a wavelength of about 1.23 Å, which is comparable to the spacing between atoms in a crystal. That match is why electron diffraction works, and why electrons in solids cannot be treated as classical points.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+The de Broglie relation links the two descriptions: $\lambda = h/p$, and equivalently the wave number $k = 2\pi/\lambda = p/\hbar$ <Cite id="S-047" />. The kinetic energy of a free particle is then
+
+$$E = \frac{p^2}{2m} = \frac{\hbar^2 k^2}{2m}$$
+
+The combination $\hbar^2/2m$ appears again and again in this course. In the units used by VASP and by this site it is $3.80998\ \text{eV Å}^2$ <Cite id="S-031" />. The site computes it from the fundamental constants and checks the result against that value in a unit test.
+
+</TheMath>
+
+<InVasp>
+
+VASP does not store electrons as little balls. It describes them as waves, built from plane waves, which you will meet in module 5. The idea that an electron is a wave with a wavelength is already enough to see why a quantity such as the cutoff energy (`ENCUT`) exists: it limits how short a wavelength the program is allowed to use.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...            | ...the wavelength | ...what you see                              |
+| --------------------------- | ----------------- | -------------------------------------------- |
+| The electron's energy up    | Gets shorter      | Finer wave pattern, more detail, more cost   |
+| The particle's mass up      | Gets shorter      | Wave behavior becomes harder to notice       |
+| The space it is squeezed in | Not directly      | Only waves that fit are allowed (next pages) |
+
+Why this matters: the wave picture is what makes energies come in steps. What happens if you ignore it: you predict that atoms are unstable and that materials have no electronic structure, which is wrong.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Picturing the electron as a ball orbiting the nucleus">
+
+That picture is a historical stepping stone. The electron in an atom is a standing wave spread around the nucleus, not a point moving along a track.
+
+</Callout>
+
+<Callout variant="mistake" title="Thinking the wave is made of many electrons">
+
+One electron is one wave. The wave describes where that single electron may be found, which is the subject of the next page.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-wave-1', 'q-wave-2', 'q-wave-3', 'q-wave-4', 'q-wave-5']} />
+
+<GoDeeper>
+
+- Griffiths and Schroeter, _Introduction to Quantum Mechanics_, chapter 1 and the sections on free particles <Cite id="S-047" />.
+- Tiesinga and others, the CODATA values of the fundamental constants <Cite id="S-031" />.
+
+</GoDeeper>

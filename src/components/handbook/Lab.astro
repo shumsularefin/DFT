@@ -2,6 +2,8 @@
 import Section from './Section.astro';
 import Badge from '../ui/Badge.astro';
 import CostOfExactness from '../labs/CostOfExactness';
+import BoxLab from '../labs/BoxLab';
+import OrbitalsLab from '../labs/OrbitalsLab';
 // Labs are registered by id. An id with no component yet shows the placeholder, so topics can be written ahead of their labs.
 interface Props {
   id: string;
@@ -14,6 +16,14 @@ const { id, title } = Astro.props;
   {id === 'cost-of-exactness' ? (
     <div data-lab-id={id}>
       <CostOfExactness client:visible />
+    </div>
+  ) : id === 'particle-in-a-box' ? (
+    <div data-lab-id={id}>
+      <BoxLab client:visible />
+    </div>
+  ) : id === 'orbitals' ? (
+    <div data-lab-id={id}>
+      <OrbitalsLab client:visible />
     </div>
   ) : (
     <div class="lab-placeholder" data-lab-id={id}>
@@ -58,5 +68,31 @@ const { id, title } = Astro.props;
   .costlab-note {
     color: var(--text-muted);
     font-size: var(--step--1);
+  }
+  .orbitals-select {
+    margin: var(--space-3) 0;
+  }
+  .orbitals-select-input {
+    min-height: var(--target);
+    min-width: 12rem;
+    font: inherit;
+    padding: 0 var(--space-3);
+    color: var(--text);
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+  }
+  .orbitals-select {
+    margin: var(--space-3) 0;
+  }
+  .orbitals-select-input {
+    min-height: var(--target);
+    min-width: 12rem;
+    font: inherit;
+    padding: 0 var(--space-3);
+    color: var(--text);
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
   }
 </style>

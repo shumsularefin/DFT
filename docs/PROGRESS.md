@@ -13,7 +13,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 | M1.3 | Handbook shell, level switch, progress, search and SEO | done | M1.2 | M | claude/vigilant-newton-ws593b | | 2026-10-29 | [work order](milestones/M1-design-and-shell.md) |
 | M2.1 | Lab framework | done | M1.3 | M | claude/vigilant-newton-ws593b | | 2026-10-29 | [work order](milestones/M2-modules-1-3.md) |
 | M2.2 | Module 1: Why DFT exists | done | M1.3 | M | claude/vigilant-newton-ws593b | | 2026-10-29 | [work order](milestones/M2-modules-1-3.md) |
-| M2.3 | Module 2: Quantum basics without math (with labs) | todo | M2.1, M2.2 | L | | | | [work order](milestones/M2-modules-1-3.md) |
+| M2.3 | Module 2: Quantum basics without math (with labs) | done | M2.1, M2.2 | L | claude/vigilant-newton-ws593b | | 2026-11-03 | [work order](milestones/M2-modules-1-3.md) |
 | M2.4 | Module 3: The many-electron problem and why density helps (with labs) | todo | M2.3 | L | | | | [work order](milestones/M2-modules-1-3.md) |
 | M3.1 | Structure core: lattice math and POSCAR | todo | M0.2 | M | | | | [work order](milestones/M3-input-builder.md) |
 | M3.2 | KPOINTS generation | todo | M3.1 | M | | | | [work order](milestones/M3-input-builder.md) |
@@ -76,3 +76,4 @@ Newest first. One line per session: date, stage, outcome, branch.
 ## Author actions outstanding
 
 See `docs/SETUP_FIREBASE.md` and the "author" rows of `docs/OPEN_QUESTIONS.md` (Q-001, Q-004, Q-006, Q-007, Q-008, Q-011, Q-013, Q-015, Q-017, Q-019).
+- 2026-11-03, M2.3: Module 2 (6 topics, 31 questions, 9 glossary terms), particle-in-a-box and orbitals labs, constants, box, hydrogen, sampler worker; golden file `quantum_basics_reference.json`. Branch `claude/vigilant-newton-ws593b`
