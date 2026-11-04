@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import KmeshLab from '../../components/labs/KmeshLab';
+---
+
+<BaseLayout
+  title="k-point mesh lab"
+  description="Monkhorst-Pack and Gamma-centred meshes, irreducible points, and why metals need denser meshes."
+  pageClass="tool"
+>
+  <div class="container">
+    <h1>k-point mesh lab</h1>
+    <p>
+      Pick a cell and a mesh. The lab counts the irreducible points under the lattice symmetry and draws the
+      mesh. The 3D code is not downloaded until you press the start button.
+    </p>
+    <KmeshLab client:load headingLevel={2} />
+  </div>
+</BaseLayout>

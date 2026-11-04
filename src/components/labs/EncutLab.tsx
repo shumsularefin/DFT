@@ -3,9 +3,9 @@ import LabShell from './LabShell';
 import Lazy3D, { type SceneModule } from './Lazy3D';
 import Slider from '../ui/Slider';
 import Badge from '../ui/Badge';
+import LatticeChooser, { latticeOf } from './LatticeChooser';
 import ConvergencePlot from '../tools/convergence/ConvergencePlot';
 import '../tools/convergence/convergence.css';
-import { parsePoscar } from '../../lib/crystal/poscar';
 import type { Mat3 } from '../../lib/crystal/types';
 import {
   gVectorsWithin,
@@ -25,38 +25,6 @@ const load = (): Promise<SceneModule> => import('../../lib/three/EncutScene');
 const isEncutScene = (c: SceneController | null): c is EncutScene =>
   !!c && typeof (c as EncutScene).setBasis === 'function';
 
-const fcc = (a: number): Mat3 => [
-  [0, a / 2, a / 2],
-  [a / 2, 0, a / 2],
-  [a / 2, a / 2, 0],
-];
-const CELLS: Record<string, { label: string; lattice: Mat3 }> = {
-  sc: {
-    label: 'Simple cubic, a = 4.0 Å',
-    lattice: [
-      [4, 0, 0],
-      [0, 4, 0],
-      [0, 0, 4],
-    ],
-  },
-  fcc: { label: 'fcc Cu primitive cell, a = 3.61 Å', lattice: fcc(3.61) },
-  bcc: {
-    label: 'bcc primitive cell, a = 3.0 Å',
-    lattice: [
-      [-1.5, 1.5, 1.5],
-      [1.5, -1.5, 1.5],
-      [1.5, 1.5, -1.5],
-    ],
-  },
-  hex: {
-    label: 'Hexagonal, a = 3.0 Å, c = 5.0 Å',
-    lattice: [
-      [3, 0, 0],
-      [-1.5, (3 * Math.sqrt(3)) / 2, 0],
-      [0, 0, 5],
-    ],
-  },
-};
 const REFERENCE_ENCUT = 400;
 const ENCUT_DEFAULT = 400;
 const CUTOFFS = Array.from({ length: 40 }, (_, i) => 20 * (i + 1));
@@ -128,15 +96,12 @@ export default function EncutLab({ headingLevel = 3 }: { headingLevel?: 2 | 3 })
   const SubHeading = (headingLevel === 2 ? 'h3' : 'h4') as 'h3' | 'h4';
   const [cellId, setCellId] = useState('fcc');
   const [custom, setCustom] = useState<Mat3 | null>(null);
-  const [poscar, setPoscar] = useState('');
-  const [poscarError, setPoscarError] = useState('');
   const [encut, setEncut] = useState(ENCUT_DEFAULT);
   const [potId, setPotId] = useState('kp');
   const [scene, setScene] = useState<EncutScene | null>(null);
   const [curve, setCurve] = useState<CurvePoint[] | null>(null);
 
-  const lattice: Mat3 =
-    cellId === 'custom' && custom ? custom : CELLS[cellId === 'custom' ? 'fcc' : cellId]!.lattice;
+  const lattice: Mat3 = latticeOf(cellId, custom);
   const cell = useMemo(() => reciprocalCell(lattice), [lattice]);
   const tooBig = tooLargeToEnumerate(lattice, encut, ENUM_LIMIT);
   const set = useMemo(() => (tooBig ? null : gVectorsWithin(lattice, encut)), [lattice, encut, tooBig]);
@@ -195,17 +160,6 @@ export default function EncutLab({ headingLevel = 3 }: { headingLevel?: 2 | 3 })
     return { r, view: energyView(r, 1e-3, true) };
   }, [curve]);
 
-  const applyPoscar = () => {
-    try {
-      const res = parsePoscar(poscar);
-      setCustom(res.structure.lattice);
-      setCellId('custom');
-      setPoscarError('');
-    } catch (e) {
-      setPoscarError(e instanceof Error ? e.message : 'Could not read this POSCAR.');
-    }
-  };
-
   const reset = () => {
     setCellId('fcc');
     setEncut(ENCUT_DEFAULT);
@@ -226,24 +180,14 @@ export default function EncutLab({ headingLevel = 3 }: { headingLevel?: 2 | 3 })
       headingLevel={headingLevel}
       controls={
         <>
-          <div className="orbitals-select">
-            <label htmlFor="encut-cell" className="slider-label">
-              Cell
-            </label>
-            <select
-              id="encut-cell"
-              value={cellId}
-              onChange={(e) => setCellId(e.target.value)}
-              className="orbitals-select-input"
-            >
-              {Object.entries(CELLS).map(([id, c]) => (
-                <option key={id} value={id}>
-                  {c.label}
-                </option>
-              ))}
-              {custom && <option value="custom">Your POSCAR</option>}
-            </select>
-          </div>
+          <LatticeChooser
+            cellId={cellId}
+            custom={custom}
+            onChange={(id, c) => {
+              setCellId(id);
+              setCustom(c);
+            }}
+          />
           <Slider label="ENCUT" min={50} max={800} step={10} value={encut} unit="eV" onChange={setEncut} />
           <div className="cv-field">
             <label htmlFor="encut-number">ENCUT (type a value, eV)</label>
@@ -260,28 +204,6 @@ export default function EncutLab({ headingLevel = 3 }: { headingLevel?: 2 | 3 })
               }}
             />
           </div>
-          <details>
-            <summary>Use your own POSCAR cell</summary>
-            <div className="cv-field">
-              <label htmlFor="encut-poscar">
-                Paste a POSCAR (only the lattice is used, nothing is uploaded)
-              </label>
-              <textarea
-                id="encut-poscar"
-                rows={8}
-                value={poscar}
-                onChange={(e) => setPoscar(e.target.value)}
-              />
-            </div>
-            <button type="button" onClick={applyPoscar}>
-              Use this cell
-            </button>
-            {poscarError && (
-              <p className="cv-note" role="alert">
-                {poscarError}
-              </p>
-            )}
-          </details>
         </>
       }
       readouts={[

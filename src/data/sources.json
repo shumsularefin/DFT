@@ -414,5 +414,13 @@
     "access": "open source",
     "status": "cross-checked",
     "notes": "7 recalled Cordero values match (H 0.31, C 0.76, N 0.71, O 0.66, Si 1.11, Fe 1.32, Cu 1.32)"
+  },
+  {
+    "id": "S-053",
+    "citation": "M. Abramowitz and I. A. Stegun (eds.), \"Handbook of Mathematical Functions\", National Bureau of Standards (1964), Table 7.1 (error function)",
+    "usedFor": "Tabulated erf values used to test the Gaussian smearing weight (M4.5)",
+    "access": "book",
+    "status": "cited-from-memory",
+    "notes": ""
   }
 ]

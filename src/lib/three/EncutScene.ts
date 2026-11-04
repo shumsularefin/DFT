@@ -11,13 +11,11 @@ import {
   SphereGeometry,
 } from 'three';
 import type { Mat3 } from '../crystal/types';
+import { cellEdges, toScene } from './cellEdges';
 import { SceneController, disposeObject, type ControllerOptions } from './SceneController';
 
 export const POINT_COLOR = '#e8590c';
 export const SPHERE_COLOR = '#1971c2';
-
-/** Physics (x, y, z) to scene (x, z, -y): z points up, handedness kept. */
-const toScene = (x: number, y: number, z: number): [number, number, number] => [x, z, -y];
 
 export class EncutScene extends SceneController {
   private points: Points | undefined;
@@ -55,22 +53,7 @@ export class EncutScene extends SceneController {
       new MeshBasicMaterial({ color: SPHERE_COLOR, transparent: true, opacity: 0.1, depthWrite: false }),
     );
     this.scene.add(this.sphere);
-    const corners: [number, number, number][] = [];
-    for (const a of [-0.5, 0.5])
-      for (const b of [-0.5, 0.5])
-        for (const c of [-0.5, 0.5])
-          corners.push(
-            toScene(
-              a * cell[0][0] + b * cell[1][0] + c * cell[2][0],
-              a * cell[0][1] + b * cell[1][1] + c * cell[2][1],
-              a * cell[0][2] + b * cell[1][2] + c * cell[2][2],
-            ),
-          );
-    // corner index = 4a + 2b + c; edges join corners that differ in one bit
-    const pairs: [[number, number, number], [number, number, number]][] = [];
-    for (let i = 0; i < 8; i++)
-      for (const bit of [1, 2, 4]) if (!(i & bit)) pairs.push([corners[i]!, corners[i | bit]!]);
-    this.cell = this.addLineSegments(pairs, '#7b8494');
+    this.cell = this.addLineSegments(cellEdges(cell), '#7b8494');
     const d = this.radius * 2.6;
     this.camera.position.set(d, d * 0.7, d);
     this.camera.lookAt(0, 0, 0);
