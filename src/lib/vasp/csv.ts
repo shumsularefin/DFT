@@ -1,6 +1,7 @@
 // Series CSV parser for pasted convergence results. Pure.
 // @source S-042 (workflow convergence series)
 import { ParseError } from '../crystal/errors';
+import { parseSeriesLabel } from './kseries';
 
 export interface SeriesRow {
   x: number;
@@ -78,12 +79,13 @@ export function parseSeriesCsv(text: string): SeriesCsv {
         );
       return k;
     });
-    if (!cols.includes('x') || !cols.includes('energy'))
+    const fromLabel = !cols.includes('x') && cols.includes('label');
+    if ((!cols.includes('x') && !fromLabel) || !cols.includes('energy'))
       throw new ParseError(
         'the header needs an x column (for example encut) and an energy column',
         lines[0]!.n,
       );
-    xName = first[cols.indexOf('x')]!.toLowerCase();
+    xName = fromLabel ? 'label' : first[cols.indexOf('x')]!.toLowerCase();
     start = 1;
   }
   const rows: SeriesRow[] = [];
@@ -103,6 +105,15 @@ export function parseSeriesCsv(text: string): SeriesCsv {
         row[k] = Number(c);
       }
     });
+    if (row.x === undefined && row.label !== undefined) {
+      const sl = parseSeriesLabel(row.label);
+      if (!sl)
+        throw new ParseError(
+          `the label "${row.label}" does not say the setting; use names like encut_450 or kpt_0.04`,
+          n,
+        );
+      row.x = sl.x;
+    }
     if (row.x === undefined || row.energy === undefined) throw new ParseError('missing x or energy', n);
     rows.push(row as SeriesRow);
   }

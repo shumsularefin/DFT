@@ -207,7 +207,11 @@ describe('scripts', () => {
     writeFileSync(join(dir, '00_conv/encut_450/OUTCAR'), outcar('-14.6', '-0.80'));
     const out = execFileSync('bash', [join(dir, 'collect.sh')], { encoding: 'utf8' });
     expect(out).toBe('label,E_sigma0,pressure_kB,nions\nencut_400,-14.5,-1.20,4\nencut_450,-14.6,-0.80,4\n');
-    expect(() => parseSeriesCsv(out)).toThrow(); // x comes from the label (M4.3); the header aliases are accepted
+    const csv = parseSeriesCsv(out);
+    expect(csv.rows.map((r) => [r.x, r.energy, r.pressure, r.natoms])).toEqual([
+      [400, -14.5, -1.2, 4],
+      [450, -14.6, -0.8, 4],
+    ]);
   });
 });
 
