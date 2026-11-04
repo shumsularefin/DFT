@@ -201,3 +201,19 @@
   margin: 0.125rem 0.25rem 0.125rem 0;
   min-height: 2.75rem;
 }
+
+.ib-mode {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.75rem 0;
+}
+.ib-mode button[aria-pressed='true'] {
+  font-weight: 700;
+  border-color: var(--accent, currentColor);
+  text-decoration: underline;
+}
+.ib-series pre {
+  overflow: auto;
+  max-width: 100%;
+}

@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import './input-builder.css';
 import CheckStep from './CheckStep';
 import JobStep from './JobStep';
 import KpointsStep from './KpointsStep';
+import SeriesPanel from './SeriesPanel';
 import SettingsStep from './SettingsStep';
 import StructureStep from './StructureStep';
 import TagCard from './TagCard';
@@ -13,6 +14,7 @@ import { STEPS, useBuilder } from './store';
 export default function InputBuilder() {
   const { step, setStep, selectedTag, applyShare, set } = useBuilder();
   const level = useLevel();
+  const [mode, setMode] = useState<'single' | 'series'>('single');
 
   useEffect(() => {
     const m = /(?:^|[#&])s=([^&]+)/.exec(location.hash);
@@ -31,40 +33,54 @@ export default function InputBuilder() {
         and sources are linked from each message. Everything runs in your browser and nothing is uploaded.
         POTCAR files are never generated.
       </p>
-      <nav aria-label="Builder steps">
-        <ol className="ib-steps">
-          {STEPS.map((name, i) => (
-            <li key={name}>
-              <button
-                type="button"
-                onClick={() => setStep(i)}
-                aria-current={i === step ? 'step' : undefined}
-                className={i === step ? 'is-current' : undefined}
-              >
-                <span className="ib-num">{i + 1}</span> {name}
-              </button>
-            </li>
-          ))}
-        </ol>
-      </nav>
-      <div className="ib-layout">
-        <div className="ib-main">
-          <Body />
-          <div className="ib-nav">
-            <button type="button" disabled={step === 0} onClick={() => setStep(step - 1)}>
-              Back
-            </button>
-            <button type="button" disabled={step === last} onClick={() => setStep(step + 1)}>
-              Next
-            </button>
-          </div>
-        </div>
-        {step === 2 && (
-          <div className="ib-aside">
-            <TagCard name={selectedTag} level={level} onSelect={(n) => set('selectedTag', n)} />
-          </div>
-        )}
+      <div role="group" aria-label="Builder mode" className="ib-mode">
+        <button type="button" aria-pressed={mode === 'single'} onClick={() => setMode('single')}>
+          Single calculation
+        </button>
+        <button type="button" aria-pressed={mode === 'series'} onClick={() => setMode('series')}>
+          Convergence series
+        </button>
       </div>
+      {mode === 'series' ? (
+        <SeriesPanel />
+      ) : (
+        <>
+          <nav aria-label="Builder steps">
+            <ol className="ib-steps">
+              {STEPS.map((name, i) => (
+                <li key={name}>
+                  <button
+                    type="button"
+                    onClick={() => setStep(i)}
+                    aria-current={i === step ? 'step' : undefined}
+                    className={i === step ? 'is-current' : undefined}
+                  >
+                    <span className="ib-num">{i + 1}</span> {name}
+                  </button>
+                </li>
+              ))}
+            </ol>
+          </nav>
+          <div className="ib-layout">
+            <div className="ib-main">
+              <Body />
+              <div className="ib-nav">
+                <button type="button" disabled={step === 0} onClick={() => setStep(step - 1)}>
+                  Back
+                </button>
+                <button type="button" disabled={step === last} onClick={() => setStep(step + 1)}>
+                  Next
+                </button>
+              </div>
+            </div>
+            {step === 2 && (
+              <div className="ib-aside">
+                <TagCard name={selectedTag} level={level} onSelect={(n) => set('selectedTag', n)} />
+              </div>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }
