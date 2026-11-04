@@ -6,6 +6,7 @@ import BoxLab from '../labs/BoxLab';
 import OrbitalsLab from '../labs/OrbitalsLab';
 import ExponentialWall from '../labs/ExponentialWall';
 import DensityMap from '../labs/DensityMap';
+import EncutLab from '../labs/EncutLab';
 // Labs are registered by id. An id with no component yet shows the placeholder, so topics can be written ahead of their labs.
 interface Props {
   id: string;
@@ -34,6 +35,10 @@ const { id, title } = Astro.props;
   ) : id === 'density-as-a-map' ? (
     <div data-lab-id={id}>
       <DensityMap client:visible />
+    </div>
+  ) : id === 'encut-sphere' ? (
+    <div data-lab-id={id}>
+      <EncutLab client:visible />
     </div>
   ) : (
     <div class="lab-placeholder" data-lab-id={id}>
