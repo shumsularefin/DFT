@@ -37,7 +37,7 @@
     "usedFor": "Setyawan-Curtarolo k-paths",
     "access": "open access (arXiv)",
     "status": "cross-checked",
-    "notes": "fcc points agree with seekpath (`tests/reference/kpaths.json`); tables to be checked against the paper in M5.4"
+    "notes": "fcc points agree with seekpath (`tests/reference/kpaths.json`); pymatgen port reproduces 20 of 23 variants (M5.4); tables still to be checked against the paper (Q-038)"
   },
   {
     "id": "S-006",
