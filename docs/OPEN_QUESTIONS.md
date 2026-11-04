@@ -37,6 +37,7 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-031 | open | author |
 | Q-032 | open | author |
 | Q-033 | open | author |
+| Q-034 | open | author |
 
 ## Q-001. Repository licence
 Which licence for the code and which for the written content and data (a common split: MIT for code, CC BY 4.0 for original text)? Affects `LICENSE`, the footer and the references page. Until decided: no LICENSE file; `THIRD_PARTY_NOTICES.md` lists upstream licences. **Owner: author.**
@@ -138,3 +139,6 @@ Statements in `src/content/handbook/03-many-electrons/` that rest on general kno
 
 ## Q-033. M4.3 convergence plotter: statements to confirm
 (1) The explanation text (why the setting matters, the Pro note that differences rather than total energy converge) is written from the handbook's convergence section and D-014; confirm the wording. (2) The 1.3 x ENMAX advice is shown for ENCUT series only; confirm it should not also appear when a relaxation is not planned. (3) OSZICAR files give F and E0 only, so "energy without entropy" is not available from them and the row is skipped for that quantity; say if you want a fallback. (4) File and folder naming (`encut_450`, `kpt_0.04`, `kpt_6x6x6`) is the only way x is read from files; other names need the table. (5) Only OSZICAR and OUTCAR formats from the hand-written fixtures were tested (Q-031).
+
+## Q-034. M4.4 ENCUT lab: statements to confirm
+(1) The work exponent 1.5 in the scaling hint is a rule of thumb, not sourced; confirm or give a source (S-049, S-050 are cited from memory). (2) The toy potential strengths (Kronig-Penney 6 eV, width 1 Angstrom in a 4 Angstrom cell; cosine 2 eV) are chosen only to give a visible curve; confirm that is acceptable for teaching. (3) Whether the lab should also show VASP's own plane-wave count (NPLWV, reported in OUTCAR) once real output is available; VASP's basis includes a different G-grid convention for FFT, which was not verified here.

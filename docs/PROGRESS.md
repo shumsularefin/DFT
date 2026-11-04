@@ -24,7 +24,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 | M4.1 | Output parsers and convergence analysis | done | M3.2 | L | claude/vigilant-newton-ws593b | | 2026-11-03 | [report](reports/M4.1.md), [work order](milestones/M4-convergence.md) |
 | M4.2 | Convergence series generator | done | M3.5, M4.1 | M | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M4.2.md), [work order](milestones/M4-convergence.md) |
 | M4.3 | Convergence plotter UI | done | M4.1 | M | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M4.3.md), [work order](milestones/M4-convergence.md) |
-| M4.4 | ENCUT lab and toy plane-wave solver | todo | M2.1, M3.1 | L | | | | [work order](milestones/M4-convergence.md) |
+| M4.4 | ENCUT lab and toy plane-wave solver | done | M2.1, M3.1 | L | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M4.4.md), [work order](milestones/M4-convergence.md) |
 | M4.5 | K-point mesh lab | todo | M4.4, M3.2 | L | | | | [work order](milestones/M4-convergence.md) |
 | M5.1 | Symmetry (moyo), CIF and standardization | todo | M3.1 | L | | | | [work order](milestones/M5-brillouin-zone.md) |
 | M5.2 | Brillouin zone geometry | todo | M3.1 | M | | | | [work order](milestones/M5-brillouin-zone.md) |
@@ -87,3 +87,4 @@ See `docs/SETUP_FIREBASE.md` and the "author" rows of `docs/OPEN_QUESTIONS.md` (
 - 2026-11-03, M4.1: OSZICAR, OUTCAR and series-CSV parsers, label mapping and `analyzeSeries` (D-014) with 30 tests; formats validated on hand-written fixtures only. Q-031 raised, Q-014 updated.
 - 2026-11-04, M4.2: convergence series generator (`series.ts`: ENCUT and k-mesh series, project tree, run/collect/make_potcar scripts, zip) and a "Convergence series" mode in the Input Builder; 23 unit and 7 e2e tests. D-041, Q-032.
 - 2026-11-04, M4.3: convergence plotter at `/tools/convergence/` (file drop, CSV paste, editable table, threshold slider, plain-language result, SVG/PNG/CSV export); view-model `convergenceView.ts` and `seriesInput.ts`. D-042, Q-033.
+- 2026-11-04, M4.4: ENCUT lab (`EncutLab`, lab id `encut-sphere`, demo `/design/encut-lab/`), exact plane-wave counts (`planewaves.ts`, 20 golden counts) and a toy 1D plane-wave solver (`kp1d.ts`, worker). D-043, Q-034.

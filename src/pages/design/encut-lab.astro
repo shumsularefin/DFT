@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EncutLab from '../../components/labs/EncutLab';
+---
+
+<BaseLayout
+  title="ENCUT lab"
+  description="The plane-wave sphere: how many plane waves a cutoff energy keeps."
+  pageClass="tool"
+>
+  <div class="container">
+    <h1>ENCUT lab</h1>
+    <p>
+      Pick a cell and an energy cutoff. The lab counts the plane waves exactly and draws them. The 3D code is
+      not downloaded until you press the start button.
+    </p>
+    <EncutLab client:load headingLevel={2} />
+  </div>
+</BaseLayout>
