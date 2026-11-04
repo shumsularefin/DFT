@@ -38,9 +38,10 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-032 | open | author |
 | Q-033 | open | author |
 | Q-034 | open | author |
+| Q-035 | open | author |
 
 ## Q-001. Repository licence
-Which licence for the code and which for the written content and data (a common split: MIT for code, CC BY 4.0 for original text)? Affects `LICENSE`, the footer and the references page. Until decided: no LICENSE file; `THIRD_PARTY_NOTICES.md` lists upstream licences. **Owner: author.**
+Which licence for the code and which for the written content and data (a common split: MIT for code, CC BY 4.0 for original text)? Affects `LICENSE`, the footer and the references page. Until decided: no LICENSE file; `THIRD_PARTY_NOTICES.md` lists upstream licences. **Update 2026-11-04:** the secrets `FIREBASE_SERVICE_ACCOUNT` and `FIREBASE_PROJECT_ID` are set (screenshot from the author) and the deploy workflow has succeeded on every merge to main since; the live site URL was not opened from the builder environment, so please confirm it shows the latest stage. **Owner: author.**
 
 ## Q-002. Shannon radii: licence and completeness
 The tolerance explorer bundles Shannon (1976) radii built from pymatgen's table (pymatgen is MIT; the numbers are Shannon's published data). Two things are unverified: (a) whether bundling a compiled copy of the table needs more than attribution; (b) completeness. pymatgen has 492 spin-resolved entries; check against the original table (Acta Cryst. A32, 751) or the Imperial College online database, listing any missing rows. 34 textbook anchor values agree, but they were written down after some pymatgen values had been seen, so that is a consistency check only; this question is about a genuinely independent comparison. **Close:** M8.1 diffs the dataset against the original and records the result here; the author confirms the licence position.
@@ -142,3 +143,6 @@ Statements in `src/content/handbook/03-many-electrons/` that rest on general kno
 
 ## Q-034. M4.4 ENCUT lab: statements to confirm
 (1) The work exponent 1.5 in the scaling hint is a rule of thumb, not sourced; confirm or give a source (S-049, S-050 are cited from memory). (2) The toy potential strengths (Kronig-Penney 6 eV, width 1 Angstrom in a 4 Angstrom cell; cosine 2 eV) are chosen only to give a visible curve; confirm that is acceptable for teaching. (3) Whether the lab should also show VASP's own plane-wave count (NPLWV, reported in OUTCAR) once real output is available; VASP's basis includes a different G-grid convention for FFT, which was not verified here.
+
+## Q-035. M4.5 k-point mesh lab: statements to confirm
+(1) The lab counts irreducible points from the lattice point group only; a real crystal with atoms can have fewer operations (M5.1 will use spglib or moyo). The notice says so; confirm the wording. (2) The Monkhorst-Pack set uses VASP's formula (shift on even n only); other codes shift differently. (3) The "metals need denser meshes" explanation (Fermi surface cuts the zone, algebraic versus exponential decay) is supported by the toy numbers and standard teaching (S-049) but the claim for real metals is not tested here; confirm it may be stated at that level. (4) The reference for the toy plot is a 600 by 600 mesh except for the unsmeared metal (exact -8t/pi^2); confirm that is acceptable.
