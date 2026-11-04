@@ -7,6 +7,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- Convergence plotter tool: drop OSZICAR or OUTCAR files or paste a table, see where the energy stops changing with a threshold band and a plain-language explanation, and export SVG, PNG or CSV. Runs in your browser.
 - Convergence series generator in the Input Builder: ENCUT and k-mesh test folders with INCAR, KPOINTS, POSCAR and job scripts, plus run, collect and POTCAR-assembly scripts, downloaded as one zip (never contains POTCAR content).
 - Output readers and convergence check library: OSZICAR, OUTCAR and pasted series, with the rule that a setting counts as converged only when every later point stays within the threshold (no UI yet).
 - File explorer for handbook pages: click any line of a POSCAR, KPOINTS or INCAR to read what it means at your level, plus a panel describing the fields in a POTCAR header (structure only, no POTCAR content).

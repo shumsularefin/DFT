@@ -1,0 +1,138 @@
+.cv-banner,
+.cv-sample {
+  border: 1px solid var(--border-strong);
+  border-radius: 0.5rem;
+  padding: var(--space-3);
+  background: var(--surface);
+}
+.cv-note {
+  color: var(--text);
+  border-left: 4px solid var(--warn);
+  padding-left: var(--space-2);
+}
+.cv-drop {
+  border: 2px dashed var(--border-strong);
+  border-radius: 0.5rem;
+  padding: var(--space-3);
+  display: grid;
+  gap: var(--space-2);
+}
+.cv-field {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+  margin-block: var(--space-2);
+}
+.cv-field textarea {
+  max-width: 100%;
+  font-family: var(--font-mono, monospace);
+}
+.cv-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: flex-end;
+}
+.cv-fieldset {
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+}
+.cv-radio {
+  display: block;
+}
+.cv-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-block: var(--space-3);
+}
+.cv-explain {
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: var(--space-3);
+  background: var(--surface);
+}
+.cv-advice {
+  border-left: 4px solid var(--accent);
+  padding-left: var(--space-2);
+}
+.cv-fig {
+  margin: var(--space-3) 0;
+  max-width: 100%;
+}
+.cv-svg {
+  width: 100%;
+  height: auto;
+  max-width: 720px;
+  display: block;
+}
+.cv-tip {
+  min-height: 2.5em;
+  font-size: 0.95rem;
+}
+.cv-grid {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+.cv-axis {
+  stroke: var(--text-muted);
+  stroke-width: 1.5;
+}
+.cv-tick {
+  fill: var(--text);
+  font-size: 12px;
+}
+.cv-label {
+  fill: var(--text);
+  font-size: 13px;
+}
+.cv-line {
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+.cv-band {
+  fill: var(--ok);
+  fill-opacity: 0.18;
+}
+.cv-marker {
+  stroke: var(--ok);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+}
+.cv-mlabel {
+  fill: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+}
+.cv-pt {
+  fill: var(--surface);
+  stroke: var(--accent);
+  stroke-width: 2.5;
+  cursor: pointer;
+}
+.cv-pt-ok {
+  fill: var(--ok);
+  stroke: var(--text);
+}
+.cv-pt:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.cv-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.cv-table {
+  border-collapse: collapse;
+  max-width: 100%;
+}
+.cv-table th,
+.cv-table td {
+  border: 1px solid var(--border);
+  padding: 0.25rem 0.5rem;
+  text-align: left;
+}
+.cv-table input {
+  width: 7rem;
+  max-width: 100%;
+}
