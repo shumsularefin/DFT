@@ -35,6 +35,7 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-029 | open | author |
 | Q-030 | open | author |
 | Q-031 | open | author |
+| Q-032 | open | author |
 
 ## Q-001. Repository licence
 Which licence for the code and which for the written content and data (a common split: MIT for code, CC BY 4.0 for original text)? Affects `LICENSE`, the footer and the references page. Until decided: no LICENSE file; `THIRD_PARTY_NOTICES.md` lists upstream licences. **Owner: author.**
@@ -130,3 +131,6 @@ Statements in `src/content/handbook/03-many-electrons/` that rest on general kno
 
 ## Q-031. M4.1 judgement calls and unvalidated formats
 (1) Every OSZICAR and OUTCAR line pattern was written from the handbooks and the work order and tested on hand-written fixtures plus the generated OSZICAR golden file; none was run on a real VASP output (Q-008). Please supply real trimmed files in `data/author/`. (2) D-014 says a series with no earlier qualifying point is "only-last-point". Read literally, that case is exactly "not converged" (the last index always qualifies vacuously), so `analyzeSeries` returns `not-converged` and the `only-last-point` status is never produced; it stays in the type. Confirm, or say what distinction was meant (for example, converged at the second-to-last point, which currently gives `converged` plus a warning that one later point confirms it). (3) `monotonic` means the distance to the final value never grows from one point to the next. (4) Series with no `natoms` are treated as per atom as given, with a warning. (5) A noncollinear `mag=` line with three numbers keeps only the first.
+
+## Q-032. M4.2 convergence series: judgement calls to confirm
+(1) ENCUT grid: the work order says the series always includes the value nearest 1.3 x ENMAX rounded to 10, yet `encutSeries(400)` must equal the author's seven values (which lack 520) while `encutSeries(520)` must contain 680. Implemented as: when ENMAX is a multiple of 50 the plain 50 eV grid is returned; otherwise 1.3 x ENMAX rounded to 10 is added when missing. Confirm this is the intended rule. (2) The "size check" warning fires above 100000 atom x k-point units (full mesh, summed over runs). The number is a user-interface threshold, not a measured cost; replace it if you have timings from your cluster. (3) `collect.sh` prints `label,E_sigma0,pressure_kB,nions`, taking pressure as field 4 of the `external pressure` line and NIONS as the last field of the first `NIONS` line; checked on hand-written OUTCAR lines only (same caveat as Q-031). (4) The plotter (M4.3) must take x from the label (`encut_450`, `kpt_0.04`) because `collect.sh` has no x column; `parseSeriesLabel` already does this.

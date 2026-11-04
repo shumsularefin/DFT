@@ -22,7 +22,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 | M3.5 | Input Builder UI | done | M3.4, M1.3 | L | claude/vigilant-newton-ws593b | | 2026-11-03 | [report](reports/M3.5.md), [work order](milestones/M3-input-builder.md) |
 | M3.6 | Clickable file explorer | done | M3.3, M1.2 | S | claude/vigilant-newton-ws593b | | 2026-11-03 | [report](reports/M3.6.md), [work order](milestones/M3-input-builder.md) |
 | M4.1 | Output parsers and convergence analysis | done | M3.2 | L | claude/vigilant-newton-ws593b | | 2026-11-03 | [report](reports/M4.1.md), [work order](milestones/M4-convergence.md) |
-| M4.2 | Convergence series generator | todo | M3.5, M4.1 | M | | | | [work order](milestones/M4-convergence.md) |
+| M4.2 | Convergence series generator | done | M3.5, M4.1 | M | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M4.2.md), [work order](milestones/M4-convergence.md) |
 | M4.3 | Convergence plotter UI | todo | M4.1 | M | | | | [work order](milestones/M4-convergence.md) |
 | M4.4 | ENCUT lab and toy plane-wave solver | todo | M2.1, M3.1 | L | | | | [work order](milestones/M4-convergence.md) |
 | M4.5 | K-point mesh lab | todo | M4.4, M3.2 | L | | | | [work order](milestones/M4-convergence.md) |
@@ -85,3 +85,4 @@ See `docs/SETUP_FIREBASE.md` and the "author" rows of `docs/OPEN_QUESTIONS.md` (
 - 2026-11-03, M3.5: Input Builder UI at `/tools/input-builder/` (six steps, zip download via fflate, share link, job scripts). Lighthouse mobile 98/100/100, tool JS 118.4/200 KB gzip. Judgement calls in D-038.
 - 2026-11-03, M3.6: clickable file explorer (`annotate.ts`, `FileExplorer`, `PseudopotentialHeader`, MDX `<VaspFileExplorer>` and `<PseudopotentialHeader>`); 14 unit and 12 e2e tests. Q-030 raised.
 - 2026-11-03, M4.1: OSZICAR, OUTCAR and series-CSV parsers, label mapping and `analyzeSeries` (D-014) with 30 tests; formats validated on hand-written fixtures only. Q-031 raised, Q-014 updated.
+- 2026-11-04, M4.2: convergence series generator (`series.ts`: ENCUT and k-mesh series, project tree, run/collect/make_potcar scripts, zip) and a "Convergence series" mode in the Input Builder; 23 unit and 7 e2e tests. D-041, Q-032.
