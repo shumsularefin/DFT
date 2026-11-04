@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import UnitCellLab from '../../components/labs/UnitCellLab';
+---
+
+<BaseLayout
+  title="Unit cell viewer"
+  description="Atoms, bonds and supercells of a crystal in 3D."
+  pageClass="tool"
+>
+  <div class="container">
+    <h1>Unit cell viewer</h1>
+    <p>
+      Atoms, bonds and supercells of a crystal in 3D. The 3D code is not downloaded until you press the start
+      button.
+    </p>
+    <UnitCellLab client:load headingLevel={2} />
+  </div>
+</BaseLayout>

@@ -23,6 +23,7 @@ import {
   type Texture,
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { placeLabels } from './labelPlacement';
 
 export interface RendererLike {
   domElement: HTMLCanvasElement;
@@ -335,17 +336,43 @@ export class SceneController {
     return thing;
   }
 
+  /** Remove one label made by addLabel. */
+  removeLabel(el: HTMLElement): void {
+    el.remove();
+    this.labels = this.labels.filter((l) => l.el !== el);
+  }
+
+  /** Remove every label (for example before the scene is rebuilt). */
+  clearLabels(): void {
+    for (const { el } of this.labels) el.remove();
+    this.labels = [];
+  }
+
+  /** Keep labels from covering each other (placeLabels). Off by default: labels sit centred on their point. */
+  declutterLabels = false;
+
   private positionLabels(): void {
     if (!this.labels.length) return;
     const w = this.container.clientWidth;
     const h = this.container.clientHeight;
     const v = new Vector3();
+    const shown: { el: HTMLElement; x: number; y: number }[] = [];
     for (const { el, position } of this.labels) {
       v.copy(position).project(this.camera);
       const visible = v.z < 1;
       el.style.display = visible ? '' : 'none';
-      el.style.transform = `translate(-50%, -50%) translate(${((v.x + 1) / 2) * w}px, ${((1 - v.y) / 2) * h}px)`;
+      if (visible) shown.push({ el, x: ((v.x + 1) / 2) * w, y: ((1 - v.y) / 2) * h });
     }
+    const offsets = this.declutterLabels
+      ? placeLabels(
+          shown.map((s) => ({ x: s.x, y: s.y, w: s.el.offsetWidth || 24, h: s.el.offsetHeight || 16 })),
+          { w, h },
+        )
+      : null;
+    shown.forEach((s, i) => {
+      const o = offsets?.[i];
+      s.el.style.transform = `translate(-50%, -50%) translate(${s.x + (o?.dx ?? 0)}px, ${s.y + (o?.dy ?? 0)}px)`;
+    });
   }
 
   /** Release listeners, observers, GPU resources and the canvas. Idempotent. */

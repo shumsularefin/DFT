@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BrillouinLab from '../../components/labs/BrillouinLab';
+---
+
+<BaseLayout
+  title="Brillouin zone viewer"
+  description="The first Brillouin zone, reciprocal vectors and k-path in 3D."
+  pageClass="tool"
+>
+  <div class="container">
+    <h1>Brillouin zone viewer</h1>
+    <p>
+      The first Brillouin zone, reciprocal vectors and k-path in 3D. The 3D code is not downloaded until you
+      press the start button.
+    </p>
+    <BrillouinLab client:load headingLevel={2} />
+  </div>
+</BaseLayout>
