@@ -438,5 +438,21 @@
     "access": "open source (code read in full); paper paywalled",
     "status": "cited-from-memory",
     "notes": "The code of `niggli.c` was read in full and the port in `niggli.ts` reproduces SeeK-path's aP output for all 4 triclinic golden cells; the paper itself was not read"
+  },
+  {
+    "id": "S-056",
+    "citation": "W3C, \"Web Content Accessibility Guidelines (WCAG) 2.1\", Recommendation (2018), definitions of relative luminance and contrast ratio, success criteria 1.4.3 and 1.4.11",
+    "usedFor": "Contrast ratio of the atom colour palette against the light and dark backgrounds (M5.5)",
+    "access": "open web",
+    "status": "cited-from-memory",
+    "notes": "Same formula as `scripts/build/contrast.mjs`; tested against the 21:1 black on white and 1:1 identical anchors"
+  },
+  {
+    "id": "S-057",
+    "citation": "M. Okabe and K. Ito, \"Color Universal Design (CUD): How to make figures and presentations that are friendly to colorblind people\" (2008), the eight-colour palette",
+    "usedFor": "Colour-blind-safe colours for atoms and k-point orbits (M5.5)",
+    "access": "open web",
+    "status": "cited-from-memory",
+    "notes": "The hex values are those already used by the k-mesh lab; no simulation of colour vision is claimed, only that the set is the published colour-blind-safe one and that each colour keeps contrast on both themes"
   }
 ]
