@@ -430,5 +430,13 @@
     "access": "format convention",
     "status": "cited-from-memory",
     "notes": ""
+  },
+  {
+    "id": "S-055",
+    "citation": "spglib 2.8.0 `src/niggli.c` (BSD-3-Clause, Copyright (C) 2023 Atsushi Togo), which implements R. W. Grosse-Kunstleve, N. K. Sauter, P. D. Adams, \"Numerically stable algorithms for the computation of reduced unit cells\", Acta Cryst. A60, 1-6 (2004)",
+    "usedFor": "Niggli reduction used by the HPKOT triclinic (aP) branch",
+    "access": "open source (code read in full); paper paywalled",
+    "status": "cited-from-memory",
+    "notes": "The code of `niggli.c` was read in full and the port in `niggli.ts` reproduces SeeK-path's aP output for all 4 triclinic golden cells; the paper itself was not read"
   }
 ]

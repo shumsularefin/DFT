@@ -28,7 +28,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 | M4.5 | K-point mesh lab | done | M4.4, M3.2 | L | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M4.5.md), [work order](milestones/M4-convergence.md) |
 | M5.1 | Symmetry (moyo), CIF and standardization | done | M3.1 | L | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M5.1.md), [work order](milestones/M5-brillouin-zone.md) |
 | M5.2 | Brillouin zone geometry | done | M3.1 | M | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M5.2.md), [work order](milestones/M5-brillouin-zone.md) |
-| M5.3 | HPKOT k-paths (default convention) | todo | M5.1, M5.2 | L | | | | [work order](milestones/M5-brillouin-zone.md) |
+| M5.3 | HPKOT k-paths (default convention) | done | M5.1, M5.2 | L | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M5.3.md), [work order](milestones/M5-brillouin-zone.md) |
 | M5.4 | Setyawan-Curtarolo k-paths (second convention) | todo | M5.3 | L | | | | [work order](milestones/M5-brillouin-zone.md) |
 | M5.5 | 3D Brillouin zone and lattice viewer | todo | M5.2, M2.1 | M | | | | [work order](milestones/M5-brillouin-zone.md) |
 | M5.6 | k-path tool page and exports | todo | M5.3, M5.4, M5.5, M3.2 | M | | | | [work order](milestones/M5-brillouin-zone.md) |
@@ -91,3 +91,4 @@ See `docs/SETUP_FIREBASE.md` and the "author" rows of `docs/OPEN_QUESTIONS.md` (
 - 2026-11-04, M4.5: k-point mesh lab (`KmeshLab`, lab id `kpoint-mesh`, demo `/design/kpoint-lab/`): lattice point group (`pointgroup.ts`), mesh points, irreducible counts and the Q-017 symmetry test (`kmesh.ts`, golden spglib counts), toy metal-versus-insulator panel (`tightbinding2d.ts`). D-044, Q-035, S-053.
 - 2026-11-04, M5.1: moyo symmetry (`symmetry.ts`, worker + client, `/design/symmetry-check/`), standardization message (`standardize.ts`), CIF reader/writer (`cif.ts`), format detection (`io.ts`), element table; 39/39 golden space groups and atom counts; 10 seekpath primitive-metric differences listed in the report; `lazy.moyo` budget. See [report](reports/M5.1.md).
 - 2026-11-04, M5.2: exact first Brillouin zone by half-space clipping (`brillouin.ts`), shared basis reduction (`reduction.ts`); 12/12 golden lattices, 300 seeded random cells, median 0.3 to 1.2 ms per zone. See [report](reports/M5.2.md).
+- 2026-11-04, M5.3: HPKOT k-paths (`kpath/hpkot.ts`, `kpath/expr.ts`, `niggli.ts`, tables in `src/data/kpath/hpkot/`); 39/39 golden structures and all 29 variants match. D-047, Q-037. See [report](reports/M5.3.md).
