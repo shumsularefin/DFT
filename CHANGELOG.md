@@ -7,6 +7,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- Symmetry and structure files: find the space group of a POSCAR, CIF or XYZ file in your browser (the engine loads only when you ask), see what standardizing the cell changed in plain language with the transformation matrix, and read CIF files safely (partly filled sites are refused with an explanation). Check page at /design/symmetry-check/.
 - k-point mesh lab: Monkhorst-Pack and Gamma-centred meshes drawn in the reciprocal cell, the number of irreducible points under the lattice symmetry, a plain explanation when a mesh breaks the symmetry, and a toy panel showing why metals need denser meshes than insulators.
 - ENCUT lab: pick a cell and a cutoff, see the sphere of plane waves with the exact count next to the smooth estimate, a scaling hint, and a toy-model curve showing why a higher cutoff changes the energy (3D view loads on request; flat slice without WebGL).
 - Convergence plotter tool: drop OSZICAR or OUTCAR files or paste a table, see where the energy stops changing with a threshold band and a plain-language explanation, and export SVG, PNG or CSV. Runs in your browser.
