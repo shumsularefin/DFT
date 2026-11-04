@@ -18,6 +18,10 @@
     "three": {
       "contains": "WebGLRenderer",
       "maxKB": 150
+    },
+    "moyo": {
+      "contains": "analyze_cell",
+      "maxKB": 300
     }
   }
 }

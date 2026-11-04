@@ -26,7 +26,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 | M4.3 | Convergence plotter UI | done | M4.1 | M | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M4.3.md), [work order](milestones/M4-convergence.md) |
 | M4.4 | ENCUT lab and toy plane-wave solver | done | M2.1, M3.1 | L | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M4.4.md), [work order](milestones/M4-convergence.md) |
 | M4.5 | K-point mesh lab | done | M4.4, M3.2 | L | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M4.5.md), [work order](milestones/M4-convergence.md) |
-| M5.1 | Symmetry (moyo), CIF and standardization | todo | M3.1 | L | | | | [work order](milestones/M5-brillouin-zone.md) |
+| M5.1 | Symmetry (moyo), CIF and standardization | done | M3.1 | L | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M5.1.md), [work order](milestones/M5-brillouin-zone.md) |
 | M5.2 | Brillouin zone geometry | todo | M3.1 | M | | | | [work order](milestones/M5-brillouin-zone.md) |
 | M5.3 | HPKOT k-paths (default convention) | todo | M5.1, M5.2 | L | | | | [work order](milestones/M5-brillouin-zone.md) |
 | M5.4 | Setyawan-Curtarolo k-paths (second convention) | todo | M5.3 | L | | | | [work order](milestones/M5-brillouin-zone.md) |
@@ -89,3 +89,4 @@ See `docs/SETUP_FIREBASE.md` and the "author" rows of `docs/OPEN_QUESTIONS.md` (
 - 2026-11-04, M4.3: convergence plotter at `/tools/convergence/` (file drop, CSV paste, editable table, threshold slider, plain-language result, SVG/PNG/CSV export); view-model `convergenceView.ts` and `seriesInput.ts`. D-042, Q-033.
 - 2026-11-04, M4.4: ENCUT lab (`EncutLab`, lab id `encut-sphere`, demo `/design/encut-lab/`), exact plane-wave counts (`planewaves.ts`, 20 golden counts) and a toy 1D plane-wave solver (`kp1d.ts`, worker). D-043, Q-034.
 - 2026-11-04, M4.5: k-point mesh lab (`KmeshLab`, lab id `kpoint-mesh`, demo `/design/kpoint-lab/`): lattice point group (`pointgroup.ts`), mesh points, irreducible counts and the Q-017 symmetry test (`kmesh.ts`, golden spglib counts), toy metal-versus-insulator panel (`tightbinding2d.ts`). D-044, Q-035, S-053.
+- 2026-11-04, M5.1: moyo symmetry (`symmetry.ts`, worker + client, `/design/symmetry-check/`), standardization message (`standardize.ts`), CIF reader/writer (`cif.ts`), format detection (`io.ts`), element table; 39/39 golden space groups and atom counts; 10 seekpath primitive-metric differences listed in the report; `lazy.moyo` budget. See [report](reports/M5.1.md).

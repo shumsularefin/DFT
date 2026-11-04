@@ -95,7 +95,7 @@ export function checkSize(dist, budgets) {
 }
 
 /**
- * Lazy chunks: each budgets.lazyChunks entry names a string that identifies its JS files (for example
+ * Lazy chunks: each budgets.lazyChunks entry names a string that identifies its JS or wasm files (for example
  * "WebGLRenderer" for three) and a gzip cap. Files under dist/ that contain the string are summed.
  * An entry that matches nothing is a violation, so a renamed or dropped chunk cannot pass silently.
  */
@@ -103,7 +103,9 @@ export function checkLazyChunks(dist, budgets) {
   const rows = [];
   const violations = [];
   const jsDir = path.join(dist, '_astro');
-  const files = fs.existsSync(jsDir) ? fs.readdirSync(jsDir).filter((f) => f.endsWith('.js')) : [];
+  const files = fs.existsSync(jsDir)
+    ? fs.readdirSync(jsDir).filter((f) => f.endsWith('.js') || f.endsWith('.wasm'))
+    : [];
   for (const [name, { contains, maxKB }] of Object.entries(budgets.lazyChunks ?? {})) {
     let bytes = 0;
     let matched = 0;

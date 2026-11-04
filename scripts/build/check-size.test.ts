@@ -98,6 +98,14 @@ describe('checkLazyChunks', () => {
     expect(checkLazyChunks(dist, lazy).violations[0]).toMatch(/lazy chunk "three": .* > 1 KB/);
   });
 
+  it('counts .wasm files too (the moyo engine)', () => {
+    const dist = fixture({ '_astro/m.wasm': Buffer.concat([Buffer.from('analyze_cell'), noise(3000)]) });
+    const moyo = { pageClasses: {}, lazyChunks: { moyo: { contains: 'analyze_cell', maxKB: 1 } } };
+    const r = checkLazyChunks(dist, moyo);
+    expect(r.rows[0]?.matched).toBe(1);
+    expect(r.violations[0]).toMatch(/lazy chunk "moyo": .* > 1 KB/);
+  });
+
   it('fails when no file matches, so a renamed chunk cannot slip through', () => {
     const dist = fixture({ '_astro/t.js': 'nothing here' });
     expect(checkLazyChunks(dist, lazy).violations[0]).toMatch(/no file contains/);

@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SymmetryCheck from '../../components/labs/SymmetryCheck';
+---
+
+<BaseLayout
+  title="Symmetry check"
+  description="Find the space group of a structure and see what standardizing its cell changes."
+  pageClass="tool"
+>
+  <div class="container">
+    <h1>Symmetry check</h1>
+    <p>
+      This page proves the symmetry engine (moyo, compiled to WebAssembly) runs in a worker. The engine is not
+      downloaded until you press the button.
+    </p>
+    <SymmetryCheck client:load headingLevel={2} />
+  </div>
+</BaseLayout>
