@@ -265,4 +265,5 @@ describe('route notes', () => {
   it.todo(
     'Q-039: the exact layout of the KPATH.in that VASPKIT writes is unverified; compare once the author supplies one',
   );
+  it.todo('M7.5: link the band-structure plotting tool from the k-path page once it exists');
 });

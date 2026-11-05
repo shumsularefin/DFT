@@ -47,6 +47,7 @@ export class BzScene extends ViewScene {
   private zoneLabels: HTMLElement[] = [];
   private pointLabels: HTMLElement[] = [];
   private pathStart: Vector3 | undefined;
+  private marker: Mesh | undefined;
   private recip: Mat3 | undefined;
 
   constructor(container: HTMLElement, options?: ControllerOptions) {
@@ -205,6 +206,25 @@ export class BzScene extends ViewScene {
         new PointsMaterial({ color: BZ_COLORS.mesh, size: this.size * 0.03, sizeAttenuation: true }),
       );
       this.scene.add(this.meshPoints);
+    }
+    this.requestRender();
+  }
+
+  /** Move the marker that travels along the path (Cartesian k, 1/Angstrom). Pass null to hide it. */
+  setMarker(k: Vec3 | null): void {
+    if (!k) {
+      if (this.marker) this.marker.visible = false;
+    } else {
+      if (!this.marker) {
+        this.marker = new Mesh(
+          new SphereGeometry(this.size * 0.045, 16, 12),
+          new MeshBasicMaterial({ color: new Color(BZ_COLORS.points) }),
+        );
+        this.scene.add(this.marker);
+      }
+      const s = toScene(k[0], k[1], k[2]);
+      this.marker.position.set(s[0], s[1], s[2]);
+      this.marker.visible = true;
     }
     this.requestRender();
   }

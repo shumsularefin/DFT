@@ -1,5 +1,6 @@
 import { reciprocalLengths, kpointCount } from '../../../lib/vasp/kpoints';
 import type { RoundingRule } from '../../../lib/vasp/kpoints';
+import { sendHandoff } from '../../../lib/handoff';
 import { centeringOf, kpointsOf, useBuilder, type KpMode } from './store';
 
 export default function KpointsStep() {
@@ -32,8 +33,22 @@ export default function KpointsStep() {
       </fieldset>
       {s.kpMode === 'line' ? (
         <p className="ib-note">
-          Line-mode paths come from the k-path tool, which is not built yet (
-          <a href="/tools/#kpath">planned</a>). Bring your own KPATH file for now. No KPOINTS file is written.
+          Line-mode paths come from the <a href="/tools/kpath/">k-path tool</a>. No KPOINTS file is written
+          here.{' '}
+          {s.structure && (
+            <button
+              type="button"
+              onClick={() => {
+                if (s.structure)
+                  sendHandoff(
+                    { v: 1, kind: 'structure', from: 'input-builder', structure: s.structure },
+                    '/tools/kpath/',
+                  );
+              }}
+            >
+              Open this structure in the k-path tool
+            </button>
+          )}
         </p>
       ) : (
         <>
