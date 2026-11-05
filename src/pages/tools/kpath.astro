@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import KPathTool from '../../components/tools/kpath/KPathTool';
+---
+
+<BaseLayout
+  title="K-path tool"
+  description="Find the band-structure k-path for your cell in two conventions, see it in the Brillouin zone, and download VASP line-mode KPOINTS, KPATH.in, KPOINTS_OPT and a coordinate list. Runs in your browser."
+  pageClass="tool"
+>
+  <div class="container">
+    <h1>K-path tool</h1>
+    <p>
+      Give a cell, get the standardized primitive cell, the high-symmetry path through its Brillouin zone, and
+      the files VASP needs for a band-structure run.
+    </p>
+    <KPathTool client:load />
+  </div>
+</BaseLayout>

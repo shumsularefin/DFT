@@ -7,6 +7,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- k-path tool at /tools/kpath/: choose one of the 14 Bravais lattices or drop a POSCAR or CIF, see what standardizing did to your cell, switch between the HPKOT and Setyawan-Curtarolo paths, set points per segment or a density, watch a marker move along the path in the Brillouin zone, and download KPOINTS (line mode), KPATH.in, KPOINTS_OPT, a CSV or JSON point list and the standardized POSCAR. The Input Builder can hand its structure over.
 - 3D Brillouin zone viewer and unit cell viewer: translucent zone with labelled reciprocal vectors, special points, the k-path with direction ticks and an optional k-mesh; real-space cells with atoms sized by covalent radius, colour-blind-safe element colours, bonds and 1 to 3 repeats. Orbit, zoom, pan, preset views and keyboard control; a flat rotatable view with dashed hidden edges when WebGL is missing. Pages at /design/brillouin-lab/ and /design/unit-cell-lab/.
 - Second band-path convention (Setyawan-Curtarolo, the one pymatgen and the Materials Project use): all 23 lattice variants, selectable alongside the default HPKOT path (no UI yet).
 - Recommended band path (HPKOT convention, the one SeeK-path uses): the special points, their coordinates and the path for any structure, for all 29 lattice variants, with a warning when a cell sits on the boundary between two variants (no UI yet).
