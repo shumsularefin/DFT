@@ -58,6 +58,7 @@ export const REGISTERED_LABS = [
   'orbitals',
   'exponential-wall',
   'density-as-a-map',
+  'scf-loop',
 ] as const;
 
 /** Page class for a topic: "island" if its body embeds a registered lab, else "content". */

@@ -1,0 +1,127 @@
+---
+id: exchange-and-correlation
+title: Hartree, exchange and correlation
+module: 4
+order: 3
+summary: The effective potential has three parts. Two are known exactly; the third, exchange-correlation, is the one approximation of practical DFT.
+concepts: [hartree-potential, exchange-correlation, effective-potential]
+requires: [kohn-sham]
+vaspTags: [GGA, METAGGA, LHFCALC]
+sources: [S-012, S-013, S-019, S-046, S-048, S-049]
+status: draft
+updated: 2026-11-06
+noLab: true
+---
+
+<Why>
+
+Every result you get from VASP depends on one choice you make, often without noticing: the exchange-correlation <Term id="functional">functional</Term>. To make that choice well you need to know what it approximates and what the other parts of the potential already do exactly. This page takes the effective potential apart.
+
+</Why>
+
+<Intuition>
+
+The <Term id="effective-potential">effective potential</Term> felt by each Kohn-Sham electron has three parts.
+
+1. **The nuclei.** The <Term id="external-potential">external potential</Term>: attraction to the positive nuclei (in VASP, to the ion cores described by the POTCAR). Known exactly.
+2. **The Hartree potential.** The <Term id="hartree-potential">Hartree potential</Term> is the classical electrostatic repulsion from the whole electron cloud, as if the density were a smooth charged fog. Known exactly once you know the density <Cite id="S-048" />.
+3. **Exchange and correlation.** Everything quantum about the repulsion, plus the small part of the kinetic energy the stand-ins miss. This is the <Term id="exchange-correlation">exchange-correlation</Term> potential, and its exact form is unknown <Cite id="S-012" />.
+
+What goes into part 3? Two effects. **Exchange**: electrons with the same spin avoid each other because of the Pauli principle, so each electron digs a small hole in the density of same-spin electrons around it. **Correlation**: all electrons also dodge each other because they repel, a little more than the smooth-fog picture allows. The Hartree potential gets both wrong in the same direction: it even makes each electron repel its own charge (self-interaction). The exchange-correlation term corrects this, as far as the approximation allows.
+
+The approximations form a ladder <Cite id="S-046" />. The lowest rung, the local density approximation (LDA), uses only the density at each point. The next, generalized gradient approximations (GGA) such as PBE, also use how fast the density changes <Cite id="S-013" />. Higher rungs add more ingredients, and hybrid functionals mix in some exact exchange at much higher cost. Module 5 helps you choose.
+
+<Level min="intermediate">
+
+The lab on the next page uses the closed-shell two-electron case, where exchange is simple: it cancels exactly half of the Hartree potential, so the effective potential is the nuclear potential plus half the Hartree potential. That is Hartree-Fock, not DFT, but it shows clearly how a potential that depends on the density forces a self-consistent loop <Cite id="S-048" />.
+
+</Level>
+
+<Level min="pro">
+
+$E_\text{xc}$ is defined as the remainder $F[n] - T_s[n] - E_\text{H}[n]$, so it also contains the kinetic-energy difference $T - T_s$. The exact functional is free of self-interaction; LDA and GGA are not, which drives the systematic underestimate of band gaps and the over-delocalization of localized d and f states (module 5, DFT+U) <Cite id="S-049" />.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+In atomic units the three parts are
+
+$$v_\text{ext}(\mathbf{r}) = -\sum_I \frac{Z_I}{|\mathbf{r}-\mathbf{R}_I|}, \qquad v_\text{H}(\mathbf{r}) = \int \frac{n(\mathbf{r}')}{|\mathbf{r}-\mathbf{r}'|}\,d\mathbf{r}', \qquad v_\text{xc}(\mathbf{r}) = \frac{\delta E_\text{xc}[n]}{\delta n(\mathbf{r})}$$
+
+<Cite id="S-012" />. The Hartree energy is $E_\text{H} = \tfrac{1}
+{2}\iint n(\mathbf{r})n(\mathbf{r}')/|\mathbf{r}-\mathbf{r}'|\,d\mathbf{r}\,d\mathbf{r}'$. In LDA, $E_\text
+{xc} = \int n\,\varepsilon_\text{xc}^\text{unif}(n)\,d\mathbf{r}$, the energy per electron of a uniform
+electron gas of the same local density; GGA adds a dependence on $|\nabla n|$ <Cite id="S-013" />.
+
+</TheMath>
+
+<InVasp>
+
+The functional is chosen in the INCAR. If you set nothing, VASP takes the functional named in the POTCAR files, which for the standard PAW sets is PBE <Cite id="S-019" />. You can say it explicitly:
+
+<VaspFile
+  name="INCAR"
+  code={`GGA = PE   ! PBE, the usual starting point for solids`}
+  annotations={{ 1: 'see the VASP wiki page GGA for the other letters' }}
+/>
+
+Meta-GGAs are chosen with `METAGGA` (for example `METAGGA = R2SCAN`) and hybrids with `LHFCALC = .TRUE.` plus further tags (VASP wiki pages METAGGA and LHFCALC) <Cite id="S-019" />. Module 5 explains when each is worth it.
+
+</InVasp>
+
+<WhatChanges>
+
+| Part of the potential | Known exactly? | What it does                                    | What goes wrong if it is missing          |
+| --------------------- | -------------- | ----------------------------------------------- | ----------------------------------------- |
+| External (nuclei)     | Yes            | Binds electrons to atoms                        | No material at all                        |
+| Hartree               | Yes            | Spreads the cloud out by classical repulsion    | Electrons pile up far too close to nuclei |
+| Exchange-correlation  | No             | Corrects self-repulsion, adds Pauli and dodging | Bonds too weak and long, energies far off |
+
+Why this value of the functional: PBE is a robust, well-tested default for solids, not the best for every property. What happens if you get it wrong: band gaps, magnetic moments and reaction energies can all shift, sometimes a lot.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Thinking the Hartree potential includes exchange">
+
+The Hartree potential is purely classical. Exchange is in the exchange-correlation term (or, in Hartree-Fock, in the separate exchange operator).
+
+</Callout>
+
+<Callout variant="mistake" title="Mixing POTCARs and functionals without thinking">
+
+The POTCAR files were made with a given functional. Using a very different functional in the INCAR is common for hybrids and meta-GGAs, but it is a choice to make on purpose, not by accident.
+
+</Callout>
+
+</Mistakes>
+
+<Check
+  ids={[
+    'q-hart-1',
+    'q-hart-2',
+    'q-hart-3',
+    'q-hart-4',
+    'q-xc-1',
+    'q-xc-2',
+    'q-xc-3',
+    'q-xc-4',
+    'q-veff-1',
+    'q-veff-2',
+    'q-veff-3',
+    'q-veff-4',
+  ]}
+/>
+
+<GoDeeper>
+
+- Perdew, Burke and Ernzerhof on PBE <Cite id="S-013" />.
+- Perdew and Schmidt on Jacob's ladder <Cite id="S-046" />.
+- Szabo and Ostlund, chapter 3, for Hartree and exchange in the closed-shell case <Cite id="S-048" />.
+- VASP wiki pages GGA, METAGGA and LHFCALC <Cite id="S-019" />.
+
+</GoDeeper>

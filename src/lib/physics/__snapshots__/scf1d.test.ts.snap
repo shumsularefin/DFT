@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`scf1d behaviour > records the observed behaviour for alpha = 1.0 1`] = `
+{
+  "Z": 1,
+  "behaviour": "oscillating",
+  "n": 300,
+}
+`;
+
+exports[`scf1d behaviour > records the observed behaviour for alpha = 1.0 2`] = `
+{
+  "Z": 2,
+  "behaviour": "converged",
+  "n": 14,
+}
+`;

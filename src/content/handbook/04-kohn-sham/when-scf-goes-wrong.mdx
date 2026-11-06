@@ -1,0 +1,120 @@
+---
+id: when-scf-goes-wrong
+title: When the SCF loop goes wrong
+module: 4
+order: 5
+summary: How to recognise a loop that oscillates, stalls or never starts, and the first things to change.
+concepts: [scf-failure]
+requires: [density-mixing]
+vaspTags: [NELM, AMIX, BMIX, AMIX_MAG, BMIX_MAG, ALGO, NELMDL, SIGMA, ISMEAR, TIME]
+sources: [S-010, S-019, S-041, S-042]
+status: draft
+updated: 2026-11-06
+noLab: true
+---
+
+<Why>
+
+Sooner or later a run will hit `NELM` without converging, or print energies that jump up and down. Knowing why this happens turns a frustrating afternoon into a five-minute fix. This page is the short version; module 8 has the full error finder.
+
+</Why>
+
+<Intuition>
+
+Three patterns cover most failures.
+
+**Oscillation (charge sloshing).** The energy goes up, down, up, down. Charge is being pushed across the cell and back, each round overcorrecting the last. This is what you saw in the lab with too much mixing. It is common in metals, in slabs with vacuum, and in long cells, where moving charge over long distances costs little <Cite id="S-010" />. The cure is to mix less: lower `AMIX` and `BMIX` step by step <Cite id="S-042" />.
+
+**Stalling.** The energy creeps down but never gets within `EDIFF` before `NELM` steps. The loop is stable but too slow, or it keeps switching between nearly degenerate states (magnetic systems, d and f electrons, DFT+U). A more robust algorithm (`ALGO = All` or `Damped`), more steps, a temporarily larger smearing for metals, or a better starting point help <Cite id="S-042" />.
+
+**A bad start.** Random starting orbitals plus a structure with atoms far too close can send the first steps wild. Letting the orbitals settle before the density is updated (`NELMDL`), or fixing the structure, cures it.
+
+The order of attack matters: first make sure the structure and the inputs are sensible, then change the mixing, and only then raise `NELM` <Cite id="S-042" />.
+
+<Level min="intermediate">
+
+A useful habit: converge a hard magnetic system without spin first, write the `CHGCAR`, and restart spin-polarized from it. Or converge with a larger `SIGMA` and restart with the small one. Both give the loop a good starting density <Cite id="S-042" />.
+
+</Level>
+
+<Level min="pro">
+
+With Pulay mixing the long-wavelength part of the density response grows with the cell length, which is why sloshing gets worse in long cells and slabs; Kerker preconditioning (the `BMIX` parameter) damps exactly those components <Cite id="S-010" />. For magnetization, `AMIX_MAG` and `BMIX_MAG` play the same roles.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+For linear mixing on a model with a single unstable mode of response $\lambda$ (the factor by which an error in the input density is amplified in the output), the error after one step is multiplied by $1 - \alpha(1-\lambda)$. The loop converges only if this has magnitude below 1, that is $0 < \alpha < 2/(1-\lambda)$ for $\lambda < 1$. A strongly responding system (large negative $\lambda$, as in metals at long wavelength) therefore needs a small $\alpha$ <Cite id="S-010" />.
+
+<Level min="intermediate">
+
+This is why the lab's Z = 1 case oscillates at $\alpha = 1$ and converges at 0.8: its response is just strong enough that the full step overshoots.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+The author's handbook gives this ladder for a stubborn loop, in order (VASP 5.4 and 6.x) <Cite id="S-042" />:
+
+<VaspFile
+  name="INCAR"
+  code={`ALGO     = All      ! or Damped with TIME = 0.4
+AMIX     = 0.1      ! damp the charge mixing
+BMIX     = 0.0001
+AMIX_MAG = 0.4      ! and the magnetization mixing
+BMIX_MAG = 0.0001
+NELM     = 200
+NELMDL   = -12      ! more non-self-consistent warm-up steps`}
+  annotations={{
+    2: 'with BMIX = 0.0001 this is close to plain linear mixing',
+    6: 'only after the mixing is fixed',
+  }}
+/>
+
+For metals, a temporarily larger `SIGMA` (0.1 to 0.2 eV with `ISMEAR = 1`) can get the loop started; then reduce it and restart from the `CHGCAR` <Cite id="S-042" />. See the VASP wiki pages AMIX, BMIX, ALGO and NELMDL <Cite id="S-019" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| Symptom in OSZICAR                 | Likely cause                   | First change                              |
+| ---------------------------------- | ------------------------------ | ----------------------------------------- |
+| Energy oscillates step to step     | Charge sloshing                | Lower AMIX and BMIX                       |
+| Energy creeps down, hits NELM      | Slow or near-degenerate states | `ALGO = All` or `Damped`, then more steps |
+| Huge energies in the first steps   | Bad start or overlapping atoms | Check the structure; raise `NELMDL`       |
+| Magnetic moment flips between runs | Several magnetic solutions     | Lower AMIX_MAG, BMIX_MAG; check MAGMOM    |
+
+Why this order: changing the mixing fixes the cause; raising NELM only buys time. What happens if you ignore a non-converged step: VASP moves on, and every later number inherits the error.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Changing five tags at once">
+
+Change one thing, rerun, and look at the energies. Otherwise you never learn which change mattered.
+
+</Callout>
+
+<Callout variant="mistake" title="Trusting a run that hit NELM">
+
+A step that ended at NELM has an unconverged density, so its forces and energy are not reliable, even if the relaxation continues.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-scffail-1', 'q-scffail-2', 'q-scffail-3', 'q-scffail-4', 'q-scffail-5']} />
+
+<GoDeeper>
+
+- Kresse and Furthmüller on mixing and charge sloshing <Cite id="S-010" />.
+- The author's VASP Workflow Handbook, the electronic-convergence section <Cite id="S-042" />.
+- VASP wiki pages AMIX, BMIX, ALGO, NELMDL, and the page on electronic minimization <Cite id="S-019" />.
+
+</GoDeeper>

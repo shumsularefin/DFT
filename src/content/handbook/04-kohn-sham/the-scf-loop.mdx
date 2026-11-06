@@ -1,0 +1,133 @@
+---
+id: the-scf-loop
+title: The self-consistent loop
+module: 4
+order: 4
+summary: The potential depends on the density and the density on the potential. Watch a computed loop chase its own tail until the two agree.
+concepts: [scf-loop, density-mixing]
+requires: [effective-potential]
+vaspTags: [EDIFF, NELM, AMIX, BMIX, ALGO]
+sources: [S-010, S-012, S-019, S-041, S-042, S-047, S-048]
+status: draft
+updated: 2026-11-06
+---
+
+<Why>
+
+Every VASP run you start spends most of its time in this loop, and most failed runs fail here. If you can picture what the loop does, the lines VASP prints (one per electronic step) stop being noise, and the advice "lower AMIX" stops being magic.
+
+</Why>
+
+<Intuition>
+
+The Kohn-Sham equations have a chicken-and-egg problem. To solve for the orbitals you need the potential. To build the potential you need the density. To get the density you need the orbitals. The way out is to go round the circle <Cite id="S-012" />:
+
+1. **Guess** a density (VASP starts from overlapping atomic densities).
+2. **Build** the effective potential from it.
+3. **Solve** for the orbitals in that potential.
+4. **Compute** a new density from the filled orbitals.
+5. **Mix** the new density with the old one.
+6. **Check**: did the density (or the energy) change by more than a small tolerance? If yes, go back to step 2 with the mixed density. If no, the density reproduces itself: it is **self-consistent**, and you are done.
+
+The amount the density changes in one round is the <Term id="residual">residual</Term>. Watching it shrink is watching the loop converge.
+
+**Why mix?** It seems natural to take the new density as the next guess. Often that overshoots: too much charge moves one way, the potential answers by pushing it back too far, and the density sloshes back and forth. <Term id="density-mixing">Mixing</Term> takes only a fraction of the change, which damps the swing. Too small a fraction is safe but slow. Too large a fraction can oscillate or blow up.
+
+The lab is a real computation of a deliberately tiny system: two electrons on a line, attracted by a softened nucleus of charge Z and repelling each other. You can step through each iteration, change the mixing fraction and switch the repulsion off.
+
+<Level min="intermediate">
+
+Try these. With the default alpha of 0.3 the residual falls along a straight line on the log axis: each round removes the same fraction of the error, which is called linear convergence. At alpha 0.05 the line is much shallower. For Z = 1 at alpha 1.0 the loop gets close, then the error grows again and settles into a jump between two densities: this is the toy version of charge sloshing. Switch the repulsion off and the loop finishes in one step, because the potential no longer depends on the density.
+
+</Level>
+
+<Level min="pro">
+
+The lab's model is restricted Hartree-Fock for a closed shell of two electrons, where exchange cancels half the Hartree potential, so the Fock operator is $h_0 + v_\text{H}/2$ <Cite id="S-048" />. The site's code matches the reference generator's total energies to better than 1e-6 hartree. For Z = 2 the converged energy is -2.22450 hartree; the exact two-electron energy on the same grid is -2.23855 hartree, so this model misses 0.01405 hartree of correlation energy, which is what an exchange-correlation functional would try to supply (values from `tests/reference/scf1d_reference.json`).
+
+</Level>
+
+</Intuition>
+
+<Lab id="scf-loop" title="The self-consistency loop" />
+
+<TheMath>
+
+Linear mixing with parameter $\alpha$ updates the input density of iteration $k$ as
+
+$$n_{k+1}^\text{in} = (1-\alpha)\, n_k^\text{in} + \alpha\, n_k^\text{out}$$
+
+and the residual in the lab is $R_k = \big(\int (n_k^\text{out} - n_k^\text{in})^2\, dx\big)^{1/2}$. The loop has converged when $R_k$ is below a tolerance; the lab uses $10^{-10}$.
+
+<Level min="intermediate">
+
+In the lab's model (atomic units, $x$ in bohr), $v_\text{ext}(x) = -Z/\sqrt{x^2+1}$, the interaction is $w(x-x') = 1/\sqrt{(x-x')^2+1}$, the density is $n = 2|\phi|^2$, and $v_\text{H}(x) = \int n(x')\,w(x-x')\,dx'$. The orbital is the lowest solution of $[-\tfrac{1}{2}\, d^2/dx^2 + v_\text{ext} + v_\text{H}/2]\phi = \varepsilon\phi$ on 299 grid points between -15 and 15 bohr, with the same finite-difference solver as the particle-in-a-box lab <Cite id="S-047" />. The energy is $E = 2\langle\phi|h_0|\phi\rangle + J$ with $J = \tfrac{1}{4}\iint n\,w\,n$ <Cite id="S-048" />.
+
+</Level>
+
+<Level min="pro">
+
+VASP does not use linear mixing by default. It uses a Pulay (Broyden-type) mixer, which builds the next guess from the history of several previous densities and residuals, with a Kerker-like weighting (BMIX) that damps the long-wavelength components responsible for sloshing in metals <Cite id="S-010" />.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+In VASP each line beginning `DAV:` or `RMM:` in the screen output (and `OSZICAR`) is one trip round the loop. Three tags control it (VASP 6.x; VASP wiki pages EDIFF, NELM, AMIX and BMIX) <Cite id="S-019" />:
+
+- `EDIFF`: stop when the total energy changes by less than this between steps. Default `1E-4` eV; the author's protocol uses `1E-6` for relaxations and tighter for sensitive properties <Cite id="S-042" />.
+- `NELM`: the most steps allowed. Default 60. If a step hits NELM, the forces from it are not converged; fix the mixing first rather than raising NELM <Cite id="S-042" />.
+- `AMIX` and `BMIX`: the mixing fraction and the Kerker damping of the Pulay mixer. Defaults 0.4 and 1.0 <Cite id="S-042" />.
+
+<VaspFile
+  name="INCAR"
+  code={`EDIFF = 1E-6   ! electronic stop: energy change in eV
+NELM  = 120    ! allow more steps for harder systems
+ALGO  = Normal ! Davidson, robust`}
+  annotations={{ 1: 'smaller = tighter, more steps', 2: 'a ceiling, not a target' }}
+/>
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                                    | ...the loop                                                           |
+| -------------------------------------------- | --------------------------------------------------------------------- |
+| Lower the mixing fraction (alpha, AMIX)      | Becomes steadier but slower                                           |
+| Raise it towards 1                           | Can speed up, or overshoot and oscillate                              |
+| Tighten the tolerance (EDIFF)                | Takes more steps; forces and small energy differences become reliable |
+| Switch off the electron repulsion (lab only) | Converges at once: nothing depends on the density any more            |
+
+Why this value: the defaults work for most insulators and simple metals. What happens if you skip convergence: VASP continues after NELM steps with an unconverged density, and the energies and forces are wrong without any error message.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Reading the lab as Kohn-Sham DFT">
+
+The lab is a one-dimensional, two-electron Hartree-Fock toy model. It shows the loop, not a functional or a material.
+
+</Callout>
+
+<Callout variant="mistake" title="Raising NELM to hide a loop that does not converge">
+
+If the residual is not falling, more steps rarely help. Change the mixing or the algorithm (next page and module 8).
+
+</Callout>
+
+</Mistakes>
+
+<Check
+  ids={['q-scf-1', 'q-scf-2', 'q-scf-3', 'q-scf-4', 'q-scf-5', 'q-mix-1', 'q-mix-2', 'q-mix-3', 'q-mix-4']}
+/>
+
+<GoDeeper>
+
+- Kresse and Furthmüller on the iterative schemes and Pulay mixing used in VASP <Cite id="S-010" />.
+- Szabo and Ostlund, chapter 3, on the self-consistent field procedure <Cite id="S-048" />.
+- VASP wiki pages EDIFF, NELM, AMIX, BMIX and IMIX <Cite id="S-019" />.
+
+</GoDeeper>

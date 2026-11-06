@@ -1,0 +1,114 @@
+---
+id: the-kohn-sham-idea
+title: The Kohn-Sham idea
+module: 4
+order: 2
+summary: Replace the real, interacting electrons by stand-ins that do not interact but have the same density. Almost everything then becomes solvable.
+concepts: [kohn-sham]
+requires: [hohenberg-kohn]
+vaspTags: [NBANDS]
+sources: [S-012, S-019, S-049]
+status: draft
+updated: 2026-11-06
+noLab: true
+---
+
+<Why>
+
+The Hohenberg-Kohn theorems say the density is enough, but they leave the energy functional unknown, and the worst part of it is the kinetic energy. Guessing the kinetic energy directly from the density works badly. In 1965 Kohn and Sham found a trick that computes almost all of it exactly <Cite id="S-012" />. It is the reason DFT is practical, and it is what VASP solves every time you press run.
+
+</Why>
+
+<Intuition>
+
+Imagine a stand-in system: electrons that **do not repel each other at all**, moving in some carefully chosen potential. Non-interacting electrons are easy, because each one obeys its own one-electron Schrödinger equation, like the particle in a box of module 2. The idea is to choose the potential so that the stand-ins have **exactly the same density** as the real electrons <Cite id="S-012" />.
+
+If you can do that, you get three things for free:
+
+- The density, because it is the same.
+- Most of the kinetic energy, because the kinetic energy of non-interacting electrons is easy to compute from their orbitals.
+- A set of one-electron orbitals, the <Term id="kohn-sham-orbital">Kohn-Sham orbitals</Term>, which you fill two at a time (one spin up, one spin down) from the bottom, as in module 2.
+
+The potential the stand-ins feel is called the <Term id="effective-potential">effective potential</Term>. It contains the pull of the nuclei, the average repulsion of the electron cloud (the Hartree part) and one more piece that hides everything the stand-ins get wrong: the exchange-correlation potential. The next page is about those two pieces.
+
+An analogy: a flight simulator does not fly, but if its controls respond exactly like the real plane's, a pilot learns the same lessons. The Kohn-Sham system does not interact, but it is tuned to produce the same density.
+
+<Level min="intermediate">
+
+There is a catch that becomes the whole next part of this module: the effective potential depends on the density, and the density depends on the orbitals, which depend on the potential. You cannot solve the equations in one go. You guess, solve, update and repeat until nothing changes, which is the self-consistent loop of page 4.
+
+</Level>
+
+<Level min="pro">
+
+The Kohn-Sham orbitals and their energies are, strictly, auxiliary quantities. Only the density and the total energy carry the guarantee of the theorems. In practice the orbital energies are read as band energies, and they are often close, but the band gap from them is not the true gap even with the exact functional (the derivative discontinuity) <Cite id="S-049" />.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+Each Kohn-Sham orbital $\psi_i$ obeys, in atomic units,
+
+$$\Big[-\tfrac{1}{2}\nabla^2 + v_\text{eff}(\mathbf{r})\Big]\psi_i(\mathbf{r}) = \varepsilon_i\,\psi_i(\mathbf{r}), \qquad n(\mathbf{r}) = \sum_i f_i\,|\psi_i(\mathbf{r})|^2$$
+
+where $f_i$ is the occupation (up to 2 for a spatial orbital) and the effective potential is
+
+$$v_\text{eff}(\mathbf{r}) = v_\text{ext}(\mathbf{r}) + v_\text{H}(\mathbf{r}) + v_\text{xc}(\mathbf{r})$$
+
+<Cite id="S-012" />. The energy is split as $E = T_s[n] + \int v_\text{ext}\, n + E_\text{H}[n] + E_\text{xc}
+[n]$, where $T_s$ is the kinetic energy of the stand-ins, computed exactly from the orbitals, and $E_\text{xc}
+$ collects whatever is left over.
+
+</TheMath>
+
+<InVasp>
+
+VASP solves the Kohn-Sham equations for you. The number of orbitals it computes is `NBANDS`. By default it takes more than the occupied ones (the VASP wiki page NBANDS gives the formula), because empty orbitals help the solver and are needed for metals and for densities of states <Cite id="S-019" />. The orbitals themselves are written to `WAVECAR`; their energies appear in `OUTCAR` and `EIGENVAL`.
+
+<VaspFile
+  name="INCAR"
+  code={`NBANDS = 64   ! only set this when a task needs more empty bands (optics, band plots)`}
+  annotations={{ 1: 'leave unset for ordinary runs; VASP picks a safe default' }}
+/>
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...                         | ...what happens                                                          |
+| ---------------------------------------- | ------------------------------------------------------------------------ |
+| Remove the exchange-correlation piece    | You are left with the Hartree approximation, which is much less accurate |
+| Ask for more orbitals (`NBANDS`)         | More empty states computed; cost grows, occupied results barely change   |
+| Ask for fewer than the occupied orbitals | VASP stops with an error: the density needs every occupied orbital       |
+
+Why the trick: it hands the hard kinetic energy to a problem we can solve exactly. Why it is not the end: the leftover piece, exchange-correlation, still has to be approximated.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Thinking Kohn-Sham electrons are the real electrons">
+
+They are stand-ins tuned to give the right density. Their orbitals are very useful, but they are not the wavefunction of the real system.
+
+</Callout>
+
+<Callout variant="mistake" title="Thinking the Kohn-Sham idea is an approximation">
+
+The construction is exact in principle. The approximation enters only when you choose a formula for exchange and correlation.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-ks-1', 'q-ks-2', 'q-ks-3', 'q-ks-4']} />
+
+<GoDeeper>
+
+- Kohn and Sham, "Self-consistent equations including exchange and correlation effects" <Cite id="S-012" />.
+- Martin, chapter 7, on the Kohn-Sham auxiliary system <Cite id="S-049" />.
+- VASP wiki page NBANDS <Cite id="S-019" />.
+
+</GoDeeper>
