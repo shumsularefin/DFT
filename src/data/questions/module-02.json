@@ -24,7 +24,8 @@
       }
     ],
     "hints": [
-      "Think of the pattern made by waves passing through gaps."
+      "Think of the pattern made by waves passing through gaps.",
+      "Waves passing through gaps overlap and form bright and dark rings. Which option describes such a pattern for electrons?"
     ],
     "difficulty": -2,
     "level": "beginner",
@@ -57,7 +58,8 @@
       }
     ],
     "hints": [
-      "The relation is lambda = h / p."
+      "The relation is lambda = h / p.",
+      "The wavelength is inversely proportional to momentum. Mass and charge alone do not set it."
     ],
     "difficulty": -1,
     "level": "intermediate",
@@ -90,7 +92,8 @@
       }
     ],
     "hints": [
-      "Use lambda = h / p with a large p."
+      "Use lambda = h / p with a large p.",
+      "A ball has a huge momentum compared with an electron, so lambda = h / p is tiny."
     ],
     "difficulty": -1,
     "level": "intermediate",
@@ -123,7 +126,8 @@
       }
     ],
     "hints": [
-      "Think of the guitar string."
+      "Think of the guitar string.",
+      "A guitar string can only vibrate in whole patterns that fit between its ends. The electron is similar, around the nucleus."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -142,7 +146,8 @@
     "tolerance": 0.005,
     "unit": "Å",
     "hints": [
-      "First find k = sqrt(E / 3.80998), then use wavelength = 2 pi / k."
+      "First find k = sqrt(E / 3.80998), then use wavelength = 2 pi / k.",
+      "Check the order of magnitude: for 100 eV the wavelength is about one angstrom."
     ],
     "difficulty": 1,
     "level": "pro",
@@ -176,7 +181,8 @@
       }
     ],
     "hints": [
-      "It is a probability, not a speed."
+      "It is a probability, not a speed.",
+      "The wavefunction itself can be negative or complex. Its square is never negative, which suits a probability."
     ],
     "difficulty": -2,
     "level": "beginner",
@@ -209,7 +215,8 @@
       }
     ],
     "hints": [
-      "The electron has to be found somewhere."
+      "The electron has to be found somewhere.",
+      "Add up the probability over every point. The total must be one, because the electron exists somewhere."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -242,7 +249,8 @@
       }
     ],
     "hints": [
-      "Square the new function."
+      "Square the new function.",
+      "(-psi)^2 = psi^2. The sign cancels when you square."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -275,7 +283,8 @@
       }
     ],
     "hints": [
-      "Think of adding two waves on a rope."
+      "Think of adding two waves on a rope.",
+      "Two simpler waves add point by point to make a new wave, and the sum is allowed as a state."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -308,7 +317,8 @@
       }
     ],
     "hints": [
-      "Look at the cross term between the two parts."
+      "Look at the cross term between the two parts.",
+      "Two energies mean two different oscillation rates. The cross term between them oscillates at the difference."
     ],
     "difficulty": 1,
     "level": "pro",
@@ -341,7 +351,8 @@
       }
     ],
     "hints": [
-      "Think of the guitar string."
+      "Think of the guitar string.",
+      "The wavefunction must be zero at both walls, so only whole numbers of half-wavelengths fit."
     ],
     "difficulty": -2,
     "level": "beginner",
@@ -374,7 +385,8 @@
       }
     ],
     "hints": [
-      "Squeezing a wave costs energy."
+      "Squeezing a wave costs energy.",
+      "The energy goes as 1 / L^2, so a smaller L gives a higher energy."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -407,7 +419,8 @@
       }
     ],
     "hints": [
-      "Nodes = n - 1."
+      "Nodes = n - 1.",
+      "Count the zero crossings between the walls: the n-th state has n - 1 of them."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -426,7 +439,8 @@
     "tolerance": 0.001,
     "unit": "eV",
     "hints": [
-      "Use E1 = pi^2 (3.80998 eV Å^2) / L^2."
+      "Use E1 = pi^2 (3.80998 eV Å^2) / L^2.",
+      "E1 = pi^2 x 3.80998 / 25, since L^2 = 25 Å^2."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -445,7 +459,8 @@
     "tolerance": 0.005,
     "unit": "eV",
     "hints": [
-      "Energy scales as n squared."
+      "Energy scales as n squared.",
+      "E3 = 9 x E1, with E1 from the previous question."
     ],
     "difficulty": 1,
     "level": "intermediate",
@@ -478,7 +493,8 @@
       }
     ],
     "hints": [
-      "Period = h / gap."
+      "Period = h / gap.",
+      "The oscillation period is h divided by the energy gap, so a larger gap means a shorter period."
     ],
     "difficulty": 1,
     "level": "pro",
@@ -511,7 +527,8 @@
       }
     ],
     "hints": [
-      "The letters s, p, d, f follow one number."
+      "The letters s, p, d, f follow one number.",
+      "The number l = 0, 1, 2, 3 corresponds to s, p, d, f."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -544,7 +561,8 @@
       }
     ],
     "hints": [
-      "2l + 1."
+      "2l + 1.",
+      "For p, l = 1, so there are 2 x 1 + 1 values of the magnetic quantum number."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -577,7 +595,8 @@
       }
     ],
     "hints": [
-      "n - l - 1."
+      "n - l - 1.",
+      "n - l - 1 = 3 - 2 - 1."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -596,7 +615,8 @@
     "tolerance": 0.001,
     "unit": "eV",
     "hints": [
-      "E_n = -13.6057 / n^2."
+      "E_n = -13.6057 / n^2.",
+      "Put n = 2 into -13.6057 / n^2, which divides by 4."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -629,7 +649,8 @@
       }
     ],
     "hints": [
-      "Density per unit radius, not per unit volume."
+      "Density per unit radius, not per unit volume.",
+      "The most likely distance is where the density per unit radius peaks, which for 1s is the Bohr radius."
     ],
     "difficulty": 1,
     "level": "intermediate",
@@ -662,7 +683,8 @@
       }
     ],
     "hints": [
-      "It is a property of the wavefunction."
+      "It is a property of the wavefunction.",
+      "Orbital shapes come from a wavefunction that can be positive or negative. The colour marks which."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -695,7 +717,8 @@
       }
     ],
     "hints": [
-      "Two spin values."
+      "Two spin values.",
+      "There are two spin values, up and down, and each can appear once per orbital."
     ],
     "difficulty": -2,
     "level": "beginner",
@@ -728,7 +751,8 @@
       }
     ],
     "hints": [
-      "It is about states, not forces."
+      "It is about states, not forces.",
+      "The principle forbids two electrons from sharing every quantum number, spin included."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -747,7 +771,8 @@
     "tolerance": 0.001,
     "unit": "",
     "hints": [
-      "2n^2, or add up 2 + 6 + 10."
+      "2n^2, or add up 2 + 6 + 10.",
+      "Add the s, p and d orbitals for n = 3: 2 + 6 + 10."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -780,7 +805,8 @@
       }
     ],
     "hints": [
-      "Five orbitals."
+      "Five orbitals.",
+      "Five d orbitals, two electrons in each."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -813,7 +839,8 @@
       }
     ],
     "hints": [
-      "The tag starts with IS."
+      "The tag starts with IS.",
+      "ISPIN = 1 forces equal spin populations. The other allowed value lets them differ."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -847,7 +874,8 @@
       }
     ],
     "hints": [
-      "Many atoms, many levels."
+      "Many atoms, many levels.",
+      "When atoms come together, each level splits into many close ones that blend into a range."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -880,7 +908,8 @@
       }
     ],
     "hints": [
-      "Energy, not space."
+      "Energy, not space.",
+      "The gap is a range on the energy axis where there are no states at all."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -913,7 +942,8 @@
       }
     ],
     "hints": [
-      "Can small pushes move the electrons?"
+      "Can small pushes move the electrons?",
+      "A full band with a large gap above has no nearby empty states for electrons to move into."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -947,7 +977,8 @@
       }
     ],
     "hints": [
-      "They summarize energies."
+      "They summarize energies.",
+      "A band diagram or density of states condenses the energies of many electrons into a readable picture."
     ],
     "difficulty": 0,
     "level": "beginner",

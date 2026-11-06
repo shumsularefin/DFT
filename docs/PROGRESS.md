@@ -32,7 +32,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 | M5.4 | Setyawan-Curtarolo k-paths (second convention) | done | M5.3 | L | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M5.4.md), [work order](milestones/M5-brillouin-zone.md) |
 | M5.5 | 3D Brillouin zone and lattice viewer | done | M5.2, M2.1 | M | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M5.5.md), [work order](milestones/M5-brillouin-zone.md) |
 | M5.6 | k-path tool page and exports | done | M5.3, M5.4, M5.5, M3.2 | M | claude/vigilant-newton-ws593b | | 2026-11-05 | [report](reports/M5.6.md), [work order](milestones/M5-brillouin-zone.md) |
-| M6.1 | Concept graph and question bank | todo | M2.4 | M | | | | [work order](milestones/M6-adaptive-engine.md) |
+| M6.1 | Concept graph and question bank | done | M2.4 | M | claude/vigilant-newton-ws593b | | 2026-11-06 | [report](reports/M6.1.md), [work order](milestones/M6-adaptive-engine.md) |
 | M6.2 | Mastery and spacing models | todo | M6.1 | M | | | | [work order](milestones/M6-adaptive-engine.md) |
 | M6.3 | Thompson-sampling policy | todo | M6.2 | M | | | | [work order](milestones/M6-adaptive-engine.md) |
 | M6.4 | Practice UI, quizzes, mastery map and gentle gamification | todo | M6.3, M1.3 | L | | | | [work order](milestones/M6-adaptive-engine.md) |

@@ -28,7 +28,7 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-022 | open | author or auditor |
 | Q-023 | open | author |
 | Q-024 | open | author or auditor |
-| Q-025 | open | builder (M6.4 or when module 1 questions are revised) |
+| Q-025 | closed | builder (M6.1) |
 | Q-026 | open | author or auditor |
 | Q-027 | open | author or auditor |
 | Q-028 | open | author |
@@ -115,6 +115,8 @@ Statements in `src/content/handbook/01-why-dft/` that rest on general knowledge 
 Statements in `src/content/handbook/02-quantum-basics/` that rest on general knowledge and the `cited-from-memory` register (S-047, S-050, S-036, S-049) and not on a page that was read: (1) electron diffraction shows the wave side of electrons; (2) the 1.2264 angstrom wavelength at 100 eV is computed from hbar^2/2m (S-031, tested) and matches the textbook 12.264/sqrt(E) rule; (3) hydrogen energy depends only on n, so shells are degenerate, and the node counts n-l-1 radial and l angular; (4) shell capacity 2n^2 and 2, 6, 10, 14 per subshell (tested against the orbital list); (5) that parallel spins are favoured in degenerate levels and that this underlies magnetic atoms and iron; (6) that VASP assumes closed-shell pairing unless `ISPIN = 2` and that this raises cost; (7) that VASP projects onto s, p and d character; (8) band, gap and metal versus insulator sketch (S-050, S-036) and that common DFT approximations underestimate gaps (S-049); (9) VASP tag names `ENCUT`, `ISMEAR`, `SIGMA`, `CHGCAR`, `WAVECAR`. **Close:** the author or auditor reads these against the cited books and the VASP wiki, edits wording, and upgrades the register status.
 
 ## Q-025. Module 1 questions have fewer than four items per concept
+**Status: closed in M6.1.** Module 1 now has 40 questions, at least 4 per concept, enforced by `scripts/lint-questions.mjs` and the shape tests.
+
 `src/data/questions/module-01.json` (M2.2) has 17 questions, 3 to 5 per topic, but the concept tags are finer than that, so some concepts (for example `simulation`) have only 2. CONTENT_GUIDE section 7 asks for four per concept. The shape test enforces this for module 2 only. **Close:** add questions or merge concept tags for module 1 and enable the check for it (`perConcept` in `questions.test.ts`).
 
 ## Q-026. Module 3 wording that needs a human check
