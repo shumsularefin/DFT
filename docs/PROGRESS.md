@@ -32,7 +32,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 | M5.4 | Setyawan-Curtarolo k-paths (second convention) | done | M5.3 | L | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M5.4.md), [work order](milestones/M5-brillouin-zone.md) |
 | M5.5 | 3D Brillouin zone and lattice viewer | done | M5.2, M2.1 | M | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M5.5.md), [work order](milestones/M5-brillouin-zone.md) |
 | M5.6 | k-path tool page and exports | done | M5.3, M5.4, M5.5, M3.2 | M | claude/vigilant-newton-ws593b | | 2026-11-05 | [report](reports/M5.6.md), [work order](milestones/M5-brillouin-zone.md) |
-| M6.1 | Concept graph and question bank | todo | M2.4 | M | | | | [work order](milestones/M6-adaptive-engine.md) |
+| M6.1 | Concept graph and question bank | done | M2.4 | M | claude/great-dijkstra-oj0kbx |  | 2026-11-06 | [report](reports/M6.1.md), [work order](milestones/M6-adaptive-engine.md) |
 | M6.2 | Mastery and spacing models | todo | M6.1 | M | | | | [work order](milestones/M6-adaptive-engine.md) |
 | M6.3 | Thompson-sampling policy | todo | M6.2 | M | | | | [work order](milestones/M6-adaptive-engine.md) |
 | M6.4 | Practice UI, quizzes, mastery map and gentle gamification | todo | M6.3, M1.3 | L | | | | [work order](milestones/M6-adaptive-engine.md) |
@@ -64,6 +64,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 
 Newest first. One line per session: date, stage, outcome, branch.
 
+- 2026-11-06, M6.1: concept graph (71 concepts), question schema and grading, lint-questions, module 1 retag (Q-025 closed), second hints for 72 questions. Branch `claude/great-dijkstra-oj0kbx`.
 - 2026-10-29, M2.2: Module 1 (4 topics, 17 questions, 14 glossary terms), cost-of-exactness lab, scaling.ts; Lighthouse mobile 100/100/100; 145 e2e pass. Branch `claude/vigilant-newton-ws593b`
 - 2026-10-29, M2.1: SceneController, capabilities, LabShell, Lazy3D, Fallback2D, demo page; three chunk 135 KB gz lazy; e2e incl. no-WebGL and reduced motion. Branch `claude/vigilant-newton-ws593b`.
 - 2026-10-29, M1.3: chrome, stores, progress, search, landing/about/privacy/tools/changelog, link check; 114 e2e pass; Lighthouse 100/100/100 (SEO 66, noindex). Branch `claude/vigilant-newton-ws593b`.

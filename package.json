@@ -15,7 +15,7 @@
     "lint": "eslint .",
     "typecheck": "astro check",
     "test": "vitest run",
-    "lint:content": "node scripts/lint-content.mjs",
+    "lint:content": "node scripts/lint-content.mjs && node --disable-warning=ExperimentalWarning scripts/lint-questions.mjs",
     "test:e2e": "playwright test",
     "guard": "node --test scripts/guard/guard.test.mjs && node scripts/guard/run-all.mjs",
     "size": "node scripts/build/check-size.mjs",

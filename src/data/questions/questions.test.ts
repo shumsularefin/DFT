@@ -18,7 +18,7 @@ interface Q {
   sources: string[];
 }
 const MODULES = [
-  { name: 'module 1', perConcept: false, dir: 'src/content/handbook/01-why-dft', questions: q1 as Q[] },
+  { name: 'module 1', perConcept: true, dir: ['src/content/handbook/00-start', 'src/content/handbook/01-why-dft'], questions: q1 as Q[] },
   { name: 'module 3', perConcept: true, dir: 'src/content/handbook/03-many-electrons', questions: q3 as Q[] },
   { name: 'module 2', perConcept: true, dir: 'src/content/handbook/02-quantum-basics', questions: q2 as Q[] },
 ];
@@ -40,7 +40,7 @@ describe.each(MODULES)('$name questions', ({ dir, questions, perConcept }) => {
       for (const o of x.options!) expect(o.why.length).toBeGreaterThan(10);
     }
   });
-  it('have at least 4 questions per concept (module 1 is a known gap, Q-025)', () => {
+  it('have at least 4 questions per concept', () => {
     if (!perConcept) return;
     const count = new Map<string, number>();
     for (const x of questions) for (const c of x.concepts) count.set(c, (count.get(c) ?? 0) + 1);
@@ -58,8 +58,8 @@ describe.each(MODULES)('$name questions', ({ dir, questions, perConcept }) => {
   it('are referenced by the Check ids of the topics, 3 to 6 per topic', () => {
     const ids = new Set(questions.map((x) => x.id));
     const used = new Set<string>();
-    for (const f of readdirSync(dir)) {
-      const m = /<Check ids=\{\[([^\]]*)\]\}/.exec(readFileSync(`${dir}/${f}`, 'utf8'));
+    for (const f of [dir].flat().flatMap((d) => readdirSync(d).map((n) => `${d}/${n}`))) {
+      const m = /<Check ids=\{\[([^\]]*)\]\}/.exec(readFileSync(f, 'utf8'));
       const list = [...(m?.[1] ?? '').matchAll(/'([^']+)'/g)].map((x) => x[1]!);
       expect(list.length, f).toBeGreaterThanOrEqual(3);
       expect(list.length, f).toBeLessThanOrEqual(6);

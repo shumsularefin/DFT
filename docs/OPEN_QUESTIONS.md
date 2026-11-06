@@ -28,7 +28,7 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-022 | open | author or auditor |
 | Q-023 | open | author |
 | Q-024 | open | author or auditor |
-| Q-025 | open | builder (M6.4 or when module 1 questions are revised) |
+| Q-025 | closed | builder (M6.1) |
 | Q-026 | open | author or auditor |
 | Q-027 | open | author or auditor |
 | Q-028 | open | author |
@@ -116,6 +116,8 @@ Statements in `src/content/handbook/02-quantum-basics/` that rest on general kno
 
 ## Q-025. Module 1 questions have fewer than four items per concept
 `src/data/questions/module-01.json` (M2.2) has 17 questions, 3 to 5 per topic, but the concept tags are finer than that, so some concepts (for example `simulation`) have only 2. CONTENT_GUIDE section 7 asks for four per concept. The shape test enforces this for module 2 only. **Close:** add questions or merge concept tags for module 1 and enable the check for it (`perConcept` in `questions.test.ts`).
+
+**Closed (M6.1):** module 1 concept tags merged (`materials-from-atoms`, `quantum-mechanics` into `simulation`; `scaling` into `method-ladder`; `ground-state` into `dft-scope`; `vasp-workflow` into `roadmap`) and four `how-to-use` questions added; every published concept now has at least four questions and `lint-questions.mjs` enforces it.
 
 ## Q-026. Module 3 wording that needs a human check
 Statements in `src/content/handbook/03-many-electrons/` that rest on general knowledge and the `cited-from-memory` register (S-011, S-048, S-049, S-012, S-047), not on a page that was read: (1) the electronic Hamiltonian written in the many-electron page and the role of the pair repulsion term; (2) the Born-Oppenheimer wording; (3) "full configuration interaction mixes all determinants and its count is C(M, N)" (S-048), and that symmetry only reduces the count by a modest factor; (4) the density definition n(r) = N times the integral over the other coordinates (S-048); (5) the one-electron formula V = E + (hbar^2/2m) psi''/psi (derived from the Schrodinger equation, tested numerically, but the statement that it is the one-electron case of Hohenberg-Kohn is from S-011 memory); (6) Hohenberg-Kohn stated for a non-degenerate ground state; (7) the Kohn-Sham energy split E = T_s + int v n + E_H + E_xc (S-012) and that only E_xc is unknown; (8) VASP facts: `CHGCAR` holds the density, `NELECT` defaults from POTCAR valence electrons, only valence electrons explicit, `GGA` tag. **Close:** the author or auditor reads these against the cited books and the VASP wiki, and upgrades the register status.

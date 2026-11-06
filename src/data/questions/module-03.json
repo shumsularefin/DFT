@@ -24,7 +24,8 @@
       }
     ],
     "hints": [
-      "Think about what happens when you add a second electron."
+      "Think about what happens when you add a second electron.",
+      "With two electrons, the motion of one depends on where the other is."
     ],
     "difficulty": -2,
     "level": "beginner",
@@ -57,7 +58,8 @@
       }
     ],
     "hints": [
-      "Three per electron."
+      "Three per electron.",
+      "Each electron has x, y and z."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -76,7 +78,8 @@
     "tolerance": 0.001,
     "unit": "",
     "hints": [
-      "Number of coordinates is 3N, and each takes 10 values."
+      "Number of coordinates is 3N, and each takes 10 values.",
+      "Four electrons have 12 coordinates."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -109,7 +112,8 @@
       }
     ],
     "hints": [
-      "Think about heavy versus light."
+      "Think about heavy versus light.",
+      "Nuclei are thousands of times heavier than electrons."
     ],
     "difficulty": -1,
     "level": "intermediate",
@@ -142,7 +146,8 @@
       }
     ],
     "hints": [
-      "The coupling is between pairs."
+      "The coupling is between pairs.",
+      "Without the pair term, each electron feels only the nuclei."
     ],
     "difficulty": 0,
     "level": "pro",
@@ -175,7 +180,8 @@
       }
     ],
     "hints": [
-      "Choose N orbitals from M."
+      "Choose N orbitals from M.",
+      "Each determinant is one choice of occupied spin orbitals."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -194,7 +200,8 @@
     "tolerance": 0.5,
     "unit": "",
     "hints": [
-      "The binomial coefficient C(10, 5)."
+      "The binomial coefficient C(10, 5).",
+      "C(10, 5) = 10! / (5! x 5!)."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -213,7 +220,8 @@
     "tolerance": 0.01,
     "unit": "TB",
     "hints": [
-      "Multiply by 8, then divide by 10^12."
+      "Multiply by 8, then divide by 10^12.",
+      "8 x 137 846 528 820 bytes is about 1.1 x 10^12 bytes."
     ],
     "difficulty": 1,
     "level": "intermediate",
@@ -246,7 +254,8 @@
       }
     ],
     "hints": [
-      "Compare the growth of the problem with the growth of hardware."
+      "Compare the growth of the problem with the growth of hardware.",
+      "Each added electron multiplies the work, while hardware improves only steadily."
     ],
     "difficulty": 0,
     "level": "beginner",
@@ -279,7 +288,8 @@
       }
     ],
     "hints": [
-      "It is exact counting."
+      "It is exact counting.",
+      "It counts stored numbers, without using any symmetry to reduce them."
     ],
     "difficulty": -1,
     "level": "intermediate",
@@ -312,7 +322,8 @@
       }
     ],
     "hints": [
-      "A map over space."
+      "A map over space.",
+      "The density gives one number at each point in space."
     ],
     "difficulty": -2,
     "level": "beginner",
@@ -345,7 +356,8 @@
       }
     ],
     "hints": [
-      "Add up the electrons everywhere."
+      "Add up the electrons everywhere.",
+      "The density is electrons per unit volume."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -378,7 +390,8 @@
       }
     ],
     "hints": [
-      "Think about what the constant does to all energies."
+      "Think about what the constant does to all energies.",
+      "A constant shift moves every level by the same amount without changing the shapes."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -411,7 +424,8 @@
       }
     ],
     "hints": [
-      "Sum over occupied orbitals."
+      "Sum over occupied orbitals.",
+      "Each occupied orbital adds its own probability density."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -430,7 +444,8 @@
     "tolerance": 0.001,
     "unit": "",
     "hints": [
-      "Density counts electrons."
+      "Density counts electrons.",
+      "The integral counts the electrons."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -463,7 +478,8 @@
       }
     ],
     "hints": [
-      "One density, one potential."
+      "One density, one potential.",
+      "Given the density, you could in principle recover the potential that produced it."
     ],
     "difficulty": -1,
     "level": "intermediate",
@@ -496,7 +512,8 @@
       }
     ],
     "hints": [
-      "Count the variables."
+      "Count the variables.",
+      "The wavefunction grows with every electron; the density does not."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -529,7 +546,8 @@
       }
     ],
     "hints": [
-      "Look at the name."
+      "Look at the name.",
+      "Ground means lowest energy."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -562,7 +580,8 @@
       }
     ],
     "hints": [
-      "Existence versus recipe."
+      "Existence versus recipe.",
+      "The theorem proves a functional exists, which is different from writing it down."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -595,7 +614,8 @@
       }
     ],
     "hints": [
-      "What was new?"
+      "What was new?",
+      "Going from a potential to a density was already known; the other direction was new."
     ],
     "difficulty": 1,
     "level": "pro",
@@ -628,7 +648,8 @@
       }
     ],
     "hints": [
-      "One unknown term."
+      "One unknown term.",
+      "Kinetic, Hartree and external terms are treated exactly in Kohn-Sham DFT."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -662,7 +683,8 @@
       }
     ],
     "hints": [
-      "Pauli plus repulsion."
+      "Pauli plus repulsion.",
+      "One part comes from antisymmetry, the other from electrons repelling each other."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -696,7 +718,8 @@
       }
     ],
     "hints": [
-      "Theorem versus recipe."
+      "Theorem versus recipe.",
+      "The exact functional exists but is unknown."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -730,7 +753,8 @@
       }
     ],
     "hints": [
-      "Think about where the error comes from."
+      "Think about where the error comes from.",
+      "A result that holds with two different functionals is less likely to be an artefact of one."
     ],
     "difficulty": 0,
     "level": "intermediate",

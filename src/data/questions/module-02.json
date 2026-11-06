@@ -24,7 +24,8 @@
       }
     ],
     "hints": [
-      "Think of the pattern made by waves passing through gaps."
+      "Think of the pattern made by waves passing through gaps.",
+      "Rings or fringes only form when waves overlap and interfere."
     ],
     "difficulty": -2,
     "level": "beginner",
@@ -57,7 +58,8 @@
       }
     ],
     "hints": [
-      "The relation is lambda = h / p."
+      "The relation is lambda = h / p.",
+      "Faster or heavier particles have more momentum."
     ],
     "difficulty": -1,
     "level": "intermediate",
@@ -90,7 +92,8 @@
       }
     ],
     "hints": [
-      "Use lambda = h / p with a large p."
+      "Use lambda = h / p with a large p.",
+      "A ball has a huge mass compared with an electron, so p is enormous."
     ],
     "difficulty": -1,
     "level": "intermediate",
@@ -123,7 +126,8 @@
       }
     ],
     "hints": [
-      "Think of the guitar string."
+      "Think of the guitar string.",
+      "The electron is confined around the nucleus, like a string fixed at both ends."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -137,12 +141,13 @@
       "wave-nature"
     ],
     "type": "numeric",
-    "prompt": "An electron has 100 eV of kinetic energy. Using the energy scale 3.80998 eV Å^2 for hbar^2/2m, what is its de Broglie wavelength, in Å?",
+    "prompt": "An electron has 100 eV of kinetic energy. Using the energy scale 3.80998 eV \u00c5^2 for hbar^2/2m, what is its de Broglie wavelength, in \u00c5?",
     "answer": 1.2264,
     "tolerance": 0.005,
-    "unit": "Å",
+    "unit": "\u00c5",
     "hints": [
-      "First find k = sqrt(E / 3.80998), then use wavelength = 2 pi / k."
+      "First find k = sqrt(E / 3.80998), then use wavelength = 2 pi / k.",
+      "k = sqrt(100 / 3.80998) is about 5.12 per Angstrom."
     ],
     "difficulty": 1,
     "level": "pro",
@@ -176,7 +181,8 @@
       }
     ],
     "hints": [
-      "It is a probability, not a speed."
+      "It is a probability, not a speed.",
+      "The wavefunction itself can be negative; its square cannot."
     ],
     "difficulty": -2,
     "level": "beginner",
@@ -209,7 +215,8 @@
       }
     ],
     "hints": [
-      "The electron has to be found somewhere."
+      "The electron has to be found somewhere.",
+      "Adding up the probability over all space must give a certain event."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -242,7 +249,8 @@
       }
     ],
     "hints": [
-      "Square the new function."
+      "Square the new function.",
+      "(-1) squared is 1."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -275,7 +283,8 @@
       }
     ],
     "hints": [
-      "Think of adding two waves on a rope."
+      "Think of adding two waves on a rope.",
+      "Two waves on the same rope add up to a new shape."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -308,7 +317,8 @@
       }
     ],
     "hints": [
-      "Look at the cross term between the two parts."
+      "Look at the cross term between the two parts.",
+      "Each energy state has a phase that turns at its own rate; only the difference shows up in the density."
     ],
     "difficulty": 1,
     "level": "pro",
@@ -341,7 +351,8 @@
       }
     ],
     "hints": [
-      "Think of the guitar string."
+      "Think of the guitar string.",
+      "The wave must vanish at both walls."
     ],
     "difficulty": -2,
     "level": "beginner",
@@ -374,7 +385,8 @@
       }
     ],
     "hints": [
-      "Squeezing a wave costs energy."
+      "Squeezing a wave costs energy.",
+      "A shorter box forces a shorter wavelength, and shorter waves carry more energy."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -407,7 +419,8 @@
       }
     ],
     "hints": [
-      "Nodes = n - 1."
+      "Nodes = n - 1.",
+      "The ground state n = 1 has no interior nodes."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -421,12 +434,13 @@
       "quantization-box"
     ],
     "type": "numeric",
-    "prompt": "What is the lowest energy of an electron in a box of length 5 Å, in eV?",
+    "prompt": "What is the lowest energy of an electron in a box of length 5 \u00c5, in eV?",
     "answer": 1.5041,
     "tolerance": 0.001,
     "unit": "eV",
     "hints": [
-      "Use E1 = pi^2 (3.80998 eV Å^2) / L^2."
+      "Use E1 = pi^2 (3.80998 eV \u00c5^2) / L^2.",
+      "pi squared is about 9.87 and L squared is 25."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -440,12 +454,13 @@
       "quantization-box"
     ],
     "type": "numeric",
-    "prompt": "For the same 5 Å box, what is the energy of the n = 3 state, in eV?",
+    "prompt": "For the same 5 \u00c5 box, what is the energy of the n = 3 state, in eV?",
     "answer": 13.537,
     "tolerance": 0.005,
     "unit": "eV",
     "hints": [
-      "Energy scales as n squared."
+      "Energy scales as n squared.",
+      "Multiply the n = 1 energy by 3 squared."
     ],
     "difficulty": 1,
     "level": "intermediate",
@@ -478,7 +493,8 @@
       }
     ],
     "hints": [
-      "Period = h / gap."
+      "Period = h / gap.",
+      "The period is inversely proportional to the gap."
     ],
     "difficulty": 1,
     "level": "pro",
@@ -511,7 +527,8 @@
       }
     ],
     "hints": [
-      "The letters s, p, d, f follow one number."
+      "The letters s, p, d, f follow one number.",
+      "s is 0, p is 1, d is 2, f is 3."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -544,7 +561,8 @@
       }
     ],
     "hints": [
-      "2l + 1."
+      "2l + 1.",
+      "For p, l = 1."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -577,7 +595,8 @@
       }
     ],
     "hints": [
-      "n - l - 1."
+      "n - l - 1.",
+      "Put n = 3 and l = 2 into n - l - 1."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -596,7 +615,8 @@
     "tolerance": 0.001,
     "unit": "eV",
     "hints": [
-      "E_n = -13.6057 / n^2."
+      "E_n = -13.6057 / n^2.",
+      "Divide -13.6057 eV by 4."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -613,7 +633,7 @@
     "prompt": "Where is the 1s electron most likely to be found, as a distance from the nucleus?",
     "options": [
       {
-        "text": "At the Bohr radius, 0.529 Å",
+        "text": "At the Bohr radius, 0.529 \u00c5",
         "correct": true,
         "why": "The radial probability peaks at a0."
       },
@@ -623,13 +643,14 @@
         "why": "Tempting because the density itself is highest there, but there is little volume at small distance so the radial peak is at a0."
       },
       {
-        "text": "Far away, at several Å",
+        "text": "Far away, at several \u00c5",
         "correct": false,
-        "why": "Tempting because 1s is large in the diagrams, but most of it is within about 1 Å."
+        "why": "Tempting because 1s is large in the diagrams, but most of it is within about 1 \u00c5."
       }
     ],
     "hints": [
-      "Density per unit radius, not per unit volume."
+      "Density per unit radius, not per unit volume.",
+      "The radial probability is r squared times the density, which peaks at one special length."
     ],
     "difficulty": 1,
     "level": "intermediate",
@@ -662,7 +683,8 @@
       }
     ],
     "hints": [
-      "It is a property of the wavefunction."
+      "It is a property of the wavefunction.",
+      "Squaring removes this property, so it does not appear in the probability."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -695,7 +717,8 @@
       }
     ],
     "hints": [
-      "Two spin values."
+      "Two spin values.",
+      "Spin can only be up or down."
     ],
     "difficulty": -2,
     "level": "beginner",
@@ -728,7 +751,8 @@
       }
     ],
     "hints": [
-      "It is about states, not forces."
+      "It is about states, not forces.",
+      "Two electrons may share an orbital only if their spins differ."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -747,7 +771,8 @@
     "tolerance": 0.001,
     "unit": "",
     "hints": [
-      "2n^2, or add up 2 + 6 + 10."
+      "2n^2, or add up 2 + 6 + 10.",
+      "For n = 3 the subshells are s, p and d."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -780,7 +805,8 @@
       }
     ],
     "hints": [
-      "Five orbitals."
+      "Five orbitals.",
+      "Each orbital holds two electrons."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -813,7 +839,8 @@
       }
     ],
     "hints": [
-      "The tag starts with IS."
+      "The tag starts with IS.",
+      "Its value 1 means no spin polarization, and 2 means spin polarized."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -847,7 +874,8 @@
       }
     ],
     "hints": [
-      "Many atoms, many levels."
+      "Many atoms, many levels.",
+      "Bring N identical atoms together and each level splits into N close levels."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -880,7 +908,8 @@
       }
     ],
     "hints": [
-      "Energy, not space."
+      "Energy, not space.",
+      "It is about which energies are allowed, not about a physical gap between atoms."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -913,7 +942,8 @@
       }
     ],
     "hints": [
-      "Can small pushes move the electrons?"
+      "Can small pushes move the electrons?",
+      "Electrons in a full band need a lot of energy to reach an empty state."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -947,7 +977,8 @@
       }
     ],
     "hints": [
-      "They summarize energies."
+      "They summarize energies.",
+      "Instead of one level per electron, look at how many states there are at each energy."
     ],
     "difficulty": 0,
     "level": "beginner",

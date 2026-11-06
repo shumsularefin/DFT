@@ -1,5 +1,141 @@
 [
   {
+    "id": "q-how-to-use-1",
+    "concepts": [
+      "reading-a-topic-page"
+    ],
+    "type": "single",
+    "prompt": "You want the VASP settings for a topic. Which part of the page do you open?",
+    "options": [
+      {
+        "text": "In VASP",
+        "correct": true,
+        "why": "Every topic puts its VASP tags and example files in the In VASP part."
+      },
+      {
+        "text": "Intuition",
+        "correct": false,
+        "why": "Tempting because it comes early, but Intuition explains the idea with pictures, not the settings."
+      },
+      {
+        "text": "Go deeper",
+        "correct": false,
+        "why": "Tempting because it sounds advanced, but Go deeper only points to further reading."
+      }
+    ],
+    "hints": [
+      "Each of the nine parts has one job.",
+      "Look for the part named after the program."
+    ],
+    "difficulty": -2,
+    "level": "beginner",
+    "sources": [
+      "S-019"
+    ]
+  },
+  {
+    "id": "q-how-to-use-2",
+    "concepts": [
+      "reading-a-topic-page"
+    ],
+    "type": "single",
+    "prompt": "What does switching the level from Beginner to Pro change on a page?",
+    "options": [
+      {
+        "text": "More depth appears, such as full equations and edge cases, while the simple version stays correct",
+        "correct": true,
+        "why": "The levels add detail on top of the same correct picture."
+      },
+      {
+        "text": "The page shows a different and contradictory explanation",
+        "correct": false,
+        "why": "Tempting if you expect separate courses, but each level builds on the one below it."
+      },
+      {
+        "text": "Nothing, the level only changes the colours",
+        "correct": false,
+        "why": "Tempting because the page layout stays the same, but the content inside the level blocks changes."
+      }
+    ],
+    "hints": [
+      "Think of the staircase picture on this page.",
+      "Higher steps add, they do not replace."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-019"
+    ]
+  },
+  {
+    "id": "q-how-to-use-3",
+    "concepts": [
+      "reading-a-topic-page"
+    ],
+    "type": "single",
+    "prompt": "A word on the page has a dotted underline. What does that tell you?",
+    "options": [
+      {
+        "text": "It is a glossary term, and focusing or clicking it shows a short definition",
+        "correct": true,
+        "why": "Dotted underlines mark terms defined in the glossary."
+      },
+      {
+        "text": "It is a spelling mistake",
+        "correct": false,
+        "why": "Tempting because word processors use wavy underlines for spelling, but here the dots mark a definition."
+      },
+      {
+        "text": "It links to another website",
+        "correct": false,
+        "why": "Tempting because links are underlined too, but terms open a definition in place without leaving the page."
+      }
+    ],
+    "hints": [
+      "You can read the definition without leaving the page.",
+      "It works with the keyboard as well as the mouse."
+    ],
+    "difficulty": -2,
+    "level": "beginner",
+    "sources": [
+      "S-019"
+    ]
+  },
+  {
+    "id": "q-how-to-use-4",
+    "concepts": [
+      "reading-a-topic-page"
+    ],
+    "type": "single",
+    "prompt": "Where does the site send you to check the exact meaning and default of a VASP tag?",
+    "options": [
+      {
+        "text": "The VASP wiki page named after that tag",
+        "correct": true,
+        "why": "The site names the wiki page so you can check the official reference yourself."
+      },
+      {
+        "text": "A forum post with the most votes",
+        "correct": false,
+        "why": "Tempting because forums are quick, but they can be out of date or wrong; the wiki is the reference."
+      },
+      {
+        "text": "The site itself is the only reference you need",
+        "correct": false,
+        "why": "Tempting because the site explains the tags, but the official documentation is the authority and may change between versions."
+      }
+    ],
+    "hints": [
+      "The In VASP part names a page for every tag.",
+      "It is maintained by the developers of the program."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-019"
+    ]
+  },
+  {
     "id": "q-why-sim-1",
     "concepts": [
       "simulation"
@@ -24,7 +160,8 @@
       }
     ],
     "hints": [
-      "Think about the cost of making and testing each candidate."
+      "Think about the cost of making and testing each candidate.",
+      "Making and measuring one candidate can take months; a calculation can rank many in that time."
     ],
     "difficulty": -2,
     "level": "beginner",
@@ -35,7 +172,7 @@
   {
     "id": "q-why-sim-2",
     "concepts": [
-      "materials-from-atoms"
+      "simulation"
     ],
     "type": "single",
     "prompt": "Which part of an atom mainly decides how atoms bond and whether a material conducts electricity?",
@@ -57,7 +194,8 @@
       }
     ],
     "hints": [
-      "Which part moves and rearranges when bonds form?"
+      "Which part moves and rearranges when bonds form?",
+      "Nuclei stay nearly in place; bonding is about sharing or moving something lighter."
     ],
     "difficulty": -2,
     "level": "beginner",
@@ -69,7 +207,7 @@
   {
     "id": "q-why-sim-3",
     "concepts": [
-      "quantum-mechanics"
+      "simulation"
     ],
     "type": "single",
     "prompt": "Why does simulating a material need quantum mechanics?",
@@ -91,7 +229,8 @@
       }
     ],
     "hints": [
-      "Which particle decides the material properties, and what rules does it follow?"
+      "Which particle decides the material properties, and what rules does it follow?",
+      "Ask whether a tiny, light particle can be treated like a thrown ball."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -124,7 +263,8 @@
       }
     ],
     "hints": [
-      "Where did the number come from?"
+      "Where did the number come from?",
+      "A computed structure inherits every choice and approximation that went into the model."
     ],
     "difficulty": -0.5,
     "level": "beginner",
@@ -135,7 +275,7 @@
   {
     "id": "q-ladder-1",
     "concepts": [
-      "scaling"
+      "method-ladder"
     ],
     "type": "single",
     "prompt": "A method costs size to the power 3. By what factor does the cost grow when the system size doubles?",
@@ -157,7 +297,8 @@
       }
     ],
     "hints": [
-      "Cost goes as N to the p. Compare (2N) to the p with N to the p."
+      "Cost goes as N to the p. Compare (2N) to the p with N to the p.",
+      "Doubling N multiplies N cubed by 2 x 2 x 2."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -191,7 +332,8 @@
       }
     ],
     "hints": [
-      "Which rung has no electrons, only atoms pushing on atoms?"
+      "Which rung has no electrons, only atoms pushing on atoms?",
+      "Classical potentials describe atoms as balls joined by springs and similar terms."
     ],
     "difficulty": -2,
     "level": "beginner",
@@ -202,7 +344,7 @@
   {
     "id": "q-ladder-3",
     "concepts": [
-      "scaling"
+      "method-ladder"
     ],
     "type": "single",
     "prompt": "The lab shows a straight line on a chart with both axes logarithmic. What does a steeper line mean?",
@@ -224,7 +366,8 @@
       }
     ],
     "hints": [
-      "What does the slope of a line on a log-log chart measure?"
+      "What does the slope of a line on a log-log chart measure?",
+      "On a log-log chart, cost = N to the p becomes a straight line whose slope is p."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -257,7 +400,8 @@
       }
     ],
     "hints": [
-      "Which part of the energy has no known exact form?"
+      "Which part of the energy has no known exact form?",
+      "Everything else in Kohn-Sham DFT can be written down exactly."
     ],
     "difficulty": 0.5,
     "level": "intermediate",
@@ -291,7 +435,8 @@
       }
     ],
     "hints": [
-      "Read the \"What to notice\" box in the lab."
+      "Read the \"What to notice\" box in the lab.",
+      "A shared starting point is a drawing choice, not a measured cost."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -302,7 +447,7 @@
   {
     "id": "q-scope-1",
     "concepts": [
-      "ground-state"
+      "dft-scope"
     ],
     "type": "single",
     "prompt": "DFT is mainly a theory of which state?",
@@ -324,7 +469,8 @@
       }
     ],
     "hints": [
-      "Which state has the lowest energy?"
+      "Which state has the lowest energy?",
+      "Excited states need extensions of the theory, not plain DFT."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -357,7 +503,8 @@
       }
     ],
     "hints": [
-      "Where does the approximation sit in DFT?"
+      "Where does the approximation sit in DFT?",
+      "Common functionals are known to underestimate band gaps in many materials."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -391,7 +538,8 @@
       }
     ],
     "hints": [
-      "Does the question involve states above the ground state?"
+      "Does the question involve states above the ground state?",
+      "Light absorption lifts an electron into a higher state."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -424,7 +572,8 @@
       }
     ],
     "hints": [
-      "Where does the exchange-correlation approximation enter?"
+      "Where does the exchange-correlation approximation enter?",
+      "Different functionals can give quite different gaps for the same material."
     ],
     "difficulty": -0.5,
     "level": "beginner",
@@ -457,7 +606,8 @@
       }
     ],
     "hints": [
-      "Think about what each stage lets you understand next."
+      "Think about what each stage lets you understand next.",
+      "You cannot judge a setting before you know what it controls."
     ],
     "difficulty": -1.5,
     "level": "beginner",
@@ -468,7 +618,7 @@
   {
     "id": "q-roadmap-2",
     "concepts": [
-      "vasp-workflow"
+      "roadmap"
     ],
     "type": "single",
     "prompt": "Which four files does a VASP calculation need?",
@@ -490,7 +640,8 @@
       }
     ],
     "hints": [
-      "Four inputs describe structure, sampling, settings and the atoms."
+      "Four inputs describe structure, sampling, settings and the atoms.",
+      "One file each for the atoms positions, the k-points, the settings and the pseudopotentials."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -501,7 +652,7 @@
   {
     "id": "q-roadmap-3",
     "concepts": [
-      "vasp-workflow"
+      "roadmap"
     ],
     "type": "single",
     "prompt": "Does this site run VASP for you?",
@@ -523,7 +674,8 @@
       }
     ],
     "hints": [
-      "Where does the computation on this site happen?"
+      "Where does the computation on this site happen?",
+      "The site is static pages and scripts in your browser, with no server doing work."
     ],
     "difficulty": -1.5,
     "level": "beginner",
@@ -556,7 +708,8 @@
       }
     ],
     "hints": [
-      "What did the page say about the effort involved?"
+      "What did the page say about the effort involved?",
+      "Errors usually point to one setting at a time; change one thing and run again."
     ],
     "difficulty": -1,
     "level": "beginner",

@@ -1,0 +1,792 @@
+[
+  {
+    "id": "reading-a-topic-page",
+    "label": "How a topic page works",
+    "module": 1,
+    "level": "beginner",
+    "prerequisites": [],
+    "summary": "Each topic follows the same nine parts, and the level switch changes how deep each part goes.",
+    "status": "published"
+  },
+  {
+    "id": "simulation",
+    "label": "Why simulate materials",
+    "module": 1,
+    "level": "beginner",
+    "prerequisites": [],
+    "summary": "Simulation predicts properties from atoms and electrons, so only the promising candidates need to be made.",
+    "status": "published"
+  },
+  {
+    "id": "method-ladder",
+    "label": "The ladder of methods",
+    "module": 1,
+    "level": "beginner",
+    "prerequisites": [
+      "simulation"
+    ],
+    "summary": "Methods trade accuracy for cost, and their cost grows with system size at very different rates.",
+    "status": "published"
+  },
+  {
+    "id": "dft-scope",
+    "label": "What DFT can and cannot tell you",
+    "module": 1,
+    "level": "beginner",
+    "prerequisites": [
+      "method-ladder"
+    ],
+    "summary": "DFT gives ground-state energies, structures and densities well, and some quantities, such as band gaps, poorly.",
+    "status": "published"
+  },
+  {
+    "id": "roadmap",
+    "label": "Roadmap to a first VASP project",
+    "module": 1,
+    "level": "beginner",
+    "prerequisites": [
+      "dft-scope"
+    ],
+    "summary": "A first project moves from a question to a structure, inputs, convergence tests, the run and analysis.",
+    "status": "published"
+  },
+  {
+    "id": "wave-nature",
+    "label": "Particles behave as waves",
+    "module": 2,
+    "level": "beginner",
+    "prerequisites": [],
+    "summary": "Electrons show interference, so their behaviour is described by waves with a wavelength set by their momentum.",
+    "status": "published"
+  },
+  {
+    "id": "wavefunction-meaning",
+    "label": "The wavefunction",
+    "module": 2,
+    "level": "beginner",
+    "prerequisites": [
+      "wave-nature"
+    ],
+    "summary": "The square of the wavefunction gives the probability of finding the particle at each place.",
+    "status": "published"
+  },
+  {
+    "id": "quantization-box",
+    "label": "Quantized energy levels",
+    "module": 2,
+    "level": "beginner",
+    "prerequisites": [
+      "wavefunction-meaning"
+    ],
+    "summary": "Confining a wave allows only certain standing waves, so only certain energies are possible.",
+    "status": "published"
+  },
+  {
+    "id": "orbital-shapes",
+    "label": "Orbitals and quantum numbers",
+    "module": 2,
+    "level": "beginner",
+    "prerequisites": [
+      "quantization-box"
+    ],
+    "summary": "Atomic orbitals have sizes and shapes labelled by the quantum numbers n, l and m.",
+    "status": "published"
+  },
+  {
+    "id": "spin-pauli",
+    "label": "Spin and the Pauli principle",
+    "module": 2,
+    "level": "beginner",
+    "prerequisites": [
+      "orbital-shapes"
+    ],
+    "summary": "Each orbital holds at most two electrons of opposite spin, which builds the shell structure.",
+    "status": "published"
+  },
+  {
+    "id": "levels-to-bands",
+    "label": "From energy levels to bands",
+    "module": 2,
+    "level": "beginner",
+    "prerequisites": [
+      "spin-pauli"
+    ],
+    "summary": "Levels of many atoms spread into bands, and how bands are filled separates metals from insulators.",
+    "status": "published"
+  },
+  {
+    "id": "many-electron-problem",
+    "label": "The many-electron problem",
+    "module": 3,
+    "level": "beginner",
+    "prerequisites": [
+      "levels-to-bands"
+    ],
+    "summary": "Every electron feels every other electron, so the wavefunction depends on all coordinates at once.",
+    "status": "published"
+  },
+  {
+    "id": "exponential-wall",
+    "label": "The exponential wall",
+    "module": 3,
+    "level": "beginner",
+    "prerequisites": [
+      "many-electron-problem"
+    ],
+    "summary": "Storing a many-electron wavefunction on a grid needs memory that grows exponentially with the electron count.",
+    "status": "published"
+  },
+  {
+    "id": "electron-density-meaning",
+    "label": "The electron density",
+    "module": 3,
+    "level": "beginner",
+    "prerequisites": [
+      "exponential-wall"
+    ],
+    "summary": "The density is a function of three coordinates only, whatever the number of electrons.",
+    "status": "published"
+  },
+  {
+    "id": "density-to-potential",
+    "label": "From density to potential",
+    "module": 3,
+    "level": "intermediate",
+    "prerequisites": [
+      "electron-density-meaning"
+    ],
+    "summary": "The density determines the electrostatic potential, which is the first step towards using it as the main variable.",
+    "status": "published"
+  },
+  {
+    "id": "approximations-needed",
+    "label": "What still needs approximating",
+    "module": 3,
+    "level": "intermediate",
+    "prerequisites": [
+      "density-to-potential"
+    ],
+    "summary": "Exchange and correlation are the part of the energy that DFT cannot write exactly and must approximate.",
+    "status": "published"
+  },
+  {
+    "id": "hohenberg-kohn",
+    "label": "Hohenberg-Kohn theorems",
+    "module": 4,
+    "level": "intermediate",
+    "prerequisites": [
+      "approximations-needed"
+    ],
+    "summary": "The ground-state density fixes the external potential, and the true density minimises the energy functional.",
+    "status": "planned"
+  },
+  {
+    "id": "kohn-sham",
+    "label": "The Kohn-Sham idea",
+    "module": 4,
+    "level": "intermediate",
+    "prerequisites": [
+      "hohenberg-kohn"
+    ],
+    "summary": "Replace interacting electrons by non-interacting ones that have the same density in an effective potential.",
+    "status": "planned"
+  },
+  {
+    "id": "hartree-potential",
+    "label": "The Hartree potential",
+    "module": 4,
+    "level": "intermediate",
+    "prerequisites": [
+      "kohn-sham",
+      "density-to-potential"
+    ],
+    "summary": "The classical electrostatic repulsion of the electron cloud with itself.",
+    "status": "planned"
+  },
+  {
+    "id": "exchange-correlation",
+    "label": "Exchange and correlation",
+    "module": 4,
+    "level": "intermediate",
+    "prerequisites": [
+      "kohn-sham"
+    ],
+    "summary": "The one term in Kohn-Sham DFT that must be approximated, through a functional.",
+    "status": "planned"
+  },
+  {
+    "id": "effective-potential",
+    "label": "The effective potential",
+    "module": 4,
+    "level": "intermediate",
+    "prerequisites": [
+      "hartree-potential",
+      "exchange-correlation"
+    ],
+    "summary": "Nuclear, Hartree and exchange-correlation potentials added together act on every Kohn-Sham electron.",
+    "status": "planned"
+  },
+  {
+    "id": "scf-loop",
+    "label": "The self-consistent field loop",
+    "module": 4,
+    "level": "intermediate",
+    "prerequisites": [
+      "effective-potential"
+    ],
+    "summary": "Guess a density, build the potential, solve, make a new density, mix and repeat until nothing changes.",
+    "status": "planned"
+  },
+  {
+    "id": "density-mixing",
+    "label": "Density mixing",
+    "module": 4,
+    "level": "intermediate",
+    "prerequisites": [
+      "scf-loop"
+    ],
+    "summary": "Blending the new density with the old one keeps the loop stable; too much oscillates, too little is slow.",
+    "status": "planned"
+  },
+  {
+    "id": "scf-failure",
+    "label": "When SCF goes wrong",
+    "module": 4,
+    "level": "pro",
+    "prerequisites": [
+      "density-mixing"
+    ],
+    "summary": "Charge sloshing and poor mixing make the loop oscillate or diverge, and there are standard remedies.",
+    "status": "planned"
+  },
+  {
+    "id": "plane-wave-basis",
+    "label": "Plane-wave basis sets",
+    "module": 5,
+    "level": "intermediate",
+    "prerequisites": [
+      "scf-loop"
+    ],
+    "summary": "In a periodic crystal the orbitals are expanded in plane waves, and more waves describe finer detail.",
+    "status": "planned"
+  },
+  {
+    "id": "encut",
+    "label": "The energy cutoff ENCUT",
+    "module": 5,
+    "level": "intermediate",
+    "prerequisites": [
+      "plane-wave-basis"
+    ],
+    "summary": "ENCUT sets which plane waves are kept, and the energy converges as it rises.",
+    "status": "planned"
+  },
+  {
+    "id": "pulay-stress",
+    "label": "Pulay stress",
+    "module": 5,
+    "level": "pro",
+    "prerequisites": [
+      "encut"
+    ],
+    "summary": "With a fixed basis, a changing cell volume gives a spurious stress unless ENCUT is high enough.",
+    "status": "planned"
+  },
+  {
+    "id": "brillouin-zone",
+    "label": "The Brillouin zone",
+    "module": 5,
+    "level": "intermediate",
+    "prerequisites": [
+      "plane-wave-basis"
+    ],
+    "summary": "Electron states in a crystal are labelled by k-vectors in the reciprocal-space cell called the Brillouin zone.",
+    "status": "planned"
+  },
+  {
+    "id": "kpoint-sampling",
+    "label": "k-point sampling",
+    "module": 5,
+    "level": "intermediate",
+    "prerequisites": [
+      "brillouin-zone"
+    ],
+    "summary": "Integrals over the Brillouin zone are replaced by sums over a finite mesh of k-points.",
+    "status": "planned"
+  },
+  {
+    "id": "gamma-vs-mp",
+    "label": "Gamma-centred versus Monkhorst-Pack meshes",
+    "module": 5,
+    "level": "pro",
+    "prerequisites": [
+      "kpoint-sampling"
+    ],
+    "summary": "Shifted and unshifted meshes differ in symmetry, which matters for hexagonal cells.",
+    "status": "planned"
+  },
+  {
+    "id": "pseudopotentials",
+    "label": "Pseudopotentials",
+    "module": 5,
+    "level": "intermediate",
+    "prerequisites": [
+      "plane-wave-basis"
+    ],
+    "summary": "Core electrons are frozen and the sharp potential near the nucleus is replaced by a smoother one.",
+    "status": "planned"
+  },
+  {
+    "id": "paw",
+    "label": "The PAW method",
+    "module": 5,
+    "level": "pro",
+    "prerequisites": [
+      "pseudopotentials"
+    ],
+    "summary": "Projector augmented waves restore all-electron information near the nucleus while keeping a smooth basis.",
+    "status": "planned"
+  },
+  {
+    "id": "functionals",
+    "label": "Exchange-correlation functionals",
+    "module": 5,
+    "level": "intermediate",
+    "prerequisites": [
+      "exchange-correlation"
+    ],
+    "summary": "LDA, GGA, meta-GGA and hybrids form a ladder of accuracy and cost.",
+    "status": "planned"
+  },
+  {
+    "id": "hybrid-functionals",
+    "label": "Hybrid functionals",
+    "module": 5,
+    "level": "pro",
+    "prerequisites": [
+      "functionals"
+    ],
+    "summary": "Mixing in exact exchange improves band gaps at a large extra cost.",
+    "status": "planned"
+  },
+  {
+    "id": "smearing",
+    "label": "Smearing",
+    "module": 5,
+    "level": "intermediate",
+    "prerequisites": [
+      "kpoint-sampling"
+    ],
+    "summary": "Spreading occupations over a small energy width makes metals converge with fewer k-points.",
+    "status": "planned"
+  },
+  {
+    "id": "ismear-sigma",
+    "label": "Choosing ISMEAR and SIGMA",
+    "module": 5,
+    "level": "intermediate",
+    "prerequisites": [
+      "smearing"
+    ],
+    "summary": "The smearing method and width are chosen by whether the system is a metal, a semiconductor or an insulator.",
+    "status": "planned"
+  },
+  {
+    "id": "spin-polarization",
+    "label": "Spin polarization",
+    "module": 5,
+    "level": "intermediate",
+    "prerequisites": [
+      "spin-pauli",
+      "scf-loop"
+    ],
+    "summary": "Separate densities for up and down spin describe magnetic materials.",
+    "status": "planned"
+  },
+  {
+    "id": "magmom",
+    "label": "Initial magnetic moments",
+    "module": 5,
+    "level": "intermediate",
+    "prerequisites": [
+      "spin-polarization"
+    ],
+    "summary": "MAGMOM sets a starting moment per atom in POSCAR order, and the start decides which magnetic state is found.",
+    "status": "planned"
+  },
+  {
+    "id": "dft-plus-u",
+    "label": "DFT+U",
+    "module": 5,
+    "level": "pro",
+    "prerequisites": [
+      "functionals",
+      "spin-polarization"
+    ],
+    "summary": "A penalty on partly filled localized orbitals corrects some self-interaction error in d and f systems.",
+    "status": "planned"
+  },
+  {
+    "id": "vdw-corrections",
+    "label": "van der Waals corrections",
+    "module": 5,
+    "level": "intermediate",
+    "prerequisites": [
+      "functionals"
+    ],
+    "summary": "Dispersion forces missing from common functionals are added by correction schemes.",
+    "status": "planned"
+  },
+  {
+    "id": "poscar",
+    "label": "The POSCAR file",
+    "module": 6,
+    "level": "beginner",
+    "prerequisites": [
+      "brillouin-zone"
+    ],
+    "summary": "The cell vectors, species, counts and positions of every atom.",
+    "status": "planned"
+  },
+  {
+    "id": "kpoints-file",
+    "label": "The KPOINTS file",
+    "module": 6,
+    "level": "beginner",
+    "prerequisites": [
+      "kpoint-sampling"
+    ],
+    "summary": "How the k-point mesh or path is written for VASP.",
+    "status": "planned"
+  },
+  {
+    "id": "incar",
+    "label": "The INCAR file",
+    "module": 6,
+    "level": "beginner",
+    "prerequisites": [
+      "encut",
+      "smearing"
+    ],
+    "summary": "The tags that decide what VASP calculates and how.",
+    "status": "planned"
+  },
+  {
+    "id": "potcar",
+    "label": "The POTCAR file",
+    "module": 6,
+    "level": "beginner",
+    "prerequisites": [
+      "paw"
+    ],
+    "summary": "The PAW datasets for every species, in POSCAR order, obtained under your VASP licence.",
+    "status": "planned"
+  },
+  {
+    "id": "output-files",
+    "label": "VASP output files",
+    "module": 6,
+    "level": "beginner",
+    "prerequisites": [
+      "incar"
+    ],
+    "summary": "What OUTCAR, OSZICAR, CONTCAR, DOSCAR and the other output files contain.",
+    "status": "planned"
+  },
+  {
+    "id": "vasp-protocol",
+    "label": "A calculation workflow",
+    "module": 7,
+    "level": "intermediate",
+    "prerequisites": [
+      "output-files",
+      "roadmap"
+    ],
+    "summary": "Relax, then compute the self-consistent charge density, then the band structure and DOS.",
+    "status": "planned"
+  },
+  {
+    "id": "job-scripts",
+    "label": "Job scripts",
+    "module": 7,
+    "level": "intermediate",
+    "prerequisites": [
+      "vasp-protocol"
+    ],
+    "summary": "Batch scripts request resources on a cluster and start VASP.",
+    "status": "planned"
+  },
+  {
+    "id": "parallelization",
+    "label": "Parallel settings",
+    "module": 7,
+    "level": "pro",
+    "prerequisites": [
+      "job-scripts"
+    ],
+    "summary": "NCORE and KPAR distribute work over cores and change speed but not results.",
+    "status": "planned"
+  },
+  {
+    "id": "restarts",
+    "label": "Restarts with ISTART and ICHARG",
+    "module": 7,
+    "level": "intermediate",
+    "prerequisites": [
+      "vasp-protocol"
+    ],
+    "summary": "Reading WAVECAR or CHGCAR saves time, but the inputs must match.",
+    "status": "planned"
+  },
+  {
+    "id": "reading-outputs",
+    "label": "Reading OSZICAR and OUTCAR",
+    "module": 7,
+    "level": "intermediate",
+    "prerequisites": [
+      "output-files"
+    ],
+    "summary": "The electronic and ionic steps, energies, forces and moments in the output files.",
+    "status": "planned"
+  },
+  {
+    "id": "vaspkit",
+    "label": "VASPKIT in practice",
+    "module": 7,
+    "level": "intermediate",
+    "prerequisites": [
+      "vasp-protocol"
+    ],
+    "summary": "A helper program that prepares inputs and post-processes outputs.",
+    "status": "planned"
+  },
+  {
+    "id": "convergence-testing",
+    "label": "Why converge",
+    "module": 8,
+    "level": "intermediate",
+    "prerequisites": [
+      "encut",
+      "kpoint-sampling"
+    ],
+    "summary": "Results must not change when the numerical settings improve, to a stated tolerance.",
+    "status": "planned"
+  },
+  {
+    "id": "encut-convergence",
+    "label": "ENCUT convergence",
+    "module": 8,
+    "level": "intermediate",
+    "prerequisites": [
+      "convergence-testing"
+    ],
+    "summary": "Raise ENCUT until the energy per atom changes less than the tolerance.",
+    "status": "planned"
+  },
+  {
+    "id": "kpoint-convergence",
+    "label": "k-point convergence",
+    "module": 8,
+    "level": "intermediate",
+    "prerequisites": [
+      "convergence-testing",
+      "smearing"
+    ],
+    "summary": "Refine the mesh until the energy per atom is converged; metals need more points.",
+    "status": "planned"
+  },
+  {
+    "id": "scf-trouble",
+    "label": "SCF convergence problems",
+    "module": 8,
+    "level": "pro",
+    "prerequisites": [
+      "scf-failure",
+      "reading-outputs"
+    ],
+    "summary": "Mixing, ALGO and NELM settings for loops that do not converge.",
+    "status": "planned"
+  },
+  {
+    "id": "relaxation-trouble",
+    "label": "Relaxation problems",
+    "module": 8,
+    "level": "pro",
+    "prerequisites": [
+      "reading-outputs"
+    ],
+    "summary": "ZBRENT errors, step sizes and the choice of optimizer.",
+    "status": "planned"
+  },
+  {
+    "id": "error-diagnosis",
+    "label": "Diagnosing VASP errors",
+    "module": 8,
+    "level": "intermediate",
+    "prerequisites": [
+      "reading-outputs"
+    ],
+    "summary": "Reading an error message, finding the likely cause and the fix.",
+    "status": "planned"
+  },
+  {
+    "id": "energies-forces",
+    "label": "Energies and forces",
+    "module": 9,
+    "level": "intermediate",
+    "prerequisites": [
+      "reading-outputs"
+    ],
+    "summary": "Which energy to report and how forces show that a structure is relaxed.",
+    "status": "planned"
+  },
+  {
+    "id": "relaxation-analysis",
+    "label": "Judging a relaxation",
+    "module": 9,
+    "level": "intermediate",
+    "prerequisites": [
+      "energies-forces"
+    ],
+    "summary": "Checking that forces and stresses are below the target and the structure makes sense.",
+    "status": "planned"
+  },
+  {
+    "id": "density-of-states",
+    "label": "Density of states",
+    "module": 9,
+    "level": "intermediate",
+    "prerequisites": [
+      "levels-to-bands",
+      "smearing"
+    ],
+    "summary": "The number of states per energy, total and projected on atoms and orbitals.",
+    "status": "planned"
+  },
+  {
+    "id": "band-structure",
+    "label": "Band structures",
+    "module": 9,
+    "level": "intermediate",
+    "prerequisites": [
+      "brillouin-zone",
+      "density-of-states"
+    ],
+    "summary": "Energies along a path of high-symmetry k-points.",
+    "status": "planned"
+  },
+  {
+    "id": "band-gap",
+    "label": "Band gaps",
+    "module": 9,
+    "level": "intermediate",
+    "prerequisites": [
+      "band-structure"
+    ],
+    "summary": "The gap between occupied and empty states, direct or indirect, and why DFT underestimates it.",
+    "status": "planned"
+  },
+  {
+    "id": "charge-density",
+    "label": "Charge density analysis",
+    "module": 9,
+    "level": "intermediate",
+    "prerequisites": [
+      "electron-density-meaning",
+      "output-files"
+    ],
+    "summary": "Isosurfaces and slices of the computed density.",
+    "status": "planned"
+  },
+  {
+    "id": "perovskite-structure",
+    "label": "The perovskite structure",
+    "module": 10,
+    "level": "intermediate",
+    "prerequisites": [
+      "poscar"
+    ],
+    "summary": "ABX3 compounds with corner-sharing octahedra and many distorted variants.",
+    "status": "planned"
+  },
+  {
+    "id": "tolerance-factor",
+    "label": "Tolerance factors",
+    "module": 10,
+    "level": "intermediate",
+    "prerequisites": [
+      "perovskite-structure"
+    ],
+    "summary": "Ionic-radius ratios that estimate whether a perovskite is likely to form.",
+    "status": "planned"
+  },
+  {
+    "id": "worked-workflow",
+    "label": "A worked perovskite workflow",
+    "module": 10,
+    "level": "pro",
+    "prerequisites": [
+      "tolerance-factor",
+      "vasp-protocol",
+      "convergence-testing"
+    ],
+    "summary": "A full project from structure to electronic structure on the RCuO3 family.",
+    "status": "planned"
+  },
+  {
+    "id": "interpreting-results",
+    "label": "Interpreting results",
+    "module": 10,
+    "level": "pro",
+    "prerequisites": [
+      "worked-workflow",
+      "band-gap"
+    ],
+    "summary": "Turning converged numbers into honest statements about a material.",
+    "status": "planned"
+  },
+  {
+    "id": "screening-materials",
+    "label": "Screening materials data",
+    "module": 11,
+    "level": "intermediate",
+    "prerequisites": [
+      "dft-scope"
+    ],
+    "summary": "Filtering computed databases to find candidates and judging whether a first project is feasible.",
+    "status": "planned"
+  },
+  {
+    "id": "building-structures",
+    "label": "Building structures",
+    "module": 11,
+    "level": "intermediate",
+    "prerequisites": [
+      "poscar"
+    ],
+    "summary": "Making crystals, supercells, surfaces and molecules for a calculation.",
+    "status": "planned"
+  },
+  {
+    "id": "research-tools",
+    "label": "The research tools",
+    "module": 11,
+    "level": "intermediate",
+    "prerequisites": [
+      "vasp-protocol"
+    ],
+    "summary": "How the tolerance-factor explorer, input builder, convergence helper and k-path tool fit together.",
+    "status": "planned"
+  },
+  {
+    "id": "next-steps",
+    "label": "What next",
+    "module": 11,
+    "level": "beginner",
+    "prerequisites": [
+      "research-tools"
+    ],
+    "summary": "Where to go after a first project.",
+    "status": "planned"
+  }
+]
