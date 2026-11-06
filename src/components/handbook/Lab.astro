@@ -11,12 +11,19 @@ import KmeshLab from '../labs/KmeshLab';
 import BrillouinLab from '../labs/BrillouinLab';
 import UnitCellLab from '../labs/UnitCellLab';
 import ScfLab from '../labs/ScfLab';
+import SmearingLab from '../labs/SmearingLab';
+import DftuLab from '../labs/DftuLab';
+import PawLab from '../labs/PawLab';
+import FunctionalLadder from '../labs/FunctionalLadder';
+import SpinCartoon from '../labs/SpinCartoon';
 // Labs are registered by id. An id with no component yet shows the placeholder, so topics can be written ahead of their labs.
 interface Props {
   id: string;
   title?: string;
+  /** A second lab shown under the first (only 'brillouin-zone' is supported). */
+  also?: 'brillouin-zone';
 }
-const { id, title } = Astro.props;
+const { id, title, also } = Astro.props;
 ---
 
 <Section id="lab" heading="Lab">
@@ -60,6 +67,26 @@ const { id, title } = Astro.props;
     <div data-lab-id={id}>
       <ScfLab client:visible />
     </div>
+  ) : id === 'smearing' ? (
+    <div data-lab-id={id}>
+      <SmearingLab client:visible />
+    </div>
+  ) : id === 'dft-plus-u' ? (
+    <div data-lab-id={id}>
+      <DftuLab client:visible />
+    </div>
+  ) : id === 'paw-picture' ? (
+    <div data-lab-id={id}>
+      <PawLab client:visible />
+    </div>
+  ) : id === 'functional-ladder' ? (
+    <div data-lab-id={id}>
+      <FunctionalLadder client:visible />
+    </div>
+  ) : id === 'spin-cartoon' ? (
+    <div data-lab-id={id}>
+      <SpinCartoon client:visible />
+    </div>
   ) : (
     <div class="lab-placeholder" data-lab-id={id}>
       <p>
@@ -67,6 +94,11 @@ const { id, title } = Astro.props;
       </p>
       <p>The interactive lab for this topic is not built yet. It arrives in a later stage.</p>
       <slot />
+    </div>
+  )}
+  {also === 'brillouin-zone' && (
+    <div data-lab-id="brillouin-zone">
+      <BrillouinLab client:visible headingLevel={3} />
     </div>
   )}
 </Section>

@@ -268,7 +268,7 @@
    "scf-loop"
   ],
   "summary": "In a periodic crystal the orbitals are expanded in plane waves, and more waves describe finer detail.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "encut",
@@ -279,7 +279,7 @@
    "plane-wave-basis"
   ],
   "summary": "ENCUT sets which plane waves are kept, and the energy converges as it rises.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "pulay-stress",
@@ -290,7 +290,7 @@
    "encut"
   ],
   "summary": "With a fixed basis, a changing cell volume gives a spurious stress unless ENCUT is high enough.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "brillouin-zone",
@@ -301,7 +301,7 @@
    "plane-wave-basis"
   ],
   "summary": "Electron states in a crystal are labelled by k-vectors in the reciprocal-space cell called the Brillouin zone.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "kpoint-sampling",
@@ -312,7 +312,7 @@
    "brillouin-zone"
   ],
   "summary": "Integrals over the Brillouin zone are replaced by sums over a finite mesh of k-points.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "gamma-vs-mp",
@@ -323,7 +323,7 @@
    "kpoint-sampling"
   ],
   "summary": "Shifted and unshifted meshes differ in symmetry, which matters for hexagonal cells.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "pseudopotentials",
@@ -334,7 +334,7 @@
    "plane-wave-basis"
   ],
   "summary": "Core electrons are frozen and the sharp potential near the nucleus is replaced by a smoother one.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "paw",
@@ -345,7 +345,7 @@
    "pseudopotentials"
   ],
   "summary": "Projector augmented waves restore all-electron information near the nucleus while keeping a smooth basis.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "functionals",
@@ -356,7 +356,7 @@
    "exchange-correlation"
   ],
   "summary": "LDA, GGA, meta-GGA and hybrids form a ladder of accuracy and cost.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "hybrid-functionals",
@@ -367,7 +367,7 @@
    "functionals"
   ],
   "summary": "Mixing in exact exchange improves band gaps at a large extra cost.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "smearing",
@@ -378,7 +378,7 @@
    "kpoint-sampling"
   ],
   "summary": "Spreading occupations over a small energy width makes metals converge with fewer k-points.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "ismear-sigma",
@@ -389,7 +389,7 @@
    "smearing"
   ],
   "summary": "The smearing method and width are chosen by whether the system is a metal, a semiconductor or an insulator.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "spin-polarization",
@@ -401,7 +401,7 @@
    "scf-loop"
   ],
   "summary": "Separate densities for up and down spin describe magnetic materials.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "magmom",
@@ -412,7 +412,7 @@
    "spin-polarization"
   ],
   "summary": "MAGMOM sets a starting moment per atom in POSCAR order, and the start decides which magnetic state is found.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "dft-plus-u",
@@ -424,7 +424,7 @@
    "spin-polarization"
   ],
   "summary": "A penalty on partly filled localized orbitals corrects some self-interaction error in d and f systems.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "vdw-corrections",
@@ -435,7 +435,7 @@
    "functionals"
   ],
   "summary": "Dispersion forces missing from common functionals are added by correction schemes.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "poscar",

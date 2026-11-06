@@ -38,7 +38,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 | M6.4 | Practice UI, quizzes, mastery map and gentle gamification | done | M6.3, M1.3 | L | claude/great-dijkstra-oj0kbx |  | 2026-11-06 | [report](reports/M6.4.md), [work order](milestones/M6-adaptive-engine.md) |
 | M6.5 | Optional progress sync with Firebase (Spark) | done | M6.4, M0.2 | M | claude/great-dijkstra-oj0kbx |  | 2026-11-06 | [report](reports/M6.5.md), [work order](milestones/M6-adaptive-engine.md) |
 | M7.1 | Module 4: Hohenberg-Kohn, Kohn-Sham and the SCF loop (with SCF lab) | done | M6.1, M2.4 | L | claude/great-dijkstra-oj0kbx |  | 2026-11-06 | [report](reports/M7.1.md), [work order](milestones/M7-remaining-modules.md) |
-| M7.2 | Module 5: Practical choices | todo | M7.1, M4.4, M4.5, M5.5 | L | | | | [work order](milestones/M7-remaining-modules.md) |
+| M7.2 | Module 5: Practical choices | done | M7.1, M4.4, M4.5, M5.5 | L | claude/great-dijkstra-oj0kbx |  | 2026-11-06 | [report](reports/M7.2.md), [work order](milestones/M7-remaining-modules.md) |
 | M7.3 | Modules 6 and 7: VASP files and running a calculation | todo | M3.6, M4.1 | L | | | | [work order](milestones/M7-remaining-modules.md) |
 | M7.4 | Module 8: Convergence testing and common errors (with error finder) | todo | M7.3, M4.3 | M | | | | [work order](milestones/M7-remaining-modules.md) |
 | M7.5 | Module 9: Analysis (with relaxation, DOS/band and charge-density tools) | todo | M7.4, M5.6, M2.1 | L | | | | [work order](milestones/M7-remaining-modules.md) |
@@ -64,6 +64,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 
 Newest first. One line per session: date, stage, outcome, branch.
 
+- 2026-11-06, M7.2: module 5 (8 topics, 5 labs), smearing and DFT+U libraries, /tags/ cards, 65 questions Branch `claude/great-dijkstra-oj0kbx`.
 - 2026-11-06, M7.1: module 4 (5 topics), SCF toy lab matching golden energies, 35 questions Branch `claude/great-dijkstra-oj0kbx`.
 - 2026-11-06, M6.5: optional Firebase sync (Firestore lite, lazy 56 KB), rules with 6 emulator tests, privacy page, setup docs. Branch `claude/great-dijkstra-oj0kbx`.
 - 2026-11-06, M6.4: Check quiz (no-JS fallback), /practice/ sessions, /progress/ mastery map, gentle streak, export/import/reset; 14 e2e tests. Branch `claude/great-dijkstra-oj0kbx`.

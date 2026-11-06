@@ -681,5 +681,42 @@
   "sources": [
    "S-010"
   ]
+ },
+ {
+  "id": "brillouin-zone",
+  "label": "Brillouin zone",
+  "short": "The cell of reciprocal space that contains every distinct wavevector label k of a crystal exactly once, centred on Gamma.",
+  "level": "intermediate",
+  "sources": [
+   "S-036"
+  ]
+ },
+ {
+  "id": "pulay-stress",
+  "label": "Pulay stress",
+  "short": "An artificial stress from an incomplete plane-wave basis when the cell volume changes; it shrinks as ENCUT is raised.",
+  "level": "pro",
+  "sources": [
+   "S-040"
+  ]
+ },
+ {
+  "id": "smearing",
+  "label": "Smearing",
+  "short": "Replacing the sharp step of occupations at the Fermi level by a smooth curve of width SIGMA, so that metals converge with fewer k-points.",
+  "level": "intermediate",
+  "sources": [
+   "S-015",
+   "S-019"
+  ]
+ },
+ {
+  "id": "kpoint",
+  "label": "k-point",
+  "short": "A sample point in the Brillouin zone. VASP averages over a mesh of them to compute energies and densities.",
+  "level": "intermediate",
+  "sources": [
+   "S-007"
+  ]
  }
 ]

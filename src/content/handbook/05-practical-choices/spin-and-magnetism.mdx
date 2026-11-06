@@ -1,0 +1,119 @@
+---
+id: spin-and-magnetism
+title: Spin polarization and MAGMOM
+module: 5
+order: 6
+summary: When to switch on spin, how to write MAGMOM in POSCAR order, and why the starting moments decide which magnetic state you find.
+concepts: [spin-polarization, magmom]
+requires: [spin-pauli, scf-loop]
+vaspTags: [ISPIN, MAGMOM, NUPDOWN, AMIX_MAG, BMIX_MAG, LSORBIT]
+sources: [S-019, S-041, S-042, S-047]
+status: draft
+updated: 2026-11-06
+---
+
+<Why>
+
+Iron, nickel, many oxides and most compounds with d or f electrons are magnetic. If you run them without spin you get the wrong structure and energies; if you start the spins badly, VASP happily converges to the wrong magnetic state. Two tags control this, and the commonest error in the author's experience is a MAGMOM line with the wrong count <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+Each electron has spin up or down (module 2). In a non-magnetic material the up and down densities are equal, so VASP can compute one density. In a magnetic material they differ, and the difference, summed over the cell, is the magnetic moment. <Tag name="ISPIN" label="ISPIN = 2" /> tells VASP to keep two densities <Cite id="S-019" />.
+
+The SCF loop needs a starting guess for the moments, and that is <Tag name="MAGMOM" />: **one number per atom, in POSCAR order**, in Bohr magnetons <Cite id="S-042" />. The guess matters because a magnetic material can have several self-consistent solutions: ferromagnetic (all moments parallel), antiferromagnetic (alternating), non-magnetic. The loop usually finds the one closest to where it started. So:
+
+- Start ferromagnetic: give every magnetic atom the same positive moment.
+- Start antiferromagnetic: give neighbours opposite signs, in a cell big enough to hold both.
+- Compare the energies of the different orders to find the ground state.
+
+Repeats are written with a star: `MAGMOM = 2*5.0 4*0.6` means two atoms with 5.0 and then four with 0.6. The lab builds the line for a small example and shows the count rule. The input builder checks the count for you (rule V001).
+
+<Level min="intermediate">
+
+Start with moments a bit larger than you expect (for example 5 for Fe, Mn or Co); the loop reduces them more easily than it grows them. Small values on non-magnetic atoms such as oxygen (0.6 in the handbook's example) are a convention to avoid symmetry forcing them to zero <Cite id="S-042" />. If you do not set MAGMOM, VASP starts every atom at 1.0 <Cite id="S-019" />.
+
+</Level>
+
+<Level min="pro">
+
+For spin-orbit coupling (`LSORBIT = .TRUE.`, the `vasp_ncl` executable) each atom needs three MAGMOM values, x y z <Cite id="S-042" />. `NUPDOWN` fixes the total moment, which helps to map out states that the free loop does not find. Difficult magnetic loops benefit from smaller `AMIX_MAG` and `BMIX_MAG` (module 4) <Cite id="S-042" />.
+
+</Level>
+
+</Intuition>
+
+<Lab id="spin-cartoon" title="Spin arrangements and MAGMOM" />
+
+<TheMath>
+
+With spin polarization the density splits into $n = n_\uparrow + n_\downarrow$ and the magnetization density $m = n_\uparrow - n_\downarrow$. The total moment per cell in Bohr magnetons is
+
+$$M = \int_\text{cell} \big(n_\uparrow - n_\downarrow\big)\, d\mathbf{r}$$
+
+and the exchange-correlation functional depends on both spin densities, which is what lets a moment lower the energy.
+
+</TheMath>
+
+<InVasp>
+
+<VaspFile
+  name="INCAR"
+  code={`ISPIN  = 2
+MAGMOM = 2*5.0 4*0.6   ! 2 Fe then 4 O, as in POSCAR`}
+  annotations={{ 1: 'two spin densities', 2: 'count must equal the number of atoms' }}
+/>
+
+After the run, `grep magnetization OSZICAR` gives the total moment and the end of OUTCAR lists moments per atom. See <Tag name="ISPIN" />, <Tag name="MAGMOM" /> and <Tag name="NUPDOWN" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                              | ...then                                         |
+| -------------------------------------- | ----------------------------------------------- |
+| Run a magnetic material with ISPIN = 1 | Wrong energies and structure; no moments at all |
+| Give MAGMOM the wrong count            | Moments land on the wrong atoms, or VASP stops  |
+| Start ferromagnetic only               | You may miss a lower antiferromagnetic state    |
+| Start all moments at zero              | The loop usually stays non-magnetic             |
+
+Why one value per atom: VASP assigns them by position in POSCAR. What happens if you only try one order: you report a state that may not be the ground state.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Counting species instead of atoms">
+
+`MAGMOM = 5.0 0.6` for a cell of 2 Fe and 4 O is wrong: it needs six values, `2*5.0 4*0.6`.
+
+</Callout>
+
+<Callout variant="mistake" title="Comparing magnetic orders in cells of different size without care">
+
+Compare energies per formula unit, and use the same ENCUT and an equivalent k-point density.
+
+</Callout>
+
+</Mistakes>
+
+<Check
+  ids={[
+    'q-spinpol-1',
+    'q-spinpol-2',
+    'q-spinpol-3',
+    'q-spinpol-4',
+    'q-magmom-1',
+    'q-magmom-2',
+    'q-magmom-3',
+    'q-magmom-4',
+  ]}
+/>
+
+<GoDeeper>
+
+- VASP wiki pages ISPIN, MAGMOM, NUPDOWN and LSORBIT <Cite id="S-019" />.
+- The author's VASP Workflow Handbook, magnetism section <Cite id="S-042" />.
+
+</GoDeeper>

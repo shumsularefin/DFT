@@ -40,6 +40,7 @@ export const FOOTER_LINKS = [
   { label: 'About', href: '/about/' },
   { label: 'References', href: '/references/' },
   { label: 'Glossary', href: '/glossary/' },
+  { label: 'VASP tags', href: '/tags/' },
   { label: 'Privacy', href: '/privacy/' },
   { label: 'Changelog', href: '/changelog/' },
 ] as const;

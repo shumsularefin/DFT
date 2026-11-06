@@ -1,0 +1,115 @@
+---
+id: functionals
+title: Choosing a functional
+module: 5
+order: 4
+summary: LDA, GGA, meta-GGA and hybrids. What each rung of the ladder adds, what it costs, and how to request it in VASP.
+concepts: [functionals, hybrid-functionals]
+requires: [exchange-correlation]
+vaspTags: [METAGGA, LHFCALC, HFSCREEN, LASPH, ALGO]
+sources: [S-013, S-019, S-025, S-026, S-027, S-042, S-046]
+status: draft
+updated: 2026-11-06
+---
+
+<Why>
+
+The exchange-correlation functional is the one approximation in your calculation (module 4). The choice decides how accurate lattice constants, band gaps and reaction energies will be, and how long you wait. Reviewers ask which functional you used and why; this page gives you the answer.
+
+</Why>
+
+<Intuition>
+
+Think of the functionals as a ladder, Jacob's ladder, from the simplest approximation at the bottom towards the exact functional at the top <Cite id="S-046" />. Each rung adds one more ingredient:
+
+1. **LDA** uses only the density at each point.
+2. **GGA** also uses how fast the density changes. PBE is the standard GGA for solids <Cite id="S-013" />.
+3. **Meta-GGA** adds the kinetic-energy density. SCAN and its smoother variant r2SCAN are the common ones <Cite id="S-026" />.
+4. **Hybrids** mix in a fraction of exact exchange from Hartree-Fock. HSE06 screens it at long range, which keeps solids affordable <Cite id="S-025" />.
+5. **The fifth rung** uses unoccupied orbitals too (RPA): research territory.
+
+Climbing costs time, and higher is not better for every property. Two rules of thumb from the author's handbook: PBE lattice constants are typically about 1 to 2 % too large and LDA ones about 1 to 2 % too small <Cite id="S-042" />. GGA band gaps are usually too small; hybrids and the modified Becke-Johnson potential (mBJ) do much better for gaps <Cite id="S-027" />.
+
+A sensible default: **PBE for structures and most energies**, then a higher rung for the property that needs it, checked against experiment or a second functional.
+
+<Level min="intermediate">
+
+Hybrid runs cost much more because exact exchange couples every pair of orbitals and k-points. Common savings: converge the structure with PBE, then run HSE06 on that structure; reduce the k-mesh used for exchange with NKRED; use `ALGO = Damped` or `All` <Cite id="S-042" />.
+
+</Level>
+
+<Level min="pro">
+
+mBJ (`METAGGA = MBJ`) is a potential, not an energy functional, so it gives good gaps but no consistent total energies or forces; use it for band structures on a fixed geometry only <Cite id="S-027" />. r2SCAN needs `LASPH = .TRUE.` and, for the mixer, `LMIXTAU = .TRUE.` is often recommended (VASP wiki METAGGA) <Cite id="S-019" />.
+
+</Level>
+
+</Intuition>
+
+<Lab id="functional-ladder" title="Jacob's ladder" />
+
+<TheMath>
+
+The hybrid HSE06 splits the Coulomb interaction into short- and long-range parts with a screening parameter $\mu$ and mixes exact exchange only at short range:
+
+$$E_\text{xc}^\text{HSE} = \tfrac{1}{4}E_\text{x}^\text{HF,SR}(\mu) + \tfrac{3}{4}E_\text{x}^\text{PBE,SR}(\mu) + E_\text{x}^\text{PBE,LR}(\mu) + E_\text{c}^\text{PBE}$$
+
+with $\mu = 0.2$ per Angstrom in the HSE06 parametrisation, which is the VASP tag `HFSCREEN = 0.2` <Cite id="S-025" /> <Cite id="S-019" />.
+
+</TheMath>
+
+<InVasp>
+
+<VaspFile
+  name="INCAR"
+  code={`! HSE06 on a structure relaxed with PBE
+LHFCALC  = .TRUE.
+HFSCREEN = 0.2
+ALGO     = Damped
+TIME     = 0.4`}
+  annotations={{ 2: 'switch on exact exchange', 3: '0.2 = HSE06; 0 would be PBE0', 4: 'robust for hybrids' }}
+/>
+
+For r2SCAN use `METAGGA = R2SCAN` with `LASPH = .TRUE.`. See <Tag name="LHFCALC" />, <Tag name="HFSCREEN" />, <Tag name="METAGGA" /> and <Tag name="LASPH" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you move from PBE to... | Typical gain                                  | Cost                |
+| -------------------------- | --------------------------------------------- | ------------------- |
+| LDA                        | Lattice constants err the other way           | Same                |
+| r2SCAN                     | Better structures and energies in many cases  | More                |
+| HSE06                      | Much better band gaps for many semiconductors | Much more           |
+| mBJ (potential only)       | Good gaps on a fixed structure                | Moderate; no forces |
+
+Why PBE first: robust and cheap, and its errors are well known. What happens if you report a property from the wrong rung: for example a PBE band gap quoted as a prediction will usually be too small.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Relaxing with a hybrid by default">
+
+Relax with PBE (or r2SCAN), then run the expensive functional on the result, unless the property needs hybrid geometries.
+
+</Callout>
+
+<Callout variant="mistake" title="Not stating the functional">
+
+Every number you report depends on it. Say which one, with which settings.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-func-1', 'q-func-2', 'q-func-3', 'q-func-4', 'q-hyb-1', 'q-hyb-2', 'q-hyb-3', 'q-hyb-4']} />
+
+<GoDeeper>
+
+- Perdew, Burke and Ernzerhof on PBE <Cite id="S-013" />; Sun, Ruzsinszky and Perdew on SCAN <Cite id="S-026" />.
+- Heyd, Scuseria and Ernzerhof on HSE <Cite id="S-025" />; Tran and Blaha on mBJ <Cite id="S-027" />.
+- Perdew and Schmidt, Jacob's ladder <Cite id="S-046" />.
+- VASP wiki pages LHFCALC, HFSCREEN and METAGGA <Cite id="S-019" />.
+
+</GoDeeper>

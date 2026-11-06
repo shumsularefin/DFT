@@ -44,6 +44,7 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-038 | open | author |
 | Q-039 | open | author |
 | Q-040 | open | author |
+| Q-041 | open | auditor |
 
 ## Q-001. Repository licence
 Which licence for the code and which for the written content and data (a common split: MIT for code, CC BY 4.0 for original text)? Affects `LICENSE`, the footer and the references page. Until decided: no LICENSE file; `THIRD_PARTY_NOTICES.md` lists upstream licences. **Update 2026-11-04:** the secrets `FIREBASE_SERVICE_ACCOUNT` and `FIREBASE_PROJECT_ID` are set (screenshot from the author) and the deploy workflow has succeeded on every merge to main since; the live site URL was not opened from the builder environment, so please confirm it shows the latest stage. **Owner: author.**
@@ -170,3 +171,6 @@ Statements in `src/content/handbook/03-many-electrons/` that rest on general kno
 ## Q-040. Contact route for deleting a sync account
 With sync on (M6.5), "Delete my synced data" removes the Firestore record, but the Firebase Authentication account (Google id and email) can only be deleted by the site owner in the Firebase console, and the site has no contact route. **Close:** the author adds a contact (email or form) to `/about/` and `/privacy/`, or decides that the Auth record may be deleted by the user from the client (`deleteUser`, which needs a recent sign-in) and a stage adds that button.
 
+
+## Q-041. Sign convention of Marzari-Vanderbilt cold smearing
+`src/lib/physics/smearing.ts` uses x = (epsilon - mu)/sigma and the broadened delta function exp(-(x + 1/sqrt2)^2)(2 + sqrt2 x)/sqrt(pi), which is the form in the work order, exp(-(u - 1/sqrt2)^2)(2 - sqrt2 u)/sqrt(pi), with u = (mu - epsilon)/sigma = -x. The u convention was taken from the widely used implementation in Quantum ESPRESSO (`w0gauss` with `ngauss = -1`), not read from S-016 (paywalled, network unavailable). The tests check the convention-independent properties (integral 1, zero first moment) and that occupations are never negative but exceed 1 below the Fermi level, the property cold smearing was designed for. **Close:** read S-016 and confirm that the paper's variable is (mu - epsilon)/sigma; if it is the other sign, mirror the function and the "never negative" test.

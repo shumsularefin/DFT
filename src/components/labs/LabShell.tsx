@@ -99,7 +99,7 @@ export default function LabShell({
         <strong>Text description. </strong>
         {description}
       </p>
-      <aside className="lab-notice" aria-label="What to notice">
+      <aside className="lab-notice" aria-label={`What to notice: ${title}`}>
         <p className="lab-notice-title">What to notice</p>
         <p>{notice}</p>
       </aside>

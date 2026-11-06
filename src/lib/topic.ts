@@ -59,6 +59,15 @@ export const REGISTERED_LABS = [
   'exponential-wall',
   'density-as-a-map',
   'scf-loop',
+  'encut-sphere',
+  'kpoint-mesh',
+  'brillouin-zone',
+  'unit-cell',
+  'smearing',
+  'dft-plus-u',
+  'paw-picture',
+  'functional-ladder',
+  'spin-cartoon',
 ] as const;
 
 /** Page class for a topic: "island" if its body embeds a registered lab, else "content". */

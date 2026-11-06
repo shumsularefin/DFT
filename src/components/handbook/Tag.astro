@@ -1,0 +1,16 @@
+---
+// Inline link from a handbook page to the tag card of one INCAR tag on /tags/. Fails the build for an unknown tag.
+import tagsFile from '../../data/vasp-tags.json';
+interface Props {
+  name: string;
+  /** Text to show instead of the tag name (for example "ISMEAR = 0"). */
+  label?: string;
+}
+const { name, label } = Astro.props;
+if (!tagsFile.tags.some((t) => t.name === name))
+  throw new Error(`<Tag name="${name}">: not in vasp-tags.json`);
+---
+
+<a class="tag-link" href={`/tags/#${name}`}>
+  <code>{label ?? name}</code>
+</a>
