@@ -34,7 +34,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 | M5.6 | k-path tool page and exports | done | M5.3, M5.4, M5.5, M3.2 | M | claude/vigilant-newton-ws593b | | 2026-11-05 | [report](reports/M5.6.md), [work order](milestones/M5-brillouin-zone.md) |
 | M6.1 | Concept graph and question bank | done | M2.4 | M | claude/great-dijkstra-oj0kbx |  | 2026-11-06 | [report](reports/M6.1.md), [work order](milestones/M6-adaptive-engine.md) |
 | M6.2 | Mastery and spacing models | done | M6.1 | M | claude/great-dijkstra-oj0kbx |  | 2026-11-06 | [report](reports/M6.2.md), [work order](milestones/M6-adaptive-engine.md) |
-| M6.3 | Thompson-sampling policy | todo | M6.2 | M | | | | [work order](milestones/M6-adaptive-engine.md) |
+| M6.3 | Thompson-sampling policy | done | M6.2 | M | claude/great-dijkstra-oj0kbx |  | 2026-11-06 | [report](reports/M6.3.md), [work order](milestones/M6-adaptive-engine.md) |
 | M6.4 | Practice UI, quizzes, mastery map and gentle gamification | todo | M6.3, M1.3 | L | | | | [work order](milestones/M6-adaptive-engine.md) |
 | M6.5 | Optional progress sync with Firebase (Spark) | todo | M6.4, M0.2 | M | | | | [work order](milestones/M6-adaptive-engine.md) |
 | M7.1 | Module 4: Hohenberg-Kohn, Kohn-Sham and the SCF loop (with SCF lab) | todo | M6.1, M2.4 | L | | | | [work order](milestones/M7-remaining-modules.md) |
@@ -64,6 +64,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 
 Newest first. One line per session: date, stage, outcome, branch.
 
+- 2026-11-06, M6.3: Thompson-sampling policy with guard rails, seeded samplers, simulator (policy 0.55 to 0.61 vs random 0.25 to 0.30). Branch `claude/great-dijkstra-oj0kbx`.
 - 2026-11-06, M6.2: BKT, Rasch/Elo, SM-2, learner state with merge; all worked examples exact. Branch `claude/great-dijkstra-oj0kbx`.
 - 2026-11-06, M6.1: concept graph (71 concepts), question schema and grading, lint-questions, module 1 retag (Q-025 closed), second hints for 72 questions. Branch `claude/great-dijkstra-oj0kbx`.
 - 2026-10-29, M2.2: Module 1 (4 topics, 17 questions, 14 glossary terms), cost-of-exactness lab, scaling.ts; Lighthouse mobile 100/100/100; 145 e2e pass. Branch `claude/vigilant-newton-ws593b`

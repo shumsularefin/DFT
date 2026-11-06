@@ -28,6 +28,8 @@ export interface QuestionState extends Sm2 {
   /** Epoch milliseconds when the item is due for review. */
   due: number;
   lastReviewed: number;
+  /** The policy arm that first showed this question (for the delayed retention bonus, M6.3). */
+  introducedBy?: string;
 }
 
 export interface Arm {
@@ -85,6 +87,8 @@ export interface AnswerInput {
   hints: number;
   gaveUp?: boolean;
   now: number;
+  /** The policy arm that chose this question, if any. */
+  arm?: string;
 }
 
 /** Applies one answer: BKT and Elo per concept, Elo item difficulty and SM-2 for the question. Pure. */
@@ -196,6 +200,7 @@ export function parseState(raw: unknown): LearnerState | null {
   }
   for (const q of Object.values(questions))
     if (!isObj(q) || ![q.n, q.interval, q.ef, q.b, q.due, q.lastReviewed].every(isNum)) return null;
+    else if (q.introducedBy !== undefined && typeof q.introducedBy !== 'string') return null;
   for (const a of Object.values(arms)) if (!isObj(a) || !isNum(a.alpha) || !isNum(a.beta)) return null;
   if (!activeDays.every((d) => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d))) return null;
   if (typeof settings.hideStreak !== 'boolean') return null;

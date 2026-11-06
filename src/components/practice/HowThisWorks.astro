@@ -1,0 +1,57 @@
+---
+// "How this works" for the practice engine (M6.3 text, placed by M6.4). Beginner level, honest about
+// being a set of heuristics. Sources: S-037 (knowledge tracing), S-038 (SM-2), S-039 (Thompson sampling).
+import Badge from '../ui/Badge.astro';
+interface Props {
+  headingLevel?: 2 | 3;
+}
+const { headingLevel = 2 } = Astro.props;
+const H = `h${headingLevel}` as 'h2' | 'h3';
+---
+
+<section class="how-this-works" aria-labelledby="how-this-works">
+  <H id="how-this-works">
+    How this works <Badge variant="heuristic" />
+  </H>
+  <p>
+    The practice page chooses your next question with three simple models. They are rules of thumb with fixed
+    settings, not a trained artificial intelligence, and they can be wrong about you. You can always pick a
+    topic yourself instead.
+  </p>
+  <ol>
+    <li>
+      <strong>How well you know each idea.</strong> Every concept keeps a number between 0 and 1: the chance
+      that you know it. A right answer raises it, a wrong one lowers it, and a little is added each time you
+      practise because practice teaches. This is called knowledge tracing (
+      <a href="/references/#S-037">Corbett and Anderson, 1994</a>). We call a concept mastered at 0.95.
+    </li>
+    <li>
+      <strong>When to see a question again.</strong> After a good answer the next review is 1 day later, then
+      6 days, then longer and longer gaps. A wrong answer brings the question back tomorrow. This is the SM-2
+      spacing rule (<a href="/references/#S-038">Wozniak, 1990</a>), used by many flashcard apps.
+    </li>
+    <li>
+      <strong>What kind of item to give you.</strong> There are a few kinds: a review that is due, an easier
+      new question, a question at about your level, a harder one, a hint, or a topic to read. The page keeps a
+      running score of how well each kind has helped you and tries the promising ones more often, while still
+      trying the others now and then. This is Thompson sampling (
+      <a href="/references/#S-039">Thompson, 1933</a>).
+    </li>
+  </ol>
+  <p>Some rules are fixed and never learned:</p>
+  <ul>
+    <li>Reviews that are more than 3 days overdue come first.</li>
+    <li>
+      You are not given questions on an idea whose foundations all look shaky, unless nothing else is left.
+    </li>
+    <li>After 3 wrong answers in a row you are offered a hint or an easier question.</li>
+    <li>
+      There are no timers. The time you take is used only to tune the choice of item; it is never shown or
+      scored.
+    </li>
+  </ul>
+  <p>
+    Everything stays in this browser on this device. Nothing is sent anywhere unless you switch on progress
+    sync and sign in.
+  </p>
+</section>
