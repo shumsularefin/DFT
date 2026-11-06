@@ -1,0 +1,813 @@
+[
+  {
+    "id": "reading-a-topic-page",
+    "label": "Reading a topic page",
+    "module": 1,
+    "summary": "How each page is laid out and how to choose your level.",
+    "prerequisites": [],
+    "level": "beginner",
+    "status": "published"
+  },
+  {
+    "id": "simulation",
+    "label": "Simulation of a material",
+    "module": 1,
+    "summary": "A model of a material, a set of rules and a list of questions answered on a computer.",
+    "prerequisites": [],
+    "level": "beginner",
+    "status": "published"
+  },
+  {
+    "id": "materials-from-atoms",
+    "label": "Materials from atoms",
+    "module": 1,
+    "summary": "A material is a crowd of nuclei with electrons that decide bonding, conduction and colour.",
+    "prerequisites": [],
+    "level": "beginner",
+    "status": "published"
+  },
+  {
+    "id": "quantum-mechanics",
+    "label": "Quantum mechanics for electrons",
+    "module": 1,
+    "summary": "The rules that describe electrons, which are too light for everyday ball-and-spring physics.",
+    "prerequisites": [
+      "materials-from-atoms"
+    ],
+    "level": "beginner",
+    "status": "published"
+  },
+  {
+    "id": "method-ladder",
+    "label": "The ladder of methods",
+    "module": 1,
+    "summary": "Simulation methods trade accuracy against cost, from force fields to exact solutions.",
+    "prerequisites": [
+      "simulation"
+    ],
+    "level": "beginner",
+    "status": "published"
+  },
+  {
+    "id": "scaling",
+    "label": "Cost scaling",
+    "module": 1,
+    "summary": "How much more work a method needs when the system grows.",
+    "prerequisites": [
+      "simulation"
+    ],
+    "level": "beginner",
+    "status": "published"
+  },
+  {
+    "id": "dft-scope",
+    "label": "What DFT can and cannot tell you",
+    "module": 1,
+    "summary": "The questions DFT answers well, with care, or not at all.",
+    "prerequisites": [
+      "method-ladder"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "ground-state",
+    "label": "The ground state",
+    "module": 1,
+    "summary": "The lowest-energy arrangement of the electrons for a given set of atoms.",
+    "prerequisites": [
+      "method-ladder"
+    ],
+    "level": "beginner",
+    "status": "published"
+  },
+  {
+    "id": "roadmap",
+    "label": "Roadmap to a first project",
+    "module": 1,
+    "summary": "The order in which to learn the ideas, the settings and the checks.",
+    "prerequisites": [
+      "dft-scope"
+    ],
+    "level": "beginner",
+    "status": "published"
+  },
+  {
+    "id": "vasp-workflow",
+    "label": "The VASP workflow",
+    "module": 1,
+    "summary": "Four input files, one command, and output files to read and check.",
+    "prerequisites": [
+      "dft-scope"
+    ],
+    "level": "beginner",
+    "status": "published"
+  },
+  {
+    "id": "wave-nature",
+    "label": "Wave nature of electrons",
+    "module": 2,
+    "summary": "Electrons show interference, so they have a wavelength that depends on momentum.",
+    "prerequisites": [],
+    "level": "beginner",
+    "status": "published"
+  },
+  {
+    "id": "wavefunction-meaning",
+    "label": "Meaning of the wavefunction",
+    "module": 2,
+    "summary": "The square of the wavefunction gives the probability of finding the electron near a point.",
+    "prerequisites": [
+      "wave-nature"
+    ],
+    "level": "beginner",
+    "status": "published"
+  },
+  {
+    "id": "quantization-box",
+    "label": "Quantization in a box",
+    "module": 2,
+    "summary": "Only waves that fit between the walls are allowed, so energies come in steps.",
+    "prerequisites": [
+      "wavefunction-meaning"
+    ],
+    "level": "beginner",
+    "status": "published"
+  },
+  {
+    "id": "orbital-shapes",
+    "label": "Orbital shapes",
+    "module": 2,
+    "summary": "The s, p, d and f shapes and the quantum numbers that label them.",
+    "prerequisites": [
+      "quantization-box"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "spin-pauli",
+    "label": "Spin and the Pauli principle",
+    "module": 2,
+    "summary": "Each orbital holds two electrons of opposite spin, and no two share a state.",
+    "prerequisites": [
+      "orbital-shapes"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "levels-to-bands",
+    "label": "From levels to bands",
+    "module": 2,
+    "summary": "Many atoms turn single levels into bands, separated by gaps.",
+    "prerequisites": [
+      "spin-pauli"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "many-electron-problem",
+    "label": "The many-electron problem",
+    "module": 3,
+    "summary": "Electrons repel each other, so their motions are tied together.",
+    "prerequisites": [
+      "levels-to-bands"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "exponential-wall",
+    "label": "The exponential wall",
+    "module": 3,
+    "summary": "The exact problem multiplies in size with every added electron.",
+    "prerequisites": [
+      "many-electron-problem"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "electron-density-meaning",
+    "label": "Electron density",
+    "module": 3,
+    "summary": "A map of how much electron charge sits at each point, with three variables only.",
+    "prerequisites": [
+      "exponential-wall"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "density-to-potential",
+    "label": "From density to potential",
+    "module": 3,
+    "summary": "The ground-state density fixes the external potential, up to a constant.",
+    "prerequisites": [
+      "electron-density-meaning"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "approximations-needed",
+    "label": "Why approximations are needed",
+    "module": 3,
+    "summary": "The exact functional is unknown, so one term must be approximated.",
+    "prerequisites": [
+      "density-to-potential"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "hohenberg-kohn-theorems",
+    "label": "Hohenberg-Kohn theorems",
+    "module": 4,
+    "summary": "The two theorems that make the density a sufficient variable.",
+    "prerequisites": [
+      "approximations-needed"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "variational-principle",
+    "label": "Variational principle",
+    "module": 4,
+    "summary": "The true ground-state density gives the lowest energy among all trial densities.",
+    "prerequisites": [
+      "hohenberg-kohn-theorems"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "kohn-sham-idea",
+    "label": "The Kohn-Sham idea",
+    "module": 4,
+    "summary": "Replace the interacting electrons by non-interacting ones that share the same density.",
+    "prerequisites": [
+      "variational-principle"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "kohn-sham-equations",
+    "label": "Kohn-Sham equations",
+    "module": 4,
+    "summary": "One-electron equations whose effective potential depends on the density.",
+    "prerequisites": [
+      "kohn-sham-idea"
+    ],
+    "level": "pro",
+    "status": "planned"
+  },
+  {
+    "id": "exchange-correlation-term",
+    "label": "Exchange-correlation term",
+    "module": 4,
+    "summary": "The one energy term that is not known exactly and must be approximated.",
+    "prerequisites": [
+      "kohn-sham-idea"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "scf-loop",
+    "label": "The self-consistent loop",
+    "module": 4,
+    "summary": "Guess a density, solve, update, and repeat until input and output agree.",
+    "prerequisites": [
+      "kohn-sham-equations"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "scf-mixing",
+    "label": "Density mixing",
+    "module": 4,
+    "summary": "How the new density is blended with the old one to keep the loop stable.",
+    "prerequisites": [
+      "scf-loop"
+    ],
+    "level": "pro",
+    "status": "planned"
+  },
+  {
+    "id": "kohn-sham-eigenvalues",
+    "label": "Kohn-Sham eigenvalues",
+    "module": 4,
+    "summary": "The energies of the auxiliary system and what they do and do not mean.",
+    "prerequisites": [
+      "kohn-sham-equations"
+    ],
+    "level": "pro",
+    "status": "planned"
+  },
+  {
+    "id": "plane-waves",
+    "label": "Plane waves as a basis",
+    "module": 5,
+    "summary": "Wavefunctions in a crystal are written as a sum of waves with set wavelengths.",
+    "prerequisites": [
+      "kohn-sham-equations"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "bloch-theorem",
+    "label": "Bloch theorem",
+    "module": 5,
+    "summary": "In a repeating crystal, each wavefunction is a plane wave times a repeating part.",
+    "prerequisites": [
+      "plane-waves"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "reciprocal-space",
+    "label": "Reciprocal space",
+    "module": 5,
+    "summary": "The space of wave vectors, with its own repeating cell.",
+    "prerequisites": [
+      "bloch-theorem"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "cutoff-energy",
+    "label": "Plane-wave cutoff",
+    "module": 5,
+    "summary": "The largest wave energy kept in the basis, which controls accuracy and cost.",
+    "prerequisites": [
+      "plane-waves"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "brillouin-zone",
+    "label": "Brillouin zone",
+    "module": 5,
+    "summary": "The primitive cell of reciprocal space.",
+    "prerequisites": [
+      "reciprocal-space"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "k-points",
+    "label": "k-point sampling",
+    "module": 5,
+    "summary": "Integrals over the Brillouin zone are replaced by a finite set of points.",
+    "prerequisites": [
+      "brillouin-zone"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "kpoint-mesh",
+    "label": "k-point meshes",
+    "module": 5,
+    "summary": "Regular grids of k-points, and when a Gamma-centred grid is the safer choice.",
+    "prerequisites": [
+      "k-points"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "pseudopotentials",
+    "label": "Pseudopotentials",
+    "module": 5,
+    "summary": "A smooth stand-in for the nucleus and core electrons.",
+    "prerequisites": [
+      "plane-waves"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "paw-method",
+    "label": "The PAW method",
+    "module": 5,
+    "summary": "Projector augmented waves recover the true wavefunction near the core.",
+    "prerequisites": [
+      "pseudopotentials"
+    ],
+    "level": "pro",
+    "status": "planned"
+  },
+  {
+    "id": "functionals",
+    "label": "Choosing a functional",
+    "module": 5,
+    "summary": "The ladder of exchange-correlation approximations and their typical strengths.",
+    "prerequisites": [
+      "exchange-correlation-term"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "hybrid-functionals",
+    "label": "Hybrid functionals",
+    "module": 5,
+    "summary": "Functionals that mix in part of the Hartree-Fock exchange, at higher cost.",
+    "prerequisites": [
+      "functionals"
+    ],
+    "level": "pro",
+    "status": "planned"
+  },
+  {
+    "id": "van-der-waals",
+    "label": "van der Waals corrections",
+    "module": 5,
+    "summary": "Corrections for the weak attraction that simple functionals miss.",
+    "prerequisites": [
+      "functionals"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "smearing",
+    "label": "Smearing",
+    "module": 5,
+    "summary": "Fractional occupations near the Fermi level that help metals converge.",
+    "prerequisites": [
+      "k-points"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "spin-polarization",
+    "label": "Spin polarization",
+    "module": 5,
+    "summary": "Letting spin-up and spin-down electrons differ, needed for magnetic materials.",
+    "prerequisites": [
+      "spin-pauli",
+      "scf-loop"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "dft-plus-u",
+    "label": "DFT+U",
+    "module": 5,
+    "summary": "An on-site correction for strongly interacting localized electrons.",
+    "prerequisites": [
+      "functionals",
+      "spin-polarization"
+    ],
+    "level": "pro",
+    "status": "planned"
+  },
+  {
+    "id": "lattice-vectors",
+    "label": "Lattice and structure",
+    "module": 6,
+    "summary": "A crystal is a repeating cell described by three vectors and the atom positions in it.",
+    "prerequisites": [
+      "materials-from-atoms"
+    ],
+    "level": "beginner",
+    "status": "planned"
+  },
+  {
+    "id": "poscar-file",
+    "label": "The POSCAR file",
+    "module": 6,
+    "summary": "The structure input: cell, species and atomic positions.",
+    "prerequisites": [
+      "lattice-vectors",
+      "vasp-workflow"
+    ],
+    "level": "beginner",
+    "status": "planned"
+  },
+  {
+    "id": "kpoints-file",
+    "label": "The KPOINTS file",
+    "module": 6,
+    "summary": "The input that sets how the Brillouin zone is sampled.",
+    "prerequisites": [
+      "k-points",
+      "vasp-workflow"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "incar-file",
+    "label": "The INCAR file",
+    "module": 6,
+    "summary": "The input of tags that control what is calculated and how carefully.",
+    "prerequisites": [
+      "vasp-workflow"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "potcar-file",
+    "label": "The POTCAR file",
+    "module": 6,
+    "summary": "The licensed pseudopotential input; this site never shows its contents.",
+    "prerequisites": [
+      "pseudopotentials",
+      "vasp-workflow"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "job-scripts",
+    "label": "Job scripts",
+    "module": 7,
+    "summary": "The batch script that asks a cluster to run the calculation.",
+    "prerequisites": [
+      "vasp-workflow"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "output-files",
+    "label": "OUTCAR and OSZICAR",
+    "module": 7,
+    "summary": "The output files, and which lines to read first.",
+    "prerequisites": [
+      "job-scripts",
+      "scf-loop"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "restart-files",
+    "label": "Restarting from earlier results",
+    "module": 7,
+    "summary": "Reusing a wavefunction or charge density from a previous run.",
+    "prerequisites": [
+      "output-files"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "convergence-testing",
+    "label": "Convergence testing",
+    "module": 8,
+    "summary": "Raising a setting until the quantity you care about stops changing.",
+    "prerequisites": [
+      "cutoff-energy",
+      "k-points",
+      "output-files"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "cutoff-convergence",
+    "label": "Cutoff convergence",
+    "module": 8,
+    "summary": "Testing the plane-wave cutoff against the quantity of interest.",
+    "prerequisites": [
+      "convergence-testing"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "kpoint-convergence",
+    "label": "k-point convergence",
+    "module": 8,
+    "summary": "Testing the k-point mesh against the quantity of interest.",
+    "prerequisites": [
+      "convergence-testing"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "common-errors",
+    "label": "Common errors and fixes",
+    "module": 8,
+    "summary": "Typical failures, what they mean, and how to correct them.",
+    "prerequisites": [
+      "output-files"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "total-energy",
+    "label": "Total energy",
+    "module": 9,
+    "summary": "The energy of the electrons and nuclei, useful for comparing structures.",
+    "prerequisites": [
+      "output-files"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "forces-and-relaxation",
+    "label": "Forces and relaxation",
+    "module": 9,
+    "summary": "Moving atoms along the forces until the structure is stable.",
+    "prerequisites": [
+      "total-energy"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "density-of-states",
+    "label": "Density of states",
+    "module": 9,
+    "summary": "How many electron states sit at each energy.",
+    "prerequisites": [
+      "levels-to-bands",
+      "total-energy"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "band-structure",
+    "label": "Band structure",
+    "module": 9,
+    "summary": "Energies of the states along a path through the Brillouin zone.",
+    "prerequisites": [
+      "density-of-states",
+      "brillouin-zone"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "charge-density-analysis",
+    "label": "Charge density analysis",
+    "module": 9,
+    "summary": "Looking at where the electrons sit in a calculated material.",
+    "prerequisites": [
+      "electron-density-meaning",
+      "total-energy"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "elastic-constants",
+    "label": "Elastic constants",
+    "module": 9,
+    "summary": "How the energy changes when the cell is deformed.",
+    "prerequisites": [
+      "forces-and-relaxation"
+    ],
+    "level": "pro",
+    "status": "planned"
+  },
+  {
+    "id": "optical-properties",
+    "label": "Optical properties",
+    "module": 9,
+    "summary": "Estimating absorption from the computed states, with known limits.",
+    "prerequisites": [
+      "band-structure"
+    ],
+    "level": "pro",
+    "status": "planned"
+  },
+  {
+    "id": "perovskite-structure",
+    "label": "The perovskite structure",
+    "module": 10,
+    "summary": "The ABX3 family of crystals built from corner-sharing octahedra.",
+    "prerequisites": [
+      "lattice-vectors"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "tolerance-factor",
+    "label": "Tolerance factors",
+    "module": 10,
+    "summary": "Heuristic ratios of ionic radii that hint at whether a perovskite can form.",
+    "prerequisites": [
+      "perovskite-structure"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "worked-example-workflow",
+    "label": "A worked perovskite workflow",
+    "module": 10,
+    "summary": "A full relaxation, SCF and band-structure run on an example oxide.",
+    "prerequisites": [
+      "tolerance-factor",
+      "convergence-testing",
+      "band-structure"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "material-builder",
+    "label": "Material Builder",
+    "module": 11,
+    "summary": "Building and editing structures before a calculation.",
+    "prerequisites": [
+      "poscar-file",
+      "perovskite-structure"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "screening",
+    "label": "Screening studies",
+    "module": 11,
+    "summary": "Running many related calculations and comparing results with care.",
+    "prerequisites": [
+      "material-builder",
+      "worked-example-workflow"
+    ],
+    "level": "pro",
+    "status": "planned"
+  },
+  {
+    "id": "born-oppenheimer-approximation",
+    "label": "Born-Oppenheimer approximation",
+    "module": 3,
+    "summary": "Treat the heavy nuclei as fixed while the light electrons are solved for.",
+    "prerequisites": [
+      "many-electron-problem"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "fermi-level",
+    "label": "Fermi level",
+    "module": 5,
+    "summary": "The energy up to which states are filled at zero temperature.",
+    "prerequisites": [
+      "levels-to-bands",
+      "kohn-sham-idea"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "space-group-symmetry",
+    "label": "Symmetry and space groups",
+    "module": 6,
+    "summary": "The symmetry operations of a crystal, which reduce work and fix allowed paths.",
+    "prerequisites": [
+      "lattice-vectors"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "supercells",
+    "label": "Supercells",
+    "module": 6,
+    "summary": "Repeated copies of a cell, used to describe defects and larger patterns.",
+    "prerequisites": [
+      "lattice-vectors"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  },
+  {
+    "id": "ionic-radii",
+    "label": "Ionic radii",
+    "module": 10,
+    "summary": "Tabulated sizes of ions that depend on charge and coordination.",
+    "prerequisites": [
+      "perovskite-structure"
+    ],
+    "level": "intermediate",
+    "status": "planned"
+  }
+]

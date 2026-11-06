@@ -18,7 +18,7 @@ interface Q {
   sources: string[];
 }
 const MODULES = [
-  { name: 'module 1', perConcept: false, dir: 'src/content/handbook/01-why-dft', questions: q1 as Q[] },
+  { name: 'module 1', perConcept: true, dir: 'src/content/handbook/01-why-dft', questions: q1 as Q[] },
   { name: 'module 3', perConcept: true, dir: 'src/content/handbook/03-many-electrons', questions: q3 as Q[] },
   { name: 'module 2', perConcept: true, dir: 'src/content/handbook/02-quantum-basics', questions: q2 as Q[] },
 ];
@@ -30,7 +30,7 @@ describe.each(MODULES)('$name questions', ({ dir, questions, perConcept }) => {
   });
   it('have exactly one correct option and a "why" on every option (numeric ones have an answer)', () => {
     for (const x of questions) {
-      expect(x.hints.length).toBeGreaterThan(0);
+      expect(x.hints.length, x.id).toBeGreaterThanOrEqual(2);
       if (x.type === 'numeric') {
         expect(typeof x.answer, x.id).toBe('number');
         expect(x.tolerance, x.id).toBeGreaterThan(0);
@@ -40,7 +40,7 @@ describe.each(MODULES)('$name questions', ({ dir, questions, perConcept }) => {
       for (const o of x.options!) expect(o.why.length).toBeGreaterThan(10);
     }
   });
-  it('have at least 4 questions per concept (module 1 is a known gap, Q-025)', () => {
+  it('have at least 4 questions per concept ', () => {
     if (!perConcept) return;
     const count = new Map<string, number>();
     for (const x of questions) for (const c of x.concepts) count.set(c, (count.get(c) ?? 0) + 1);
@@ -48,7 +48,8 @@ describe.each(MODULES)('$name questions', ({ dir, questions, perConcept }) => {
   });
   it('cite sources that exist in the register', () => {
     for (const x of questions) {
-      expect(x.sources.length).toBeGreaterThan(0);
+      // Page-structure questions about the site itself carry no science, so no source.
+      if (!x.concepts.includes('reading-a-topic-page')) expect(x.sources.length, x.id).toBeGreaterThan(0);
       for (const s of x.sources) expect(sourceIds.has(s)).toBe(true);
     }
   });
@@ -68,6 +69,10 @@ describe.each(MODULES)('$name questions', ({ dir, questions, perConcept }) => {
         used.add(id);
       }
     }
-    expect(used.size).toBe(ids.size);
+    // The bank may hold more questions than the page quizzes show (M6.1): every concept still has one on its page.
+    const shown = new Set<string>();
+    for (const x of questions) if (used.has(x.id)) for (const c of x.concepts) shown.add(c);
+    const all = new Set(questions.flatMap((x) => x.concepts));
+    for (const c of all) if (c !== 'reading-a-topic-page') expect(shown.has(c), c).toBe(true);
   });
 });

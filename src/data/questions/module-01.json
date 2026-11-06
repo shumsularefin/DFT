@@ -24,7 +24,8 @@
       }
     ],
     "hints": [
-      "Think about the cost of making and testing each candidate."
+      "Think about the cost of making and testing each candidate.",
+      "A simulation is a cheap first filter. Ask which choice saves lab time without claiming to replace the lab."
     ],
     "difficulty": -2,
     "level": "beginner",
@@ -57,7 +58,8 @@
       }
     ],
     "hints": [
-      "Which part moves and rearranges when bonds form?"
+      "Which part moves and rearranges when bonds form?",
+      "Bonding and conduction come from the lighter particles around each nucleus, not from the nucleus itself."
     ],
     "difficulty": -2,
     "level": "beginner",
@@ -91,7 +93,8 @@
       }
     ],
     "hints": [
-      "Which particle decides the material properties, and what rules does it follow?"
+      "Which particle decides the material properties, and what rules does it follow?",
+      "Electrons are very small and light. Everyday rules for balls and springs fail for them, which is why a different theory is needed."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -124,7 +127,8 @@
       }
     ],
     "hints": [
-      "Where did the number come from?"
+      "Where did the number come from?",
+      "A computed number belongs to the model you built. It is a prediction until someone compares it with a measurement."
     ],
     "difficulty": -0.5,
     "level": "beginner",
@@ -157,7 +161,8 @@
       }
     ],
     "hints": [
-      "Cost goes as N to the p. Compare (2N) to the p with N to the p."
+      "Cost goes as N to the p. Compare (2N) to the p with N to the p.",
+      "Doubling gives (2N)^p / N^p = 2^p. Put p = 3 into that."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -191,7 +196,8 @@
       }
     ],
     "hints": [
-      "Which rung has no electrons, only atoms pushing on atoms?"
+      "Which rung has no electrons, only atoms pushing on atoms?",
+      "Names on the ladder: force fields, Hartree-Fock, coupled cluster, DFT. Only one of them skips electrons altogether."
     ],
     "difficulty": -2,
     "level": "beginner",
@@ -224,7 +230,8 @@
       }
     ],
     "hints": [
-      "What does the slope of a line on a log-log chart measure?"
+      "What does the slope of a line on a log-log chart measure?",
+      "A straight line on log-log axes means a power law. A larger exponent gives a steeper line."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -257,7 +264,8 @@
       }
     ],
     "hints": [
-      "Which part of the energy has no known exact form?"
+      "Which part of the energy has no known exact form?",
+      "DFT is exact in principle. Ask which single term in its energy has no exact formula."
     ],
     "difficulty": 0.5,
     "level": "intermediate",
@@ -291,7 +299,8 @@
       }
     ],
     "hints": [
-      "Read the \"What to notice\" box in the lab."
+      "Read the \"What to notice\" box in the lab.",
+      "The lab sets every prefactor equal, so it shows relative cost. It says nothing about absolute run time at small sizes."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -324,7 +333,8 @@
       }
     ],
     "hints": [
-      "Which state has the lowest energy?"
+      "Which state has the lowest energy?",
+      "DFT is built on the ground-state density, so it speaks about the lowest-energy arrangement of the electrons."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -357,7 +367,8 @@
       }
     ],
     "hints": [
-      "Where does the approximation sit in DFT?"
+      "Where does the approximation sit in DFT?",
+      "Common approximate functionals are known to underestimate gaps. The first move is to check the functional, not to blame the software."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -391,7 +402,8 @@
       }
     ],
     "hints": [
-      "Does the question involve states above the ground state?"
+      "Does the question involve states above the ground state?",
+      "Absorbing light lifts an electron out of the ground state. Ground-state theory does not describe that directly."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -424,7 +436,8 @@
       }
     ],
     "hints": [
-      "Where does the exchange-correlation approximation enter?"
+      "Where does the exchange-correlation approximation enter?",
+      "The band gap depends on which exchange-correlation approximation was used, so the number is incomplete without it."
     ],
     "difficulty": -0.5,
     "level": "beginner",
@@ -457,7 +470,8 @@
       }
     ],
     "hints": [
-      "Think about what each stage lets you understand next."
+      "Think about what each stage lets you understand next.",
+      "Each stage prepares the next: understand the idea, then make practical choices, then check results."
     ],
     "difficulty": -1.5,
     "level": "beginner",
@@ -490,7 +504,8 @@
       }
     ],
     "hints": [
-      "Four inputs describe structure, sampling, settings and the atoms."
+      "Four inputs describe structure, sampling, settings and the atoms.",
+      "One file holds the structure, one the k-point sampling, one the settings, and one the description of each atom type."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -523,7 +538,8 @@
       }
     ],
     "hints": [
-      "Where does the computation on this site happen?"
+      "Where does the computation on this site happen?",
+      "The site is a learning and tools site that runs in the browser. VASP itself is a licensed program you run elsewhere."
     ],
     "difficulty": -1.5,
     "level": "beginner",
@@ -556,11 +572,776 @@
       }
     ],
     "hints": [
-      "What did the page say about the effort involved?"
+      "What did the page say about the effort involved?",
+      "Early failures are expected. The page recommends reading messages and changing one thing at a time."
     ],
     "difficulty": -1,
     "level": "beginner",
     "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-how-to-use-1",
+    "concepts": [
+      "reading-a-topic-page"
+    ],
+    "type": "single",
+    "prompt": "What does a word with a dotted underline in a topic page mean?",
+    "options": [
+      {
+        "text": "It is a defined term: hover, focus or click to read its short definition",
+        "correct": true,
+        "why": "The definition opens in place, so you do not lose your spot on the page."
+      },
+      {
+        "text": "It is a link that takes you away to another site",
+        "correct": false,
+        "why": "Tempting because underlines usually mean links, but a dotted underline opens the definition on the same page."
+      },
+      {
+        "text": "It is a spelling mistake in the text",
+        "correct": false,
+        "why": "Tempting because underlines mark errors in some editors, but here they mark defined terms."
+      }
+    ],
+    "hints": [
+      "Think of the first time a new word appears.",
+      "The definition is short and appears without leaving the page."
+    ],
+    "difficulty": -2,
+    "level": "beginner",
+    "sources": []
+  },
+  {
+    "id": "q-how-to-use-2",
+    "concepts": [
+      "reading-a-topic-page"
+    ],
+    "type": "single",
+    "prompt": "Where do the VASP settings for a topic appear?",
+    "options": [
+      {
+        "text": "In the \"In VASP\" part, in a copyable block",
+        "correct": true,
+        "why": "Each topic ends its practical part with the settings that matter, in a block you can copy."
+      },
+      {
+        "text": "Only in the glossary",
+        "correct": false,
+        "why": "Tempting because the glossary defines terms, but settings belong to the topic page where they are used."
+      },
+      {
+        "text": "Only on the references page",
+        "correct": false,
+        "why": "Tempting because references name the VASP wiki, but the settings themselves sit in the topic."
+      }
+    ],
+    "hints": [
+      "Look for the part named after the program.",
+      "It comes after the math part and before the part about what changes what."
+    ],
+    "difficulty": -1.5,
+    "level": "beginner",
+    "sources": []
+  },
+  {
+    "id": "q-how-to-use-3",
+    "concepts": [
+      "reading-a-topic-page"
+    ],
+    "type": "single",
+    "prompt": "What does the level switch change on a page?",
+    "options": [
+      {
+        "text": "How much depth you see, from the simplest correct version to full equations and edge cases",
+        "correct": true,
+        "why": "Higher levels add practical depth and the full math, without changing what is correct."
+      },
+      {
+        "text": "Which topic is shown",
+        "correct": false,
+        "why": "Tempting because levels sound like course choices, but the topic stays the same."
+      },
+      {
+        "text": "Whether the content is correct",
+        "correct": false,
+        "why": "Tempting because simple can sound wrong, but every level states a correct version of the idea."
+      }
+    ],
+    "hints": [
+      "Beginner shows the simplest correct version.",
+      "Pro adds equations, edge cases and pointers to the literature."
+    ],
+    "difficulty": -1.5,
+    "level": "beginner",
+    "sources": []
+  },
+  {
+    "id": "q-how-to-use-4",
+    "concepts": [
+      "reading-a-topic-page"
+    ],
+    "type": "single",
+    "prompt": "Which three questions does each page answer about every setting?",
+    "options": [
+      {
+        "text": "Why you set it, why that value, and what happens if you skip it or get it wrong",
+        "correct": true,
+        "why": "This is the habit the site tries to build: knowing the reason, not only the value to copy."
+      },
+      {
+        "text": "Who invented it, when, and where",
+        "correct": false,
+        "why": "Tempting because history is interesting, but it does not help you choose a value."
+      },
+      {
+        "text": "How much it costs, how fast it runs, and who pays",
+        "correct": false,
+        "why": "Tempting because cost matters in practice, but these are not the three questions the pages answer."
+      }
+    ],
+    "hints": [
+      "They are about reasons, not about history.",
+      "One of them is about what happens if you skip the setting."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": []
+  },
+  {
+    "id": "q-why-sim-5",
+    "concepts": [
+      "simulation"
+    ],
+    "type": "single",
+    "prompt": "In a material simulation, what is \"the model\"?",
+    "options": [
+      {
+        "text": "The atoms and positions you give the program: whatever you leave out, it does not know about",
+        "correct": true,
+        "why": "The program computes only for the structure you describe."
+      },
+      {
+        "text": "The real sample in the laboratory",
+        "correct": false,
+        "why": "Tempting because a model stands for the sample, but the model is the description you give the program."
+      },
+      {
+        "text": "The computer that runs the calculation",
+        "correct": false,
+        "why": "Tempting because the computer is the visible part, but the model is the description of the material."
+      }
+    ],
+    "hints": [
+      "A wind tunnel tests a model aircraft, not the real one.",
+      "Think about what the program is actually given."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-018"
+    ]
+  },
+  {
+    "id": "q-why-sim-6",
+    "concepts": [
+      "simulation"
+    ],
+    "type": "single",
+    "prompt": "A real sample has a surface, but your model leaves it out. What follows?",
+    "options": [
+      {
+        "text": "The answer leaves out the effect of the surface too",
+        "correct": true,
+        "why": "A simulation answers for the model you built, not for the real sample."
+      },
+      {
+        "text": "The program adds the surface automatically",
+        "correct": false,
+        "why": "Tempting because the program seems smart, but it only knows what you describe."
+      },
+      {
+        "text": "The answer is still exact for the real sample",
+        "correct": false,
+        "why": "Tempting because the number looks precise, but precision is not the same as describing the right system."
+      }
+    ],
+    "hints": [
+      "Recall the page on treating a result as a measurement.",
+      "What the model leaves out, the result leaves out."
+    ],
+    "difficulty": -0.5,
+    "level": "beginner",
+    "sources": [
+      "S-018"
+    ]
+  },
+  {
+    "id": "q-why-sim-7",
+    "concepts": [
+      "materials-from-atoms"
+    ],
+    "type": "single",
+    "prompt": "What is a nucleus, compared with the electrons around it?",
+    "options": [
+      {
+        "text": "Tiny and heavy, and it mostly stays where it is",
+        "correct": true,
+        "why": "The electrons are lighter and are what hold the crowd of atoms together."
+      },
+      {
+        "text": "Light and fast, and it glues the atoms together",
+        "correct": false,
+        "why": "Tempting because the glue role is real, but it belongs to the electrons."
+      },
+      {
+        "text": "The same as an electron",
+        "correct": false,
+        "why": "Tempting because both are tiny, but the nucleus is far heavier."
+      }
+    ],
+    "hints": [
+      "Think of a heavy centre with a light cloud around it.",
+      "Which of the two do the atoms share when they bond?"
+    ],
+    "difficulty": -2,
+    "level": "beginner",
+    "sources": [
+      "S-018"
+    ]
+  },
+  {
+    "id": "q-why-sim-8",
+    "concepts": [
+      "materials-from-atoms"
+    ],
+    "type": "single",
+    "prompt": "Which of these is decided mainly by the electrons of a material?",
+    "options": [
+      {
+        "text": "Which colours of light it absorbs",
+        "correct": true,
+        "why": "Electrons decide bonding, conduction and colour."
+      },
+      {
+        "text": "How many protons each nucleus has",
+        "correct": false,
+        "why": "Tempting because the nucleus matters, but the proton count defines the element and is part of the model you give."
+      },
+      {
+        "text": "The country where the sample was made",
+        "correct": false,
+        "why": "Tempting as a distractor, but where a sample was made has no effect on its electrons."
+      }
+    ],
+    "hints": [
+      "The page names three things electrons decide: bonding, conduction and one more.",
+      "Which option is about light?"
+    ],
+    "difficulty": -1.5,
+    "level": "beginner",
+    "sources": [
+      "S-018",
+      "S-047"
+    ]
+  },
+  {
+    "id": "q-why-sim-9",
+    "concepts": [
+      "materials-from-atoms"
+    ],
+    "type": "single",
+    "prompt": "Why must a model say which kind each atom is?",
+    "options": [
+      {
+        "text": "Different atoms make a different material, so the energy and forces change",
+        "correct": true,
+        "why": "Changing the kind of atoms is changing the material."
+      },
+      {
+        "text": "Only to label the file",
+        "correct": false,
+        "why": "Tempting because labels look harmless, but the program uses the kind to decide how electrons behave."
+      },
+      {
+        "text": "The program guesses the material from the title",
+        "correct": false,
+        "why": "Tempting because the title is the first thing you write, but the program never guesses."
+      }
+    ],
+    "hints": [
+      "See the \"What changes what\" table on the first page.",
+      "Think of swapping one element for another."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-018"
+    ]
+  },
+  {
+    "id": "q-why-sim-10",
+    "concepts": [
+      "quantum-mechanics"
+    ],
+    "type": "single",
+    "prompt": "What does the Schrödinger equation connect, for the electrons of a material?",
+    "options": [
+      {
+        "text": "The Hamiltonian (the recipe of all the energies) with the wavefunction and the energy",
+        "correct": true,
+        "why": "Solving it would give the wavefunction of all the electrons together and the energy that goes with it."
+      },
+      {
+        "text": "The price of a calculation with its run time",
+        "correct": false,
+        "why": "Tempting because cost is a theme on the site, but that is the topic of scaling, not of this equation."
+      },
+      {
+        "text": "A ball on a spring with its speed",
+        "correct": false,
+        "why": "Tempting because the equation is old and general, but its job here is electrons, not balls and springs."
+      }
+    ],
+    "hints": [
+      "The equation has three symbols: H, psi and E.",
+      "Recall what the wavefunction describes."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-047"
+    ]
+  },
+  {
+    "id": "q-why-sim-11",
+    "concepts": [
+      "quantum-mechanics"
+    ],
+    "type": "single",
+    "prompt": "Can the Schrödinger equation be solved exactly for a material with many electrons?",
+    "options": [
+      {
+        "text": "No, so every practical method is an approximation of some kind",
+        "correct": true,
+        "why": "For more than a couple of electrons nobody can solve it exactly."
+      },
+      {
+        "text": "Yes, with a fast enough laptop",
+        "correct": false,
+        "why": "Tempting because computers keep getting faster, but the problem grows faster still."
+      },
+      {
+        "text": "Yes, but only for metals",
+        "correct": false,
+        "why": "Tempting because metals seem simple, but they are not exactly solvable either."
+      }
+    ],
+    "hints": [
+      "The next page lines up the methods by cost.",
+      "What does the word \"practical\" imply about the method?"
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-047",
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-why-sim-12",
+    "concepts": [
+      "quantum-mechanics"
+    ],
+    "type": "single",
+    "prompt": "Why can the electrons be solved for with the nuclei held fixed?",
+    "options": [
+      {
+        "text": "The nuclei are heavy and slow, while the electrons are light and fast",
+        "correct": true,
+        "why": "This split is the Born-Oppenheimer approximation, which most calculations on this site rely on."
+      },
+      {
+        "text": "Because nuclei have no effect on electrons",
+        "correct": false,
+        "why": "Tempting because nuclei stay still, but they attract the electrons and are essential."
+      },
+      {
+        "text": "Because electrons are heavier than nuclei",
+        "correct": false,
+        "why": "Tempting by mixing up the two, but it is the other way round."
+      }
+    ],
+    "hints": [
+      "Compare the masses of the two kinds of particle.",
+      "Slow and heavy versus light and fast."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-ladder-6",
+    "concepts": [
+      "method-ladder"
+    ],
+    "type": "single",
+    "prompt": "Which statement about the ladder of methods is correct?",
+    "options": [
+      {
+        "text": "Higher rungs can be more accurate, and they cost much more",
+        "correct": true,
+        "why": "The ladder trades accuracy against cost."
+      },
+      {
+        "text": "Higher rungs are always faster",
+        "correct": false,
+        "why": "Tempting because newer sounds quicker, but the top rungs are the slowest."
+      },
+      {
+        "text": "Every rung gives the same answer",
+        "correct": false,
+        "why": "Tempting because all methods study the same material, but approximations differ."
+      }
+    ],
+    "hints": [
+      "The picture is of rungs from rough and quick to accurate and slow.",
+      "There is no free lunch in the ladder."
+    ],
+    "difficulty": -1.5,
+    "level": "beginner",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-ladder-7",
+    "concepts": [
+      "scaling"
+    ],
+    "type": "numeric",
+    "prompt": "A method costs size to the power 5. By what factor does the cost grow when the system size doubles?",
+    "answer": 32,
+    "tolerance": 0.5,
+    "unit": "x",
+    "hints": [
+      "Doubling multiplies the cost by 2^p.",
+      "Compute 2 x 2 x 2 x 2 x 2."
+    ],
+    "difficulty": -0.5,
+    "level": "beginner",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-ladder-8",
+    "concepts": [
+      "scaling"
+    ],
+    "type": "single",
+    "prompt": "Why is a large scaling exponent a practical problem?",
+    "options": [
+      {
+        "text": "Each doubling of the system multiplies the cost by a big factor, so large systems become out of reach",
+        "correct": true,
+        "why": "Cost follows size to a power, so a bigger exponent grows far faster."
+      },
+      {
+        "text": "It makes the answer less accurate at every size",
+        "correct": false,
+        "why": "Tempting because expensive sounds like fussy, but scaling is about cost, not accuracy."
+      },
+      {
+        "text": "It only matters when the computer is old",
+        "correct": false,
+        "why": "Tempting because hardware matters, but a steep power outruns any realistic hardware gain."
+      }
+    ],
+    "hints": [
+      "Compare 2^3 with 2^7.",
+      "The lab compares steepness, not heights."
+    ],
+    "difficulty": -0.5,
+    "level": "beginner",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-scope-5",
+    "concepts": [
+      "dft-scope"
+    ],
+    "type": "single",
+    "prompt": "A standard calculation holds the nuclei still at zero temperature. What does this mean for a question about heat and time?",
+    "options": [
+      {
+        "text": "A single ground-state calculation does not answer it, and extra steps are needed",
+        "correct": true,
+        "why": "Heat, motion and time are beyond one standard run."
+      },
+      {
+        "text": "It answers it directly",
+        "correct": false,
+        "why": "Tempting because the calculation is detailed, but it contains no time."
+      },
+      {
+        "text": "It answers it if you use a bigger cell",
+        "correct": false,
+        "why": "Tempting because bigger sounds better, but cell size does not add temperature."
+      }
+    ],
+    "hints": [
+      "Look at the \"not built for\" list on the scope page.",
+      "What does zero temperature rule out?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-011"
+    ]
+  },
+  {
+    "id": "q-scope-6",
+    "concepts": [
+      "ground-state"
+    ],
+    "type": "single",
+    "prompt": "What is the ground state of a set of atoms?",
+    "options": [
+      {
+        "text": "The arrangement of the electrons with the lowest energy",
+        "correct": true,
+        "why": "It is the lowest-energy state of the electrons for the given atoms."
+      },
+      {
+        "text": "The arrangement with the highest energy",
+        "correct": false,
+        "why": "Tempting by reversal, but ground means lowest."
+      },
+      {
+        "text": "The arrangement that appears at high temperature",
+        "correct": false,
+        "why": "Tempting because high temperature changes things, but the ground state is defined by energy, not temperature."
+      }
+    ],
+    "hints": [
+      "Ground is the bottom.",
+      "Which option mentions the lowest energy?"
+    ],
+    "difficulty": -2,
+    "level": "beginner",
+    "sources": [
+      "S-011"
+    ]
+  },
+  {
+    "id": "q-scope-7",
+    "concepts": [
+      "ground-state"
+    ],
+    "type": "single",
+    "prompt": "Which of these is a ground-state question?",
+    "options": [
+      {
+        "text": "Which of two atomic arrangements has lower energy?",
+        "correct": true,
+        "why": "Comparing the lowest energies of two models is the typical DFT task."
+      },
+      {
+        "text": "Exactly how does the material absorb light?",
+        "correct": false,
+        "why": "Tempting because it is a natural question, but absorption involves excited states."
+      },
+      {
+        "text": "What happens to the sample over an hour of heating?",
+        "correct": false,
+        "why": "Tempting because it is practical, but it needs time and temperature."
+      }
+    ],
+    "hints": [
+      "Which question asks only for energies of lowest-energy states?",
+      "Excited states and time are outside the ground-state theory."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-011"
+    ]
+  },
+  {
+    "id": "q-scope-8",
+    "concepts": [
+      "ground-state"
+    ],
+    "type": "single",
+    "prompt": "What does the Hohenberg-Kohn theorem say determines everything about the ground state?",
+    "options": [
+      {
+        "text": "The ground-state electron density",
+        "correct": true,
+        "why": "The density, the amount of charge at each point, is enough."
+      },
+      {
+        "text": "The temperature of the sample",
+        "correct": false,
+        "why": "Tempting because temperature affects materials, but the theorem is about the density."
+      },
+      {
+        "text": "The colour of the material",
+        "correct": false,
+        "why": "Tempting because colour is visible, but it is a result and not the starting point."
+      }
+    ],
+    "hints": [
+      "It is a map over space.",
+      "Recall the three-variable quantity from module 3."
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-011"
+    ]
+  },
+  {
+    "id": "q-roadmap-5",
+    "concepts": [
+      "roadmap"
+    ],
+    "type": "single",
+    "prompt": "In the author's five-step protocol for a first project, what comes first?",
+    "options": [
+      {
+        "text": "A relaxation: prepare the four input files and relax the structure",
+        "correct": true,
+        "why": "Relaxation comes first and later steps build on it."
+      },
+      {
+        "text": "Optical properties",
+        "correct": false,
+        "why": "Tempting because they are the goal for some, but they are the last step."
+      },
+      {
+        "text": "Elastic properties",
+        "correct": false,
+        "why": "Tempting because they are a headline result, but they come after the relaxation and SCF steps."
+      }
+    ],
+    "hints": [
+      "You need a stable structure before you ask for properties.",
+      "The first step starts with the four input files."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-roadmap-6",
+    "concepts": [
+      "roadmap"
+    ],
+    "type": "single",
+    "prompt": "Is the five-step protocol a universal recipe for every system?",
+    "options": [
+      {
+        "text": "No: metals, magnets and large cells may need different choices",
+        "correct": true,
+        "why": "It is a path for a first project, not a recipe for everything."
+      },
+      {
+        "text": "Yes, for every system",
+        "correct": false,
+        "why": "Tempting because a recipe is comforting, but systems differ."
+      },
+      {
+        "text": "Yes, but only for oxides",
+        "correct": false,
+        "why": "Tempting because the worked example is an oxide, but the rule is that the protocol is a starting path."
+      }
+    ],
+    "hints": [
+      "The page calls it a path for a first project.",
+      "What do convergence and common-errors pages collect?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-roadmap-7",
+    "concepts": [
+      "vasp-workflow"
+    ],
+    "type": "single",
+    "prompt": "Which of the four VASP input files holds the structure?",
+    "options": [
+      {
+        "text": "POSCAR",
+        "correct": true,
+        "why": "It lists the cell and where the atoms are."
+      },
+      {
+        "text": "KPOINTS",
+        "correct": false,
+        "why": "Tempting because it also describes the crystal, but it sets how the repeating pattern is sampled."
+      },
+      {
+        "text": "INCAR",
+        "correct": false,
+        "why": "Tempting because it is the main file, but it holds the settings of the run."
+      }
+    ],
+    "hints": [
+      "The name hints at positions.",
+      "Which file is not about sampling or settings?"
+    ],
+    "difficulty": -2,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-roadmap-8",
+    "concepts": [
+      "vasp-workflow"
+    ],
+    "type": "single",
+    "prompt": "Why does this site never show the contents of a POTCAR?",
+    "options": [
+      {
+        "text": "It comes under your own VASP licence and the site does not reproduce it",
+        "correct": true,
+        "why": "The site never generates or hosts POTCAR content."
+      },
+      {
+        "text": "It is always empty",
+        "correct": false,
+        "why": "Tempting because you cannot see it here, but a real POTCAR is not empty."
+      },
+      {
+        "text": "The browser cannot display it",
+        "correct": false,
+        "why": "Tempting because it is technical, but the reason is the licence."
+      }
+    ],
+    "hints": [
+      "Think about who owns it.",
+      "The page says you get it under your own licence."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-010",
       "S-042"
     ]
   }
