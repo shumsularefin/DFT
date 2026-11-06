@@ -4,5 +4,7 @@ declare namespace App {
     cites?: string[];
     /** Running count of <Term> on the current page, for unique popover ids. */
     termCount?: number;
+    /** The current topic's id and concepts; set by the topic route for <Check>. */
+    topic?: { id: string; concepts: string[] };
   }
 }

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { grade, MalformedResponse, parseQuestions, questionSchema, type Question } from './questions';
+import { grade, MalformedResponse } from './grade';
+import { parseQuestions, questionSchema, type Question } from './questions';
 import { graph, questions } from './bank';
 
 const common = {

@@ -1,0 +1,339 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { catalog } from '../lib/learning/catalog';
+import { layout, NODE_H, NODE_W } from '../lib/learning/mapLayout';
+
+const { concepts } = await catalog();
+const map = layout(concepts);
+const modules = [...new Set(concepts.map((c) => c.module))].sort((a, b) => a - b);
+const topics = await getCollection('handbook');
+const topicsByModule: Record<number, string[]> = {};
+for (const t of topics) (topicsByModule[t.data.module] ??= []).push(t.id);
+const json = JSON.stringify({ topicsByModule }).replace(/</g, '\\u003c');
+/** Splits a label into at most two lines of about 26 characters, at word boundaries. */
+const lines = (s: string): string[] => {
+  const out: string[] = [''];
+  for (const w of s.split(' ')) {
+    const cur = out[out.length - 1]!;
+    if (cur && (cur + ' ' + w).length > 26 && out.length < 2) out.push(w);
+    else out[out.length - 1] = cur ? `${cur} ${w}` : w;
+  }
+  return out;
+};
+---
+
+<BaseLayout
+  title="Your progress"
+  description="Your mastery map, a gentle streak, milestones and controls for the learning data stored on this device."
+  pageClass="content"
+>
+  <div class="container">
+    <h1>Your progress</h1>
+    <p class="lead">
+      Everything here is stored in this browser only. Mastery is an estimate from your answers (see
+      <a href="/practice/#how-this-works">how this works</a>); 95 % counts as mastered.
+    </p>
+    <p class="progress-notice" data-progress-notice hidden></p>
+
+    <section aria-labelledby="streak-h" data-streak-section>
+      <h2 id="streak-h">Streak and milestones</h2>
+      <p data-streak class="js-only">
+        No practice recorded yet. Answer a question on any topic to begin.
+      </p>
+      <ul class="milestones js-only" data-milestones></ul>
+      <label class="js-only hide-streak">
+        <input type="checkbox" data-hide-streak /> Hide the streak
+      </label>
+    </section>
+
+    <section aria-labelledby="map-h">
+      <h2 id="map-h">Mastery map</h2>
+      <fieldset class="filters">
+        <legend>Show module</legend>
+        <label>
+          <input type="radio" name="module-filter" value="all" checked /> All
+        </label>
+        {modules.map((m) => (
+          <label>
+            <input type="radio" name="module-filter" value={String(m)} /> {m}
+          </label>
+        ))}
+      </fieldset>
+      <p class="legend" aria-hidden="true">
+        <span>
+          <svg width="14" height="14" viewBox="0 0 14 14">
+            <circle cx="7" cy="7" r="5.5" class="mk-new" />
+          </svg>{' '}
+          Not started
+        </span>
+        <span>
+          <svg width="14" height="14" viewBox="0 0 14 14">
+            <path d="M7 1.5 L12.5 12.5 L1.5 12.5 Z" class="mk-learning" />
+          </svg>{' '}
+          In progress
+        </span>
+        <span>
+          <svg width="14" height="14" viewBox="0 0 14 14">
+            <rect x="1.5" y="1.5" width="11" height="11" class="mk-mastered" />
+          </svg>{' '}
+          Mastered
+        </span>
+      </p>
+      <div class="map-scroll">
+        <svg
+          class="map"
+          viewBox={`0 0 ${map.width} ${map.height}`}
+          width={map.width}
+          height={map.height}
+          role="group"
+          aria-labelledby="map-title"
+          data-map
+        >
+          <title id="map-title">Concept map, one link per concept. The table below lists the same concepts with their state.</title>
+          {map.headers.map((h) => (
+            <text x={h.x} y="22" class="map-module" data-module={h.module}>
+              Module {h.module}
+            </text>
+          ))}
+          <g class="map-edges" aria-hidden="true">
+            {map.edges.map((e) => (
+              <path d={e.d} data-from={e.from} data-to={e.to} />
+            ))}
+          </g>
+          {map.nodes.map((n) => {
+            const c = concepts.find((x) => x.id === n.id)!;
+            return (
+              <a href={c.href ?? '/handbook/'} data-node={n.id} data-module={n.module} data-state="new">
+                <rect x={n.x} y={n.y} width={NODE_W} height={NODE_H} rx="6" class="map-box" />
+                <g class="map-mark" transform={`translate(${n.x + 10} ${n.y + 8})`}>
+                  <circle cx="7" cy="7" r="5.5" class="mk-new" />
+                  <path d="M7 1.5 L12.5 12.5 L1.5 12.5 Z" class="mk-learning" />
+                  <rect x="1.5" y="1.5" width="11" height="11" class="mk-mastered" />
+                </g>
+                <text x={n.x + 30} y={n.y + 18} class="map-label">
+                  {lines(n.label).map((l, i) => (
+                    <tspan x={n.x + 30} dy={i === 0 ? 0 : 15}>
+                      {l}
+                    </tspan>
+                  ))}
+                </text>
+                <text x={n.x + 30} y={n.y + 50} class="map-state" data-state-text>
+                  Not started
+                </text>
+              </a>
+            );
+          })}
+        </svg>
+      </div>
+
+      <table class="map-table">
+        <caption>All concepts with their mastery estimate</caption>
+        <thead>
+          <tr>
+            <th scope="col">Concept</th>
+            <th scope="col">Module</th>
+            <th scope="col">State</th>
+            <th scope="col">Estimate</th>
+          </tr>
+        </thead>
+        <tbody>
+          {concepts.map((c) => (
+            <tr data-row={c.id} data-module={c.module}>
+              <th scope="row">{c.href ? <a href={c.href}>{c.label}</a> : c.label}</th>
+              <td>{c.module}</td>
+              <td data-cell-state>Not started</td>
+              <td data-cell-pl>none yet</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+
+    <section aria-labelledby="data-h">
+      <h2 id="data-h">Your data</h2>
+      <p>
+        Export a copy of your learning data as a JSON file, bring it to another browser with Import, or start
+        again with Reset. Nothing leaves this device unless you do this yourself.
+      </p>
+      <div class="data-actions js-only">
+        <button type="button" class="btn" data-export>
+          Export as JSON
+        </button>
+        <label class="btn">
+          Import JSON <input type="file" accept="application/json,.json" data-import class="sr-only" />
+        </label>
+        <button type="button" class="btn" data-reset>
+          Reset all learning data
+        </button>
+      </div>
+      <p data-data-status role="status"></p>
+      <dialog data-reset-dialog aria-labelledby="reset-h">
+        <h3 id="reset-h">Reset all learning data?</h3>
+        <p>
+          This deletes your answers, mastery estimates, review schedule and streak from this browser. It
+          cannot be undone. Export first if you want a copy.
+        </p>
+        <form method="dialog" class="data-actions">
+          <button value="cancel" class="btn" autofocus>
+            Keep my data
+          </button>
+          <button value="reset" class="btn btn-primary" data-reset-confirm>
+            Reset
+          </button>
+        </form>
+      </dialog>
+    </section>
+    <script type="application/json" data-progress-data set:html={json} />
+  </div>
+</BaseLayout>
+
+<script>
+  import '../scripts/progress-page';
+</script>
+
+<style>
+  .lead {
+    max-width: var(--measure);
+  }
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    border: 0;
+    padding: 0;
+    margin: 0 0 var(--space-3);
+  }
+  .filters legend {
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+  }
+  .filters label {
+    display: inline-flex;
+    gap: var(--space-1);
+    align-items: center;
+    min-height: var(--target);
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+  .legend span {
+    display: inline-flex;
+    gap: var(--space-1);
+    align-items: center;
+  }
+  .map-scroll {
+    overflow-x: auto;
+    max-width: 100%;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .map {
+    display: block;
+    font-family: inherit;
+  }
+  .map-module {
+    font-weight: 600;
+    fill: var(--text);
+    font-size: 14px;
+  }
+  .map-edges path {
+    fill: none;
+    stroke: var(--border-strong);
+    stroke-width: 1.5;
+  }
+  .map-box {
+    fill: var(--surface);
+    stroke: var(--border-strong);
+  }
+  .map a:focus-visible .map-box,
+  .map a:hover .map-box {
+    stroke: var(--accent);
+    stroke-width: 3;
+  }
+  .map a:focus {
+    outline: none;
+  }
+  .map-label {
+    fill: var(--text);
+    font-size: 13px;
+  }
+  .map-state {
+    fill: var(--text-muted);
+    font-size: 12px;
+  }
+  .mk-new {
+    fill: none;
+    stroke: var(--text-muted);
+    stroke-width: 1.5;
+  }
+  .mk-learning {
+    fill: var(--surface-2);
+    stroke: var(--accent);
+    stroke-width: 1.5;
+  }
+  .mk-mastered {
+    fill: var(--accent);
+    stroke: var(--accent);
+  }
+  .map-mark > * {
+    display: none;
+  }
+  [data-state='new'] .map-mark .mk-new,
+  [data-state='learning'] .map-mark .mk-learning,
+  [data-state='mastered'] .map-mark .mk-mastered {
+    display: inline;
+  }
+  [data-state='mastered'] .map-box {
+    stroke-width: 2.5;
+  }
+  .map-table {
+    margin-top: var(--space-5);
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 48rem;
+  }
+  .map-table caption {
+    text-align: left;
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+  }
+  .map-table th,
+  .map-table td {
+    overflow-wrap: anywhere;
+    text-align: left;
+    padding: var(--space-2);
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .milestones {
+    padding-left: var(--space-5);
+  }
+  .hide-streak {
+    display: inline-flex;
+    gap: var(--space-2);
+    align-items: center;
+    min-height: var(--target);
+  }
+  .data-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  dialog {
+    max-width: min(32rem, calc(100vw - 2rem));
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+  }
+  dialog::backdrop {
+    background: rgb(0 0 0 / 0.4);
+  }
+  .data-actions label.btn:has(input:focus-visible) {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+</style>

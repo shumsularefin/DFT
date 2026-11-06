@@ -33,7 +33,7 @@ export const NAV = [
   { label: 'Tools', href: '/tools/' },
   { label: 'Studio', href: '/tools/#studio' },
   { label: 'Builder', href: '/tools/#builder' },
-  { label: 'Practice', href: '/tools/#practice' },
+  { label: 'Practice', href: '/practice/' },
 ] as const;
 
 export const FOOTER_LINKS = [

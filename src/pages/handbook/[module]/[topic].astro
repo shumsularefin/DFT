@@ -33,6 +33,7 @@ const { entry } = Astro.props;
 const { Content } = await render(entry);
 const body = entry.body ?? '';
 Astro.locals.cites = citeOrder(body);
+Astro.locals.topic = { id: entry.id, concepts: entry.data.concepts };
 const sections = presentSections(body);
 const components = {
   Why,
