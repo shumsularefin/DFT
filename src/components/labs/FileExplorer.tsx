@@ -61,7 +61,8 @@ export default function FileExplorer({ kind, text, annotations }: Props) {
 
   return (
     <div className="fx">
-      <figure className="fx-file" style={{ margin: 0 }}>
+      {/* tabIndex: long lines scroll sideways, and a scrollable region must be reachable by keyboard */}
+      <figure className="fx-file" style={{ margin: 0 }} tabIndex={0}>
         <figcaption className="fx-name">{kind}</figcaption>
         <ol className="fx-lines" aria-label={`${kind} lines`}>
           {lines.map((ln, i) => {

@@ -1,0 +1,120 @@
+---
+id: incar
+title: The INCAR file
+module: 6
+order: 3
+summary: The tag file that decides what VASP calculates and how. Its syntax, how defaults work, and how to check what VASP actually used.
+concepts: [incar]
+requires: [encut, smearing]
+vaspTags: [ENCUT, EDIFF, ISMEAR, SIGMA, ISPIN, MAGMOM, IBRION, NSW, EDIFFG]
+sources: [S-019, S-041, S-042]
+status: draft
+updated: 2026-11-06
+noLab: true
+---
+
+<Why>
+
+INCAR is where all the choices of module 5 end up: the cutoff, the smearing, spin, the functional. It is also the file where a typing mistake can be silently ignored. Knowing its syntax and how defaults work tells you what VASP will really do.
+
+</Why>
+
+<Intuition>
+
+<Term id="incar">INCAR</Term> is a list of `TAG = value` lines <Cite id="S-041" />:
+
+- `!` or `#` starts a comment; `;` separates two tags on one line.
+- Any tag you leave out takes its default value.
+- Many defaults depend on other tags. For example IBRION defaults to -1 (no ionic moves) when NSW = 0, and ICHARG depends on ISTART <Cite id="S-019" />.
+
+A useful way to read an INCAR is in groups: **what to calculate** (IBRION, NSW, ISIF, LORBIT), **how accurately** (ENCUT, EDIFF, EDIFFG, PREC), **the electrons** (ISMEAR, SIGMA, ISPIN, MAGMOM) and **housekeeping** (LWAVE, LCHARG, NCORE). The file explorer below sorts the tags of a real protocol INCAR in exactly this way.
+
+<Level min="intermediate">
+
+A misspelled tag may be ignored without an error. VASP echoes every parameter it used near the top of OUTCAR, so after the first run, check there that your values arrived <Cite id="S-041" />. The <a href="/tags/">VASP tag cards</a> give the meaning and default of each tag used in this handbook.
+
+</Level>
+
+<Level min="pro">
+
+Templates are a starting point, not an answer. The VASPKIT templates start from conservative defaults (the lattice-relaxation template even leaves ENCUT commented out), so always set ENCUT, EDIFF, ISMEAR and spin yourself <Cite id="S-042" />. Every INCAR shown in this handbook is checked by the same validator the input builder uses.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+There is no formula in INCAR itself, but two of its numbers are thresholds with units. EDIFF (eV) stops the electronic loop when the total energy changes by less than EDIFF between steps. EDIFFG stops the ionic loop: a positive value is an energy change in eV; a negative value means "stop when every force is below $|\text{EDIFFG}|$ eV per angstrom" <Cite id="S-019" />. The protocol uses $\text{EDIFFG} = -0.005$ and an EDIFF small enough that forces are converged, $10^{-6}$ or smaller <Cite id="S-042" />.
+
+</TheMath>
+
+<InVasp>
+
+The relaxation INCAR from step 1 of the author's protocol (the input builder's "relax" preset, with ENCUT shown for a largest ENMAX of 400 eV) <Cite id="S-042" />. Click a tag:
+
+<VaspFileExplorer
+  kind="INCAR"
+  code={`SYSTEM = Compound-relax
+PREC = Accurate
+ENCUT = 520
+EDIFF = 1E-6
+ALGO = Normal
+NELM = 120
+NELMIN = 6
+ISMEAR = 0
+SIGMA = 0.05
+LREAL = .FALSE.
+LASPH = .TRUE.
+ISPIN = 2
+MAGMOM = 2*5.0 4*0.6
+LMAXMIX = 4
+IBRION = 2
+ISIF = 3
+NSW = 200
+EDIFFG = -0.005
+POTIM = 0.3
+LWAVE = .TRUE.
+LCHARG = .TRUE.
+NCORE = 4`}
+/>
+
+MAGMOM here is for a six-atom cell with two magnetic atoms first; change it to match your POSCAR.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                       | ...then                                                       |
+| ------------------------------- | ------------------------------------------------------------- |
+| Leave out ISMEAR                | The default ISMEAR = 1 is used, which is wrong for insulators |
+| Misspell a tag (`ENCUTT = 520`) | It may be ignored; the default cutoff is used                 |
+| Set NSW = 0                     | No ionic steps: a static run (IBRION defaults to -1)          |
+| Use a positive EDIFFG           | Relaxation stops on an energy change, not on forces           |
+
+Why it matters: every tag you omit is a decision made for you. What happens if you skip the OUTCAR check: you may never find out which value was used.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Trusting a template unchanged">
+  A template's ENCUT, MAGMOM and smearing were chosen for some other system. Set them for yours{' '}
+  <Cite id="S-042" />.
+</Callout>
+
+<Callout variant="mistake" title="Not checking the parameter echo">
+  After the first ionic step, run `grep ENCUT OUTCAR` (and the other key tags) to confirm VASP used your
+  values <Cite id="S-041" />.
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-incar-1', 'q-incar-2', 'q-incar-3', 'q-incar-4', 'q-incar-5']} />
+
+<GoDeeper>
+
+- VASP wiki, page INCAR and the page of each tag <Cite id="S-019" />.
+- The INCAR tag dictionary in the Workflow Handbook <Cite id="S-042" />.
+
+</GoDeeper>

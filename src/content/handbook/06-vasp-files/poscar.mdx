@@ -1,0 +1,125 @@
+---
+id: poscar
+title: The POSCAR file
+module: 6
+order: 1
+summary: The structure file, line by line. The cell, the species, the counts and the positions, and the two mistakes that break most first runs.
+concepts: [poscar]
+requires: [brillouin-zone]
+vaspTags: []
+sources: [S-019, S-041, S-042]
+status: draft
+updated: 2026-11-06
+noLab: true
+---
+
+<Why>
+
+Every VASP run starts by reading POSCAR. If it is wrong, every number that follows is the answer to a different question: a different cell, atoms in the wrong places, or magnetic moments on the wrong atoms. Reading a POSCAR line by line takes one minute and prevents the most common first-run failures.
+
+</Why>
+
+<Intuition>
+
+A <Term id="unit-cell">unit cell</Term> is a box that repeats in all three directions to fill space. <Term id="poscar">POSCAR</Term> describes that box and what is inside it <Cite id="S-041" />:
+
+1. **A comment line.** Anything you like; VASP ignores it.
+2. **A scaling factor.** Every lattice vector (and Cartesian position) is multiplied by it. A negative value means "scale the cell to this volume".
+3. **Three lattice vectors**, one per line: the edges of the box.
+4. **The element symbols**, for example `Si` or `Ti O`. Their order must be the order of the potentials in POTCAR.
+5. **The number of atoms of each element**, in the same order.
+6. **Optionally `Selective dynamics`**, which lets you freeze some coordinates (only the first letter S is read).
+7. **`Direct` or `Cartesian`**: positions as fractions of the lattice vectors, or in angstrom.
+8. **One line per atom** with its three coordinates (and three T/F flags with selective dynamics).
+
+The file explorer below is a live POSCAR: click any line to see what it means.
+
+<Level min="intermediate">
+
+The element line was added in VASP 5. Older files have no symbol line, and VASP then takes the species from POTCAR, which is easy to get wrong. Always write the symbol line <Cite id="S-041" />.
+
+The order of atoms matters in three places: POTCAR is concatenated in the same species order, MAGMOM lists one value per atom in POSCAR order, and LDAU tags list one value per species in the same order <Cite id="S-042" />.
+
+</Level>
+
+<Level min="pro">
+
+After a relaxation VASP writes CONTCAR in exactly the POSCAR format, so the next step is `cp CONTCAR POSCAR`. With a variable-cell relaxation (ISIF = 3) the plane-wave basis was set up for the starting cell, so repeat the relaxation from CONTCAR until the cell no longer changes <Cite id="S-041" />.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+With scaling factor $s$ and lattice vectors $\mathbf{a}_1, \mathbf{a}_2, \mathbf{a}_3$ as written, the real cell vectors are $s\,\mathbf{a}_i$. A Direct position $(u, v, w)$ is the Cartesian point
+
+$$\mathbf{r} = u\,s\mathbf{a}_1 + v\,s\mathbf{a}_2 + w\,s\mathbf{a}_3.$$
+
+The cell volume is $V = s^3\,|\mathbf{a}_1 \cdot (\mathbf{a}_2 \times \mathbf{a}_3)|$. For the diamond silicon example, $s = 5.43$ angstrom and the face-centred vectors give $V = 5.43^3 / 4 \approx 40.0$ cubic angstrom, one quarter of the conventional cube, as expected for a primitive fcc cell <Cite id="S-041" />.
+
+</TheMath>
+
+<InVasp>
+
+Silicon in the diamond structure, the example from the author's Field Handbook <Cite id="S-041" />. Click a line:
+
+<VaspFileExplorer
+  kind="POSCAR"
+  code={`Si diamond
+5.43
+  0.0  0.5  0.5
+  0.5  0.0  0.5
+  0.5  0.5  0.0
+Si
+2
+Direct
+  0.00  0.00  0.00
+  0.25  0.25  0.25`}
+/>
+
+The Workflow Handbook builds POSCAR from a CIF with VASPKIT task 105, and recommends task 602 (standardised primitive cell) before relaxing so that later k-paths match the cell <Cite id="S-042" />. The <a href="/tools/input-builder/">input builder</a> writes POSCAR, INCAR, KPOINTS and the POTCAR command together.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                                   | ...then                                                                 |
+| ------------------------------------------- | ----------------------------------------------------------------------- |
+| Change the scaling factor                   | Every length in the cell changes; the crystal is compressed or expanded |
+| Swap `Direct` for `Cartesian` by mistake    | Fractions are read as angstrom; atoms pile up near the origin           |
+| Reorder the species without changing POTCAR | Every atom gets the wrong potential; the run may even look fine         |
+| Add `Selective dynamics` with F flags       | Those coordinates stay fixed during relaxation (used for slabs)         |
+| Use the conventional cell                   | Same crystal, more atoms, more expensive; k-paths then follow that cell |
+
+Why it matters: the structure is the question you are asking. What happens if you skip the check: you get a precise answer to the wrong question.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Species order differs from POTCAR">
+  POSCAR says `Ti O`, POTCAR was built as `O Ti`. VASP puts the oxygen potential on titanium. Check with `grep
+  TITEL POTCAR` that the order matches line 6 <Cite id="S-041" />.
+</Callout>
+
+<Callout variant="mistake" title="Direct and Cartesian mixed up">
+  Atoms end up almost on top of each other and VASP warns that "the distance between some ions is very small"{' '}
+  <Cite id="S-041" />.
+</Callout>
+
+<Callout variant="mistake" title="MAGMOM written per species instead of per atom">
+  MAGMOM needs one value per atom in POSCAR order (or the `N*value` shorthand). Fewer values than atoms is an
+  error.
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-poscar-1', 'q-poscar-2', 'q-poscar-3', 'q-poscar-4', 'q-poscar-5']} />
+
+<GoDeeper>
+
+- VASP wiki, page POSCAR, for every optional line (velocities, predictor-corrector block) <Cite id="S-019" />.
+- The Field Handbook entry for POSCAR and CONTCAR <Cite id="S-041" />.
+
+</GoDeeper>

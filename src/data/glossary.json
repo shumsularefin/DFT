@@ -718,5 +718,68 @@
   "sources": [
    "S-007"
   ]
+ },
+ {
+  "id": "poscar",
+  "label": "POSCAR",
+  "short": "The VASP input file with the cell vectors, the species, the atom counts and the atomic positions.",
+  "level": "beginner",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "incar",
+  "label": "INCAR",
+  "short": "The VASP input file of TAG = value lines that decides what is calculated and how.",
+  "level": "beginner",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "potcar",
+  "label": "POTCAR",
+  "short": "The VASP input file with the PAW dataset of every species, joined in POSCAR order. Licensed; never shared.",
+  "level": "beginner",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "oszicar",
+  "label": "OSZICAR",
+  "short": "The short VASP log with one line per electronic step and one summary line per ionic step.",
+  "level": "beginner",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "outcar",
+  "label": "OUTCAR",
+  "short": "The full VASP log: parameters used, symmetry, energies, forces, stress, magnetization and timing.",
+  "level": "beginner",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "vaspkit",
+  "label": "VASPKIT",
+  "short": "A menu-driven helper program that writes VASP inputs and post-processes outputs.",
+  "level": "intermediate",
+  "sources": [
+   "S-020"
+  ]
+ },
+ {
+  "id": "job-script",
+  "label": "job script",
+  "short": "A batch file that requests cores and time from a cluster scheduler and starts VASP.",
+  "level": "intermediate",
+  "sources": [
+   "S-042"
+  ]
  }
 ]

@@ -446,7 +446,7 @@
    "brillouin-zone"
   ],
   "summary": "The cell vectors, species, counts and positions of every atom.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "kpoints-file",
@@ -457,7 +457,7 @@
    "kpoint-sampling"
   ],
   "summary": "How the k-point mesh or path is written for VASP.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "incar",
@@ -469,7 +469,7 @@
    "smearing"
   ],
   "summary": "The tags that decide what VASP calculates and how.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "potcar",
@@ -480,7 +480,7 @@
    "paw"
   ],
   "summary": "The PAW datasets for every species, in POSCAR order, obtained under your VASP licence.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "output-files",
@@ -491,7 +491,7 @@
    "incar"
   ],
   "summary": "What OUTCAR, OSZICAR, CONTCAR, DOSCAR and the other output files contain.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "vasp-protocol",
@@ -503,7 +503,7 @@
    "roadmap"
   ],
   "summary": "Relax, then compute the self-consistent charge density, then the band structure and DOS.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "job-scripts",
@@ -514,7 +514,7 @@
    "vasp-protocol"
   ],
   "summary": "Batch scripts request resources on a cluster and start VASP.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "parallelization",
@@ -525,7 +525,7 @@
    "job-scripts"
   ],
   "summary": "NCORE and KPAR distribute work over cores and change speed but not results.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "restarts",
@@ -536,7 +536,7 @@
    "vasp-protocol"
   ],
   "summary": "Reading WAVECAR or CHGCAR saves time, but the inputs must match.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "reading-outputs",
@@ -547,7 +547,7 @@
    "output-files"
   ],
   "summary": "The electronic and ionic steps, energies, forces and moments in the output files.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "vaspkit",
@@ -558,7 +558,7 @@
    "vasp-protocol"
   ],
   "summary": "A helper program that prepares inputs and post-processes outputs.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "convergence-testing",

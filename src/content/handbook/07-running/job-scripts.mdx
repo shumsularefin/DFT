@@ -1,0 +1,126 @@
+---
+id: job-scripts
+title: Job scripts and parallel settings
+module: 7
+order: 2
+summary: How a batch script asks a cluster for cores and starts VASP, and how NCORE and KPAR share the work without changing the result.
+concepts: [job-scripts, parallelization]
+requires: [vasp-protocol]
+vaspTags: [NCORE, KPAR]
+sources: [S-019, S-042]
+status: draft
+updated: 2026-11-06
+noLab: true
+---
+
+<Why>
+
+VASP runs on clusters, and clusters run jobs through a scheduler. A job script says how many cores you need, for how long, and which program to start. The parallel tags in INCAR then decide how VASP splits the work. Good choices can halve the wall time; bad ones waste your allocation or stop the run.
+
+</Why>
+
+<Intuition>
+
+A <Term id="job-script">job script</Term> has two parts:
+
+1. **Directives** for the scheduler: a job name, the number of nodes and tasks per node, a time limit, a queue. SLURM writes them as `#SBATCH` lines, PBS as `#PBS` lines.
+2. **Commands**: change to the submission folder, load the VASP module of your site, and start VASP with `srun` or `mpirun`.
+
+You submit it with `sbatch job.sh` (SLURM) or `qsub job.sh` (PBS). Site details (module names, queue names) differ between clusters; ask your administrators or read the site documentation.
+
+<Level min="intermediate">
+
+Which executable: `vasp_std` for normal runs, `vasp_gam` for Gamma-point-only runs (faster, less memory), `vasp_ncl` for non-collinear magnetism and spin-orbit coupling <Cite id="S-019" />.
+
+**NCORE** sets how many cores work together on one band. **KPAR** splits the k-points into groups that run side by side. Both change speed and memory, not the physics: the energy must be the same to numerical precision with any valid choice <Cite id="S-019" />.
+
+</Level>
+
+<Level min="pro">
+
+Rules of thumb (Heuristic): NCORE a divisor of the cores per node, often between 4 and the number of cores per socket; KPAR a divisor of the total cores and at most the number of irreducible k-points. A few runs that time the first ionic step with different values settle it for your machine. Some run types restrict the choice: the protocol's elastic step comments out NCORE because IBRION = 6 runs without band parallelization <Cite id="S-042" />, and hybrid-functional runs have their own advice on the VASP wiki <Cite id="S-019" />.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+With $P$ MPI ranks, KPAR groups of $P / \text{KPAR}$ ranks each handle a share of the k-points, and inside each group the bands are shared among $P / (\text{KPAR} \cdot \text{NCORE})$ band groups of NCORE ranks each. Both divisions must be exact, which is why both tags should be divisors <Cite id="S-019" />. On 2 nodes with 32 tasks each, $P = 64$; KPAR = 4 and NCORE = 4 give 4 k-point groups of 16 ranks, each with 4 band groups of 4 ranks.
+
+</TheMath>
+
+<InVasp>
+
+A SLURM template from the input builder's job-script generator <Cite id="S-042" />. Replace the module name with your site's:
+
+<VaspFile
+  name="shell"
+  code={`#!/bin/bash
+#SBATCH --job-name=Compound-relax
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=32
+#SBATCH --time=24:00:00
+#SBATCH --output=%x-%j.out
+
+cd "$SLURM_SUBMIT_DIR"
+module load vasp/your-version
+
+srun vasp_std > vasp.out 2>&1`}
+/>
+
+The same job for PBS:
+
+<VaspFile
+  name="shell"
+  code={`#!/bin/bash
+#PBS -N Compound-relax
+#PBS -l select=1:ncpus=32:mpiprocs=32
+#PBS -l walltime=24:00:00
+#PBS -j oe
+
+cd "$PBS_O_WORKDIR"
+module load vasp/your-version
+
+mpirun -np 32 vasp_std > vasp.out 2>&1`}
+/>
+
+The <a href="/tools/input-builder/">input builder</a> writes either script for your node count and lists the NCORE and KPAR values that divide it. The INCAR tag cards for <Tag name="NCORE" /> and <Tag name="KPAR" /> give the defaults.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                              | ...then                                                              |
+| -------------------------------------- | -------------------------------------------------------------------- |
+| Ask for more cores                     | Faster up to a point, then communication dominates                   |
+| Set KPAR larger than the k-point count | Some groups have nothing to do; wasted cores                         |
+| Change NCORE                           | Speed and memory change; the energy must not                         |
+| Set a time limit that is too short     | The job is killed; CONTCAR may be truncated                          |
+| Use `vasp_gam` with a k-point mesh     | Not allowed: the Gamma-only build is only for the single Gamma point |
+
+Why it matters: cluster time is finite and shared. What happens if you never time it: you may run at half the speed you could.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Treating a parallel setting as physics">
+  If the energy changes when you change NCORE or KPAR, something else is wrong (an unconverged run, a
+  different mesh). Parallel tags never change converged results <Cite id="S-019" />.
+</Callout>
+
+<Callout variant="mistake" title="Leaving NCORE in an IBRION = 6 run">
+  Comment it out, as protocol step 4 says <Cite id="S-042" />.
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-jobs-1', 'q-jobs-2', 'q-jobs-3', 'q-jobs-4', 'q-par-1', 'q-par-2', 'q-par-3', 'q-par-4']} />
+
+<GoDeeper>
+
+- VASP wiki, pages NCORE, KPAR and "Optimizing the parallelization" <Cite id="S-019" />.
+- Your cluster's own documentation for module names, queues and limits.
+
+</GoDeeper>

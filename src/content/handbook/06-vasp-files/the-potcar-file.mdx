@@ -1,0 +1,109 @@
+---
+id: potcar
+title: The POTCAR file
+module: 6
+order: 4
+summary: What POTCAR holds, how to build it from your licensed library in POSCAR order, and which three lines to grep. This site never shows POTCAR content.
+concepts: [potcar]
+requires: [paw]
+vaspTags: [ENCUT]
+sources: [S-019, S-041, S-042]
+status: draft
+updated: 2026-11-06
+noLab: true
+---
+
+<Why>
+
+POTCAR holds the <Term id="pseudopotential">PAW datasets</Term>: how the valence electrons feel each ion core. It sets the default cutoff, the number of valence electrons and the functional. A wrong POTCAR gives a calculation that runs perfectly and describes the wrong atoms.
+
+POTCAR files are licensed by VASP Software GmbH. This handbook never shows, generates or uploads their content. Build POTCAR on your own machine from the library that comes with your licence.
+
+</Why>
+
+<Intuition>
+
+A <Term id="potcar">POTCAR</Term> for a compound is the individual element files **joined end to end, in the same order as the species line of POSCAR** <Cite id="S-041" />. For `Ti O` in POSCAR:
+
+```shell
+cat $POTCAR_LIBRARY/Ti_pv/POTCAR $POTCAR_LIBRARY/O/POTCAR > POTCAR
+```
+
+Each dataset lists, among other things <Cite id="S-041" />:
+
+- **TITEL**: which dataset it is (for example `PAW_PBE Ti_pv`).
+- **ENMAX**: the recommended minimum plane-wave cutoff, in eV.
+- **ZVAL**: how many valence electrons the dataset treats explicitly.
+- **LEXCH**: the functional it was made with (`PE` is PBE, `CA` is LDA).
+
+<Level min="intermediate">
+
+Dataset names carry suffixes: `_pv` and `_sv` put semicore p or s states in the valence (more electrons, more accurate, more expensive), `_h` is hard (higher cutoff), `_s` is soft, `_GW` is made for GW calculations <Cite id="S-041" />. VASP publishes a list of recommended datasets; VASPKIT task 103 uses it, task 104 lets you choose per element <Cite id="S-042" />.
+
+</Level>
+
+<Level min="pro">
+
+VASP takes the exchange-correlation functional from LEXCH unless an INCAR tag (GGA, METAGGA, LHFCALC) overrides it. Keep the POTCAR family and the INCAR consistent; never mix LDA and PBE datasets in one POTCAR <Cite id="S-041" />.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+Two numbers from POTCAR feed straight into your INCAR. The cutoff: for a variable-cell relaxation the protocol uses $\text{ENCUT} = 1.3 \times \max(\text{ENMAX})$ over all species, to keep the Pulay stress small; for fixed-cell runs the largest ENMAX is a usable minimum that you still converge-test <Cite id="S-041" /> <Cite id="S-042" />. The electron count: VASP's NELECT is $\sum_s N_s\,\text{ZVAL}_s$ over species $s$ with $N_s$ atoms, which sets the default NBANDS.
+
+</TheMath>
+
+<InVasp>
+
+Inspect your own POTCAR with these commands (they print only header lines, run them on your machine) <Cite id="S-041" />:
+
+<VaspFile
+  name="shell"
+  code={`grep TITEL POTCAR   # which datasets, in which order
+grep ENMAX POTCAR   # default cutoffs; take the largest
+grep ZVAL  POTCAR   # valence electrons per atom
+grep LEXCH POTCAR   # PE = PBE, CA = LDA`}
+/>
+
+The order printed by `grep TITEL` must match line 6 of POSCAR. The input builder writes the `cat` command for your species, never the file itself.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                        | ...then                                                                   |
+| -------------------------------- | ------------------------------------------------------------------------- |
+| Switch `Ti` for `Ti_sv`          | More valence electrons and a higher ENMAX: slower but often more accurate |
+| Concatenate in the wrong order   | Atoms get the wrong potentials; the run may still converge                |
+| Mix LDA and PBE datasets         | Inconsistent physics; VASP may warn or simply use one functional for all  |
+| Use `_h` datasets without reason | Much higher cutoff and cost for little gain                               |
+
+Why it matters: POTCAR decides which electrons are calculated at all. What happens if you skip the check: results for the wrong atoms or the wrong number of electrons.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="POTCAR order differs from POSCAR">
+  The single most common setup error. Check `grep TITEL POTCAR` against the species line every time{' '}
+  <Cite id="S-041" />.
+</Callout>
+
+<Callout variant="mistake" title="Sharing POTCAR files">
+  POTCAR files are licensed. Do not post them online, attach them to issues or commit them to a public
+  repository. Share the list of TITEL lines instead.
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-potcar-1', 'q-potcar-2', 'q-potcar-3', 'q-potcar-4']} />
+
+<GoDeeper>
+
+- VASP wiki, pages POTCAR and "Available PAW potentials" <Cite id="S-019" />.
+- The Field Handbook entry for POTCAR, including its correction on the 1.3 x ENMAX rule <Cite id="S-041" />.
+
+</GoDeeper>

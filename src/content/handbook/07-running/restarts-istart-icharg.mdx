@@ -1,0 +1,127 @@
+---
+id: restarts-istart-icharg
+title: Restarts with ISTART and ICHARG
+module: 7
+order: 3
+summary: What ISTART and ICHARG read from the folder, which values the protocol uses, and the rule about what must not change between the run that wrote a file and the run that reads it.
+concepts: [restarts]
+requires: [vasp-protocol]
+vaspTags: [ISTART, ICHARG, LWAVE, LCHARG]
+sources: [S-019, S-041, S-042]
+status: draft
+updated: 2026-11-06
+noLab: true
+---
+
+<Why>
+
+Two small tags decide whether a run starts from scratch or continues from files in the folder. Most "why does my band structure look wrong" problems trace back to them <Cite id="S-042" />. Used well, they save hours; used carelessly, they import the wrong physics without any warning.
+
+</Why>
+
+<Intuition>
+
+**ISTART** is about the wavefunctions (WAVECAR). **ICHARG** is about the charge density (CHGCAR). The tables are from the author's Workflow Handbook <Cite id="S-042" />:
+
+| ISTART | Meaning                                                                                                                                  |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| 0      | Fresh start, random wavefunctions. Default when no WAVECAR exists.                                                                       |
+| 1      | Read WAVECAR; keep ENCUT constant (basis rebuilt for the new cell). Default when WAVECAR exists. The protocol's SCF-after-relax setting. |
+| 2      | Read WAVECAR; keep the basis set constant. Used rarely, for example for consistent energies along a strained series.                     |
+
+| ICHARG | Meaning                                                                                  |
+| ------ | ---------------------------------------------------------------------------------------- |
+| 0      | Density built from the initial wavefunctions. Default when ISTART is more than 0.        |
+| 1      | Read CHGCAR and continue self-consistently. Use to restart a stalled SCF.                |
+| 2      | Superposition of atomic densities. Default for a fresh start.                            |
+| 11     | Read CHGCAR and keep it fixed (non-self-consistent). Band structures and dense-mesh DOS. |
+
+<Level min="intermediate">
+
+**The rule.** An ICHARG = 11 run inherits its physics from the CHGCAR. Keep ENCUT, ISPIN, MAGMOM, LMAXMIX, the functional and any LDAU tags identical to the SCF that wrote it. The cell must also be identical <Cite id="S-042" />.
+
+For WAVECAR the k-points and spin setting must match the earlier run for the file to be reused; otherwise VASP starts from random wavefunctions. A 0-byte WAVECAR means the earlier run wrote nothing (LWAVE = .FALSE. or a crash) <Cite id="S-041" />.
+
+</Level>
+
+<Level min="pro">
+
+Why ICHARG = 11 is non-self-consistent: the density is fixed, so the Kohn-Sham potential is fixed, and VASP only diagonalises that Hamiltonian at the new k-points. The eigenvalues are right only if the density was the converged ground state of the same Hamiltonian, which is what the rule protects. LMAXMIX matters for d and f elements because CHGCAR stores the PAW one-centre occupancies only up to the LMAXMIX of the run that wrote it; set it to 4 for d elements and 6 for f elements in the SCF, and keep it in the reading run <Cite id="S-019" />.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+In the language of module 4: the SCF loop finds $n(\mathbf{r})$ such that $n = F[V_\text{eff}[n]]$. A run with ICHARG = 11 takes $n$ from CHGCAR and solves
+
+$$\hat h[n]\,\psi_{n\mathbf{k}} = \varepsilon_{n\mathbf{k}}\,\psi_{n\mathbf{k}}$$
+
+once, at any k-points you like, without updating $n$ <Cite id="S-019" />. Change ENCUT, the functional or $U$ between the two runs and $\hat h$ is no longer the Hamiltonian whose ground state $n$ is.
+
+</TheMath>
+
+<InVasp>
+
+Restart a stalled SCF from its last density (copy CHGCAR, keep everything else):
+
+<VaspFile
+  name="INCAR"
+  code={`ISTART = 0
+ICHARG = 1      ! read CHGCAR, continue self-consistently
+PREC = Accurate
+ENCUT = 520
+EDIFF = 1E-6
+NELM = 200
+ISMEAR = 0
+SIGMA = 0.05
+NSW = 0`}
+/>
+
+The band-structure run of protocol step 3 (route B) uses ICHARG = 11 and the same ENCUT, ISPIN, MAGMOM and LMAXMIX as the SCF <Cite id="S-042" />. Checks before you submit:
+
+<VaspFile
+  name="shell"
+  code={`ls -l WAVECAR CHGCAR          # present and not 0 bytes
+diff POSCAR ../01_relax/CONTCAR  # same cell as the SCF
+grep -E "ENCUT|ISPIN|LMAXMIX" INCAR ../01_relax/INCAR`}
+/>
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                                        | ...then                                                            |
+| ------------------------------------------------ | ------------------------------------------------------------------ |
+| Start the SCF with ISTART = 1 after a relaxation | Fewer electronic steps: the wavefunctions are nearly right already |
+| Use ICHARG = 11 with a different ENCUT           | Bands from a Hamiltonian that does not match the density           |
+| Use ICHARG = 11 with a different MAGMOM          | Spin state inconsistent with the stored magnetization              |
+| Delete WAVECAR and keep ISTART = 1               | VASP falls back to a fresh start                                   |
+| Use ICHARG = 1 for a stalled run                 | Continues from the last density rather than from atoms             |
+
+Why it matters: a restart is a promise that nothing important changed. What happens if you break it: results that look normal and are wrong.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Running an SCF on a line path">
+  A line-mode KPOINTS is not suitable for self-consistent calculations <Cite id="S-042" />. Bands come from
+  ICHARG = 11 or from KPOINTS_OPT.
+</Callout>
+
+<Callout variant="mistake" title="Copying CHGCAR from a different structure">
+  The density belongs to one cell and one set of positions. Copy it only from the SCF on the same structure.
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-restart-1', 'q-restart-2', 'q-restart-3', 'q-restart-4', 'q-restart-5']} />
+
+<GoDeeper>
+
+- VASP wiki, pages ISTART, ICHARG and LMAXMIX <Cite id="S-019" />.
+- The Workflow Handbook's ISTART and ICHARG section <Cite id="S-042" />.
+
+</GoDeeper>
