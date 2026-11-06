@@ -156,3 +156,14 @@ test.describe('practice and progress', () => {
     await expect(page.locator('[data-practice-notice]')).toContainText('blocks storage');
   });
 });
+
+test('without PUBLIC_FIREBASE_* the sync panel is absent and no Firebase code is requested', async ({
+  page,
+}) => {
+  const requests: string[] = [];
+  page.on('request', (r) => requests.push(r.url()));
+  await page.goto('/progress/');
+  await expect(page.locator('[data-sync]')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Sign in to sync' })).toHaveCount(0);
+  expect(requests.filter((u) => /firebase|googleapis/.test(u))).toEqual([]);
+});

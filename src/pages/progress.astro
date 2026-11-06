@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { catalog } from '../lib/learning/catalog';
 import { layout, NODE_H, NODE_W } from '../lib/learning/mapLayout';
+import { firebaseConfig } from '../lib/sync/config';
 
 const { concepts } = await catalog();
 const map = layout(concepts);
@@ -184,12 +185,41 @@ const lines = (s: string): string[] => {
         </form>
       </dialog>
     </section>
+    {firebaseConfig && (
+      <section aria-labelledby="sync-h" class="sync" data-sync hidden>
+        <h2 id="sync-h">Sync across devices (optional)</h2>
+        <p>
+          Sign in with Google to keep one copy of your learning data in the cloud and use it on other devices.
+          Only your answers, mastery estimates and review schedule are stored, in one record that only you can
+          read. Sync happens when you open this page and within a minute of later changes. See the
+          <a href="/privacy/">privacy page</a>.
+        </p>
+        <p data-sync-status role="status"></p>
+        <button type="button" class="btn btn-primary" data-sync-signin>
+          Sign in to sync
+        </button>
+        <div data-sync-signedin hidden>
+          <p>
+            Signed in as <span data-sync-user></span>.
+          </p>
+          <div class="data-actions">
+            <button type="button" class="btn" data-sync-signout>
+              Sign out
+            </button>
+            <button type="button" class="btn" data-sync-delete>
+              Delete my synced data
+            </button>
+          </div>
+        </div>
+      </section>
+    )}
     <script type="application/json" data-progress-data set:html={json} />
   </div>
 </BaseLayout>
 
 <script>
   import '../scripts/progress-page';
+  import '../scripts/sync-ui';
 </script>
 
 <style>

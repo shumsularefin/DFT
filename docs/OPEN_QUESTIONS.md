@@ -39,6 +39,11 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-033 | open | author |
 | Q-034 | open | author |
 | Q-035 | open | author |
+| Q-036 | open | author |
+| Q-037 | open | author |
+| Q-038 | open | author |
+| Q-039 | open | author |
+| Q-040 | open | author |
 
 ## Q-001. Repository licence
 Which licence for the code and which for the written content and data (a common split: MIT for code, CC BY 4.0 for original text)? Affects `LICENSE`, the footer and the references page. Until decided: no LICENSE file; `THIRD_PARTY_NOTICES.md` lists upstream licences. **Update 2026-11-04:** the secrets `FIREBASE_SERVICE_ACCOUNT` and `FIREBASE_PROJECT_ID` are set (screenshot from the author) and the deploy workflow has succeeded on every merge to main since; the live site URL was not opened from the builder environment, so please confirm it shows the latest stage. **Owner: author.**
@@ -161,3 +166,7 @@ Statements in `src/content/handbook/03-many-electrons/` that rest on general kno
 
 ## Q-039. M5.6 VASPKIT KPATH.in layout and other items to confirm
 (1) The `KPATH.in` download is VASPKIT-style (the same line-mode content as KPOINTS, which the protocol in S-042 relies on with `cp KPATH.in KPOINTS`); the exact layout VASPKIT writes was **not** compared with a real file. **Close (author, ~5 min):** send me a `KPATH.in` that VASPKIT wrote and I compare it with `writeKpathIn`. An `it.todo` names this question. (2) VASP line mode takes one point count for the whole file, so hand-set per-segment counts apply to the table, the animation and the CSV/JSON but a KPOINTS file uses the largest count; the page says so. Confirm that is the behaviour you want (D-050). (3) The `KPOINTS_OPT` route A/B text follows your protocol (S-042); please check the wording matches how you run it.
+
+## Q-040. Contact route for deleting a sync account
+With sync on (M6.5), "Delete my synced data" removes the Firestore record, but the Firebase Authentication account (Google id and email) can only be deleted by the site owner in the Firebase console, and the site has no contact route. **Close:** the author adds a contact (email or form) to `/about/` and `/privacy/`, or decides that the Auth record may be deleted by the user from the client (`deleteUser`, which needs a recent sign-in) and a stage adds that button.
+

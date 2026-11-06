@@ -30,7 +30,15 @@ Also edit `.firebaserc` and replace `REPLACE_WITH_YOUR_FIREBASE_PROJECT_ID` with
 
 ## 3. Optional: progress sync (stage M6.5)
 
-Skip until you reach M6.5. Then: enable **Authentication** (Google sign-in) and **Firestore** (production mode; the stage adds rules). Register a web app and put its config values into repository **variables** (not secrets, not the repo): `PUBLIC_FIREBASE_API_KEY`, `PUBLIC_FIREBASE_AUTH_DOMAIN`, `PUBLIC_FIREBASE_PROJECT_ID`, `PUBLIC_FIREBASE_APP_ID`. The site builds and works without them.
+The code is in place (M6.5); the button stays hidden until you do these steps. Sync is optional: skip this section and the site works the same, with nothing ever sent.
+
+1. Firebase console, **Build, Authentication**: Get started, enable the **Google** provider. Under Settings, Authorized domains, make sure `<project-id>.web.app` and `<project-id>.firebaseapp.com` are listed (they are by default).
+2. **Build, Firestore Database**: Create database, **production mode**, a location near your users. Production mode denies everything until the rules from this repository are deployed.
+3. **Project settings, General, Your apps**: add a **Web app** (no Hosting setup needed). Copy `apiKey`, `authDomain`, `projectId` and `appId` into repository **variables** (Settings, Secrets and variables, Actions, **Variables** tab): `PUBLIC_FIREBASE_API_KEY`, `PUBLIC_FIREBASE_AUTH_DOMAIN`, `PUBLIC_FIREBASE_PROJECT_ID`, `PUBLIC_FIREBASE_APP_ID`. These identify the project publicly and are not secrets, but they never go into the repository files.
+4. Deploying the rules: add the repository variable `DEPLOY_FIRESTORE_RULES` with the value `true`. The deploy workflow then runs `firebase deploy --only firestore:rules` after the hosting deploy. The service account needs the role **Firebase Rules Admin** (Google Cloud console, IAM) in addition to the hosting roles. Alternatively deploy the rules once yourself: `npx firebase-tools@15.34.1 deploy --only firestore:rules --project <id>`.
+5. Merge anything to `main` (or re-run the deploy) so the site is rebuilt with the variables. "Sync across devices" then appears on `/progress/`.
+
+Quota: one document per user, at most one write per minute while practising plus one when the tab is hidden; see `docs/reports/M6.5.md` for the worst-case arithmetic against the Spark limits (Q-006).
 
 ## 4. Merge settings on GitHub
 

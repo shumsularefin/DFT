@@ -36,7 +36,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 | M6.2 | Mastery and spacing models | done | M6.1 | M | claude/great-dijkstra-oj0kbx |  | 2026-11-06 | [report](reports/M6.2.md), [work order](milestones/M6-adaptive-engine.md) |
 | M6.3 | Thompson-sampling policy | done | M6.2 | M | claude/great-dijkstra-oj0kbx |  | 2026-11-06 | [report](reports/M6.3.md), [work order](milestones/M6-adaptive-engine.md) |
 | M6.4 | Practice UI, quizzes, mastery map and gentle gamification | done | M6.3, M1.3 | L | claude/great-dijkstra-oj0kbx |  | 2026-11-06 | [report](reports/M6.4.md), [work order](milestones/M6-adaptive-engine.md) |
-| M6.5 | Optional progress sync with Firebase (Spark) | todo | M6.4, M0.2 | M | | | | [work order](milestones/M6-adaptive-engine.md) |
+| M6.5 | Optional progress sync with Firebase (Spark) | done | M6.4, M0.2 | M | claude/great-dijkstra-oj0kbx |  | 2026-11-06 | [report](reports/M6.5.md), [work order](milestones/M6-adaptive-engine.md) |
 | M7.1 | Module 4: Hohenberg-Kohn, Kohn-Sham and the SCF loop (with SCF lab) | todo | M6.1, M2.4 | L | | | | [work order](milestones/M7-remaining-modules.md) |
 | M7.2 | Module 5: Practical choices | todo | M7.1, M4.4, M4.5, M5.5 | L | | | | [work order](milestones/M7-remaining-modules.md) |
 | M7.3 | Modules 6 and 7: VASP files and running a calculation | todo | M3.6, M4.1 | L | | | | [work order](milestones/M7-remaining-modules.md) |
@@ -64,6 +64,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 
 Newest first. One line per session: date, stage, outcome, branch.
 
+- 2026-11-06, M6.5: optional Firebase sync (Firestore lite, lazy 56 KB), rules with 6 emulator tests, privacy page, setup docs. Branch `claude/great-dijkstra-oj0kbx`.
 - 2026-11-06, M6.4: Check quiz (no-JS fallback), /practice/ sessions, /progress/ mastery map, gentle streak, export/import/reset; 14 e2e tests. Branch `claude/great-dijkstra-oj0kbx`.
 - 2026-11-06, M6.3: Thompson-sampling policy with guard rails, seeded samplers, simulator (policy 0.55 to 0.61 vs random 0.25 to 0.30). Branch `claude/great-dijkstra-oj0kbx`.
 - 2026-11-06, M6.2: BKT, Rasch/Elo, SM-2, learner state with merge; all worked examples exact. Branch `claude/great-dijkstra-oj0kbx`.

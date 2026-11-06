@@ -54,3 +54,12 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           projectId: ${{ vars.FIREBASE_PROJECT_ID || secrets.FIREBASE_PROJECT_ID }}
           channelId: live
+      - name: Deploy Firestore rules (only when sync is switched on, docs/SETUP_FIREBASE.md)
+        if: steps.detect.outputs.go == 'true' && vars.DEPLOY_FIRESTORE_RULES == 'true'
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          PID: ${{ vars.FIREBASE_PROJECT_ID || secrets.FIREBASE_PROJECT_ID }}
+        run: |
+          printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
+          GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json" npx -y firebase-tools@15.34.1 deploy --only firestore:rules --project "$PID" --non-interactive
+          rm -f "$RUNNER_TEMP/sa.json"
