@@ -7,6 +7,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- Learning models: Bayesian knowledge tracing, an Elo/IRT difficulty estimate, SM-2 spaced repetition and a mergeable learner state (no UI yet).
 - Concept graph (73 concepts with prerequisites) and a validated question bank with a grader, plus a content lint that requires at least 4 questions per concept; module 1 now has 40 questions and every question has two hints.
 - k-path tool at /tools/kpath/: choose one of the 14 Bravais lattices or drop a POSCAR or CIF, see what standardizing did to your cell, switch between the HPKOT and Setyawan-Curtarolo paths, set points per segment or a density, watch a marker move along the path in the Brillouin zone, and download KPOINTS (line mode), KPATH.in, KPOINTS_OPT, a CSV or JSON point list and the standardized POSCAR. The Input Builder can hand its structure over.
 - 3D Brillouin zone viewer and unit cell viewer: translucent zone with labelled reciprocal vectors, special points, the k-path with direction ticks and an optional k-mesh; real-space cells with atoms sized by covalent radius, colour-blind-safe element colours, bonds and 1 to 3 repeats. Orbit, zoom, pan, preset views and keyboard control; a flat rotatable view with dashed hidden edges when WebGL is missing. Pages at /design/brillouin-lab/ and /design/unit-cell-lab/.
