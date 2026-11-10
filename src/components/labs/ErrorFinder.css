@@ -1,0 +1,95 @@
+.ef-input {
+  display: grid;
+  gap: var(--space-1);
+}
+.ef-input label {
+  font-weight: 600;
+}
+.ef-input textarea {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  min-height: 6rem;
+}
+.ef-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.ef-error,
+.ef-none {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+.ef-results {
+  display: grid;
+  gap: var(--space-3);
+}
+.ef-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface);
+  overflow-wrap: anywhere;
+}
+.ef-card h4,
+.ef-card h5 {
+  margin-block: var(--space-2) var(--space-1);
+}
+.ef-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--step--1);
+  margin: 0;
+}
+.ef-kind {
+  font-weight: 600;
+  color: var(--text);
+}
+.ef-line,
+.ef-msgs,
+.ef-src,
+.ef-more {
+  font-size: var(--step--1);
+  color: var(--text-muted);
+}
+.ef-msgs code {
+  display: inline-block;
+  margin: 0 var(--space-1) var(--space-1) 0;
+}
+.ef-incar {
+  margin: var(--space-1) 0;
+  padding: var(--space-1) var(--space-2);
+  background: var(--surface-2);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  overflow-x: auto;
+}
+.ef-browse details {
+  margin-block: var(--space-1);
+}
+.ef-browse summary {
+  min-height: var(--target);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.ef-link {
+  min-height: var(--target);
+  background: none;
+  border: 0;
+  padding: 0 var(--space-1);
+  color: var(--accent);
+  text-align: left;
+  text-decoration: underline;
+  font: inherit;
+  cursor: pointer;
+}
+.ef-browse li {
+  list-style: none;
+}

@@ -1,0 +1,116 @@
+---
+id: scf-trouble
+title: When the electronic loop will not converge
+module: 8
+order: 4
+summary: The order to try things when NELM runs out (structure, algorithm, mixing, smearing, bands), with the OSZICAR signs that tell you which problem you have.
+concepts: [scf-trouble]
+requires: [scf-failure, reading-outputs]
+vaspTags: [NELM, ALGO, AMIX, BMIX, NBANDS]
+sources: [S-019, S-041, S-042]
+status: draft
+updated: 2026-11-10
+---
+
+<Why>
+
+VASP does not stop when the electronic loop fails to converge. It runs NELM steps, takes whatever density it has, and moves on, so the forces and energies that follow are unreliable <Cite id="S-041" />. Learning to spot this in OSZICAR, and what to change first, saves more cluster time than any other habit.
+
+</Why>
+
+<Intuition>
+
+The electronic loop is a conversation between the density and the potential it creates (module 4). Each step proposes a new density, and a <Term id="density-mixing">mixer</Term> decides how far to move towards it. If it moves too far, the density overshoots and the next step overshoots back. In a big cell or a slab the density can slosh from one end to the other like water in a tank. That is <Term id="charge-sloshing">charge sloshing</Term>.
+
+How you recognise it: in OSZICAR the electronic steps show dE jumping around by about 1E-2 instead of shrinking, and NELM (default 60) is reached on every ionic step <Cite id="S-041" />.
+
+**Try things in this order.** Each step is cheaper and more likely to be the real cause than the next.
+
+1. **Check the structure.** Overlapping atoms or a broken geometry cause most "unconvergeable" cases. Look at it in VESTA.
+2. **Change the algorithm and allow more steps.** `ALGO = All` (or `Damped`) and `NELM = 150` to `200`.
+3. **Soften the mixing.** `AMIX = 0.1`, `BMIX = 0.0001` (linear mixing, for slabs and sloshing). For magnets also `AMIX_MAG = 0.4`, `BMIX_MAG = 0.0001`.
+4. **Widen the smearing a little** for a metal (SIGMA 0.1 to 0.2) during the hard phase.
+5. **Add empty bands.** Raise NBANDS by about 20 % if the highest bands are occupied.
+6. **Start from something simpler.** Use a converged WAVECAR from an easier setting, for example PBE before HSE, or non-magnetic before magnetic <Cite id="S-041" />.
+
+<Level min="intermediate">
+
+Raising NELM alone is not a fix: if a step needs 200 iterations, something about the problem is wrong and a larger NELM only hides it <Cite id="S-042" />. A magnetic state that flips between two solutions also shows up as a loop that never settles; look at the `mag=` value in OSZICAR. For magnetic, +U, hybrid and meta-GGA runs, longer NELM (100 to 300) is normal, and `ALGO = All` is the usual starting point <Cite id="S-042" />.
+
+</Level>
+
+<Level min="pro">
+
+AMIX sets the amplitude of the mixing step and BMIX the cut-off wave vector of the Kerker-type preconditioner; a very small BMIX turns the mixing into plain linear mixing, which damps long-wavelength sloshing and is why it helps slabs and large cells <Cite id="S-019" />.
+
+</Level>
+
+</Intuition>
+
+<Lab id="output-reader" title="Output reader" />
+
+<TheMath>
+
+Simple mixing updates the input density as $n^{(i+1)} = n^{(i)} + \alpha\,\bigl(n^{(i)}_\text{out} - n^{(i)}\bigr)$, where $n_\text{out}$ is the density computed from the current one and $\alpha$ is the mixing amplitude. If $\alpha$ is too large for the system the residual $n_\text{out}-n$ grows from one step to the next instead of shrinking, which is the sloshing seen in the dE column <Cite id="S-019" />.
+
+</TheMath>
+
+<InVasp>
+
+A hard-case INCAR following the order above (all values from the handbook's troubleshooting entry) <Cite id="S-041" />:
+
+<VaspFile
+  name="INCAR"
+  code={`PREC = Accurate
+ENCUT = 520
+EDIFF = 1E-6
+ALGO = All
+NELM = 200
+AMIX = 0.1
+BMIX = 0.0001
+ISMEAR = 0
+SIGMA = 0.05
+NSW = 0`}
+/>
+
+Find the problem in OSZICAR with `tail -5 OSZICAR`, and use the output reader above to see the loops of a pasted OSZICAR. The [error finder](/errors/) lists the entry "The electronic loop does not converge" with the same steps.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                      | ...then                                                         |
+| ------------------------------ | --------------------------------------------------------------- |
+| Raise NELM only                | The loop runs longer and may still not converge                 |
+| Lower AMIX and BMIX            | Each step is gentler; more steps but less sloshing              |
+| Switch to ALGO = All           | A more robust, slower minimiser for metals, magnets and hybrids |
+| Start from a converged WAVECAR | Far fewer steps, if the setup matches the earlier run           |
+
+Why this order: structure problems are the most common and cost nothing to check. What happens if you skip it: you spend hours tuning mixing for a structure that has two atoms on top of each other.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Trusting the forces of an ionic step that hit NELM">
+
+VASP continues anyway; the forces from that step are unreliable <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Changing five tags at once">
+
+Change one thing from the list, rerun, and look at OSZICAR. Otherwise you will not learn which one worked.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-scft-1', 'q-scft-2', 'q-scft-3', 'q-scft-4', 'q-scft-5']} />
+
+<GoDeeper>
+
+- The SCF loop in module 4 and the ALGO card in the tag reference <Cite id="S-019" />.
+- The troubleshooting section of the Field Handbook <Cite id="S-041" />.
+
+</GoDeeper>

@@ -1,0 +1,109 @@
+---
+id: kpoint-convergence
+title: Converging the k-mesh and the smearing
+module: 8
+order: 3
+summary: Refine the mesh at a fixed cutoff until the energy per atom stops changing, why metals need more care than insulators, and how to test the smearing width.
+concepts: [kpoint-convergence]
+requires: [convergence-testing, smearing]
+vaspTags: [KSPACING, ISMEAR, SIGMA]
+sources: [S-007, S-019, S-041, S-042]
+status: draft
+updated: 2026-11-10
+---
+
+<Why>
+
+The k-mesh decides how well VASP replaces an integral over the Brillouin zone by a sum over a few points. Too few points and the energy, forces and density of states are wrong in ways that look perfectly smooth. Too many and a short test becomes a week on the cluster. The test finds the cheapest mesh that has stopped mattering.
+
+</Why>
+
+<Intuition>
+
+Imagine estimating the average height in a city by measuring a few people. In a town where everyone is about the same height, a handful of measurements is enough. In a city with two very different groups, a handful can easily miss one group. That is the difference between an insulator and a metal.
+
+- **Insulators and semiconductors:** the filled bands vary smoothly across the zone, and a modest mesh converges quickly.
+- **Metals:** the Fermi surface cuts through bands, so occupations jump from filled to empty inside the zone, and the sum over points converges slowly. Smearing softens the jump, but the mesh still needs to be denser <Cite id="S-041" />.
+
+**The test.** Fix ENCUT (the series generator uses 1.3 times the largest ENMAX), keep the structure and the smearing the same in every run, and refine only the mesh. The Field Handbook's example is 4x4x4, then 6x6x6, then 8x8x8, stopping when the energy changes by less than about 1 meV per atom <Cite id="S-041" />. The generator can also step through VASPKIT resolutions (0.06, 0.05, 0.04, 0.03, 0.025, 0.02 in units of 2 pi per angstrom), which gives similar spacing in all directions even for a non-cubic cell.
+
+**Use a Gamma-centred mesh.** It keeps the symmetry of the lattice for every cell type; an even Monkhorst-Pack mesh can break the symmetry of hexagonal and fcc-primitive cells (checked numerically for this site, Q-017).
+
+<Level min="intermediate">
+
+**Testing the smearing.** SIGMA and the mesh interact: a wider SIGMA softens the Fermi step and lets a coarser mesh work, but it also moves the energy away from the zero-smearing value. The handbook's check is the entropy term in OUTCAR: reduce SIGMA until |T\*S| per atom is below 1 meV (Heuristic) <Cite id="S-041" />. So the order for a metal is: pick a SIGMA that passes the entropy check, converge the mesh at that SIGMA, and report both.
+
+**Which ISMEAR.** ISMEAR = 0 with SIGMA = 0.05 is the safe choice for metals and insulators alike; for metals the recipe in the handbook is ISMEAR = 1 with SIGMA between 0.1 and 0.2 and a denser mesh <Cite id="S-041" />.
+
+</Level>
+
+<Level min="pro">
+
+The tetrahedron method (ISMEAR = -5) needs at least four irreducible k-points and is not meaningful on a line, so it suits dense static or DOS runs rather than the convergence test of a large cell or a band path <Cite id="S-019" />. When you compare two cells of different size, compare at the same k-point density rather than the same mesh: a doubled cell needs half the mesh along the doubled direction.
+
+</Level>
+
+</Intuition>
+
+<Lab id="kpoint-mesh" title="The k-point mesh explorer" />
+
+<TheMath>
+
+The energy per cell is a Brillouin-zone average, $E = \frac{1}{V_\text{BZ}}\int_\text{BZ} \varepsilon(\mathbf{k})\,d\mathbf{k}$, replaced by a weighted sum over the mesh points $\sum_{\mathbf{k}} w_{\mathbf{k}}\,\varepsilon(\mathbf{k})$. For a smooth integrand the error falls very fast with the number of points; where occupations jump at the Fermi surface it falls much more slowly, which is the numerical meaning of "metals are harder" <Cite id="S-007" /> <Cite id="S-041" />.
+
+</TheMath>
+
+<InVasp>
+
+KPOINTS for one run of a Gamma-centred series (the mesh is the only thing that changes between runs):
+
+<VaspFile
+  name="KPOINTS"
+  code={`Gamma 6x6x6
+0
+Gamma
+6 6 6
+0 0 0`}
+/>
+
+In the input builder's "Convergence series" mode choose the mesh series or the resolution series. The plotter reads the label (`kpt_6x6x6`, `kpt_0.04`) as the x value. The check on the smearing is in OUTCAR: `grep EENTRO OUTCAR | tail -1` shows the entropy term <Cite id="S-041" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                                    | ...then                                                                 |
+| -------------------------------------------- | ----------------------------------------------------------------------- |
+| Double the mesh along every direction        | About eight times the points before symmetry; cost rises sharply        |
+| Increase SIGMA for a metal                   | A coarser mesh looks converged, but the energy drifts from the true one |
+| Use an even Monkhorst-Pack mesh on hexagonal | Symmetry can break and the run may fail (module 8, error finder)        |
+| Test the mesh at a different ENCUT each time | The curve mixes two effects                                             |
+
+Why this order: ENCUT first, mesh second, so each test has one moving part. What happens if you skip it: a band gap, a density of states or a force that depends on how many k-points you happened to type.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Converging an insulator's mesh and reusing it for a metal">
+
+A metal needs a denser mesh and a checked SIGMA <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Quoting F instead of E0 when SIGMA is large">
+
+With Gaussian smearing quote the energy extrapolated to zero smearing, and keep T\*S per atom small <Cite id="S-042" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-kconv-1', 'q-kconv-2', 'q-kconv-3', 'q-kconv-4', 'q-kconv-5']} />
+
+<GoDeeper>
+
+- The smearing and k-point topics in module 5.
+- Monkhorst and Pack's paper on special points <Cite id="S-007" />.
+
+</GoDeeper>

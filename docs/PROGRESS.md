@@ -40,7 +40,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 | M7.1 | Module 4: Hohenberg-Kohn, Kohn-Sham and the SCF loop (with SCF lab) | done | M6.1, M2.4 | L | claude/great-dijkstra-oj0kbx |  | 2026-11-06 | [report](reports/M7.1.md), [work order](milestones/M7-remaining-modules.md) |
 | M7.2 | Module 5: Practical choices | done | M7.1, M4.4, M4.5, M5.5 | L | claude/great-dijkstra-oj0kbx |  | 2026-11-06 | [report](reports/M7.2.md), [work order](milestones/M7-remaining-modules.md) |
 | M7.3 | Modules 6 and 7: VASP files and running a calculation | done | M3.6, M4.1 | L | claude/great-dijkstra-oj0kbx |  | 2026-11-06 | [report](reports/M7.3.md), [work order](milestones/M7-remaining-modules.md) |
-| M7.4 | Module 8: Convergence testing and common errors (with error finder) | todo | M7.3, M4.3 | M | | | | [work order](milestones/M7-remaining-modules.md) |
+| M7.4 | Module 8: Convergence testing and common errors (with error finder) | done | M7.3, M4.3 | M | claude/zen-bardeen-qzm2f2 | | 2026-11-10 | [report](reports/M7.4.md), [work order](milestones/M7-remaining-modules.md) |
 | M7.5 | Module 9: Analysis (with relaxation, DOS/band and charge-density tools) | todo | M7.4, M5.6, M2.1 | L | | | | [work order](milestones/M7-remaining-modules.md) |
 | M8.1 | Shannon radii dataset and lookup | todo | M0.2 | M | | | | [work order](milestones/M8-tolerance-factor.md) |
 | M8.2 | Factors, checks and mixed sites | todo | M8.1 | M | | | | [work order](milestones/M8-tolerance-factor.md) |
@@ -64,6 +64,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 
 Newest first. One line per session: date, stage, outcome, branch.
 
+- 2026-11-10, M7.4: module 8 (6 topics), error finder with 32 merged entries (22 + 20 handbook rows), `/errors/`, 30 questions. Branch `claude/zen-bardeen-qzm2f2`.
 - 2026-11-06, M7.3: Modules 6 and 7, output-reader lab, 53 questions; protocol quoted word for word Branch `claude/great-dijkstra-oj0kbx`.
 - 2026-11-06, M7.2: module 5 (8 topics, 5 labs), smearing and DFT+U libraries, /tags/ cards, 65 questions Branch `claude/great-dijkstra-oj0kbx`.
 - 2026-11-06, M7.1: module 4 (5 topics), SCF toy lab matching golden energies, 35 questions Branch `claude/great-dijkstra-oj0kbx`.

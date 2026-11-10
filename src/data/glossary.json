@@ -781,5 +781,23 @@
   "sources": [
    "S-042"
   ]
+ },
+ {
+  "id": "convergence-test",
+  "label": "convergence test",
+  "short": "A series of runs that change one numerical setting step by step, with everything else fixed, to find where the result stops changing.",
+  "level": "beginner",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "charge-sloshing",
+  "label": "charge sloshing",
+  "short": "The electron density swinging back and forth between steps of the electronic loop instead of settling, common in large cells, slabs and metals.",
+  "level": "intermediate",
+  "sources": [
+   "S-041"
+  ]
  }
 ]

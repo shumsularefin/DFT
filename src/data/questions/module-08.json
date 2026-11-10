@@ -1,0 +1,1003 @@
+[
+  {
+    "id": "q-conv-1",
+    "concepts": [
+      "convergence-testing"
+    ],
+    "type": "single",
+    "prompt": "Which of these is a numerical setting that you can converge?",
+    "options": [
+      {
+        "text": "The k-point mesh",
+        "correct": true,
+        "why": "More points give a result that stops changing, so the mesh converges."
+      },
+      {
+        "text": "The exchange-correlation functional",
+        "correct": false,
+        "why": "Tempting, but a different functional is a different model, not a finer version of the same one."
+      },
+      {
+        "text": "The value of U in DFT+U",
+        "correct": false,
+        "why": "Tempting, but U changes the physics you ask about; it does not converge to a limit."
+      }
+    ],
+    "hints": [
+      "Which choice gives a result that stops changing as you improve it?",
+      "Functionals and U are model choices."
+    ],
+    "difficulty": -0.5,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-conv-2",
+    "concepts": [
+      "convergence-testing"
+    ],
+    "type": "single",
+    "prompt": "What does it mean that a series is converged at one setting, in the strict form this site uses?",
+    "options": [
+      {
+        "text": "Every later setting differs from it by no more than the tolerance",
+        "correct": true,
+        "why": "This avoids calling a flat spot in the middle of a curve converged."
+      },
+      {
+        "text": "The next setting differs from it by no more than the tolerance",
+        "correct": false,
+        "why": "Tempting, but a flat spot can fool this weaker test."
+      },
+      {
+        "text": "The last setting has the lowest energy",
+        "correct": false,
+        "why": "Tempting, but the lowest value says nothing about whether the curve has levelled off."
+      }
+    ],
+    "hints": [
+      "Think about a curve that is flat for two points and then falls again.",
+      "Which rule looks at all later points?"
+    ],
+    "difficulty": 0.3,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-conv-3",
+    "concepts": [
+      "convergence-testing"
+    ],
+    "type": "numeric",
+    "prompt": "What tolerance, in meV per atom, does the author's handbook use for the total energy?",
+    "answer": 1,
+    "tolerance": 0,
+    "hints": [
+      "It is a round number.",
+      "It is the default of the convergence plotter."
+    ],
+    "difficulty": -0.5,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ],
+    "unit": "meV/atom"
+  },
+  {
+    "id": "q-conv-4",
+    "concepts": [
+      "convergence-testing"
+    ],
+    "type": "multi",
+    "prompt": "Which should you write next to a reported energy so that others can judge it?",
+    "options": [
+      {
+        "text": "ENCUT",
+        "correct": true,
+        "why": "The cutoff controls the basis size, so it belongs next to the number."
+      },
+      {
+        "text": "The k-mesh and its centring",
+        "correct": true,
+        "why": "The mesh decides the Brillouin-zone sampling error."
+      },
+      {
+        "text": "The smearing method and width",
+        "correct": true,
+        "why": "They set how far the smeared energy is from the zero-smearing one."
+      },
+      {
+        "text": "The name of the cluster",
+        "correct": false,
+        "why": "Tempting, but the machine does not change the converged result."
+      }
+    ],
+    "hints": [
+      "Which settings change the number?",
+      "Report both ENCUT and the mesh at least."
+    ],
+    "difficulty": 0.0,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-conv-5",
+    "concepts": [
+      "convergence-testing"
+    ],
+    "type": "single",
+    "prompt": "In a convergence test you change two settings between runs. What is the main problem?",
+    "options": [
+      {
+        "text": "You cannot tell which setting moved the result",
+        "correct": true,
+        "why": "Each test should have one moving part."
+      },
+      {
+        "text": "VASP refuses to run",
+        "correct": false,
+        "why": "Tempting, but VASP runs fine; the trouble is in interpreting the curve."
+      },
+      {
+        "text": "The energies become negative",
+        "correct": false,
+        "why": "Tempting, but the sign of the energy is unrelated to how many settings changed."
+      }
+    ],
+    "hints": [
+      "What is the purpose of keeping the others fixed?",
+      "Think about reading the curve afterwards."
+    ],
+    "difficulty": -0.3,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-encutc-1",
+    "concepts": [
+      "encut-convergence"
+    ],
+    "type": "single",
+    "prompt": "Where do you read ENMAX, the recommended cutoff, and which value do you use for a mixed-species cell?",
+    "options": [
+      {
+        "text": "In each POTCAR; the largest one",
+        "correct": true,
+        "why": "The hardest species sets the basis you need."
+      },
+      {
+        "text": "In POSCAR; the smallest one",
+        "correct": false,
+        "why": "Tempting, but POSCAR holds the structure, not cutoffs, and the smallest would under-describe the hardest species."
+      },
+      {
+        "text": "In KPOINTS; the average",
+        "correct": false,
+        "why": "Tempting, but KPOINTS holds the mesh only."
+      }
+    ],
+    "hints": [
+      "Which file comes from the pseudopotential library?",
+      "`grep ENMAX POTCAR`."
+    ],
+    "difficulty": -0.3,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-encutc-2",
+    "concepts": [
+      "encut-convergence"
+    ],
+    "type": "numeric",
+    "prompt": "The series generator is given ENMAX = 400 eV. How many ENCUT values does its default series contain (400 up to 700 eV in 50 eV steps)?",
+    "answer": 7,
+    "tolerance": 0,
+    "hints": [
+      "Count 400, 450, 500 and so on.",
+      "The end is the first multiple of 50 at or above 1.75 times ENMAX."
+    ],
+    "difficulty": 0.3,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-encutc-3",
+    "concepts": [
+      "encut-convergence"
+    ],
+    "type": "single",
+    "prompt": "What stays fixed in an ENCUT convergence series?",
+    "options": [
+      {
+        "text": "The structure, the k-mesh and the smearing",
+        "correct": true,
+        "why": "Only ENCUT may change, or the curve mixes effects."
+      },
+      {
+        "text": "The number of electronic steps only",
+        "correct": false,
+        "why": "Tempting, but the mesh and structure must be fixed as well."
+      },
+      {
+        "text": "Nothing; each run uses its own best settings",
+        "correct": false,
+        "why": "Tempting, but that makes the runs incomparable."
+      }
+    ],
+    "hints": [
+      "How many things should change between runs?",
+      "Think about the generator: one fixed mesh."
+    ],
+    "difficulty": -0.3,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-encutc-4",
+    "concepts": [
+      "encut-convergence"
+    ],
+    "type": "single",
+    "prompt": "The energy has settled at 450 eV but the pressure is still changing. You plan a cell relaxation. What follows?",
+    "options": [
+      {
+        "text": "Use a higher ENCUT; stress converges more slowly than energy",
+        "correct": true,
+        "why": "This is Pulay stress; a relaxation that changes volume needs at least 1.3 times ENMAX."
+      },
+      {
+        "text": "450 eV is fine because the energy is converged",
+        "correct": false,
+        "why": "Tempting, but the stress is what drives a volume change."
+      },
+      {
+        "text": "Lower ENCUT to speed up the relaxation",
+        "correct": false,
+        "why": "Tempting for speed, but it makes the stress worse."
+      }
+    ],
+    "hints": [
+      "Which quantity drives the cell change?",
+      "Stress versus energy convergence."
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-encutc-5",
+    "concepts": [
+      "encut-convergence"
+    ],
+    "type": "order",
+    "prompt": "Put the ENCUT test in order.",
+    "options": [
+      {
+        "text": "Read the largest ENMAX from the POTCARs",
+        "correct": true,
+        "why": "Step 1: it sets the starting value."
+      },
+      {
+        "text": "Generate the runs that differ only in ENCUT",
+        "correct": true,
+        "why": "Step 2: one folder per value."
+      },
+      {
+        "text": "Run them all and collect the energies",
+        "correct": true,
+        "why": "Step 3: collect.sh writes the CSV."
+      },
+      {
+        "text": "Plot energy per atom against ENCUT",
+        "correct": true,
+        "why": "Step 4: the plotter marks the tolerance band."
+      },
+      {
+        "text": "Pick the cheapest setting that has stopped changing",
+        "correct": true,
+        "why": "Step 5: the decision."
+      }
+    ],
+    "hints": [
+      "You need the numbers before the plot.",
+      "The decision is last."
+    ],
+    "difficulty": 0.0,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-kconv-1",
+    "concepts": [
+      "kpoint-convergence"
+    ],
+    "type": "single",
+    "prompt": "Why do metals need a denser k-mesh than insulators?",
+    "options": [
+      {
+        "text": "The Fermi surface makes occupations jump inside the zone",
+        "correct": true,
+        "why": "The sum over points then converges slowly."
+      },
+      {
+        "text": "Metals have more atoms",
+        "correct": false,
+        "why": "Tempting, but the cell size is not the reason."
+      },
+      {
+        "text": "Metals need a higher ENCUT",
+        "correct": false,
+        "why": "Tempting, but ENCUT is a different setting."
+      }
+    ],
+    "hints": [
+      "Think about filled versus partly filled bands.",
+      "Where does the occupation change abruptly?"
+    ],
+    "difficulty": -0.2,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-kconv-2",
+    "concepts": [
+      "kpoint-convergence"
+    ],
+    "type": "single",
+    "prompt": "In the Field Handbook's example series 4x4x4, 6x6x6, 8x8x8, when do you stop refining?",
+    "options": [
+      {
+        "text": "When the energy changes by less than about 1 meV per atom",
+        "correct": true,
+        "why": "That is the handbook tolerance for the energy."
+      },
+      {
+        "text": "After exactly three meshes",
+        "correct": false,
+        "why": "Tempting because the example has three, but the stopping rule is the tolerance."
+      },
+      {
+        "text": "When the run takes more than an hour",
+        "correct": false,
+        "why": "Tempting, but cost is not a convergence criterion."
+      }
+    ],
+    "hints": [
+      "What number did the handbook give?",
+      "Convergence is about the result, not the count."
+    ],
+    "difficulty": -0.4,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-kconv-3",
+    "concepts": [
+      "kpoint-convergence"
+    ],
+    "type": "single",
+    "prompt": "Which centring keeps the lattice symmetry for every cell type?",
+    "options": [
+      {
+        "text": "Gamma-centred",
+        "correct": true,
+        "why": "It always keeps the symmetry of the lattice."
+      },
+      {
+        "text": "An even Monkhorst-Pack mesh",
+        "correct": false,
+        "why": "Tempting, but it can break the symmetry of hexagonal and fcc-primitive cells."
+      },
+      {
+        "text": "A mesh shifted by half a step on every axis",
+        "correct": false,
+        "why": "Tempting, but a shifted mesh is the typical cause of the IBZKPT error on hexagonal cells."
+      }
+    ],
+    "hints": [
+      "Which centring never shifts the points off the origin?",
+      "Hexagonal cells are the classic problem."
+    ],
+    "difficulty": 0.0,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-kconv-4",
+    "concepts": [
+      "kpoint-convergence"
+    ],
+    "type": "single",
+    "prompt": "For a metal you widen SIGMA until the mesh looks converged. What is the risk?",
+    "options": [
+      {
+        "text": "The energy drifts away from the zero-smearing value",
+        "correct": true,
+        "why": "Check the entropy term; keep |T*S| per atom small."
+      },
+      {
+        "text": "The run will not start",
+        "correct": false,
+        "why": "Tempting, but a wide SIGMA is allowed; it is just physically less accurate."
+      },
+      {
+        "text": "The k-mesh becomes denser",
+        "correct": false,
+        "why": "Tempting, but the mesh is set in KPOINTS, not by SIGMA."
+      }
+    ],
+    "hints": [
+      "What does the entropy term measure?",
+      "Which energy do you quote?"
+    ],
+    "difficulty": 0.4,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-kconv-5",
+    "concepts": [
+      "kpoint-convergence"
+    ],
+    "type": "numeric",
+    "prompt": "With a doubled mesh along each of the three directions, roughly how many times more k-points are there before symmetry is used?",
+    "answer": 8,
+    "tolerance": 0,
+    "hints": [
+      "Two times along x, y and z.",
+      "2 x 2 x 2."
+    ],
+    "difficulty": -0.3,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-scft-1",
+    "concepts": [
+      "scf-trouble"
+    ],
+    "type": "single",
+    "prompt": "An ionic step ends at NELM. What does VASP do next, and what does that mean for the forces?",
+    "options": [
+      {
+        "text": "It continues anyway; the forces of that step are unreliable",
+        "correct": true,
+        "why": "VASP does not stop, so you must check OSZICAR."
+      },
+      {
+        "text": "It stops with an error",
+        "correct": false,
+        "why": "Tempting, but VASP only shows the problem in the files."
+      },
+      {
+        "text": "It doubles NELM",
+        "correct": false,
+        "why": "Tempting, but NELM is a fixed limit."
+      }
+    ],
+    "hints": [
+      "Does VASP report this as an error?",
+      "What do you look at to notice it?"
+    ],
+    "difficulty": -0.2,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-scft-2",
+    "concepts": [
+      "scf-trouble"
+    ],
+    "type": "order",
+    "prompt": "Put the first fixes for a loop that will not converge in the handbook order.",
+    "options": [
+      {
+        "text": "Check the structure for overlapping atoms",
+        "correct": true,
+        "why": "First: most \"unconvergeable\" cases are broken geometries."
+      },
+      {
+        "text": "Use ALGO = All and raise NELM",
+        "correct": true,
+        "why": "Second: a more robust algorithm and more steps."
+      },
+      {
+        "text": "Reduce the mixing (AMIX and BMIX)",
+        "correct": true,
+        "why": "Third: gentler steps against sloshing."
+      },
+      {
+        "text": "Widen SIGMA a little for a metal",
+        "correct": true,
+        "why": "Fourth: softer occupations help the hard phase."
+      },
+      {
+        "text": "Add about 20 % more bands",
+        "correct": true,
+        "why": "Fifth: when the highest bands are occupied."
+      }
+    ],
+    "hints": [
+      "The cheapest check comes first.",
+      "Mixing comes after the algorithm."
+    ],
+    "difficulty": 0.4,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-scft-3",
+    "concepts": [
+      "scf-trouble"
+    ],
+    "type": "single",
+    "prompt": "What is charge sloshing?",
+    "options": [
+      {
+        "text": "The density swinging back and forth between steps instead of settling",
+        "correct": true,
+        "why": "Common in large cells, slabs and metals."
+      },
+      {
+        "text": "Electrons leaving the cell",
+        "correct": false,
+        "why": "Tempting, but the cell is periodic and charge does not leave."
+      },
+      {
+        "text": "A rounding error in the energy",
+        "correct": false,
+        "why": "Tempting, but it is a feature of the iteration, not of rounding."
+      }
+    ],
+    "hints": [
+      "Think of water in a tank.",
+      "Which column of OSZICAR shows it?"
+    ],
+    "difficulty": 0.0,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-scft-4",
+    "concepts": [
+      "scf-trouble"
+    ],
+    "type": "single",
+    "prompt": "Which settings follow the handbook for linear mixing in a slab?",
+    "options": [
+      {
+        "text": "AMIX = 0.1 and BMIX = 0.0001",
+        "correct": true,
+        "why": "These soften the mixing; for magnets add AMIX_MAG = 0.4 and BMIX_MAG = 0.0001."
+      },
+      {
+        "text": "AMIX = 1.0 and BMIX = 1.0",
+        "correct": false,
+        "why": "Tempting as \"more mixing\", but larger steps make sloshing worse."
+      },
+      {
+        "text": "NELM = 5",
+        "correct": false,
+        "why": "Tempting, but that only limits the number of steps."
+      }
+    ],
+    "hints": [
+      "Smaller numbers mean gentler mixing.",
+      "BMIX very small is linear mixing."
+    ],
+    "difficulty": 0.5,
+    "level": "pro",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-scft-5",
+    "concepts": [
+      "scf-trouble"
+    ],
+    "type": "single",
+    "prompt": "You only raise NELM from 60 to 300 and the loop still uses all steps. What is the right conclusion?",
+    "options": [
+      {
+        "text": "Something else is wrong; look at structure, algorithm and mixing",
+        "correct": true,
+        "why": "A larger NELM only hides the problem."
+      },
+      {
+        "text": "Nothing is wrong; slow convergence is normal",
+        "correct": false,
+        "why": "Tempting, but using every step means the loop is not converging."
+      },
+      {
+        "text": "Raise EDIFF to 1E-1",
+        "correct": false,
+        "why": "Tempting as a shortcut, but a loose EDIFF stops the loop without real convergence."
+      }
+    ],
+    "hints": [
+      "Is raising NELM a fix or a delay?",
+      "What did the page say about NELM alone?"
+    ],
+    "difficulty": 0.3,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-relt-1",
+    "concepts": [
+      "relaxation-trouble"
+    ],
+    "type": "single",
+    "prompt": "You set NSW = 50 and no IBRION. OSZICAR shows temperatures T=. What happened?",
+    "options": [
+      {
+        "text": "IBRION defaulted to 0, which is molecular dynamics",
+        "correct": true,
+        "why": "Always set IBRION explicitly in a relaxation INCAR."
+      },
+      {
+        "text": "The relaxation is working normally",
+        "correct": false,
+        "why": "Tempting, but a relaxation does not print a temperature."
+      },
+      {
+        "text": "The cell is too hot",
+        "correct": false,
+        "why": "Tempting, but the T= is the ionic temperature of an MD run."
+      }
+    ],
+    "hints": [
+      "What is the default IBRION?",
+      "Which run type prints T=?"
+    ],
+    "difficulty": -0.1,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-relt-2",
+    "concepts": [
+      "relaxation-trouble"
+    ],
+    "type": "single",
+    "prompt": "ZBRENT: fatal error in bracketing. Which is a first step?",
+    "options": [
+      {
+        "text": "Copy CONTCAR to POSCAR and restart, tightening EDIFF",
+        "correct": true,
+        "why": "Often the structure is already near the minimum."
+      },
+      {
+        "text": "Delete the INCAR",
+        "correct": false,
+        "why": "Tempting for a fresh start, but VASP needs it."
+      },
+      {
+        "text": "Raise NSW to 10000",
+        "correct": false,
+        "why": "Tempting, but the line search failure is not about the step count."
+      }
+    ],
+    "hints": [
+      "Is the structure perhaps already close to converged?",
+      "Which file holds the last structure?"
+    ],
+    "difficulty": 0.0,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-relt-3",
+    "concepts": [
+      "relaxation-trouble"
+    ],
+    "type": "single",
+    "prompt": "Your slab relaxed with ISIF = 3 and the vacuum layer is gone. Why?",
+    "options": [
+      {
+        "text": "The vacuum has no stress to resist the cell shrinking",
+        "correct": true,
+        "why": "Use ISIF = 2 for slabs, surfaces and molecules in a box."
+      },
+      {
+        "text": "POTIM was too large",
+        "correct": false,
+        "why": "Tempting, but the cause is the cell relaxation, not the step size."
+      },
+      {
+        "text": "ENCUT was too low",
+        "correct": false,
+        "why": "Tempting, but ENCUT does not remove vacuum."
+      }
+    ],
+    "hints": [
+      "Which ISIF changes the cell?",
+      "What resists compression in empty space?"
+    ],
+    "difficulty": 0.0,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-relt-4",
+    "concepts": [
+      "relaxation-trouble"
+    ],
+    "type": "single",
+    "prompt": "A volume relaxation changes the cell again when you rerun it from CONTCAR. What is the likely cause and cure?",
+    "options": [
+      {
+        "text": "Pulay stress; use about 1.3 times the largest ENMAX and rerun until the volume stops changing",
+        "correct": true,
+        "why": "Finish with a static run on the final structure."
+      },
+      {
+        "text": "A bug in CONTCAR",
+        "correct": false,
+        "why": "Tempting, but the file is correct; the basis is tied to the starting cell."
+      },
+      {
+        "text": "Too many k-points",
+        "correct": false,
+        "why": "Tempting, but k-points are not the cause of a drifting volume."
+      }
+    ],
+    "hints": [
+      "Which quantity is biased when the basis is fixed?",
+      "How many rounds are normal?"
+    ],
+    "difficulty": 0.4,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-relt-5",
+    "concepts": [
+      "relaxation-trouble"
+    ],
+    "type": "single",
+    "prompt": "With EDIFFG = -0.01, when does the relaxation stop?",
+    "options": [
+      {
+        "text": "When the largest force is below 0.01 eV per angstrom",
+        "correct": true,
+        "why": "A negative EDIFFG is a force criterion."
+      },
+      {
+        "text": "When the energy changes by less than 0.01 eV",
+        "correct": false,
+        "why": "Tempting, but that is what a positive EDIFFG means."
+      },
+      {
+        "text": "After 0.01 ps",
+        "correct": false,
+        "why": "Tempting, but EDIFFG is not a time."
+      }
+    ],
+    "hints": [
+      "Look at the sign.",
+      "Forces are in eV per angstrom."
+    ],
+    "difficulty": 0.0,
+    "level": "intermediate",
+    "sources": [
+      "S-019"
+    ]
+  },
+  {
+    "id": "q-errd-1",
+    "concepts": [
+      "error-diagnosis"
+    ],
+    "type": "single",
+    "prompt": "Where does VASP print its error messages?",
+    "options": [
+      {
+        "text": "To standard output (your job log), not to OUTCAR",
+        "correct": true,
+        "why": "Read the end of vasp.out or the scheduler log first."
+      },
+      {
+        "text": "Only to OUTCAR",
+        "correct": false,
+        "why": "Tempting, but OUTCAR often ends without an explanation."
+      },
+      {
+        "text": "To a file called ERROR",
+        "correct": false,
+        "why": "Tempting, but VASP writes no such file."
+      }
+    ],
+    "hints": [
+      "Which file is your scheduler writing?",
+      "OUTCAR is not the first place."
+    ],
+    "difficulty": -0.3,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-errd-2",
+    "concepts": [
+      "error-diagnosis"
+    ],
+    "type": "order",
+    "prompt": "Put the first three looks in order after a crash.",
+    "options": [
+      {
+        "text": "tail -30 of the standard output",
+        "correct": true,
+        "why": "First: the error text."
+      },
+      {
+        "text": "tail -5 OSZICAR",
+        "correct": true,
+        "why": "Second: electronic loop or ionic step."
+      },
+      {
+        "text": "tail -40 OUTCAR",
+        "correct": true,
+        "why": "Third: the last thing VASP did."
+      }
+    ],
+    "hints": [
+      "Start with the text of the error.",
+      "OUTCAR is the longest."
+    ],
+    "difficulty": 0.0,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-errd-3",
+    "concepts": [
+      "error-diagnosis"
+    ],
+    "type": "single",
+    "prompt": "The job disappeared with no message at all. What is the usual cause?",
+    "options": [
+      {
+        "text": "The wall-time limit or running out of memory",
+        "correct": true,
+        "why": "Check the scheduler log."
+      },
+      {
+        "text": "A typo in the INCAR",
+        "correct": false,
+        "why": "Tempting, but a bad INCAR normally prints a message."
+      },
+      {
+        "text": "Too few bands",
+        "correct": false,
+        "why": "Tempting, but that gives a warning or error text."
+      }
+    ],
+    "hints": [
+      "Who stops a job silently?",
+      "Where is that logged?"
+    ],
+    "difficulty": 0.0,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-errd-4",
+    "concepts": [
+      "error-diagnosis"
+    ],
+    "type": "single",
+    "prompt": "Your log has two errors, one early and one late. Which do you fix first?",
+    "options": [
+      {
+        "text": "The first one, then rerun",
+        "correct": true,
+        "why": "One real failure often triggers a cascade."
+      },
+      {
+        "text": "The last one",
+        "correct": false,
+        "why": "Tempting because it is at the bottom, but it may be a consequence."
+      },
+      {
+        "text": "Whichever is easier",
+        "correct": false,
+        "why": "Tempting, but it wastes reruns when the first is the real cause."
+      }
+    ],
+    "hints": [
+      "What causes what?",
+      "Read in the order things happened."
+    ],
+    "difficulty": 0.0,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-errd-5",
+    "concepts": [
+      "error-diagnosis"
+    ],
+    "type": "single",
+    "prompt": "The error finder matches your pasted text only on keywords, not on an exact message. How should you treat the result?",
+    "options": [
+      {
+        "text": "As a suggestion to check; look for the exact message to confirm",
+        "correct": true,
+        "why": "Exact and routine-name matches are stronger evidence."
+      },
+      {
+        "text": "As certain, because the finder is automatic",
+        "correct": false,
+        "why": "Tempting, but keyword matches are only possible matches."
+      },
+      {
+        "text": "As wrong, because it is not exact",
+        "correct": false,
+        "why": "Tempting, but keyword matches are often useful; they just need checking."
+      }
+    ],
+    "hints": [
+      "Which match kind is the weakest?",
+      "What would make you sure?"
+    ],
+    "difficulty": 0.4,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ]
+  }
+]
