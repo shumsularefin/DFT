@@ -1,0 +1,975 @@
+[
+  {
+    "id": "q-ef-1",
+    "concepts": [
+      "energies-forces"
+    ],
+    "type": "single",
+    "prompt": "A structure is relaxed when what is small?",
+    "options": [
+      {
+        "text": "Every force on the atoms",
+        "correct": true,
+        "why": "The force is the slope of the energy, so flat means no push left."
+      },
+      {
+        "text": "Only the total energy",
+        "correct": false,
+        "why": "Tempting, but the energy changes very little near a minimum even while forces are still large."
+      },
+      {
+        "text": "The cell volume",
+        "correct": false,
+        "why": "Tempting, but the volume says nothing about whether the atoms still feel forces."
+      }
+    ],
+    "hints": [
+      "Think of balls on a hilly landscape.",
+      "Which quantity is the slope?"
+    ],
+    "difficulty": -0.8,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-ef-2",
+    "concepts": [
+      "energies-forces"
+    ],
+    "type": "single",
+    "prompt": "Which unit does VASP use for forces in OUTCAR?",
+    "options": [
+      {
+        "text": "eV/Angstrom",
+        "correct": true,
+        "why": "The TOTAL-FORCE block is given in eV per angstrom."
+      },
+      {
+        "text": "eV",
+        "correct": false,
+        "why": "Tempting, but that is an energy, not a force."
+      },
+      {
+        "text": "Hartree/Bohr",
+        "correct": false,
+        "why": "Tempting, but VASP uses eV and angstrom here, not atomic units."
+      }
+    ],
+    "hints": [
+      "A force is an energy divided by a length.",
+      "Look at the header of the TOTAL-FORCE block."
+    ],
+    "difficulty": -0.6,
+    "level": "beginner",
+    "sources": [
+      "S-019"
+    ]
+  },
+  {
+    "id": "q-ef-3",
+    "concepts": [
+      "energies-forces"
+    ],
+    "type": "single",
+    "prompt": "Why should every calculation you compare use the same OUTCAR energy line?",
+    "options": [
+      {
+        "text": "The entropy term depends on the smearing, so mixed lines add a numerical difference",
+        "correct": true,
+        "why": "Free energy and the sigma-to-0 energy differ by an entropy term that changes with SIGMA."
+      },
+      {
+        "text": "The lines have different units",
+        "correct": false,
+        "why": "Tempting, but they all use eV; the difference is an entropy term."
+      },
+      {
+        "text": "Only one line is ever written",
+        "correct": false,
+        "why": "Tempting, but OUTCAR holds several energy lines in each ionic step."
+      }
+    ],
+    "hints": [
+      "What does the free energy include that the other line does not?",
+      "Does the extra term depend on SIGMA?"
+    ],
+    "difficulty": 0.0,
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-ef-4",
+    "concepts": [
+      "energies-forces"
+    ],
+    "type": "multi",
+    "prompt": "Which readings suggest the forces of a step are unreliable?",
+    "options": [
+      {
+        "text": "The ionic step hit NELM",
+        "correct": true,
+        "why": "VASP continues anyway, so the forces from that step are unreliable."
+      },
+      {
+        "text": "A large total drift line",
+        "correct": true,
+        "why": "A large drift shows the forces are not consistent, often from loose convergence."
+      },
+      {
+        "text": "The step is the last one",
+        "correct": false,
+        "why": "Tempting, but being last says nothing about the quality of the forces."
+      }
+    ],
+    "hints": [
+      "Think about electronic convergence.",
+      "What does the drift line check?"
+    ],
+    "difficulty": 0.3,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-ef-5",
+    "concepts": [
+      "energies-forces"
+    ],
+    "type": "single",
+    "prompt": "A very tight force criterion such as EDIFFG = -0.001 needs what else?",
+    "options": [
+      {
+        "text": "A tight EDIFF, such as 1E-7 or smaller",
+        "correct": true,
+        "why": "Forces are only as accurate as the SCF behind them."
+      },
+      {
+        "text": "A smaller ENCUT",
+        "correct": false,
+        "why": "Tempting, but a lower cutoff makes forces less accurate, not more."
+      },
+      {
+        "text": "A larger SIGMA",
+        "correct": false,
+        "why": "Tempting, but a larger smearing does not make forces more accurate."
+      }
+    ],
+    "hints": [
+      "Forces come from the electronic loop.",
+      "Which tag sets how tightly it converges?"
+    ],
+    "difficulty": 0.6,
+    "level": "pro",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-rx-1",
+    "concepts": [
+      "relaxation-analysis"
+    ],
+    "type": "single",
+    "prompt": "How does VASP signal that a relaxation with a negative EDIFFG reached its criterion?",
+    "options": [
+      {
+        "text": "It prints reached required accuracy in OUTCAR",
+        "correct": true,
+        "why": "That line appears when every force is below the absolute value of EDIFFG."
+      },
+      {
+        "text": "The job simply ends",
+        "correct": false,
+        "why": "Tempting, but a job also ends when it runs out of steps (NSW)."
+      },
+      {
+        "text": "The energy stops changing",
+        "correct": false,
+        "why": "Tempting, but a flat energy can hide forces that are still large."
+      }
+    ],
+    "hints": [
+      "Look for a phrase in OUTCAR.",
+      "Ending is not the same as converging."
+    ],
+    "difficulty": -0.6,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-rx-2",
+    "concepts": [
+      "relaxation-analysis"
+    ],
+    "type": "single",
+    "prompt": "A cell relaxation ended after NSW steps with large forces. Is it relaxed?",
+    "options": [
+      {
+        "text": "No, it stopped for running out of steps",
+        "correct": true,
+        "why": "The criterion was not reached, so the structure is not relaxed."
+      },
+      {
+        "text": "Yes, because the job finished",
+        "correct": false,
+        "why": "Tempting, but finishing is not the same as reaching the criterion."
+      },
+      {
+        "text": "Yes, if the energy fell",
+        "correct": false,
+        "why": "Tempting, but the energy can fall and the forces still be large."
+      }
+    ],
+    "hints": [
+      "Compare the largest force with EDIFFG.",
+      "What stopped the run?"
+    ],
+    "difficulty": -0.3,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-rx-3",
+    "concepts": [
+      "relaxation-analysis"
+    ],
+    "type": "single",
+    "prompt": "After a cell relaxation, which energy do you report?",
+    "options": [
+      {
+        "text": "The static calculation on the relaxed structure",
+        "correct": true,
+        "why": "The relaxation used a basis built for the starting cell, so a static run on the final geometry is the one to report."
+      },
+      {
+        "text": "The last energy of the relaxation",
+        "correct": false,
+        "why": "Tempting, but it was computed with the basis of the starting cell."
+      },
+      {
+        "text": "The first energy of the relaxation",
+        "correct": false,
+        "why": "Tempting, but that belongs to the starting structure."
+      }
+    ],
+    "hints": [
+      "What was the basis built for?",
+      "Copy CONTCAR to POSCAR and run again."
+    ],
+    "difficulty": 0.1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-rx-4",
+    "concepts": [
+      "relaxation-analysis"
+    ],
+    "type": "multi",
+    "prompt": "Which checks does the handbook suggest after a relaxation?",
+    "options": [
+      {
+        "text": "Compare lattice constants with experiment",
+        "correct": true,
+        "why": "Large deviations hint at a wrong magnetic state, missing vdW or a wrong POTCAR."
+      },
+      {
+        "text": "Compare the space group of POSCAR and CONTCAR",
+        "correct": true,
+        "why": "Symmetry can be lost during a relaxation."
+      },
+      {
+        "text": "Check the number of CPU cores used",
+        "correct": false,
+        "why": "Tempting, but the core count does not tell you whether the structure is right."
+      }
+    ],
+    "hints": [
+      "One is about the size, one about symmetry.",
+      "What would a wrong structure show?"
+    ],
+    "difficulty": 0.2,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-rx-5",
+    "concepts": [
+      "relaxation-analysis"
+    ],
+    "type": "single",
+    "prompt": "Why does the handbook use ENCUT of 1.3 times ENMAX for cell relaxations?",
+    "options": [
+      {
+        "text": "To keep the Pulay stress small",
+        "correct": true,
+        "why": "Stress converges more slowly than energy, so the cutoff needs a margin."
+      },
+      {
+        "text": "To make the run faster",
+        "correct": false,
+        "why": "Tempting, but a higher cutoff makes it slower."
+      },
+      {
+        "text": "To change the functional",
+        "correct": false,
+        "why": "Tempting, but ENCUT does not change the functional."
+      }
+    ],
+    "hints": [
+      "What changes in the basis when the cell changes?",
+      "Which quantity converges slowest?"
+    ],
+    "difficulty": 0.6,
+    "level": "pro",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-dos-1",
+    "concepts": [
+      "density-of-states"
+    ],
+    "type": "single",
+    "prompt": "What does the density of states count?",
+    "options": [
+      {
+        "text": "The number of electron states per unit energy",
+        "correct": true,
+        "why": "Where the curve is zero there are no states at that energy."
+      },
+      {
+        "text": "The number of atoms per unit volume",
+        "correct": false,
+        "why": "Tempting, but that is a density of atoms, not of states."
+      },
+      {
+        "text": "The number of electrons in the cell",
+        "correct": false,
+        "why": "Tempting, but that is the integral of the DOS, not the DOS itself."
+      }
+    ],
+    "hints": [
+      "Read the axes: energy and states per eV.",
+      "What happens at an energy with no states?"
+    ],
+    "difficulty": -0.8,
+    "level": "beginner",
+    "sources": [
+      "S-050"
+    ]
+  },
+  {
+    "id": "q-dos-2",
+    "concepts": [
+      "density-of-states"
+    ],
+    "type": "single",
+    "prompt": "The DOS is non-zero at the Fermi level. What does that suggest?",
+    "options": [
+      {
+        "text": "A metal at this level of theory",
+        "correct": true,
+        "why": "States are available right at the Fermi level, so electrons can move."
+      },
+      {
+        "text": "An insulator",
+        "correct": false,
+        "why": "Tempting, but an insulator has a gap that contains the Fermi level."
+      },
+      {
+        "text": "A failed calculation",
+        "correct": false,
+        "why": "Tempting, but a non-zero DOS at E_F is normal for a metal."
+      }
+    ],
+    "hints": [
+      "Is there a gap around zero?",
+      "Compare with the insulator case."
+    ],
+    "difficulty": -0.4,
+    "level": "beginner",
+    "sources": [
+      "S-050"
+    ]
+  },
+  {
+    "id": "q-dos-3",
+    "concepts": [
+      "density-of-states"
+    ],
+    "type": "single",
+    "prompt": "Why do you need the POSCAR to group a DOSCAR by element?",
+    "options": [
+      {
+        "text": "DOSCAR lists atoms by number and does not store element names",
+        "correct": true,
+        "why": "The projected blocks are in atom order only."
+      },
+      {
+        "text": "DOSCAR holds only the total DOS",
+        "correct": false,
+        "why": "Tempting, but it can hold projected blocks when LORBIT is set."
+      },
+      {
+        "text": "The POSCAR holds the DOS",
+        "correct": false,
+        "why": "Tempting, but the POSCAR holds the structure, not the DOS."
+      }
+    ],
+    "hints": [
+      "What identifies each projected block?",
+      "Which file maps numbers to elements?"
+    ],
+    "difficulty": 0.0,
+    "level": "intermediate",
+    "sources": [
+      "S-019"
+    ]
+  },
+  {
+    "id": "q-dos-4",
+    "concepts": [
+      "density-of-states"
+    ],
+    "type": "single",
+    "prompt": "Which tag writes the site- and orbital-projected DOS?",
+    "options": [
+      {
+        "text": "LORBIT = 11",
+        "correct": true,
+        "why": "With LORBIT = 11 the nine orbital columns are written for each atom."
+      },
+      {
+        "text": "NEDOS = 11",
+        "correct": false,
+        "why": "Tempting, but NEDOS is the number of energy points, not a switch for projection."
+      },
+      {
+        "text": "ISMEAR = 11",
+        "correct": false,
+        "why": "Tempting, but ISMEAR sets the smearing method."
+      }
+    ],
+    "hints": [
+      "It starts with L, a logical-like switch.",
+      "The tag is named after orbitals."
+    ],
+    "difficulty": -0.2,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-dos-5",
+    "concepts": [
+      "density-of-states"
+    ],
+    "type": "single",
+    "prompt": "Why read a gap from the unsmoothed DOS?",
+    "options": [
+      {
+        "text": "Smoothing broadens peaks and can fill in a small gap",
+        "correct": true,
+        "why": "It only changes how the curve looks, so it can hide the gap."
+      },
+      {
+        "text": "Smoothing is not allowed in VASP",
+        "correct": false,
+        "why": "Tempting, but smoothing is a plotting choice; it is just not physics."
+      },
+      {
+        "text": "The unsmoothed DOS has no noise",
+        "correct": false,
+        "why": "Tempting, but it is spiky, but its gaps are the ones in the data."
+      }
+    ],
+    "hints": [
+      "What does Gaussian broadening do to edges?",
+      "Is smoothing physics or presentation?"
+    ],
+    "difficulty": 0.4,
+    "level": "pro",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-bs-1",
+    "concepts": [
+      "band-structure"
+    ],
+    "type": "single",
+    "prompt": "What is plotted along the horizontal axis of a band structure?",
+    "options": [
+      {
+        "text": "Position along a path through the Brillouin zone",
+        "correct": true,
+        "why": "The x axis is the running distance along the k-path, with labelled points."
+      },
+      {
+        "text": "Energy",
+        "correct": false,
+        "why": "Tempting, but energy is on the vertical axis."
+      },
+      {
+        "text": "Time",
+        "correct": false,
+        "why": "Tempting, but nothing in a band structure changes with time."
+      }
+    ],
+    "hints": [
+      "What does each point of the path represent?",
+      "Names like Gamma and X label it."
+    ],
+    "difficulty": -0.8,
+    "level": "beginner",
+    "sources": [
+      "S-050"
+    ]
+  },
+  {
+    "id": "q-bs-2",
+    "concepts": [
+      "band-structure"
+    ],
+    "type": "single",
+    "prompt": "In route A of the protocol (VASP 6.3 or newer), where does the path go?",
+    "options": [
+      {
+        "text": "Into a KPOINTS_OPT file next to the uniform mesh in KPOINTS",
+        "correct": true,
+        "why": "VASP then writes the bands on that path from the same job."
+      },
+      {
+        "text": "Into POSCAR",
+        "correct": false,
+        "why": "Tempting, but POSCAR holds the structure, not the path."
+      },
+      {
+        "text": "Into INCAR",
+        "correct": false,
+        "why": "Tempting, but the INCAR holds tags, the path goes into a KPOINTS-style file."
+      }
+    ],
+    "hints": [
+      "The mesh stays in KPOINTS.",
+      "The name ends with _OPT."
+    ],
+    "difficulty": 0.0,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-bs-3",
+    "concepts": [
+      "band-structure"
+    ],
+    "type": "single",
+    "prompt": "In route B, what does ICHARG = 11 do in the band run?",
+    "options": [
+      {
+        "text": "It reads the saved CHGCAR and keeps the density fixed",
+        "correct": true,
+        "why": "The bands are then computed on the line-mode path without a new SCF."
+      },
+      {
+        "text": "It writes a new CHGCAR",
+        "correct": false,
+        "why": "Tempting, but it reads one, it does not write one."
+      },
+      {
+        "text": "It turns on spin polarization",
+        "correct": false,
+        "why": "Tempting, but that is ISPIN."
+      }
+    ],
+    "hints": [
+      "The density comes from an earlier run.",
+      "Fixed means non-self-consistent."
+    ],
+    "difficulty": 0.2,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-bs-4",
+    "concepts": [
+      "band-structure"
+    ],
+    "type": "single",
+    "prompt": "Which smearing is not meaningful for the line-mode path run?",
+    "options": [
+      {
+        "text": "Tetrahedron (ISMEAR = -5)",
+        "correct": true,
+        "why": "It needs a mesh of at least four points and is not meaningful on a line."
+      },
+      {
+        "text": "Gaussian (ISMEAR = 0)",
+        "correct": false,
+        "why": "Tempting, but this is the one the workflow uses for the path."
+      },
+      {
+        "text": "Fermi (ISMEAR = -1)",
+        "correct": false,
+        "why": "Tempting, but this one works on any set of k-points."
+      }
+    ],
+    "hints": [
+      "Tetrahedra need a mesh.",
+      "Which method divides the zone into tetrahedra?"
+    ],
+    "difficulty": 0.3,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-bs-5",
+    "concepts": [
+      "band-structure"
+    ],
+    "type": "single",
+    "prompt": "Why does a path that misses a band edge give a gap that is too large?",
+    "options": [
+      {
+        "text": "The true minimum or maximum may lie off the path",
+        "correct": true,
+        "why": "The gap is read only at the k-points in the file."
+      },
+      {
+        "text": "The path changes the functional",
+        "correct": false,
+        "why": "Tempting, but the functional is fixed in the INCAR."
+      },
+      {
+        "text": "Bands change with the path",
+        "correct": false,
+        "why": "Tempting, but the bands are the same; only the sampling differs."
+      }
+    ],
+    "hints": [
+      "Where is the gap read from?",
+      "What if an extreme lies between path points?"
+    ],
+    "difficulty": 0.5,
+    "level": "pro",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-bg-1",
+    "concepts": [
+      "band-gap"
+    ],
+    "type": "single",
+    "prompt": "The valence band maximum and the conduction band minimum are at the same k-point. The gap is...",
+    "options": [
+      {
+        "text": "Direct",
+        "correct": true,
+        "why": "Direct means both extremes sit at the same k."
+      },
+      {
+        "text": "Indirect",
+        "correct": false,
+        "why": "Tempting, but indirect means they are at different k-points."
+      },
+      {
+        "text": "Metallic",
+        "correct": false,
+        "why": "Tempting, but a metal has no gap at all."
+      }
+    ],
+    "hints": [
+      "Compare the two k-points.",
+      "Same k means no change of momentum."
+    ],
+    "difficulty": -0.7,
+    "level": "beginner",
+    "sources": [
+      "S-050"
+    ]
+  },
+  {
+    "id": "q-bg-2",
+    "concepts": [
+      "band-gap"
+    ],
+    "type": "single",
+    "prompt": "Bands cross the Fermi level on your path. What is reported?",
+    "options": [
+      {
+        "text": "A metallic system with no gap",
+        "correct": true,
+        "why": "A band holds occupied and empty states, so there is no gap to report."
+      },
+      {
+        "text": "A gap of zero for an insulator",
+        "correct": false,
+        "why": "Tempting, but a zero gap here means a metal, not an insulator."
+      },
+      {
+        "text": "A direct gap",
+        "correct": false,
+        "why": "Tempting, but a direct gap needs a gap to exist."
+      }
+    ],
+    "hints": [
+      "Is there any energy range without states at E_F?",
+      "Occupied and empty states in one band."
+    ],
+    "difficulty": -0.2,
+    "level": "intermediate",
+    "sources": [
+      "S-050"
+    ]
+  },
+  {
+    "id": "q-bg-3",
+    "concepts": [
+      "band-gap"
+    ],
+    "type": "single",
+    "prompt": "Which statement about a PBE band gap is right?",
+    "options": [
+      {
+        "text": "It usually underestimates the gap",
+        "correct": true,
+        "why": "The handbook uses HSE06 or mBJ for quantitative gaps."
+      },
+      {
+        "text": "It equals the optical gap",
+        "correct": false,
+        "why": "Tempting, but the Kohn-Sham gap is not the optical gap."
+      },
+      {
+        "text": "It is always larger than experiment",
+        "correct": false,
+        "why": "Tempting, but semilocal functionals tend to underestimate gaps."
+      }
+    ],
+    "hints": [
+      "Recall the functional ladder.",
+      "Which functionals does the handbook suggest for gaps?"
+    ],
+    "difficulty": 0.1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-bg-4",
+    "concepts": [
+      "band-gap"
+    ],
+    "type": "numeric",
+    "prompt": "The VBM is at -0.20 eV and the CBM is at 1.35 eV. What is the band gap?",
+    "answer": 1.55,
+    "tolerance": 0.01,
+    "unit": "eV",
+    "hints": [
+      "Gap is CBM minus VBM.",
+      "Mind the sign of the VBM."
+    ],
+    "difficulty": 0.0,
+    "level": "beginner",
+    "sources": [
+      "S-050"
+    ]
+  },
+  {
+    "id": "q-cd-1",
+    "concepts": [
+      "charge-density"
+    ],
+    "type": "single",
+    "prompt": "What do you divide the CHGCAR numbers by to get electrons per cubic angstrom?",
+    "options": [
+      {
+        "text": "The cell volume",
+        "correct": true,
+        "why": "Each value is the density times the cell volume."
+      },
+      {
+        "text": "The number of atoms",
+        "correct": false,
+        "why": "Tempting, but the values are scaled by volume, not by atom count."
+      },
+      {
+        "text": "The number of grid points",
+        "correct": false,
+        "why": "Tempting, but that is used for the electron count, not for the density."
+      }
+    ],
+    "hints": [
+      "Look at the header of CHGCAR.",
+      "What is multiplied in?"
+    ],
+    "difficulty": -0.4,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-cd-2",
+    "concepts": [
+      "charge-density"
+    ],
+    "type": "single",
+    "prompt": "Which method turns a grid of density values into a surface?",
+    "options": [
+      {
+        "text": "Marching cubes",
+        "correct": true,
+        "why": "It looks at each small cube of the grid and draws the piece of surface that crosses it."
+      },
+      {
+        "text": "Fourier transform",
+        "correct": false,
+        "why": "Tempting, but that moves between real and reciprocal space, it does not draw a surface."
+      },
+      {
+        "text": "Monkhorst-Pack",
+        "correct": false,
+        "why": "Tempting, but that is a k-point mesh."
+      }
+    ],
+    "hints": [
+      "The surface is built cube by cube.",
+      "Lorensen and Cline, 1987."
+    ],
+    "difficulty": -0.3,
+    "level": "beginner",
+    "sources": [
+      "S-030"
+    ]
+  },
+  {
+    "id": "q-cd-3",
+    "concepts": [
+      "charge-density"
+    ],
+    "type": "single",
+    "prompt": "How can you check that a CHGCAR belongs to your system?",
+    "options": [
+      {
+        "text": "Sum the grid values and divide by the number of grid points to get the electron count",
+        "correct": true,
+        "why": "That should equal the valence electrons of the system."
+      },
+      {
+        "text": "Count the lines in the file",
+        "correct": false,
+        "why": "Tempting, but the line count depends on the grid and layout, not on the system."
+      },
+      {
+        "text": "Read the first line",
+        "correct": false,
+        "why": "Tempting, but the first line is a free comment."
+      }
+    ],
+    "hints": [
+      "What does the density integrate to?",
+      "Include only valence electrons."
+    ],
+    "difficulty": 0.2,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-cd-4",
+    "concepts": [
+      "charge-density"
+    ],
+    "type": "single",
+    "prompt": "What does the second grid in a spin-polarized CHGCAR hold?",
+    "options": [
+      {
+        "text": "The magnetization, spin up minus spin down",
+        "correct": true,
+        "why": "It is the magnetization density in the same layout as the first grid."
+      },
+      {
+        "text": "The core electrons",
+        "correct": false,
+        "why": "Tempting, but core electrons are not written here."
+      },
+      {
+        "text": "The density at the next step",
+        "correct": false,
+        "why": "Tempting, but CHGCAR holds one converged density."
+      }
+    ],
+    "hints": [
+      "ISPIN = 2 adds something.",
+      "Which difference is a magnetization?"
+    ],
+    "difficulty": 0.1,
+    "level": "intermediate",
+    "sources": [
+      "S-019"
+    ]
+  },
+  {
+    "id": "q-cd-5",
+    "concepts": [
+      "charge-density"
+    ],
+    "type": "single",
+    "prompt": "You raise the isosurface level. What happens?",
+    "options": [
+      {
+        "text": "The surface shrinks to enclose only the densest regions",
+        "correct": true,
+        "why": "Only places with a high density stay inside the surface."
+      },
+      {
+        "text": "The surface grows and joins atoms",
+        "correct": false,
+        "why": "Tempting, but that is what a lower level does."
+      },
+      {
+        "text": "Nothing changes",
+        "correct": false,
+        "why": "Tempting, but the level decides which density value the surface follows."
+      }
+    ],
+    "hints": [
+      "A high level means a rare value.",
+      "Where is the density highest?"
+    ],
+    "difficulty": -0.5,
+    "level": "beginner",
+    "sources": [
+      "S-043"
+    ]
+  }
+]

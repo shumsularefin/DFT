@@ -70,6 +70,10 @@ export const REGISTERED_LABS = [
   'spin-cartoon',
   'output-reader',
   'error-finder',
+  'relaxation-viewer',
+  'dos-viewer',
+  'band-viewer',
+  'density-viewer',
 ] as const;
 
 /** Page class for a topic: "island" if its body embeds a registered lab, else "content". */

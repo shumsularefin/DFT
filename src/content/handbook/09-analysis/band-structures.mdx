@@ -1,0 +1,104 @@
+---
+id: band-structures
+title: Band structures and band gaps
+module: 9
+order: 4
+summary: Reading bands along a k-path, the two routes to compute them, and how to report a gap as direct or indirect without overstating it.
+concepts: [band-structure, band-gap]
+requires: [brillouin-zone, density-of-states]
+vaspTags: [ICHARG, LCHARG, ISMEAR, NBANDS]
+sources: [S-019, S-041, S-042, S-050]
+status: draft
+updated: 2026-11-11
+---
+
+<Why>
+
+The DOS tells you how many states there are at each energy. The band structure tells you where in k-space they are, which decides whether the lowest excitation needs a change of momentum. The size and type of the band gap follow from it.
+
+</Why>
+
+<Intuition>
+
+Walk through the Brillouin zone along a path that joins high-symmetry points such as Γ, X and M, and plot the energy of every band along the way. The top of the occupied bands is the **valence band maximum** (VBM) and the bottom of the empty bands is the **conduction band minimum** (CBM). If both are at the same k-point the gap is **direct**, otherwise it is **indirect** <Cite id="S-050" />.
+
+The gap you read is only for the k-points on your path. A band edge that lies off the path is missed, so the true gap can be smaller.
+
+<Level min="intermediate">
+
+There are two routes in the author's protocol <Cite id="S-042" />. **Route A** (VASP 6.3 or newer): run one SCF with the uniform mesh in KPOINTS and copy the path file to KPOINTS_OPT; VASP then also writes the bands on that path, in EIGENVAL_OPT. **Route B**: run the SCF without ICHARG = 11, then a second run with the line-mode path as KPOINTS and ICHARG = 11, which reads the saved CHGCAR and keeps the density fixed. Use ISMEAR = 0, because the tetrahedron method is not meaningful on a line <Cite id="S-041" />.
+
+</Level>
+
+<Level min="pro">
+
+DFT with PBE underestimates gaps; HSE06 or mBJ are used for quantitative gaps <Cite id="S-042" />. The gap here is a Kohn-Sham gap, not an optical gap. In a metal, bands cross the Fermi level and no gap is reported.
+
+</Level>
+
+</Intuition>
+
+<Lab id="band-viewer" title="Band structure viewer" />
+
+<TheMath>
+
+With bands $\varepsilon_{n\mathbf{k}}$ the gap is $E_g = \min_{\mathbf{k}} \varepsilon^{\text{c}}_{\mathbf{k}} - \max_{\mathbf{k}} \varepsilon^{\text{v}}_{\mathbf{k}}$, and it is direct when both extremes lie at the same $\mathbf{k}$ <Cite id="S-050" />. The x axis is the running distance $\sum |\Delta\mathbf{k}|$ along the path, with the factor $2\pi$ in the reciprocal lattice.
+
+</TheMath>
+
+<InVasp>
+
+The line-mode KPOINTS of route B (a path from the k-path tool, all values from your own structure) <Cite id="S-019" />:
+
+<VaspFile
+  name="KPOINTS"
+  code={`k-path
+20
+Line-mode
+Reciprocal
+0.0 0.0 0.0 ! GAMMA
+0.5 0.0 0.0 ! X
+
+0.5 0.0 0.0 ! X
+0.5 0.5 0.0 ! M`}
+/>
+
+Open EIGENVAL (or EIGENVAL_OPT), the KPOINTS file for the labels and a POSCAR for the distance scale in the viewer above.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                      | ...then                                                    |
+| ------------------------------ | ---------------------------------------------------------- |
+| Use more points per segment    | Smoother lines and a better chance to catch the band edges |
+| Use a wrong path for your cell | Edges at labelled points may not be the true extremes      |
+| Switch from PBE to a hybrid    | The gap usually opens; the band shapes change less         |
+
+Why the path matters: the standard path joins the points where extremes usually occur. What happens if you skip it: you may report an indirect gap as direct, or miss the minimum.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Reporting the gap of the path as the gap of the material">
+
+State that it is the gap on the sampled path, and what the functional is.
+
+</Callout>
+
+<Callout variant="mistake" title="Using tetrahedron smearing on a line">
+
+ISMEAR = -5 needs a mesh of at least four points and is not meaningful on a line <Cite id="S-041" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-bs-1', 'q-bs-2', 'q-bs-3', 'q-bs-4', 'q-bs-5', 'q-bg-1', 'q-bg-2', 'q-bg-3', 'q-bg-4']} />
+
+<GoDeeper>
+
+- The k-path tool in module 5 and the density of states topic <Cite id="S-042" />.
+
+</GoDeeper>

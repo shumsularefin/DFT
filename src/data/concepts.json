@@ -638,7 +638,7 @@
    "reading-outputs"
   ],
   "summary": "Which energy to report and how forces show that a structure is relaxed.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "relaxation-analysis",
@@ -649,7 +649,7 @@
    "energies-forces"
   ],
   "summary": "Checking that forces and stresses are below the target and the structure makes sense.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "density-of-states",
@@ -661,7 +661,7 @@
    "smearing"
   ],
   "summary": "The number of states per energy, total and projected on atoms and orbitals.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "band-structure",
@@ -673,7 +673,7 @@
    "density-of-states"
   ],
   "summary": "Energies along a path of high-symmetry k-points.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "band-gap",
@@ -684,7 +684,7 @@
    "band-structure"
   ],
   "summary": "The gap between occupied and empty states, direct or indirect, and why DFT underestimates it.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "charge-density",
@@ -696,7 +696,7 @@
    "output-files"
   ],
   "summary": "Isosurfaces and slices of the computed density.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "perovskite-structure",

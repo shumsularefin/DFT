@@ -1,0 +1,103 @@
+---
+id: relaxations
+title: Judging a relaxation
+module: 9
+order: 2
+summary: How to tell that a relaxation really finished, what to look at in the trajectory, and why you rerun from CONTCAR before computing properties.
+concepts: [relaxation-analysis]
+requires: [reading-outputs, energies-forces]
+vaspTags: [IBRION, ISIF, EDIFFG, NSW, EDIFF]
+sources: [S-019, S-041, S-042]
+status: draft
+updated: 2026-11-11
+---
+
+<Why>
+
+A relaxation that stops is not the same as a relaxation that worked. It may have stopped at NSW, with forces still large, or the structure may have changed into something you did not intend. Checking takes a minute and protects every number you compute afterwards.
+
+</Why>
+
+<Intuition>
+
+Three questions, in this order.
+
+1. **Did it reach the criterion?** With a negative EDIFFG, VASP stops when every force is below its absolute value and prints `reached required accuracy` in OUTCAR <Cite id="S-041" />. If it stopped because it ran out of steps (NSW), it did not finish.
+2. **Does the structure make sense?** Compare lattice constants with experiment. In the author's handbook PBE tends to overestimate by about 1 to 2 percent and LDA to underestimate by about the same; deviations above about 3 percent suggest a wrong magnetic state, missing van der Waals or a wrong POTCAR <Cite id="S-042" />.
+3. **Is the symmetry still there?** Compare the space group of POSCAR and CONTCAR <Cite id="S-042" />.
+
+<Level min="intermediate">
+
+For a cell relaxation (ISIF = 3) the plane-wave basis was built for the starting cell, so the last energy is not the one to report. Copy CONTCAR to POSCAR and repeat until it converges in one to three ionic steps, then run a static calculation on the final geometry <Cite id="S-042" />.
+
+</Level>
+
+<Level min="pro">
+
+ENCUT of 1.3 times the largest ENMAX keeps the Pulay stress small in cell relaxations <Cite id="S-042" />. Back up OUTCAR and CONTCAR before the next run overwrites them.
+
+</Level>
+
+</Intuition>
+
+<Lab id="relaxation-viewer" title="Relaxation viewer" />
+
+<TheMath>
+
+The stopping rule for EDIFFG below zero is $\max_i |\mathbf{F}_i| < |\text{EDIFFG}|$. For EDIFFG above zero it is that the energy change between steps is smaller than EDIFFG <Cite id="S-019" />. The force rule is the more reliable one <Cite id="S-042" />.
+
+</TheMath>
+
+<InVasp>
+
+A relaxation INCAR with a force criterion (values from the Workflow Handbook) <Cite id="S-042" />:
+
+<VaspFile
+  name="INCAR"
+  code={`IBRION = 2
+ISIF = 3
+NSW = 100
+EDIFF = 1E-6
+EDIFFG = -0.005
+ENCUT = 520`}
+/>
+
+Open the XDATCAR together with OSZICAR or OUTCAR in the viewer above. Your files are read in the browser and never uploaded.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                          | ...then                                                    |
+| ---------------------------------- | ---------------------------------------------------------- |
+| Tighten EDIFFG                     | More ionic steps, forces closer to zero                    |
+| Loosen EDIFF but keep EDIFFG tight | Forces are noisy, so the stop rule is unreliable           |
+| Relax the cell and skip the rerun  | The final energy belongs to a basis built for another cell |
+
+Why rerun: the basis was built for the starting cell. What happens if you skip it: an energy and stress that are slightly inconsistent with the final structure.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Calling a run relaxed because it stopped">
+
+Check for `reached required accuracy`, not for the end of the job.
+
+</Callout>
+
+<Callout variant="mistake" title="Using the relaxation's last energy as the result">
+
+Run a static calculation on the relaxed structure and report that energy <Cite id="S-042" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-rx-1', 'q-rx-2', 'q-rx-3', 'q-rx-4', 'q-rx-5']} />
+
+<GoDeeper>
+
+- Relaxation trouble in module 8 and the energies and forces topic <Cite id="S-041" />.
+
+</GoDeeper>
