@@ -7,6 +7,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- Shannon ionic and crystal radii dataset (94 elements) with a lookup that refuses to guess: a missing oxidation state, coordination, spin or geometry returns the reason and the available choices (no UI yet).
 - Module 9, analysis (five topics) with four viewers that read your own VASP files in the browser: relaxation viewer (XDATCAR with OSZICAR or OUTCAR energy and largest force, POSCAR download), DOS viewer (total and projected, spin mirrored, smoothing off by default), band structure viewer (EIGENVAL, KPOINTS labels, direct or indirect gap) and charge density viewer (isosurface and cross-section of CHGCAR, magnetization). Large files are read in a background thread with progress. No example data is shipped; nothing is uploaded.
 - Module 8, convergence testing and common errors (six topics) and the VASP error finder at /errors/: paste a log excerpt or describe a symptom and get ranked causes and ordered fixes at your level, matched in your browser from 32 entries merged from the two handbooks.
 - k-path tool at /tools/kpath/: choose one of the 14 Bravais lattices or drop a POSCAR or CIF, see what standardizing did to your cell, switch between the HPKOT and Setyawan-Curtarolo paths, set points per segment or a density, watch a marker move along the path in the Brillouin zone, and download KPOINTS (line mode), KPATH.in, KPOINTS_OPT, a CSV or JSON point list and the standardized POSCAR. The Input Builder can hand its structure over.
