@@ -70,6 +70,7 @@ test.describe('practice and progress', () => {
   test('a session runs, a wrong answer comes back for review after a day, axe clean', async ({ page }) => {
     await page.clock.install({ time: new Date('2026-11-02T10:00:00Z') });
     await page.goto('/practice/');
+    await page.waitForFunction(() => document.querySelectorAll('astro-island[ssr]').length === 0);
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
     expect(await noOverflow(page)).toBe(true);
     await page.getByRole('button', { name: 'Start a session' }).click();

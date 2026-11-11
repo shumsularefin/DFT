@@ -83,7 +83,7 @@ describe('irreducible counts equal spglib (golden, fcc Cu primitive)', () => {
   });
 });
 
-describe('meshIsSymmetric equals the golden mesh_point_group_symmetry (S-007, Q-017)', () => {
+describe('meshIsSymmetric equals the golden mesh_point_group_symmetry (S-007, S-019)', () => {
   const lat: Record<string, Mat3> = {
     'hcp_Mg_P6_3/mmc': L('hex_ideal'),
     fcc_Cu_primitive: L('fcc_primitive'),
@@ -97,10 +97,11 @@ describe('meshIsSymmetric equals the golden mesh_point_group_symmetry (S-007, Q-
       expect(meshIsSymmetric(cube(r.n), 'gamma', g)).toBe(r.gamma_centred_symmetric);
       expect(meshIsSymmetric(cube(r.n), 'monkhorst-pack', g)).toBe(r.monkhorst_pack_symmetric);
     });
-  it('the report names the Q-017 reason for an even MP mesh on a hexagonal lattice', () => {
+  it('the report names the reason for an even MP mesh on a hexagonal lattice', () => {
     const rep = meshSymmetryReport(cube(4), 'monkhorst-pack', groups['hcp_Mg_P6_3/mmc']!);
     expect(rep.symmetric).toBe(false);
     expect(rep.failing).toBeGreaterThan(0);
-    expect(rep.reason).toContain('Q-017');
+    expect(rep.reason).toContain('shifted off Gamma');
+    expect(rep.reason).toContain('VASP wiki');
   });
 });

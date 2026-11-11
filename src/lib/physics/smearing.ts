@@ -6,9 +6,9 @@
 //   energy is -T S = -sigma * sum_i w_i s(x_i) (VASP prints T*S as EENTRO). For Fermi-Dirac s is the usual
 //   -f ln f - (1 - f) ln(1 - f).
 // @source S-015 (Methfessel-Paxton: delta_N = sum_n A_n H_2n(x) exp(-x^2), A_n = (-1)^n / (n! 4^n sqrt(pi)))
-// @source S-016 (Marzari-Vanderbilt cold smearing). Marzari and Vanderbilt write
-//   delta(u) = exp(-(u - 1/sqrt2)^2) (2 - sqrt2 u) / sqrt(pi) with u = (mu - epsilon)/sigma = -x;
-//   here it is used as delta(x) = exp(-(x + 1/sqrt2)^2) (2 + sqrt2 x) / sqrt(pi). See Q-041.
+// @source S-016 (Marzari-Vanderbilt cold smearing). Eq. (1) of the paper (arXiv:cond-mat/9903147, read 2026-11-11)
+//   is delta(u) = exp(-(u - 1/sqrt2)^2) (2 - sqrt2 u) / sqrt(pi) with u = (mu - epsilon)/sigma = -x;
+//   here it is used as delta(x) = exp(-(x + 1/sqrt2)^2) (2 + sqrt2 x) / sqrt(pi), the same function (Q-041 closed).
 // @source S-053 (error function)
 import { erf } from './tightbinding2d';
 

@@ -81,7 +81,7 @@ export default function KpointsStep() {
             </select>
           </div>
           <p className="ib-warn" role="note">
-            The rule VASP uses to turn KSPACING into a mesh is not yet confirmed (Q-004). This tool uses{' '}
+            VASP and VASPKIT both round up (ceil), as their documentation states. This tool uses{' '}
             <strong>{kp.rule}</strong>. Check the mesh VASP prints in OUTCAR.
           </p>
           {kp.mesh && s.structure && (

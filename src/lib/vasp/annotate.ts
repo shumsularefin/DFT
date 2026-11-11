@@ -321,7 +321,7 @@ export const POTCAR_FIELDS: readonly PotcarField[] = [
   {
     name: 'ENMIN',
     meaning:
-      'Listed next to ENMAX in the header. The handbooks do not describe it, so it is not explained here yet (Q-030).',
+      'The minimum viable plane-wave cutoff for this dataset, in eV (VASP wiki, ENMIN and POTCAR pages, S-019). With several species the largest ENMIN applies; VASP uses it as the default cutoff only with the deprecated PREC = Low. Production runs use ENMAX or more.',
   },
   {
     name: 'LEXCH',

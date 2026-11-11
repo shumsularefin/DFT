@@ -25,7 +25,7 @@ Seed material for this milestone is the author's two handbooks (`docs/source-mat
 **Tests and reference values**:
 - Round trip on every structure in `tests/reference/kpaths.json` (39) (`structures.*.input`: `lattice_rows`, `frac_coords`, `atomic_numbers` mapped to symbols): write then parse equals the original to 1e-12.
 - Reciprocal lattice rows with 2 pi equal `tests/reference/bz_geometry.json` `lattices.*.reciprocal_lattice_rows_with_2pi` to 1e-10 for all 12 lattices; `reciprocal . lattice^T = 2 pi I`.
-- Volumes: fcc primitive a = 3.61 gives 11.7607 Angstrom^3 (a^3/4); `cell_volume` field of `bz_geometry.json` for all 12 lattices; BZ volume relation is tested in M5.2, not here.
+- Volumes: fcc primitive a = 3.61 gives 11.76147 Angstrom^3 (a^3/4; corrected from 11.7607, Q-027); `cell_volume` field of `bz_geometry.json` for all 12 lattices; BZ volume relation is tested in M5.2, not here.
 - Negative scale: a cell of volume 8.0 with `-27.0` becomes volume 27.0 (all lengths x 1.5).
 - Hexagonal lattice parameters round trip: `fromParameters(a, a, c, 90, 90, 120)` returns the same parameters.
 - Wrapping, minimum image on a skewed cell (compare with a brute-force search over neighbouring cells).

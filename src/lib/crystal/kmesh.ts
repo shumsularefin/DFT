@@ -1,5 +1,5 @@
 // k-meshes in the reciprocal lattice basis, orbit counting under a point group, and the mesh-symmetry test.
-// @source S-007 (Monkhorst-Pack meshes), S-032 (irreducible points as spglib counts them), D-044, Q-017.
+// @source S-007 (Monkhorst-Pack meshes), S-032 (irreducible points as spglib counts them), S-019 (VASP wiki KPOINTS: avoid even MP meshes on hexagonal lattices), D-044.
 // Points are fractional coordinates q along b1, b2, b3. A mesh point is (g + s) / n with g = 0..n-1 and s = 0 or 1/2.
 // A rotation R of the real-space lattice (f' = f R) acts on q as q' = q (R^-1)^T (inverse transpose).
 import { intInverse, type IntMat3 } from './pointgroup';
@@ -148,7 +148,7 @@ export interface SymmetryReport {
   /** Rotations (of the group given) that send at least one mesh point off the mesh. */
   failing: number;
   of: number;
-  /** One sentence naming the reason, used by the lab (Q-017). */
+  /** One sentence naming the reason, used by the lab. */
   reason: string;
 }
 
@@ -184,7 +184,7 @@ export function meshSymmetryReport(
       : 'The mesh contains Gamma and every symmetry operation of the lattice maps it onto itself.'
     : `${failing} of ${acts.length} symmetry operations of the lattice send some mesh points off the mesh, so the mesh has lower symmetry than the crystal. ` +
       (anyShift
-        ? 'An even Monkhorst-Pack mesh is shifted off Gamma; on hexagonal and fcc lattices that shift is not preserved by every rotation. A Gamma-centred mesh keeps the full symmetry (see Q-017).'
+        ? 'An even Monkhorst-Pack mesh is shifted off Gamma; on hexagonal and fcc lattices that shift is not preserved by every rotation. A Gamma-centred mesh keeps the full symmetry, and the VASP wiki advises against even Monkhorst-Pack meshes on hexagonal lattices.'
         : 'The three divisions are not equivalent under the lattice symmetry, so a rotation turns one direction into another with a different spacing.');
   return { symmetric, failing, of: acts.length, reason };
 }

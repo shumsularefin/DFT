@@ -119,3 +119,17 @@ describe('Dudarev DFT+U toy (S-014, work order values)', () => {
     );
   });
 });
+
+describe('cold smearing follows Eq. (1) of Marzari et al. 1999 (S-016, Q-041)', () => {
+  // Eq. (1), written in the paper's own variable u = (mu - epsilon) / sigma.
+  const paper = (u: number) =>
+    (Math.exp(-((u - 1 / Math.SQRT2) ** 2)) * (2 - Math.SQRT2 * u)) / Math.sqrt(Math.PI);
+  it('delta(x) equals the paper with u = -x', () => {
+    for (const x of [-3, -1.2, -0.5, 0, 0.3, 1 / Math.SQRT2, 1.4, 2.5]) {
+      expect(delta('cold', x)).toBeCloseTo(paper(-x), 14);
+    }
+  });
+  it('the weight vanishes at u = sqrt2 (x = -sqrt2), below the Fermi level as the paper places it', () => {
+    expect(Math.abs(delta('cold', -Math.SQRT2))).toBeLessThan(1e-15);
+  });
+});

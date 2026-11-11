@@ -32,7 +32,7 @@ How many? It depends on how fast things change across the zone.
 
 Symmetry helps. Many mesh points are copies of each other under the crystal's rotations, so VASP computes only the different ones, the irreducible points. The first lab counts them.
 
-**Gamma-centred or Monkhorst-Pack.** A Gamma-centred mesh always contains the zone centre. A Monkhorst-Pack mesh with an even number of points along a direction is shifted off the centre. For hexagonal cells the shifted meshes break the six-fold symmetry, so the safe choice is Gamma-centred. The author's handbook says "odd MP meshes" in one table; the site's own tests show it is the even ones that break the symmetry, and this is recorded as Q-017 until the author confirms <Cite id="S-042" />.
+**Gamma-centred or Monkhorst-Pack.** A Gamma-centred mesh always contains the zone centre. A Monkhorst-Pack mesh with an even number of points along a direction is shifted off the centre. For hexagonal cells the shifted meshes break the six-fold symmetry, so the safe choice is Gamma-centred. The author's handbook says "odd MP meshes" in one table; the site's own tests show it is the even ones that break the symmetry, and the VASP wiki agrees: "Avoid Monkhorst-Pack meshes with an even number of in-plane subdivisions" <Cite id="S-019" />.
 
 <Level min="intermediate">
 

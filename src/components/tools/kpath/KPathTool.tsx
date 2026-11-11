@@ -698,8 +698,8 @@ export default function KPathTool() {
           <p>{ROUTE_NOTES.routeA}</p>
           <p>{ROUTE_NOTES.routeB}</p>
           <p className="kp-note">
-            KPATH.in here has the same content as KPOINTS. The exact layout VASPKIT writes has not been
-            checked (open question Q-039).
+            KPATH.in here holds the same points as KPOINTS, written in the layout the VASPKIT documentation
+            shows (labels without the ! mark), so VASPKIT can read the labels back for its band plots.
           </p>
           <p>
             Next, plotting the bands you get from this run is covered in the band-structure chapter (planned,

@@ -64,6 +64,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 
 Newest first. One line per session: date, stage, outcome, branch.
 
+- 2026-11-11, open-question sweep: merged main's parallel M6.1 to M6.3 into the M6.1 to M7.4 chain (supersedes PR #29); 10 questions closed against the sources (VASP wiki, both k-path papers, Bartel, Marzari, VASPKIT docs, Firebase pricing), 9 narrowed. [Report](reports/open-questions-2026-11-11.md). Branch `claude/festive-heisenberg-wueip0`.
 - 2026-11-10, M7.4: module 8 (6 topics), error finder with 32 merged entries (22 + 20 handbook rows), `/errors/`, 30 questions. Branch `claude/zen-bardeen-qzm2f2`.
 - 2026-11-06, M7.3: Modules 6 and 7, output-reader lab, 53 questions; protocol quoted word for word Branch `claude/great-dijkstra-oj0kbx`.
 - 2026-11-06, M7.2: module 5 (8 topics, 5 labs), smearing and DFT+U libraries, /tags/ cards, 65 questions Branch `claude/great-dijkstra-oj0kbx`.
@@ -84,7 +85,7 @@ Newest first. One line per session: date, stage, outcome, branch.
 
 ## Author actions outstanding
 
-See `docs/SETUP_FIREBASE.md` and the "author" rows of `docs/OPEN_QUESTIONS.md` (Q-001, Q-004, Q-006, Q-007, Q-008, Q-011, Q-013, Q-015, Q-017, Q-019).
+See `docs/SETUP_FIREBASE.md` and the "author" rows of `docs/OPEN_QUESTIONS.md` (Q-001, Q-008, Q-011, Q-019, Q-040; Q-004, Q-006, Q-007, Q-013, Q-015 and Q-017 were closed on 2026-11-11).
 - 2026-11-03, M2.3: Module 2 (6 topics, 31 questions, 9 glossary terms), particle-in-a-box and orbitals labs, constants, box, hydrogen, sampler worker; golden file `quantum_basics_reference.json`. Branch `claude/vigilant-newton-ws593b`
 - 2026-11-03, M2.4: Module 3 (5 topics, 24 questions, 6 glossary terms), exponential-wall and density-as-a-map labs, combinatorics, solver1d, density1d; golden file `solver1d_reference.json`. Branch `claude/vigilant-newton-ws593b`
 - 2026-11-03, M3.1: structure core (`src/lib/crystal/`: linalg, lattice, POSCAR reader and writer, structure helpers), `src/lib/handoff.ts`, atomic masses table; round trip on 39 golden structures, 12 reciprocal lattices. Branch `claude/vigilant-newton-ws593b`.

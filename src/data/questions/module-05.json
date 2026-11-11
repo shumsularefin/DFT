@@ -723,7 +723,7 @@
    }
   ],
   "hints": [
-   "Q-017 discusses this.",
+   "Odd meshes contain Gamma; even ones are shifted off it.",
    "Which mesh keeps the zone centre?"
   ],
   "difficulty": 0.0,
@@ -763,7 +763,7 @@
    {
     "text": "It is the even MP meshes that break hexagonal symmetry; odd ones include Gamma",
     "correct": true,
-    "why": "Recorded as Q-017, an erratum awaiting the author's confirmation."
+    "why": "The VASP wiki KPOINTS page agrees: avoid Monkhorst-Pack meshes with an even number of in-plane subdivisions on hexagonal cells."
    },
    {
     "text": "Odd MP meshes break the symmetry, as written",

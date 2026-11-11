@@ -178,7 +178,7 @@ describe('boundary variants', () => {
     expect(min).toBeGreaterThanOrEqual(90 - 1e-9);
   });
   it.todo(
-    'Q-038: mclc4 point table is checked only against the pymatgen source, no golden structure or real cell reaches it',
+    'mclc4: table checked by eye against S-005 Table 18 (Q-038, closed); no numeric test, since the paper defines it by an equality no real cell reaches',
   );
 
   it('mclc2: reciprocal gamma = 90 degrees, adds F_3', () => {

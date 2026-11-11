@@ -531,7 +531,7 @@
    "name": "NUPDOWN",
    "group": "spin",
    "type": "int",
-   "default": "Not stated in the handbooks. See the VASP wiki page for NUPDOWN.",
+   "default": "not set (-1): the moment is fully relaxed (VASP wiki, NUPDOWN page)",
    "typical": "unset; integer for fixed-moment runs",
    "vaspVersion": "6.x",
    "summary": {
@@ -950,7 +950,7 @@
    "name": "NFREE",
    "group": "ionic",
    "type": "int",
-   "default": "Not stated in the handbooks. See the VASP wiki page for NFREE.",
+   "default": "2 if IBRION = 5 or 6, else 0 (VASP wiki, NFREE page)",
    "typical": "2 (±) or 4",
    "vaspVersion": "6.x",
    "summary": {
@@ -1060,7 +1060,7 @@
    "name": "LASPH",
    "group": "accuracy",
    "type": "bool",
-   "default": "Not stated in the handbooks. See the VASP wiki page for LASPH.",
+   "default": ".FALSE. (VASP wiki, LASPH page)",
    "typical": ".TRUE.",
    "vaspVersion": "6.x",
    "summary": {
@@ -1252,7 +1252,7 @@
    "name": "NBANDS",
    "group": "electronic",
    "type": "int",
-   "default": "Not stated in the handbooks. See the VASP wiki page for NBANDS.",
+   "default": "max(nint(NELECT + 2) / 2 + max(NIONS / 2, 3), int(0.6 NELECT)) (VASP wiki, NBANDS page)",
    "typical": "default; 2–3× for optics; extra for band plots",
    "vaspVersion": "6.x",
    "summary": {
@@ -1447,7 +1447,7 @@
    "name": "LAECHG",
    "group": "output",
    "type": "bool",
-   "default": "Not stated in the handbooks. See the VASP wiki page for LAECHG.",
+   "default": ".FALSE. (VASP wiki, LAECHG page)",
    "typical": ".TRUE.",
    "vaspVersion": "6.x",
    "summary": {
@@ -1477,7 +1477,7 @@
    "name": "LVHAR",
    "group": "output",
    "type": "bool",
-   "default": "Not stated in the handbooks. See the VASP wiki page for LVHAR.",
+   "default": ".FALSE. (VASP wiki, LVHAR page)",
    "typical": ".TRUE.",
    "vaspVersion": "6.x",
    "summary": {
@@ -1506,7 +1506,7 @@
    "name": "LELF",
    "group": "output",
    "type": "bool",
-   "default": "Not stated in the handbooks. See the VASP wiki page for LELF.",
+   "default": ".FALSE. (VASP wiki, LELF page)",
    "typical": ".TRUE.",
    "vaspVersion": "6.x",
    "summary": {
@@ -1534,7 +1534,7 @@
    "name": "LOPTICS",
    "group": "optics",
    "type": "bool",
-   "default": "Not stated in the handbooks. See the VASP wiki page for LOPTICS.",
+   "default": ".FALSE. (VASP wiki, LOPTICS page)",
    "typical": ".TRUE.",
    "vaspVersion": "6.x",
    "summary": {
@@ -1597,7 +1597,7 @@
    "name": "LEPSILON",
    "group": "dielectric",
    "type": "bool",
-   "default": "Not stated in the handbooks. See the VASP wiki page for LEPSILON.",
+   "default": ".FALSE. (VASP wiki, LEPSILON page)",
    "typical": ".TRUE. with IBRION=8",
    "vaspVersion": "6.x",
    "summary": {
@@ -1659,7 +1659,7 @@
    "name": "LCALCEPS",
    "group": "dielectric",
    "type": "bool",
-   "default": "Not stated in the handbooks. See the VASP wiki page for LCALCEPS.",
+   "default": ".FALSE. (VASP wiki, LCALCEPS page)",
    "typical": ".TRUE.",
    "vaspVersion": "6.x",
    "summary": {
@@ -1688,7 +1688,7 @@
    "name": "LDAU",
    "group": "dftu",
    "type": "bool",
-   "default": "Not stated in the handbooks. See the VASP wiki page for LDAU.",
+   "default": ".FALSE. (VASP wiki, LDAU page)",
    "typical": ".TRUE., 2",
    "vaspVersion": "6.x",
    "summary": {
@@ -1721,7 +1721,7 @@
    "name": "LDAUTYPE",
    "group": "dftu",
    "type": "int",
-   "default": "Not stated in the handbooks. See the VASP wiki page for LDAUTYPE.",
+   "default": "2 (VASP wiki, LDAUTYPE page)",
    "typical": ".TRUE., 2",
    "vaspVersion": "6.x",
    "summary": {
@@ -1753,7 +1753,7 @@
    "name": "LDAUL",
    "group": "dftu",
    "type": "int-array",
-   "default": "Not stated in the handbooks. See the VASP wiki page for LDAUL.",
+   "default": "2 for every species (VASP wiki, LDAUL page)",
    "typical": "2 -1, 5.3 0, 0 0",
    "vaspVersion": "6.x",
    "summary": {
@@ -1785,7 +1785,7 @@
    "name": "LDAUU",
    "group": "dftu",
    "type": "real-array",
-   "default": "Not stated in the handbooks. See the VASP wiki page for LDAUU.",
+   "default": "0.0 for every species (VASP wiki, LDAUU page)",
    "typical": "2 -1, 5.3 0, 0 0",
    "vaspVersion": "6.x",
    "summary": {
@@ -1817,7 +1817,7 @@
    "name": "LDAUJ",
    "group": "dftu",
    "type": "real-array",
-   "default": "Not stated in the handbooks. See the VASP wiki page for LDAUJ.",
+   "default": "0.0 for every species (VASP wiki, LDAUJ page)",
    "typical": "2 -1, 5.3 0, 0 0",
    "vaspVersion": "6.x",
    "summary": {
@@ -1849,7 +1849,7 @@
    "name": "LDAUPRINT",
    "group": "dftu",
    "type": "int",
-   "default": "Not stated in the handbooks. See the VASP wiki page for LDAUPRINT.",
+   "default": "0 (VASP wiki, LDAUPRINT page)",
    "typical": "Not stated in the handbooks.",
    "vaspVersion": "6.x",
    "summary": {
@@ -1878,7 +1878,7 @@
    "name": "METAGGA",
    "group": "metagga",
    "type": "string",
-   "default": "Not stated in the handbooks. See the VASP wiki page for METAGGA.",
+   "default": "not set: the functional of LEXCH in POTCAR, unless GGA or XC is given (VASP wiki, METAGGA page)",
    "typical": "R2SCAN, SCAN, MBJ",
    "vaspVersion": "6.x",
    "summary": {
@@ -1911,7 +1911,7 @@
    "name": "LMIXTAU",
    "group": "metagga",
    "type": "bool",
-   "default": "Not stated in the handbooks. See the VASP wiki page for LMIXTAU.",
+   "default": ".FALSE. (VASP wiki, LMIXTAU page)",
    "typical": ".TRUE.",
    "vaspVersion": "6.x",
    "summary": {
@@ -1941,7 +1941,7 @@
    "name": "LHFCALC",
    "group": "hybrid",
    "type": "bool",
-   "default": "Not stated in the handbooks. See the VASP wiki page for LHFCALC.",
+   "default": ".FALSE. (VASP wiki, LHFCALC page)",
    "typical": ".TRUE.",
    "vaspVersion": "6.x",
    "summary": {
@@ -1973,7 +1973,7 @@
    "name": "HFSCREEN",
    "group": "hybrid",
    "type": "real",
-   "default": "Not stated in the handbooks. See the VASP wiki page for HFSCREEN.",
+   "default": "0 (no screening) (VASP wiki, HFSCREEN page)",
    "typical": "0.2 and 0.25 = HSE06; 0 and 0.25 = PBE0",
    "vaspVersion": "6.x",
    "summary": {
@@ -2004,7 +2004,7 @@
    "name": "AEXX",
    "group": "hybrid",
    "type": "real",
-   "default": "Not stated in the handbooks. See the VASP wiki page for AEXX.",
+   "default": "0.25 if LHFCALC = .TRUE. (1 if LRHFCALC = .TRUE.), else 0 (VASP wiki, AEXX page)",
    "typical": "0.2 and 0.25 = HSE06; 0 and 0.25 = PBE0",
    "vaspVersion": "6.x",
    "summary": {
@@ -2035,7 +2035,7 @@
    "name": "PRECFOCK",
    "group": "hybrid",
    "type": "string",
-   "default": "Not stated in the handbooks. See the VASP wiki page for PRECFOCK.",
+   "default": "Normal (Single if PREC = Single or SingleN; Fast for RPAR runs) (VASP wiki, PRECFOCK page)",
    "typical": "Fast/Normal; NKRED = 2",
    "vaspVersion": "6.x",
    "summary": {
@@ -2066,7 +2066,7 @@
    "name": "NKRED",
    "group": "hybrid",
    "type": "int",
-   "default": "Not stated in the handbooks. See the VASP wiki page for NKRED.",
+   "default": "1 (VASP wiki, NKRED page)",
    "typical": "Fast/Normal; NKRED = 2",
    "vaspVersion": "6.x",
    "summary": {
@@ -2095,7 +2095,7 @@
    "name": "IVDW",
    "group": "vdw",
    "type": "int",
-   "default": "Not stated in the handbooks. See the VASP wiki page for IVDW.",
+   "default": "0 (no correction) (VASP wiki, IVDW page)",
    "typical": "11 (D3), 12 (D3-BJ), 20 (TS)",
    "vaspVersion": "6.x",
    "summary": {
@@ -2125,7 +2125,7 @@
    "name": "LSORBIT",
    "group": "soc",
    "type": "bool",
-   "default": "Not stated in the handbooks. See the VASP wiki page for LSORBIT.",
+   "default": ".FALSE. (VASP wiki, LSORBIT page)",
    "typical": ".TRUE.; 0 0 1",
    "vaspVersion": "6.x",
    "summary": {
@@ -2154,7 +2154,7 @@
    "name": "SAXIS",
    "group": "soc",
    "type": "real-array",
-   "default": "Not stated in the handbooks. See the VASP wiki page for SAXIS.",
+   "default": "0 0 1 (VASP wiki, SAXIS page)",
    "typical": ".TRUE.; 0 0 1",
    "vaspVersion": "6.x",
    "summary": {
@@ -2219,7 +2219,7 @@
    "name": "SYMPREC",
    "group": "symmetry",
    "type": "real",
-   "default": "Not stated in the handbooks. See the VASP wiki page for SYMPREC.",
+   "default": "1E-5 (VASP wiki, SYMPREC page)",
    "typical": "default; ISYM = 0 to switch off; SYMPREC 1E-4–1E-3",
    "vaspVersion": "6.x",
    "summary": {
@@ -2247,7 +2247,7 @@
    "name": "KSPACING",
    "group": "kpoints",
    "type": "real",
-   "default": "Not stated in the handbooks. See the VASP wiki page for KSPACING.",
+   "default": "0.5 (VASP wiki, KSPACING page)",
    "typical": "0.15–0.25",
    "vaspVersion": "6.x",
    "summary": {
@@ -2277,7 +2277,7 @@
    "name": "LDIPOL",
    "group": "slab",
    "type": "bool",
-   "default": "Not stated in the handbooks. See the VASP wiki page for LDIPOL.",
+   "default": ".FALSE. (VASP wiki, LDIPOL page)",
    "typical": ".TRUE., 3 (along z)",
    "vaspVersion": "6.x",
    "summary": {
@@ -2335,7 +2335,7 @@
    "name": "SYSTEM",
    "group": "output",
    "type": "string",
-   "default": "Not stated in the handbooks. See the VASP wiki page for SYSTEM.",
+   "default": "unknown system (VASP wiki, SYSTEM page)",
    "typical": "Not stated in the handbooks.",
    "vaspVersion": "6.x",
    "summary": {
@@ -2366,7 +2366,7 @@
    "name": "TIME",
    "group": "electronic",
    "type": "real",
-   "default": "Not stated in the handbooks. See the VASP wiki page for TIME.",
+   "default": "0.4 (VASP wiki, TIME page)",
    "typical": "Not stated in the handbooks.",
    "vaspVersion": "6.x",
    "summary": {
@@ -2396,7 +2396,7 @@
    "name": "LUSE_VDW",
    "group": "vdw",
    "type": "bool",
-   "default": "Not stated in the handbooks. See the VASP wiki page for LUSE_VDW.",
+   "default": ".FALSE. (VASP wiki, LUSE_VDW page)",
    "typical": "Not stated in the handbooks.",
    "vaspVersion": "6.x",
    "summary": {
@@ -2424,7 +2424,7 @@
    "name": "BPARAM",
    "group": "vdw",
    "type": "real",
-   "default": "Not stated in the handbooks. See the VASP wiki page for BPARAM.",
+   "default": "6.3 (VASP wiki, BPARAM page)",
    "typical": "Not stated in the handbooks.",
    "vaspVersion": "6.x",
    "summary": {
@@ -2451,7 +2451,7 @@
    "name": "CMBJ",
    "group": "metagga",
    "type": "real",
-   "default": "Not stated in the handbooks. See the VASP wiki page for CMBJ.",
+   "default": "calculated self-consistently (VASP wiki, CMBJ page)",
    "typical": "Not stated in the handbooks.",
    "vaspVersion": "6.x",
    "summary": {
