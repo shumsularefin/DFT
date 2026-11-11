@@ -43,7 +43,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 | M7.4 | Module 8: Convergence testing and common errors (with error finder) | done | M7.3, M4.3 | M | claude/zen-bardeen-qzm2f2 | | 2026-11-10 | [report](reports/M7.4.md), [work order](milestones/M7-remaining-modules.md) |
 | M7.5 | Module 9: Analysis (with relaxation, DOS/band and charge-density tools) | done | M7.4, M5.6, M2.1 | L | claude/zen-bardeen-qzm2f2 | | 2026-11-11 | [report](reports/M7.5.md), [work order](milestones/M7-remaining-modules.md) |
 | M8.1 | Shannon radii dataset and lookup | done | M0.2 | M | claude/zen-bardeen-qzm2f2 | | 2026-11-11 | [report](reports/M8.1.md), [work order](milestones/M8-tolerance-factor.md) |
-| M8.2 | Factors, checks and mixed sites | todo | M8.1 | M | | | | [work order](milestones/M8-tolerance-factor.md) |
+| M8.2 | Factors, checks and mixed sites | done | M8.1 | M | claude/zen-bardeen-qzm2f2 | | 2026-11-11 | [report](reports/M8.2.md), [work order](milestones/M8-tolerance-factor.md) |
 | M8.3 | Explorer UI and the shared periodic table | todo | M8.2, M1.3 | M | | | | [work order](milestones/M8-tolerance-factor.md) |
 | M8.4 | Maps, family trend and hand-offs | todo | M8.3, M4.3 | M | | | | [work order](milestones/M8-tolerance-factor.md) |
 | M9.1 | Data pipeline, schema, validation and sample data | todo | M5.1 | L | | | | [work order](milestones/M9-screening-studio.md) |
@@ -64,6 +64,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 
 Newest first. One line per session: date, stage, outcome, branch.
 
+- 2026-11-11, M8.2: `factors.ts`, `sites.ts`, `checks.ts`, `oxidation.ts` and `oxidation-states.json` (93 elements); 16 golden compounds and 3 family sweeps within 1e-6; Q-003 formula and threshold confirmed against the arXiv text; D-058. Branch `claude/zen-bardeen-qzm2f2`.
 - 2026-11-11, M8.1: Shannon radii dataset (`src/data/shannon-radii.json`, 491 assignable rows plus 1 unassigned Eu row, 94 elements) built by `scripts/data/build_shannon.py` from pymatgen; lookup `src/lib/perovskite/shannon.ts` that never guesses; 34 anchors and Ln3+ coverage match. D-057, Q-002 updated. Branch `claude/zen-bardeen-qzm2f2`.
 - 2026-11-11, M7.5 (session two): parse worker with progress, four viewers (relaxation, DOS, band, density; no example data), module 9 (5 topics, 29 questions, 5 glossary terms), e2e at 360 px and desktop. Stage done. Branch `claude/zen-bardeen-qzm2f2`.
 - 2026-11-11, M7.5 (session one of two): CHGCAR, EIGENVAL, XDATCAR, DOSCAR parsers, band gap, marching cubes, all against the fixtures; viewers, workers and topics remain. Branch `claude/zen-bardeen-qzm2f2`.

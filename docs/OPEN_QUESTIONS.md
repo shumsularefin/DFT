@@ -6,7 +6,7 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 |---|---|---|
 | Q-001 | open | author |
 | Q-002 | open | author + builder (M8.1) |
-| Q-003 | open | builder (needs arxiv access) or author (PDF) |
+| Q-003 | partly closed (M8.2) | builder (needs arxiv access) or author (PDF) |
 | Q-004 | open | author (5-minute VASP run) |
 | Q-005 | open | builder (M8.4) |
 | Q-006 | open | author |
@@ -15,11 +15,11 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-009 | open | author + builder (M9.1) |
 | Q-010 | open | builder (M9.3, needs vasp.at) |
 | Q-011 | open | author |
-| Q-012 | open | builder (M8.2, M10.1) |
+| Q-012 | partly closed (M8.2) | builder (M8.2, M10.1) |
 | Q-013 | open | author (one VASPKIT run) |
 | Q-014 | open | builder (M4.1) |
 | Q-015 | open | author |
-| Q-016 | open | builder (M8.2) |
+| Q-016 | partly closed (M8.2) | builder (M8.2) |
 | Q-017 | open | author (confirm erratum) |
 | Q-018 | open | builder (M3.2, needs vasp.at) or author (one run) |
 | Q-019 | open | author |
@@ -55,6 +55,8 @@ The tolerance explorer bundles Shannon (1976) radii built from pymatgen's table 
 ## Q-003. Bartel tau: equation, threshold and radius conventions
 Implemented from memory: tau = r_X/r_B - n_A (n_A - (r_A/r_B)/ln(r_A/r_B)), perovskite predicted when tau < 4.18 (Bartel et al., Sci. Adv. 5, eaav0693, 2019). The paper could not be fetched when the plan was made (arxiv.org and PMC unreachable). Also unconfirmed: which Shannon coordination numbers the paper used for A, B, X, and how it treats mixed oxidation states. Sanity values from the golden file look right (SrTiO3 3.80, CsPbBr3 4.10, CsPbI3 4.30). **Close:** read the paper (allow arxiv.org / pmc.ncbi.nlm.nih.gov, or the author attaches the PDF to the session); M8.2 must not be marked done until this is closed or the UI shows "formula not yet confirmed against the paper".
 
+**M8.2 update (2026-11-11):** arxiv.org was reachable. The arXiv:1801.07700 PDF text (19 pages) shows Equation 2 as tau = rX/rB - nA (nA - (rA/rB)/ln(rA/rB)), "rA > rB by definition", "tau < 4.18 indicates perovskite", and in Methods that Shannon radii for A and B are chosen "closest to the coordination number of twelve and six" (so a missing CN 12 falls back to the nearest CN in the paper; this site instead shows it as missing, D-028). Formula and threshold match the implementation, so `TAU_CONFIRMATION.confirmed` is true. **Still open:** the journal version (science.org returned 403) was not read, so differences between preprint and published text are unchecked; the paper does not describe mixed oxidation states, so the mixed-site use of tau is this site's extension (Q-016).
+
 ## Q-004. KSPACING and VASPKIT resolution to k-mesh rule
 The rounding rule VASP applies for KSPACING and the one VASPKIT task 102 applies for its "resolution" (in 2 pi / Angstrom) could not be read (vasp.at unreachable). Candidates are in `tests/reference/pw_kmesh_reference.json` (`kspacing_candidates`: ceil, round half up, int plus 0.999). **Calibration (author, 5 minutes per run):** take fcc Cu with the primitive cell (a = 3.61 Angstrom, vectors (0,a/2,a/2), (a/2,0,a/2), (a/2,a/2,0)); each reciprocal vector has length |b| = 3.0146 1/Angstrom including 2 pi. Run VASP with `NSW = 0` and `KSPACING = 0.3`, no KPOINTS file, then read the mesh from OUTCAR (the line that starts `generate k-points for:` prints three integers; if your version words it differently, use the subdivisions in IBZKPT). Do three runs with `KSPACING = 0.3`, `0.28` and `0.30145` (ratios |b|/KSPACING = 10.0487, 10.7665, 10.0004). The expected mesh per rule is: **ceil 11, 11, 11**; **round-half-up 10, 11, 10**; **int(x + 0.999) 11, 11, 10**; **truncate 10, 10, 10**. The three runs together separate all four rules (the golden file holds the first three; truncation is listed for completeness). Report the integers. Do the same with `vaspkit -task 102` at resolution 0.04 and report the mesh it writes. **Close:** record the rule in D-016 and pin it in tests.
 
@@ -82,6 +84,8 @@ Cost tiers need a cited price source (for example USGS Mineral Commodity Summari
 ## Q-012. Oxidation-state data provenance
 Common and uncommon oxidation states per element are needed for charge-balance checks. Candidates: pymatgen's `common_oxidation_states` / `oxidation_states` (MIT) or SMACT (MIT code, but its data may derive from ICSD statistics). Planning found that pymatgen's `Common oxidation states` lists only +2 for Cu (unusable: it would flag Cu(I) as unusual), while SMACT 4.0.2 ships ICSD 2024 occurrence counts that separate common from rare states sensibly (Cu +2 56 %, +1 41 %, +3 3 %; `tests/reference/element_reference.json`). Proposed: use the SMACT counts with a 10 % share threshold. Still open: whether redistributing statistics derived from ICSD needs more than attribution. **Close:** M8.2 adopts the proposal or another source, records it, and the author confirms the licence position.
 
+**M8.2 update (2026-11-11):** adopted as proposed (D-058): `scripts/data/build_oxidation.py` exports SMACT 4.0.2 counts for 93 elements to `src/data/oxidation-states.json`; share >= 0.10 is common, any count known-rare, none not-observed. Tested against the 30-element golden shares. **Still open:** the licence position for redistributing ICSD-derived counts (author).
+
 ## Q-013. VASPKIT 303 convention
 The Workflow Handbook says VASPKIT 303 uses the same algorithm as SeeK-path (HPKOT). **Close (author, one run):** run `vaspkit -task 303` on a Cu fcc primitive cell and check that `KPATH.in` follows `Γ-X-U | K-Γ-L-W-X` (the HPKOT golden path), not `Γ-X-W-K-Γ-L-U-W-L-K | U-X`. If it differs, change D-005's default.
 
@@ -95,6 +99,8 @@ Is the Firebase project created, the GitHub repository variable `FIREBASE_PROJEC
 
 ## Q-016. Mixed-site weighting
 Mixed A or B sites use occupancy-weighted averages of ionic radius and of oxidation state (a documented, common convention, not a result from the tau paper). **Close:** M8.2 finds a citation for the convention used in the literature, or labels it "linear mixing convention" in the UI.
+
+**M8.2 update (2026-11-11):** no citation was sought or found. `mixSite` returns `convention: 'linear mixing'` so the UI must label it so (M8.3). The tau paper does not cover mixed sites.
 
 ## Q-017. Erratum in the author's Workflow Handbook: odd versus even Monkhorst-Pack meshes
 The "Input and output files" table lists "Odd MP meshes on hexagonal cells (use Gamma-centred)" as a common KPOINTS mistake. The numerical test says the opposite: with VASP's Monkhorst-Pack formula k = (2r - N - 1)/(2N), **odd N includes Gamma and is symmetric; even N is shifted off Gamma and breaks the point-group symmetry** of a hexagonal lattice (checked with spglib on P6_3/mmc Mg for N = 2 to 8; `tests/reference/pw_kmesh_reference.json`, `mesh_point_group_symmetry`). The same holds for the fcc primitive cell, but not for sc or bcc primitive cells. The handbook's advice (use Gamma-centred meshes for hexagonal and trigonal cells) is right; the word "odd" appears to be a slip for "even". **Close:** the author confirms; the site's text and the M3.2 hexagonal rule then say "even Monkhorst-Pack meshes". Until confirmed the rule is written as "Monkhorst-Pack meshes can break hexagonal symmetry, and even ones do" with this test as its evidence.

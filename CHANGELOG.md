@@ -7,6 +7,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- Tolerance factor calculations: Goldschmidt t, octahedral factor and Bartel tau with their warnings (undefined tau, swapped sites), mixed A and B sites, charge balance, and oxidation-state commonness from ICSD counts. Every check is labelled a rule of thumb (no UI yet).
 - Shannon ionic and crystal radii dataset (94 elements) with a lookup that refuses to guess: a missing oxidation state, coordination, spin or geometry returns the reason and the available choices (no UI yet).
 - Module 9, analysis (five topics) with four viewers that read your own VASP files in the browser: relaxation viewer (XDATCAR with OSZICAR or OUTCAR energy and largest force, POSCAR download), DOS viewer (total and projected, spin mirrored, smoothing off by default), band structure viewer (EIGENVAL, KPOINTS labels, direct or indirect gap) and charge density viewer (isosurface and cross-section of CHGCAR, magnetization). Large files are read in a background thread with progress. No example data is shipped; nothing is uploaded.
 - Module 8, convergence testing and common errors (six topics) and the VASP error finder at /errors/: paste a log excerpt or describe a symptom and get ranked causes and ordered fixes at your level, matched in your browser from 32 entries merged from the two handbooks.

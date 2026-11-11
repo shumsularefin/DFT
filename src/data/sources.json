@@ -20,8 +20,8 @@
     "citation": "C. J. Bartel, C. Sutton, B. R. Goldsmith, R. Ouyang, C. B. Musgrave, L. M. Ghiringhelli, M. Scheffler, \"New tolerance factor to predict the stability of perovskite oxides and halides\", Science Advances 5, eaav0693 (2019); arXiv:1801.07700",
     "usedFor": "tau tolerance factor",
     "access": "open access",
-    "status": "cited-from-memory",
-    "notes": "Title, authors and journal confirmed by a web search; the equation and 4.18 threshold are NOT yet confirmed: Q-003"
+    "status": "cross-checked",
+    "notes": "Equation 2, rA > rB and the 4.18 threshold read in the arXiv preprint text (2026-11-11); journal version not read: Q-003"
   },
   {
     "id": "S-004",
