@@ -1,0 +1,144 @@
+.tf {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+.tf-sites {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+}
+.tf-site,
+.tf-picker,
+.tf-policy,
+.tf-results {
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: var(--space-3);
+  background: var(--surface);
+  min-width: 0;
+}
+.tf-site h2,
+.tf-results h2 {
+  font-size: 1.15rem;
+  margin-top: 0;
+}
+.tf-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  align-items: flex-end;
+}
+.tf-occ {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.tf-field {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+}
+.tf-field label {
+  font-size: 0.85rem;
+}
+.tf select,
+.tf input[type='text'] {
+  min-height: 2.75rem;
+  max-width: 100%;
+  font: inherit;
+}
+.tf-btn {
+  min-height: 2.75rem;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: 0.375rem;
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+.tf-btn:focus-visible,
+.tf select:focus-visible,
+.tf input:focus-visible,
+.tf summary:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.tf-el b {
+  font-size: 1.1rem;
+}
+.tf-small {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.tf-picker-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+}
+.tf-picker-head h3 {
+  margin: 0;
+}
+.tf-problem {
+  border-left: 4px solid var(--danger);
+  padding-left: var(--space-2);
+}
+.tf-cards {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+}
+.tf-card {
+  border: 1px solid var(--border-strong);
+  border-radius: 0.5rem;
+  padding: var(--space-3);
+  background: var(--bg);
+  min-width: 0;
+}
+.tf-card h3 {
+  margin: 0 0 var(--space-2);
+  font-size: 1rem;
+}
+.tf-value {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+.tf-tag {
+  display: inline-block;
+  margin: 0 0 var(--space-2);
+  padding: 0.05rem 0.5rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+.tf-checks {
+  padding-left: var(--space-4);
+}
+.tf-checks li {
+  margin-block: var(--space-2);
+}
+.tf-checks li[data-severity='error'] {
+  border-left: 4px solid var(--danger);
+  padding-left: var(--space-2);
+  margin-left: calc(-1 * var(--space-2) - 4px);
+  list-style: none;
+}
+.tf-checks li[data-severity='warning'] {
+  border-left: 4px solid var(--warn);
+  padding-left: var(--space-2);
+  margin-left: calc(-1 * var(--space-2) - 4px);
+  list-style: none;
+}
+.tf-honesty {
+  font-weight: 600;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tf * {
+    transition: none;
+    animation: none;
+  }
+}

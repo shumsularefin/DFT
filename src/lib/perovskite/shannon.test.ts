@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import ref from '../../../tests/reference/perovskite_reference.json';
-import { getRadius, oxidationStates, coordinations, spins, shannonMeta } from './shannon';
+import { geometries, getRadius, oxidationStates, coordinations, spins, shannonMeta } from './shannon';
 import data from '../../data/shannon-radii.json';
 
 const ROMAN: Record<string, number> = {
@@ -68,6 +68,13 @@ describe('never guesses', () => {
   it('helpers', () => {
     expect(oxidationStates('Cu')).toEqual(expect.arrayContaining([1, 2, 3]));
     expect(spins('Fe', 3, 6).sort()).toEqual(['HS', 'LS']);
+  });
+});
+
+describe('geometries', () => {
+  it('Cu2+ CN 4 lists the standard and square-planar entries', () => {
+    expect(geometries('Cu', 2, 4)).toEqual(expect.arrayContaining(['SQ']));
+    expect(geometries('Ti', 4, 6)).toEqual([null]);
   });
 });
 

@@ -63,6 +63,15 @@ export function spins(el: string, ox: number, cn: number): Spin[] {
   );
 }
 
+/** Geometries tabulated at this coordination (null is the standard one). */
+export function geometries(el: string, ox: number, cn: number): Geometry[] {
+  return uniq(
+    forIon(el, ox)
+      .filter((e) => e.cn === cn)
+      .map((e) => e.geometry),
+  );
+}
+
 export function getRadius(q: RadiusQuery): RadiusResult {
   const ion = forIon(q.el, q.ox);
   const label = `${q.el}${Math.abs(q.ox)}${q.ox < 0 ? '-' : '+'}`;
