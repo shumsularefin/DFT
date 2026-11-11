@@ -128,15 +128,51 @@ describe('fcc Cu, HPKOT, 20 points per segment', () => {
     expect(writeKpoints(t, header)).toBe(expected);
   });
 
-  it('KPATH.in and KPOINTS_OPT hold the same path, only the first line differs', () => {
+  it('KPOINTS_OPT holds the same path as KPOINTS, only the first line differs', () => {
     const k = writeKpoints(t, header).split('\n');
-    for (const text of [writeKpathIn(t, header), writeKpointsOpt(t, header)]) {
-      const lines = text.split('\n');
-      expect(lines.slice(1)).toEqual(k.slice(1));
-      expect(lines[0]).toContain('HPKOT');
+    const lines = writeKpointsOpt(t, header).split('\n');
+    expect(lines.slice(1)).toEqual(k.slice(1));
+    expect(lines[0]).toContain('HPKOT');
+    expect(lines[0]).toContain('KPOINTS_OPT');
+  });
+
+  it('KPATH.in uses the VASPKIT layout and holds the same points and labels as KPOINTS (S-058, Q-039)', () => {
+    const lines = writeKpathIn(t, header).split('\n');
+    expect(lines[0]).toContain('KPATH.in');
+    expect(lines[0]).toContain('HPKOT');
+    expect(lines.slice(1, 4)).toEqual(['   20', 'Line-Mode', 'Reciprocal']);
+    // Every point row: three 15-column numbers with 10 decimals, five spaces, bare label (no "!").
+    const pointRow = /^(?:[ -]{1,6}\d\.\d{10}){3} {5}\S+$/;
+    const k = writeKpoints(t, header).split('\n');
+    for (let i = 4; i < lines.length; i++) {
+      if (k[i] === '') {
+        expect(lines[i]).toBe('');
+        continue;
+      }
+      expect(lines[i]).toMatch(pointRow);
+      expect(lines[i]!.length).toBe(45 + 5 + lines[i]!.trim().split(/\s+/)[3]!.length);
+      const [a, b, c, label] = lines[i]!.trim().split(/\s+/);
+      expect([a, b, c, label]).toEqual(k[i]!.replace(' ! ', ' ').split(' '));
     }
-    expect(writeKpathIn(t, header).split('\n')[0]).toContain('KPATH.in');
-    expect(writeKpointsOpt(t, header).split('\n')[0]).toContain('KPOINTS_OPT');
+  });
+
+  it('a KPATH.in row matches the row VASPKIT documents, character for character (S-058)', () => {
+    // From the VASPKIT tutorial (task 302, MoS2): "   0.3333333333   0.3333333333   0.0000000000     K"
+    const one: PathTable = {
+      ...t,
+      lineModeCount: 20,
+      segments: [
+        { ...t.segments[0]!, kFrom: [0, 0, 0], fromFile: 'GAMMA', kTo: [1 / 3, 1 / 3, 0], toFile: 'K' },
+      ],
+    };
+    expect(writeKpathIn(one, header).split('\n').slice(1)).toEqual([
+      '   20',
+      'Line-Mode',
+      'Reciprocal',
+      '   0.0000000000   0.0000000000   0.0000000000     GAMMA',
+      '   0.3333333333   0.3333333333   0.0000000000     K',
+      '',
+    ]);
   });
 
   it('table totals', () => {
@@ -262,8 +298,5 @@ describe('route notes', () => {
     expect(ROUTE_NOTES.routeA).toContain('KPOINTS_OPT');
     expect(ROUTE_NOTES.routeB).toContain('ICHARG = 11');
   });
-  it.todo(
-    'Q-039: the exact layout of the KPATH.in that VASPKIT writes is unverified; compare once the author supplies one',
-  );
   it.todo('M7.5: link the band-structure plotting tool from the k-path page once it exists');
 });

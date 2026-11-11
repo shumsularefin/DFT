@@ -1,0 +1,2162 @@
+[
+ {
+  "id": "q-pw-1",
+  "concepts": [
+   "plane-wave-basis"
+  ],
+  "type": "single",
+  "prompt": "Why are plane waves a natural basis for crystals?",
+  "options": [
+   {
+    "text": "They repeat with the cell, just like the crystal",
+    "correct": true,
+    "why": "Plane waves compatible with the lattice have the periodicity built in."
+   },
+   {
+    "text": "They are centred on atoms",
+    "correct": false,
+    "why": "Tempting from chemistry, but plane waves fill the whole cell and are not tied to atoms."
+   },
+   {
+    "text": "They need no cutoff",
+    "correct": false,
+    "why": "Tempting, but there are infinitely many; a cutoff selects a finite set."
+   }
+  ],
+  "hints": [
+   "Think about what repeats in a crystal.",
+   "A wave that fits the cell repeats in every cell."
+  ],
+  "difficulty": -0.5,
+  "level": "beginner",
+  "sources": [
+   "S-010",
+   "S-049"
+  ]
+ },
+ {
+  "id": "q-pw-2",
+  "concepts": [
+   "plane-wave-basis"
+  ],
+  "type": "single",
+  "prompt": "In the plane-wave picture, what do the short-wavelength waves describe?",
+  "options": [
+   {
+    "text": "Fine detail, such as rapid variation near the nuclei",
+    "correct": true,
+    "why": "Short waves change quickly in space, so they capture sharp features."
+   },
+   {
+    "text": "The average density",
+    "correct": false,
+    "why": "Tempting, but the broad shape comes from the long waves."
+   },
+   {
+    "text": "The number of electrons",
+    "correct": false,
+    "why": "Tempting, but that is fixed by the occupations, not the waves."
+   }
+  ],
+  "hints": [
+   "Overtones add detail to a sound.",
+   "Which waves change fastest in space?"
+  ],
+  "difficulty": 0.0,
+  "level": "beginner",
+  "sources": [
+   "S-010",
+   "S-049"
+  ]
+ },
+ {
+  "id": "q-pw-3",
+  "concepts": [
+   "plane-wave-basis"
+  ],
+  "type": "single",
+  "prompt": "Why do short plane waves carry more kinetic energy?",
+  "options": [
+   {
+    "text": "Kinetic energy grows with the square of the wavevector",
+    "correct": true,
+    "why": "Shorter wavelength means larger |k + G| and energy (hbar^2/2m)|k + G|^2."
+   },
+   {
+    "text": "Because they have more electrons",
+    "correct": false,
+    "why": "Tempting, but a basis function has no electrons of its own."
+   },
+   {
+    "text": "They do not; all plane waves have the same energy",
+    "correct": false,
+    "why": "Tempting, but the energy depends on the wavevector."
+   }
+  ],
+  "hints": [
+   "Recall the de Broglie relation from module 2.",
+   "Energy goes as wavevector squared."
+  ],
+  "difficulty": 0.3,
+  "level": "intermediate",
+  "sources": [
+   "S-010",
+   "S-049"
+  ]
+ },
+ {
+  "id": "q-pw-4",
+  "concepts": [
+   "plane-wave-basis"
+  ],
+  "type": "multi",
+  "prompt": "Which statements about a plane-wave basis are true? Select all that apply.",
+  "options": [
+   {
+    "text": "The same basis works for any element",
+    "correct": true,
+    "why": "Plane waves do not depend on which atoms are present."
+   },
+   {
+    "text": "Its quality is controlled by one number, the cutoff",
+    "correct": true,
+    "why": "That is a key practical advantage."
+   },
+   {
+    "text": "It describes the wiggles near nuclei cheaply",
+    "correct": false,
+    "why": "Tempting, but those need very short waves; pseudopotentials avoid them."
+   },
+   {
+    "text": "Forces need no Pulay correction from basis functions moving with atoms",
+    "correct": true,
+    "why": "Plane waves do not move with the atoms, unlike atom-centred bases."
+   }
+  ],
+  "hints": [
+   "What depends on the atoms, and what does not?",
+   "The core region is the expensive part."
+  ],
+  "difficulty": 0.8,
+  "level": "pro",
+  "sources": [
+   "S-010",
+   "S-049"
+  ]
+ },
+ {
+  "id": "q-encut2-1",
+  "concepts": [
+   "encut"
+  ],
+  "type": "single",
+  "prompt": "What does ENCUT control?",
+  "options": [
+   {
+    "text": "The kinetic-energy cutoff that decides which plane waves are kept",
+    "correct": true,
+    "why": "Every wave with energy below ENCUT is kept."
+   },
+   {
+    "text": "The number of electrons",
+    "correct": false,
+    "why": "Tempting because both are counts, but electrons come from the POTCAR (NELECT)."
+   },
+   {
+    "text": "The number of k-points",
+    "correct": false,
+    "why": "Tempting, but that is the KPOINTS file or KSPACING."
+   }
+  ],
+  "hints": [
+   "It is an energy in eV.",
+   "It cuts the plane-wave sum."
+  ],
+  "difficulty": -0.5,
+  "level": "beginner",
+  "sources": [
+   "S-019",
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-encut2-2",
+  "concepts": [
+   "encut"
+  ],
+  "type": "numeric",
+  "prompt": "The largest ENMAX among your POTCARs is 400 eV. What ENCUT does the protocol use?",
+  "hints": [
+   "The protocol multiplies the largest ENMAX by 1.3.",
+   "400 times 1.3."
+  ],
+  "difficulty": -0.5,
+  "level": "beginner",
+  "sources": [
+   "S-042"
+  ],
+  "answer": 520,
+  "tolerance": 0.5,
+  "unit": "eV"
+ },
+ {
+  "id": "q-encut2-3",
+  "concepts": [
+   "encut"
+  ],
+  "type": "single",
+  "prompt": "You raise ENCUT from 400 to 600 eV. Roughly how does the number of plane waves change?",
+  "options": [
+   {
+    "text": "It grows by about (600/400)^(3/2), close to 1.8 times",
+    "correct": true,
+    "why": "The count grows as ENCUT to the 3/2 power."
+   },
+   {
+    "text": "It grows by 1.5 times",
+    "correct": false,
+    "why": "Tempting as the ratio of cutoffs, but the waves fill a sphere in 3D."
+   },
+   {
+    "text": "It does not change",
+    "correct": false,
+    "why": "Tempting because the cell is the same, but the sphere is bigger."
+   }
+  ],
+  "hints": [
+   "The kept waves fill a sphere.",
+   "The radius goes as the square root of ENCUT."
+  ],
+  "difficulty": 0.5,
+  "level": "intermediate",
+  "sources": [
+   "S-010",
+   "S-049"
+  ]
+ },
+ {
+  "id": "q-encut2-4",
+  "concepts": [
+   "encut"
+  ],
+  "type": "single",
+  "prompt": "Why must ENCUT be the same in calculations whose energies you compare?",
+  "options": [
+   {
+    "text": "Each ENCUT has its own basis-set error, which cancels only if it is the same",
+    "correct": true,
+    "why": "Differences at equal ENCUT converge much faster than absolute energies."
+   },
+   {
+    "text": "VASP refuses to run otherwise",
+    "correct": false,
+    "why": "Tempting, but VASP accepts any ENCUT; the danger is silent."
+   },
+   {
+    "text": "Because ENCUT changes the number of atoms",
+    "correct": false,
+    "why": "Tempting, but atoms come from the POSCAR."
+   }
+  ],
+  "hints": [
+   "Think about error cancellation.",
+   "An energy difference subtracts two errors."
+  ],
+  "difficulty": 0.0,
+  "level": "intermediate",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-pulay-1",
+  "concepts": [
+   "pulay-stress"
+  ],
+  "type": "single",
+  "prompt": "What is Pulay stress?",
+  "options": [
+   {
+    "text": "An artificial stress from an incomplete basis when the cell volume changes",
+    "correct": true,
+    "why": "With a fixed set of plane waves, the basis quality depends on the volume."
+   },
+   {
+    "text": "The real pressure inside a crystal",
+    "correct": false,
+    "why": "Tempting, but it is an artefact, not physics."
+   },
+   {
+    "text": "Stress caused by too many k-points",
+    "correct": false,
+    "why": "Tempting, but it comes from the plane-wave cutoff."
+   }
+  ],
+  "hints": [
+   "It is named after a basis-set effect.",
+   "It disappears as ENCUT grows."
+  ],
+  "difficulty": 0.3,
+  "level": "intermediate",
+  "sources": [
+   "S-040"
+  ]
+ },
+ {
+  "id": "q-pulay-2",
+  "concepts": [
+   "pulay-stress"
+  ],
+  "type": "single",
+  "prompt": "In which runs does Pulay stress matter most?",
+  "options": [
+   {
+    "text": "Relaxations that change the cell shape or volume (ISIF = 3) and elastic runs",
+    "correct": true,
+    "why": "These depend on the stress, which converges slowly with ENCUT."
+   },
+   {
+    "text": "Static runs at fixed geometry",
+    "correct": false,
+    "why": "Tempting, but the stress is not used to change anything there."
+   },
+   {
+    "text": "Band-structure runs",
+    "correct": false,
+    "why": "Tempting, but the cell is fixed and stress is not used."
+   }
+  ],
+  "hints": [
+   "Who uses the stress?",
+   "The cell must be allowed to change."
+  ],
+  "difficulty": 0.3,
+  "level": "intermediate",
+  "sources": [
+   "S-040",
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-pulay-3",
+  "concepts": [
+   "pulay-stress"
+  ],
+  "type": "single",
+  "prompt": "A cell relaxation at a low ENCUT gives a volume that is...",
+  "options": [
+   {
+    "text": "Too small",
+    "correct": true,
+    "why": "At fixed plane-wave number the basis worsens as the volume grows, so the cell is pulled smaller."
+   },
+   {
+    "text": "Too large",
+    "correct": false,
+    "why": "Tempting, but the artefact favours the smaller cell."
+   },
+   {
+    "text": "Exactly right",
+    "correct": false,
+    "why": "Tempting, but stress converges slowly with ENCUT."
+   }
+  ],
+  "hints": [
+   "Which volume has the better basis at fixed wave count?",
+   "Smaller cell, same waves, finer description."
+  ],
+  "difficulty": 0.8,
+  "level": "pro",
+  "sources": [
+   "S-040"
+  ]
+ },
+ {
+  "id": "q-pulay-4",
+  "concepts": [
+   "pulay-stress"
+  ],
+  "type": "single",
+  "prompt": "Why does the protocol use 1.3 x ENMAX rather than ENMAX?",
+  "options": [
+   {
+    "text": "The default cutoff often has to be raised by about 30 % to converge the stress",
+    "correct": true,
+    "why": "This is the VASP wiki note the handbook cites."
+   },
+   {
+    "text": "ENMAX is a minimum that VASP rejects",
+    "correct": false,
+    "why": "Tempting, but VASP accepts ENMAX; the problem is the stress."
+   },
+   {
+    "text": "To make runs faster",
+    "correct": false,
+    "why": "Tempting, but a higher cutoff is slower."
+   }
+  ],
+  "hints": [
+   "Stress converges more slowly than energy.",
+   "Where did the 30 % come from?"
+  ],
+  "difficulty": 0.0,
+  "level": "beginner",
+  "sources": [
+   "S-019",
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-bz-1",
+  "concepts": [
+   "brillouin-zone"
+  ],
+  "type": "single",
+  "prompt": "What is the first Brillouin zone?",
+  "options": [
+   {
+    "text": "The cell of reciprocal space that contains every distinct k label once",
+    "correct": true,
+    "why": "All other k are equivalent to one inside it."
+   },
+   {
+    "text": "The region near the nucleus",
+    "correct": false,
+    "why": "Tempting, but that is a real-space idea."
+   },
+   {
+    "text": "The unit cell of the crystal",
+    "correct": false,
+    "why": "Tempting, but it lives in reciprocal space."
+   }
+  ],
+  "hints": [
+   "k labels repeat in reciprocal space.",
+   "It is the set of points closest to Gamma."
+  ],
+  "difficulty": -0.3,
+  "level": "beginner",
+  "sources": [
+   "S-036"
+  ]
+ },
+ {
+  "id": "q-bz-2",
+  "concepts": [
+   "brillouin-zone"
+  ],
+  "type": "single",
+  "prompt": "You double the real-space cell length along one direction. What happens to the Brillouin zone along that direction?",
+  "options": [
+   {
+    "text": "It becomes half as long",
+    "correct": true,
+    "why": "Reciprocal lengths go as one over real-space lengths."
+   },
+   {
+    "text": "It doubles",
+    "correct": false,
+    "why": "Tempting, but real and reciprocal space are inverse."
+   },
+   {
+    "text": "Nothing",
+    "correct": false,
+    "why": "Tempting, but the reciprocal lattice depends on the cell."
+   }
+  ],
+  "hints": [
+   "Reciprocal means inverse.",
+   "b = 2 pi / a in one dimension."
+  ],
+  "difficulty": 0.0,
+  "level": "intermediate",
+  "sources": [
+   "S-036"
+  ]
+ },
+ {
+  "id": "q-bz-3",
+  "concepts": [
+   "brillouin-zone"
+  ],
+  "type": "single",
+  "prompt": "What point is at the centre of every Brillouin zone?",
+  "options": [
+   {
+    "text": "Gamma (k = 0)",
+    "correct": true,
+    "why": "The zone is built around Gamma."
+   },
+   {
+    "text": "X",
+    "correct": false,
+    "why": "Tempting as a common label, but X is on a face."
+   },
+   {
+    "text": "The Fermi point",
+    "correct": false,
+    "why": "Tempting, but the Fermi level is an energy, not a point."
+   }
+  ],
+  "hints": [
+   "k = 0.",
+   "It is the first letter of most band paths."
+  ],
+  "difficulty": -0.5,
+  "level": "beginner",
+  "sources": [
+   "S-036"
+  ]
+ },
+ {
+  "id": "q-bz-4",
+  "concepts": [
+   "brillouin-zone"
+  ],
+  "type": "single",
+  "prompt": "What does the label k on an electron state tell you?",
+  "options": [
+   {
+    "text": "How the phase of the orbital changes from one cell to the next",
+    "correct": true,
+    "why": "Bloch states pick up a phase exp(i k R) between cells."
+   },
+   {
+    "text": "The energy of the state",
+    "correct": false,
+    "why": "Tempting, but the energy depends on k and the band index."
+   },
+   {
+    "text": "Which atom the electron is on",
+    "correct": false,
+    "why": "Tempting, but Bloch states spread over the crystal."
+   }
+  ],
+  "hints": [
+   "Bloch theorem.",
+   "Each cell looks the same up to a phase."
+  ],
+  "difficulty": 0.5,
+  "level": "intermediate",
+  "sources": [
+   "S-050"
+  ]
+ },
+ {
+  "id": "q-ksamp-1",
+  "concepts": [
+   "kpoint-sampling"
+  ],
+  "type": "single",
+  "prompt": "Why does VASP use a finite mesh of k-points?",
+  "options": [
+   {
+    "text": "Averages over the zone are approximated by weighted sums over sample points",
+    "correct": true,
+    "why": "The mesh replaces an integral by a sum."
+   },
+   {
+    "text": "Because only those k-points exist in a real crystal",
+    "correct": false,
+    "why": "Tempting, but k is continuous in a large crystal."
+   },
+   {
+    "text": "To set the plane-wave cutoff",
+    "correct": false,
+    "why": "Tempting, but that is ENCUT."
+   }
+  ],
+  "hints": [
+   "Think of numerical integration.",
+   "A sum over sample points."
+  ],
+  "difficulty": -0.5,
+  "level": "beginner",
+  "sources": [
+   "S-007"
+  ]
+ },
+ {
+  "id": "q-ksamp-2",
+  "concepts": [
+   "kpoint-sampling"
+  ],
+  "type": "single",
+  "prompt": "Which materials need the densest k-point meshes?",
+  "options": [
+   {
+    "text": "Metals",
+    "correct": true,
+    "why": "Occupations jump across the Fermi surface inside the zone, which converges slowly."
+   },
+   {
+    "text": "Wide-gap insulators",
+    "correct": false,
+    "why": "Tempting because gaps are interesting, but their filled bands vary smoothly."
+   },
+   {
+    "text": "Molecules in a big box",
+    "correct": false,
+    "why": "Tempting, but a big box has a tiny zone; Gamma alone often suffices."
+   }
+  ],
+  "hints": [
+   "Where do occupations jump?",
+   "Smooth functions need few samples."
+  ],
+  "difficulty": 0.0,
+  "level": "intermediate",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-ksamp-3",
+  "concepts": [
+   "kpoint-sampling"
+  ],
+  "type": "single",
+  "prompt": "An 8 x 8 x 8 mesh has 512 points but VASP reports far fewer k-points. Why?",
+  "options": [
+   {
+    "text": "Symmetry: equivalent points are computed once and given larger weights",
+    "correct": true,
+    "why": "Only irreducible points are calculated."
+   },
+   {
+    "text": "VASP drops points it cannot converge",
+    "correct": false,
+    "why": "Tempting, but no points are dropped for convergence reasons."
+   },
+   {
+    "text": "The mesh was too dense and VASP reduced it",
+    "correct": false,
+    "why": "Tempting, but VASP uses the mesh you gave."
+   }
+  ],
+  "hints": [
+   "The k-mesh lab shows this.",
+   "Rotations map points onto each other."
+  ],
+  "difficulty": 0.0,
+  "level": "intermediate",
+  "sources": [
+   "S-007"
+  ]
+ },
+ {
+  "id": "q-ksamp-4",
+  "concepts": [
+   "kpoint-sampling"
+  ],
+  "type": "numeric",
+  "prompt": "Your primitive cell converges with a 12 x 12 x 12 mesh. A supercell is 3 times longer along a only. How many points along a keep the same density?",
+  "hints": [
+   "The zone shrinks along a by the same factor.",
+   "12 divided by 3."
+  ],
+  "difficulty": 0.3,
+  "level": "intermediate",
+  "sources": [
+   "S-036"
+  ],
+  "answer": 4,
+  "tolerance": 0,
+  "unit": ""
+ },
+ {
+  "id": "q-gmp-1",
+  "concepts": [
+   "gamma-vs-mp"
+  ],
+  "type": "single",
+  "prompt": "What is the difference between a Gamma-centred mesh and a Monkhorst-Pack mesh with an even number of points?",
+  "options": [
+   {
+    "text": "The even MP mesh is shifted off Gamma; the Gamma-centred mesh contains it",
+    "correct": true,
+    "why": "With VASP's formula, even N does not include k = 0."
+   },
+   {
+    "text": "They have different numbers of points",
+    "correct": false,
+    "why": "Tempting, but N x N x N is the same count."
+   },
+   {
+    "text": "MP meshes only work for cubic cells",
+    "correct": false,
+    "why": "Tempting, but both work for any cell; symmetry is the issue."
+   }
+  ],
+  "hints": [
+   "Where is the first point?",
+   "Even N skips k = 0."
+  ],
+  "difficulty": 0.5,
+  "level": "intermediate",
+  "sources": [
+   "S-007"
+  ]
+ },
+ {
+  "id": "q-gmp-2",
+  "concepts": [
+   "gamma-vs-mp"
+  ],
+  "type": "single",
+  "prompt": "Which mesh is the safe choice for a hexagonal cell?",
+  "options": [
+   {
+    "text": "Gamma-centred",
+    "correct": true,
+    "why": "Shifted (even MP) meshes break hexagonal symmetry."
+   },
+   {
+    "text": "Monkhorst-Pack with an even number of points",
+    "correct": false,
+    "why": "Tempting as the \"standard\" mesh, but it breaks the six-fold symmetry."
+   },
+   {
+    "text": "Any mesh: symmetry does not matter",
+    "correct": false,
+    "why": "Tempting, but broken symmetry gives more irreducible points and possibly wrong results."
+   }
+  ],
+  "hints": [
+   "Odd meshes contain Gamma; even ones are shifted off it.",
+   "Which mesh keeps the zone centre?"
+  ],
+  "difficulty": 0.0,
+  "level": "intermediate",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-gmp-3",
+  "concepts": [
+   "gamma-vs-mp"
+  ],
+  "type": "numeric",
+  "prompt": "With VASP's Monkhorst-Pack formula k = (2r - N - 1)/(2N), what is the first coordinate (r = 1) for N = 4?",
+  "hints": [
+   "Substitute r = 1 and N = 4.",
+   "(2 - 5) / 8."
+  ],
+  "difficulty": 0.8,
+  "level": "pro",
+  "sources": [
+   "S-007"
+  ],
+  "answer": -0.375,
+  "tolerance": 0.0005,
+  "unit": ""
+ },
+ {
+  "id": "q-gmp-4",
+  "concepts": [
+   "gamma-vs-mp"
+  ],
+  "type": "single",
+  "prompt": "The author's handbook says \"odd MP meshes on hexagonal cells\" are a mistake. What does the site's test show?",
+  "options": [
+   {
+    "text": "It is the even MP meshes that break hexagonal symmetry; odd ones include Gamma",
+    "correct": true,
+    "why": "The VASP wiki KPOINTS page agrees: avoid Monkhorst-Pack meshes with an even number of in-plane subdivisions on hexagonal cells."
+   },
+   {
+    "text": "Odd MP meshes break the symmetry, as written",
+    "correct": false,
+    "why": "Tempting to trust the handbook, but the spglib test says otherwise."
+   },
+   {
+    "text": "Neither breaks it",
+    "correct": false,
+    "why": "Tempting, but even meshes were shown to break it."
+   }
+  ],
+  "hints": [
+   "Odd N includes k = 0.",
+   "The handbook advice (use Gamma-centred) is still right."
+  ],
+  "difficulty": 1.0,
+  "level": "pro",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-pp-1",
+  "concepts": [
+   "pseudopotentials"
+  ],
+  "type": "single",
+  "prompt": "Why do plane-wave codes use pseudopotentials?",
+  "options": [
+   {
+    "text": "The wiggles of orbitals near the nucleus would need an enormous cutoff",
+    "correct": true,
+    "why": "Replacing the core region by a smooth potential makes the cutoff practical."
+   },
+   {
+    "text": "Because core electrons do not exist",
+    "correct": false,
+    "why": "Tempting, but they exist; they are frozen, not removed from physics."
+   },
+   {
+    "text": "To make the calculation more accurate than all-electron",
+    "correct": false,
+    "why": "Tempting, but a pseudopotential is an approximation."
+   }
+  ],
+  "hints": [
+   "Fine detail needs short waves.",
+   "Where are the wiggles?"
+  ],
+  "difficulty": -0.5,
+  "level": "beginner",
+  "sources": [
+   "S-049"
+  ]
+ },
+ {
+  "id": "q-pp-2",
+  "concepts": [
+   "pseudopotentials"
+  ],
+  "type": "single",
+  "prompt": "In the PAW lab, what happens when you increase r_c?",
+  "options": [
+   {
+    "text": "The pseudo function gets smoother, so fewer plane waves are needed, but it is less transferable",
+    "correct": true,
+    "why": "That is the basic trade-off of any pseudopotential."
+   },
+   {
+    "text": "The all-electron function changes",
+    "correct": false,
+    "why": "Tempting, but the all-electron curve is the reference and stays fixed."
+   },
+   {
+    "text": "The pseudo function gets more nodes",
+    "correct": false,
+    "why": "Tempting, but the pseudo function is nodeless inside r_c by construction."
+   }
+  ],
+  "hints": [
+   "Larger radius, smoother inside.",
+   "Transferability: does it work in other environments?"
+  ],
+  "difficulty": 0.0,
+  "level": "intermediate",
+  "sources": [
+   "S-049"
+  ]
+ },
+ {
+  "id": "q-pp-3",
+  "concepts": [
+   "pseudopotentials"
+  ],
+  "type": "order",
+  "prompt": "Order the steps to build a POTCAR for a POSCAR with species Fe then O.",
+  "options": [
+   {
+    "text": "Pick the dataset for each species (for example Fe_pv and O)",
+    "correct": true,
+    "why": "The choice is made per element."
+   },
+   {
+    "text": "Concatenate the files in POSCAR order: Fe first, then O",
+    "correct": true,
+    "why": "VASP assigns by position."
+   },
+   {
+    "text": "Check with grep TITEL POTCAR",
+    "correct": true,
+    "why": "Confirms which datasets and in which order."
+   },
+   {
+    "text": "Set ENCUT from grep ENMAX POTCAR",
+    "correct": true,
+    "why": "Largest ENMAX times 1.3."
+   }
+  ],
+  "hints": [
+   "Order matters for the concatenation.",
+   "Checks come after building."
+  ],
+  "difficulty": 0.0,
+  "level": "beginner",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-pp-4",
+  "concepts": [
+   "pseudopotentials"
+  ],
+  "type": "single",
+  "prompt": "What does a _pv dataset (for example Ti_pv) change?",
+  "options": [
+   {
+    "text": "Semicore p states are treated as valence: more electrons, more accuracy, more cost",
+    "correct": true,
+    "why": "The suffix says which extra states are in the valence."
+   },
+   {
+    "text": "It is a lower-quality fast version",
+    "correct": false,
+    "why": "Tempting, but it is more complete, not less."
+   },
+   {
+    "text": "It switches on spin polarization",
+    "correct": false,
+    "why": "Tempting, but spin is ISPIN in the INCAR."
+   }
+  ],
+  "hints": [
+   "p for semicore p.",
+   "More valence electrons."
+  ],
+  "difficulty": 0.5,
+  "level": "intermediate",
+  "sources": [
+   "S-019",
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-paw-1",
+  "concepts": [
+   "paw"
+  ],
+  "type": "single",
+  "prompt": "What does PAW add to a plain pseudopotential?",
+  "options": [
+   {
+    "text": "A way to reconstruct the all-electron wavefunction near the nucleus",
+    "correct": true,
+    "why": "Stored atomic partial waves and projectors restore the core-region shape."
+   },
+   {
+    "text": "It removes the need for a cutoff",
+    "correct": false,
+    "why": "Tempting, but the smooth part is still expanded in plane waves with a cutoff."
+   },
+   {
+    "text": "It treats all electrons explicitly in plane waves",
+    "correct": false,
+    "why": "Tempting from the name, but core electrons stay frozen."
+   }
+  ],
+  "hints": [
+   "Projector augmented waves.",
+   "Augment: add back."
+  ],
+  "difficulty": 0.3,
+  "level": "intermediate",
+  "sources": [
+   "S-008"
+  ]
+ },
+ {
+  "id": "q-paw-2",
+  "concepts": [
+   "paw"
+  ],
+  "type": "single",
+  "prompt": "In PAW, which part of the wavefunction is expanded in plane waves?",
+  "options": [
+   {
+    "text": "Only the smooth pseudo wavefunction",
+    "correct": true,
+    "why": "The atomic corrections inside the spheres are handled separately."
+   },
+   {
+    "text": "The full all-electron wavefunction",
+    "correct": false,
+    "why": "Tempting, but that would need a huge cutoff."
+   },
+   {
+    "text": "Only the core electrons",
+    "correct": false,
+    "why": "Tempting, but core electrons are frozen."
+   }
+  ],
+  "hints": [
+   "Plane waves are for smooth things.",
+   "The transformation maps smooth to all-electron."
+  ],
+  "difficulty": 0.5,
+  "level": "pro",
+  "sources": [
+   "S-008"
+  ]
+ },
+ {
+  "id": "q-paw-3",
+  "concepts": [
+   "paw"
+  ],
+  "type": "single",
+  "prompt": "Why should you set LASPH = .TRUE. for d and f elements?",
+  "options": [
+   {
+    "text": "It includes non-spherical gradient corrections inside the PAW spheres",
+    "correct": true,
+    "why": "This matters for gradient-corrected functionals with localized d and f states."
+   },
+   {
+    "text": "It switches on spin",
+    "correct": false,
+    "why": "Tempting, but that is ISPIN."
+   },
+   {
+    "text": "It speeds up the run",
+    "correct": false,
+    "why": "Tempting, but it adds a small cost."
+   }
+  ],
+  "hints": [
+   "A for aspherical.",
+   "Inside the PAW spheres."
+  ],
+  "difficulty": 0.5,
+  "level": "intermediate",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-paw-4",
+  "concepts": [
+   "paw"
+  ],
+  "type": "single",
+  "prompt": "Why does the site never show the contents of a POTCAR?",
+  "options": [
+   {
+    "text": "POTCARs are licensed with VASP and must not be redistributed",
+    "correct": true,
+    "why": "You obtain them under your own licence."
+   },
+   {
+    "text": "They are empty",
+    "correct": false,
+    "why": "Tempting, but they hold the PAW datasets."
+   },
+   {
+    "text": "They change every run",
+    "correct": false,
+    "why": "Tempting, but they are fixed files."
+   }
+  ],
+  "hints": [
+   "Think about licences.",
+   "Read from them with grep instead."
+  ],
+  "difficulty": -0.5,
+  "level": "beginner",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-func-1",
+  "concepts": [
+   "functionals"
+  ],
+  "type": "single",
+  "prompt": "What is a sensible default functional for structures of solids?",
+  "options": [
+   {
+    "text": "PBE (a GGA)",
+    "correct": true,
+    "why": "Robust and cheap, with well-known errors."
+   },
+   {
+    "text": "HSE06 for everything",
+    "correct": false,
+    "why": "Tempting for accuracy, but too expensive as a default for relaxations."
+   },
+   {
+    "text": "LDA always",
+    "correct": false,
+    "why": "Tempting as the simplest, but PBE is the common default with PBE POTCARs."
+   }
+  ],
+  "hints": [
+   "Start cheap and robust.",
+   "The standard POTCARs were made with it."
+  ],
+  "difficulty": -0.5,
+  "level": "beginner",
+  "sources": [
+   "S-013",
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-func-2",
+  "concepts": [
+   "functionals"
+  ],
+  "type": "single",
+  "prompt": "According to the author's handbook, how do PBE lattice constants typically compare with experiment?",
+  "options": [
+   {
+    "text": "About 1 to 2 % too large",
+    "correct": true,
+    "why": "LDA errs the other way, about 1 to 2 % too small."
+   },
+   {
+    "text": "About 1 to 2 % too small",
+    "correct": false,
+    "why": "Tempting, but that is LDA."
+   },
+   {
+    "text": "Exactly right",
+    "correct": false,
+    "why": "Tempting, but every approximate functional has systematic errors."
+   }
+  ],
+  "hints": [
+   "PBE underbinds slightly.",
+   "LDA overbinds."
+  ],
+  "difficulty": 0.0,
+  "level": "beginner",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-func-3",
+  "concepts": [
+   "functionals"
+  ],
+  "type": "order",
+  "prompt": "Order the ingredients as you climb Jacob's ladder.",
+  "options": [
+   {
+    "text": "Density",
+    "correct": true,
+    "why": "The LDA uses only this."
+   },
+   {
+    "text": "Gradient of the density",
+    "correct": true,
+    "why": "Added by GGAs such as PBE."
+   },
+   {
+    "text": "Kinetic-energy density",
+    "correct": true,
+    "why": "Added by meta-GGAs such as r2SCAN."
+   },
+   {
+    "text": "Exact exchange",
+    "correct": true,
+    "why": "Mixed in by hybrids such as HSE06."
+   }
+  ],
+  "hints": [
+   "Each rung adds one ingredient.",
+   "The fifth rung adds unoccupied orbitals."
+  ],
+  "difficulty": 0.3,
+  "level": "intermediate",
+  "sources": [
+   "S-046"
+  ]
+ },
+ {
+  "id": "q-func-4",
+  "concepts": [
+   "functionals"
+  ],
+  "type": "single",
+  "prompt": "Why can mBJ not be used to relax a structure?",
+  "options": [
+   {
+    "text": "It is a potential without a consistent energy functional, so forces are not reliable",
+    "correct": true,
+    "why": "Use it for band structures on a fixed geometry."
+   },
+   {
+    "text": "It is too expensive",
+    "correct": false,
+    "why": "Tempting, but its cost is moderate."
+   },
+   {
+    "text": "It only works for metals",
+    "correct": false,
+    "why": "Tempting, but it is mostly used for semiconductor gaps."
+   }
+  ],
+  "hints": [
+   "Forces come from energy derivatives.",
+   "What does mBJ not have?"
+  ],
+  "difficulty": 0.8,
+  "level": "pro",
+  "sources": [
+   "S-027"
+  ]
+ },
+ {
+  "id": "q-hyb-1",
+  "concepts": [
+   "hybrid-functionals"
+  ],
+  "type": "single",
+  "prompt": "What does a hybrid functional mix in?",
+  "options": [
+   {
+    "text": "A fraction of exact (Hartree-Fock) exchange",
+    "correct": true,
+    "why": "For HSE06, a quarter at short range."
+   },
+   {
+    "text": "A fraction of the kinetic energy",
+    "correct": false,
+    "why": "Tempting, but that is a meta-GGA ingredient."
+   },
+   {
+    "text": "Two different POTCARs",
+    "correct": false,
+    "why": "Tempting, but POTCARs are unrelated to the mixing."
+   }
+  ],
+  "hints": [
+   "Hybrid of DFT and Hartree-Fock.",
+   "Exact exchange."
+  ],
+  "difficulty": -0.3,
+  "level": "beginner",
+  "sources": [
+   "S-025"
+  ]
+ },
+ {
+  "id": "q-hyb-2",
+  "concepts": [
+   "hybrid-functionals"
+  ],
+  "type": "single",
+  "prompt": "Which INCAR settings give HSE06?",
+  "options": [
+   {
+    "text": "LHFCALC = .TRUE. and HFSCREEN = 0.2",
+    "correct": true,
+    "why": "HFSCREEN sets the screening that defines HSE06."
+   },
+   {
+    "text": "GGA = PE",
+    "correct": false,
+    "why": "Tempting, but that is plain PBE."
+   },
+   {
+    "text": "METAGGA = R2SCAN",
+    "correct": false,
+    "why": "Tempting, but that is a meta-GGA."
+   }
+  ],
+  "hints": [
+   "Two tags.",
+   "HF in the names."
+  ],
+  "difficulty": 0.0,
+  "level": "intermediate",
+  "sources": [
+   "S-019",
+   "S-025"
+  ]
+ },
+ {
+  "id": "q-hyb-3",
+  "concepts": [
+   "hybrid-functionals"
+  ],
+  "type": "single",
+  "prompt": "What is the main reason to use HSE06 instead of PBE?",
+  "options": [
+   {
+    "text": "Much better band gaps for many semiconductors",
+    "correct": true,
+    "why": "GGA gaps are usually too small."
+   },
+   {
+    "text": "Faster runs",
+    "correct": false,
+    "why": "Tempting, but hybrids are much slower."
+   },
+   {
+    "text": "Better van der Waals binding",
+    "correct": false,
+    "why": "Tempting, but dispersion needs a separate correction."
+   }
+  ],
+  "hints": [
+   "What does PBE underestimate?",
+   "Gaps."
+  ],
+  "difficulty": 0.0,
+  "level": "intermediate",
+  "sources": [
+   "S-025",
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-hyb-4",
+  "concepts": [
+   "hybrid-functionals"
+  ],
+  "type": "single",
+  "prompt": "What is a common way to keep a hybrid study affordable?",
+  "options": [
+   {
+    "text": "Relax with PBE, then run HSE06 on that structure",
+    "correct": true,
+    "why": "The expensive functional is used once, where it matters."
+   },
+   {
+    "text": "Use HSE06 with no k-points",
+    "correct": false,
+    "why": "Tempting, but the zone still needs sampling."
+   },
+   {
+    "text": "Lower ENCUT below ENMAX",
+    "correct": false,
+    "why": "Tempting, but that ruins the basis."
+   }
+  ],
+  "hints": [
+   "Spend the cost where it buys accuracy.",
+   "Structures from PBE are usually fine."
+  ],
+  "difficulty": 0.3,
+  "level": "intermediate",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-smear-1",
+  "concepts": [
+   "smearing"
+  ],
+  "type": "single",
+  "prompt": "Why do metals need smearing?",
+  "options": [
+   {
+    "text": "Occupations jump from 1 to 0 at the Fermi surface, which a finite k-mesh samples badly",
+    "correct": true,
+    "why": "Smoothing the step makes sums converge."
+   },
+   {
+    "text": "Metals have no electrons near the Fermi level",
+    "correct": false,
+    "why": "Tempting, but they have many."
+   },
+   {
+    "text": "To make metals magnetic",
+    "correct": false,
+    "why": "Tempting, but magnetism is controlled by ISPIN and MAGMOM."
+   }
+  ],
+  "hints": [
+   "Sharp steps are hard to integrate.",
+   "Where do bands cross the Fermi level?"
+  ],
+  "difficulty": -0.3,
+  "level": "beginner",
+  "sources": [
+   "S-019"
+  ]
+ },
+ {
+  "id": "q-smear-2",
+  "concepts": [
+   "smearing"
+  ],
+  "type": "single",
+  "prompt": "In the smearing lab, what is special about Methfessel-Paxton occupations?",
+  "options": [
+   {
+    "text": "They go slightly below 0 and above 1",
+    "correct": true,
+    "why": "The price of a very small energy error for metals."
+   },
+   {
+    "text": "They are always exactly 0 or 1",
+    "correct": false,
+    "why": "Tempting, but that is no smearing."
+   },
+   {
+    "text": "They are the same as Fermi-Dirac",
+    "correct": false,
+    "why": "Tempting, but the shape differs."
+   }
+  ],
+  "hints": [
+   "Look at the occupation range readout.",
+   "Is it within [0, 1]?"
+  ],
+  "difficulty": 0.0,
+  "level": "intermediate",
+  "sources": [
+   "S-015"
+  ]
+ },
+ {
+  "id": "q-smear-3",
+  "concepts": [
+   "smearing"
+  ],
+  "type": "numeric",
+  "prompt": "A 40-atom cell has EENTRO = -0.020 eV (T*S = 0.020 eV). What is T*S per atom in meV?",
+  "hints": [
+   "Divide by the number of atoms.",
+   "20 meV / 40."
+  ],
+  "difficulty": -0.3,
+  "level": "beginner",
+  "sources": [
+   "S-042"
+  ],
+  "answer": 0.5,
+  "tolerance": 0.01,
+  "unit": "meV"
+ },
+ {
+  "id": "q-smear-4",
+  "concepts": [
+   "smearing"
+  ],
+  "type": "single",
+  "prompt": "In the lab, you double SIGMA. Roughly how does the entropy term change?",
+  "options": [
+   {
+    "text": "It grows about four times",
+    "correct": true,
+    "why": "T*S grows with SIGMA squared for small SIGMA."
+   },
+   {
+    "text": "It doubles",
+    "correct": false,
+    "why": "Tempting, but it is quadratic."
+   },
+   {
+    "text": "It halves",
+    "correct": false,
+    "why": "Tempting, but more smearing gives more entropy."
+   }
+  ],
+  "hints": [
+   "Try it in the lab.",
+   "Quadratic."
+  ],
+  "difficulty": 0.3,
+  "level": "intermediate",
+  "sources": [
+   "S-050"
+  ]
+ },
+ {
+  "id": "q-ismear-1",
+  "concepts": [
+   "ismear-sigma"
+  ],
+  "type": "single",
+  "prompt": "Which setting suits a semiconductor?",
+  "options": [
+   {
+    "text": "ISMEAR = 0, SIGMA = 0.05",
+    "correct": true,
+    "why": "Gaussian with a small width is safe for gapped systems."
+   },
+   {
+    "text": "ISMEAR = 1, SIGMA = 0.2",
+    "correct": false,
+    "why": "Tempting as the VASP default, but it is for metals."
+   },
+   {
+    "text": "ISMEAR = 2, SIGMA = 0.5",
+    "correct": false,
+    "why": "Tempting, but MP and large SIGMA are wrong for a gap."
+   }
+  ],
+  "hints": [
+   "Gapped means Gaussian.",
+   "Small width."
+  ],
+  "difficulty": -0.5,
+  "level": "beginner",
+  "sources": [
+   "S-019",
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-ismear-2",
+  "concepts": [
+   "ismear-sigma"
+  ],
+  "type": "single",
+  "prompt": "Why is ISMEAR = -5 a bad choice for relaxing a metal?",
+  "options": [
+   {
+    "text": "The tetrahedron method gives inaccurate forces for metals",
+    "correct": true,
+    "why": "Use it for DOS and total energies at a fixed structure."
+   },
+   {
+    "text": "It needs a Gamma-only mesh",
+    "correct": false,
+    "why": "Tempting, but it needs at least four k-points."
+   },
+   {
+    "text": "It is not supported for metals at all",
+    "correct": false,
+    "why": "Tempting, but it works for metal energies, just not forces."
+   }
+  ],
+  "hints": [
+   "Relaxations need forces.",
+   "What does the card say about -5?"
+  ],
+  "difficulty": 0.5,
+  "level": "intermediate",
+  "sources": [
+   "S-019",
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-ismear-3",
+  "concepts": [
+   "ismear-sigma"
+  ],
+  "type": "single",
+  "prompt": "You do not know whether your system is a metal. What is the safe choice?",
+  "options": [
+   {
+    "text": "ISMEAR = 0 with a small SIGMA",
+    "correct": true,
+    "why": "Gaussian smearing works for both, with small errors."
+   },
+   {
+    "text": "ISMEAR = 1",
+    "correct": false,
+    "why": "Tempting as the default, but wrong if it turns out to have a gap."
+   },
+   {
+    "text": "ISMEAR = -5",
+    "correct": false,
+    "why": "Tempting for accuracy, but not for relaxations of metals."
+   }
+  ],
+  "hints": [
+   "One method is safe for any system.",
+   "Check the result afterwards."
+  ],
+  "difficulty": 0.0,
+  "level": "beginner",
+  "sources": [
+   "S-019",
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-ismear-4",
+  "concepts": [
+   "ismear-sigma"
+  ],
+  "type": "single",
+  "prompt": "EENTRO gives T*S of 3 meV per atom for your metal. What should you do?",
+  "options": [
+   {
+    "text": "Reduce SIGMA (and add k-points if needed), then check again",
+    "correct": true,
+    "why": "The rule of thumb is below about 1 meV per atom."
+   },
+   {
+    "text": "Nothing; any value is fine",
+    "correct": false,
+    "why": "Tempting, but the error is then larger than many energy differences of interest."
+   },
+   {
+    "text": "Switch to ISMEAR = 0 for the metal and keep SIGMA",
+    "correct": false,
+    "why": "Tempting, but Gaussian would not fix a large SIGMA."
+   }
+  ],
+  "hints": [
+   "Compare with 1 meV per atom.",
+   "SIGMA controls the entropy term."
+  ],
+  "difficulty": 0.3,
+  "level": "intermediate",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-spinpol-1",
+  "concepts": [
+   "spin-polarization"
+  ],
+  "type": "single",
+  "prompt": "What does ISPIN = 2 do?",
+  "options": [
+   {
+    "text": "VASP keeps separate densities for spin up and spin down",
+    "correct": true,
+    "why": "This allows a magnetic moment."
+   },
+   {
+    "text": "It doubles the number of k-points",
+    "correct": false,
+    "why": "Tempting, but k-points are set separately."
+   },
+   {
+    "text": "It adds spin-orbit coupling",
+    "correct": false,
+    "why": "Tempting, but that is LSORBIT."
+   }
+  ],
+  "hints": [
+   "Two spin channels.",
+   "Their difference is the moment."
+  ],
+  "difficulty": -0.5,
+  "level": "beginner",
+  "sources": [
+   "S-019",
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-spinpol-2",
+  "concepts": [
+   "spin-polarization"
+  ],
+  "type": "single",
+  "prompt": "When should you switch on spin polarization?",
+  "options": [
+   {
+    "text": "For materials that may be magnetic, such as compounds of Fe, Co, Ni, Mn, or with open d or f shells",
+    "correct": true,
+    "why": "If in doubt, test with spin."
+   },
+   {
+    "text": "Never; DFT cannot describe magnetism",
+    "correct": false,
+    "why": "Tempting, but spin-polarized DFT describes many magnets."
+   },
+   {
+    "text": "Only for metals",
+    "correct": false,
+    "why": "Tempting, but many magnetic materials are insulators."
+   }
+  ],
+  "hints": [
+   "Open shells.",
+   "Magnetic oxides are insulators."
+  ],
+  "difficulty": 0.0,
+  "level": "beginner",
+  "sources": [
+   "S-019",
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-spinpol-3",
+  "concepts": [
+   "spin-polarization"
+  ],
+  "type": "single",
+  "prompt": "Why can the same magnetic material converge to different states?",
+  "options": [
+   {
+    "text": "There are several self-consistent solutions, and the loop finds the one near its start",
+    "correct": true,
+    "why": "That is why MAGMOM matters."
+   },
+   {
+    "text": "Because VASP is random",
+    "correct": false,
+    "why": "Tempting, but VASP is deterministic for a given start."
+   },
+   {
+    "text": "Because ENCUT is too low",
+    "correct": false,
+    "why": "Tempting, but the issue is multiple solutions."
+   }
+  ],
+  "hints": [
+   "Think of valleys.",
+   "The start decides the valley."
+  ],
+  "difficulty": 0.3,
+  "level": "intermediate",
+  "sources": [
+   "S-019",
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-spinpol-4",
+  "concepts": [
+   "spin-polarization"
+  ],
+  "type": "single",
+  "prompt": "How many MAGMOM values does a spin-orbit (non-collinear) run need for 5 atoms?",
+  "options": [
+   {
+    "text": "15: three per atom",
+    "correct": true,
+    "why": "Each atom needs x, y and z."
+   },
+   {
+    "text": "5",
+    "correct": false,
+    "why": "Tempting from collinear runs, but each moment is a vector here."
+   },
+   {
+    "text": "2",
+    "correct": false,
+    "why": "Tempting as one per species, but MAGMOM is per atom."
+   }
+  ],
+  "hints": [
+   "Non-collinear means vectors.",
+   "3 times 5."
+  ],
+  "difficulty": 0.5,
+  "level": "pro",
+  "sources": [
+   "S-019",
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-magmom-1",
+  "concepts": [
+   "magmom"
+  ],
+  "type": "numeric",
+  "prompt": "How many values does MAGMOM = 2*5.0 4*0.6 contain?",
+  "hints": [
+   "n*x counts as n values.",
+   "2 + 4."
+  ],
+  "difficulty": -0.5,
+  "level": "beginner",
+  "sources": [
+   "S-042"
+  ],
+  "answer": 6,
+  "tolerance": 0,
+  "unit": ""
+ },
+ {
+  "id": "q-magmom-2",
+  "concepts": [
+   "magmom"
+  ],
+  "type": "single",
+  "prompt": "A POSCAR lists 2 Fe then 4 O. Which MAGMOM is right for a ferromagnetic start?",
+  "options": [
+   {
+    "text": "MAGMOM = 2*5.0 4*0.6",
+    "correct": true,
+    "why": "One value per atom in POSCAR order."
+   },
+   {
+    "text": "MAGMOM = 5.0 0.6",
+    "correct": false,
+    "why": "Tempting as one per species, but it needs one per atom."
+   },
+   {
+    "text": "MAGMOM = 4*0.6 2*5.0",
+    "correct": false,
+    "why": "Tempting, but the order must follow POSCAR: Fe first."
+   }
+  ],
+  "hints": [
+   "Count atoms, not species.",
+   "Follow the POSCAR order."
+  ],
+  "difficulty": -0.3,
+  "level": "beginner",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-magmom-3",
+  "concepts": [
+   "magmom"
+  ],
+  "type": "single",
+  "prompt": "How do you start an antiferromagnetic calculation?",
+  "options": [
+   {
+    "text": "Give neighbouring magnetic atoms opposite signs, in a cell big enough to hold both",
+    "correct": true,
+    "why": "The loop then stays near the antiparallel arrangement."
+   },
+   {
+    "text": "Set MAGMOM to zero",
+    "correct": false,
+    "why": "Tempting, but that usually gives a non-magnetic solution."
+   },
+   {
+    "text": "Set ISPIN = 3",
+    "correct": false,
+    "why": "Tempting, but ISPIN only takes 1 or 2."
+   }
+  ],
+  "hints": [
+   "Alternating signs.",
+   "Look at the spin lab."
+  ],
+  "difficulty": 0.3,
+  "level": "intermediate",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-magmom-4",
+  "concepts": [
+   "magmom"
+  ],
+  "type": "single",
+  "prompt": "What MAGMOM does VASP use if you set ISPIN = 2 but no MAGMOM?",
+  "options": [
+   {
+    "text": "1.0 for every atom",
+    "correct": true,
+    "why": "The VASP default; a ferromagnetic start."
+   },
+   {
+    "text": "0 for every atom",
+    "correct": false,
+    "why": "Tempting, but then nothing would become magnetic."
+   },
+   {
+    "text": "It stops with an error",
+    "correct": false,
+    "why": "Tempting, but VASP has a default."
+   }
+  ],
+  "hints": [
+   "There is a default.",
+   "See the MAGMOM card."
+  ],
+  "difficulty": 0.5,
+  "level": "intermediate",
+  "sources": [
+   "S-019"
+  ]
+ },
+ {
+  "id": "q-dftu-1",
+  "concepts": [
+   "dft-plus-u"
+  ],
+  "type": "single",
+  "prompt": "What problem does DFT+U address?",
+  "options": [
+   {
+    "text": "Self-interaction makes localized d and f electrons too spread out and too fractionally occupied",
+    "correct": true,
+    "why": "The penalty pushes occupations towards 0 or 1."
+   },
+   {
+    "text": "Missing van der Waals forces",
+    "correct": false,
+    "why": "Tempting, but that is IVDW."
+   },
+   {
+    "text": "Slow SCF convergence",
+    "correct": false,
+    "why": "Tempting, but +U can even make convergence harder."
+   }
+  ],
+  "hints": [
+   "Which electrons are localized?",
+   "Module 4: self-interaction."
+  ],
+  "difficulty": 0.0,
+  "level": "intermediate",
+  "sources": [
+   "S-014"
+  ]
+ },
+ {
+  "id": "q-dftu-2",
+  "concepts": [
+   "dft-plus-u"
+  ],
+  "type": "numeric",
+  "prompt": "With E_U = (U_eff/2) n (1 - n), what is E_U in eV for U_eff = 4 eV and n = 0.5?",
+  "hints": [
+   "Substitute.",
+   "2 x 0.5 x 0.5."
+  ],
+  "difficulty": -0.3,
+  "level": "beginner",
+  "sources": [
+   "S-014"
+  ],
+  "answer": 0.5,
+  "tolerance": 0.001,
+  "unit": "eV"
+ },
+ {
+  "id": "q-dftu-3",
+  "concepts": [
+   "dft-plus-u"
+  ],
+  "type": "single",
+  "prompt": "For a nearly full orbital (n close to 1), what does the +U potential V = U_eff (1/2 - n) do?",
+  "options": [
+   {
+    "text": "It is negative, so it lowers the orbital energy",
+    "correct": true,
+    "why": "Occupied states move down, which helps open a gap."
+   },
+   {
+    "text": "It is positive and raises it",
+    "correct": false,
+    "why": "Tempting, but that is for nearly empty orbitals."
+   },
+   {
+    "text": "It is zero",
+    "correct": false,
+    "why": "Tempting, but zero is only at half filling."
+   }
+  ],
+  "hints": [
+   "Substitute n = 1.",
+   "V(1) = -U_eff / 2."
+  ],
+  "difficulty": 0.3,
+  "level": "intermediate",
+  "sources": [
+   "S-014"
+  ]
+ },
+ {
+  "id": "q-dftu-4",
+  "concepts": [
+   "dft-plus-u"
+  ],
+  "type": "single",
+  "prompt": "How are LDAUL, LDAUU and LDAUJ written?",
+  "options": [
+   {
+    "text": "One value per species, in POSCAR order",
+    "correct": true,
+    "why": "Unlike MAGMOM, which is per atom."
+   },
+   {
+    "text": "One value per atom",
+    "correct": false,
+    "why": "Tempting by analogy with MAGMOM, but these are per species."
+   },
+   {
+    "text": "One value for the whole cell",
+    "correct": false,
+    "why": "Tempting, but different elements need different U."
+   }
+  ],
+  "hints": [
+   "Per POTCAR.",
+   "Compare with MAGMOM."
+  ],
+  "difficulty": 0.3,
+  "level": "intermediate",
+  "sources": [
+   "S-019"
+  ]
+ },
+ {
+  "id": "q-dftu-5",
+  "concepts": [
+   "dft-plus-u"
+  ],
+  "type": "single",
+  "prompt": "You fit U so that the computed band gap matches experiment. What can you then claim?",
+  "options": [
+   {
+    "text": "Not the band gap as a prediction: it was an input",
+    "correct": true,
+    "why": "Other properties may then be tested."
+   },
+   {
+    "text": "A first-principles prediction of the gap",
+    "correct": false,
+    "why": "Tempting, but the agreement was built in."
+   },
+   {
+    "text": "That U is universal for all compounds",
+    "correct": false,
+    "why": "Tempting, but U depends on the system and the setup."
+   }
+  ],
+  "hints": [
+   "Fitted quantities are inputs.",
+   "Circular reasoning."
+  ],
+  "difficulty": 0.8,
+  "level": "pro",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-vdw-1",
+  "concepts": [
+   "vdw-corrections"
+  ],
+  "type": "single",
+  "prompt": "Why do LDA and GGA miss van der Waals attraction?",
+  "options": [
+   {
+    "text": "It comes from correlated electron motion far apart, while these functionals only look locally",
+    "correct": true,
+    "why": "Dispersion is long ranged and non-local."
+   },
+   {
+    "text": "Because it is a classical force",
+    "correct": false,
+    "why": "Tempting, but it is a quantum correlation effect."
+   },
+   {
+    "text": "Because it is too strong to model",
+    "correct": false,
+    "why": "Tempting, but it is weak."
+   }
+  ],
+  "hints": [
+   "Local versus long ranged.",
+   "Fluctuating dipoles."
+  ],
+  "difficulty": 0.0,
+  "level": "intermediate",
+  "sources": [
+   "S-028"
+  ]
+ },
+ {
+  "id": "q-vdw-2",
+  "concepts": [
+   "vdw-corrections"
+  ],
+  "type": "single",
+  "prompt": "Which IVDW value gives DFT-D3 with Becke-Johnson damping?",
+  "options": [
+   {
+    "text": "12",
+    "correct": true,
+    "why": "11 is D3 with zero damping, 20 is Tkatchenko-Scheffler."
+   },
+   {
+    "text": "11",
+    "correct": false,
+    "why": "Tempting, but that is zero damping."
+   },
+   {
+    "text": "20",
+    "correct": false,
+    "why": "Tempting, but that is TS."
+   }
+  ],
+  "hints": [
+   "See the IVDW card.",
+   "BJ is the second D3 option."
+  ],
+  "difficulty": 0.0,
+  "level": "beginner",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-vdw-3",
+  "concepts": [
+   "vdw-corrections"
+  ],
+  "type": "single",
+  "prompt": "Which systems most need a vdW correction?",
+  "options": [
+   {
+    "text": "Layered crystals, molecular crystals and molecules on surfaces",
+    "correct": true,
+    "why": "Their binding is largely dispersion."
+   },
+   {
+    "text": "Simple metals like Al",
+    "correct": false,
+    "why": "Tempting, but metallic bonding dominates."
+   },
+   {
+    "text": "Ionic crystals like NaCl",
+    "correct": false,
+    "why": "Tempting, but ionic bonding dominates there."
+   }
+  ],
+  "hints": [
+   "Weak binding between units.",
+   "Graphite layers."
+  ],
+  "difficulty": -0.3,
+  "level": "beginner",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-vdw-4",
+  "concepts": [
+   "vdw-corrections"
+  ],
+  "type": "single",
+  "prompt": "Why must the vdW correction be on during the relaxation?",
+  "options": [
+   {
+    "text": "It changes forces and stress, so it shapes the structure",
+    "correct": true,
+    "why": "Adding it only afterwards leaves a structure relaxed without it."
+   },
+   {
+    "text": "VASP ignores it in static runs",
+    "correct": false,
+    "why": "Tempting, but it is applied in any run where it is set."
+   },
+   {
+    "text": "It only works with ISMEAR = -5",
+    "correct": false,
+    "why": "Tempting, but it is independent of smearing."
+   }
+  ],
+  "hints": [
+   "Structures come from forces.",
+   "Consistency."
+  ],
+  "difficulty": 0.3,
+  "level": "intermediate",
+  "sources": [
+   "S-042"
+  ]
+ }
+]

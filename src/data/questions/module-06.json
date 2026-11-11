@@ -1,0 +1,774 @@
+[
+ {
+  "id": "q-poscar-1",
+  "concepts": [
+   "poscar"
+  ],
+  "type": "single",
+  "prompt": "What does the scaling factor on line 2 of POSCAR do?",
+  "options": [
+   {
+    "text": "It multiplies every lattice vector (and Cartesian positions)",
+    "correct": true,
+    "why": "A value of 5.43 turns the unit vectors written below into angstrom lengths."
+   },
+   {
+    "text": "It sets the number of atoms",
+    "correct": false,
+    "why": "Tempting because it is a number near the top, but the counts are on line 7."
+   },
+   {
+    "text": "It sets the plane-wave cutoff",
+    "correct": false,
+    "why": "Tempting, but the cutoff is ENCUT in INCAR."
+   }
+  ],
+  "hints": [
+   "Look at what the lattice-vector lines are multiplied by.",
+   "A negative value would be a volume."
+  ],
+  "difficulty": -0.5,
+  "level": "beginner",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "q-poscar-2",
+  "concepts": [
+   "poscar"
+  ],
+  "type": "single",
+  "prompt": "The species line of POSCAR says \"Ti O\". In which order must POTCAR be built?",
+  "options": [
+   {
+    "text": "Ti first, then O",
+    "correct": true,
+    "why": "POTCAR is the element files joined in the same order as the species line."
+   },
+   {
+    "text": "O first, then Ti",
+    "correct": false,
+    "why": "Tempting if you sort alphabetically, but VASP pairs potentials with species by position."
+   },
+   {
+    "text": "The order does not matter",
+    "correct": false,
+    "why": "Tempting, but VASP matches by order, so the wrong order gives atoms the wrong potentials."
+   }
+  ],
+  "hints": [
+   "VASP pairs the n-th species with the n-th dataset.",
+   "Check with grep TITEL POTCAR."
+  ],
+  "difficulty": -0.3,
+  "level": "beginner",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "q-poscar-3",
+  "concepts": [
+   "poscar"
+  ],
+  "type": "single",
+  "prompt": "A POSCAR written in fractions of the lattice vectors is read as Cartesian by mistake. What happens?",
+  "options": [
+   {
+    "text": "The fractions are read as angstrom, so atoms pile up close to each other",
+    "correct": true,
+    "why": "Values like 0.25 become 0.25 angstrom; VASP warns that some ions are very close."
+   },
+   {
+    "text": "Nothing; VASP detects the format",
+    "correct": false,
+    "why": "Tempting, but VASP follows the Direct or Cartesian line literally."
+   },
+   {
+    "text": "Only the lattice vectors change",
+    "correct": false,
+    "why": "Tempting, but the lattice is read the same way; it is the positions that are misread."
+   }
+  ],
+  "hints": [
+   "What does 0.25 mean in each mode?",
+   "Look at the error about distances between ions."
+  ],
+  "difficulty": 0.0,
+  "level": "beginner",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "q-poscar-4",
+  "concepts": [
+   "poscar"
+  ],
+  "type": "single",
+  "prompt": "What does \"F F F\" after an atom mean under Selective dynamics?",
+  "options": [
+   {
+    "text": "That atom stays fixed in x, y and z during relaxation",
+    "correct": true,
+    "why": "F means the coordinate may not move; T means it may."
+   },
+   {
+    "text": "The atom is a fluorine atom",
+    "correct": false,
+    "why": "Tempting, but species come from the species line, not from flags."
+   },
+   {
+    "text": "The atom carries no magnetic moment",
+    "correct": false,
+    "why": "Tempting, but moments are set by MAGMOM in INCAR."
+   }
+  ],
+  "hints": [
+   "T and F are true and false.",
+   "Used to freeze the bottom layers of a slab."
+  ],
+  "difficulty": 0.0,
+  "level": "intermediate",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "q-poscar-5",
+  "concepts": [
+   "poscar"
+  ],
+  "type": "numeric",
+  "prompt": "A primitive fcc cell has scaling factor 4.0 angstrom and lattice vectors (0, 0.5, 0.5), (0.5, 0, 0.5), (0.5, 0.5, 0). What is its volume in cubic angstrom?",
+  "hints": [
+   "The determinant of the three vectors is 1/4.",
+   "V = s^3 times the determinant."
+  ],
+  "difficulty": 0.5,
+  "level": "intermediate",
+  "sources": [
+   "S-041"
+  ],
+  "answer": 16.0,
+  "tolerance": 0.05,
+  "unit": "cubic angstrom"
+ },
+ {
+  "id": "q-kpfile-1",
+  "concepts": [
+   "kpoints-file"
+  ],
+  "type": "single",
+  "prompt": "Which mesh type is required for hexagonal cells?",
+  "options": [
+   {
+    "text": "Gamma-centred",
+    "correct": true,
+    "why": "Shifted meshes can break hexagonal symmetry; Gamma-centred meshes are required."
+   },
+   {
+    "text": "Monkhorst-Pack with even subdivisions",
+    "correct": false,
+    "why": "Tempting because it is efficient for cubic cells, but it shifts the mesh off Gamma and breaks hexagonal symmetry."
+   },
+   {
+    "text": "Line mode",
+    "correct": false,
+    "why": "Tempting, but line mode is for band paths, not for sampling the zone."
+   }
+  ],
+  "hints": [
+   "Which mesh always contains the zone centre?",
+   "The Field Handbook calls it a safe default for any lattice."
+  ],
+  "difficulty": 0.0,
+  "level": "beginner",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "q-kpfile-2",
+  "concepts": [
+   "kpoints-file"
+  ],
+  "type": "single",
+  "prompt": "A cell is made twice as long along a. How should the subdivisions along b1 change?",
+  "options": [
+   {
+    "text": "Roughly halve them",
+    "correct": true,
+    "why": "N_i times a_i stays roughly constant: a longer cell has a shorter reciprocal vector."
+   },
+   {
+    "text": "Double them",
+    "correct": false,
+    "why": "Tempting because the cell is bigger, but the reciprocal vector is shorter, so fewer points are needed."
+   },
+   {
+    "text": "Keep them the same",
+    "correct": false,
+    "why": "Tempting, but that oversamples the zone and wastes time."
+   }
+  ],
+  "hints": [
+   "Real and reciprocal lengths are inverse.",
+   "Think of a supercell."
+  ],
+  "difficulty": 0.2,
+  "level": "intermediate",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "q-kpfile-3",
+  "concepts": [
+   "kpoints-file"
+  ],
+  "type": "single",
+  "prompt": "Why should a band-structure line path not be used in a self-consistent run?",
+  "options": [
+   {
+    "text": "Its points do not sample the Brillouin zone evenly, so the density would be wrong",
+    "correct": true,
+    "why": "The SCF needs a uniform mesh; the path is for eigenvalues only."
+   },
+   {
+    "text": "VASP cannot read line mode",
+    "correct": false,
+    "why": "Tempting, but VASP reads line mode for non-self-consistent band runs."
+   },
+   {
+    "text": "A path has too many k-points",
+    "correct": false,
+    "why": "Tempting, but the problem is uneven sampling, not the count."
+   }
+  ],
+  "hints": [
+   "What does the SCF average over?",
+   "Bands come from ICHARG = 11 or KPOINTS_OPT."
+  ],
+  "difficulty": 0.4,
+  "level": "intermediate",
+  "sources": [
+   "S-019",
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-kpfile-4",
+  "concepts": [
+   "kpoints-file"
+  ],
+  "type": "multi",
+  "prompt": "Which statements about KPOINTS are true? Select all that apply.",
+  "options": [
+   {
+    "text": "Without a KPOINTS file VASP can build a mesh from KSPACING",
+    "correct": true,
+    "why": "KSPACING in INCAR replaces the file."
+   },
+   {
+    "text": "The 0 on line 2 means generate the mesh automatically",
+    "correct": true,
+    "why": "That is the automatic mode."
+   },
+   {
+    "text": "Metals usually need denser meshes than insulators",
+    "correct": true,
+    "why": "The Fermi surface must be resolved."
+   },
+   {
+    "text": "The shift line is mandatory",
+    "correct": false,
+    "why": "Tempting, but it is optional; 0 0 0 is the usual value."
+   }
+  ],
+  "hints": [
+   "Read the five lines of the example again.",
+   "Metals have bands crossing the Fermi level."
+  ],
+  "difficulty": 0.3,
+  "level": "intermediate",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "q-incar-1",
+  "concepts": [
+   "incar"
+  ],
+  "type": "single",
+  "prompt": "What happens to an INCAR tag you leave out?",
+  "options": [
+   {
+    "text": "VASP uses its default, which may depend on other tags",
+    "correct": true,
+    "why": "For example IBRION defaults to -1 when NSW = 0."
+   },
+   {
+    "text": "VASP stops with an error",
+    "correct": false,
+    "why": "Tempting, but most tags are optional."
+   },
+   {
+    "text": "VASP asks for it interactively",
+    "correct": false,
+    "why": "Tempting, but VASP runs in batch and never asks."
+   }
+  ],
+  "hints": [
+   "Most of INCAR is optional.",
+   "Defaults can depend on each other."
+  ],
+  "difficulty": -0.5,
+  "level": "beginner",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "q-incar-2",
+  "concepts": [
+   "incar"
+  ],
+  "type": "single",
+  "prompt": "You typed ENCUTT = 520. How do you find out what cutoff VASP actually used?",
+  "options": [
+   {
+    "text": "Look at the parameter echo near the top of OUTCAR (grep ENCUT OUTCAR)",
+    "correct": true,
+    "why": "VASP prints every parameter it used; a misspelled tag may have been ignored."
+   },
+   {
+    "text": "VASP always stops on a typo",
+    "correct": false,
+    "why": "Tempting, but a misspelled tag may be ignored silently."
+   },
+   {
+    "text": "Look in OSZICAR",
+    "correct": false,
+    "why": "Tempting because it is short, but it lists energies, not parameters."
+   }
+  ],
+  "hints": [
+   "Which file lists the parameters?",
+   "A typo may be ignored."
+  ],
+  "difficulty": 0.0,
+  "level": "beginner",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "q-incar-3",
+  "concepts": [
+   "incar"
+  ],
+  "type": "single",
+  "prompt": "EDIFFG = -0.005. When does the relaxation stop?",
+  "options": [
+   {
+    "text": "When every force is below 0.005 eV per angstrom",
+    "correct": true,
+    "why": "A negative EDIFFG is a force criterion."
+   },
+   {
+    "text": "When the energy changes by less than 0.005 eV",
+    "correct": false,
+    "why": "Tempting, but that is the meaning of a positive EDIFFG."
+   },
+   {
+    "text": "After 0.005 seconds",
+    "correct": false,
+    "why": "Tempting as a joke, but EDIFFG is an accuracy criterion."
+   }
+  ],
+  "hints": [
+   "The sign matters.",
+   "Negative means forces."
+  ],
+  "difficulty": 0.0,
+  "level": "intermediate",
+  "sources": [
+   "S-019",
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-incar-4",
+  "concepts": [
+   "incar"
+  ],
+  "type": "multi",
+  "prompt": "Which of these are valid INCAR syntax? Select all that apply.",
+  "options": [
+   {
+    "text": "ENCUT = 520 ! cutoff in eV",
+    "correct": true,
+    "why": "! starts a comment."
+   },
+   {
+    "text": "ISMEAR = 0; SIGMA = 0.05",
+    "correct": true,
+    "why": "; separates two tags on one line."
+   },
+   {
+    "text": "# a comment line",
+    "correct": true,
+    "why": "# also starts a comment."
+   },
+   {
+    "text": "ENCUT: 520",
+    "correct": false,
+    "why": "Tempting from other formats, but INCAR uses =."
+   }
+  ],
+  "hints": [
+   "TAG = value.",
+   "Two comment characters are allowed."
+  ],
+  "difficulty": 0.0,
+  "level": "beginner",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "q-incar-5",
+  "concepts": [
+   "incar"
+  ],
+  "type": "single",
+  "prompt": "Why should you set ENCUT, EDIFF, ISMEAR and spin yourself even when VASPKIT wrote the INCAR?",
+  "options": [
+   {
+    "text": "The templates start from conservative defaults that were not chosen for your system",
+    "correct": true,
+    "why": "The LR template even leaves ENCUT commented out."
+   },
+   {
+    "text": "VASPKIT INCARs cannot be read by VASP",
+    "correct": false,
+    "why": "Tempting, but they are ordinary INCARs."
+   },
+   {
+    "text": "Those tags have no defaults",
+    "correct": false,
+    "why": "Tempting, but they do; the defaults are just not right for every system."
+   }
+  ],
+  "hints": [
+   "A template was written for no system in particular.",
+   "The Workflow Handbook says so explicitly."
+  ],
+  "difficulty": 0.3,
+  "level": "intermediate",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-potcar-1",
+  "concepts": [
+   "potcar"
+  ],
+  "type": "single",
+  "prompt": "Which POTCAR line tells you the recommended minimum cutoff?",
+  "options": [
+   {
+    "text": "ENMAX",
+    "correct": true,
+    "why": "grep ENMAX POTCAR; take the largest over all species."
+   },
+   {
+    "text": "ZVAL",
+    "correct": false,
+    "why": "Tempting, but ZVAL is the number of valence electrons."
+   },
+   {
+    "text": "TITEL",
+    "correct": false,
+    "why": "Tempting, but TITEL names the dataset."
+   }
+  ],
+  "hints": [
+   "Look for the word MAX.",
+   "The protocol multiplies it by 1.3."
+  ],
+  "difficulty": -0.5,
+  "level": "beginner",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "q-potcar-2",
+  "concepts": [
+   "potcar"
+  ],
+  "type": "single",
+  "prompt": "What does the _pv suffix in Ti_pv mean?",
+  "options": [
+   {
+    "text": "Semicore p states are treated as valence",
+    "correct": true,
+    "why": "More electrons, more accurate, more expensive."
+   },
+   {
+    "text": "A plane-wave-only dataset",
+    "correct": false,
+    "why": "Tempting, but all PAW datasets are used with plane waves."
+   },
+   {
+    "text": "A dataset for PBE only with van der Waals",
+    "correct": false,
+    "why": "Tempting, but van der Waals corrections are INCAR tags, not POTCAR variants."
+   }
+  ],
+  "hints": [
+   "p and v.",
+   "Compare _sv."
+  ],
+  "difficulty": 0.0,
+  "level": "intermediate",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "q-potcar-3",
+  "concepts": [
+   "potcar"
+  ],
+  "type": "single",
+  "prompt": "A colleague asks you to post your POTCAR in a public forum. What should you do?",
+  "options": [
+   {
+    "text": "Share the TITEL lines instead; POTCAR files are licensed and must not be redistributed",
+    "correct": true,
+    "why": "The TITEL list identifies the datasets without sharing their content."
+   },
+   {
+    "text": "Post it; it is just text",
+    "correct": false,
+    "why": "Tempting, but POTCAR files are licensed by VASP Software GmbH."
+   },
+   {
+    "text": "Post only the first half",
+    "correct": false,
+    "why": "Tempting, but part of the file is still licensed content."
+   }
+  ],
+  "hints": [
+   "Who owns the POTCAR library?",
+   "What identifies a dataset without its content?"
+  ],
+  "difficulty": 0.0,
+  "level": "beginner",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "q-potcar-4",
+  "concepts": [
+   "potcar"
+  ],
+  "type": "numeric",
+  "prompt": "POTCAR lists ENMAX values of 400.0 and 282.9 eV. What ENCUT does the protocol use for the relaxation?",
+  "hints": [
+   "Take the largest ENMAX.",
+   "Multiply it by 1.3."
+  ],
+  "difficulty": 0.0,
+  "level": "beginner",
+  "sources": [
+   "S-041",
+   "S-042"
+  ],
+  "answer": 520,
+  "tolerance": 0.5,
+  "unit": "eV"
+ },
+ {
+  "id": "q-outfiles-1",
+  "concepts": [
+   "output-files"
+  ],
+  "type": "single",
+  "prompt": "Which file do you copy to POSCAR to continue from the latest structure?",
+  "options": [
+   {
+    "text": "CONTCAR",
+    "correct": true,
+    "why": "It holds the latest structure in POSCAR format."
+   },
+   {
+    "text": "XDATCAR",
+    "correct": false,
+    "why": "Tempting because it has structures, but it is the trajectory of every step."
+   },
+   {
+    "text": "OUTCAR",
+    "correct": false,
+    "why": "Tempting, but it is a log, not an input file."
+   }
+  ],
+  "hints": [
+   "CONT for continue.",
+   "Same format as POSCAR."
+  ],
+  "difficulty": -0.8,
+  "level": "beginner",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "q-outfiles-2",
+  "concepts": [
+   "output-files"
+  ],
+  "type": "single",
+  "prompt": "Which file does a run with ICHARG = 11 read?",
+  "options": [
+   {
+    "text": "CHGCAR",
+    "correct": true,
+    "why": "It holds the self-consistent density that the non-self-consistent run keeps fixed."
+   },
+   {
+    "text": "CHG",
+    "correct": false,
+    "why": "Tempting because it is also a density, but CHG is lower precision and cannot restart a run."
+   },
+   {
+    "text": "WAVECAR",
+    "correct": false,
+    "why": "Tempting, but WAVECAR is the wavefunctions, read with ISTART."
+   }
+  ],
+  "hints": [
+   "ICHARG is about the charge.",
+   "Which density file is high precision?"
+  ],
+  "difficulty": 0.0,
+  "level": "beginner",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "q-outfiles-3",
+  "concepts": [
+   "output-files"
+  ],
+  "type": "single",
+  "prompt": "IBZKPT lists far more k-points than you expected. What is the likely cause?",
+  "options": [
+   {
+    "text": "VASP found lower symmetry than you intended, for example because MAGMOM breaks it",
+    "correct": true,
+    "why": "Fewer symmetry operations leave more irreducible points."
+   },
+   {
+    "text": "The KPOINTS file was ignored",
+    "correct": false,
+    "why": "Tempting, but IBZKPT is built from your mesh."
+   },
+   {
+    "text": "ENCUT is too high",
+    "correct": false,
+    "why": "Tempting, but the cutoff does not change the k-points."
+   }
+  ],
+  "hints": [
+   "IBZKPT is reduced by symmetry.",
+   "What can lower symmetry?"
+  ],
+  "difficulty": 0.5,
+  "level": "intermediate",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "q-outfiles-4",
+  "concepts": [
+   "output-files"
+  ],
+  "type": "single",
+  "prompt": "What does CHGCAR store on its grid?",
+  "options": [
+   {
+    "text": "The density times the cell volume",
+    "correct": true,
+    "why": "Divide by the volume to get electrons per cubic angstrom."
+   },
+   {
+    "text": "The density in electrons per cubic angstrom",
+    "correct": false,
+    "why": "Tempting, but the stored values are multiplied by the cell volume."
+   },
+   {
+    "text": "The wavefunctions",
+    "correct": false,
+    "why": "Tempting, but those are in WAVECAR."
+   }
+  ],
+  "hints": [
+   "The Field Handbook gives the unit.",
+   "The average of the values is the number of electrons."
+  ],
+  "difficulty": 0.6,
+  "level": "pro",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "q-outfiles-5",
+  "concepts": [
+   "output-files"
+  ],
+  "type": "multi",
+  "prompt": "Which tags make VASP write which file? Select all correct pairs.",
+  "options": [
+   {
+    "text": "LORBIT = 11 writes PROCAR and the projected DOS",
+    "correct": true,
+    "why": "Projections need LORBIT 10 or more."
+   },
+   {
+    "text": "LAECHG = .TRUE. writes AECCAR0 and AECCAR2",
+    "correct": true,
+    "why": "Used for Bader analysis."
+   },
+   {
+    "text": "LWAVE = .FALSE. writes WAVECAR",
+    "correct": false,
+    "why": "Tempting, but .FALSE. means it is not written."
+   },
+   {
+    "text": "LVTOT = .TRUE. writes LOCPOT",
+    "correct": true,
+    "why": "The local potential, for work functions."
+   }
+  ],
+  "hints": [
+   "Each special file needs its own tag.",
+   ".FALSE. turns writing off."
+  ],
+  "difficulty": 0.3,
+  "level": "intermediate",
+  "sources": [
+   "S-041"
+  ]
+ }
+]

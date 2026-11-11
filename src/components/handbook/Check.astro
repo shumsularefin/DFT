@@ -1,16 +1,104 @@
 ---
+// "Check your understanding" (M6.4). Without JavaScript: the questions as a list with hints and answers
+// in <details>. With JavaScript (src/scripts/check.ts): one question at a time, hints on request,
+// explanations for every option, and the learner state updated on this device.
 import Section from './Section.astro';
-import Badge from '../ui/Badge.astro';
-// Placeholder until the practice UI (M6.4). ids are question ids from src/data/questions.
+import { questionById } from '../../lib/learning/bank';
+import '../../styles/quiz.css';
 interface Props {
   ids: string[];
 }
 const { ids } = Astro.props;
+const qs = ids.map((id) => {
+  const q = questionById.get(id);
+  if (!q) throw new Error(`<Check> lists unknown question ${id}`);
+  return q;
+});
+const topic = Astro.locals.topic;
+const json = JSON.stringify(qs).replace(/</g, '\\u003c');
 ---
 
 <Section id="check" heading="Check your understanding">
-  <p>
-    <Badge variant="draft" /> Practice questions arrive with the adaptive engine.
-  </p>
-  <p class="check-ids">Planned questions: {ids.join(', ')}</p>
+  <div
+    class="check"
+    data-check
+    data-topic={topic?.id ?? ''}
+    data-concepts={(topic?.concepts ?? []).join(' ')}
+  >
+    <p class="check-intro">
+      {qs.length} questions. Answers are checked on this device and nothing is sent anywhere.
+    </p>
+    <ol class="check-static">
+      {qs.map((q) => (
+        <li class="check-q">
+          <p class="check-prompt">{q.prompt}</p>
+          {'options' in q && (
+            <ul class="check-opts">
+              {q.options.map((o) => (
+                <li>{o.text}</li>
+              ))}
+            </ul>
+          )}
+          <details>
+            <summary>Hints</summary>
+            <ul>
+              {q.hints.map((h) => (
+                <li>{h}</li>
+              ))}
+            </ul>
+          </details>
+          <details>
+            <summary>Show the answer</summary>
+            {q.type === 'numeric' ? (
+              <p>
+                {q.answer}
+                {q.unit ? ` ${q.unit}` : ''} (within {q.tolerance})
+              </p>
+            ) : (
+              <ul>
+                {q.options.map((o) => (
+                  <li>
+                    <strong>
+                      {q.type === 'order' ? o.text : `${o.correct ? 'Right' : 'Not this one'}: ${o.text}.`}
+                    </strong>{' '}
+                    {o.why}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </details>
+        </li>
+      ))}
+    </ol>
+    <div class="check-live" data-check-live hidden></div>
+    <script type="application/json" data-check-data set:html={json} />
+  </div>
 </Section>
+
+<script>
+  import '../../scripts/check';
+</script>
+
+<style is:global>
+  .check-intro {
+    color: var(--text-muted);
+  }
+  .check-static {
+    padding-left: var(--space-5);
+  }
+  .check-q {
+    margin-bottom: var(--space-4);
+  }
+  .check-prompt {
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+  }
+  .check-live {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--space-4);
+  }
+  .check-mastery {
+    padding-left: var(--space-5);
+  }
+</style>

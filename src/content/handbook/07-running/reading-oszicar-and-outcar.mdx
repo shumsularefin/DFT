@@ -1,0 +1,131 @@
+---
+id: reading-oszicar-and-outcar
+title: Reading OSZICAR and OUTCAR
+module: 7
+order: 4
+summary: What every column of OSZICAR means, which OUTCAR lines to find first, and the four checks that tell you a run converged. With a reader that annotates your own files.
+concepts: [reading-outputs]
+requires: [output-files]
+vaspTags: [NELM, EDIFF, EDIFFG, SIGMA]
+sources: [S-019, S-041, S-042]
+status: draft
+updated: 2026-11-06
+---
+
+<Why>
+
+VASP rarely stops with an error when something goes wrong. It finishes, writes numbers, and leaves it to you to notice that a step never converged or that the forces are still large. Reading OSZICAR and OUTCAR is how you notice. Four checks, a minute each, separate a result from a guess.
+
+</Why>
+
+<Intuition>
+
+<Term id="oszicar">OSZICAR</Term> has two kinds of lines <Cite id="S-041" />:
+
+- One line per **electronic step**, starting with the algorithm: `DAV` (blocked Davidson), `RMM` (RMM-DIIS) or `CG`. The columns are the step number N, the free energy E, its change dE since the previous step, the change in the band-structure energy d eps, ncg, and the residuals rms and rms(c).
+- One summary line per **ionic step**: `F` (free energy), `E0` (energy extrapolated to zero smearing), `dE` (change since the previous ionic step) and, with spin, `mag` (total moment in Bohr magnetons).
+
+dE should shrink by orders of magnitude within each ionic step. When it falls below EDIFF, the electronic loop stops.
+
+<Term id="outcar">OUTCAR</Term> is long. Find these lines first, with grep <Cite id="S-042" />:
+
+- `reached required accuracy`: the relaxation met EDIFFG.
+- `TOTAL-FORCE`: the force table, eV per angstrom.
+- `free  energy   TOTEN` and `energy without entropy`: their difference is the entropy term.
+- `E-fermi`, `external pressure`, `magnetization (x)`, `Elapsed time`.
+
+<Level min="intermediate">
+
+**The four checks** <Cite id="S-041" /> <Cite id="S-042" />:
+
+1. **Did every electronic loop converge?** An ionic step that used NELM electronic steps (default 60) did not converge. VASP continues anyway, and the forces from that step are unreliable.
+2. **Did the relaxation stop for the right reason?** "reached required accuracy" must be in OUTCAR. Without it the run stopped at NSW or was killed.
+3. **Are the forces small?** With a negative EDIFFG, the largest force must be below |EDIFFG|.
+4. **Is the smearing small enough?** The entropy term T\*S per atom should be below about 1 meV (Heuristic); otherwise reduce SIGMA.
+
+</Level>
+
+<Level min="pro">
+
+A complete run ends with timing lines ("Elapsed time"). If they are missing, the job is still going, crashed, or hit the wall-time limit. For a variable-cell relaxation, `external pressure` near zero (within a few kB) and a small Pulay stress mean the cell is converged; a large Pulay stress means ENCUT is too low for the stress <Cite id="S-041" />.
+
+</Level>
+
+</Intuition>
+
+<Lab id="output-reader" title="Output reader" />
+
+<TheMath>
+
+The entropy term is the difference between two OUTCAR energies,
+
+$$T S = E_\text{without entropy} - F_\text{TOTEN},$$
+
+and the check is $|T S| / N_\text{atoms} < 1$ meV <Cite id="S-042" />. For Gaussian smearing, E0 in OSZICAR is the average of the energy and the free energy, $E_0 = \tfrac12 (E + F)$, which removes the leading error in SIGMA <Cite id="S-019" />. The force check compares $\max_I |\mathbf{F}_I|$ over all atoms with $|\text{EDIFFG}|$.
+
+</TheMath>
+
+<InVasp>
+
+The greps the Workflow Handbook lists for a quick look <Cite id="S-042" />:
+
+<VaspFile
+  name="shell"
+  code={`grep "reached required accuracy" OUTCAR
+grep -A $((NIONS+2)) "TOTAL-FORCE" OUTCAR | tail -n $NIONS
+grep "free  energy   TOTEN" OUTCAR | tail -1
+grep "energy without entropy" OUTCAR | tail -1
+grep "in kB" OUTCAR | tail -1
+grep "external pressure" OUTCAR | tail -1
+grep -A 8 "magnetization (x)" OUTCAR | tail -8
+grep E-fermi OUTCAR
+grep "Elapsed time" OUTCAR`}
+/>
+
+Set `NIONS` to your atom count first. A short OSZICAR, explained line by line (synthetic, written to show the format):
+
+<VaspFileExplorer
+  kind="OSZICAR"
+  code={`       N       E                     dE             d eps       ncg     rms          rms(c)
+DAV:   1    -0.234567890123E+02   -0.23457E+02   -0.12345E+03   960   0.123E+02
+DAV:   2    -0.234589012345E+02   -0.21122E-02   -0.21000E-02   960   0.456E-01    0.789E-01
+DAV:   3    -0.234590000000E+02   -0.98766E-04   -0.98000E-04   960   0.123E-02    0.456E-02
+   1 F= -.23459000E+02 E0= -.23458500E+02  d E =-.234590E+02  mag=     2.0000`}
+/>
+
+</InVasp>
+
+<WhatChanges>
+
+| If you see...                            | ...it means                                                       |
+| ---------------------------------------- | ----------------------------------------------------------------- |
+| An ionic step with NELM electronic steps | That step did not converge; fix the mixing before trusting forces |
+| No "reached required accuracy"           | The relaxation is not finished: rerun from CONTCAR                |
+| T\*S per atom of several meV             | SIGMA is too large for this system                                |
+| dE jumping up and down without shrinking | Charge sloshing: module 8 covers the fixes                        |
+| `mag` drifting to 0 in a magnetic system | The moment collapsed: check MAGMOM and the starting guess         |
+
+Why these checks: each one catches a failure that VASP does not report as an error. What happens if you skip them: unconverged numbers in your results table.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Quoting F for a Gaussian-smeared run">
+  For ISMEAR = 0, quote E0 (sigma to 0), not F, when comparing energies <Cite id="S-019" />.
+</Callout>
+
+<Callout variant="mistake" title="Reading the first force table">
+  OUTCAR has one TOTAL-FORCE table per ionic step. The last one belongs to the final structure.
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-read-1', 'q-read-2', 'q-read-3', 'q-read-4', 'q-read-5', 'q-read-6']} />
+
+<GoDeeper>
+
+- The Field Handbook entries for OSZICAR and OUTCAR <Cite id="S-041" />.
+- VASP wiki, pages OSZICAR and OUTCAR <Cite id="S-019" />.
+
+</GoDeeper>

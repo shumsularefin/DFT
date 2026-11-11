@@ -1,0 +1,132 @@
+---
+id: output-files
+title: VASP output files
+module: 6
+order: 5
+summary: What each output file holds, when it is written, what it is used for next, and the one thing to watch for in each.
+concepts: [output-files]
+requires: [incar]
+vaspTags: [LCHARG, LWAVE, LORBIT]
+sources: [S-019, S-041, S-042]
+status: draft
+updated: 2026-11-06
+noLab: true
+---
+
+<Why>
+
+A finished run leaves a dozen or more files in the folder. Some you read with your eyes, some feed the next calculation, some are only for a particular analysis tool. Knowing which is which tells you what to keep, what to copy forward and what to delete before your disk quota runs out.
+
+</Why>
+
+<Intuition>
+
+Three files you read after every run:
+
+- **OSZICAR**: one short line per electronic step and one per ionic step. The quick convergence check.
+- **OUTCAR**: the full log: parameters used, symmetry, energies, forces, stress, magnetization, E-fermi, timing.
+- **CONTCAR**: the latest structure in POSCAR format, the next run's POSCAR.
+
+Three files the next run reads:
+
+- **WAVECAR**: the wavefunctions (large, binary). Read with ISTART = 1.
+- **CHGCAR**: the charge density (and the magnetization density with ISPIN = 2). Read with ICHARG = 1 or 11.
+- **IBZKPT**: the irreducible k-points VASP actually used; a check on the symmetry it found.
+
+The rest are for analysis: DOSCAR, EIGENVAL and PROCAR for the electronic structure, vasprun.xml for tools, XDATCAR for trajectories <Cite id="S-041" />.
+
+<Level min="intermediate">
+
+The full reference, compacted from the author's Field Handbook (all 16 entries) <Cite id="S-041" />:
+
+| File        | Holds                                                                                                 | Watch for                                                                                          |
+| ----------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| CHG         | Lower-precision density, refreshed during relaxations and MD                                          | Not for restarts or Bader analysis; use CHGCAR                                                     |
+| CHGCAR      | Density times cell volume on the fine grid, then PAW occupancies; magnetization second with ISPIN = 2 | For Bader, run the SCF with LAECHG = .TRUE. and use AECCAR0 + AECCAR2 as the reference             |
+| CONTCAR     | Latest structure, POSCAR format; MD velocities too                                                    | Can be empty or truncated if the job was killed while writing; look before copying                 |
+| DOSCAR      | Line 6: EMAX, EMIN, NEDOS, E-fermi; total DOS, then projected DOS with LORBIT                         | Energies are absolute; take E-fermi from the self-consistent run                                   |
+| EIGENVAL    | Energy and occupation of every band at every k-point                                                  | On a uniform mesh the band edges can fall between k-points                                         |
+| IBZKPT      | Irreducible k-points and weights, in explicit KPOINTS format                                          | An unexpected count means VASP found a different symmetry (MAGMOM, a distorted cell)               |
+| OSZICAR     | One line per electronic step, one summary line per ionic step                                         | An ionic step that used NELM electronic steps did not converge                                     |
+| OUTCAR      | The full log: symmetry, forces, stress, E-fermi, magnetization                                        | Site moments are sphere integrals (RWIGS), not Bader values                                        |
+| PCDAT       | Pair correlation function g(r) for MD                                                                 | Total g(r) only; element-resolved g(r) comes from XDATCAR                                          |
+| PROCAR      | Weight of every atom and orbital in every band (LORBIT 10 or more)                                    | Very large; weights are sphere projections                                                         |
+| REPORT      | MD records: thermostat, constraints, machine-learned force field                                      | Judge POTIM from the drift of the conserved energy in OSZICAR                                      |
+| vaspout.h5  | Structure, eigenvalues, DOS, forces in HDF5 (only if compiled with HDF5)                              | Binary; needs an HDF5 reader                                                                       |
+| vasprun.xml | Most of OUTCAR, EIGENVAL and DOSCAR in tagged XML                                                     | Not closed if the job crashed; strict parsers then fail                                            |
+| WAVECAR     | Wavefunctions, binary                                                                                 | k-points and spin must match the earlier run to be reused; a 0-byte file means nothing was written |
+| XDATCAR     | Every ionic step's positions (relaxation path or MD trajectory)                                       | Positions are wrapped into the cell; unwrap before computing diffusion                             |
+| Other       | AECCAR0 and AECCAR2 (LAECHG), LOCPOT (LVTOT, LVHAR), ELFCAR (LELF)                                    | Each needs its own INCAR tag in the run that should write it                                       |
+
+</Level>
+
+<Level min="pro">
+
+CHGCAR stores $\rho(\mathbf{r})\,V_\text{cell}$, not $\rho$: divide by the cell volume to get electrons per cubic angstrom. Module 9's density viewer does that. With LCHARG = .FALSE. and LWAVE = .FALSE. a run writes neither file, which saves disk space for runs nobody will restart (elastic constants, optics) <Cite id="S-041" /> <Cite id="S-042" />.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+The density file stores values on an $N_x \times N_y \times N_z$ grid. The number of electrons in the cell is the average of the stored values,
+
+$$N_e = \frac{1}{N_x N_y N_z} \sum_{ijk} \left[\rho V_\text{cell}\right]_{ijk},$$
+
+because each grid point stands for a volume $V_\text{cell} / (N_x N_y N_z)$ <Cite id="S-041" />. That sum is a quick check that you read the file correctly: it must equal NELECT.
+
+</TheMath>
+
+<InVasp>
+
+Which tags write which file <Cite id="S-019" /> <Cite id="S-041" />:
+
+| File                  | Written when                         |
+| --------------------- | ------------------------------------ |
+| WAVECAR               | `LWAVE = .TRUE.` (the default)       |
+| CHGCAR, CHG           | `LCHARG = .TRUE.` (the default)      |
+| PROCAR, projected DOS | `LORBIT = 10`, 11 or 12              |
+| AECCAR0, AECCAR2      | `LAECHG = .TRUE.`                    |
+| LOCPOT                | `LVTOT = .TRUE.` or `LVHAR = .TRUE.` |
+| ELFCAR                | `LELF = .TRUE.`                      |
+
+Before the SCF overwrites them, back up the relaxation's OUTCAR and CONTCAR, as the protocol's folder layout says <Cite id="S-042" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                            | ...then                                                        |
+| ------------------------------------ | -------------------------------------------------------------- |
+| Set `LWAVE = .FALSE.`                | No WAVECAR: the next run cannot start from these wavefunctions |
+| Run the SCF in the relaxation folder | OUTCAR and OSZICAR of the relaxation are overwritten           |
+| Forget `LORBIT = 11`                 | DOSCAR has only the total DOS; no PROCAR                       |
+| Delete CHGCAR                        | No band structure or DOS restart without repeating the SCF     |
+
+Why it matters: each later step of the protocol needs a file from an earlier one. What happens if you skip the backup: the record of how the structure was relaxed is gone.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Copying a truncated CONTCAR">
+  If the job was killed while writing, CONTCAR can be empty. Look at it before `cp CONTCAR POSCAR`{' '}
+  <Cite id="S-041" />.
+</Callout>
+
+<Callout variant="mistake" title="Reading E-fermi from the band-structure run">
+  The value written by a non-self-consistent run can be shifted. Take E-fermi from the self-consistent OUTCAR{' '}
+  <Cite id="S-041" />.
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-outfiles-1', 'q-outfiles-2', 'q-outfiles-3', 'q-outfiles-4', 'q-outfiles-5']} />
+
+<GoDeeper>
+
+- The Field Handbook file reference, with the full facts and watch notes for each entry <Cite id="S-041" />.
+- VASP wiki, the page of each output file <Cite id="S-019" />.
+
+</GoDeeper>

@@ -1,0 +1,85 @@
+.scf-z {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-2) var(--space-3);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+.scf-z legend {
+  font-weight: 600;
+  padding-inline: var(--space-1);
+}
+.scf-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--target);
+  cursor: pointer;
+}
+.scf-radio input {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: var(--accent);
+}
+.scf-play {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.scf-cycle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: 0;
+  margin: 0 0 var(--space-3);
+  list-style: none;
+  counter-reset: scf;
+}
+.scf-cycle li {
+  counter-increment: scf;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--bg);
+  font-size: var(--step--1);
+}
+.scf-cycle li::before {
+  content: counter(scf) '. ';
+  font-weight: 600;
+}
+.scf-cycle li.scf-done {
+  border-color: var(--ok);
+}
+.scf-check {
+  font-weight: 600;
+}
+.scf-fig {
+  margin: 0 0 var(--space-3);
+}
+.scf-fig figcaption {
+  font-weight: 600;
+  font-size: var(--step--1);
+}
+.scf-legend {
+  margin: 0;
+  font-size: var(--step--1);
+  color: var(--text-muted);
+}
+.scf-key {
+  display: inline-block;
+  width: 1.6em;
+  height: 0;
+  vertical-align: middle;
+  margin-inline: var(--space-1);
+}
+.scf-key-dash {
+  border-top: 2px dashed var(--text-muted);
+}
+.scf-key-solid {
+  border-top: 3px solid var(--accent);
+}
+.scf-honest {
+  font-size: var(--step--1);
+  color: var(--text-muted);
+}

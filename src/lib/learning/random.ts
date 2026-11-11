@@ -1,10 +1,7 @@
-/**
- * Seeded random numbers and the Gamma and Beta samplers used by the policy.
- * @source S-039 (Thompson sampling needs Beta draws). The Gamma method is Marsaglia and
- * Tsang (ACM TOMS 26, 363, 2000), checked here by moments, not by a golden file (D-053).
- */
+// Seeded randomness (M6.3): every random choice in the learning engine goes through these, so tests are
+// deterministic.
 
-/** Small seeded generator (mulberry32). Same seed, same sequence. */
+/** mulberry32: a small 32-bit PRNG returning floats in [0, 1). */
 export function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
   return () => {
@@ -16,19 +13,16 @@ export function mulberry32(seed: number): () => number {
   };
 }
 
-export type Rng = () => number;
-
-/** Standard normal by the Box-Muller transform. */
-export function normal(rng: Rng): number {
+/** Standard normal by Box-Muller. */
+export function normal(rng: () => number): number {
   let u = 0;
   while (u === 0) u = rng();
   return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * rng());
 }
 
-/** Gamma(shape, 1) by Marsaglia and Tsang; shape < 1 uses the boost G(a) = G(a+1) U^(1/a). */
-export function gamma(rng: Rng, shape: number): number {
-  if (!(shape > 0) || !Number.isFinite(shape))
-    throw new RangeError(`Gamma shape must be positive, got ${shape}`);
+/** Gamma(shape, 1) by Marsaglia and Tsang (2000); shape < 1 uses the boost x * U^(1/shape). */
+export function gamma(rng: () => number, shape: number): number {
+  if (!(shape > 0)) throw new RangeError(`gamma shape must be positive, got ${shape}`);
   if (shape < 1) {
     let u = 0;
     while (u === 0) u = rng();
@@ -51,7 +45,7 @@ export function gamma(rng: Rng, shape: number): number {
 }
 
 /** Beta(alpha, beta) as X / (X + Y) with X ~ Gamma(alpha), Y ~ Gamma(beta). */
-export function beta(rng: Rng, alpha: number, b: number): number {
+export function beta(rng: () => number, alpha: number, b: number): number {
   const x = gamma(rng, alpha);
   const y = gamma(rng, b);
   return x / (x + y);

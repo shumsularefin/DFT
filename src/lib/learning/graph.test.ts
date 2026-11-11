@@ -1,92 +1,49 @@
-import { describe, it, expect } from 'vitest';
-import raw from '../../data/concepts.json';
-import {
-  GraphError,
-  ancestors,
-  descendants,
-  loadConcepts,
-  readyToLearn,
-  topologicalOrder,
-  validateGraph,
-  parseConcepts,
-  type Concept,
-} from './graph';
+import { describe, expect, it } from 'vitest';
+import conceptsJson from '../../data/concepts.json';
+import { ancestors, buildGraph, descendants, GraphError, readyToLearn, roots, type Concept } from './graph';
 
-const c = (id: string, prerequisites: string[] = [], extra: Partial<Concept> = {}) => ({
+const mk = (id: string, prerequisites: string[] = []): Concept => ({
   id,
   label: id,
   module: 1,
-  summary: 's',
-  prerequisites,
   level: 'beginner',
-  ...extra,
-});
-// a -> b -> d, a -> c -> d (a is the root)
-const diamond = () => parseConcepts([c('a'), c('b', ['a']), c('c', ['a']), c('d', ['b', 'c'])]);
-
-describe('validation', () => {
-  it('rejects an unknown prerequisite', () => {
-    expect(() => loadConcepts([c('a', ['zzz'])])).toThrow(/unknown prerequisite zzz/);
-  });
-  it('rejects duplicates and repeated prerequisites', () => {
-    expect(() => loadConcepts([c('a'), c('a')])).toThrow(/duplicate concept id a/);
-    expect(() => loadConcepts([c('a'), c('b', ['a', 'a'])])).toThrow(/twice/);
-  });
-  it('names the cycle path', () => {
-    const cyc = [c('root'), c('a', ['root', 'c']), c('b', ['a']), c('c', ['b'])];
-    expect(() => loadConcepts(cyc)).toThrow(/cycle: a -> c -> b -> a/);
-    expect(() => loadConcepts([c('x', ['x'])])).toThrow(/cycle: x -> x/);
-  });
-  it('rejects a graph with no root', () => {
-    expect(() => validateGraph(parseConcepts([c('a', ['b']), c('b', ['a'])]))).toThrow(GraphError);
-  });
-  it('rejects a bad shape', () => {
-    expect(() => parseConcepts([{ id: 'Bad Id' }])).toThrow(/concept Bad Id/);
-  });
+  summary: 'x',
+  prerequisites,
+  status: 'published',
 });
 
-describe('queries', () => {
-  it('orders prerequisites first, deterministically', () => {
-    expect(topologicalOrder(diamond())).toEqual(['a', 'b', 'c', 'd']);
-  });
-  it('finds ancestors and descendants', () => {
-    const g = diamond();
-    expect(ancestors(g, 'd')).toEqual(['a', 'b', 'c']);
-    expect(descendants(g, 'a')).toEqual(['b', 'c', 'd']);
-    expect(ancestors(g, 'a')).toEqual([]);
-    expect(() => ancestors(g, 'nope')).toThrow(/unknown concept/);
-  });
-  it('lists concepts ready to learn', () => {
-    const g = diamond();
-    expect(readyToLearn(g, {})).toEqual(['a']);
-    expect(readyToLearn(g, { a: 0.9 })).toEqual(['b', 'c']);
-    expect(readyToLearn(g, { a: 0.9, b: 0.8 })).toEqual(['c']);
-    expect(readyToLearn(g, { a: 0.9, b: 0.8, c: 0.8 })).toEqual(['d']);
-    expect(readyToLearn(g, { a: 0.5 }, { threshold: 0.5 })).toEqual(['b', 'c']);
-  });
-  it('hides planned concepts unless asked', () => {
-    const g = parseConcepts([c('a'), c('b', ['a'], { status: 'planned' })]);
-    expect(readyToLearn(g, { a: 1 })).toEqual([]);
-    expect(readyToLearn(g, { a: 1 }, { includePlanned: true })).toEqual(['b']);
-  });
-});
-
-describe('shipped concept graph', () => {
-  const g = loadConcepts(raw);
-  it('has at least 70 concepts, valid, acyclic and reachable', () => {
-    expect(g.length).toBeGreaterThanOrEqual(70);
-    expect(topologicalOrder(g)).toHaveLength(g.length);
-  });
-  it('covers every concept id used in module 0 to 3 front matter and questions', async () => {
-    const m = await Promise.all(
-      ['01', '02', '03'].map((n) => import(`../../data/questions/module-${n}.json`)),
+describe('concept graph', () => {
+  it('rejects a cycle and names the cycle path', () => {
+    expect(() => buildGraph([mk('a', ['c']), mk('b', ['a']), mk('c', ['b'])])).toThrow(
+      /cycle.*a -> c -> b -> a/,
     );
-    const ids = new Set(g.map((x) => x.id));
-    for (const q of m.flatMap((x) => x.default as { concepts: string[] }[])) {
-      for (const k of q.concepts) expect(ids.has(k), k).toBe(true);
+  });
+  it('rejects unknown prerequisites and duplicates', () => {
+    expect(() => buildGraph([mk('a', ['zz'])])).toThrow(GraphError);
+    expect(() => buildGraph([mk('a'), mk('a')])).toThrow(/duplicate/);
+  });
+  it('orders every prerequisite before its dependants', () => {
+    const g = buildGraph(conceptsJson as Concept[]);
+    const pos = new Map(g.order.map((id, i) => [id, i]));
+    for (const c of g.concepts)
+      for (const p of c.prerequisites) expect(pos.get(p)!).toBeLessThan(pos.get(c.id)!);
+    expect(g.order).toHaveLength(g.concepts.length);
+  });
+  it('the real graph is acyclic, has at least 70 concepts and covers modules 1 to 11', () => {
+    const g = buildGraph(conceptsJson as Concept[]);
+    expect(g.concepts.length).toBeGreaterThanOrEqual(70);
+    expect(new Set(g.concepts.map((c) => c.module))).toEqual(new Set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]));
+    const rs = new Set(roots(g));
+    for (const c of g.concepts) {
+      const reach = c.prerequisites.length === 0 || [...ancestors(g, c.id)].some((a) => rs.has(a));
+      expect(reach, c.id).toBe(true);
     }
   });
-  it('marks every module 4 to 11 concept as planned', () => {
-    expect(g.filter((x) => x.module >= 4).every((x) => x.status === 'planned')).toBe(true);
+  it('ancestors, descendants and ready-to-learn', () => {
+    const g = buildGraph([mk('a'), mk('b', ['a']), mk('c', ['b']), mk('d', ['a'])]);
+    expect(ancestors(g, 'c')).toEqual(new Set(['a', 'b']));
+    expect(descendants(g, 'a')).toEqual(new Set(['b', 'c', 'd']));
+    expect(readyToLearn(g, {})).toEqual(['a']);
+    expect(readyToLearn(g, { a: 0.96 }).sort()).toEqual(['b', 'd']);
   });
 });

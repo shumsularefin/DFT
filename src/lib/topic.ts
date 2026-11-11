@@ -58,10 +58,23 @@ export const REGISTERED_LABS = [
   'orbitals',
   'exponential-wall',
   'density-as-a-map',
+  'scf-loop',
+  'encut-sphere',
+  'kpoint-mesh',
+  'brillouin-zone',
+  'unit-cell',
+  'smearing',
+  'dft-plus-u',
+  'paw-picture',
+  'functional-ladder',
+  'spin-cartoon',
+  'output-reader',
+  'error-finder',
 ] as const;
 
 /** Page class for a topic: "island" if its body embeds a registered lab, else "content". */
 export function topicPageClass(body: string): 'content' | 'island' {
+  if (/<VaspFileExplorer\s/.test(body)) return 'island';
   const ids = [...body.matchAll(/<Lab\s[^>]*\bid=["']([^"']+)["']/g)].map((m) => m[1]);
   return ids.some((i) => (REGISTERED_LABS as readonly string[]).includes(i!)) ? 'island' : 'content';
 }

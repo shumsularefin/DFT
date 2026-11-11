@@ -32,15 +32,15 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 | M5.4 | Setyawan-Curtarolo k-paths (second convention) | done | M5.3 | L | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M5.4.md), [work order](milestones/M5-brillouin-zone.md) |
 | M5.5 | 3D Brillouin zone and lattice viewer | done | M5.2, M2.1 | M | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M5.5.md), [work order](milestones/M5-brillouin-zone.md) |
 | M5.6 | k-path tool page and exports | done | M5.3, M5.4, M5.5, M3.2 | M | claude/vigilant-newton-ws593b | | 2026-11-05 | [report](reports/M5.6.md), [work order](milestones/M5-brillouin-zone.md) |
-| M6.1 | Concept graph and question bank | done | M2.4 | M | claude/vigilant-newton-ws593b | | 2026-11-06 | [report](reports/M6.1.md), [work order](milestones/M6-adaptive-engine.md) |
-| M6.2 | Mastery and spacing models | done | M6.1 | M | claude/vigilant-newton-ws593b | | 2026-11-10 | [work order](milestones/M6-adaptive-engine.md) |
-| M6.3 | Thompson-sampling policy | done | M6.2 | M | claude/vigilant-newton-ws593b | | 2026-11-10 | [work order](milestones/M6-adaptive-engine.md) |
-| M6.4 | Practice UI, quizzes, mastery map and gentle gamification | todo | M6.3, M1.3 | L | | | | [work order](milestones/M6-adaptive-engine.md) |
-| M6.5 | Optional progress sync with Firebase (Spark) | todo | M6.4, M0.2 | M | | | | [work order](milestones/M6-adaptive-engine.md) |
-| M7.1 | Module 4: Hohenberg-Kohn, Kohn-Sham and the SCF loop (with SCF lab) | todo | M6.1, M2.4 | L | | | | [work order](milestones/M7-remaining-modules.md) |
-| M7.2 | Module 5: Practical choices | todo | M7.1, M4.4, M4.5, M5.5 | L | | | | [work order](milestones/M7-remaining-modules.md) |
-| M7.3 | Modules 6 and 7: VASP files and running a calculation | todo | M3.6, M4.1 | L | | | | [work order](milestones/M7-remaining-modules.md) |
-| M7.4 | Module 8: Convergence testing and common errors (with error finder) | todo | M7.3, M4.3 | M | | | | [work order](milestones/M7-remaining-modules.md) |
+| M6.1 | Concept graph and question bank | done | M2.4 | M | claude/great-dijkstra-oj0kbx |  | 2026-11-06 | [report](reports/M6.1.md), [work order](milestones/M6-adaptive-engine.md) |
+| M6.2 | Mastery and spacing models | done | M6.1 | M | claude/great-dijkstra-oj0kbx |  | 2026-11-06 | [report](reports/M6.2.md), [work order](milestones/M6-adaptive-engine.md) |
+| M6.3 | Thompson-sampling policy | done | M6.2 | M | claude/great-dijkstra-oj0kbx |  | 2026-11-06 | [report](reports/M6.3.md), [work order](milestones/M6-adaptive-engine.md) |
+| M6.4 | Practice UI, quizzes, mastery map and gentle gamification | done | M6.3, M1.3 | L | claude/great-dijkstra-oj0kbx |  | 2026-11-06 | [report](reports/M6.4.md), [work order](milestones/M6-adaptive-engine.md) |
+| M6.5 | Optional progress sync with Firebase (Spark) | done | M6.4, M0.2 | M | claude/great-dijkstra-oj0kbx |  | 2026-11-06 | [report](reports/M6.5.md), [work order](milestones/M6-adaptive-engine.md) |
+| M7.1 | Module 4: Hohenberg-Kohn, Kohn-Sham and the SCF loop (with SCF lab) | done | M6.1, M2.4 | L | claude/great-dijkstra-oj0kbx |  | 2026-11-06 | [report](reports/M7.1.md), [work order](milestones/M7-remaining-modules.md) |
+| M7.2 | Module 5: Practical choices | done | M7.1, M4.4, M4.5, M5.5 | L | claude/great-dijkstra-oj0kbx |  | 2026-11-06 | [report](reports/M7.2.md), [work order](milestones/M7-remaining-modules.md) |
+| M7.3 | Modules 6 and 7: VASP files and running a calculation | done | M3.6, M4.1 | L | claude/great-dijkstra-oj0kbx |  | 2026-11-06 | [report](reports/M7.3.md), [work order](milestones/M7-remaining-modules.md) |
+| M7.4 | Module 8: Convergence testing and common errors (with error finder) | done | M7.3, M4.3 | M | claude/zen-bardeen-qzm2f2 | | 2026-11-10 | [report](reports/M7.4.md), [work order](milestones/M7-remaining-modules.md) |
 | M7.5 | Module 9: Analysis (with relaxation, DOS/band and charge-density tools) | todo | M7.4, M5.6, M2.1 | L | | | | [work order](milestones/M7-remaining-modules.md) |
 | M8.1 | Shannon radii dataset and lookup | todo | M0.2 | M | | | | [work order](milestones/M8-tolerance-factor.md) |
 | M8.2 | Factors, checks and mixed sites | todo | M8.1 | M | | | | [work order](milestones/M8-tolerance-factor.md) |
@@ -64,6 +64,16 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 
 Newest first. One line per session: date, stage, outcome, branch.
 
+- 2026-11-11, open-question sweep: merged main's parallel M6.1 to M6.3 into the M6.1 to M7.4 chain (supersedes PR #29); 10 questions closed against the sources (VASP wiki, both k-path papers, Bartel, Marzari, VASPKIT docs, Firebase pricing), 9 narrowed. [Report](reports/open-questions-2026-11-11.md). Branch `claude/festive-heisenberg-wueip0`.
+- 2026-11-10, M7.4: module 8 (6 topics), error finder with 32 merged entries (22 + 20 handbook rows), `/errors/`, 30 questions. Branch `claude/zen-bardeen-qzm2f2`.
+- 2026-11-06, M7.3: Modules 6 and 7, output-reader lab, 53 questions; protocol quoted word for word Branch `claude/great-dijkstra-oj0kbx`.
+- 2026-11-06, M7.2: module 5 (8 topics, 5 labs), smearing and DFT+U libraries, /tags/ cards, 65 questions Branch `claude/great-dijkstra-oj0kbx`.
+- 2026-11-06, M7.1: module 4 (5 topics), SCF toy lab matching golden energies, 35 questions Branch `claude/great-dijkstra-oj0kbx`.
+- 2026-11-06, M6.5: optional Firebase sync (Firestore lite, lazy 56 KB), rules with 6 emulator tests, privacy page, setup docs. Branch `claude/great-dijkstra-oj0kbx`.
+- 2026-11-06, M6.4: Check quiz (no-JS fallback), /practice/ sessions, /progress/ mastery map, gentle streak, export/import/reset; 14 e2e tests. Branch `claude/great-dijkstra-oj0kbx`.
+- 2026-11-06, M6.3: Thompson-sampling policy with guard rails, seeded samplers, simulator (policy 0.55 to 0.61 vs random 0.25 to 0.30). Branch `claude/great-dijkstra-oj0kbx`.
+- 2026-11-06, M6.2: BKT, Rasch/Elo, SM-2, learner state with merge; all worked examples exact. Branch `claude/great-dijkstra-oj0kbx`.
+- 2026-11-06, M6.1: concept graph (71 concepts), question schema and grading, lint-questions, module 1 retag (Q-025 closed), second hints for 72 questions. Branch `claude/great-dijkstra-oj0kbx`.
 - 2026-10-29, M2.2: Module 1 (4 topics, 17 questions, 14 glossary terms), cost-of-exactness lab, scaling.ts; Lighthouse mobile 100/100/100; 145 e2e pass. Branch `claude/vigilant-newton-ws593b`
 - 2026-10-29, M2.1: SceneController, capabilities, LabShell, Lazy3D, Fallback2D, demo page; three chunk 135 KB gz lazy; e2e incl. no-WebGL and reduced motion. Branch `claude/vigilant-newton-ws593b`.
 - 2026-10-29, M1.3: chrome, stores, progress, search, landing/about/privacy/tools/changelog, link check; 114 e2e pass; Lighthouse 100/100/100 (SEO 66, noindex). Branch `claude/vigilant-newton-ws593b`.
@@ -75,7 +85,7 @@ Newest first. One line per session: date, stage, outcome, branch.
 
 ## Author actions outstanding
 
-See `docs/SETUP_FIREBASE.md` and the "author" rows of `docs/OPEN_QUESTIONS.md` (Q-001, Q-004, Q-006, Q-007, Q-008, Q-011, Q-013, Q-015, Q-017, Q-019).
+See `docs/SETUP_FIREBASE.md` and the "author" rows of `docs/OPEN_QUESTIONS.md` (Q-001, Q-008, Q-011, Q-019, Q-040; Q-004, Q-006, Q-007, Q-013, Q-015 and Q-017 were closed on 2026-11-11).
 - 2026-11-03, M2.3: Module 2 (6 topics, 31 questions, 9 glossary terms), particle-in-a-box and orbitals labs, constants, box, hydrogen, sampler worker; golden file `quantum_basics_reference.json`. Branch `claude/vigilant-newton-ws593b`
 - 2026-11-03, M2.4: Module 3 (5 topics, 24 questions, 6 glossary terms), exponential-wall and density-as-a-map labs, combinatorics, solver1d, density1d; golden file `solver1d_reference.json`. Branch `claude/vigilant-newton-ws593b`
 - 2026-11-03, M3.1: structure core (`src/lib/crystal/`: linalg, lattice, POSCAR reader and writer, structure helpers), `src/lib/handoff.ts`, atomic masses table; round trip on 39 golden structures, 12 reciprocal lattices. Branch `claude/vigilant-newton-ws593b`.

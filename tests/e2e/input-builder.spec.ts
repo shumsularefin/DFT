@@ -21,8 +21,14 @@ async function goStep(page: Page, name: string) {
   await page.getByRole('button', { name: new RegExp(`^\\d ${name}$`) }).click();
 }
 
+/** Text typed before the island hydrates is lost, so wait for hydration first. */
+async function hydrated(page: Page) {
+  await page.waitForFunction(() => document.querySelectorAll('astro-island[ssr]').length === 0);
+}
+
 async function loadStructure(page: Page, text: string) {
   await page.goto(URL);
+  await hydrated(page);
   await page.getByLabel('POSCAR text').fill(text);
 }
 

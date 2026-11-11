@@ -1,640 +1,803 @@
 [
-  {
-    "id": "wave",
-    "label": "Wave",
-    "short": "A pattern that repeats in space and time and carries energy without carrying matter along, like ripples on water.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "frequency",
-    "label": "Frequency",
-    "short": "How many times per second a wave repeats. Written with the Greek letter nu or f.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "amplitude",
-    "label": "Amplitude",
-    "short": "How tall a wave is, measured from its resting level to its peak.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "wave-particle-duality",
-    "label": "Wave-particle duality",
-    "short": "The finding that things like electrons and light sometimes behave like tiny lumps and sometimes like spreading waves, depending on how you look.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "photon",
-    "label": "Photon",
-    "short": "A single packet of light. Its energy is the Planck constant times the light's frequency.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "planck-constant",
-    "label": "Planck constant",
-    "short": "A fixed number, written h, that links the energy of a light packet to its frequency. Its value is fixed exactly by the definition of the SI units.",
-    "level": "beginner",
-    "sources": [
-      "S-031"
-    ]
-  },
-  {
-    "id": "de-broglie-wavelength",
-    "label": "de Broglie wavelength",
-    "short": "The wavelength that goes with a moving particle: the Planck constant divided by the particle's momentum.",
-    "level": "intermediate",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "quantization",
-    "label": "Quantization",
-    "short": "The fact that some quantities, such as the energy of an electron held in a small region, can only take certain separate values, not any value in between.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "boundary-condition",
-    "label": "Boundary condition",
-    "short": "A rule about what a wave must do at the edge of the region it lives in, for example that it must be zero at a wall.",
-    "level": "intermediate",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "node",
-    "label": "Node",
-    "short": "A place where a wave is exactly zero. For a wave trapped in a box, more nodes means more energy.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "quantum-state",
-    "label": "Quantum state",
-    "short": "A complete description of what is known about a quantum system, from which the chances of every measurement result can be worked out.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "wavefunction",
-    "label": "Wavefunction",
-    "short": "A function, written with the Greek letter psi, that describes the quantum state of a particle. Its squared size tells you how likely you are to find the particle at each place.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "probability-density",
-    "label": "Probability density",
-    "short": "How concentrated the chance of finding a particle is at each point. Adding it up over a region gives the chance of finding the particle there.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "superposition",
-    "label": "Superposition",
-    "short": "A state made by adding two or more states together. A particle in a superposition has no single definite value for the property in which the states differ.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "uncertainty-principle",
-    "label": "Uncertainty principle",
-    "short": "The rule that a particle's position and momentum cannot both be known exactly at once; squeezing one makes the other spread out.",
-    "level": "intermediate",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "energy-level",
-    "label": "Energy level",
-    "short": "One of the separate energy values that a bound electron is allowed to have.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "ground-state",
-    "label": "Ground state",
-    "short": "The lowest-energy state of a system.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "excited-state",
-    "label": "Excited state",
-    "short": "Any state of a system with more energy than its ground state.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "degenerate",
-    "label": "Degenerate",
-    "short": "Describes different states that happen to have exactly the same energy.",
-    "level": "intermediate",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "schrodinger-equation",
-    "label": "Schrodinger equation",
-    "short": "The equation that says how a quantum state behaves. Solving it for an electron in a given surrounding gives the allowed energies and wavefunctions.",
-    "level": "intermediate",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "hamiltonian",
-    "label": "Hamiltonian",
-    "short": "The recipe for the total energy of a system, written as an operator. The Schrodinger equation uses it to find the allowed states.",
-    "level": "intermediate",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "orbital",
-    "label": "Orbital",
-    "short": "A wavefunction for a single electron. The shape of its squared size is the familiar cloud picture of where that electron is likely to be.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "quantum-number",
-    "label": "Quantum number",
-    "short": "A whole number (or half-whole number) that labels a state, for example n, l and m for an electron in an atom.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "spdf-orbitals",
-    "label": "s, p, d and f orbitals",
-    "short": "Letters used for orbital shapes: s is a sphere, p has two lobes, d and f have more complicated lobes. They correspond to the values 0, 1, 2 and 3 of the angular quantum number l.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "spin",
-    "label": "Spin",
-    "short": "A built-in property of electrons that behaves like a tiny magnet with only two possible orientations, usually called up and down.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "fermion",
-    "label": "Fermion",
-    "short": "A kind of particle, such as the electron, that obeys the Pauli exclusion principle.",
-    "level": "intermediate",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "pauli-exclusion-principle",
-    "label": "Pauli exclusion principle",
-    "short": "The rule that two electrons cannot be in exactly the same state, which is why atoms fill up shell by shell.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "coulomb-interaction",
-    "label": "Coulomb interaction",
-    "short": "The push or pull between electric charges: like charges repel and opposite charges attract.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "many-body-problem",
-    "label": "Many-body problem",
-    "short": "The difficulty that the motion of every electron depends on every other electron, so the equations cannot be solved exactly for more than a few particles.",
-    "level": "beginner",
-    "sources": [
-      "S-048"
-    ]
-  },
-  {
-    "id": "born-oppenheimer-approximation",
-    "label": "Born-Oppenheimer approximation",
-    "short": "The simplification of treating the nuclei as standing still while the much lighter electrons settle around them.",
-    "level": "intermediate",
-    "sources": [
-      "S-048"
-    ]
-  },
-  {
-    "id": "electron-density",
-    "label": "Electron density",
-    "short": "How much electronic charge there is at each point in space. It is a single function of position, unlike the wavefunction of many electrons.",
-    "level": "beginner",
-    "sources": [
-      "S-011"
-    ]
-  },
-  {
-    "id": "exchange-correlation",
-    "label": "Exchange and correlation",
-    "short": "The parts of the electron-electron interaction that come from the Pauli principle (exchange) and from electrons avoiding each other (correlation). Density functional theory has to approximate them.",
-    "level": "intermediate",
-    "sources": [
-      "S-012",
-      "S-049"
-    ]
-  },
-  {
-    "id": "functional",
-    "label": "Functional",
-    "short": "A rule that takes a whole function as input and returns a single number. The energy as a function of the electron density is a functional.",
-    "level": "intermediate",
-    "sources": [
-      "S-011"
-    ]
-  },
-  {
-    "id": "hohenberg-kohn-theorems",
-    "label": "Hohenberg-Kohn theorems",
-    "short": "Two results showing that the ground-state electron density alone determines the energy and everything else about the system.",
-    "level": "intermediate",
-    "sources": [
-      "S-011"
-    ]
-  },
-  {
-    "id": "kohn-sham-equations",
-    "label": "Kohn-Sham equations",
-    "short": "A set of one-electron equations whose solution gives the exact ground-state density, if the exchange-correlation part were known exactly.",
-    "level": "intermediate",
-    "sources": [
-      "S-012"
-    ]
-  },
-  {
-    "id": "self-consistent-field",
-    "label": "Self-consistent field",
-    "short": "A loop that guesses the electron density, works out the potential the electrons would feel in that density, solves for a new density, and repeats until the density stops changing.",
-    "level": "beginner",
-    "sources": [
-      "S-012",
-      "S-049"
-    ]
-  },
-  {
-    "id": "dft",
-    "label": "DFT (density functional theory)",
-    "short": "A way of computing the energy and properties of atoms, molecules and solids from the electron density instead of the full many-electron wavefunction.",
-    "level": "beginner",
-    "sources": [
-      "S-011",
-      "S-018"
-    ]
-  },
-  {
-    "id": "periodic-boundary-conditions",
-    "label": "Periodic boundary conditions",
-    "short": "A trick for modelling a solid: a small cell is repeated endlessly in all directions so that it behaves as part of an infinite crystal.",
-    "level": "beginner",
-    "sources": [
-      "S-050"
-    ]
-  },
-  {
-    "id": "unit-cell",
-    "label": "Unit cell",
-    "short": "The smallest box that, repeated in every direction, builds the whole crystal.",
-    "level": "beginner",
-    "sources": [
-      "S-050"
-    ]
-  },
-  {
-    "id": "plane-wave",
-    "label": "Plane wave",
-    "short": "A wave of constant size that ripples evenly through space. VASP builds its wavefunctions from many of them.",
-    "level": "intermediate",
-    "sources": [
-      "S-049",
-      "S-010"
-    ]
-  },
-  {
-    "id": "pseudopotential",
-    "label": "Pseudopotential",
-    "short": "A smoothed stand-in for the nucleus and its tightly bound inner electrons, so that only the outer electrons need to be computed.",
-    "level": "intermediate",
-    "sources": [
-      "S-049",
-      "S-008"
-    ]
-  },
-  {
-    "id": "simulation",
-    "label": "Simulation",
-    "short": "A calculation on a computer that imitates a real system, so you can study it without building it.",
-    "level": "beginner",
-    "sources": [
-      "S-018"
-    ]
-  },
-  {
-    "id": "atom",
-    "label": "Atom",
-    "short": "The basic building block of ordinary matter: a tiny, heavy nucleus surrounded by a cloud of lighter electrons.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "electron",
-    "label": "Electron",
-    "short": "A very light particle with negative charge. Electrons around the nuclei decide how atoms bond and how a material conducts electricity and absorbs light.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "nucleus",
-    "label": "Nucleus",
-    "short": "The tiny, heavy centre of an atom, made of protons and neutrons. In most calculations here the nuclei are treated as fixed points.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "quantum-mechanics",
-    "label": "Quantum mechanics",
-    "short": "The set of rules that describes how very small things such as electrons behave. It replaces the everyday picture of tiny balls on tracks.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "approximation",
-    "label": "Approximation",
-    "short": "A deliberate simplification that makes a calculation possible at the cost of some accuracy. Every practical method uses some.",
-    "level": "beginner",
-    "sources": [
-      "S-048"
-    ]
-  },
-  {
-    "id": "basis-set",
-    "label": "Basis set",
-    "short": "A fixed collection of simple building-block functions that are added together to describe a wavefunction or a density. A bigger set describes it better and costs more.",
-    "level": "beginner",
-    "sources": [
-      "S-049"
-    ]
-  },
-  {
-    "id": "supercell",
-    "label": "Supercell",
-    "short": "A block of several unit cells joined together and repeated through space, used to model defects, surfaces or bigger arrangements of atoms.",
-    "level": "beginner",
-    "sources": [
-      "S-049"
-    ]
-  },
-  {
-    "id": "property",
-    "label": "Property",
-    "short": "Anything you can measure or compute about a material, such as its energy, its shape, its band gap or how much it conducts.",
-    "level": "beginner",
-    "sources": [
-      "S-018"
-    ]
-  },
-  {
-    "id": "scaling",
-    "label": "Scaling",
-    "short": "How the cost of a calculation grows as the system gets bigger. Cost proportional to size to the power 3 is called cubic scaling.",
-    "level": "beginner",
-    "sources": [
-      "S-048"
-    ]
-  },
-  {
-    "id": "force-field",
-    "label": "Force field",
-    "short": "A set of fixed, simple rules for the forces between atoms, without any electrons in the calculation. Very fast, and only as good as the rules.",
-    "level": "beginner",
-    "sources": [
-      "S-018"
-    ]
-  },
-  {
-    "id": "hartree-fock",
-    "label": "Hartree-Fock",
-    "short": "A method that treats each electron as moving in the average field of all the others. It leaves out part of how electrons avoid each other.",
-    "level": "intermediate",
-    "sources": [
-      "S-048"
-    ]
-  },
-  {
-    "id": "coupled-cluster",
-    "label": "Coupled cluster",
-    "short": "A family of high-accuracy methods that add electron-electron effects step by step. Accurate for small molecules and expensive for large systems.",
-    "level": "intermediate",
-    "sources": [
-      "S-048"
-    ]
-  },
-  {
-    "id": "vasp",
-    "label": "VASP",
-    "short": "The Vienna Ab initio Simulation Package, a program that computes the energy and electronic structure of atoms, molecules and solids using DFT with plane waves.",
-    "level": "beginner",
-    "sources": [
-      "S-010"
-    ]
-  },
-  {
-    "id": "standing-wave",
-    "label": "Standing wave",
-    "short": "A wave that does not travel. It stays in place with fixed points of no motion, like a plucked guitar string.",
-    "level": "beginner",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "normalization",
-    "label": "Normalization",
-    "short": "Scaling a wavefunction so that the probabilities over all of space add up to exactly one.",
-    "level": "intermediate",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "radial-node",
-    "label": "Radial node",
-    "short": "A spherical shell around the nucleus where an orbital's wavefunction is zero, so the electron is never found there.",
-    "level": "intermediate",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "angular-node",
-    "label": "Angular node",
-    "short": "A flat or cone-shaped surface through the nucleus where an orbital's wavefunction is zero. The number of angular nodes equals l.",
-    "level": "intermediate",
-    "sources": [
-      "S-047"
-    ]
-  },
-  {
-    "id": "electron-volt",
-    "label": "Electron volt (eV)",
-    "short": "The energy an electron gains when it moves through one volt. The usual unit of energy for electrons in atoms and solids.",
-    "level": "beginner",
-    "sources": [
-      "S-031"
-    ]
-  },
-  {
-    "id": "angstrom",
-    "label": "Angstrom",
-    "short": "A unit of length equal to 10^-10 meters. Atoms are a few angstrom apart in a solid.",
-    "level": "beginner",
-    "sources": [
-      "S-031"
-    ]
-  },
-  {
-    "id": "band",
-    "label": "Band",
-    "short": "A range of closely spaced electron energies that forms when many atoms are brought together in a crystal.",
-    "level": "beginner",
-    "sources": [
-      "S-050"
-    ]
-  },
-  {
-    "id": "band-gap",
-    "label": "Band gap",
-    "short": "A range of energies between two bands where no electron states exist. Its size helps decide whether a material conducts.",
-    "level": "beginner",
-    "sources": [
-      "S-050",
-      "S-036"
-    ]
-  },
-  {
-    "id": "density-of-states",
-    "label": "Density of states",
-    "short": "How many electron states are available at each energy, per unit energy.",
-    "level": "intermediate",
-    "sources": [
-      "S-050",
-      "S-036"
-    ]
-  },
-  {
-    "id": "hilbert-space",
-    "label": "Hilbert space",
-    "short": "The space of all possible states of a quantum system. Each state is a point, and adding two states gives another state.",
-    "level": "intermediate",
-    "sources": [
-      "S-047",
-      "S-048"
-    ]
-  },
-  {
-    "id": "slater-determinant",
-    "label": "Slater determinant",
-    "short": "A way to write a many-electron wavefunction from one-electron orbitals so that swapping two electrons flips the sign, as the Pauli principle requires.",
-    "level": "intermediate",
-    "sources": [
-      "S-048"
-    ]
-  },
-  {
-    "id": "spin-orbital",
-    "label": "Spin orbital",
-    "short": "An orbital together with a choice of spin up or spin down. Each electron occupies one spin orbital.",
-    "level": "intermediate",
-    "sources": [
-      "S-048"
-    ]
-  },
-  {
-    "id": "correlation",
-    "label": "Correlation",
-    "short": "The way electrons avoid each other because they repel, beyond what the simplest average-field picture captures.",
-    "level": "intermediate",
-    "sources": [
-      "S-048"
-    ]
-  },
-  {
-    "id": "external-potential",
-    "label": "External potential",
-    "short": "The push or pull on the electrons that comes from outside the electrons themselves, in a solid mainly the attraction of the nuclei.",
-    "level": "intermediate",
-    "sources": [
-      "S-011"
-    ]
-  },
-  {
-    "id": "ground-state-density",
-    "label": "Ground-state density",
-    "short": "The electron density of the lowest-energy state of a system.",
-    "level": "intermediate",
-    "sources": [
-      "S-011"
-    ]
-  }
+ {
+  "id": "wave",
+  "label": "Wave",
+  "short": "A pattern that repeats in space and time and carries energy without carrying matter along, like ripples on water.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "frequency",
+  "label": "Frequency",
+  "short": "How many times per second a wave repeats. Written with the Greek letter nu or f.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "amplitude",
+  "label": "Amplitude",
+  "short": "How tall a wave is, measured from its resting level to its peak.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "wave-particle-duality",
+  "label": "Wave-particle duality",
+  "short": "The finding that things like electrons and light sometimes behave like tiny lumps and sometimes like spreading waves, depending on how you look.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "photon",
+  "label": "Photon",
+  "short": "A single packet of light. Its energy is the Planck constant times the light's frequency.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "planck-constant",
+  "label": "Planck constant",
+  "short": "A fixed number, written h, that links the energy of a light packet to its frequency. Its value is fixed exactly by the definition of the SI units.",
+  "level": "beginner",
+  "sources": [
+   "S-031"
+  ]
+ },
+ {
+  "id": "de-broglie-wavelength",
+  "label": "de Broglie wavelength",
+  "short": "The wavelength that goes with a moving particle: the Planck constant divided by the particle's momentum.",
+  "level": "intermediate",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "quantization",
+  "label": "Quantization",
+  "short": "The fact that some quantities, such as the energy of an electron held in a small region, can only take certain separate values, not any value in between.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "boundary-condition",
+  "label": "Boundary condition",
+  "short": "A rule about what a wave must do at the edge of the region it lives in, for example that it must be zero at a wall.",
+  "level": "intermediate",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "node",
+  "label": "Node",
+  "short": "A place where a wave is exactly zero. For a wave trapped in a box, more nodes means more energy.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "quantum-state",
+  "label": "Quantum state",
+  "short": "A complete description of what is known about a quantum system, from which the chances of every measurement result can be worked out.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "wavefunction",
+  "label": "Wavefunction",
+  "short": "A function, written with the Greek letter psi, that describes the quantum state of a particle. Its squared size tells you how likely you are to find the particle at each place.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "probability-density",
+  "label": "Probability density",
+  "short": "How concentrated the chance of finding a particle is at each point. Adding it up over a region gives the chance of finding the particle there.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "superposition",
+  "label": "Superposition",
+  "short": "A state made by adding two or more states together. A particle in a superposition has no single definite value for the property in which the states differ.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "uncertainty-principle",
+  "label": "Uncertainty principle",
+  "short": "The rule that a particle's position and momentum cannot both be known exactly at once; squeezing one makes the other spread out.",
+  "level": "intermediate",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "energy-level",
+  "label": "Energy level",
+  "short": "One of the separate energy values that a bound electron is allowed to have.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "ground-state",
+  "label": "Ground state",
+  "short": "The lowest-energy state of a system.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "excited-state",
+  "label": "Excited state",
+  "short": "Any state of a system with more energy than its ground state.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "degenerate",
+  "label": "Degenerate",
+  "short": "Describes different states that happen to have exactly the same energy.",
+  "level": "intermediate",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "schrodinger-equation",
+  "label": "Schrodinger equation",
+  "short": "The equation that says how a quantum state behaves. Solving it for an electron in a given surrounding gives the allowed energies and wavefunctions.",
+  "level": "intermediate",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "hamiltonian",
+  "label": "Hamiltonian",
+  "short": "The recipe for the total energy of a system, written as an operator. The Schrodinger equation uses it to find the allowed states.",
+  "level": "intermediate",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "orbital",
+  "label": "Orbital",
+  "short": "A wavefunction for a single electron. The shape of its squared size is the familiar cloud picture of where that electron is likely to be.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "quantum-number",
+  "label": "Quantum number",
+  "short": "A whole number (or half-whole number) that labels a state, for example n, l and m for an electron in an atom.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "spdf-orbitals",
+  "label": "s, p, d and f orbitals",
+  "short": "Letters used for orbital shapes: s is a sphere, p has two lobes, d and f have more complicated lobes. They correspond to the values 0, 1, 2 and 3 of the angular quantum number l.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "spin",
+  "label": "Spin",
+  "short": "A built-in property of electrons that behaves like a tiny magnet with only two possible orientations, usually called up and down.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "fermion",
+  "label": "Fermion",
+  "short": "A kind of particle, such as the electron, that obeys the Pauli exclusion principle.",
+  "level": "intermediate",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "pauli-exclusion-principle",
+  "label": "Pauli exclusion principle",
+  "short": "The rule that two electrons cannot be in exactly the same state, which is why atoms fill up shell by shell.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "coulomb-interaction",
+  "label": "Coulomb interaction",
+  "short": "The push or pull between electric charges: like charges repel and opposite charges attract.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "many-body-problem",
+  "label": "Many-body problem",
+  "short": "The difficulty that the motion of every electron depends on every other electron, so the equations cannot be solved exactly for more than a few particles.",
+  "level": "beginner",
+  "sources": [
+   "S-048"
+  ]
+ },
+ {
+  "id": "born-oppenheimer-approximation",
+  "label": "Born-Oppenheimer approximation",
+  "short": "The simplification of treating the nuclei as standing still while the much lighter electrons settle around them.",
+  "level": "intermediate",
+  "sources": [
+   "S-048"
+  ]
+ },
+ {
+  "id": "electron-density",
+  "label": "Electron density",
+  "short": "How much electronic charge there is at each point in space. It is a single function of position, unlike the wavefunction of many electrons.",
+  "level": "beginner",
+  "sources": [
+   "S-011"
+  ]
+ },
+ {
+  "id": "exchange-correlation",
+  "label": "Exchange and correlation",
+  "short": "The parts of the electron-electron interaction that come from the Pauli principle (exchange) and from electrons avoiding each other (correlation). Density functional theory has to approximate them.",
+  "level": "intermediate",
+  "sources": [
+   "S-012",
+   "S-049"
+  ]
+ },
+ {
+  "id": "functional",
+  "label": "Functional",
+  "short": "A rule that takes a whole function as input and returns a single number. The energy as a function of the electron density is a functional.",
+  "level": "intermediate",
+  "sources": [
+   "S-011"
+  ]
+ },
+ {
+  "id": "hohenberg-kohn-theorems",
+  "label": "Hohenberg-Kohn theorems",
+  "short": "Two results showing that the ground-state electron density alone determines the energy and everything else about the system.",
+  "level": "intermediate",
+  "sources": [
+   "S-011"
+  ]
+ },
+ {
+  "id": "kohn-sham-equations",
+  "label": "Kohn-Sham equations",
+  "short": "A set of one-electron equations whose solution gives the exact ground-state density, if the exchange-correlation part were known exactly.",
+  "level": "intermediate",
+  "sources": [
+   "S-012"
+  ]
+ },
+ {
+  "id": "self-consistent-field",
+  "label": "Self-consistent field",
+  "short": "A loop that guesses the electron density, works out the potential the electrons would feel in that density, solves for a new density, and repeats until the density stops changing.",
+  "level": "beginner",
+  "sources": [
+   "S-012",
+   "S-049"
+  ]
+ },
+ {
+  "id": "dft",
+  "label": "DFT (density functional theory)",
+  "short": "A way of computing the energy and properties of atoms, molecules and solids from the electron density instead of the full many-electron wavefunction.",
+  "level": "beginner",
+  "sources": [
+   "S-011",
+   "S-018"
+  ]
+ },
+ {
+  "id": "periodic-boundary-conditions",
+  "label": "Periodic boundary conditions",
+  "short": "A trick for modelling a solid: a small cell is repeated endlessly in all directions so that it behaves as part of an infinite crystal.",
+  "level": "beginner",
+  "sources": [
+   "S-050"
+  ]
+ },
+ {
+  "id": "unit-cell",
+  "label": "Unit cell",
+  "short": "The smallest box that, repeated in every direction, builds the whole crystal.",
+  "level": "beginner",
+  "sources": [
+   "S-050"
+  ]
+ },
+ {
+  "id": "plane-wave",
+  "label": "Plane wave",
+  "short": "A wave of constant size that ripples evenly through space. VASP builds its wavefunctions from many of them.",
+  "level": "intermediate",
+  "sources": [
+   "S-049",
+   "S-010"
+  ]
+ },
+ {
+  "id": "pseudopotential",
+  "label": "Pseudopotential",
+  "short": "A smoothed stand-in for the nucleus and its tightly bound inner electrons, so that only the outer electrons need to be computed.",
+  "level": "intermediate",
+  "sources": [
+   "S-049",
+   "S-008"
+  ]
+ },
+ {
+  "id": "simulation",
+  "label": "Simulation",
+  "short": "A calculation on a computer that imitates a real system, so you can study it without building it.",
+  "level": "beginner",
+  "sources": [
+   "S-018"
+  ]
+ },
+ {
+  "id": "atom",
+  "label": "Atom",
+  "short": "The basic building block of ordinary matter: a tiny, heavy nucleus surrounded by a cloud of lighter electrons.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "electron",
+  "label": "Electron",
+  "short": "A very light particle with negative charge. Electrons around the nuclei decide how atoms bond and how a material conducts electricity and absorbs light.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "nucleus",
+  "label": "Nucleus",
+  "short": "The tiny, heavy centre of an atom, made of protons and neutrons. In most calculations here the nuclei are treated as fixed points.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "quantum-mechanics",
+  "label": "Quantum mechanics",
+  "short": "The set of rules that describes how very small things such as electrons behave. It replaces the everyday picture of tiny balls on tracks.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "approximation",
+  "label": "Approximation",
+  "short": "A deliberate simplification that makes a calculation possible at the cost of some accuracy. Every practical method uses some.",
+  "level": "beginner",
+  "sources": [
+   "S-048"
+  ]
+ },
+ {
+  "id": "basis-set",
+  "label": "Basis set",
+  "short": "A fixed collection of simple building-block functions that are added together to describe a wavefunction or a density. A bigger set describes it better and costs more.",
+  "level": "beginner",
+  "sources": [
+   "S-049"
+  ]
+ },
+ {
+  "id": "supercell",
+  "label": "Supercell",
+  "short": "A block of several unit cells joined together and repeated through space, used to model defects, surfaces or bigger arrangements of atoms.",
+  "level": "beginner",
+  "sources": [
+   "S-049"
+  ]
+ },
+ {
+  "id": "property",
+  "label": "Property",
+  "short": "Anything you can measure or compute about a material, such as its energy, its shape, its band gap or how much it conducts.",
+  "level": "beginner",
+  "sources": [
+   "S-018"
+  ]
+ },
+ {
+  "id": "scaling",
+  "label": "Scaling",
+  "short": "How the cost of a calculation grows as the system gets bigger. Cost proportional to size to the power 3 is called cubic scaling.",
+  "level": "beginner",
+  "sources": [
+   "S-048"
+  ]
+ },
+ {
+  "id": "force-field",
+  "label": "Force field",
+  "short": "A set of fixed, simple rules for the forces between atoms, without any electrons in the calculation. Very fast, and only as good as the rules.",
+  "level": "beginner",
+  "sources": [
+   "S-018"
+  ]
+ },
+ {
+  "id": "hartree-fock",
+  "label": "Hartree-Fock",
+  "short": "A method that treats each electron as moving in the average field of all the others. It leaves out part of how electrons avoid each other.",
+  "level": "intermediate",
+  "sources": [
+   "S-048"
+  ]
+ },
+ {
+  "id": "coupled-cluster",
+  "label": "Coupled cluster",
+  "short": "A family of high-accuracy methods that add electron-electron effects step by step. Accurate for small molecules and expensive for large systems.",
+  "level": "intermediate",
+  "sources": [
+   "S-048"
+  ]
+ },
+ {
+  "id": "vasp",
+  "label": "VASP",
+  "short": "The Vienna Ab initio Simulation Package, a program that computes the energy and electronic structure of atoms, molecules and solids using DFT with plane waves.",
+  "level": "beginner",
+  "sources": [
+   "S-010"
+  ]
+ },
+ {
+  "id": "standing-wave",
+  "label": "Standing wave",
+  "short": "A wave that does not travel. It stays in place with fixed points of no motion, like a plucked guitar string.",
+  "level": "beginner",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "normalization",
+  "label": "Normalization",
+  "short": "Scaling a wavefunction so that the probabilities over all of space add up to exactly one.",
+  "level": "intermediate",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "radial-node",
+  "label": "Radial node",
+  "short": "A spherical shell around the nucleus where an orbital's wavefunction is zero, so the electron is never found there.",
+  "level": "intermediate",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "angular-node",
+  "label": "Angular node",
+  "short": "A flat or cone-shaped surface through the nucleus where an orbital's wavefunction is zero. The number of angular nodes equals l.",
+  "level": "intermediate",
+  "sources": [
+   "S-047"
+  ]
+ },
+ {
+  "id": "electron-volt",
+  "label": "Electron volt (eV)",
+  "short": "The energy an electron gains when it moves through one volt. The usual unit of energy for electrons in atoms and solids.",
+  "level": "beginner",
+  "sources": [
+   "S-031"
+  ]
+ },
+ {
+  "id": "angstrom",
+  "label": "Angstrom",
+  "short": "A unit of length equal to 10^-10 meters. Atoms are a few angstrom apart in a solid.",
+  "level": "beginner",
+  "sources": [
+   "S-031"
+  ]
+ },
+ {
+  "id": "band",
+  "label": "Band",
+  "short": "A range of closely spaced electron energies that forms when many atoms are brought together in a crystal.",
+  "level": "beginner",
+  "sources": [
+   "S-050"
+  ]
+ },
+ {
+  "id": "band-gap",
+  "label": "Band gap",
+  "short": "A range of energies between two bands where no electron states exist. Its size helps decide whether a material conducts.",
+  "level": "beginner",
+  "sources": [
+   "S-050",
+   "S-036"
+  ]
+ },
+ {
+  "id": "density-of-states",
+  "label": "Density of states",
+  "short": "How many electron states are available at each energy, per unit energy.",
+  "level": "intermediate",
+  "sources": [
+   "S-050",
+   "S-036"
+  ]
+ },
+ {
+  "id": "hilbert-space",
+  "label": "Hilbert space",
+  "short": "The space of all possible states of a quantum system. Each state is a point, and adding two states gives another state.",
+  "level": "intermediate",
+  "sources": [
+   "S-047",
+   "S-048"
+  ]
+ },
+ {
+  "id": "slater-determinant",
+  "label": "Slater determinant",
+  "short": "A way to write a many-electron wavefunction from one-electron orbitals so that swapping two electrons flips the sign, as the Pauli principle requires.",
+  "level": "intermediate",
+  "sources": [
+   "S-048"
+  ]
+ },
+ {
+  "id": "spin-orbital",
+  "label": "Spin orbital",
+  "short": "An orbital together with a choice of spin up or spin down. Each electron occupies one spin orbital.",
+  "level": "intermediate",
+  "sources": [
+   "S-048"
+  ]
+ },
+ {
+  "id": "correlation",
+  "label": "Correlation",
+  "short": "The way electrons avoid each other because they repel, beyond what the simplest average-field picture captures.",
+  "level": "intermediate",
+  "sources": [
+   "S-048"
+  ]
+ },
+ {
+  "id": "external-potential",
+  "label": "External potential",
+  "short": "The push or pull on the electrons that comes from outside the electrons themselves, in a solid mainly the attraction of the nuclei.",
+  "level": "intermediate",
+  "sources": [
+   "S-011"
+  ]
+ },
+ {
+  "id": "ground-state-density",
+  "label": "Ground-state density",
+  "short": "The electron density of the lowest-energy state of a system.",
+  "level": "intermediate",
+  "sources": [
+   "S-011"
+  ]
+ },
+ {
+  "id": "kohn-sham-orbital",
+  "label": "Kohn-Sham orbital",
+  "short": "A one-electron orbital of the stand-in, non-interacting system in Kohn-Sham DFT. Filling these orbitals gives the density.",
+  "level": "intermediate",
+  "sources": [
+   "S-012"
+  ]
+ },
+ {
+  "id": "effective-potential",
+  "label": "Effective potential",
+  "short": "The single potential felt by each Kohn-Sham electron: the nuclei, plus the Hartree repulsion, plus exchange-correlation.",
+  "level": "intermediate",
+  "sources": [
+   "S-012"
+  ]
+ },
+ {
+  "id": "hartree-potential",
+  "label": "Hartree potential",
+  "short": "The classical electrostatic repulsion from the whole electron density, treated as a smooth cloud of charge.",
+  "level": "intermediate",
+  "sources": [
+   "S-048"
+  ]
+ },
+ {
+  "id": "density-mixing",
+  "label": "Density mixing",
+  "short": "Making the next guess of the SCF loop from a blend of the old and new densities, to avoid overshooting.",
+  "level": "intermediate",
+  "sources": [
+   "S-010"
+  ]
+ },
+ {
+  "id": "residual",
+  "label": "Residual",
+  "short": "How much the density (or energy) still changes in one trip round the SCF loop. It shrinks towards zero as the loop converges.",
+  "level": "intermediate",
+  "sources": [
+   "S-010"
+  ]
+ },
+ {
+  "id": "brillouin-zone",
+  "label": "Brillouin zone",
+  "short": "The cell of reciprocal space that contains every distinct wavevector label k of a crystal exactly once, centred on Gamma.",
+  "level": "intermediate",
+  "sources": [
+   "S-036"
+  ]
+ },
+ {
+  "id": "pulay-stress",
+  "label": "Pulay stress",
+  "short": "An artificial stress from an incomplete plane-wave basis when the cell volume changes; it shrinks as ENCUT is raised.",
+  "level": "pro",
+  "sources": [
+   "S-040"
+  ]
+ },
+ {
+  "id": "smearing",
+  "label": "Smearing",
+  "short": "Replacing the sharp step of occupations at the Fermi level by a smooth curve of width SIGMA, so that metals converge with fewer k-points.",
+  "level": "intermediate",
+  "sources": [
+   "S-015",
+   "S-019"
+  ]
+ },
+ {
+  "id": "kpoint",
+  "label": "k-point",
+  "short": "A sample point in the Brillouin zone. VASP averages over a mesh of them to compute energies and densities.",
+  "level": "intermediate",
+  "sources": [
+   "S-007"
+  ]
+ },
+ {
+  "id": "poscar",
+  "label": "POSCAR",
+  "short": "The VASP input file with the cell vectors, the species, the atom counts and the atomic positions.",
+  "level": "beginner",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "incar",
+  "label": "INCAR",
+  "short": "The VASP input file of TAG = value lines that decides what is calculated and how.",
+  "level": "beginner",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "potcar",
+  "label": "POTCAR",
+  "short": "The VASP input file with the PAW dataset of every species, joined in POSCAR order. Licensed; never shared.",
+  "level": "beginner",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "oszicar",
+  "label": "OSZICAR",
+  "short": "The short VASP log with one line per electronic step and one summary line per ionic step.",
+  "level": "beginner",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "outcar",
+  "label": "OUTCAR",
+  "short": "The full VASP log: parameters used, symmetry, energies, forces, stress, magnetization and timing.",
+  "level": "beginner",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "vaspkit",
+  "label": "VASPKIT",
+  "short": "A menu-driven helper program that writes VASP inputs and post-processes outputs.",
+  "level": "intermediate",
+  "sources": [
+   "S-020"
+  ]
+ },
+ {
+  "id": "job-script",
+  "label": "job script",
+  "short": "A batch file that requests cores and time from a cluster scheduler and starts VASP.",
+  "level": "intermediate",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "convergence-test",
+  "label": "convergence test",
+  "short": "A series of runs that change one numerical setting step by step, with everything else fixed, to find where the result stops changing.",
+  "level": "beginner",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "charge-sloshing",
+  "label": "charge sloshing",
+  "short": "The electron density swinging back and forth between steps of the electronic loop instead of settling, common in large cells, slabs and metals.",
+  "level": "intermediate",
+  "sources": [
+   "S-041"
+  ]
+ }
 ]

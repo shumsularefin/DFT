@@ -1,0 +1,152 @@
+---
+id: smearing
+title: Smearing, ISMEAR and SIGMA
+module: 5
+order: 5
+summary: Why metals need smeared occupations, which ISMEAR to use for which material, and how to check SIGMA with the entropy term.
+concepts: [smearing, ismear-sigma]
+requires: [kpoint-sampling]
+vaspTags: [ISMEAR, SIGMA, NEDOS]
+sources: [S-015, S-016, S-017, S-019, S-041, S-042, S-050]
+status: draft
+updated: 2026-11-06
+---
+
+<Why>
+
+ISMEAR and SIGMA appear in every INCAR, and the wrong pair is one of the most common mistakes in published work: metals relaxed with the tetrahedron method, semiconductors run with the metal default, entropy errors nobody checked. This page explains what smearing does, gives the rules from the VASP wiki and the author's handbook, and shows the check that tells you SIGMA is small enough.
+
+</Why>
+
+<Intuition>
+
+At zero temperature each electron state is either filled (below the Fermi level) or empty (above it). In a metal, bands cross the Fermi level, so as you move through the k-point mesh the occupation of a band jumps from 1 to 0. A sum over a finite mesh converges very slowly across such jumps.
+
+<Term id="smearing">Smearing</Term> replaces the sharp step by a smooth curve of width SIGMA (in eV). The
+energy then varies smoothly with the mesh and the SCF loop converges more easily. The price is a small error:
+the smeared energy is not quite the zero-width energy, and an "entropy" term $T S$ appears that measures how
+much smearing was applied.
+
+The methods differ in the shape of the curve (the lab draws each):
+
+- **Gaussian** (`ISMEAR = 0`): safe for anything, the usual choice for semiconductors and insulators with a small SIGMA.
+- **Methfessel-Paxton** (`ISMEAR = 1` or 2): designed for metals; its energy error is much smaller at the same width, at the cost of occupations slightly below 0 and above 1 <Cite id="S-015" />. Wrong for gapped systems.
+- **Fermi-Dirac** (`ISMEAR = -1`): a real electronic temperature.
+- **Tetrahedron with Blöchl corrections** (`ISMEAR = -5`): no smearing at all, accurate total energies and DOS for bulk with enough k-points, but not for relaxing metals (forces are inaccurate) <Cite id="S-017" />.
+- **Cold smearing** (Marzari-Vanderbilt) is another metal scheme with non-negative occupations <Cite id="S-016" />.
+
+**The rules** (VASP 5.4 and 6.x) <Cite id="S-042" /> <Cite id="S-019" />:
+
+- Semiconductors and insulators: `ISMEAR = 0`, `SIGMA = 0.03` to 0.05. The VASP default `ISMEAR = 1` is wrong for them.
+- Metals: `ISMEAR = 1`, `SIGMA = 0.1` to 0.2.
+- Accurate DOS and total energies of bulk, fixed structure: `ISMEAR = -5`.
+- Not sure if it is a metal: `ISMEAR = 0` with a small SIGMA is the safe choice.
+
+**The check.** Run `grep EENTRO OUTCAR`. The entropy term $T S$ divided by the number of atoms should be below about 1 meV per atom; if larger, reduce SIGMA <Cite id="S-042" />. The lab shows the same quantity for a toy metal.
+
+<Level min="intermediate">
+
+In the lab, notice that the entropy term grows roughly with SIGMA squared, and that with Methfessel-Paxton the band-energy error is far smaller than with Gaussian at the same SIGMA. For Gaussian smearing VASP also prints an extrapolated "energy(sigma->0)", the average of the energy and the free energy, which removes the leading error; quote that for Gaussian runs <Cite id="S-019" />.
+
+</Level>
+
+<Level min="pro">
+
+Methfessel-Paxton of order $N$ has broadened delta functions whose moments $\int x^m \tilde\delta_N\, dx$ vanish for $1 \le m \le 2N+1$, so the error in an integral of a smooth function is of order $\sigma^{2N+2}$ <Cite id="S-015" />. The lab's tests check these moments numerically. For a semiconductor the MP occupations of states near a band edge can be negative or above 1, which can give wrong energies and even wrong charges; that is why the rule says never MP for gapped systems.
+
+</Level>
+
+</Intuition>
+
+<Lab id="smearing" title="Smearing" />
+
+<TheMath>
+
+With $x = (\varepsilon - \mu)/\sigma$, each method defines an occupation $f(x)$ and a broadened delta function $\tilde\delta(x) = -df/dx$ that integrates to 1:
+
+- Fermi-Dirac: $f = 1/(1 + e^{x})$.
+- Gaussian: $f = \tfrac{1}{2}\,\text{erfc}(x)$, $\tilde\delta = e^{-x^2}/\sqrt{\pi}$.
+- Methfessel-Paxton order $N$: $\tilde\delta_N = \sum_{n=0}^{N} A_n H_{2n}(x)\, e^{-x^2}$ with $A_n = (-1)^n / (n!\, 4^n \sqrt{\pi})$ and $H$ the Hermite polynomials <Cite id="S-015" />. For $N = 1$: $\tilde\delta_1 = (\tfrac{3}{2} - x^2)\, e^{-x^2}/\sqrt{\pi}$.
+- Cold: $\tilde\delta = e^{-(x + 1/\sqrt{2})^2}\,(2 + \sqrt{2}\,x)/\sqrt{\pi}$ in this convention (Marzari and Vanderbilt use $u = -x$) <Cite id="S-016" />.
+
+The free energy is $F = E - TS$ with $TS = \sigma \sum_i w_i\, s(x_i)$ and $s(x) = -\int_{-\infty}^{x} t\,\tilde\delta(t)\, dt$, which for Fermi-Dirac is the familiar $-f\ln f - (1-f)\ln(1-f)$.
+
+<Level min="intermediate">
+
+The toy metal in the lab uses the free-electron density of states $g(\varepsilon) \propto \sqrt{\varepsilon}$ with one electron and a 5 eV Fermi energy, so the exact band energy is $\tfrac{3}{5} \times 5 = 3$ eV <Cite id="S-050" />. For Fermi-Dirac the lab reproduces the textbook result $TS \approx \tfrac{\pi^2}{3}\, g(\varepsilon_F)\, \sigma^2$.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+<VaspFile
+  name="INCAR"
+  code={`! semiconductor or insulator
+ISMEAR = 0
+SIGMA  = 0.05`}
+  annotations={{ 2: 'Gaussian', 3: 'eV; then check grep EENTRO OUTCAR' }}
+/>
+
+<VaspFile
+  name="INCAR"
+  code={`! metal
+ISMEAR = 1
+SIGMA  = 0.2`}
+  annotations={{ 2: 'Methfessel-Paxton order 1', 3: 'eV; T*S per atom below about 1 meV' }}
+/>
+
+The cards for <Tag name="ISMEAR" /> and <Tag name="SIGMA" /> hold the full rules and the VASP default (`ISMEAR = 1`, `SIGMA = 0.2`).
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                                     | ...then                                                          |
+| --------------------------------------------- | ---------------------------------------------------------------- |
+| Raise SIGMA                                   | Easier convergence, fewer k-points needed; larger entropy error  |
+| Use ISMEAR = 1 for a semiconductor            | Occupations outside [0, 1] near the gap; wrong energies possible |
+| Use ISMEAR = -5 to relax a metal              | Inaccurate forces                                                |
+| Lower SIGMA for a metal without more k-points | The energy jumps around with the mesh                            |
+
+Why these values: they keep the entropy term below about 1 meV per atom for typical systems. What happens if you skip the check: energies carry an error you never measured.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Leaving the VASP default ISMEAR = 1 for an insulator">
+
+The default suits metals. For gapped systems use `ISMEAR = 0` with a small SIGMA.
+
+</Callout>
+
+<Callout variant="mistake" title="Never looking at EENTRO">
+
+One grep tells you whether SIGMA is small enough. Do it for every new system.
+
+</Callout>
+
+</Mistakes>
+
+<Check
+  ids={[
+    'q-smear-1',
+    'q-smear-2',
+    'q-smear-3',
+    'q-smear-4',
+    'q-ismear-1',
+    'q-ismear-2',
+    'q-ismear-3',
+    'q-ismear-4',
+  ]}
+/>
+
+<GoDeeper>
+
+- Methfessel and Paxton <Cite id="S-015" />; Marzari, Vanderbilt, De Vita and Payne <Cite id="S-016" />; Blöchl, Jepsen and Andersen on the tetrahedron method <Cite id="S-017" />.
+- VASP wiki pages ISMEAR and SIGMA <Cite id="S-019" />.
+- The author's VASP Field Handbook, smearing section <Cite id="S-041" />.
+
+</GoDeeper>

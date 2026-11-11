@@ -76,7 +76,7 @@ describe('KSPACING versus golden for all three rules', () => {
       }
     });
   });
-  it('Q-004 calibration cases: fcc Cu primitive at 0.3, 0.28, 0.30145', () => {
+  it('documented rule (ceil, S-019 KSPACING page, S-058 VASPKIT 102) and the comparison cases: fcc Cu primitive', () => {
     const get = (k: number) =>
       kref.kspacing_candidates.find((c) => c.cell.startsWith('fcc') && c.kspacing === k)!;
     expect(get(0.3).mesh_rule_ceil).toEqual([11, 11, 11]);
@@ -104,11 +104,17 @@ describe('KSPACING versus golden for all three rules', () => {
   });
 });
 
-describe('Auto length mode (formula UNVERIFIED, Q-018)', () => {
-  it('arithmetic of the recalled formula: fcc Cu, length 20 -> 10', () => {
+describe('Auto length mode (S-019 KPOINTS page: N = int(max(1, R_k |b| + 0.5)), |b| without 2 pi)', () => {
+  it('fcc Cu primitive, |b| = 0.47979 1/A: R_k 20 -> int(10.096) = 10', () => {
     expect(meshFromLength(FCC_CU, 20)).toEqual([10, 10, 10]);
   });
-  it.todo('Q-018: confirm the Auto length formula against the VASP wiki KPOINTS page or one VASP run');
+  it('rounds half up: R_k 30 -> int(14.89) = 14, R_k 32 -> int(15.85) = 15', () => {
+    expect(meshFromLength(FCC_CU, 30)).toEqual([14, 14, 14]);
+    expect(meshFromLength(FCC_CU, 32)).toEqual([15, 15, 15]);
+  });
+  it('never below 1', () => {
+    expect(meshFromLength(FCC_CU, 0.1)).toEqual([1, 1, 1]);
+  });
 });
 
 describe('meshSymmetryRisk reproduces the golden mesh_point_group_symmetry', () => {
@@ -138,12 +144,13 @@ describe('recommendCentering', () => {
     it(`${n} -> either`, () => expect(recommendCentering(struct(rowsOf(n))).centering).toBe('either'));
   }
   it('reasons: measured claim only for hexagonal and fcc primitive', () => {
-    expect(recommendCentering(struct(rowsOf('hex_ideal'))).reason).toContain('Q-017');
-    expect(recommendCentering(struct(rowsOf('fcc_primitive'))).reason).toContain('Q-017');
+    expect(recommendCentering(struct(rowsOf('hex_ideal'))).reason).toContain('S-019');
+    expect(recommendCentering(struct(rowsOf('hex_ideal'))).reason).toContain('Measured');
+    expect(recommendCentering(struct(rowsOf('fcc_primitive'))).reason).toContain('Measured');
     const rh = recommendCentering(struct(rowsOf('rhombohedral'))).reason;
     expect(rh).toContain('S-042');
     expect(rh).toContain('not measured');
-    expect(rh).not.toContain('Q-017');
+    expect(rh).not.toContain('Measured');
   });
 });
 

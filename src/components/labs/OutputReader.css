@@ -1,0 +1,88 @@
+.or-input {
+  display: grid;
+  gap: var(--space-1);
+}
+.or-input label,
+.or-num {
+  font-weight: 600;
+}
+.or-input textarea {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  min-height: 6rem;
+}
+.or-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.or-num {
+  display: grid;
+  gap: var(--space-1);
+}
+.or-num input {
+  min-height: var(--target);
+  max-width: 9rem;
+}
+.or-banner,
+.or-error {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  border: 1px solid var(--warn);
+  font-weight: 600;
+}
+.or-checks {
+  padding-left: var(--space-4);
+}
+.or-lines {
+  list-style: none;
+  padding-left: 0;
+}
+.or-checks li,
+.or-lines li {
+  margin-bottom: var(--space-2);
+  overflow-wrap: anywhere;
+}
+.or-lines code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.or-lines p {
+  margin: var(--space-1) 0 0;
+}
+.or-mark {
+  font-weight: 600;
+}
+.or-ok .or-mark {
+  color: var(--ok);
+}
+.or-warn .or-mark {
+  color: var(--warn);
+}
+.or-bad .or-mark {
+  color: var(--danger);
+}
+.or-why,
+.or-honest {
+  color: var(--text-muted);
+  font-size: var(--step--1);
+}
+.or-table {
+  border-collapse: collapse;
+  margin-block: var(--space-3);
+  font-size: var(--step--1);
+}
+.or-table th,
+.or-table td {
+  border: 1px solid var(--border);
+  padding: var(--space-1) var(--space-2);
+  text-align: right;
+}
+.or-fig {
+  margin: 0 0 var(--space-3);
+}
+.or-fig figcaption {
+  font-weight: 600;
+  font-size: var(--step--1);
+}

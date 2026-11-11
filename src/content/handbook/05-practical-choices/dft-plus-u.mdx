@@ -1,0 +1,115 @@
+---
+id: dft-plus-u
+title: DFT+U for d and f electrons
+module: 5
+order: 7
+summary: Why GGA smears out localized d and f electrons, how the Hubbard U penalty corrects it, and how to set the LDAU tags.
+concepts: [dft-plus-u]
+requires: [functionals, spin-polarization]
+vaspTags: [LDAU, LDAUTYPE, LDAUL, LDAUU, LDAUJ, LMAXMIX, LDAUPRINT]
+sources: [S-014, S-019, S-041, S-042, S-049]
+status: draft
+updated: 2026-11-06
+---
+
+<Why>
+
+Transition-metal oxides, many magnets and rare-earth compounds are where plain GGA often fails badly: band gaps vanish, moments are too small, oxidation states come out wrong. DFT+U is the cheap, widely used fix. It has one adjustable number, and you need to know where that number comes from and what it does before you trust a result that depends on it.
+
+</Why>
+
+<Intuition>
+
+Recall the self-interaction error (module 4): in LDA and GGA an electron partly repels itself. For spread-out s and p electrons this matters little. For d and f electrons, which sit close to their atom, it pushes them to spread over neighbours and to take fractional occupations, as if half an electron sat in an orbital.
+
+DFT+U adds a penalty that is zero when an orbital is empty or full and largest when it is half filled <Cite id="S-014" />. Electrons are then pushed to commit: occupied d states move down in energy, empty ones up, and a gap can open. The lab shows the penalty and its potential for one orbital.
+
+The strength is **U_eff = U - J** in eV, set per element. It is not computed by the standard method: it is either taken from the literature for a similar system, fitted to an experimental property, or computed with a separate linear-response calculation <Cite id="S-042" />. The same U must be used in every calculation you compare, which matters for formation energies.
+
+<Level min="intermediate">
+
+In VASP the simplified (Dudarev) form is `LDAUTYPE = 2`, where only U - J matters. `LDAUL` says which orbital gets the correction per species (2 for d, 3 for f, -1 for none), `LDAUU` and `LDAUJ` give U and J per species in POSCAR order <Cite id="S-019" />. Set `LMAXMIX = 4` (d) or 6 (f) so the occupations survive in the mixer and the CHGCAR <Cite id="S-042" />.
+
+</Level>
+
+<Level min="pro">
+
+DFT+U energies depend on U, so formation and reaction energies that mix +U and non-+U compounds need a correction scheme (for example the Materials Project mixing scheme). DFT+U can also have several self-consistent solutions with different orbital occupations; the loop may land in a metastable one, so check occupations with `LDAUPRINT = 2` and try different starting points <Cite id="S-042" /> <Cite id="S-049" />.
+
+</Level>
+
+</Intuition>
+
+<Lab id="dft-plus-u" title="The DFT+U penalty" />
+
+<TheMath>
+
+In the Dudarev form the correction for one atom is
+
+$$E_U = \frac{U_\text{eff}}{2}\sum_{\sigma}\Big[\text{Tr}\,\rho^\sigma - \text{Tr}\big(\rho^\sigma\rho^\sigma\big)\Big]$$
+
+where $\rho^\sigma$ is the occupation matrix of the localized orbitals for spin $\sigma$ <Cite id="S-014" />. For a single orbital with occupation $n$ this is $E_U = \tfrac{U_\text{eff}}{2}\, n(1-n)$, and the potential it adds is $V = \partial E_U/\partial n = U_\text{eff}\,(\tfrac{1}{2} - n)$. For $U_\text{eff} = 4$ eV and $n = 0.5$, $E_U = 0.5$ eV; for $n = 1$, $V = -2$ eV.
+
+</TheMath>
+
+<InVasp>
+
+<VaspFile
+  name="INCAR"
+  code={`! Fe and O in POSCAR order; U_eff = 4 eV on Fe d
+LDAU      = .TRUE.
+LDAUTYPE  = 2
+LDAUL     = 2 -1
+LDAUU     = 4.0 0.0
+LDAUJ     = 0.0 0.0
+LMAXMIX   = 4
+LDAUPRINT = 2`}
+  annotations={{
+    3: 'Dudarev: only U - J matters',
+    4: 'one value per species: d on Fe, none on O',
+    5: 'the 4 eV is an example, not a recommendation',
+    7: '4 for d, 6 for f',
+  }}
+/>
+
+The U value here is an example of the format. Choose yours from literature on a similar compound or a linear-response calculation, and report it. See the cards for <Tag name="LDAU" />, <Tag name="LDAUL" />, <Tag name="LDAUU" />, <Tag name="LDAUJ" /> and <Tag name="LMAXMIX" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                            | ...then                                                           |
+| ------------------------------------ | ----------------------------------------------------------------- |
+| Raise U_eff                          | Occupied d states move down, empty ones up; the gap usually grows |
+| Use different U in compared runs     | Energy differences are meaningless                                |
+| Forget LMAXMIX = 4 for d elements    | Occupations lost in the mixer; slow or wrong convergence          |
+| Give LDAUL, LDAUU in the wrong order | U lands on the wrong element                                      |
+
+Why a penalty: it removes some self-interaction where it hurts most. What happens if you pick U to match the property you then "predict": the prediction is circular.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Tuning U to the band gap and then claiming the gap as a result">
+
+If U was fitted to the gap, the gap is an input. Say so.
+
+</Callout>
+
+<Callout variant="mistake" title="LDAU lists per atom instead of per species">
+
+`LDAUL`, `LDAUU` and `LDAUJ` take one value per species (per POTCAR), not per atom. That is the opposite of MAGMOM.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-dftu-1', 'q-dftu-2', 'q-dftu-3', 'q-dftu-4', 'q-dftu-5']} />
+
+<GoDeeper>
+
+- Dudarev, Botton, Savrasov, Humphreys and Sutton on the simplified rotationally invariant form <Cite id="S-014" />.
+- VASP wiki pages LDAU, LDAUTYPE, LDAUL, LDAUU and LDAUJ <Cite id="S-019" />.
+
+</GoDeeper>

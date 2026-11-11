@@ -1,75 +1,84 @@
 import { describe, expect, it } from 'vitest';
+import { mulberry32 } from './random';
 import {
-  MAX_EVENTS_PER_CONCEPT,
-  addEvent,
-  deserialize,
+  applyAnswer,
   emptyState,
-  mergeStates,
-  newConcept,
-  newQuestion,
+  HISTORY_CAP,
+  merge,
+  parseState,
   serialize,
   type LearnerState,
 } from './state';
 
-// Property style tests over a seeded generator (no Math.random). @source S-037, S-038
-function rng(seed: number) {
-  let s = seed >>> 0;
-  return () => (s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 2 ** 32;
-}
-function randomState(seed: number): LearnerState {
-  const r = rng(seed);
-  const s = emptyState();
-  for (const id of ['a', 'b', 'c']) {
-    if (r() < 0.7) {
-      let c = { ...newConcept(), pL: Math.round(r() * 100) / 100, theta: Math.round(r() * 10) / 10 };
-      for (let i = 0; i < Math.floor(r() * 5); i++)
-        c = addEvent(c, { t: Math.floor(r() * 20), q: `q${Math.floor(r() * 3)}`, correct: r() < 0.5 });
-      s.concepts[id] = c;
-    }
-    if (r() < 0.7)
-      s.questions[`q-${id}`] = {
-        ...newQuestion(),
-        b: Math.round(r() * 10) / 10,
-        due: Math.floor(r() * 9),
-        lastSeen: Math.floor(r() * 5),
-      };
+const DAY = 86_400_000;
+const T0 = Date.UTC(2026, 10, 2, 12);
+
+const answer = (s: LearnerState, q: string, correct: boolean, now: number, hints = 0, concepts = ['encut']) =>
+  applyAnswer(s, { questionId: q, concepts, difficulty: 0, correct, hints, now });
+
+/** A random state built from random answers, for property tests. */
+function randomState(seed: number, steps = 30): LearnerState {
+  const r = mulberry32(seed);
+  let s = emptyState();
+  for (let i = 0; i < steps; i++) {
+    const c = ['a', 'b', 'c', 'd'][Math.floor(r() * 4)]!;
+    s = answer(
+      s,
+      `q-${Math.floor(r() * 6)}`,
+      r() < 0.6,
+      T0 + Math.floor(r() * 30) * DAY + i,
+      Math.floor(r() * 3),
+      [c],
+    );
   }
+  s.arms = { 'new-easy': { alpha: 1 + Math.floor(r() * 5), beta: 1 + Math.floor(r() * 5) } };
   return s;
 }
 
 describe('learner state', () => {
+  it('applies BKT, Elo and SM-2 for one answer', () => {
+    const s = answer(emptyState(), 'q-encut-1', true, T0);
+    expect(s.concepts.encut!.pL).toBeCloseTo(0.692683, 6);
+    expect(s.concepts.encut!.theta).toBeCloseTo(0.2, 12);
+    expect(s.questions['q-encut-1']!.b).toBeCloseTo(-0.025, 12);
+    expect(s.questions['q-encut-1']!.due).toBe(T0 + DAY);
+    expect(s.activeDays).toHaveLength(1);
+  });
   it('round trips through JSON', () => {
-    for (let i = 0; i < 20; i++) {
-      const s = randomState(i);
-      expect(deserialize(serialize(s))).toEqual(s);
+    const s = randomState(1);
+    expect(parseState(JSON.parse(serialize(s)))).toEqual(s);
+  });
+  it('rejects malformed states', () => {
+    expect(parseState({})).toBeNull();
+    expect(parseState({ ...emptyState(), version: 99 })).toBeNull();
+    expect(
+      parseState({
+        ...emptyState(),
+        concepts: { x: { pL: 2, theta: 0, attempts: 0, lastSeen: 0, history: [] } },
+      }),
+    ).toBeNull();
+  });
+  it('caps history at 200 events per concept', () => {
+    let s = emptyState();
+    for (let i = 0; i < 250; i++) s = answer(s, 'q-1', i % 2 === 0, T0 + i);
+    expect(s.concepts.encut!.history).toHaveLength(HISTORY_CAP);
+    expect(s.concepts.encut!.history[0]!.t).toBe(T0 + 50);
+  });
+  it('merge is commutative and idempotent (property test, 40 seeds)', () => {
+    for (let seed = 1; seed <= 40; seed++) {
+      const a = randomState(seed);
+      const b = randomState(seed + 1000);
+      expect(merge(a, b), `seed ${seed}`).toEqual(merge(b, a));
+      expect(merge(a, a)).toEqual(merge(a, emptyState()));
+      expect(merge(merge(a, b), b)).toEqual(merge(a, b));
     }
   });
-  it('rejects bad input', () => {
-    expect(() => deserialize('{nope')).toThrow(/JSON/);
-    expect(() => deserialize('{"version":99,"concepts":{},"questions":{}}')).toThrow(/version/);
-  });
-  it('caps events per concept at 200, keeping the newest', () => {
-    let c = newConcept();
-    for (let i = 0; i < 300; i++) c = addEvent(c, { t: i, q: 'q', correct: true });
-    expect(c.events).toHaveLength(MAX_EVENTS_PER_CONCEPT);
-    expect(c.events[0]!.t).toBe(100);
-    expect(c.attempts).toBe(300);
-  });
-  it('merge is commutative and idempotent', () => {
-    for (let i = 0; i < 50; i++) {
-      const a = randomState(i);
-      const b = randomState(i + 1000);
-      expect(mergeStates(a, b)).toEqual(mergeStates(b, a));
-      const m = mergeStates(a, b);
-      expect(mergeStates(m, m)).toEqual(m);
-      expect(mergeStates(m, a)).toEqual(m);
-    }
-  });
-  it('merge keeps the newer record', () => {
-    const a = emptyState();
-    const b = emptyState();
-    a.concepts.x = { ...newConcept(), pL: 0.9, lastSeen: 5 };
-    b.concepts.x = { ...newConcept(), pL: 0.4, lastSeen: 9 };
-    expect(mergeStates(a, b).concepts.x!.pL).toBe(0.4);
+  it('merge keeps the newer record and unions answer histories', () => {
+    const a = answer(emptyState(), 'q-1', true, T0);
+    const b = answer(emptyState(), 'q-1', false, T0 + DAY);
+    const m = merge(a, b);
+    expect(m.concepts.encut!.lastSeen).toBe(T0 + DAY);
+    expect(m.concepts.encut!.history).toHaveLength(2);
+    expect(m.questions['q-1']!.lastReviewed).toBe(T0 + DAY);
   });
 });

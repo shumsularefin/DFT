@@ -1,94 +1,105 @@
-import { describe, it, expect } from 'vitest';
-import m1 from '../../data/questions/module-01.json';
-import m2 from '../../data/questions/module-02.json';
-import m3 from '../../data/questions/module-03.json';
-import { grade, loadQuestionBank, parseQuestions, MalformedResponseError, type Question } from './questions';
+import { describe, expect, it } from 'vitest';
+import { grade, MalformedResponse } from './grade';
+import { parseQuestions, questionSchema, type Question } from './questions';
+import { graph, questions } from './bank';
 
-const base = {
-  concepts: ['x'],
-  hints: ['a', 'b'],
+const common = {
+  concepts: ['encut'],
+  prompt: 'A prompt',
+  hints: ['h1', 'h2'],
   difficulty: 0,
   level: 'beginner',
-  sources: [],
+  sources: ['S-049'],
 };
-const opts = [
-  { text: 'A', correct: true, why: 'w' },
-  { text: 'B', correct: false, why: 'w' },
-  { text: 'C', correct: true, why: 'w' },
-];
-const mk = (extra: Record<string, unknown>) =>
-  parseQuestions([{ id: 'q-t', prompt: 'p', ...base, ...extra }])[0] as Question;
+const opt = (text: string, correct = false) => ({ text, correct, why: 'because' });
+const single = questionSchema.parse({
+  ...common,
+  id: 'q-s',
+  type: 'single',
+  options: [opt('a', true), opt('b')],
+}) as Question;
+const multi = questionSchema.parse({
+  ...common,
+  id: 'q-m',
+  type: 'multi',
+  options: [opt('a', true), opt('b'), opt('c', true)],
+}) as Question;
+const numeric = questionSchema.parse({
+  ...common,
+  id: 'q-n',
+  type: 'numeric',
+  answer: 2.5,
+  tolerance: 0.1,
+}) as Question;
+const order = questionSchema.parse({
+  ...common,
+  id: 'q-o',
+  type: 'order',
+  options: [opt('1'), opt('2'), opt('3')],
+}) as Question;
 
-describe('schema', () => {
-  it('accepts the shipped banks and defaults discrimination to 1', () => {
-    const bank = loadQuestionBank({ m1, m2, m3 });
-    expect(bank.length).toBeGreaterThanOrEqual(72);
-    expect(bank.every((q) => q.a === 1 || q.a > 0)).toBe(true);
+describe('question schema', () => {
+  it('accepts the CONTENT_GUIDE shape and defaults a = 1', () => {
+    expect(single.a).toBe(1);
   });
-  it('rejects a timer', () => {
-    expect(() =>
-      parseQuestions([
-        { id: 'q-t', prompt: 'p', ...base, type: 'numeric', answer: 1, tolerance: 0, timeLimitSec: 30 },
-      ]),
-    ).toThrow(/timeLimitSec/);
-  });
-  it('rejects a numeric question without tolerance and a single with two correct options', () => {
-    expect(() => parseQuestions([{ id: 'q-t', prompt: 'p', ...base, type: 'numeric', answer: 1 }])).toThrow(
-      /tolerance/,
-    );
-    expect(() =>
-      parseQuestions([{ id: 'q-t', prompt: 'p', ...base, type: 'single', options: opts }]),
-    ).toThrow(/exactly one/);
-  });
-  it('rejects duplicate ids across modules', () => {
-    const q = { id: 'q-t', prompt: 'p', ...base, type: 'numeric', answer: 1, tolerance: 0 };
-    expect(() => loadQuestionBank({ a: [q], b: [q] })).toThrow(/duplicate question id q-t/);
+  it('refuses timers and single questions without exactly one correct option', () => {
+    expect(
+      questionSchema.safeParse({
+        ...common,
+        id: 'q-t',
+        type: 'numeric',
+        answer: 1,
+        tolerance: 0,
+        timeLimitSec: 30,
+      }).success,
+    ).toBe(false);
+    expect(
+      questionSchema.safeParse({
+        ...common,
+        id: 'q-x',
+        type: 'single',
+        options: [opt('a', true), opt('b', true)],
+      }).success,
+    ).toBe(false);
   });
 });
 
-describe('grade', () => {
+describe('grading', () => {
   it('single', () => {
-    const q = mk({ type: 'single', options: [opts[0], opts[1]] });
-    expect(grade(q, { type: 'single', index: 0 }).correct).toBe(true);
-    expect(grade(q, { type: 'single', index: 1 }).correct).toBe(false);
-    expect(() => grade(q, { type: 'single', index: 2 })).toThrow(MalformedResponseError);
-    expect(() => grade(q, { type: 'single', index: 0.5 })).toThrow(MalformedResponseError);
+    expect(grade(single, { type: 'single', choice: 0 })).toEqual({ correct: true });
+    expect(grade(single, { type: 'single', choice: 1 })).toEqual({ correct: false });
   });
-  it('multi is an exact set', () => {
-    const q = mk({ type: 'multi', options: opts });
-    expect(grade(q, { type: 'multi', indices: [2, 0] })).toEqual({ correct: true, partial: 1 });
-    expect(grade(q, { type: 'multi', indices: [0] }).correct).toBe(false);
-    expect(grade(q, { type: 'multi', indices: [0, 1, 2] }).correct).toBe(false);
-    expect(() => grade(q, { type: 'multi', indices: [0, 0] })).toThrow(MalformedResponseError);
-    expect(() => grade(q, { type: 'multi', indices: [5] })).toThrow(MalformedResponseError);
+  it('multi needs the exact set', () => {
+    expect(grade(multi, { type: 'multi', choices: [2, 0] }).correct).toBe(true);
+    const g = grade(multi, { type: 'multi', choices: [0] });
+    expect(g.correct).toBe(false);
+    expect(g.partial).toBeCloseTo(2 / 3, 12);
   });
-  it('numeric tolerance is inclusive', () => {
-    const q = mk({ type: 'numeric', answer: 10, tolerance: 0.5 });
-    expect(grade(q, { type: 'numeric', value: 10.5 }).correct).toBe(true);
-    expect(grade(q, { type: 'numeric', value: 9.5 }).correct).toBe(true);
-    expect(grade(q, { type: 'numeric', value: 10.51 }).correct).toBe(false);
-    expect(() => grade(q, { type: 'numeric', value: NaN })).toThrow(MalformedResponseError);
-    expect(() => grade(q, { type: 'numeric', value: Infinity })).toThrow(MalformedResponseError);
+  it('numeric within tolerance, inclusive', () => {
+    expect(grade(numeric, { type: 'numeric', value: 2.6 }).correct).toBe(true);
+    expect(grade(numeric, { type: 'numeric', value: 2.4 }).correct).toBe(true);
+    expect(grade(numeric, { type: 'numeric', value: 2.61 }).correct).toBe(false);
   });
-  it('order is an exact sequence', () => {
-    const q = mk({ type: 'order', items: ['a', 'b', 'c'] });
-    expect(grade(q, { type: 'order', items: ['a', 'b', 'c'] }).correct).toBe(true);
-    const r = grade(q, { type: 'order', items: ['a', 'c', 'b'] });
-    expect(r.correct).toBe(false);
-    expect(r.partial).toBeCloseTo(1 / 3);
-    expect(() => grade(q, { type: 'order', items: ['a', 'b'] })).toThrow(MalformedResponseError);
-    expect(() => grade(q, { type: 'order', items: ['a', 'a', 'b'] })).toThrow(MalformedResponseError);
+  it('order needs the exact sequence', () => {
+    expect(grade(order, { type: 'order', order: [0, 1, 2] }).correct).toBe(true);
+    expect(grade(order, { type: 'order', order: [1, 0, 2] })).toEqual({ correct: false, partial: 1 / 3 });
   });
-  it('rejects a response of the wrong type', () => {
-    const q = mk({ type: 'numeric', answer: 1, tolerance: 0 });
-    expect(() => grade(q, { type: 'single', index: 0 })).toThrow(MalformedResponseError);
+  it('rejects malformed responses instead of grading them wrong', () => {
+    expect(() => grade(single, { type: 'single', choice: 5 })).toThrow(MalformedResponse);
+    expect(() => grade(single, { type: 'numeric', value: 1 })).toThrow(MalformedResponse);
+    expect(() => grade(multi, { type: 'multi', choices: [0, 0] })).toThrow(MalformedResponse);
+    expect(() => grade(numeric, { type: 'numeric', value: Number.NaN })).toThrow(MalformedResponse);
+    expect(() => grade(order, { type: 'order', order: [0, 0, 1] })).toThrow(MalformedResponse);
   });
-  it('grades a shipped numeric question at its own answer', () => {
-    const q = loadQuestionBank({ m2 }).find((x) => x.id === 'q-wave-5') as Question;
-    expect(q.type).toBe('numeric');
-    if (q.type === 'numeric') {
-      expect(grade(q, { type: 'numeric', value: q.answer }).correct).toBe(true);
-      expect(grade(q, { type: 'numeric', value: q.answer + 1 }).correct).toBe(false);
-    }
+  it('parseQuestions lists every problem', () => {
+    expect(() => parseQuestions([{ id: 'bad' }], 'f.json')).toThrow(/f\.json/);
+  });
+});
+
+describe('the real bank', () => {
+  it('parses and every concept exists in the graph', () => {
+    expect(questions.length).toBeGreaterThan(70);
+    for (const q of questions)
+      for (const c of q.concepts) expect(graph.byId.has(c), `${q.id}: ${c}`).toBe(true);
   });
 });

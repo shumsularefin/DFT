@@ -1,0 +1,1007 @@
+[
+ {
+  "id": "q-proto-1",
+  "concepts": [
+   "vasp-protocol"
+  ],
+  "type": "order",
+  "prompt": "Put the author's protocol steps in order.",
+  "options": [
+   {
+    "text": "Relaxation with ENCUT = 1.3 x ENMAX",
+    "correct": true,
+    "why": "Step 1: everything else needs the relaxed structure."
+   },
+   {
+    "text": "SCF in the same folder with ISTART = 1 and LORBIT = 11",
+    "correct": true,
+    "why": "Step 2: writes CHGCAR and the DOS."
+   },
+   {
+    "text": "Band structure along KPATH.in from VASPKIT 303",
+    "correct": true,
+    "why": "Step 3: needs the converged density."
+   },
+   {
+    "text": "Elastic constants with IBRION = 6 and ENCUT = 620",
+    "correct": true,
+    "why": "Step 4: needs the relaxed structure."
+   },
+   {
+    "text": "Optics with LOPTICS and three times the default NBANDS",
+    "correct": true,
+    "why": "Step 5: needs more empty bands."
+   }
+  ],
+  "hints": [
+   "Which step needs which file?",
+   "The relaxation comes first."
+  ],
+  "difficulty": 0.0,
+  "level": "intermediate",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-proto-2",
+  "concepts": [
+   "vasp-protocol"
+  ],
+  "type": "single",
+  "prompt": "Why does the protocol use ENCUT = 1.3 x ENMAX for the relaxation?",
+  "options": [
+   {
+    "text": "So that the stress converges; a too-small basis gives a Pulay stress that distorts the cell",
+    "correct": true,
+    "why": "Stress converges more slowly with ENCUT than the energy."
+   },
+   {
+    "text": "To make the run faster",
+    "correct": false,
+    "why": "Tempting, but a higher cutoff makes it slower."
+   },
+   {
+    "text": "Because VASP refuses lower values",
+    "correct": false,
+    "why": "Tempting, but VASP accepts any ENCUT."
+   }
+  ],
+  "hints": [
+   "Module 5 discussed Pulay stress.",
+   "The cell changes during the relaxation."
+  ],
+  "difficulty": 0.0,
+  "level": "intermediate",
+  "sources": [
+   "S-019",
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-proto-3",
+  "concepts": [
+   "vasp-protocol"
+  ],
+  "type": "single",
+  "prompt": "Why does the elastic step comment out NCORE?",
+  "options": [
+   {
+    "text": "IBRION = 6 runs without band parallelization, and NCORE in the INCAR can stop the run",
+    "correct": true,
+    "why": "As recorded with protocol step 4."
+   },
+   {
+    "text": "NCORE changes the elastic constants",
+    "correct": false,
+    "why": "Tempting, but parallel settings never change converged physics."
+   },
+   {
+    "text": "NCORE is only for spin-polarised runs",
+    "correct": false,
+    "why": "Tempting, but NCORE applies to all runs."
+   }
+  ],
+  "hints": [
+   "It is about how VASP splits the work.",
+   "The protocol note gives the reason."
+  ],
+  "difficulty": 0.3,
+  "level": "intermediate",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-proto-4",
+  "concepts": [
+   "vasp-protocol"
+  ],
+  "type": "numeric",
+  "prompt": "The SCF OUTCAR reports NBANDS = 52. Following step 5, what is three times that, before rounding up for the core count?",
+  "hints": [
+   "Multiply by 3.",
+   "Rounding up comes afterwards."
+  ],
+  "difficulty": -0.3,
+  "level": "beginner",
+  "sources": [
+   "S-042"
+  ],
+  "answer": 156,
+  "tolerance": 0.5,
+  "unit": "bands"
+ },
+ {
+  "id": "q-proto-5",
+  "concepts": [
+   "vasp-protocol"
+  ],
+  "type": "single",
+  "prompt": "Why must the band-structure eigenvalues not come from a self-consistent run on the KPATH.in line path?",
+  "options": [
+   {
+    "text": "A line path does not sample the zone evenly, so the self-consistent density would be wrong",
+    "correct": true,
+    "why": "Use route A (KPOINTS_OPT) or route B (ICHARG = 11)."
+   },
+   {
+    "text": "KPATH.in has the wrong file format",
+    "correct": false,
+    "why": "Tempting, but it is a valid line-mode KPOINTS."
+   },
+   {
+    "text": "VASPKIT 211 cannot read it",
+    "correct": false,
+    "why": "Tempting, but 211 reads band runs."
+   }
+  ],
+  "hints": [
+   "The VASP wiki says line mode is not suitable for SCF.",
+   "Two validated routes exist."
+  ],
+  "difficulty": 0.4,
+  "level": "intermediate",
+  "sources": [
+   "S-019",
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-proto-6",
+  "concepts": [
+   "vasp-protocol"
+  ],
+  "type": "single",
+  "prompt": "The relaxation and SCF share a folder. What should you do before starting the SCF?",
+  "options": [
+   {
+    "text": "Copy CONTCAR to POSCAR and back up the relaxation OUTCAR and CONTCAR",
+    "correct": true,
+    "why": "The SCF overwrites them."
+   },
+   {
+    "text": "Delete WAVECAR",
+    "correct": false,
+    "why": "Tempting for a clean start, but ISTART = 1 needs it."
+   },
+   {
+    "text": "Change ENCUT to the POTCAR default",
+    "correct": false,
+    "why": "Tempting, but the SCF keeps the converged settings."
+   }
+  ],
+  "hints": [
+   "Which files will the SCF overwrite?",
+   "Which file does ISTART = 1 read?"
+  ],
+  "difficulty": 0.0,
+  "level": "beginner",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-jobs-1",
+  "concepts": [
+   "job-scripts"
+  ],
+  "type": "single",
+  "prompt": "What does a line starting with #SBATCH do?",
+  "options": [
+   {
+    "text": "It gives a request to the SLURM scheduler, such as the number of nodes",
+    "correct": true,
+    "why": "The shell sees a comment; sbatch reads the directive."
+   },
+   {
+    "text": "It is a comment with no effect",
+    "correct": false,
+    "why": "Tempting because of the #, but sbatch reads these lines."
+   },
+   {
+    "text": "It starts VASP",
+    "correct": false,
+    "why": "Tempting, but VASP is started by srun or mpirun."
+   }
+  ],
+  "hints": [
+   "Who reads the line?",
+   "PBS uses #PBS for the same purpose."
+  ],
+  "difficulty": -0.5,
+  "level": "beginner",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-jobs-2",
+  "concepts": [
+   "job-scripts"
+  ],
+  "type": "single",
+  "prompt": "Which executable do you use for a spin-orbit coupling run?",
+  "options": [
+   {
+    "text": "vasp_ncl",
+    "correct": true,
+    "why": "Non-collinear magnetism and spin-orbit coupling need the ncl build."
+   },
+   {
+    "text": "vasp_gam",
+    "correct": false,
+    "why": "Tempting because it is fast, but it is for Gamma-point-only runs."
+   },
+   {
+    "text": "vasp_std",
+    "correct": false,
+    "why": "Tempting as the default, but it is collinear only."
+   }
+  ],
+  "hints": [
+   "ncl means non-collinear.",
+   "Spin-orbit couples spin direction to the lattice."
+  ],
+  "difficulty": 0.0,
+  "level": "intermediate",
+  "sources": [
+   "S-019"
+  ]
+ },
+ {
+  "id": "q-jobs-3",
+  "concepts": [
+   "job-scripts"
+  ],
+  "type": "single",
+  "prompt": "A job hit its wall-time limit during a relaxation. What should you check first?",
+  "options": [
+   {
+    "text": "That CONTCAR is complete before copying it to POSCAR",
+    "correct": true,
+    "why": "A job killed while writing can leave CONTCAR empty or truncated."
+   },
+   {
+    "text": "That POTCAR changed",
+    "correct": false,
+    "why": "Tempting, but VASP never writes POTCAR."
+   },
+   {
+    "text": "That ENCUT was halved",
+    "correct": false,
+    "why": "Tempting, but VASP does not change your INCAR."
+   }
+  ],
+  "hints": [
+   "Which file is rewritten after every ionic step?",
+   "Look before you copy."
+  ],
+  "difficulty": 0.0,
+  "level": "beginner",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "q-jobs-4",
+  "concepts": [
+   "job-scripts"
+  ],
+  "type": "single",
+  "prompt": "How do you submit job.sh on a PBS cluster?",
+  "options": [
+   {
+    "text": "qsub job.sh",
+    "correct": true,
+    "why": "PBS uses qsub; SLURM uses sbatch."
+   },
+   {
+    "text": "sbatch job.sh",
+    "correct": false,
+    "why": "Tempting, but that is SLURM."
+   },
+   {
+    "text": "bash job.sh",
+    "correct": false,
+    "why": "Tempting, but that runs it on the login node without the scheduler."
+   }
+  ],
+  "hints": [
+   "Different schedulers, different commands.",
+   "q for queue."
+  ],
+  "difficulty": -0.5,
+  "level": "beginner",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-par-1",
+  "concepts": [
+   "parallelization"
+  ],
+  "type": "single",
+  "prompt": "You change NCORE from 4 to 8 and the converged energy changes by 20 meV. What does this tell you?",
+  "options": [
+   {
+    "text": "Something else is wrong, such as an unconverged run; parallel settings do not change converged results",
+    "correct": true,
+    "why": "NCORE changes speed and memory, not physics."
+   },
+   {
+    "text": "NCORE = 8 is more accurate",
+    "correct": false,
+    "why": "Tempting, but parallel tags are not accuracy settings."
+   },
+   {
+    "text": "This is the normal size of the effect",
+    "correct": false,
+    "why": "Tempting, but the energies must agree to numerical precision."
+   }
+  ],
+  "hints": [
+   "What do parallel tags change?",
+   "Look at the convergence checks."
+  ],
+  "difficulty": 0.3,
+  "level": "intermediate",
+  "sources": [
+   "S-019"
+  ]
+ },
+ {
+  "id": "q-par-2",
+  "concepts": [
+   "parallelization"
+  ],
+  "type": "single",
+  "prompt": "What does KPAR do?",
+  "options": [
+   {
+    "text": "Splits the k-points into groups that are computed side by side",
+    "correct": true,
+    "why": "Each group of ranks handles a share of the k-points."
+   },
+   {
+    "text": "Sets the number of k-points",
+    "correct": false,
+    "why": "Tempting from the name, but the mesh is set by KPOINTS."
+   },
+   {
+    "text": "Sets the number of cores per band",
+    "correct": false,
+    "why": "Tempting, but that is NCORE."
+   }
+  ],
+  "hints": [
+   "K for k-points, PAR for parallel.",
+   "It does not change the mesh."
+  ],
+  "difficulty": 0.0,
+  "level": "intermediate",
+  "sources": [
+   "S-019"
+  ]
+ },
+ {
+  "id": "q-par-3",
+  "concepts": [
+   "parallelization"
+  ],
+  "type": "numeric",
+  "prompt": "A job has 64 MPI ranks with KPAR = 4 and NCORE = 4. How many band groups are there in each k-point group?",
+  "hints": [
+   "Each k-point group has 64 / 4 ranks.",
+   "Divide that by NCORE."
+  ],
+  "difficulty": 0.6,
+  "level": "pro",
+  "sources": [
+   "S-019"
+  ],
+  "answer": 4,
+  "tolerance": 0.01,
+  "unit": "groups"
+ },
+ {
+  "id": "q-par-4",
+  "concepts": [
+   "parallelization"
+  ],
+  "type": "single",
+  "prompt": "Why should KPAR not exceed the number of irreducible k-points?",
+  "options": [
+   {
+    "text": "Some k-point groups would have nothing to compute",
+    "correct": true,
+    "why": "Those cores sit idle."
+   },
+   {
+    "text": "VASP would add k-points",
+    "correct": false,
+    "why": "Tempting, but VASP never changes your mesh for parallelism."
+   },
+   {
+    "text": "The energy would change",
+    "correct": false,
+    "why": "Tempting, but parallel settings do not change the result."
+   }
+  ],
+  "hints": [
+   "How are k-points shared?",
+   "More groups than points means idle groups."
+  ],
+  "difficulty": 0.3,
+  "level": "pro",
+  "sources": [
+   "S-019"
+  ]
+ },
+ {
+  "id": "q-restart-1",
+  "concepts": [
+   "restarts"
+  ],
+  "type": "single",
+  "prompt": "Which ISTART does the protocol use for the SCF after the relaxation?",
+  "options": [
+   {
+    "text": "1, read WAVECAR and keep ENCUT constant",
+    "correct": true,
+    "why": "The relaxation left a WAVECAR in the same folder."
+   },
+   {
+    "text": "0, fresh start",
+    "correct": false,
+    "why": "Tempting for safety, but it throws away nearly converged wavefunctions."
+   },
+   {
+    "text": "2, keep the basis set constant",
+    "correct": false,
+    "why": "Tempting, but it is used rarely, for example along a strained series."
+   }
+  ],
+  "hints": [
+   "Same folder, WAVECAR present.",
+   "Protocol step 2 says so."
+  ],
+  "difficulty": -0.3,
+  "level": "beginner",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-restart-2",
+  "concepts": [
+   "restarts"
+  ],
+  "type": "single",
+  "prompt": "What does ICHARG = 11 do?",
+  "options": [
+   {
+    "text": "Reads CHGCAR and keeps it fixed, for band structures and dense-mesh DOS",
+    "correct": true,
+    "why": "Non-self-consistent: only the eigenvalues are computed."
+   },
+   {
+    "text": "Reads CHGCAR and continues self-consistently",
+    "correct": false,
+    "why": "Tempting, but that is ICHARG = 1."
+   },
+   {
+    "text": "Starts from atomic densities",
+    "correct": false,
+    "why": "Tempting, but that is ICHARG = 2."
+   }
+  ],
+  "hints": [
+   "11 is the non-self-consistent value.",
+   "The density is not updated."
+  ],
+  "difficulty": 0.0,
+  "level": "intermediate",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-restart-3",
+  "concepts": [
+   "restarts"
+  ],
+  "type": "multi",
+  "prompt": "Which must be identical between the SCF and an ICHARG = 11 run that reads its CHGCAR? Select all that apply.",
+  "options": [
+   {
+    "text": "ENCUT",
+    "correct": true,
+    "why": "Part of the rule in the Workflow Handbook."
+   },
+   {
+    "text": "ISPIN and MAGMOM",
+    "correct": true,
+    "why": "The stored magnetization must match."
+   },
+   {
+    "text": "The cell",
+    "correct": true,
+    "why": "The density belongs to one structure."
+   },
+   {
+    "text": "The k-points",
+    "correct": false,
+    "why": "Tempting, but changing the k-points is the point of the band run."
+   }
+  ],
+  "hints": [
+   "The run inherits its physics from CHGCAR.",
+   "What changes in a band run?"
+  ],
+  "difficulty": 0.4,
+  "level": "intermediate",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-restart-4",
+  "concepts": [
+   "restarts"
+  ],
+  "type": "single",
+  "prompt": "An SCF stalled after 200 steps. How can you continue from its last density?",
+  "options": [
+   {
+    "text": "ICHARG = 1 with the CHGCAR from that run",
+    "correct": true,
+    "why": "It reads the density and continues self-consistently."
+   },
+   {
+    "text": "ICHARG = 11",
+    "correct": false,
+    "why": "Tempting, but that keeps the density fixed and never converges it."
+   },
+   {
+    "text": "ICHARG = 2",
+    "correct": false,
+    "why": "Tempting, but that starts again from atoms."
+   }
+  ],
+  "hints": [
+   "You want to continue, not freeze.",
+   "1 is continue."
+  ],
+  "difficulty": 0.2,
+  "level": "intermediate",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-restart-5",
+  "concepts": [
+   "restarts"
+  ],
+  "type": "single",
+  "prompt": "Why must LMAXMIX be kept when reading a CHGCAR of a d or f element compound?",
+  "options": [
+   {
+    "text": "CHGCAR stores the PAW one-centre occupancies only up to LMAXMIX",
+    "correct": true,
+    "why": "Set 4 for d, 6 for f elements, in both runs."
+   },
+   {
+    "text": "LMAXMIX sets the number of k-points",
+    "correct": false,
+    "why": "Tempting, but it is about angular momentum in the mixer and CHGCAR."
+   },
+   {
+    "text": "It does not matter",
+    "correct": false,
+    "why": "Tempting, but the Workflow Handbook lists it in the rule."
+   }
+  ],
+  "hints": [
+   "L is angular momentum.",
+   "What is stored besides the grid?"
+  ],
+  "difficulty": 0.7,
+  "level": "pro",
+  "sources": [
+   "S-019",
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-read-1",
+  "concepts": [
+   "reading-outputs"
+  ],
+  "type": "single",
+  "prompt": "In OSZICAR, an ionic step used 60 electronic steps with NELM = 60. What does this mean?",
+  "options": [
+   {
+    "text": "That step did not converge electronically; its forces are unreliable",
+    "correct": true,
+    "why": "VASP continues anyway; fix the mixing."
+   },
+   {
+    "text": "It converged exactly at the limit",
+    "correct": false,
+    "why": "Tempting, but reaching NELM means the loop was stopped, not converged."
+   },
+   {
+    "text": "Nothing; 60 steps is normal",
+    "correct": false,
+    "why": "Tempting, but a typical step needs far fewer."
+   }
+  ],
+  "hints": [
+   "NELM is the maximum.",
+   "VASP does not stop on its own."
+  ],
+  "difficulty": 0.0,
+  "level": "beginner",
+  "sources": [
+   "S-041"
+  ]
+ },
+ {
+  "id": "q-read-2",
+  "concepts": [
+   "reading-outputs"
+  ],
+  "type": "single",
+  "prompt": "What is E0 on an OSZICAR ionic line?",
+  "options": [
+   {
+    "text": "The energy extrapolated to zero smearing",
+    "correct": true,
+    "why": "For Gaussian smearing quote E0 when comparing energies."
+   },
+   {
+    "text": "The energy of the first electronic step",
+    "correct": false,
+    "why": "Tempting because of the 0, but it is sigma to 0."
+   },
+   {
+    "text": "The zero-point energy",
+    "correct": false,
+    "why": "Tempting, but VASP does not compute vibrations here."
+   }
+  ],
+  "hints": [
+   "Sigma to zero.",
+   "Compare F and E0."
+  ],
+  "difficulty": 0.0,
+  "level": "intermediate",
+  "sources": [
+   "S-019",
+   "S-041"
+  ]
+ },
+ {
+  "id": "q-read-3",
+  "concepts": [
+   "reading-outputs"
+  ],
+  "type": "single",
+  "prompt": "Which OUTCAR line confirms that a relaxation met EDIFFG?",
+  "options": [
+   {
+    "text": "reached required accuracy",
+    "correct": true,
+    "why": "Without it the run stopped at NSW or was killed."
+   },
+   {
+    "text": "Elapsed time",
+    "correct": false,
+    "why": "Tempting, but that only says the run ended."
+   },
+   {
+    "text": "E-fermi",
+    "correct": false,
+    "why": "Tempting, but that is the Fermi energy."
+   }
+  ],
+  "hints": [
+   "grep for accuracy.",
+   "Missing means unfinished."
+  ],
+  "difficulty": -0.3,
+  "level": "beginner",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-read-4",
+  "concepts": [
+   "reading-outputs"
+  ],
+  "type": "numeric",
+  "prompt": "OUTCAR: energy without entropy = -45.120 eV, TOTEN = -45.128 eV, 8 atoms. What is T*S per atom in meV?",
+  "hints": [
+   "Subtract the two energies.",
+   "Divide by the number of atoms and convert to meV."
+  ],
+  "difficulty": 0.3,
+  "level": "intermediate",
+  "sources": [
+   "S-042"
+  ],
+  "answer": 1.0,
+  "tolerance": 0.01,
+  "unit": "meV"
+ },
+ {
+  "id": "q-read-5",
+  "concepts": [
+   "reading-outputs"
+  ],
+  "type": "single",
+  "prompt": "With EDIFFG = -0.01 the largest force in the last TOTAL-FORCE table is 0.03 eV per angstrom. What do you conclude?",
+  "options": [
+   {
+    "text": "The structure is not relaxed to the criterion",
+    "correct": true,
+    "why": "Every force must be below 0.01."
+   },
+   {
+    "text": "The structure is relaxed",
+    "correct": false,
+    "why": "Tempting, but 0.03 is three times the limit."
+   },
+   {
+    "text": "The force table is wrong",
+    "correct": false,
+    "why": "Tempting, but there is no reason to doubt it."
+   }
+  ],
+  "hints": [
+   "Compare with |EDIFFG|.",
+   "Use the last table."
+  ],
+  "difficulty": 0.0,
+  "level": "beginner",
+  "sources": [
+   "S-019"
+  ]
+ },
+ {
+  "id": "q-read-6",
+  "concepts": [
+   "reading-outputs"
+  ],
+  "type": "multi",
+  "prompt": "Which are signs of trouble in a relaxation? Select all that apply.",
+  "options": [
+   {
+    "text": "No \"reached required accuracy\" line",
+    "correct": true,
+    "why": "The run stopped before meeting EDIFFG."
+   },
+   {
+    "text": "Ionic steps that used NELM electronic steps",
+    "correct": true,
+    "why": "Those steps did not converge."
+   },
+   {
+    "text": "T*S per atom of 5 meV",
+    "correct": true,
+    "why": "SIGMA is too large (Heuristic: about 1 meV)."
+   },
+   {
+    "text": "dE falling by several orders of magnitude within each ionic step",
+    "correct": false,
+    "why": "Tempting to worry about, but that is healthy convergence."
+   }
+  ],
+  "hints": [
+   "Use the four checks.",
+   "One option describes normal behaviour."
+  ],
+  "difficulty": 0.4,
+  "level": "intermediate",
+  "sources": [
+   "S-041",
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-vkit-1",
+  "concepts": [
+   "vaspkit"
+  ],
+  "type": "single",
+  "prompt": "Which VASPKIT task writes KPATH.in for a band structure?",
+  "options": [
+   {
+    "text": "303",
+    "correct": true,
+    "why": "Protocol step 3: vaspkit 3, then 303."
+   },
+   {
+    "text": "102",
+    "correct": false,
+    "why": "Tempting because it writes KPOINTS, but 102 is the uniform SCF mesh."
+   },
+   {
+    "text": "211",
+    "correct": false,
+    "why": "Tempting, but 211 reads the band result."
+   }
+  ],
+  "hints": [
+   "Group 3 is band paths.",
+   "211 comes afterwards."
+  ],
+  "difficulty": 0.0,
+  "level": "beginner",
+  "sources": [
+   "S-020",
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-vkit-2",
+  "concepts": [
+   "vaspkit"
+  ],
+  "type": "single",
+  "prompt": "What does the 101 task code SRMG produce?",
+  "options": [
+   {
+    "text": "A spin-polarised (magnetic) relaxation INCAR template",
+    "correct": true,
+    "why": "SR is standard relaxation, MG adds magnetism."
+   },
+   {
+    "text": "A static run with spin-orbit coupling",
+    "correct": false,
+    "why": "Tempting, but that would be ST and SO."
+   },
+   {
+    "text": "A KPOINTS file",
+    "correct": false,
+    "why": "Tempting, but 101 writes INCAR templates."
+   }
+  ],
+  "hints": [
+   "Codes are joined.",
+   "SR and MG."
+  ],
+  "difficulty": 0.0,
+  "level": "intermediate",
+  "sources": [
+   "S-020",
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-vkit-3",
+  "concepts": [
+   "vaspkit"
+  ],
+  "type": "single",
+  "prompt": "You run 101 in a folder where you hand-edited INCAR. With default settings, what happens?",
+  "options": [
+   {
+    "text": "The INCAR is replaced (SET_INCAR_WRITE_MODE = OVERRIDE)",
+    "correct": true,
+    "why": "Set BACK-UP-OLD or BACK-UP-NEW to protect it."
+   },
+   {
+    "text": "VASPKIT merges your edits",
+    "correct": false,
+    "why": "Tempting, but the default mode overwrites."
+   },
+   {
+    "text": "VASPKIT refuses to run",
+    "correct": false,
+    "why": "Tempting, but it runs and overwrites."
+   }
+  ],
+  "hints": [
+   "Read the ~/.vaspkit settings table.",
+   "The default is OVERRIDE."
+  ],
+  "difficulty": 0.3,
+  "level": "intermediate",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-vkit-4",
+  "concepts": [
+   "vaspkit"
+  ],
+  "type": "single",
+  "prompt": "A menu number from a tutorial does nothing in your VASPKIT. Why?",
+  "options": [
+   {
+    "text": "Menus change between releases; check the menu of your installed version",
+    "correct": true,
+    "why": "The codes here are from VASPKIT 1.5."
+   },
+   {
+    "text": "Your VASP is too old",
+    "correct": false,
+    "why": "Tempting, but the menus are VASPKIT's, not VASP's."
+   },
+   {
+    "text": "VASPKIT needs a POTCAR first",
+    "correct": false,
+    "why": "Tempting, but that only applies to tasks that build POTCAR."
+   }
+  ],
+  "hints": [
+   "The caveat is on the page.",
+   "Which version is the map from?"
+  ],
+  "difficulty": 0.0,
+  "level": "beginner",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "q-vkit-5",
+  "concepts": [
+   "vaspkit"
+  ],
+  "type": "single",
+  "prompt": "Which VASPKIT task should you run before every submission?",
+  "options": [
+   {
+    "text": "109, check all input files",
+    "correct": true,
+    "why": "It fixes INCAR and POSCAR format and checks POTCAR against POSCAR."
+   },
+   {
+    "text": "105, POSCAR from CIF",
+    "correct": false,
+    "why": "Tempting, but that builds a structure; it does not check."
+   },
+   {
+    "text": "711, optics",
+    "correct": false,
+    "why": "Tempting, but that is analysis after a run."
+   }
+  ],
+  "hints": [
+   "A check, not a generator.",
+   "It compares POTCAR with POSCAR."
+  ],
+  "difficulty": 0.0,
+  "level": "beginner",
+  "sources": [
+   "S-042"
+  ]
+ }
+]

@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HowThisWorks from '../components/practice/HowThisWorks.astro';
+import { catalog } from '../lib/learning/catalog';
+import '../styles/quiz.css';
+
+const { concepts, bank } = await catalog();
+const json = JSON.stringify({ concepts, bank }).replace(/</g, '\\u003c');
+---
+
+<BaseLayout
+  title="Practice"
+  description="Short practice sessions that pick the next question for you and bring back what you are about to forget."
+  pageClass="island"
+>
+  <div class="container">
+    <h1>Practice</h1>
+    <p class="lead">
+      Short sessions of up to 10 items. The page picks each item for you: reviews that are due, new questions
+      near your level, or a topic to read. You can stop at any time.
+    </p>
+    <noscript>
+      <p>
+        Practice needs JavaScript. Every topic page lists its questions with answers, which works without it.
+      </p>
+    </noscript>
+    <div class="practice js-only" data-practice>
+      <p class="practice-stats" data-practice-stats aria-live="polite"></p>
+      <p class="practice-notice" data-practice-notice hidden></p>
+      <div class="practice-stage" data-practice-stage>
+        <button type="button" class="btn btn-primary" data-practice-start>
+          Start a session
+        </button>
+      </div>
+    </div>
+    <p>
+      <a href="/progress/">See your mastery map and data controls</a>
+    </p>
+    <HowThisWorks />
+    <script type="application/json" data-practice-data set:html={json} />
+  </div>
+</BaseLayout>
+
+<script>
+  import '../scripts/practice';
+</script>
+
+<style>
+  .lead {
+    max-width: var(--measure);
+  }
+  .practice {
+    max-width: var(--measure);
+    margin-block: var(--space-5);
+  }
+  .practice-stage {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--space-4);
+  }
+  :global(.practice-topic) {
+    margin-top: 0;
+  }
+</style>

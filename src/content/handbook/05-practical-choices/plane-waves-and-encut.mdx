@@ -1,0 +1,130 @@
+---
+id: plane-waves-and-encut
+title: Plane waves and the cutoff energy
+module: 5
+order: 1
+summary: VASP builds every orbital from plane waves. ENCUT decides how many; here is why 1.3 times ENMAX is the protocol value.
+concepts: [plane-wave-basis, encut, pulay-stress]
+requires: [scf-loop]
+vaspTags: [ENCUT, PREC]
+sources: [S-010, S-019, S-040, S-041, S-042, S-049]
+status: draft
+updated: 2026-11-06
+---
+
+<Why>
+
+ENCUT is the first number you choose in every INCAR, and the one you are most often asked about in a group meeting. It decides how finely VASP can describe the electrons, how long the run takes and whether a cell relaxation can be trusted. This page explains what it controls, why the author's protocol sets it to 1.3 times the largest ENMAX, and what goes wrong otherwise.
+
+</Why>
+
+<Intuition>
+
+In a crystal the pattern repeats from cell to cell, so a natural way to describe an orbital is as a sum of waves that repeat with the cell: <Term id="plane-wave">plane waves</Term>. A few long waves capture the broad shape; short waves add fine detail. This is the same idea as building a sound from a fundamental tone and its overtones.
+
+Short waves carry more kinetic energy. <Tag name="ENCUT" /> is a kinetic-energy cutoff in eV: VASP keeps every plane wave below it and throws away the rest <Cite id="S-010" />. In reciprocal space the kept waves fill a sphere, which the lab draws. Raise ENCUT and the sphere grows, so the description gets finer and the run gets slower.
+
+Three things follow.
+
+- **The energy converges from above as ENCUT rises.** More waves can only lower the energy, so a converged ENCUT is one where raising it further changes the energy by less than your target.
+- **Energy differences converge faster than energies.** Errors largely cancel when you compare two structures computed with the same ENCUT, which is why the protocol says to keep it identical in every calculation you compare <Cite id="S-042" />.
+- **Stress converges much more slowly than energy.** When a cell changes volume during a relaxation, the set of plane waves is kept fixed in number while the sphere changes, and the stress picks up an artificial part called <Term id="pulay-stress">Pulay stress</Term> <Cite id="S-040" />. The cure is a higher cutoff.
+
+**Why 1.3 times ENMAX.** Every POTCAR states a recommended cutoff, ENMAX (`grep ENMAX POTCAR`). The VASP wiki notes the default cutoff often has to be raised by about 30 % to converge the stress tensor, so the author's protocol uses ENCUT = 1.3 times the largest ENMAX among your species for relaxations, and the same value in every later run <Cite id="S-042" /> <Cite id="S-019" />. It is a rule of thumb that you still check with a convergence test (module 8).
+
+<Level min="intermediate">
+
+The number of plane waves grows roughly as ENCUT to the power 3/2 times the cell volume, because the kept waves fill a sphere whose radius grows as the square root of ENCUT <Cite id="S-049" />. The lab counts them exactly for the cell you choose.
+
+</Level>
+
+<Level min="pro">
+
+Pulay stress is nearly isotropic and always pushes the same way: at a fixed number of plane waves the basis gets worse as the volume grows, so the cell is pulled towards too small a volume. Restarting a volume relaxation rebuilds the basis for the new cell and reduces the error, and a higher cutoff makes it small in the first place <Cite id="S-040" /> <Cite id="S-041" />.
+
+</Level>
+
+</Intuition>
+
+<Lab id="encut-sphere" title="The plane-wave sphere" />
+
+<TheMath>
+
+An orbital at wavevector $\mathbf{k}$ is written as $\psi_{\mathbf{k}}(\mathbf{r}) = \sum_{\mathbf{G}} c_{\mathbf{G}}\, e^{i(\mathbf{k}+\mathbf{G})\cdot\mathbf{r}}$, a sum over reciprocal lattice vectors $\mathbf{G}$. The cutoff keeps the terms with
+
+$$\frac{\hbar^2}{2m}|\mathbf{k}+\mathbf{G}|^2 < E_\text{cut}$$
+
+<Cite id="S-010" />. The number of kept waves is about $\frac{V}{6\pi^2}\left(\frac{2m E_\text{cut}}{\hbar^2}\right)^{3/2}$ for a cell of volume $V$ <Cite id="S-049" />.
+
+</TheMath>
+
+<InVasp>
+
+<VaspFile
+  name="INCAR"
+  code={`ENCUT = 520   ! 1.3 x largest ENMAX (here ENMAX = 400 eV)
+PREC  = Accurate`}
+  annotations={{
+    1: 'grep ENMAX POTCAR, take the largest, multiply by 1.3',
+    2: 'denser FFT grids; the protocol default',
+  }}
+/>
+
+The number 520 is an example for a largest ENMAX of 400 eV; work out your own. See the cards for <Tag name="ENCUT" /> and <Tag name="PREC" />, and the VASP wiki pages of the same names (VASP 5.4 and 6.x) <Cite id="S-019" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                                        | ...then                                                        |
+| ------------------------------------------------ | -------------------------------------------------------------- |
+| Raise ENCUT                                      | More plane waves; lower and better converged energy; slower    |
+| Use ENMAX instead of 1.3 x ENMAX in a cell relax | Pulay stress: the relaxed volume comes out too small           |
+| Compare energies computed with different ENCUT   | The difference contains a basis-set error, not only physics    |
+| Mix POTCARs with different ENMAX                 | Use the largest one, or the hardest element is under-described |
+
+Why this value: 1.3 x ENMAX converges the stress for relaxations. What happens if you skip it: energies may look fine while the volume and every property that depends on it are off.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Changing ENCUT between the relaxation and the later runs">
+
+Keep it identical in every calculation you compare <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Treating 1.3 x ENMAX as converged without checking">
+
+It is a rule of thumb. Module 8 shows how to test it for your system and property.
+
+</Callout>
+
+</Mistakes>
+
+<Check
+  ids={[
+    'q-pw-1',
+    'q-pw-2',
+    'q-pw-3',
+    'q-pw-4',
+    'q-encut2-1',
+    'q-encut2-2',
+    'q-encut2-3',
+    'q-encut2-4',
+    'q-pulay-1',
+    'q-pulay-2',
+    'q-pulay-3',
+    'q-pulay-4',
+  ]}
+/>
+
+<GoDeeper>
+
+- Kresse and Furthmüller on the plane-wave method in VASP <Cite id="S-010" />.
+- Francis and Payne on basis-set corrections and Pulay stress <Cite id="S-040" />.
+- Martin, chapter 12, on plane waves <Cite id="S-049" />.
+- VASP wiki pages ENCUT, PREC and "Energy cutoff and FFT meshes" <Cite id="S-019" />.
+
+</GoDeeper>

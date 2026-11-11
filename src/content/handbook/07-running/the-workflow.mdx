@@ -1,0 +1,253 @@
+---
+id: the-workflow
+title: The workflow, step by step
+module: 7
+order: 1
+summary: The author's five-step protocol (relaxation, SCF and DOS, band structure, elastic constants, optics), quoted as written, with what each step needs and why.
+concepts: [vasp-protocol]
+requires: [output-files, roadmap]
+vaspTags: [ENCUT, EDIFFG, ISTART, ICHARG, LORBIT, IBRION, NCORE, NBANDS, LOPTICS]
+sources: [S-019, S-020, S-041, S-042]
+status: draft
+updated: 2026-11-06
+noLab: true
+---
+
+<Why>
+
+A property calculation is never a single run. The band gap needs a converged density, which needs a relaxed structure, which needs a converged cutoff and mesh. Doing the steps in the right order, in the right folders, with the right files copied forward, is most of the practical skill. This page gives the protocol the handbook is built on.
+
+</Why>
+
+<Intuition>
+
+Every property depends on one of two things: a **relaxed structure**, or a **converged charge density** from a static SCF run on that structure <Cite id="S-042" />. Knowing which one a calculation needs tells you which files to copy into its folder:
+
+- Electronic properties (DOS, bands, optics, Bader charges) need the CHGCAR from the static SCF.
+- Lattice properties (elastic constants, equation of state, phonons) need only the relaxed structure.
+
+Before any of this, the cutoff and the k-mesh are converge-tested (module 8).
+
+<Level min="intermediate">
+
+The suggested project layout from the Workflow Handbook <Cite id="S-042" />. Relaxation and SCF share one folder (protocol step 2); back up OUTCAR and CONTCAR of the relaxation before the SCF overwrites them. Other calculations get their own folder with copies of the files they need.
+
+```text
+Compound/
+├── 00_conv/      encut_400 … encut_700/   kpt_0.05 … kpt_0.02/
+├── 01_relax/     relax → cp CONTCAR POSCAR → SCF in the same folder (ISTART=1)
+│                 → CHGCAR, WAVECAR, DOSCAR (DOS via LORBIT=11)
+├── 04_band/      SCF without ICHARG=11 + KPATH.in (303) as the band path
+├── 05_optics/    LOPTICS, NBANDS ≈ 3× default
+├── 06_elastic/   IBRION=6, ISIF=3
+├── 07_eos/       s_0.97 … s_1.03/
+├── 08_phonon/    SPOSCAR, disp-001 … (phonopy)
+├── 09_dielectric/ LEPSILON, IBRION=8 → Born charges, ε∞, ε0
+├── 10_bader/     LAECHG → AECCAR0, AECCAR2
+├── 11_magnetic/  NM/ FM/ AFM1/ AFM2/ (same supercell)
+└── 12_hse/       or 12_dftu/, 12_r2scan/
+```
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+Two numbers in the protocol come from arithmetic, not from a table.
+
+**The cutoff.** $\text{ENCUT} = 1.3 \times \max_s \text{ENMAX}_s$. With a largest ENMAX of 400 eV this gives 520 eV <Cite id="S-042" />.
+
+**The optics band count.** Take the default NBANDS from the SCF OUTCAR, multiply by 3 and round up to the next number VASP accepts. VASP itself increases NBANDS until it is divisible by the number of cores (or by NCORE), so round $3 \times \text{NBANDS}$ up to a multiple of that number <Cite id="S-042" /> <Cite id="S-019" />. For example, 48 default bands give $3 \times 48 = 144$; if VASP would round 144 up for your core count anyway, write the rounded number yourself so that the value in OUTCAR is the one you chose.
+
+</TheMath>
+
+<InVasp>
+
+<Callout variant="note" title="The author's protocol">
+  The five steps below are the author's working protocol, reproduced word for word from the Workflow Handbook,
+  spelling included <Cite id="S-042" />. The notes under each quote say what the VASP wiki and the VASPKIT
+  tutorials say about it, as recorded in the same handbook.
+</Callout>
+
+**Step 1. Relaxation**
+
+> "Prepare four INPUT files and changes it as it requires. Run relaxation with encut of 1.3 of Enmax. Ediff, ISPIN, Magmom. INCAR can be prepared from VASPKIT."
+
+- ENCUT = 1.3 x ENMAX: the default cutoff often has to be raised by about 30 % to converge the stress tensor (Pulay stress). Use the largest ENMAX among your species: `grep ENMAX POTCAR`.
+- Force criterion EDIFFG = -0.005 or -0.001 eV per angstrom. A negative EDIFFG stops when every force is below its absolute value.
+- ISPIN = 2 with one MAGMOM value per atom, in POSCAR order. VASPKIT: 101, then SR (add MG for spin: SRMG).
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM = Compound-relax
+PREC = Accurate
+ENCUT = 520     ! 1.3 x largest ENMAX
+EDIFF = 1E-6
+ISMEAR = 0
+SIGMA = 0.05
+ISPIN = 2
+MAGMOM = 2*5.0 4*0.6
+LMAXMIX = 4
+IBRION = 2
+ISIF = 3
+NSW = 200
+EDIFFG = -0.005
+LWAVE = .TRUE.
+LCHARG = .TRUE.`}
+/>
+
+**Step 2. SCF in the same folder**
+
+> "Same folder RUN SCF calculation. ISTART should be 1, INCAR will be generated from VASPkit. Try Converge repeatedly. For DOS, LORBIT = 11."
+
+- ISTART = 1 reads the WAVECAR left by the relaxation (after `cp CONTCAR POSCAR`).
+- IBRION is not written: with NSW = 0 the default is already IBRION = -1.
+- ISMEAR = 0, SIGMA = 0.05 as in the VASPKIT template: Gaussian smearing with a small SIGMA for semiconductors and insulators.
+- LORBIT = 11 writes the projected DOS and PROCAR. The DOS is read from this run with VASPKIT 111 or 113.
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM = Compound-scf
+ISTART = 1
+PREC = Accurate
+ENCUT = 520
+EDIFF = 1E-6
+NELM = 200
+ISMEAR = 0
+SIGMA = 0.05
+ISPIN = 2
+MAGMOM = 2*5.0 4*0.6
+LMAXMIX = 4
+NSW = 0
+LORBIT = 11
+NEDOS = 3001
+LWAVE = .TRUE.
+LCHARG = .TRUE.`}
+/>
+
+**Step 3. Band structure**
+
+> "For BAND, Run SCF again without ICHARG=11 in INCAR, then generate KPATH.in which will be KPOINTS vaspkit 3 - 303. For data analyasis, vaspkit 21 211."
+
+- The SCF without ICHARG = 11 on a uniform mesh writes the converged CHGCAR. 303 writes KPATH.in, which becomes the k-path for the bands, and 211 reads the result.
+- The VASP wiki says a line-mode path "is not suitable for self-consistent calculations". So the KPATH.in eigenvalues must come from one of two validated routes: (A) VASP 6.3 or later, one SCF without ICHARG = 11 with the uniform mesh in KPOINTS and KPATH.in copied to KPOINTS_OPT; (B) a run with KPOINTS = KPATH.in that reads the SCF CHGCAR (ICHARG = 11), as in the VASPKIT band tutorial. Route B's INCAR:
+
+<VaspFile
+  name="INCAR"
+  code={`ICHARG = 11     ! read CHGCAR, keep it fixed
+PREC = Accurate
+ENCUT = 520
+EDIFF = 1E-6
+ISMEAR = 0
+SIGMA = 0.05
+LORBIT = 11
+ISPIN = 2
+MAGMOM = 2*5.0 4*0.6
+LMAXMIX = 4
+NSW = 0
+LWAVE = .FALSE.
+LCHARG = .FALSE.`}
+/>
+
+**Step 4. Elastic properties**
+
+> "For elastic Properites, Prepare INCAR similar to Relaxation, but IBRION will be 6-8 and ENCUT=620. Comment out NCORE. vaspkit 2 - 203."
+
+- The VASP wiki states that IBRION = 6 with ISIF of 3 or more calculates the elastic constants (six finite lattice distortions, clamped and relaxed ions). Use IBRION = 6, ISIF = 3.
+- ENCUT = 620: stress needs the higher cutoff, as in step 1.
+- Comment out NCORE. VASP runs IBRION = 6 without band parallelization; NCORE in the INCAR can stop the run.
+- 203 reads TOTAL ELASTIC MODULI from OUTCAR.
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM = Compound-elastic
+PREC = Accurate
+ENCUT = 620
+EDIFF = 1E-8
+ISMEAR = 0
+SIGMA = 0.05
+LREAL = .FALSE.
+ISPIN = 2
+MAGMOM = 2*5.0 4*0.6
+LMAXMIX = 4
+IBRION = 6
+ISIF = 3
+NFREE = 4
+POTIM = 0.015
+NSW = 1
+! NCORE = 4    commented out for IBRION = 6
+LWAVE = .FALSE.
+LCHARG = .FALSE.`}
+/>
+
+**Step 5. Optical properties**
+
+> "For Optical Properites, run SCF again up to -06 to -08 and then generate INCAR from vaspkit. After SCF calculate get the grep NBANDS OUTCAR. Then take NBANDS 3 times of it with closest ceiling numbers. Add ISPIN and magmom if requires. For data analysis, vaspkit 71 - 711."
+
+- VASP wiki (LOPTICS): reasonable results "are usually only obtained if NBANDS is roughly doubled or tripled" with respect to the default. The wiki examples use EDIFF = 1E-8.
+- "Closest ceiling": VASP increases NBANDS until it is divisible by the number of cores (or by NCORE). Round 3 x NBANDS up to that number.
+- VASPKIT: 101, then OP, then 711. Wiki values: CSHIFT = 0.1, NEDOS about 2000.
+
+<VaspFile
+  name="INCAR"
+  code={`ISTART = 1
+PREC = Accurate
+ENCUT = 520
+EDIFF = 1E-8
+NELM = 200
+ISMEAR = 0
+SIGMA = 0.05
+NBANDS = 144    ! 3 x default NBANDS, rounded up
+LOPTICS = .TRUE.
+CSHIFT = 0.100
+NEDOS = 2001
+ISPIN = 2
+MAGMOM = 2*5.0 4*0.6
+LMAXMIX = 4
+NSW = 0
+LWAVE = .FALSE.
+LCHARG = .FALSE.`}
+/>
+
+Every INCAR on this page passes the input builder's validator with no errors. The numbers 520 and 144 are examples for a largest ENMAX of 400 eV and 48 default bands; replace them with yours. The <a href="/tools/input-builder/">input builder</a> writes these INCARs for your own structure.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                                       | ...then                                                                  |
+| ----------------------------------------------- | ------------------------------------------------------------------------ |
+| Skip the convergence tests                      | ENCUT and the mesh in every later step are unverified                    |
+| Run the SCF on the starting POSCAR, not CONTCAR | The density belongs to an unrelaxed structure                            |
+| Compute bands self-consistently on a line path  | Uneven sampling; a wrong density and wrong bands                         |
+| Leave NCORE in the elastic INCAR                | The run can stop                                                         |
+| Keep the default NBANDS for optics              | Too few empty bands; the dielectric function is wrong at higher energies |
+
+Why this order: each step needs a file that only the step before can write. What happens if you skip a step: the later result inherits whatever was not converged.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Losing the relaxation record">
+  The SCF in the same folder overwrites OUTCAR and OSZICAR. Copy them (for example to OUTCAR.relax) first{' '}
+  <Cite id="S-042" />.
+</Callout>
+
+<Callout variant="mistake" title="Changing tags between the SCF and the band run">
+  An ICHARG = 11 run inherits its physics from CHGCAR: ENCUT, ISPIN, MAGMOM, LMAXMIX, the functional and any
+  LDAU tags must be identical, and so must the cell <Cite id="S-042" />. The restarts page explains why.
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-proto-1', 'q-proto-2', 'q-proto-3', 'q-proto-4', 'q-proto-5', 'q-proto-6']} />
+
+<GoDeeper>
+
+- The Workflow Handbook's core sequence, one section per step, with failure notes <Cite id="S-042" />.
+- VASP wiki, pages IBRION, LOPTICS, NBANDS and KPOINTS_OPT <Cite id="S-019" />.
+- The VASPKIT paper and tutorials <Cite id="S-020" />.
+
+</GoDeeper>

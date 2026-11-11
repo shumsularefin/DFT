@@ -1,6 +1,6 @@
 // Path table and file writers for a band-structure k-path: segment lengths, points per segment, VASP line-mode KPOINTS,
 // KPATH.in, KPOINTS_OPT and a plain coordinate list (CSV and JSON). Pure functions, no DOM.
-// @source S-019 (VASP wiki: KPOINTS, line-mode format), S-006 (HPKOT paths), S-005 (Setyawan-Curtarolo paths), S-042 (author's Workflow Handbook: routes A and B)
+// @source S-019 (VASP wiki: KPOINTS, line-mode format), S-006 (HPKOT paths), S-005 (Setyawan-Curtarolo paths), S-042 (author's Workflow Handbook: routes A and B), S-058 (VASPKIT KPATH.in layout)
 //
 // Geometry: a segment from k1 to k2 (fractional coordinates in the basis of the reciprocal primitive lattice B, rows,
 // WITH the factor 2 pi) has length |(k2 - k1) B| in 1/Angstrom. VASP line mode writes `n` points on every segment, both
@@ -196,8 +196,25 @@ export const writeKpoints = (t: PathTable, h: KpathHeader): string =>
  * KPATH.in: the same line-mode content as KPOINTS, which is what the author's protocol relies on (`cp KPATH.in KPOINTS`).
  * The exact layout VASPKIT writes has not been checked (Q-039), so this is VASPKIT-style, not a copy of its output.
  */
-export const writeKpathIn = (t: PathTable, h: KpathHeader): string =>
-  writeKpathLineMode(t, `K-path (KPATH.in), ${kpointsComment(t, h)}`);
+/** VASPKIT row: each coordinate right-aligned in 15 columns with 10 decimals, then five spaces and the bare label. */
+const vaspkitRow = (k: Vec3, label: string): string =>
+  `${k.map((x) => f10(x).padStart(15)).join('')}     ${label}`;
+
+/**
+ * KPATH.in in the layout VASPKIT writes (S-058): comment, count, `Line-Mode`, `Reciprocal`, then point pairs with
+ * bare labels and a blank line between segments. VASP reads it as a line-mode KPOINTS file (`cp KPATH.in KPOINTS`).
+ */
+export function writeKpathIn(t: PathTable, h: KpathHeader): string {
+  const body = t.segments.map((s) => `${vaspkitRow(s.kFrom, s.fromFile)}\n${vaspkitRow(s.kTo, s.toFile)}`);
+  return [
+    oneLine(`K-path (KPATH.in), ${kpointsComment(t, h)}`),
+    String(clampPoints(t.lineModeCount)).padStart(5),
+    'Line-Mode',
+    'Reciprocal',
+    body.join('\n\n'),
+    '',
+  ].join('\n');
+}
 
 /** KPOINTS_OPT for VASP 6.3 and later (route A). Same line-mode content; the uniform mesh stays in KPOINTS. */
 export const writeKpointsOpt = (t: PathTable, h: KpathHeader): string =>

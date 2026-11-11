@@ -1,212 +1,204 @@
-/**
- * Thompson-sampling policy over kinds of practice action, with fixed guard rails.
- * A transparent heuristic, not trained reinforcement learning.
- * @source S-039 (Thompson 1933), S-037. Arm set, reward weights, targets and guard rails are
- * teaching conventions (D-053).
- */
-import { pCorrect } from './irt';
-import { MASTERY_PL } from './bkt';
-import { beta, type Rng } from './random';
+// Thompson-sampling policy over a small set of actions (S-039), with fixed guard rails (M6.3).
+// The reward weights and guard-rail numbers are conventions (D-053), labelled "Heuristic" in the UI.
+import type { Graph } from './graph';
+import { difficultyFor } from './irt';
+import { beta } from './random';
+import type { Arm, LearnerState } from './state';
 
 export const ARMS = ['review-due', 'new-easy', 'new-target', 'new-stretch', 'hint', 'suggest-topic'] as const;
-export type Arm = (typeof ARMS)[number];
+export type ArmId = (typeof ARMS)[number];
 
-export interface ArmPosterior {
-  alpha: number;
-  beta: number;
-}
-export type BanditState = Record<Arm, ArmPosterior>;
-
-export function newBandit(): BanditState {
-  return Object.fromEntries(ARMS.map((a) => [a, { alpha: 1, beta: 1 }])) as BanditState;
-}
-
-/** Target probability of a correct answer per arm (from the Rasch model). */
+/** Target probability of success for each kind of new item (from the Rasch model). */
 export const TARGET_P = { 'new-easy': 0.85, 'new-target': 0.7, 'new-stretch': 0.55 } as const;
 export const PREREQ_FLOOR = 0.6;
-export const OVERDUE_DAYS = 3;
-export const MAX_WRONG_STREAK = 3;
+export const OVERDUE_FIRST_MS = 3 * 86_400_000;
+export const MAX_WRONG_IN_A_ROW = 3;
 
-export interface PolicyQuestion {
+export interface BankItem {
   id: string;
-  concept: string;
-  /** Item difficulty b from the Rasch model. */
-  b: number;
+  concepts: string[];
+  difficulty: number;
 }
-export interface DueReview {
-  id: string;
-  overdueDays: number;
-}
+
 export interface PolicyContext {
-  theta: number;
-  /** BKT pL per concept id; missing means not seen yet (treated as 0.3, the default prior). */
-  mastery: Readonly<Record<string, number>>;
-  prerequisites: Readonly<Record<string, readonly string[]>>;
-  /** Questions that may be shown as new practice. */
-  candidates: readonly PolicyQuestion[];
-  dueReviews: readonly DueReview[];
-  consecutiveWrong: number;
-  /** A question is open and still has an unused hint. */
-  hintAvailable: boolean;
-  /** Concepts whose prerequisites are met and which are not mastered yet. */
-  readyConcepts: readonly string[];
+  now: number;
+  bank: BankItem[];
+  graph: Graph;
+  /** Wrong answers in a row in this session. */
+  wrongInARow: number;
+  /** The question just answered wrongly, if a hint for it can still be offered. */
+  hintFor?: string;
+  /** Concepts the learner may practise (published ones). Defaults to every concept in the bank. */
+  concepts?: Set<string>;
 }
 
-export interface Decision {
-  arm: Arm | null;
-  questionId?: string;
-  topic?: string;
-  /** Plain-language reason, shown in "How this works". */
-  reason: string;
-  /** Set when a fixed guard rail, not the sampler, made the choice. */
-  guard?: 'overdue-review' | 'wrong-streak';
-  samples?: Partial<Record<Arm, number>>;
+export type Choice =
+  | { arm: 'review-due'; questionId: string; reason: string }
+  | { arm: 'new-easy' | 'new-target' | 'new-stretch'; questionId: string; reason: string }
+  | { arm: 'hint'; questionId: string; reason: string }
+  | { arm: 'suggest-topic'; conceptId: string; reason: string };
+
+const armOf = (s: LearnerState, a: ArmId): Arm => s.arms[a] ?? { alpha: 1, beta: 1 };
+const pL = (s: LearnerState, c: string) => s.concepts[c]?.pL ?? 0;
+const theta = (s: LearnerState, cs: string[]) =>
+  cs.reduce((t, c) => t + (s.concepts[c]?.theta ?? 0), 0) / Math.max(1, cs.length);
+const label = (g: Graph, c: string) => g.byId.get(c)?.label ?? c;
+
+/** Guard rail: a concept whose prerequisites are all weak (pL < 0.6) is blocked. Roots are never blocked. */
+export function conceptBlocked(s: LearnerState, g: Graph, c: string): boolean {
+  const pre = g.byId.get(c)?.prerequisites ?? [];
+  return pre.length > 0 && pre.every((p) => pL(s, p) < PREREQ_FLOOR);
 }
 
-const DEFAULT_PL = 0.3;
-const pl = (m: PolicyContext['mastery'], id: string) => m[id] ?? DEFAULT_PL;
-const logit = (p: number) => Math.log(p / (1 - p));
-
-/** Candidates after the prerequisite and mastery guard rails (each relaxed if nothing is left). */
-function usable(ctx: PolicyContext): PolicyQuestion[] {
-  let pool = [...ctx.candidates];
-  const notBlocked = pool.filter((q) => {
-    const pre = ctx.prerequisites[q.concept] ?? [];
-    return pre.length === 0 || !pre.every((p) => pl(ctx.mastery, p) < PREREQ_FLOOR);
-  });
-  if (notBlocked.length > 0) pool = notBlocked;
-  const open = pool.filter((q) => pl(ctx.mastery, q.concept) < MASTERY_PL);
-  return open.length > 0 ? open : pool;
+/** Questions due for review, most overdue first. */
+export function dueQuestions(s: LearnerState, ctx: PolicyContext): string[] {
+  const inBank = new Set(ctx.bank.map((q) => q.id));
+  return Object.entries(s.questions)
+    .filter(([id, q]) => inBank.has(id) && q.lastReviewed > 0 && q.due <= ctx.now)
+    .sort(([a, x], [b, y]) => x.due - y.due || a.localeCompare(b))
+    .map(([id]) => id);
 }
 
-/** The usable question whose difficulty best matches the target chance of a correct answer. */
-export function pickQuestion(ctx: PolicyContext, targetP: number): PolicyQuestion | undefined {
-  const pool = usable(ctx);
-  if (pool.length === 0) return undefined;
-  const least = Math.min(...pool.map((q) => pl(ctx.mastery, q.concept)));
-  const here = pool.filter((q) => pl(ctx.mastery, q.concept) === least);
-  const bTarget = ctx.theta - logit(targetP);
-  return here.reduce((best, q) => {
-    const d = Math.abs(q.b - bTarget);
-    const bd = Math.abs(best.b - bTarget);
-    return d < bd || (d === bd && q.id < best.id) ? q : best;
-  });
+/** New (never answered) questions, split into allowed ones and ones blocked by the prerequisite rail. */
+function newQuestions(s: LearnerState, ctx: PolicyContext) {
+  const allowedConcepts = ctx.concepts;
+  const fresh = ctx.bank.filter(
+    (q) => !s.questions[q.id] && (!allowedConcepts || q.concepts.every((c) => allowedConcepts.has(c))),
+  );
+  const open = fresh.filter((q) => !q.concepts.some((c) => conceptBlocked(s, ctx.graph, c)));
+  return { fresh, open };
 }
 
-function isEligible(arm: Arm, ctx: PolicyContext): boolean {
-  switch (arm) {
-    case 'review-due':
-      return ctx.dueReviews.length > 0;
-    case 'hint':
-      return ctx.hintAvailable;
-    case 'suggest-topic':
-      return ctx.readyConcepts.length > 0;
-    default:
-      return pickQuestion(ctx, TARGET_P[arm]) !== undefined;
-  }
-}
-
-function realise(arm: Arm, ctx: PolicyContext, reason: string, extra: Partial<Decision> = {}): Decision {
-  if (arm === 'review-due') {
-    const first = ctx.dueReviews.reduce((a, b) =>
-      b.overdueDays > a.overdueDays || (b.overdueDays === a.overdueDays && b.id < a.id) ? b : a,
-    );
-    return { arm, questionId: first.id, reason, ...extra };
-  }
-  if (arm === 'hint') return { arm, reason, ...extra };
-  if (arm === 'suggest-topic') return { arm, topic: ctx.readyConcepts[0], reason, ...extra };
-  const q = pickQuestion(ctx, TARGET_P[arm]);
-  return { arm, questionId: q?.id, reason, ...extra };
-}
-
-/** Guard rails first (fixed, not learned), then Thompson sampling among eligible arms. */
-export function choose(bandit: BanditState, ctx: PolicyContext, rng: Rng): Decision {
-  const worst = ctx.dueReviews.reduce((m, d) => Math.max(m, d.overdueDays), -Infinity);
-  if (worst > OVERDUE_DAYS) {
-    return realise(
-      'review-due',
-      ctx,
-      `A review is more than ${OVERDUE_DAYS} days overdue, so it comes first.`,
-      { guard: 'overdue-review' },
-    );
-  }
-  if (ctx.consecutiveWrong >= MAX_WRONG_STREAK) {
-    const arm: Arm = ctx.hintAvailable ? 'hint' : 'new-easy';
-    if (isEligible(arm, ctx)) {
-      return realise(
-        arm,
-        ctx,
-        `${MAX_WRONG_STREAK} wrong answers in a row, so you get ${arm === 'hint' ? 'a hint' : 'an easier question'}.`,
-        { guard: 'wrong-streak' },
-      );
+/** The new question whose difficulty is closest to the one that gives success probability p. */
+function closestTo(s: LearnerState, items: BankItem[], p: number): BankItem | undefined {
+  let best: BankItem | undefined;
+  let bestGap = Infinity;
+  for (const q of items) {
+    const gap = Math.abs(q.difficulty - difficultyFor(theta(s, q.concepts), p));
+    if (gap < bestGap || (gap === bestGap && best && q.id < best.id)) {
+      best = q;
+      bestGap = gap;
     }
   }
-  const samples: Partial<Record<Arm, number>> = {};
-  let best: Arm | null = null;
-  for (const arm of ARMS) {
-    if (!isEligible(arm, ctx)) continue;
-    const s = beta(rng, bandit[arm].alpha, bandit[arm].beta);
-    samples[arm] = s;
-    if (best === null || s > (samples[best] as number)) best = arm;
-  }
-  if (best === null) return { arm: null, reason: 'Nothing is available right now.', samples };
-  return realise(
-    best,
-    ctx,
-    `Sampled the best expected payoff among ${Object.keys(samples).length} available kinds of action.`,
-    { samples },
+  return best;
+}
+
+/** The next concept to read about: not yet practised, all prerequisites at least PREREQ_FLOOR. */
+function topicToSuggest(s: LearnerState, ctx: PolicyContext): string | undefined {
+  const inBank = new Set(ctx.bank.flatMap((q) => q.concepts));
+  return ctx.graph.order.find(
+    (c) =>
+      inBank.has(c) &&
+      (!ctx.concepts || ctx.concepts.has(c)) &&
+      !s.concepts[c] &&
+      (ctx.graph.byId.get(c)?.prerequisites ?? []).every((p) => pL(s, p) >= PREREQ_FLOOR),
   );
+}
+
+/** Builds the candidate choice for every eligible arm (no randomness). */
+export function eligible(s: LearnerState, ctx: PolicyContext): Map<ArmId, Choice> {
+  const out = new Map<ArmId, Choice>();
+  const due = dueQuestions(s, ctx);
+  if (due[0]) out.set('review-due', { arm: 'review-due', questionId: due[0], reason: 'due for review' });
+
+  const { fresh, open } = newQuestions(s, ctx);
+  // Guard rail: blocked concepts are allowed only when nothing else is eligible.
+  const pool = open.length > 0 || due.length > 0 ? open : fresh;
+  for (const arm of ['new-easy', 'new-target', 'new-stretch'] as const) {
+    const q = closestTo(s, pool, TARGET_P[arm]);
+    if (q) {
+      const why =
+        arm === 'new-easy'
+          ? 'an easier question'
+          : arm === 'new-stretch'
+            ? 'a stretch question'
+            : 'the next step';
+      out.set(arm, { arm, questionId: q.id, reason: `${why} on ${label(ctx.graph, q.concepts[0]!)}` });
+    }
+  }
+  if (ctx.hintFor)
+    out.set('hint', { arm: 'hint', questionId: ctx.hintFor, reason: 'a hint for the last question' });
+  const topic = topicToSuggest(s, ctx);
+  if (topic)
+    out.set('suggest-topic', {
+      arm: 'suggest-topic',
+      conceptId: topic,
+      reason: `read about ${label(ctx.graph, topic)} next`,
+    });
+  return out;
+}
+
+/**
+ * Picks the next action. Fixed rails first (overdue reviews, a run of wrong answers), then Thompson
+ * sampling: draw from each eligible arm's Beta posterior and take the largest. Returns null when nothing
+ * is eligible.
+ */
+export function choose(s: LearnerState, ctx: PolicyContext, rng: () => number): Choice | null {
+  const options = eligible(s, ctx);
+  const due = options.get('review-due');
+  if (due?.arm === 'review-due') {
+    const q = s.questions[due.questionId]!;
+    if (ctx.now - q.due >= OVERDUE_FIRST_MS) return { ...due, reason: 'overdue for review' };
+  }
+  let arms = [...options.keys()];
+  if (ctx.wrongInARow >= MAX_WRONG_IN_A_ROW) {
+    const easier = arms.filter((a) => a === 'hint' || a === 'new-easy');
+    if (easier.length) arms = easier;
+  }
+  if (arms.length === 0) return null;
+  let best: ArmId = arms[0]!;
+  let bestDraw = -1;
+  for (const a of arms) {
+    const { alpha, beta: b } = armOf(s, a);
+    const draw = beta(rng, alpha, b);
+    if (draw > bestDraw) {
+      best = a;
+      bestDraw = draw;
+    }
+  }
+  return options.get(best)!;
 }
 
 export interface Outcome {
   correct: boolean;
   hintsUsed: number;
   maxHints: number;
-  /** 0..1, 1 for a quick answer. No timers are shown to the learner; callers may pass 0.5. */
-  speedScore: number;
-  /** 0 or 1, credited later (see delayedRetentionUpdate). Pass 0 at answer time. */
-  retentionBonus: number;
+  /** Seconds to answer; used only to tune the picker, never shown or scored. */
+  seconds?: number;
 }
 
 export const REWARD_WEIGHTS = { correct: 0.5, hints: 0.2, speed: 0.1, retention: 0.2 } as const;
 
-/** Reward in [0, 1] (heuristic, D-053). */
+/** 1 at 10 s or less, 0 at 60 s or more, linear between. Missing time counts as neutral (0.5). */
+export const speedScore = (seconds?: number): number =>
+  seconds === undefined ? 0.5 : Math.min(1, Math.max(0, 1 - (seconds - 10) / 50));
+
+/** Immediate reward in [0, 1]; the retention part is credited later (creditRetention). */
 export function reward(o: Outcome): number {
-  const hintTerm = o.maxHints > 0 ? 1 - Math.min(o.hintsUsed, o.maxHints) / o.maxHints : 1;
-  const r =
+  const hintPart = o.maxHints > 0 ? 1 - Math.min(o.hintsUsed, o.maxHints) / o.maxHints : 1;
+  return (
     REWARD_WEIGHTS.correct * (o.correct ? 1 : 0) +
-    REWARD_WEIGHTS.hints * hintTerm +
-    REWARD_WEIGHTS.speed * Math.min(1, Math.max(0, o.speedScore)) +
-    REWARD_WEIGHTS.retention * Math.min(1, Math.max(0, o.retentionBonus));
-  return Math.min(1, Math.max(0, r));
+    REWARD_WEIGHTS.hints * hintPart +
+    REWARD_WEIGHTS.speed * speedScore(o.seconds)
+  );
 }
 
-/** alpha += r, beta += 1 - r. Returns a new state. */
-export function updateBandit(state: BanditState, arm: Arm, r: number): BanditState {
-  if (!(r >= 0 && r <= 1)) throw new RangeError(`reward must be in [0, 1], got ${r}`);
-  const p = state[arm];
-  return { ...state, [arm]: { alpha: p.alpha + r, beta: p.beta + (1 - r) } };
+/** Beta update with a fractional reward. */
+export function updateArm(s: LearnerState, arm: ArmId, r: number): LearnerState {
+  const a = armOf(s, arm);
+  const rr = Math.min(1, Math.max(0, r));
+  return { ...s, arms: { ...s.arms, [arm]: { alpha: a.alpha + rr, beta: a.beta + (1 - rr) } } };
 }
 
 /**
- * Delayed retention credit: when an item scheduled by `arm` is answered correctly after its
- * interval, add a pseudo-observation of weight 0.2 (the retention weight): alpha += 0.2 b,
- * beta += 0.2 (1 - b) with b = 1 for retained, 0 for forgotten.
+ * Delayed retention bonus: when a review is answered correctly at or after its due time, the arm that
+ * first introduced the item gets the retention share as extra success.
  */
-export function delayedRetentionUpdate(state: BanditState, arm: Arm, retained: boolean): BanditState {
-  const w = REWARD_WEIGHTS.retention;
-  const p = state[arm];
-  return { ...state, [arm]: { alpha: p.alpha + (retained ? w : 0), beta: p.beta + (retained ? 0 : w) } };
+export function creditRetention(s: LearnerState, introducedBy: ArmId | undefined): LearnerState {
+  if (!introducedBy) return s;
+  const a = armOf(s, introducedBy);
+  return {
+    ...s,
+    arms: { ...s.arms, [introducedBy]: { alpha: a.alpha + REWARD_WEIGHTS.retention, beta: a.beta } },
+  };
 }
-
-/** Chance of a correct answer under the Rasch model, for UI explanations. */
-export const expectedCorrect = pCorrect;
-
-/** Text for the "How this works" panel (beginner level, honest about being a heuristic). */
-export const HOW_THIS_WORKS = [
-  'This is a simple helper that picks your next practice item. It is a set of rules of thumb, not an artificial intelligence that has studied you.',
-  'It keeps a rough guess of how well you know each idea, using a standard method from the education research literature called knowledge tracing. The guess is an estimate. It can be wrong, and it never leaves your browser.',
-  'It chooses between six kinds of action: a review that is due, an easier question, a question near your level, a harder stretch question, a hint, or a suggested topic. Each kind has a score that starts equal. When a kind of action seems to help you (you answer correctly, with few hints), its score rises, so you see more of it. A little randomness keeps it trying the others. This is called Thompson sampling.',
-  'Some rules are fixed and never learned: a review that is more than 3 days overdue comes first, three wrong answers in a row bring a hint or an easier question, and it avoids ideas whose basics you have not met yet.',
-  'The numbers in the reward and the targets (aiming for about 7 correct in 10) are choices made by the authors of this site for teaching, not measured laws. Treat all of it as a coach that makes suggestions, not a test result.',
-] as const;

@@ -1,24 +1,15 @@
-/**
- * Rasch / Elo style ability and difficulty estimates.
- * @source S-037 (the knowledge-tracing family this site uses). The K values are teaching
- * conventions (D-052), not fitted constants.
- */
-export const K_THETA = 0.4;
-export const K_B = 0.05;
+// Rasch model with Elo-style updates (S-037 for the learner model it feeds; K values are conventions, D-052).
+export const K_LEARNER = 0.4;
+export const K_ITEM = 0.05;
 
-export function pCorrect(theta: number, b: number): number {
-  return 1 / (1 + Math.exp(-(theta - b)));
+/** Probability of a correct answer for ability theta on an item of difficulty b (logits). */
+export const pCorrect = (theta: number, b: number): number => 1 / (1 + Math.exp(-(theta - b)));
+
+/** Moves the learner up and the item down after a correct answer (and the reverse after a wrong one). */
+export function eloUpdate(theta: number, b: number, correct: boolean, k = K_LEARNER, kb = K_ITEM) {
+  const surprise = (correct ? 1 : 0) - pCorrect(theta, b);
+  return { theta: theta + k * surprise, b: b - kb * surprise };
 }
 
-/** One response: the learner moves fast, the item difficulty moves slowly. */
-export function updateElo(
-  theta: number,
-  b: number,
-  correct: boolean,
-  kTheta: number = K_THETA,
-  kB: number = K_B,
-): { theta: number; b: number; p: number } {
-  const p = pCorrect(theta, b);
-  const err = (correct ? 1 : 0) - p;
-  return { theta: theta + kTheta * err, b: b - kB * err, p };
-}
+/** The item difficulty at which the learner's chance of success equals `p` (inverse of pCorrect). */
+export const difficultyFor = (theta: number, p: number): number => theta - Math.log(p / (1 - p));

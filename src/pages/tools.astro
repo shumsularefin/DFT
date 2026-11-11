@@ -3,7 +3,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Card from '../components/ui/Card.astro';
 import Badge from '../components/ui/Badge.astro';
 
-const tools = [
+interface ToolCard {
+  id: string;
+  title: string;
+  text: string;
+  href?: string;
+  cta?: string;
+}
+const tools: ToolCard[] = [
   {
     id: 'tolerance',
     title: 'Tolerance-factor explorer',
@@ -13,19 +20,32 @@ const tools = [
     id: 'input-builder',
     title: 'Input builder',
     text: 'Prepare POSCAR, KPOINTS and INCAR files with plain-language explanations and warnings for risky combinations.',
+    href: '/tools/input-builder/',
+    cta: 'Open the input builder',
   },
   {
     id: 'convergence',
     title: 'Convergence plotter',
     text: 'Paste results from a series of runs and see whether the energy has settled.',
+    href: '/tools/convergence/',
+    cta: 'Open the convergence plotter',
   },
   {
     id: 'kpath',
     title: 'Brillouin zone and k-path viewer',
     text: 'See the Brillouin zone of your structure in 3D and export a k-path for a band-structure run.',
+    href: '/tools/kpath/',
+    cta: 'Open the k-path tool',
+  },
+  {
+    id: 'errors',
+    title: 'VASP error finder',
+    text: 'Paste an error message or describe a symptom and see likely causes and what to try, in order.',
+    href: '/errors/',
+    cta: 'Open the error finder',
   },
 ];
-const more = [
+const more: ToolCard[] = [
   {
     id: 'studio',
     title: 'Screening Studio',
@@ -40,19 +60,22 @@ const more = [
     id: 'practice',
     title: 'Practice',
     text: 'Short questions that adapt to what you already know and bring topics back at spaced intervals.',
+    href: '/practice/',
+    cta: 'Start practising',
   },
 ];
 ---
 
 <BaseLayout
   title="Tools"
-  description="Research tools for the DFT Handbook. The input builder, convergence plotter and k-path tool are available; the others are planned."
+  description="Research tools for the DFT Handbook. The input builder, convergence plotter, k-path tool and error finder are available; the others are planned."
 >
   <div class="container">
     <h1>Tools</h1>
     <p>
-      These tools run entirely in your browser. The input builder, the convergence plotter and the k-path tool
-      are available now. The others are not built yet, so they have no link. Each card says what it will do.
+      These tools run entirely in your browser. The input builder, the convergence plotter, the k-path tool
+      and the error finder are available now. The others are not built yet, so they have no link. Each card
+      says what it will do.
     </p>
     <h2>Research tools</h2>
     <div class="tool-grid">
@@ -62,17 +85,9 @@ const more = [
             {t.title}
           </h3>
           <p>{t.text}</p>
-          {t.id === 'input-builder' ? (
+          {t.href ? (
             <p>
-              <a href="/tools/input-builder/">Open the input builder</a>
-            </p>
-          ) : t.id === 'convergence' ? (
-            <p>
-              <a href="/tools/convergence/">Open the convergence plotter</a>
-            </p>
-          ) : t.id === 'kpath' ? (
-            <p>
-              <a href="/tools/kpath/">Open the k-path tool</a>
+              <a href={t.href}>{t.cta}</a>
             </p>
           ) : (
             <p>
@@ -90,9 +105,15 @@ const more = [
             {t.title}
           </h3>
           <p>{t.text}</p>
-          <p>
-            <Badge variant="draft" /> Coming soon
-          </p>
+          {t.href ? (
+            <p>
+              <a href={t.href}>{t.cta}</a>
+            </p>
+          ) : (
+            <p>
+              <Badge variant="draft" /> Coming soon
+            </p>
+          )}
         </Card>
       ))}
     </div>

@@ -1,20 +1,18 @@
-/**
- * Learner state: versioned, serialisable, size capped, mergeable (M6.5 sync).
- * @source S-037, S-038 for the quantities stored. The storage layout and the merge rule are
- * engineering choices (D-052).
- */
-import { DEFAULT_BKT } from './bkt';
-import { INITIAL_SM2 } from './sm2';
+// The learner state (M6.2): versioned, JSON-serializable, size-capped, and mergeable for sync (M6.5).
+import { BKT_DEFAULTS, update as bktUpdate } from './bkt';
+import { eloUpdate } from './irt';
+import { quality, review, SM2_START, type Sm2 } from './sm2';
 
 export const STATE_VERSION = 1;
-export const MAX_EVENTS_PER_CONCEPT = 200;
+export const HISTORY_CAP = 200;
+const DAY_MS = 86_400_000;
 
-export interface LearnEvent {
+export interface AnswerEvent {
   /** Epoch milliseconds. */
   t: number;
-  /** Question id. */
   q: string;
   correct: boolean;
+  hints: number;
 }
 
 export interface ConceptState {
@@ -22,122 +20,194 @@ export interface ConceptState {
   theta: number;
   attempts: number;
   lastSeen: number;
-  /** Most recent events only, pruned to MAX_EVENTS_PER_CONCEPT. */
-  events: LearnEvent[];
+  history: AnswerEvent[];
 }
 
-export interface QuestionState {
+export interface QuestionState extends Sm2 {
   b: number;
-  n: number;
-  interval: number;
-  ef: number;
-  /** Epoch day number the question is next due. */
+  /** Epoch milliseconds when the item is due for review. */
   due: number;
-  lastSeen: number;
+  lastReviewed: number;
+  /** The policy arm that first showed this question (for the delayed retention bonus, M6.3). */
+  introducedBy?: string;
+}
+
+export interface Arm {
+  alpha: number;
+  beta: number;
 }
 
 export interface LearnerState {
-  version: number;
+  version: typeof STATE_VERSION;
+  updatedAt: number;
   concepts: Record<string, ConceptState>;
   questions: Record<string, QuestionState>;
+  /** Thompson-sampling posteriors per arm (M6.3). */
+  arms: Record<string, Arm>;
+  /** Local calendar days (YYYY-MM-DD) with at least one answer, for the gentle streak (M6.4). */
+  activeDays: string[];
+  settings: { hideStreak: boolean };
 }
 
-export function emptyState(): LearnerState {
-  return { version: STATE_VERSION, concepts: {}, questions: {} };
+export const emptyState = (): LearnerState => ({
+  version: STATE_VERSION,
+  updatedAt: 0,
+  concepts: {},
+  questions: {},
+  arms: {},
+  activeDays: [],
+  settings: { hideStreak: false },
+});
+
+export const newConcept = (): ConceptState => ({
+  pL: BKT_DEFAULTS.pL0,
+  theta: 0,
+  attempts: 0,
+  lastSeen: 0,
+  history: [],
+});
+
+export const newQuestion = (difficulty: number): QuestionState => ({
+  ...SM2_START,
+  b: difficulty,
+  due: 0,
+  lastReviewed: 0,
+});
+
+export const dayKey = (t: number): string => {
+  const d = new Date(t);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
+export interface AnswerInput {
+  questionId: string;
+  concepts: string[];
+  difficulty: number;
+  correct: boolean;
+  hints: number;
+  gaveUp?: boolean;
+  now: number;
+  /** The policy arm that chose this question, if any. */
+  arm?: string;
 }
 
-export function newConcept(): ConceptState {
-  return { pL: DEFAULT_BKT.pL0, theta: 0, attempts: 0, lastSeen: 0, events: [] };
-}
-
-export function newQuestion(): QuestionState {
-  return { b: 0, n: INITIAL_SM2.n, interval: INITIAL_SM2.interval, ef: INITIAL_SM2.ef, due: 0, lastSeen: 0 };
-}
-
-const eventOrder = (a: LearnEvent, b: LearnEvent) =>
-  a.t - b.t || (a.q < b.q ? -1 : a.q > b.q ? 1 : Number(a.correct) - Number(b.correct));
-
-/** Keep only the newest MAX_EVENTS_PER_CONCEPT events, in time order. */
-export function pruneEvents(events: LearnEvent[]): LearnEvent[] {
-  const sorted = [...events].sort(eventOrder);
-  return sorted.slice(Math.max(0, sorted.length - MAX_EVENTS_PER_CONCEPT));
-}
-
-/** Drop exact duplicate events, then prune. */
-function dedupePrune(events: LearnEvent[]): LearnEvent[] {
-  const seen = new Set<string>();
-  const out: LearnEvent[] = [];
-  for (const e of events) {
-    const k = `${e.t}|${e.q}|${e.correct}`;
-    if (!seen.has(k)) {
-      seen.add(k);
-      out.push(e);
-    }
+/** Applies one answer: BKT and Elo per concept, Elo item difficulty and SM-2 for the question. Pure. */
+export function applyAnswer(s: LearnerState, a: AnswerInput): LearnerState {
+  const concepts = { ...s.concepts };
+  const prevQ = s.questions[a.questionId] ?? newQuestion(a.difficulty);
+  let b = prevQ.b;
+  for (const id of a.concepts) {
+    const c = concepts[id] ?? newConcept();
+    const elo = eloUpdate(c.theta, prevQ.b, a.correct);
+    b += elo.b - prevQ.b;
+    const history = [...c.history, { t: a.now, q: a.questionId, correct: a.correct, hints: a.hints }].slice(
+      -HISTORY_CAP,
+    );
+    concepts[id] = {
+      pL: bktUpdate(c.pL, a.correct),
+      theta: elo.theta,
+      attempts: c.attempts + 1,
+      lastSeen: a.now,
+      history,
+    };
   }
-  return pruneEvents(out);
+  // With several concepts the item moves once per concept, averaged so multi-concept items do not drift faster.
+  b = prevQ.b + (b - prevQ.b) / Math.max(1, a.concepts.length);
+  const sm = review(prevQ, quality(a.correct, a.hints, a.gaveUp));
+  const questions = {
+    ...s.questions,
+    [a.questionId]: { ...sm, b, due: a.now + sm.interval * DAY_MS, lastReviewed: a.now },
+  };
+  const day = dayKey(a.now);
+  const activeDays = s.activeDays.includes(day) ? s.activeDays : [...s.activeDays, day].sort();
+  return { ...s, concepts, questions, activeDays, updatedAt: Math.max(s.updatedAt, a.now) };
 }
 
-/** Append an event and prune. Returns a new concept state. */
-export function addEvent(c: ConceptState, e: LearnEvent): ConceptState {
+// ---------- merge (sync) ----------
+
+/** Deterministic tie-break so merge stays commutative when timestamps are equal. */
+const later = <T>(a: T, b: T, ta: number, tb: number): T => {
+  if (ta !== tb) return ta > tb ? a : b;
+  return JSON.stringify(a) >= JSON.stringify(b) ? a : b;
+};
+
+const mergeHistory = (a: AnswerEvent[], b: AnswerEvent[]): AnswerEvent[] => {
+  const key = (e: AnswerEvent) => `${e.t}|${e.q}|${e.correct ? 1 : 0}|${e.hints}`;
+  const all = new Map<string, AnswerEvent>();
+  for (const e of [...a, ...b]) all.set(key(e), e);
+  return [...all.values()].sort((x, y) => x.t - y.t || key(x).localeCompare(key(y))).slice(-HISTORY_CAP);
+};
+
+/** `pick` also receives one-sided records (with itself), so every merged record is normalized the same way. */
+function mergeRecords<T>(
+  a: Record<string, T>,
+  b: Record<string, T>,
+  pick: (x: T, y: T) => T,
+): Record<string, T> {
+  const out: Record<string, T> = {};
+  for (const k of [...new Set([...Object.keys(a), ...Object.keys(b)])].sort()) {
+    const x = a[k] ?? b[k]!;
+    const y = b[k] ?? x;
+    out[k] = pick(x, y);
+  }
+  return out;
+}
+
+/**
+ * Merges two learner states (for example this device and the synced copy). Per concept and per question
+ * the most recently updated record wins; answer histories are unioned. Commutative and idempotent.
+ */
+export function merge(a: LearnerState, b: LearnerState): LearnerState {
   return {
-    ...c,
-    events: pruneEvents([...c.events, e]),
-    attempts: c.attempts + 1,
-    lastSeen: Math.max(c.lastSeen, e.t),
+    version: STATE_VERSION,
+    updatedAt: Math.max(a.updatedAt, b.updatedAt),
+    concepts: mergeRecords(a.concepts, b.concepts, (x, y) => ({
+      ...later(x, y, x.lastSeen, y.lastSeen),
+      history: mergeHistory(x.history, y.history),
+    })),
+    questions: mergeRecords(a.questions, b.questions, (x, y) => later(x, y, x.lastReviewed, y.lastReviewed)),
+    arms: mergeRecords(a.arms, b.arms, (x, y) => later(x, y, x.alpha + x.beta, y.alpha + y.beta)),
+    activeDays: [...new Set([...a.activeDays, ...b.activeDays])].sort(),
+    settings: later(a.settings, b.settings, a.updatedAt, b.updatedAt),
   };
 }
 
-export function serialize(s: LearnerState): string {
-  return JSON.stringify(s);
-}
+// ---------- serialization ----------
 
-export function deserialize(text: string): LearnerState {
-  let raw: unknown;
-  try {
-    raw = JSON.parse(text);
-  } catch {
-    throw new Error('Learner state is not valid JSON');
+const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
+const isObj = (v: unknown): v is Record<string, unknown> =>
+  typeof v === 'object' && v !== null && !Array.isArray(v);
+
+/** Parses and validates a stored or imported state; returns null when it is not a valid learner state. */
+export function parseState(raw: unknown): LearnerState | null {
+  if (!isObj(raw) || raw.version !== STATE_VERSION || !isNum(raw.updatedAt)) return null;
+  const { concepts, questions, arms, activeDays, settings } = raw;
+  if (!isObj(concepts) || !isObj(questions) || !isObj(arms) || !Array.isArray(activeDays) || !isObj(settings))
+    return null;
+  for (const c of Object.values(concepts)) {
+    if (!isObj(c) || ![c.pL, c.theta, c.attempts, c.lastSeen].every(isNum) || !Array.isArray(c.history))
+      return null;
+    if ((c.pL as number) < 0 || (c.pL as number) > 1) return null;
+    for (const e of c.history as unknown[])
+      if (
+        !isObj(e) ||
+        !isNum(e.t) ||
+        typeof e.q !== 'string' ||
+        typeof e.correct !== 'boolean' ||
+        !isNum(e.hints)
+      )
+        return null;
   }
-  const o = raw as Partial<LearnerState> | null;
-  if (!o || typeof o !== 'object' || o.version !== STATE_VERSION || !o.concepts || !o.questions) {
-    throw new Error(`Learner state has an unsupported shape or version (expected version ${STATE_VERSION})`);
-  }
-  return { version: STATE_VERSION, concepts: o.concepts, questions: o.questions };
+  for (const q of Object.values(questions))
+    if (!isObj(q) || ![q.n, q.interval, q.ef, q.b, q.due, q.lastReviewed].every(isNum)) return null;
+    else if (q.introducedBy !== undefined && typeof q.introducedBy !== 'string') return null;
+  for (const a of Object.values(arms)) if (!isObj(a) || !isNum(a.alpha) || !isNum(a.beta)) return null;
+  if (!activeDays.every((d) => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d))) return null;
+  if (typeof settings.hideStreak !== 'boolean') return null;
+  const s = raw as unknown as LearnerState;
+  // Enforce the cap on import as well, so a hand-edited file cannot grow the document without bound.
+  for (const c of Object.values(s.concepts)) c.history = c.history.slice(-HISTORY_CAP);
+  return s;
 }
 
-const key = (v: unknown) => JSON.stringify(v);
-
-/** The record that wins: newer lastSeen, then a fixed tie-break so the choice is order independent. */
-function newer<T extends { lastSeen: number }>(a: T, b: T): T {
-  if (a.lastSeen !== b.lastSeen) return a.lastSeen > b.lastSeen ? a : b;
-  return key(a) >= key(b) ? a : b;
-}
-
-function mergeConcept(a: ConceptState, b: ConceptState): ConceptState {
-  const w = newer(a, b);
-  return {
-    pL: w.pL,
-    theta: w.theta,
-    lastSeen: Math.max(a.lastSeen, b.lastSeen),
-    // Attempts survive pruning, so take the larger count rather than the event count.
-    attempts: Math.max(a.attempts, b.attempts),
-    events: dedupePrune([...a.events, ...b.events]),
-  };
-}
-
-/** Commutative and idempotent merge of two learner states (for sync, M6.5). */
-export function mergeStates(a: LearnerState, b: LearnerState): LearnerState {
-  const concepts: Record<string, ConceptState> = {};
-  for (const id of new Set([...Object.keys(a.concepts), ...Object.keys(b.concepts)])) {
-    const x = a.concepts[id];
-    const y = b.concepts[id];
-    concepts[id] = x && y ? mergeConcept(x, y) : { ...(x ?? y!), events: dedupePrune((x ?? y!).events) };
-  }
-  const questions: Record<string, QuestionState> = {};
-  for (const id of new Set([...Object.keys(a.questions), ...Object.keys(b.questions)])) {
-    const x = a.questions[id];
-    const y = b.questions[id];
-    questions[id] = x && y ? newer(x, y) : { ...(x ?? y!) };
-  }
-  return { version: STATE_VERSION, concepts, questions };
-}
+export const serialize = (s: LearnerState): string => JSON.stringify(s);

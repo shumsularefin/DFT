@@ -1,0 +1,142 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import tagsFile from '../data/vasp-tags.json';
+
+interface Tag {
+  name: string;
+  group: string;
+  default: string;
+  typical: string;
+  vaspVersion: string;
+  summary: { beginner: string; intermediate: string; pro?: string };
+  why: string;
+  breaks: string;
+  related: string[];
+  sources: string[];
+  corrections?: { was: string; now: string }[];
+  notes: string;
+}
+const tags = (tagsFile.tags as unknown as Tag[]).slice().sort((a, b) => a.name.localeCompare(b.name));
+const groups = [...new Set(tags.map((t) => t.group))].sort();
+---
+
+<BaseLayout
+  title="VASP tag cards"
+  description="What each INCAR tag used on this site does, why it has its usual value, its default and what breaks."
+>
+  <div class="container">
+    <h1>VASP tag cards</h1>
+    <p>
+      One card per INCAR tag used in the handbook and the input builder: what it does, why the usual value,
+      the default, typical values and what breaks. The values come from the VASP wiki and the author's
+      handbooks (see the sources on each card); the VASP version each applies to is stated. Always check the
+      VASP wiki page of the same name for your version.
+    </p>
+    <nav aria-label="Tags by group" class="tags-index">
+      {groups.map((g) => (
+        <p>
+          <strong>{g}:</strong>{' '}
+          {tags
+            .filter((t) => t.group === g)
+            .map((t, i) => (
+              <>
+                {i > 0 && ', '}
+                <a href={`#${t.name}`}>{t.name}</a>
+              </>
+            ))}
+        </p>
+      ))}
+    </nav>
+    {tags.map((t) => (
+      <section class="tagcard" id={t.name} aria-labelledby={`h-${t.name}`}>
+        <h2 id={`h-${t.name}`}>
+          <code>{t.name}</code> <span class="tagcard-group">{t.group}</span>
+        </h2>
+        <p>{t.summary.beginner}</p>
+        <dl>
+          <dt>Why this value</dt>
+          <dd>{t.why}</dd>
+          <dt>Default</dt>
+          <dd>{t.default}</dd>
+          <dt>Typical</dt>
+          <dd>{t.typical}</dd>
+          <dt>What breaks</dt>
+          <dd>{t.breaks}</dd>
+          {t.corrections?.map((c) => (
+            <>
+              <dt>Corrected in the handbook</dt>
+              <dd>{c.now}</dd>
+            </>
+          ))}
+          {t.related.length > 0 && (
+            <>
+              <dt>Related</dt>
+              <dd>
+                {t.related.map((r, i) => (
+                  <>
+                    {i > 0 && ', '}
+                    <a href={`#${r}`}>{r}</a>
+                  </>
+                ))}
+              </dd>
+            </>
+          )}
+        </dl>
+        {t.summary.pro && (
+          <details>
+            <summary>More detail (intermediate and pro)</summary>
+            <p>{[t.summary.intermediate, t.summary.pro].join(' ')}</p>
+          </details>
+        )}
+        <p class="tagcard-meta">
+          VASP {t.vaspVersion}. Sources:{' '}
+          {t.sources.map((s, i) => (
+            <>
+              {i > 0 && ', '}
+              <a href={`/references/#${s}`}>{s}</a>
+            </>
+          ))}
+          . {t.notes}
+        </p>
+      </section>
+    ))}
+  </div>
+</BaseLayout>
+
+<style>
+  .tags-index p {
+    margin: var(--space-1) 0;
+  }
+  .tagcard {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3) var(--space-4);
+    margin: var(--space-4) 0;
+    background: var(--surface);
+    scroll-margin-top: var(--space-6);
+  }
+  .tagcard:target {
+    border-color: var(--accent);
+  }
+  .tagcard h2 {
+    margin: 0;
+    font-size: var(--step-1);
+  }
+  .tagcard-group {
+    font-size: var(--step--1);
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+  .tagcard dt {
+    font-weight: 600;
+    margin-top: var(--space-2);
+  }
+  .tagcard dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+  .tagcard-meta {
+    font-size: var(--step--1);
+    color: var(--text-muted);
+  }
+</style>

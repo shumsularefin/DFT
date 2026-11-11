@@ -25,7 +25,7 @@
     ],
     "hints": [
       "Think about what happens when you add a second electron.",
-      "With two electrons, each one's motion depends on where the other is."
+      "With two electrons, the motion of one depends on where the other is."
     ],
     "difficulty": -2,
     "level": "beginner",
@@ -59,7 +59,7 @@
     ],
     "hints": [
       "Three per electron.",
-      "Each electron has three position coordinates, so N electrons have 3 x N."
+      "Each electron has x, y and z."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -79,7 +79,7 @@
     "unit": "",
     "hints": [
       "Number of coordinates is 3N, and each takes 10 values.",
-      "The grid has 10^(3N) values, and 3N = 12 for four electrons. Which exponent is that?"
+      "Four electrons have 12 coordinates."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -113,7 +113,7 @@
     ],
     "hints": [
       "Think about heavy versus light.",
-      "Nuclei are thousands of times heavier, so on the electrons' time scale they barely move."
+      "Nuclei are thousands of times heavier than electrons."
     ],
     "difficulty": -1,
     "level": "intermediate",
@@ -147,7 +147,7 @@
     ],
     "hints": [
       "The coupling is between pairs.",
-      "Without the pair repulsion term, the energy is a sum of one-electron terms, which can be solved separately."
+      "Without the pair term, each electron feels only the nuclei."
     ],
     "difficulty": 0,
     "level": "pro",
@@ -181,7 +181,7 @@
     ],
     "hints": [
       "Choose N orbitals from M.",
-      "A determinant is one way to fill occupied spin orbitals. The count is how many such ways exist."
+      "Each determinant is one choice of occupied spin orbitals."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -221,7 +221,7 @@
     "unit": "TB",
     "hints": [
       "Multiply by 8, then divide by 10^12.",
-      "137 846 528 820 x 8 bytes, then divide by 10^12 for terabytes."
+      "8 x 137 846 528 820 bytes is about 1.1 x 10^12 bytes."
     ],
     "difficulty": 1,
     "level": "intermediate",
@@ -255,7 +255,7 @@
     ],
     "hints": [
       "Compare the growth of the problem with the growth of hardware.",
-      "Hardware improves by a fixed factor over time, while the problem multiplies at every electron you add."
+      "Each added electron multiplies the work, while hardware improves only steadily."
     ],
     "difficulty": 0,
     "level": "beginner",
@@ -289,7 +289,7 @@
     ],
     "hints": [
       "It is exact counting.",
-      "The lab counts how many numbers the full wavefunction needs, without using symmetry to shrink it."
+      "It counts stored numbers, without using any symmetry to reduce them."
     ],
     "difficulty": -1,
     "level": "intermediate",
@@ -323,7 +323,7 @@
     ],
     "hints": [
       "A map over space.",
-      "Density is a function of position in space only, so it needs x, y and z."
+      "The density gives one number at each point in space."
     ],
     "difficulty": -2,
     "level": "beginner",
@@ -357,7 +357,7 @@
     ],
     "hints": [
       "Add up the electrons everywhere.",
-      "Integrating charge density over all space gives the total charge, counted in electrons."
+      "The density is electrons per unit volume."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -391,7 +391,7 @@
     ],
     "hints": [
       "Think about what the constant does to all energies.",
-      "A constant shift moves every energy equally and does not change the shape of any orbital."
+      "A constant shift moves every level by the same amount without changing the shapes."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -425,7 +425,7 @@
     ],
     "hints": [
       "Sum over occupied orbitals.",
-      "Each occupied orbital contributes its squared magnitude, multiplied by how many electrons occupy it."
+      "Each occupied orbital adds its own probability density."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -445,7 +445,7 @@
     "unit": "",
     "hints": [
       "Density counts electrons.",
-      "The integral of the density equals the number of electrons, so N = 6 gives 6."
+      "The integral counts the electrons."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -479,7 +479,7 @@
     ],
     "hints": [
       "One density, one potential.",
-      "If two potentials gave the same ground-state density, they would have to differ by a constant at most."
+      "Given the density, you could in principle recover the potential that produced it."
     ],
     "difficulty": -1,
     "level": "intermediate",
@@ -513,7 +513,7 @@
     ],
     "hints": [
       "Count the variables.",
-      "The density has three variables for any N, while the wavefunction has 3N."
+      "The wavefunction grows with every electron; the density does not."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -547,7 +547,7 @@
     ],
     "hints": [
       "Look at the name.",
-      "The theorem is about the ground state, the state of lowest energy."
+      "Ground means lowest energy."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -581,7 +581,7 @@
     ],
     "hints": [
       "Existence versus recipe.",
-      "The theorem proves that an energy functional exists. It does not tell you what that functional looks like."
+      "The theorem proves a functional exists, which is different from writing it down."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -615,7 +615,7 @@
     ],
     "hints": [
       "What was new?",
-      "Potential to density is the easy direction. The theorem adds that the density also fixes the potential."
+      "Going from a potential to a density was already known; the other direction was new."
     ],
     "difficulty": 1,
     "level": "pro",
@@ -649,7 +649,7 @@
     ],
     "hints": [
       "One unknown term.",
-      "Almost every term in the energy is known exactly. One is not."
+      "Kinetic, Hartree and external terms are treated exactly in Kohn-Sham DFT."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -684,7 +684,7 @@
     ],
     "hints": [
       "Pauli plus repulsion.",
-      "Exchange comes from the Pauli principle. Correlation comes from electrons avoiding each other beyond that."
+      "One part comes from antisymmetry, the other from electrons repelling each other."
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -719,7 +719,7 @@
     ],
     "hints": [
       "Theorem versus recipe.",
-      "Distinguish the theorem from the recipe. The theorem is exact, the practical functional is not."
+      "The exact functional exists but is unknown."
     ],
     "difficulty": -1,
     "level": "beginner",
@@ -754,7 +754,7 @@
     ],
     "hints": [
       "Think about where the error comes from.",
-      "If two functionals disagree, the error is not random. It depends on the material and the property."
+      "A result that holds with two different functionals is less likely to be an artefact of one."
     ],
     "difficulty": 0,
     "level": "intermediate",

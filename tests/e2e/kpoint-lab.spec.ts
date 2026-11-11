@@ -25,12 +25,12 @@ test.describe('k-point mesh lab', () => {
     await expect(readout(page, 'Mesh has the lattice symmetry')).toHaveText('yes');
   });
 
-  test('even Monkhorst-Pack on fcc gives 28 points and shows the Q-017 explanation', async ({ page }) => {
+  test('even Monkhorst-Pack on fcc gives 28 points and shows the shift explanation', async ({ page }) => {
     await open(page);
     await page.getByRole('switch', { name: /Monkhorst-Pack instead/ }).click();
     await expect(readout(page, 'Irreducible points')).toHaveText('28');
     await expect(readout(page, 'Mesh has the lattice symmetry')).toHaveText('no');
-    await expect(page.getByText(/Q-017/)).toBeVisible();
+    await expect(page.getByText(/shifted off Gamma/)).toBeVisible();
   });
 
   test('a smaller mesh changes the counts', async ({ page }) => {

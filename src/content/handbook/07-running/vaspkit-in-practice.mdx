@@ -1,0 +1,128 @@
+---
+id: vaspkit-in-practice
+title: VASPKIT in practice
+module: 7
+order: 5
+summary: The VASPKIT tasks the protocol uses, how to run them without the menus, the settings file that matters, and why you check every template it writes.
+concepts: [vaspkit]
+requires: [vasp-protocol]
+vaspTags: []
+sources: [S-020, S-042]
+status: draft
+updated: 2026-11-06
+noLab: true
+---
+
+<Why>
+
+VASPKIT is a helper program that writes input files and reads results: INCAR templates, k-meshes, band paths, DOS and band plots, elastic constants. The author's protocol calls it at almost every step. It saves time, but a template is only as good as the values you check in it.
+
+</Why>
+
+<Intuition>
+
+<Term id="vaspkit">VASPKIT</Term> is menu-driven: type `vaspkit`, then a group number, then a three-digit task
+<Cite id="S-020" /> <Cite id="S-042" />.
+
+<Callout variant="note" title="Menu numbers change">
+  Every code below is taken from the VASPKIT 1.5 tutorials and feature list, as recorded in the author's
+  Workflow Handbook. Menus still change between releases, so if a number does nothing, check the menu of your
+  installed version <Cite id="S-042" />.
+</Callout>
+
+The tasks the protocol uses <Cite id="S-042" />:
+
+| Code      | Does                                                                             | Protocol step |
+| --------- | -------------------------------------------------------------------------------- | ------------- |
+| 101       | INCAR template for task codes (SR relaxation, ST static, MG magnetic, OP optics) | 1, 2, 5       |
+| 102       | KPOINTS for SCF from a resolution in 2 pi per angstrom                           | 1             |
+| 103 / 104 | POTCAR with default or user-chosen datasets (from your licensed library)         | 1             |
+| 105       | POSCAR from CIF                                                                  | 1             |
+| 109       | Check all input files; run it before every submission                            | all           |
+| 602       | Standardised primitive cell, so later k-paths match your cell                    | before 1      |
+| 111 / 113 | Total and projected DOS                                                          | 2             |
+| 303       | KPATH.in, the band path                                                          | 3             |
+| 211       | Band structure from the band run                                                 | 3             |
+| 203       | Elastic constants from OUTCAR                                                    | 4             |
+| 711       | Optical constants from vasprun.xml                                               | 5             |
+
+<Level min="intermediate">
+
+Task codes for 101 are joined into one string: `SRMG` is a spin-polarised relaxation, `STH6D3` a static HSE06 run with D3. Other codes: LR lattice relaxation, SO spin-orbit, D3 DFT-D3, H6 HSE06, PU DFT+U, OP optics, EC static dielectric constant, DC elastic constants, BD Bader, FD and DT phonons, FQ frequencies, EL ELF, PC partial charge, MD molecular dynamics. There is no meta-GGA code: add the METAGGA tags to an ST or SR template by hand <Cite id="S-042" />.
+
+The templates start from conservative defaults (the LR template has PREC = Normal, LREAL = Auto and ENCUT commented out), so always set ENCUT, EDIFF, ISMEAR and spin yourself <Cite id="S-042" />.
+
+</Level>
+
+<Level min="pro">
+
+The `~/.vaspkit` settings that matter <Cite id="S-042" />:
+
+| Setting                                         | Effect                                                                                                                      |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `PBE_PATH`, `POTCAR_TYPE`, `RECOMMENDED_POTCAR` | Where your POTCAR library lives, which functional, and whether the recommended datasets are used. Required for 102 and 103. |
+| `SET_INCAR_WRITE_MODE`                          | Default OVERRIDE replaces an existing INCAR when you run 101. BACK-UP-OLD or BACK-UP-NEW protect hand-edited files.         |
+| `MINI_INCAR`                                    | `.TRUE.` writes INCARs without the explanatory comments                                                                     |
+| `SET_FERMI_ENERGY_ZERO`                         | `.TRUE.` (default) shifts DOS and band energies so that E-fermi is zero                                                     |
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+Task 102 turns a resolution $\Delta k$ (in units of $2\pi$ per angstrom) into subdivisions along each reciprocal vector, roughly $N_i \approx |\mathbf{b}_i| / (2\pi\,\Delta k)$ rounded to a whole number (the exact rounding is VASPKIT's). The Workflow Handbook's guide: 0.06 to 0.04 is low, 0.04 to 0.03 medium (usually enough), 0.02 to 0.01 fine <Cite id="S-042" />. Smaller $\Delta k$ means more k-points; always confirm with a convergence test.
+
+</TheMath>
+
+<InVasp>
+
+Five ways to run the same task, so that VASPKIT can be scripted <Cite id="S-042" />:
+
+<VaspFile
+  name="shell"
+  code={`vaspkit                              # interactive menus
+vaspkit -task 102 -kpr 0.04          # command-line mode (vaspkit -help lists options)
+echo -e "102\\n2\\n0.04\\n" | vaspkit  # piped answers, in menu order
+(echo 102; echo 2; echo 0.04) | vaspkit
+vaspkit < cmd.in                     # answers stored one per line in a file`}
+/>
+
+The 109 check, then a look at the INCAR it left, is the habit to build: VASPKIT writes a file, you decide what goes in it.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                                    | ...then                                                  |
+| -------------------------------------------- | -------------------------------------------------------- |
+| Run 101 over a hand-edited INCAR             | With the default OVERRIDE mode your edits are replaced   |
+| Use a template without setting ENCUT         | The template's value (or the POTCAR default) is used     |
+| Plot DOS with SET_FERMI_ENERGY_ZERO = .TRUE. | Energies are shifted so E-fermi = 0                      |
+| Use a menu number from an older tutorial     | It may do something else in your version: check the menu |
+
+Why it matters: a tool that writes inputs makes choices for you. What happens if you never read the output: someone else's defaults in your results.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Overwriting a hand-edited INCAR">
+  Set `SET_INCAR_WRITE_MODE` to BACK-UP-OLD or BACK-UP-NEW in `~/.vaspkit` before running 101 in a folder you
+  have worked in <Cite id="S-042" />.
+</Callout>
+
+<Callout variant="mistake" title="Trusting a menu number blindly">
+  Check the menu of your installed version; numbers have moved between releases <Cite id="S-042" />.
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-vkit-1', 'q-vkit-2', 'q-vkit-3', 'q-vkit-4', 'q-vkit-5']} />
+
+<GoDeeper>
+
+- V. Wang et al., the VASPKIT paper, and the VASPKIT tutorials <Cite id="S-020" />.
+- The Workflow Handbook's VASPKIT command map <Cite id="S-042" />.
+
+</GoDeeper>

@@ -33,13 +33,14 @@ export const NAV = [
   { label: 'Tools', href: '/tools/' },
   { label: 'Studio', href: '/tools/#studio' },
   { label: 'Builder', href: '/tools/#builder' },
-  { label: 'Practice', href: '/tools/#practice' },
+  { label: 'Practice', href: '/practice/' },
 ] as const;
 
 export const FOOTER_LINKS = [
   { label: 'About', href: '/about/' },
   { label: 'References', href: '/references/' },
   { label: 'Glossary', href: '/glossary/' },
+  { label: 'VASP tags', href: '/tags/' },
   { label: 'Privacy', href: '/privacy/' },
   { label: 'Changelog', href: '/changelog/' },
 ] as const;

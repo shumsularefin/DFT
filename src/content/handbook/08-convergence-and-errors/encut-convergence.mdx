@@ -1,0 +1,114 @@
+---
+id: encut-convergence
+title: Converging ENCUT, step by step
+module: 8
+order: 2
+summary: Generate a series of runs that differ only in ENCUT, collect the energies, plot them, and pick the cheapest setting that has stopped changing.
+concepts: [encut-convergence]
+requires: [convergence-testing]
+vaspTags: [ENCUT, PREC, EDIFF]
+sources: [S-019, S-041, S-042]
+status: draft
+updated: 2026-11-10
+---
+
+<Why>
+
+ENCUT is the setting you test first, because it does not depend on the k-mesh question and it controls how fine the description of the electrons is. A cutoff that is too low gives energies that are too high and stress that is wrong. A cutoff that is much higher than needed makes every later run slower for nothing.
+
+</Why>
+
+<Intuition>
+
+The test has five steps. None of them needs more than a few minutes of your attention; the cluster does the waiting.
+
+1. **Read ENMAX.** Every POTCAR states a recommended cutoff. Take the largest among your species (`grep ENMAX POTCAR`) <Cite id="S-042" />.
+2. **Choose the values.** The series generator starts at ENMAX rounded down to a multiple of 50 eV and goes up to about 1.75 times ENMAX in steps of 50 eV. For ENMAX = 400 eV that is 400, 450, ..., 700 eV. When ENMAX is not a multiple of 50 it also includes 1.3 times ENMAX, the protocol's production value, so the series always brackets it.
+3. **Run them all with everything else fixed.** One folder per value, the same POSCAR, the same k-mesh, the same smearing, static runs (NSW = 0).
+4. **Collect the energies.** The generated `collect.sh` prints the label, the energy extrapolated to zero smearing, the pressure and the number of atoms, one row per run.
+5. **Plot and decide.** Drop the results into the plotter. It divides by the number of atoms, applies the tolerance band and names the cheapest converged ENCUT.
+
+<Level min="intermediate">
+
+**Which energy.** The plotter reads the energy with sigma extrapolated to 0 from OUTCAR. From OSZICAR files it has only F and E0, which it uses instead.
+
+**Look at the pressure column too.** Stress converges more slowly than energy. If the energy has settled at 450 eV but the pressure is still moving, a relaxation that changes the volume needs a higher cutoff than a static run does <Cite id="S-041" />.
+
+**What to carry forward.** For fixed-cell runs the converged value is the one to use. For variable-cell relaxations the protocol's 1.3 times ENMAX is a floor; if your test says more is needed, use the larger value (Heuristic: the author's workflow gives the rule, the choice of "larger of the two" is a conservative reading). Then keep it identical in every run you will compare <Cite id="S-042" />.
+
+</Level>
+
+<Level min="pro">
+
+A converged ENCUT for the energy can be lower than one for forces, stress or a band gap, so test the property you will report. The hardest species sets ENMAX, which is why you take the largest among your POTCARs <Cite id="S-019" />. If you must compare energies across systems, use one ENCUT for all of them, the largest any of them needs, rather than each system's own converged value (Heuristic: the cutoff must be the same in every run you compare <Cite id="S-042" />).
+
+</Level>
+
+</Intuition>
+
+<Lab id="encut-sphere" title="The plane-wave sphere and the convergence curve" />
+
+<TheMath>
+
+The number of plane waves grows roughly as $E_\text{cut}^{3/2}$, so the cost of a run grows faster than the cutoff itself; each 50 eV step costs more than the one before it. The energy per atom $e(E_\text{cut})$ approaches its limit from above, and the test asks for the smallest cutoff whose energy is within the tolerance $\tau$ of every higher one, the criterion in the previous topic <Cite id="S-042" />.
+
+</TheMath>
+
+<InVasp>
+
+One run of a series, as the generator writes it (static, fixed mesh, non-spin-polarised unless you switch spin on):
+
+<VaspFile
+  name="INCAR"
+  code={`PREC = Accurate
+ENCUT = 450
+EDIFF = 1E-6
+ISMEAR = 0
+SIGMA = 0.05
+NSW = 0
+IBRION = -1
+LWAVE = .FALSE.
+LCHARG = .FALSE.`}
+/>
+
+The project folder holds one such INCAR per value, `run_all.sh` to run them one after another (`bash run_all.sh`), `collect.sh` to print the results as CSV and a `README.txt`. Open the [input builder](/tools/input-builder/) in "Convergence series" mode to make it, and the [plotter](/tools/convergence/) to read the CSV.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                               | ...then                                                  |
+| --------------------------------------- | -------------------------------------------------------- |
+| Start the series below ENMAX            | The first points are in the badly under-converged region |
+| Use a different k-mesh in some runs     | The curve mixes two effects and means nothing            |
+| Use a loose EDIFF                       | Noise in the energies can hide or fake convergence       |
+| Stop at the first point inside the band | A later bump may leave the band; check every later point |
+
+Why these steps: each run isolates one setting. What happens if you skip the test: you either pay for a cutoff you do not need or trust a cutoff that is too low.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Testing with a different k-mesh in each run">
+
+Keep the mesh fixed. The series generator does so for you <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Using the converged static ENCUT for a cell relaxation">
+
+Use at least 1.3 times the largest ENMAX when the volume changes <Cite id="S-041" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-encutc-1', 'q-encutc-2', 'q-encutc-3', 'q-encutc-4', 'q-encutc-5']} />
+
+<GoDeeper>
+
+- The plane-wave topic in module 5 for why the sphere grows with ENCUT.
+- The convergence plotter in the [tools](/tools/) list.
+
+</GoDeeper>

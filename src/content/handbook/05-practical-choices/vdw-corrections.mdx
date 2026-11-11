@@ -1,0 +1,95 @@
+---
+id: vdw-corrections
+title: Van der Waals corrections
+module: 5
+order: 8
+summary: Common functionals miss the weak attraction between layers and molecules. One INCAR tag adds it back.
+concepts: [vdw-corrections]
+requires: [functionals]
+vaspTags: [IVDW]
+sources: [S-019, S-028, S-042]
+status: draft
+updated: 2026-11-06
+noLab: true
+---
+
+<Why>
+
+Graphite, MoS2, molecular crystals, molecules on surfaces: all are held together partly by van der Waals (dispersion) forces. PBE barely sees these forces, so layered crystals fall apart along the stacking direction or come out far too far apart. If your system has layers, molecules or adsorbates, this page is not optional.
+
+</Why>
+
+<Intuition>
+
+Even a neutral atom has a fluctuating cloud of electrons. A momentary imbalance on one atom induces one on its neighbour, and the two attract. This dispersion attraction is weak and long ranged, and it comes from correlated motion of electrons far apart. LDA and GGA only look at the density near each point, so they cannot describe it <Cite id="S-028" />.
+
+The practical fix is to add an energy term that depends on the distances between atoms, with coefficients for each element pair. Grimme's D3 method is the most common; its Becke-Johnson damped version (D3-BJ) changes how the correction is switched off at short range <Cite id="S-028" />. Tkatchenko-Scheffler (TS) derives the coefficients from the density instead.
+
+In VASP you choose one with `IVDW` <Cite id="S-042" />:
+
+- `IVDW = 11`: DFT-D3 (zero damping).
+- `IVDW = 12`: DFT-D3 with Becke-Johnson damping.
+- `IVDW = 20`: Tkatchenko-Scheffler.
+
+The author's handbook marks it as essential for layered (c-axis) and molecular crystals, set in the relaxation <Cite id="S-042" />.
+
+<Level min="intermediate">
+
+The correction changes forces and stress, so it must be on during the relaxation, not only added afterwards. Use the same IVDW in every calculation you compare.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+D3 adds a pairwise term
+
+$$E_\text{disp} = -\sum_{A<B} \sum_{n=6,8} s_n \frac{C_n^{AB}}{r_{AB}^n}\, f_\text{damp}(r_{AB})$$
+
+where $C_n^{AB}$ are dispersion coefficients for the pair of atoms, $s_n$ are scaling factors fitted for each functional, and the damping function switches the term off at short range; zero damping and Becke-Johnson damping differ in this function <Cite id="S-028" />.
+
+</TheMath>
+
+<InVasp>
+
+<VaspFile
+  name="INCAR"
+  code={`IVDW = 12   ! DFT-D3 with Becke-Johnson damping`}
+  annotations={{ 1: '11 = D3, 12 = D3-BJ, 20 = TS' }}
+/>
+
+See the card for <Tag name="IVDW" /> and the VASP wiki page IVDW <Cite id="S-019" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                             | ...then                                                        |
+| ------------------------------------- | -------------------------------------------------------------- |
+| Relax a layered crystal without IVDW  | The interlayer distance comes out far too large                |
+| Add IVDW only in the final static run | The structure was relaxed without it; results are inconsistent |
+| Switch between D3 and D3-BJ           | Small but real changes; report which one                       |
+
+Why add it: the functional is missing physics, not precision. What happens if you skip it in layered systems: the structure itself is wrong.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Using a vdW correction as a fitting knob">
+
+Choose a scheme before you look at the result, and report it.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-vdw-1', 'q-vdw-2', 'q-vdw-3', 'q-vdw-4']} />
+
+<GoDeeper>
+
+- Grimme, Antony, Ehrlich and Krieg on DFT-D3, and Grimme, Ehrlich and Goerigk on Becke-Johnson damping <Cite id="S-028" />.
+- VASP wiki page IVDW <Cite id="S-019" />.
+
+</GoDeeper>

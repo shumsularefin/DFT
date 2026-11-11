@@ -1,0 +1,138 @@
+---
+id: kpoints-and-the-brillouin-zone
+title: K-points and the Brillouin zone
+module: 5
+order: 2
+summary: Why VASP samples a mesh of k-points, how dense it must be, and when a Gamma-centred mesh is the safe choice.
+concepts: [brillouin-zone, kpoint-sampling, gamma-vs-mp]
+requires: [plane-wave-basis]
+vaspTags: [KSPACING, ISMEAR]
+sources: [S-007, S-019, S-036, S-042, S-050]
+status: draft
+updated: 2026-11-06
+---
+
+<Why>
+
+The KPOINTS file is the second number every calculation needs, after ENCUT. Too few k-points and the energy of a metal is simply wrong; too many and you wait for nothing. This page explains what a k-point is, why a finite mesh is enough, and how to pick one, including a known slip in the author's handbook about hexagonal cells.
+
+</Why>
+
+<Intuition>
+
+In a crystal each electron state carries a label $\mathbf{k}$, a wavevector that says how the orbital's phase changes from one cell to the next <Cite id="S-050" />. All the different labels fit inside one cell of reciprocal space, the first <Term id="brillouin-zone">Brillouin zone</Term> <Cite id="S-036" />. The second lab shows that zone for common lattices.
+
+Quantities such as the total energy are averages over every $\mathbf{k}$ in the zone. A computer cannot average over infinitely many, so VASP samples a regular mesh of points and adds them up with weights <Cite id="S-007" />. That is all a k-point mesh is: the sample points of an average.
+
+How many? It depends on how fast things change across the zone.
+
+- **Insulators and semiconductors**: the filled bands vary smoothly, and a modest mesh converges quickly.
+- **Metals**: the Fermi surface cuts through bands, so occupations jump from 1 to 0 inside the zone. A sum over points converges slowly; smearing (a later page) and denser meshes are the fix.
+- **Bigger cells need fewer k-points**: a cell twice as long in real space has a zone half as long in reciprocal space, so the same spacing needs half the points along that direction.
+
+Symmetry helps. Many mesh points are copies of each other under the crystal's rotations, so VASP computes only the different ones, the irreducible points. The first lab counts them.
+
+**Gamma-centred or Monkhorst-Pack.** A Gamma-centred mesh always contains the zone centre. A Monkhorst-Pack mesh with an even number of points along a direction is shifted off the centre. For hexagonal cells the shifted meshes break the six-fold symmetry, so the safe choice is Gamma-centred. The author's handbook says "odd MP meshes" in one table; the site's own tests show it is the even ones that break the symmetry, and the VASP wiki agrees: "Avoid Monkhorst-Pack meshes with an even number of in-plane subdivisions" <Cite id="S-019" />.
+
+<Level min="intermediate">
+
+`KSPACING` in the INCAR is an alternative to a KPOINTS file: VASP then picks the number of points along each direction from the reciprocal-lattice lengths so that the spacing is at most the value given (in 1/Angstrom, with the 2 pi included). Smaller KSPACING means more points <Cite id="S-019" />.
+
+</Level>
+
+<Level min="pro">
+
+With VASP's Monkhorst-Pack formula the points along a direction are $(2r - N - 1)/(2N)$ for $r = 1 \dots N$, so odd $N$ contains $\Gamma$ and even $N$ does not. The site checked with spglib that even meshes break the point group of hexagonal Mg and of the fcc primitive cell, but not of the sc or bcc primitive cells (`tests/reference/pw_kmesh_reference.json`).
+
+</Level>
+
+</Intuition>
+
+<Lab id="kpoint-mesh" title="K-point mesh" also="brillouin-zone" />
+
+<TheMath>
+
+The average over the zone of volume $\Omega_\text{BZ}$ is replaced by a weighted sum:
+
+$$\frac{1}{\Omega_\text{BZ}} \int_\text{BZ} f(\mathbf{k})\, d\mathbf{k} \approx \sum_{j} w_j\, f(\mathbf{k}_j), \qquad \sum_j w_j = 1$$
+
+<Cite id="S-007" />. Along reciprocal vector $\mathbf{b}_i$ a mesh of $N_i$ points spaces them by $|\mathbf{b}
+_i|/N_i$; KSPACING fixes this spacing and chooses $N_i$ accordingly <Cite id="S-019" />.
+
+</TheMath>
+
+<InVasp>
+
+A Gamma-centred 8 by 8 by 8 mesh:
+
+<VaspFile
+  name="KPOINTS"
+  code={`Automatic mesh
+0
+Gamma
+8 8 8
+0 0 0`}
+  annotations={{
+    2: '0 = generate the mesh automatically',
+    3: 'Gamma-centred; safe for hexagonal cells',
+    4: 'points along b1, b2, b3',
+  }}
+/>
+
+The mesh is converged like ENCUT, by a test (module 8). The cards for <Tag name="KSPACING" /> and <Tag name="ISMEAR" /> say how the mesh and the smearing interact. VASPKIT (task 102) writes this file for you <Cite id="S-042" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                               | ...then                                                                    |
+| --------------------------------------- | -------------------------------------------------------------------------- |
+| Double the mesh along each direction    | About eight times the points before symmetry; the energy converges         |
+| Use a metal with a coarse mesh          | Energies and forces jump as the mesh changes; use smearing and more points |
+| Use an even MP mesh on a hexagonal cell | Symmetry is broken; use Gamma-centred                                      |
+| Double the cell length                  | Half as many points needed along that direction                            |
+
+Why a mesh: it turns an integral over the zone into a short sum. What happens if it is too coarse: energy differences and DOS are wrong, especially for metals.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Using the same mesh for a supercell as for the primitive cell">
+
+A larger cell needs proportionally fewer points along the longer directions. The same mesh wastes time; it does not add accuracy.
+
+</Callout>
+
+<Callout variant="mistake" title="Reading a band structure from a mesh run">
+
+A band structure needs k-points along a path, which is a different KPOINTS file (module 9 and the k-path tool).
+
+</Callout>
+
+</Mistakes>
+
+<Check
+  ids={[
+    'q-bz-1',
+    'q-bz-2',
+    'q-bz-3',
+    'q-bz-4',
+    'q-ksamp-1',
+    'q-ksamp-2',
+    'q-ksamp-3',
+    'q-ksamp-4',
+    'q-gmp-1',
+    'q-gmp-2',
+    'q-gmp-3',
+    'q-gmp-4',
+  ]}
+/>
+
+<GoDeeper>
+
+- Monkhorst and Pack, "Special points for Brillouin-zone integrations" <Cite id="S-007" />.
+- Ashcroft and Mermin, chapter 5, on the reciprocal lattice and the Brillouin zone <Cite id="S-036" />.
+- VASP wiki pages KPOINTS and KSPACING <Cite id="S-019" />.
+
+</GoDeeper>

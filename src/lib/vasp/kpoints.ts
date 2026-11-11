@@ -1,13 +1,14 @@
 // KPOINTS: mesh sizes, mesh coordinates, text writers and a parser.
 // @source S-019 (VASP wiki: KPOINTS, KSPACING), S-042 (author's Workflow Handbook), S-007 (Monkhorst and Pack 1976)
 //
-// ROUNDING RULES (Q-004 is OPEN: the rule VASP and VASPKIT apply has not been read or run):
+// ROUNDING RULES (Q-004 closed 2026-11-11 from the documentation, not from a run):
 //   ratio_i = |b_i| / spacing, with |b_i| the reciprocal vector length INCLUDING 2 pi.
-//   'ceil'      N_i = max(1, ceil(ratio_i))               default (D-016): never gives a coarser mesh than asked
+//   'ceil'      N_i = max(1, ceil(ratio_i))               default (D-016): the rule the VASP wiki KSPACING page
+//                                                         (S-019) and the VASPKIT task 102 documentation (S-058) state
 //   'round'     N_i = max(1, floor(ratio_i + 0.5))        round half up
 //   'plus0.999' N_i = max(1, floor(ratio_i + 0.999))      the "int(x + 0.999)" candidate
-// Calibration protocol (the author, 5 minutes per run): see Q-004 in docs/OPEN_QUESTIONS.md. Fcc Cu primitive
-// a = 3.61 with KSPACING 0.3, 0.28 and 0.30145 separates the three rules (golden file kspacing_candidates).
+// The other two rules stay available for comparison only. Fcc Cu primitive a = 3.61 with KSPACING 0.3, 0.28 and
+// 0.30145 separates the three rules (golden file kspacing_candidates); a VASP run would still be a useful check.
 import { ParseError } from '../crystal/errors';
 import { reciprocalLattice, latticeParameters } from '../crystal/lattice';
 import { norm } from '../crystal/linalg';
@@ -18,7 +19,7 @@ export const DEFAULT_RULE: RoundingRule = 'ceil';
 export type Mesh = readonly [number, number, number];
 export interface MeshResult {
   mesh: Mesh;
-  /** The rule that produced the mesh (the UI must show it, because Q-004 is open). */
+  /** The rule that produced the mesh (the UI shows it, since a non-default rule can be picked). */
   rule: RoundingRule;
   /** Unrounded ratios |b_i| / spacing. */
   ratios: Vec3;
@@ -65,8 +66,9 @@ export function meshFromResolution(
 }
 
 /**
- * VASP "Auto" length mode: N_i = max(1, int(length x |b_i| + 0.5)) with |b_i| WITHOUT 2 pi.
- * UNVERIFIED (Q-018): recalled from the VASP wiki KPOINTS page.
+ * VASP "Auto" length mode: N_i = int(max(1, R_k |b_i| + 0.5)) with |b_i| WITHOUT 2 pi (b_i . a_j = delta_ij).
+ * @source S-019 (VASP wiki KPOINTS page, "Fully automatic mesh"; read 2026-11-11, Q-018 closed). The wiki notes
+ * that this differs slightly from KSPACING (which rounds up) and recommends KSPACING instead.
  */
 export function meshFromLength(m: Mat3, length: number): Mesh {
   if (!(length > 0) || !Number.isFinite(length)) throw new RangeError('length must be positive');
@@ -137,14 +139,14 @@ export function recommendCentering(s: Structure): Centering {
     return {
       centering: 'gamma',
       reason:
-        'Use Gamma-centred meshes for hexagonal and trigonal cells (author handbook rule, S-042). Measured here: an even Monkhorst-Pack mesh on a hexagonal cell (hcp Mg) does not keep the lattice symmetry, while Gamma-centred meshes do (Q-017).',
+        'Use Gamma-centred meshes for hexagonal and trigonal cells (author handbook rule, S-042). The VASP wiki KPOINTS page says to avoid Monkhorst-Pack meshes with an even number of in-plane subdivisions on hexagonal lattices (S-019). Measured here: an even Monkhorst-Pack mesh on hcp Mg does not keep the lattice symmetry, while Gamma-centred meshes do.',
     };
   }
   if (metricIsFccPrimitive(m)) {
     return {
       centering: 'gamma',
       reason:
-        'The face-centred cubic primitive cell has a = b = c and all angles 60 degrees. Measured here: an even Monkhorst-Pack mesh on it (fcc Cu) does not keep the lattice symmetry, while Gamma-centred meshes do (Q-017). Use a Gamma-centred mesh.',
+        'The face-centred cubic primitive cell has a = b = c and all angles 60 degrees. Measured here: an even Monkhorst-Pack mesh on it (fcc Cu) does not keep the lattice symmetry, while Gamma-centred meshes do (S-007, golden spglib test). Use a Gamma-centred mesh.',
     };
   }
   const p = latticeParameters(m);

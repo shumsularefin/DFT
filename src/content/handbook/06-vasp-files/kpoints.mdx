@@ -1,0 +1,111 @@
+---
+id: kpoints
+title: The KPOINTS file
+module: 6
+order: 2
+summary: How to write the k-point mesh or band path for VASP. Gamma-centred or Monkhorst-Pack, how many subdivisions, and when KSPACING replaces the file.
+concepts: [kpoints-file]
+requires: [kpoint-sampling]
+vaspTags: [KSPACING]
+sources: [S-019, S-041, S-042]
+status: draft
+updated: 2026-11-06
+noLab: true
+---
+
+<Why>
+
+Module 5 explained why a crystal needs <Term id="kpoint">k-points</Term>. KPOINTS is where you tell VASP which ones. A mesh that is too coarse gives wrong energies and forces; a mesh of the wrong type can break the symmetry of the crystal and stop the run. Five lines decide this.
+
+</Why>
+
+<Intuition>
+
+The most common KPOINTS is an automatic mesh, five lines long <Cite id="S-041" />:
+
+1. A comment.
+2. `0`: "generate the points automatically".
+3. `Gamma` or `Monkhorst-Pack`: where the mesh is centred.
+4. Three numbers: how many subdivisions along each reciprocal lattice vector.
+5. An optional shift (usually `0 0 0`).
+
+**Gamma-centred** meshes always contain the centre of the Brillouin zone. They are required for hexagonal cells and are a safe default for any lattice. **Monkhorst-Pack** meshes with even subdivisions are shifted off Gamma; they are efficient for simple cubic and orthorhombic cells but can break the symmetry of fcc, bcc and hexagonal lattices <Cite id="S-041" />.
+
+<Level min="intermediate">
+
+The number of subdivisions scales inversely with the cell length: $N_i \times a_i$ is roughly constant. A cell twice as long needs half the k-points along that direction. Converge the mesh until the energy changes by less than about 1 meV per atom; metals need denser meshes than insulators <Cite id="S-041" />.
+
+Other KPOINTS modes: **line mode** lists the corners of a band-structure path (the <a href="/tools/kpath/">k-path tool</a> writes it), and **explicit mode** lists every point with its weight. Without any KPOINTS file, VASP builds a mesh from the INCAR tag KSPACING <Cite id="S-019" />.
+
+</Level>
+
+<Level min="pro">
+
+A line-mode path is not suitable for a self-consistent calculation: its points do not sample the zone evenly. Band structures therefore come either from a non-self-consistent run that reads a converged CHGCAR (ICHARG = 11), or, in VASP 6.3 and later, from KPOINTS_OPT alongside a uniform mesh <Cite id="S-042" />. Module 9 covers both routes.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+For reciprocal lattice vectors $\mathbf{b}_i$ and subdivisions $N_i$, a Gamma-centred mesh contains the points
+
+$$\mathbf{k} = \sum_i \frac{n_i}{N_i}\,\mathbf{b}_i, \qquad n_i = 0, 1, \ldots, N_i - 1.$$
+
+A Monkhorst-Pack mesh uses $(n_i + \tfrac12 - \tfrac{N_i}{2}) / N_i$ instead, which for even $N_i$ avoids Gamma. VASP then keeps only the irreducible points (IBZKPT) and weights each by how many equivalent points it stands for <Cite id="S-041" />. KSPACING sets $N_i = \max(1, \lceil |\mathbf{b}_i| / \text{KSPACING} \rceil)$, with $|\mathbf{b}_i|$ including the factor $2\pi$ <Cite id="S-019" />.
+
+</TheMath>
+
+<InVasp>
+
+An automatic Gamma-centred 8 x 8 x 8 mesh, as in the Field Handbook <Cite id="S-041" />. Click a line:
+
+<VaspFileExplorer
+  kind="KPOINTS"
+  code={`Automatic mesh
+0
+Gamma
+  8  8  8
+  0  0  0`}
+/>
+
+VASPKIT task 102 writes KPOINTS from a resolution in units of 2 pi per angstrom (0.04 to 0.03 is usually enough), and task 303 writes the band path KPATH.in <Cite id="S-042" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                               | ...then                                                              |
+| --------------------------------------- | -------------------------------------------------------------------- |
+| Double every subdivision                | About eight times more k-points before symmetry, a more accurate sum |
+| Use an even Monkhorst-Pack mesh for hcp | Symmetry can break; VASP may stop with a lattice-class error         |
+| Delete KPOINTS and set KSPACING         | VASP builds a Gamma-centred mesh from the spacing                    |
+| Use line mode for an SCF run            | Uneven sampling; the density and energy are wrong                    |
+
+Why these values: the mesh must be dense enough that the energy no longer changes by more than about 1 meV per atom. What happens if you skip the test: energies and forces carry an error you never measured.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Monkhorst-Pack on a hexagonal cell">
+  Use Gamma-centred meshes for hexagonal lattices. A shifted mesh triggers "Reciprocal lattice and k-lattice
+  belong to different class of lattices" <Cite id="S-041" />.
+</Callout>
+
+<Callout variant="mistake" title="Keeping the same mesh for a supercell">
+  A 2 x 2 x 2 supercell needs about half the subdivisions. Keeping the primitive-cell mesh wastes time without
+  improving accuracy.
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-kpfile-1', 'q-kpfile-2', 'q-kpfile-3', 'q-kpfile-4']} />
+
+<GoDeeper>
+
+- VASP wiki, pages KPOINTS and KSPACING <Cite id="S-019" />.
+- The Field Handbook entries for KPOINTS and IBZKPT <Cite id="S-041" />.
+
+</GoDeeper>

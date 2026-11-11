@@ -22,6 +22,10 @@
     "moyo": {
       "contains": "analyze_cell",
       "maxKB": 300
+    },
+    "firebase": {
+      "contains": "identitytoolkit.googleapis.com",
+      "maxKB": 70
     }
   }
 }

@@ -1,0 +1,104 @@
+---
+id: hohenberg-kohn-theorems
+title: The Hohenberg-Kohn theorems
+module: 4
+order: 1
+summary: Two statements from 1964 that make the density a legitimate replacement for the wavefunction, and what they do not promise.
+concepts: [hohenberg-kohn]
+requires: [approximations-needed]
+vaspTags: []
+sources: [S-011, S-048, S-049]
+status: draft
+updated: 2026-11-06
+noLab: true
+---
+
+<Why>
+
+Module 3 showed that the wavefunction of many electrons is too big to store, while the <Term id="electron-density">electron density</Term> is a single function of three coordinates. Swapping one for the other is only allowed if no information is lost. The two <Term id="hohenberg-kohn-theorems">Hohenberg-Kohn theorems</Term> are the permission slip: they prove that, for the lowest-energy state, the density is enough <Cite id="S-011" />. Every DFT calculation you will ever run rests on them.
+
+</Why>
+
+<Intuition>
+
+**Statement 1: the density fixes everything.** The electrons in a material feel the pull of the nuclei, the <Term id="external-potential">external potential</Term>. Different arrangements of nuclei give different ground-state densities, and the theorem says the reverse is also true: from the ground-state density alone you could work out the external potential, up to an added constant that changes nothing physical. Once you know the potential, you know the Hamiltonian, and so in principle every property of the system <Cite id="S-011" />. The density lab in module 3 showed the one-electron version of this; the theorem says it holds for any number of interacting electrons.
+
+**Statement 2: the right density has the lowest energy.** There is an energy <Term id="functional">functional</Term>, a rule that takes a whole density and returns one number, whose smallest value is the true ground-state energy, reached at the true ground-state density. So finding the ground state becomes a search: try densities, keep the one with the lowest energy <Cite id="S-011" />.
+
+An analogy: a fingerprint identifies a person, even though it is much smaller than the person. The ground-state density is the fingerprint of the system.
+
+**What the theorems do not give you.** They prove the energy functional exists, but they do not say what it is. Part of it is easy (the attraction to the nuclei, the classical repulsion of the charge cloud). The rest, the kinetic energy of interacting electrons and the quantum parts of their repulsion, is unknown. The next page is the clever way around the kinetic part; what remains is the one approximation of practical DFT.
+
+<Level min="intermediate">
+
+The theorems are about the **ground state**. They say nothing directly about excited states, which is one reason band gaps from ordinary DFT need care (module 9). They also assume a non-degenerate ground state in the original proof; later work (the constrained search of Levy and Lieb) removed that restriction <Cite id="S-049" />.
+
+</Level>
+
+<Level min="pro">
+
+The first theorem is proved by contradiction: if two potentials differing by more than a constant gave the same ground-state density, the variational principle applied to each ground state with the other's Hamiltonian gives $E_1 + E_2 < E_1 + E_2$. The proof needs no formula for the functional, which is exactly why it gives none.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+Write $v(\mathbf{r})$ for the external potential and $n(\mathbf{r})$ for the density. The energy functional is
+
+$$E_v[n] = F[n] + \int v(\mathbf{r})\, n(\mathbf{r})\, d\mathbf{r}$$
+
+where $F[n]$ (kinetic energy plus electron-electron repulsion) is the same for every material: it is universal <Cite id="S-011" />. Statement 1: $n_0 \mapsto v$ is one-to-one up to a constant. Statement 2: $E_v[n] \ge E_0$ for every allowed density with the right electron count, with equality at $n = n_0$.
+
+<Level min="intermediate">
+
+The square brackets mean "a function of the whole function $n$", not of a single number. A functional eats a curve and returns a number, like the area under it.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+There is no VASP tag for a theorem, but you meet its consequences in every run. VASP iterates on the density and stops when the energy no longer changes (the electronic tolerance `EDIFF`). The fact that the lowest energy belongs to the right density is why "converged energy" is a meaningful target. Writing out the density to `CHGCAR` is writing out the fingerprint.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                                  | ...then                                                             |
+| ------------------------------------------ | ------------------------------------------------------------------- |
+| Know the exact ground-state density        | You could, in principle, recover the potential and every property   |
+| Try a density that is not the ground state | The exact functional gives an energy above the true ground state    |
+| Need an excited-state property (band gap)  | The theorems do not cover it directly; extra care or methods needed |
+| Use an approximate functional              | The variational guarantee is for the exact functional only          |
+
+Why this matters for you: it is the reason a DFT code can work with a few numbers per grid point instead of a wavefunction with $3N$ coordinates. What happens if you forget the limits: you may trust ground-state DFT for properties it was never promised to get right.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Thinking the theorems tell us the functional">
+
+They prove it exists. Finding good approximations to it has kept researchers busy since 1964.
+
+</Callout>
+
+<Callout variant="mistake" title="Expecting approximate DFT energies to be upper bounds">
+
+The lowest-energy promise holds for the exact functional. With an approximate one, a computed energy can lie below the true energy.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-hkt-1', 'q-hkt-2', 'q-hkt-3', 'q-hkt-4', 'q-hkt-5']} />
+
+<GoDeeper>
+
+- Hohenberg and Kohn, "Inhomogeneous electron gas", the original two-page proof <Cite id="S-011" />.
+- Martin, chapter 6, for the theorems and the constrained-search formulation <Cite id="S-049" />.
+
+</GoDeeper>

@@ -1059,6 +1059,44 @@ for (const [n] of usage) if (!nameSet.has(n)) throw new Error(`preset uses tag $
 
 const clip = (s, n) => (s.length <= n ? s : s.slice(0, s.lastIndexOf(' ', n - 1)) + ' ...');
 const UNSTATED = (n) => `Not stated in the handbooks. See the VASP wiki page for ${n}.`;
+// Defaults the handbooks do not state, transcribed from the TAGDEF/DEF line of each tag's VASP wiki page
+// (S-019, pages read 2026-11-11; closes Q-028 item 1 for these tags). Used only when the handbooks say nothing.
+const WIKI_DEFAULTS = {
+  NUPDOWN: 'not set (-1): the moment is fully relaxed',
+  NFREE: '2 if IBRION = 5 or 6, else 0',
+  LASPH: '.FALSE.',
+  NBANDS: 'max(nint(NELECT + 2) / 2 + max(NIONS / 2, 3), int(0.6 NELECT))',
+  LAECHG: '.FALSE.',
+  LVHAR: '.FALSE.',
+  LELF: '.FALSE.',
+  LOPTICS: '.FALSE.',
+  LEPSILON: '.FALSE.',
+  LCALCEPS: '.FALSE.',
+  LDAU: '.FALSE.',
+  LDAUTYPE: '2',
+  LDAUL: '2 for every species',
+  LDAUU: '0.0 for every species',
+  LDAUJ: '0.0 for every species',
+  LDAUPRINT: '0',
+  METAGGA: 'not set: the functional of LEXCH in POTCAR, unless GGA or XC is given',
+  LMIXTAU: '.FALSE.',
+  LHFCALC: '.FALSE.',
+  HFSCREEN: '0 (no screening)',
+  AEXX: '0.25 if LHFCALC = .TRUE. (1 if LRHFCALC = .TRUE.), else 0',
+  PRECFOCK: 'Normal (Single if PREC = Single or SingleN; Fast for RPAR runs)',
+  NKRED: '1',
+  IVDW: '0 (no correction)',
+  LSORBIT: '.FALSE.',
+  SAXIS: '0 0 1',
+  SYMPREC: '1E-5',
+  KSPACING: '0.5',
+  LDIPOL: '.FALSE.',
+  SYSTEM: 'unknown system',
+  TIME: '0.4',
+  LUSE_VDW: '.FALSE.',
+  BPARAM: '6.3',
+  CMBJ: 'calculated self-consistently',
+};
 const VERSION_NOTE = 'Minimum VASP version is not stated in the handbooks and has not been checked.';
 
 const tags = T.map(([name, group, type, beginner, breaks, related, key]) => {
@@ -1090,6 +1128,8 @@ const tags = T.map(([name, group, type, beginner, breaks, related, key]) => {
   };
   if (name in extra && !f) def = `${extra[name]} (as stated in the Workflow Handbook dictionary)`;
   if (name === 'NEDOS') def = '301';
+  if (def === UNSTATED(name) && name in WIKI_DEFAULTS)
+    def = `${WIKI_DEFAULTS[name]} (VASP wiki, ${name} page)`;
   const typical = row ? row.typical : f ? f.common : '';
   const interm = row ? row.controls : f ? strip(f.summary) : '';
   const pro = f ? clip(f.facts.map(strip).join(' '), 600) : row ? row.why : undefined;

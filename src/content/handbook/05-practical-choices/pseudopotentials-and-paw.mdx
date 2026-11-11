@@ -1,0 +1,117 @@
+---
+id: pseudopotentials-and-paw
+title: Pseudopotentials and PAW
+module: 5
+order: 3
+summary: Why VASP does not treat every electron explicitly, what the POTCAR holds, and how PAW gets the core region back.
+concepts: [pseudopotentials, paw]
+requires: [plane-wave-basis]
+vaspTags: [ENCUT, LASPH, LMAXMIX]
+sources: [S-008, S-009, S-019, S-041, S-042, S-049]
+status: draft
+updated: 2026-11-06
+---
+
+<Why>
+
+Every VASP run needs a POTCAR, and choosing it is a real decision: which dataset for each element, which electrons count as valence, and which cutoff follows from it. This page explains what a pseudopotential is, why plane waves need one, and what the projector augmented-wave (PAW) method adds.
+
+</Why>
+
+<Intuition>
+
+Near a nucleus the attraction is enormous, and the inner orbitals of an atom wiggle rapidly there: each orbital must have nodes to stay orthogonal to the ones below it. Describing those wiggles with plane waves would need an enormous cutoff <Cite id="S-049" />.
+
+But chemistry happens further out. The core electrons (for silicon, the 1s, 2s and 2p electrons) barely change when the atom bonds. So the core can be frozen, and the strong potential near the nucleus replaced by a weaker, smooth one that gives the same valence orbitals outside a cutoff radius $r_c$. That replacement is a <Term id="pseudopotential">pseudopotential</Term>. Inside $r_c$ the valence orbital becomes smooth and nodeless, so far fewer plane waves are needed. The lab shows the idea.
+
+The trade-off is set by $r_c$. A larger radius gives a smoother function and a lower cutoff, but the potential is then less faithful when the atom finds itself in a very different environment (it is less transferable).
+
+**PAW** (projector augmented waves) keeps the smooth functions for the plane waves but stores, for each atom, the true all-electron shapes inside $r_c$ and the recipe to switch between the two <Cite id="S-008" />. Quantities that need the core region, such as the density near the nucleus, can then be reconstructed. VASP's POTCAR files are PAW datasets <Cite id="S-009" />.
+
+**What to read from a POTCAR.** You never edit it and the site never shows one (it is licensed). Three grep commands tell you what you need <Cite id="S-042" />:
+
+- `grep TITEL POTCAR`: which datasets, in which order (must match the species order in POSCAR).
+- `grep ENMAX POTCAR`: the recommended cutoff of each; use 1.3 times the largest for ENCUT.
+- `grep ZVAL POTCAR`: valence electrons per species.
+
+<Level min="intermediate">
+
+Some elements have several datasets: `_pv` or `_sv` treat semicore p or s states as valence (more electrons, more accurate, more expensive), `_h` are harder (higher ENMAX), `_GW` are built for many-body methods. The VASP wiki lists the recommended choice per element; the author's handbook warns against using `_GW` or `_h` sets without a reason and against mixing LDA and PBE files <Cite id="S-042" /> <Cite id="S-019" />.
+
+</Level>
+
+<Level min="pro">
+
+For d and f elements set `LASPH = .TRUE.` so that the non-spherical parts of the gradient corrections inside the PAW spheres are included, and `LMAXMIX = 4` (d) or 6 (f) so that the mixer and CHGCAR keep the one-centre occupations, which matters for DFT+U and non-self-consistent runs (see Q-019 on the handbook's band INCARs) <Cite id="S-042" />.
+
+</Level>
+
+</Intuition>
+
+<Lab id="paw-picture" title="All-electron and pseudo wavefunctions" />
+
+<TheMath>
+
+PAW maps a smooth pseudo wavefunction $\tilde\psi$ to the all-electron one with a linear transformation
+
+$$|\psi\rangle = |\tilde\psi\rangle + \sum_i \big(|\phi_i\rangle - |\tilde\phi_i\rangle\big)\langle \tilde p_i|\tilde\psi\rangle$$
+
+where $\phi_i$ are all-electron atomic partial waves, $\tilde\phi_i$ their smooth partners (equal outside $r_c$), and $\tilde p_i$ projector functions <Cite id="S-008" />. Only $\tilde\psi$ is expanded in plane waves.
+
+</TheMath>
+
+<InVasp>
+
+Build the POTCAR by concatenating the element files in POSCAR order (VASPKIT task 103 does this) <Cite id="S-042" />:
+
+<VaspFile
+  name="shell"
+  code={`cat ~/potpaw_PBE/Fe_pv/POTCAR ~/potpaw_PBE/O/POTCAR > POTCAR
+grep TITEL POTCAR    # check order matches POSCAR
+grep ENMAX POTCAR    # largest x 1.3 -> ENCUT`}
+  annotations={{ 1: 'paths depend on your licensed installation', 2: 'order mistakes are a top error' }}
+/>
+
+See <Tag name="LASPH" /> and <Tag name="LMAXMIX" /> for the d- and f-element settings.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                                 | ...then                                                            |
+| ----------------------------------------- | ------------------------------------------------------------------ |
+| Choose a `_pv` or `_sv` dataset           | More valence electrons; more accurate for some oxides; higher cost |
+| Put the POTCAR files in a different order | Atoms get the wrong potentials; results are nonsense               |
+| Use a `_h` dataset                        | Higher ENMAX, so a higher ENCUT is needed                          |
+| Forget LASPH for a d or f element         | Small but systematic errors with gradient-corrected functionals    |
+
+Why PAW: plane waves at a practical cutoff with near all-electron accuracy. What happens if you pick datasets carelessly: energies cannot be compared, and some properties shift.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="POTCAR order not matching POSCAR order">
+
+VASP assigns potentials by position, not by name. Always check with `grep TITEL POTCAR`.
+
+</Callout>
+
+<Callout variant="mistake" title="Comparing energies made with different datasets">
+
+Changing `Fe` to `Fe_pv` changes the total energy by a large constant. Only compare energies from the same datasets.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-pp-1', 'q-pp-2', 'q-pp-3', 'q-pp-4', 'q-paw-1', 'q-paw-2', 'q-paw-3', 'q-paw-4']} />
+
+<GoDeeper>
+
+- Blöchl, "Projector augmented-wave method" <Cite id="S-008" />.
+- Kresse and Joubert on PAW in VASP <Cite id="S-009" />.
+- Martin, chapter 11, on pseudopotentials <Cite id="S-049" />.
+- VASP wiki pages "Available PAW potentials", LASPH and LMAXMIX <Cite id="S-019" />.
+
+</GoDeeper>

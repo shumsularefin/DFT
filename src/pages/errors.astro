@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ErrorFinder from '../components/labs/ErrorFinder';
+---
+
+<BaseLayout
+  title="Error finder"
+  description="Paste a VASP error message or describe what went wrong and see likely causes and the fixes to try, in order. Matching runs in your browser."
+  pageClass="tool"
+>
+  <div class="container">
+    <h1>VASP error finder</h1>
+    <p>
+      Paste the end of your log (VASP writes errors to standard output, not OUTCAR) or type what you see. The
+      entries come from the author's two handbooks. Nothing you paste leaves your browser.
+    </p>
+    <ErrorFinder client:load />
+  </div>
+</BaseLayout>

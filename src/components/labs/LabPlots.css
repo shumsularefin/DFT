@@ -1,0 +1,91 @@
+.lp-radios {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-2) var(--space-3);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-4);
+}
+.lp-radios legend {
+  font-weight: 600;
+  padding-inline: var(--space-1);
+}
+.lp-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--target);
+  cursor: pointer;
+}
+.lp-radio input {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: var(--accent);
+}
+.lp-fig {
+  margin: 0 0 var(--space-3);
+}
+.lp-fig figcaption {
+  font-weight: 600;
+  font-size: var(--step--1);
+}
+.lp-legend,
+.lp-muted {
+  font-size: var(--step--1);
+  color: var(--text-muted);
+}
+.lp-legend {
+  margin: 0;
+}
+.lp-key {
+  display: inline-block;
+  width: 1.6em;
+  height: 0;
+  vertical-align: middle;
+  margin-inline: var(--space-1);
+}
+.lp-dash {
+  border-top: 2px dashed var(--text-muted);
+}
+.lp-solid {
+  border-top: 3px solid var(--accent);
+}
+.ladder {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--space-2);
+  max-width: 28rem;
+}
+.ladder-rung {
+  width: 100%;
+  min-height: var(--target);
+  text-align: left;
+  font: inherit;
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+.ladder-rung.is-sel {
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.ladder-detail dt {
+  font-weight: 600;
+  margin-top: var(--space-2);
+}
+.ladder-detail dd {
+  margin: 0;
+}
+.spin-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  padding-left: 1.2em;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+}
