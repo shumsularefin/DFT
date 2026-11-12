@@ -22,6 +22,7 @@ import RelaxationViewer from '../labs/RelaxationViewer';
 import DosViewer from '../labs/DosViewer';
 import BandViewer from '../labs/BandViewer';
 import DensityViewer from '../labs/DensityViewer';
+import ToleranceLab from '../labs/ToleranceLab';
 // Labs are registered by id. An id with no component yet shows the placeholder, so topics can be written ahead of their labs.
 interface Props {
   id: string;
@@ -116,6 +117,10 @@ const { id, title, also } = Astro.props;
   ) : id === 'density-viewer' ? (
     <div data-lab-id={id}>
       <DensityViewer client:visible />
+    </div>
+  ) : id === 'tolerance-explorer' ? (
+    <div data-lab-id={id}>
+      <ToleranceLab client:visible />
     </div>
   ) : (
     <div class="lab-placeholder" data-lab-id={id}>

@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Lab from '../../components/handbook/Lab.astro';
+---
+
+<BaseLayout
+  title="Tolerance lab embed demo"
+  description="Demo of the tolerance-factor explorer embedded as a lab, as module 10 will use it."
+  pageClass="island"
+>
+  <div class="container">
+    <h1>Tolerance lab embed demo</h1>
+    <p>This page shows the lab id tolerance-explorer as an MDX topic would embed it. It is not indexed.</p>
+    <Lab id="tolerance-explorer" title="Tolerance-factor explorer" />
+  </div>
+</BaseLayout>

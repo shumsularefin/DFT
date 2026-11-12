@@ -74,6 +74,7 @@ export const REGISTERED_LABS = [
   'dos-viewer',
   'band-viewer',
   'density-viewer',
+  'tolerance-explorer',
 ] as const;
 
 /** Page class for a topic: "island" if its body embeds a registered lab, else "content". */

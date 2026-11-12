@@ -34,6 +34,7 @@ test.describe('tolerance-factor explorer', () => {
   test('NdCuO3 with Cu3+: uncommon warning, policy selector, CN 9 gives the golden t', async ({ page }) => {
     await page.goto(URL);
     await pick(page, 'A', 'Neodymium');
+    await pick(page, 'A', 'Neodymium');
     await pick(page, 'B', 'Copper');
     await page.getByLabel(/^Oxidation state, B site/).selectOption('3');
     await page.getByLabel(/^Oxidation state, A site/).selectOption('3');
@@ -148,5 +149,77 @@ test.describe('tolerance-factor explorer', () => {
     await pick(page, 'A', 'Gadolinium');
     r = await new AxeBuilder({ page }).analyze();
     expect(r.violations).toEqual([]);
+  });
+
+  test.describe('plots and sweeps (M8.4)', () => {
+    test('map has the octahedral lines and the composition point', async ({ page }) => {
+      await page.goto(URL);
+      const ex = page.getByTestId('explorer');
+      await expect(ex.getByRole('img', { name: /Map of the Goldschmidt/ })).toBeVisible();
+      const lines = ex.getByTestId('ref-line');
+      await expect(lines).toHaveCount(2);
+      expect(Number(await lines.nth(0).getAttribute('data-value'))).toBeCloseTo(Math.SQRT2 - 1, 9);
+      expect(Number(await lines.nth(1).getAttribute('data-value'))).toBeCloseTo(Math.sqrt(3) - 1, 9);
+      expect(Number(await ex.getByTestId('marker').getAttribute('data-x'))).toBeCloseTo(1.0016, 3);
+      await expect(page.getByTestId('map-caveat')).toContainText('Heuristic');
+    });
+
+    test('tau view shows the threshold and the confirmation note', async ({ page }) => {
+      await page.goto(URL);
+      await page.getByRole('button', { name: 'Tau view' }).click();
+      await expect(page.getByTestId('tau-note')).toContainText('Confirmation');
+      await expect(page.getByTestId('ref-line')).toHaveAttribute('data-value', '4.18');
+    });
+
+    test('family sweep shows gaps with reasons, and the policy fills them', async ({ page }) => {
+      await page.goto(URL);
+      await pick(page, 'A', 'Neodymium');
+      await pick(page, 'B', 'Copper');
+      await pick(page, 'X', 'Oxygen');
+      await page.getByRole('button', { name: 'Family trend' }).click();
+      // CN 12 has no Shannon radius for 12 of the 16 elements.
+      await expect(page.getByTestId('gap-count')).toContainText('12 of 16');
+      expect(await page.getByTestId('gap').count()).toBeGreaterThan(0);
+      await page.getByLabel(/A-site coordination policy/).selectOption('9');
+      await expect(page.getByTestId('gap-count')).toContainText(/\d+ of 16/);
+    });
+
+    test('mixed sweep appears only for a mixed site and CSV downloads', async ({ page }) => {
+      await page.goto(URL);
+      await page.getByRole('button', { name: 'Mixed-site sweep' }).click();
+      await expect(page.getByTestId('mixed-empty')).toBeVisible();
+      await page.getByRole('button', { name: 'Add second occupant to the A site' }).click();
+      await page.getByRole('button', { name: /^Element, A site second occupant/ }).click();
+      await page
+        .getByRole('region', { name: 'Element picker for the A site' })
+        .getByRole('button', { name: /Barium/ })
+        .click();
+      await expect(page.getByTestId('gap-count')).toContainText('0 of 11');
+      const dl = page.waitForEvent('download');
+      await page.getByRole('button', { name: 'Download sweep CSV' }).click();
+      expect((await dl).suggestedFilename()).toBe('tolerance-mixed.csv');
+    });
+
+    test('SVG export and hand-off messages', async ({ page, context }) => {
+      await context.grantPermissions(['clipboard-read', 'clipboard-write']).catch(() => undefined);
+      await page.goto(URL);
+      const dl = page.waitForEvent('download');
+      await page.getByRole('button', { name: 'Download SVG' }).click();
+      expect((await dl).suggestedFilename()).toBe('tolerance-map.svg');
+      await page.getByRole('button', { name: 'Material Builder' }).click();
+      await expect(page.getByTestId('explorer-note')).toContainText('not built yet');
+      await page.getByRole('button', { name: 'Screening Studio' }).click();
+      await expect(page.getByTestId('explorer-note')).toContainText('Sr-Ti-O');
+    });
+
+    test('plots pass axe with a data table', async ({ page }) => {
+      await page.goto(URL);
+      for (const v of ['Map of t and mu', 'Tau view', 'Family trend']) {
+        await page.getByRole('button', { name: v }).click();
+        await page.getByText('Data table for this plot').first().click();
+        const r = await new AxeBuilder({ page }).include('[data-testid="explorer"]').analyze();
+        expect(r.violations, v).toEqual([]);
+      }
+    });
   });
 });

@@ -7,6 +7,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- Plots and sweeps in the tolerance-factor explorer: a t against mu map with the octahedral limits and a sourced t band, a tau view with the 4.18 line, a family trend over La to Lu and Y (missing Shannon radii shown as gaps with the reason, never interpolated), a mixed-site sweep, CSV/SVG/PNG export, and hand-offs for the Material Builder and Screening Studio (those pages are not built yet, so the validated payload is copied). Also available as the `tolerance-explorer` lab for the handbook.
 - Tolerance-factor explorer at /tools/tolerance-factor/: pick the A, B and X ions from a periodic table (keyboard and screen-reader friendly, a searchable list on phones), see the exact Shannon table entry behind each radius, and read Goldschmidt t, the octahedral factor and Bartel tau with plain-language explanations and warnings. Mixed sites, spin states and a visible lanthanide coordination policy are supported, and the composition is kept in the link so you can share it.
 - Tolerance factor calculations: Goldschmidt t, octahedral factor and Bartel tau with their warnings (undefined tau, swapped sites), mixed A and B sites, charge balance, and oxidation-state commonness from ICSD counts. Every check is labelled a rule of thumb (no UI yet).
 - Shannon ionic and crystal radii dataset (94 elements) with a lookup that refuses to guess: a missing oxidation state, coordination, spin or geometry returns the reason and the available choices (no UI yet).

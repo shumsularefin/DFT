@@ -45,7 +45,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 | M8.1 | Shannon radii dataset and lookup | done | M0.2 | M | claude/zen-bardeen-qzm2f2 | | 2026-11-11 | [report](reports/M8.1.md), [work order](milestones/M8-tolerance-factor.md) |
 | M8.2 | Factors, checks and mixed sites | done | M8.1 | M | claude/zen-bardeen-qzm2f2 | | 2026-11-11 | [report](reports/M8.2.md), [work order](milestones/M8-tolerance-factor.md) |
 | M8.3 | Explorer UI and the shared periodic table | done | M8.2, M1.3 | M | claude/zen-bardeen-qzm2f2 | | 2026-11-11 | [report](reports/M8.3.md), [work order](milestones/M8-tolerance-factor.md) |
-| M8.4 | Maps, family trend and hand-offs | todo | M8.3, M4.3 | M | | | | [work order](milestones/M8-tolerance-factor.md) |
+| M8.4 | Maps, family trend and hand-offs | done | M8.3, M4.3 | M | claude/zen-bardeen-qzm2f2 | | 2026-11-12 | [report](reports/M8.4.md), [work order](milestones/M8-tolerance-factor.md) |
 | M9.1 | Data pipeline, schema, validation and sample data | todo | M5.1 | L | | | | [work order](milestones/M9-screening-studio.md) |
 | M9.2 | Explorer UI | todo | M9.1, M8.3 | L | | | | [work order](milestones/M9-screening-studio.md) |
 | M9.3 | Feasibility check and first-project builder | todo | M9.2, M3.5, M4.2 | L | | | | [work order](milestones/M9-screening-studio.md) |
@@ -64,6 +64,7 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 
 Newest first. One line per session: date, stage, outcome, branch.
 
+- 2026-11-12, M8.4: t-mu map, tau view, family trend (La to Lu plus Y, with gaps), mixed-site sweep, CSV/SVG/PNG export, validated hand-offs, `tolerance-explorer` lab; axe clean, Lighthouse 100/100/100. Q-005 sourced. D-060. Branch `claude/zen-bardeen-qzm2f2`.
 - 2026-11-11, M8.3: `/tools/tolerance-factor/` and the shared `PeriodicTable` (grid with arrow keys and type-ahead, search list at phone width); golden t shown for SrTiO3 and NdCuO3 under both policies; axe clean, Lighthouse 100/100/100. D-059. Branch `claude/zen-bardeen-qzm2f2`.
 - 2026-11-11, M8.2: `factors.ts`, `sites.ts`, `checks.ts`, `oxidation.ts` and `oxidation-states.json` (93 elements); 16 golden compounds and 3 family sweeps within 1e-6; Q-003 formula and threshold confirmed against the arXiv text; D-058. Branch `claude/zen-bardeen-qzm2f2`.
 - 2026-11-11, M8.1: Shannon radii dataset (`src/data/shannon-radii.json`, 491 assignable rows plus 1 unassigned Eu row, 94 elements) built by `scripts/data/build_shannon.py` from pymatgen; lookup `src/lib/perovskite/shannon.ts` that never guesses; 34 anchors and Ln3+ coverage match. D-057, Q-002 updated. Branch `claude/zen-bardeen-qzm2f2`.

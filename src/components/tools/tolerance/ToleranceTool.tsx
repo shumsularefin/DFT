@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import PeriodicTable from '../../ui/PeriodicTable';
+import Explorer from './Explorer';
 import { cellOf } from '../../../lib/chem/periodic';
 import { oxidationInfo } from '../../../lib/chem/oxidation';
 import { evaluateCompound, type Check, type Composition } from '../../../lib/perovskite/checks';
@@ -270,6 +271,7 @@ export default function ToleranceTool() {
       )}
 
       <Results evaluation={evaluation} level={level} onCopy={copy} copied={copied} />
+      <Explorer composition={comp} effective={effective} evaluation={evaluation} policy={policy} />
     </div>
   );
 }
