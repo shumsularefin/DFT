@@ -69,6 +69,12 @@ export const REGISTERED_LABS = [
   'functional-ladder',
   'spin-cartoon',
   'output-reader',
+  'error-finder',
+  'relaxation-viewer',
+  'dos-viewer',
+  'band-viewer',
+  'density-viewer',
+  'tolerance-explorer',
 ] as const;
 
 /** Page class for a topic: "island" if its body embeds a registered lab, else "content". */

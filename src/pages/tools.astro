@@ -15,6 +15,8 @@ const tools: ToolCard[] = [
     id: 'tolerance',
     title: 'Tolerance-factor explorer',
     text: 'Check whether a chosen set of ions is likely to form a perovskite, with the radii and the formula shown.',
+    href: '/tools/tolerance-factor/',
+    cta: 'Open the tolerance-factor explorer',
   },
   {
     id: 'input-builder',
@@ -36,6 +38,13 @@ const tools: ToolCard[] = [
     text: 'See the Brillouin zone of your structure in 3D and export a k-path for a band-structure run.',
     href: '/tools/kpath/',
     cta: 'Open the k-path tool',
+  },
+  {
+    id: 'errors',
+    title: 'VASP error finder',
+    text: 'Paste an error message or describe a symptom and see likely causes and what to try, in order.',
+    href: '/errors/',
+    cta: 'Open the error finder',
   },
 ];
 const more: ToolCard[] = [
@@ -61,13 +70,14 @@ const more: ToolCard[] = [
 
 <BaseLayout
   title="Tools"
-  description="Research tools for the DFT Handbook. The input builder, convergence plotter and k-path tool are available; the others are planned."
+  description="Research tools for the DFT Handbook. The input builder, convergence plotter, k-path tool and error finder are available; the others are planned."
 >
   <div class="container">
     <h1>Tools</h1>
     <p>
-      These tools run entirely in your browser. The input builder, the convergence plotter and the k-path tool
-      are available now. The others are not built yet, so they have no link. Each card says what it will do.
+      These tools run entirely in your browser. The input builder, the convergence plotter, the k-path tool
+      and the error finder are available now. The others are not built yet, so they have no link. Each card
+      says what it will do.
     </p>
     <h2>Research tools</h2>
     <div class="tool-grid">

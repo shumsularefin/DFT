@@ -570,7 +570,7 @@
    "kpoint-sampling"
   ],
   "summary": "Results must not change when the numerical settings improve, to a stated tolerance.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "encut-convergence",
@@ -581,7 +581,7 @@
    "convergence-testing"
   ],
   "summary": "Raise ENCUT until the energy per atom changes less than the tolerance.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "kpoint-convergence",
@@ -593,7 +593,7 @@
    "smearing"
   ],
   "summary": "Refine the mesh until the energy per atom is converged; metals need more points.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "scf-trouble",
@@ -605,7 +605,7 @@
    "reading-outputs"
   ],
   "summary": "Mixing, ALGO and NELM settings for loops that do not converge.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "relaxation-trouble",
@@ -616,7 +616,7 @@
    "reading-outputs"
   ],
   "summary": "ZBRENT errors, step sizes and the choice of optimizer.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "error-diagnosis",
@@ -627,7 +627,7 @@
    "reading-outputs"
   ],
   "summary": "Reading an error message, finding the likely cause and the fix.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "energies-forces",
@@ -638,7 +638,7 @@
    "reading-outputs"
   ],
   "summary": "Which energy to report and how forces show that a structure is relaxed.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "relaxation-analysis",
@@ -649,7 +649,7 @@
    "energies-forces"
   ],
   "summary": "Checking that forces and stresses are below the target and the structure makes sense.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "density-of-states",
@@ -661,7 +661,7 @@
    "smearing"
   ],
   "summary": "The number of states per energy, total and projected on atoms and orbitals.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "band-structure",
@@ -673,7 +673,7 @@
    "density-of-states"
   ],
   "summary": "Energies along a path of high-symmetry k-points.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "band-gap",
@@ -684,7 +684,7 @@
    "band-structure"
   ],
   "summary": "The gap between occupied and empty states, direct or indirect, and why DFT underestimates it.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "charge-density",
@@ -696,7 +696,7 @@
    "output-files"
   ],
   "summary": "Isosurfaces and slices of the computed density.",
-  "status": "planned"
+  "status": "published"
  },
  {
   "id": "perovskite-structure",

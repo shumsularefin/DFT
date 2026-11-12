@@ -1,0 +1,100 @@
+---
+id: density-of-states
+title: Density of states
+module: 9
+order: 3
+summary: What the DOS counts, how to read total and projected curves with the Fermi level at zero, and what smoothing does and does not change.
+concepts: [density-of-states]
+requires: [levels-to-bands, smearing]
+vaspTags: [LORBIT, NEDOS, EMIN, EMAX, ISMEAR, SIGMA]
+sources: [S-019, S-041, S-042, S-050]
+status: draft
+updated: 2026-11-11
+---
+
+<Why>
+
+The density of states answers "how many electron states are there at each energy". It shows at a glance whether a material has a gap at the Fermi level, and which atoms and orbitals the states near the Fermi level belong to. That is why you read it before interpreting almost any electronic property.
+
+</Why>
+
+<Intuition>
+
+Plot energy along the horizontal axis and the number of states per eV up the vertical axis. Where the curve is zero there are no states. If zero energy (the Fermi level) sits inside such a gap, the material is a semiconductor or an insulator at this level of theory. If the curve is non-zero at the Fermi level, it is a metal <Cite id="S-050" />.
+
+The **projected DOS** splits the total among atoms and orbital types (s, p, d). It tells you, for example, that the states just below the Fermi level are mainly oxygen p, and the ones just above are mainly metal d.
+
+<Level min="intermediate">
+
+DOSCAR stores the total DOS and, with LORBIT = 11, a block for each atom with nine orbitals in the order s, py, pz, px, dxy, dyz, dz2, dxz, dx2. LORBIT = 10 gives only s, p, d <Cite id="S-019" />. DOSCAR does not store element names, so you need the POSCAR to know which atom is which. The default NEDOS of 301 points is too coarse for a clean projected DOS; the author's handbook uses 3001 <Cite id="S-042" />. In a spin-polarized run there is one column for spin up and one for spin down, usually drawn mirrored.
+
+</Level>
+
+<Level min="pro">
+
+A smoother DOS comes from a denser k-mesh in the SCF, not from broadening <Cite id="S-042" />. Gaussian smoothing only changes how the curve looks and can fill in a small gap, so read gaps from the unsmoothed curve. Tetrahedron smearing (ISMEAR = -5) gives an accurate DOS for bulk but needs at least four k-points, and it is not for relaxations of metals <Cite id="S-041" />.
+
+</Level>
+
+</Intuition>
+
+<Lab id="dos-viewer" title="DOS viewer" />
+
+<TheMath>
+
+The DOS is $g(E) = \sum_{n,\mathbf{k}} w_{\mathbf{k}}\,\delta(E - \varepsilon_{n\mathbf{k}})$, with the delta function replaced by the smearing you chose. The integrated DOS up to $E$ counts the electrons below $E$, which is why DOSCAR also lists it <Cite id="S-019" />.
+
+</TheMath>
+
+<InVasp>
+
+An SCF run that writes a projected DOS <Cite id="S-042" />:
+
+<VaspFile
+  name="INCAR"
+  code={`LORBIT = 11
+NEDOS = 3001
+ISMEAR = 0
+SIGMA = 0.05
+NSW = 0`}
+/>
+
+Open the DOSCAR in the viewer above, and add the POSCAR to group atoms by element.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                  | ...then                                                       |
+| -------------------------- | ------------------------------------------------------------- |
+| Raise NEDOS                | A finer energy grid; the curve gets sharper, not more correct |
+| Use a denser k-mesh        | A smoother curve that is closer to the true DOS               |
+| Turn Gaussian smoothing on | A prettier curve; gaps look smaller                           |
+
+Why set LORBIT: without it there is no projected DOS. What happens if you skip it: you can only see the total.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Assuming DOSCAR atoms are in element order by name">
+
+DOSCAR lists atoms by number only. Use the POSCAR of the same run.
+
+</Callout>
+
+<Callout variant="mistake" title="Reading a gap from a smoothed curve">
+
+Smoothing fills in small gaps. Use the unsmoothed curve and the band structure.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-dos-1', 'q-dos-2', 'q-dos-3', 'q-dos-4', 'q-dos-5']} />
+
+<GoDeeper>
+
+- The smearing topic in module 5 and the band structure topic next <Cite id="S-019" />.
+
+</GoDeeper>

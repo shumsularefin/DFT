@@ -10,6 +10,7 @@ Code or data derived from other projects is recorded here with its licence. Port
 | spglib 2.8.0 `niggli.c` | BSD-3-Clause | Niggli reduction ported to `src/lib/crystal/niggli.ts` (full text below) | M5.3 |
 | RDKit (`@rdkit/rdkit`) | BSD-3-Clause | Molecule 2D layout and sanitization (npm dependency, not copied) | M10.3 |
 | Materials Project data (via `mp-api`) | see Q-009 | Screening Studio dataset, attribution required | M9.1 |
+| Marching-cubes case tables (Paul Bourke, from Cory Gene Bloyd) via three.js `examples/jsm/objects/MarchingCubes.js` | MIT (three.js) | `src/lib/physics/marchingCubesTables.ts`, copied data, integrity tested | M7.5 |
 | Fontsource: IBM Plex Sans, JetBrains Mono | SIL OFL 1.1 | Fonts (npm dependency) | M1.1 |
 
 When you port code, add: project, version, file ported, copyright line, and the licence text, below this line.

@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ToleranceTool from '../../components/tools/tolerance/ToleranceTool';
+---
+
+<BaseLayout
+  title="Tolerance-factor explorer"
+  description="Pick the A, B and X ions of a perovskite, see the Shannon radii with their table entries, and get the Goldschmidt, octahedral and Bartel tolerance factors with plain-language explanations and warnings. Runs in your browser."
+  pageClass="tool"
+>
+  <div class="container">
+    <h1>Tolerance-factor explorer</h1>
+    <p>
+      Choose the ions of an ABX3 compound. The page looks up each radius in the Shannon table, shows the exact
+      entry it used, and computes three rule-of-thumb factors that hint at whether the perovskite structure is
+      likely.
+    </p>
+    <ToleranceTool client:load />
+  </div>
+</BaseLayout>

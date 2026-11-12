@@ -1,0 +1,115 @@
+---
+id: common-errors
+title: Reading an error and finding the fix
+module: 8
+order: 6
+summary: Where VASP prints its errors, how to read them, the habits that save time, and an error finder that turns a pasted message into likely causes and fixes.
+concepts: [error-diagnosis]
+requires: [reading-outputs]
+vaspTags: [ISTART, ISYM, ALGO]
+sources: [S-019, S-041, S-042]
+status: draft
+updated: 2026-11-10
+---
+
+<Why>
+
+When a VASP job fails, the answer is almost always in the first error message, and the fix is almost always one of a short list. The skill is knowing where to look and what the message is really saying. This page gives the habits, and the error finder below gives the list: 32 entries merged from the author's two handbooks.
+
+</Why>
+
+<Intuition>
+
+**Where to look.** VASP prints errors to standard output (the file your scheduler writes, often `vasp.out` or a job log), not to OUTCAR <Cite id="S-041" />. In order:
+
+1. `tail -30` of the standard output: the error text.
+2. `tail -5 OSZICAR`: did the run stop inside an electronic loop or between ionic steps?
+3. `tail -40 OUTCAR`: the last thing VASP did.
+
+No message at all usually means the wall-time limit or running out of memory; check the scheduler log. Before restarting, make sure CONTCAR and WAVECAR are not empty <Cite id="S-041" />.
+
+**Read the first error, not the last.** One real failure often triggers a cascade. Fix the first message and rerun before chasing the others.
+
+**Four families cover most failures.**
+
+- _Bad inputs:_ atoms too close, wrong counts, a MAGMOM that does not match the number of atoms.
+- _Old files that do not fit:_ a WAVECAR or CHGCAR from a different structure, mesh or spin setting.
+- _Symmetry and k-mesh:_ a shifted mesh on a hexagonal cell, positions slightly off a symmetric site.
+- _Numerical breakdown:_ Davidson and RMM-DIIS failures, a mixer that cannot cope, an optimizer that loses its bracket.
+
+<Level min="intermediate">
+
+Two habits help. Keep the exact text of the message when you search or ask for help, because the routine name (ZBRENT, BRMIX, EDDDAV) is the most searchable part. And when a fix involves an INCAR tag, change one thing at a time. Where a fix says "start fresh", it means deleting WAVECAR and CHGCAR or setting ISTART = 0 and ICHARG = 2 <Cite id="S-041" />.
+
+</Level>
+
+<Level min="pro">
+
+Some entries are warnings that are harmless by design: "found a more primitive cell" for an intended supercell is the example. The finder marks which entry your text matched, whether by an exact message, a routine name or only by keywords, so you can judge how much to trust a match. The merged list and which handbook rows each entry came from are shown at Pro level <Cite id="S-042" />.
+
+</Level>
+
+</Intuition>
+
+<Lab id="error-finder" title="Error finder" />
+
+<TheMath>
+
+Matching is deliberately simple, so you can trust what it does. An entry matches _exactly_ if one of its message strings appears in your text (ignoring case and spacing); it matches on a _routine name_ if a distinctive upper-case name such as ZBRENT appears; otherwise it matches _by keywords_ when most of the informative words of a line appear in the entry's symptom text, allowing one typo in long words. Exact matches rank above routine names, which rank above keyword matches. Nothing is sent anywhere.
+
+</TheMath>
+
+<InVasp>
+
+The four commands from the start of the page, as you would type them in the job folder <Cite id="S-041" />:
+
+<VaspFile
+  name="shell"
+  code={`tail -30 vasp.out
+tail -5  OSZICAR
+tail -40 OUTCAR
+ls -l WAVECAR CONTCAR`}
+/>
+
+The full finder is also available on its own page, [/errors/](/errors/).
+
+</InVasp>
+
+<WhatChanges>
+
+| If the message mentions...      | ...look first at                                         |
+| ------------------------------- | -------------------------------------------------------- |
+| ZBRENT, CNORMN                  | The relaxation: noisy forces or a step that is too large |
+| BRMIX, WAVECAR                  | Old CHGCAR or WAVECAR in the folder                      |
+| IBZKPT, SGRCON, SYMPREC         | The k-mesh and the symmetry of the cell                  |
+| ZHEGV, ZPOTRF, Sub-Space-Matrix | The geometry, then ALGO                                  |
+| Nothing at all                  | The scheduler log: time limit or memory                  |
+
+Why look here first: each family has one most-likely cause. What happens if you skip the structure check: you tune settings for a POSCAR that is wrong.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Looking for the error in OUTCAR">
+
+VASP prints errors to standard output <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Setting ISYM = 0 as the first fix">
+
+It is a last resort for symmetry errors. First check the k-mesh centring and symmetrize the structure <Cite id="S-041" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-errd-1', 'q-errd-2', 'q-errd-3', 'q-errd-4', 'q-errd-5']} />
+
+<GoDeeper>
+
+- The troubleshooting section of the Field Handbook <Cite id="S-041" /> and the error index of the Workflow Handbook <Cite id="S-042" />.
+- The VASP wiki page for each tag named in a fix <Cite id="S-019" />.
+
+</GoDeeper>

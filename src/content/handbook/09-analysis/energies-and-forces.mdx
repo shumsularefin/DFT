@@ -1,0 +1,97 @@
+---
+id: energies-and-forces
+title: Energies and forces
+module: 9
+order: 1
+summary: Which energy line to report from OUTCAR, why the entropy term matters, and how the forces tell you whether a structure is relaxed.
+concepts: [energies-forces]
+requires: [reading-outputs]
+vaspTags: [EDIFFG, ISMEAR, SIGMA, NSW]
+sources: [S-019, S-041, S-042]
+status: draft
+updated: 2026-11-11
+noLab: true
+---
+
+<Why>
+
+A finished run gives you dozens of numbers. Only a few of them answer the question you asked. If you quote the wrong energy line, or call a structure relaxed because the energy stopped changing, your result can be off by more than the effect you are studying.
+
+</Why>
+
+<Intuition>
+
+Think of the atoms as balls on a hilly landscape. The **energy** is the height, the **force** on each atom is the slope under it, pointing downhill. A structure is relaxed when every slope is nearly flat. That is why the forces, not only the energy, tell you when to stop.
+
+Two energies appear in OUTCAR. The **free energy** (`free energy TOTEN`) includes a smearing entropy term. The line `energy without entropy` and the `energy(sigma->0)` value next to it do not. For a smearing of ISMEAR = 0 the extrapolated `energy(sigma->0)` is the one the author's handbooks use for comparing energies <Cite id="S-019" />. Whatever you choose, use the same line for every calculation you compare <Cite id="S-041" />.
+
+<Level min="intermediate">
+
+The force on an atom is the negative gradient of the energy with respect to its position. VASP prints it in the `TOTAL-FORCE` block in eV/Angstrom, with a `total drift` line that should be close to zero. A large drift means the forces are not consistent, often from a too-coarse grid or loose electronic convergence <Cite id="S-041" />.
+
+</Level>
+
+<Level min="pro">
+
+Forces are only as accurate as the electronic convergence behind them. A tight force criterion such as EDIFFG = -0.001 needs EDIFF of 1E-7 or tighter <Cite id="S-042" />. Forces from an ionic step that hit NELM are not reliable.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+The force on atom $i$ is $\mathbf{F}_i = -\partial E / \partial \mathbf{R}_i$. The convergence test of a relaxation is $\max_i |\mathbf{F}_i| < |\text{EDIFFG}|$ when EDIFFG is negative <Cite id="S-019" />.
+
+</TheMath>
+
+<InVasp>
+
+Find the energies and the largest force of the last step <Cite id="S-042" />:
+
+<VaspFile
+  name="shell"
+  code={`grep "energy without entropy" OUTCAR | tail -1
+grep -A 30 "TOTAL-FORCE" OUTCAR | tail -35`}
+/>
+
+The [relaxation viewer](/handbook/09-analysis/relaxations/) reads the energy and the largest force of every step from an OUTCAR.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                                   | ...then                                                     |
+| ------------------------------------------- | ----------------------------------------------------------- |
+| Compare F from one run with E0 from another | The difference includes an entropy term, not physics        |
+| Use a larger SIGMA                          | The entropy term grows, so the two energy lines drift apart |
+| Stop on a tiny energy change                | A flat region can hide forces that are still large          |
+
+Why use the same line everywhere: the entropy term depends on smearing, so mixing lines mixes a numerical choice into your energy difference. What happens if you skip it: a spurious difference of the size of the entropy term.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Judging a relaxation by the energy alone">
+
+The energy changes very little near a minimum while forces can still be large. Look at the largest force.
+
+</Callout>
+
+<Callout variant="mistake" title="Comparing energies from different smearing settings">
+
+Entropy terms differ with ISMEAR and SIGMA, so energies from different settings are not comparable.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-ef-1', 'q-ef-2', 'q-ef-3', 'q-ef-4', 'q-ef-5']} />
+
+<GoDeeper>
+
+- The OUTCAR energy block in module 7 and the smearing topic in module 5 <Cite id="S-019" />.
+- The relaxation chapter of the Workflow Handbook <Cite id="S-042" />.
+
+</GoDeeper>

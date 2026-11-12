@@ -220,7 +220,7 @@ test.describe('navigation', () => {
 
   test('tools page has no links to unbuilt tools, and nav anchors resolve', async ({ page }) => {
     await page.goto('/tools/');
-    await expect(page.getByText('Coming soon')).toHaveCount(3);
+    await expect(page.getByText('Coming soon')).toHaveCount(2);
     for (const id of ['studio', 'builder', 'practice']) await expect(page.locator(`#${id}`)).toBeAttached();
   });
 

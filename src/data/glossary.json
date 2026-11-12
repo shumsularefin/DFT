@@ -781,5 +781,70 @@
   "sources": [
    "S-042"
   ]
- }
+ },
+ {
+  "id": "convergence-test",
+  "label": "convergence test",
+  "short": "A series of runs that change one numerical setting step by step, with everything else fixed, to find where the result stops changing.",
+  "level": "beginner",
+  "sources": [
+   "S-042"
+  ]
+ },
+ {
+  "id": "charge-sloshing",
+  "label": "charge sloshing",
+  "short": "The electron density swinging back and forth between steps of the electronic loop instead of settling, common in large cells, slabs and metals.",
+  "level": "intermediate",
+  "sources": [
+   "S-041"
+  ]
+ },
+  {
+    "id": "fermi-level",
+    "label": "Fermi level",
+    "short": "The energy up to which electron states are filled at zero temperature. In the DOS plots here it is set to zero.",
+    "level": "beginner",
+    "sources": [
+      "S-050"
+    ]
+  },
+  {
+    "id": "projected-dos",
+    "label": "projected DOS",
+    "short": "The density of states split by atom and orbital type (s, p, d), showing which atoms and orbitals the states at each energy belong to.",
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-042"
+    ]
+  },
+  {
+    "id": "direct-gap",
+    "label": "direct band gap",
+    "short": "A band gap whose valence band maximum and conduction band minimum sit at the same k-point.",
+    "level": "beginner",
+    "sources": [
+      "S-050"
+    ]
+  },
+  {
+    "id": "indirect-gap",
+    "label": "indirect band gap",
+    "short": "A band gap whose valence band maximum and conduction band minimum sit at different k-points.",
+    "level": "beginner",
+    "sources": [
+      "S-050"
+    ]
+  },
+  {
+    "id": "isosurface",
+    "label": "isosurface",
+    "short": "The surface in space where a quantity such as the electron density has one chosen value.",
+    "level": "beginner",
+    "sources": [
+      "S-030",
+      "S-043"
+    ]
+  }
 ]

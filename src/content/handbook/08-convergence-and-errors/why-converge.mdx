@@ -1,0 +1,110 @@
+---
+id: why-converge
+title: Why converge, and what converged means
+module: 8
+order: 1
+summary: A result is converged when improving a numerical setting no longer changes it by more than a tolerance you chose. What converges, what does not, and the two settings to report.
+concepts: [convergence-testing]
+requires: [encut, kpoint-sampling]
+vaspTags: [ENCUT, KSPACING, SIGMA]
+sources: [S-019, S-041, S-042, S-049]
+status: draft
+updated: 2026-11-10
+noLab: true
+---
+
+<Why>
+
+Every VASP number depends on settings that have nothing to do with the physics: how many plane waves, how many k-points, how wide the smearing. If your answer changes when you improve one of them, you are measuring the setting, not the material. A <Term id="convergence-test">convergence test</Term> is how you show that the number you report is about the material <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+Think of measuring a table with a ruler. A ruler marked in centimetres gives one answer, millimetres a slightly different one, and at some point finer marks stop changing it. You stop where the answer no longer moves by more than you care about, because finer marks cost more effort for nothing.
+
+In a DFT run the "finer marks" are a higher ENCUT (more plane waves), a denser k-mesh and a smaller SIGMA. The test is always the same: change **one** setting step by step, keep everything else fixed, and watch the quantity you care about.
+
+**The tolerance.** The author's handbook uses about 1 meV per atom for the total energy <Cite id="S-041" />. This site's plotter applies it in a strict form: the first setting is "converged" when every later setting differs from it by no more than the tolerance. That avoids calling a flat spot in the middle of a curve converged.
+
+**What converges, and what does not.**
+
+- _Numerical settings_ converge: ENCUT, the k-mesh, the smearing width, the electronic and ionic stopping criteria. More effort gives a result that stops changing.
+- _Model choices_ do not converge: the functional, the value of U, the pseudopotential. Changing them changes the physics you are asking about. A perfectly converged PBE calculation is still a PBE calculation.
+
+**The property decides.** Total energies converge quickly because errors cancel when you compare two structures with the same settings. Forces, stress and band gaps can converge more slowly or more quickly, so you test the property you will report <Cite id="S-041" />. The Field Handbook's advice is to run static calculations over a range of settings until the property you care about stops changing.
+
+<Level min="intermediate">
+
+**Order and independence.** Settings interact weakly, so do the tests in a sensible order and keep the others fixed while you vary one. This site's series generator does exactly that: ENCUT runs share one fixed mesh, and mesh runs share one fixed ENCUT of 1.3 times the largest ENMAX. Repeat the ENCUT test if the mesh then turns out to need a large change.
+
+**Report both settings.** A reader cannot reproduce or judge a number without them. Write ENCUT, the k-mesh (or KSPACING and the centring), the smearing and its width, and the tolerance you used, next to the result.
+
+</Level>
+
+<Level min="pro">
+
+Absolute total energies converge variationally from above in ENCUT, but the 1 meV per atom tolerance is a statement about energy per atom, so a cell with many atoms tolerates a larger absolute error. Converge differences, not totals: a formation energy or a relative stability is the quantity to test when that is what you will quote. Stress converges more slowly than energy because of Pulay stress, which is why relaxations use 1.3 times ENMAX even when the energy looks converged earlier <Cite id="S-049" /> <Cite id="S-019" />.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+For a series of settings $x_1 < x_2 < \dots < x_n$ with energies per atom $e_i$, the strict criterion used by the plotter is: the series is converged at the smallest $i$ such that
+
+$$|e_j - e_i| \le \tau \quad \text{for every } j > i,$$
+
+where $\tau$ is the tolerance (default 1 meV per atom). If no $i$ qualifies before the last point, the series has not converged and you add points at higher settings. The last point alone is not evidence of convergence <Cite id="S-042" />.
+
+</TheMath>
+
+<InVasp>
+
+The two tests you will run for almost every project, with the tools on this site:
+
+- The [input builder](/tools/input-builder/) has a "Convergence series" mode that writes one folder per setting, a `run_all.sh` and a `collect.sh`.
+- The [convergence plotter](/tools/convergence/) reads the collected numbers, draws the curve, marks the tolerance band and names the first converged setting.
+
+The next two topics walk through each test.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                                    | ...then                                                        |
+| -------------------------------------------- | -------------------------------------------------------------- |
+| Stop at the first setting that "looks fine"  | You may be on a flat spot; check that every later point agrees |
+| Change two settings between runs             | You cannot tell which one moved the result                     |
+| Use different ENCUT in runs you compare      | The difference contains a basis-set error, not only physics    |
+| Skip the test and copy settings from a paper | Your cell, POTCARs and property may need more; test it once    |
+
+Why: the test turns "I think this is enough" into a number. What happens if you skip it: a result that moves when someone repeats it with better settings.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Calling the last point converged">
+
+A series that is still falling at its last point has not converged. Add higher settings <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Converging the energy and reporting the stress or the gap">
+
+Test the property you report. Stress in particular needs a higher cutoff than the energy <Cite id="S-041" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-conv-1', 'q-conv-2', 'q-conv-3', 'q-conv-4', 'q-conv-5']} />
+
+<GoDeeper>
+
+- The convergence advice in the Field Handbook <Cite id="S-041" /> and the Workflow Handbook <Cite id="S-042" />.
+- The VASP wiki pages for ENCUT and KSPACING <Cite id="S-019" />.
+
+</GoDeeper>

@@ -1,0 +1,98 @@
+---
+id: charge-density
+title: Charge density
+module: 9
+order: 5
+summary: What CHGCAR stores, how an isosurface and a cross-section are built from it, and why the level you choose changes what you see.
+concepts: [charge-density]
+requires: [electron-density-meaning, output-files]
+vaspTags: [LCHARG, ICHARG, ISPIN, LELF]
+sources: [S-019, S-030, S-041, S-043]
+status: draft
+updated: 2026-11-11
+---
+
+<Why>
+
+The electron density is the central quantity of DFT. Looking at it shows where electrons pile up between atoms, where a magnetic moment sits and whether a defect has pulled charge somewhere unexpected. It also catches setup mistakes that a number hides.
+
+</Why>
+
+<Intuition>
+
+CHGCAR starts with the structure, then a grid size, then the values of the density on that grid. Each value is the density multiplied by the cell volume, so dividing by the volume gives electrons per cubic angstrom <Cite id="S-041" />. In a spin-polarized run a second grid follows: the magnetization, the difference between spin up and spin down.
+
+An **isosurface** is the surface where the density equals a chosen value. It is built from the grid by the marching-cubes method, which looks at each small cube of the grid and draws the piece of surface that crosses it <Cite id="S-030" />. A **cross-section** simply colours one plane of the grid.
+
+<Level min="intermediate">
+
+The sum of all grid values divided by the number of grid points equals the number of valence electrons, which is a good check on the file. The grid values are in x-fastest order, and the file also contains augmentation blocks after the grids that a viewer must skip <Cite id="S-019" />. VESTA draws the same surfaces <Cite id="S-043" />.
+
+</Level>
+
+<Level min="pro">
+
+The original 256-case marching-cubes table is ambiguous on some faces, so an isosurface that squeezes through a single cell can in rare cases have a hole. For crystal grids the viewer wraps the mesh around the cell edges, so a surface crossing a cell face is closed.
+
+</Level>
+
+</Intuition>
+
+<Lab id="density-viewer" title="Charge density viewer" />
+
+<TheMath>
+
+The density on a grid point is $\rho(\mathbf{r}_i) = V^{-1}\,c_i$, where $c_i$ is the number in the file and $V$ the cell volume. The electron count is $N = \frac{1}{N_\text{grid}}\sum_i c_i$ <Cite id="S-041" />.
+
+</TheMath>
+
+<InVasp>
+
+Make sure the density is written (it is by default in a static run) <Cite id="S-042" />:
+
+<VaspFile
+  name="INCAR"
+  code={`LCHARG = .TRUE.
+ISPIN = 2
+NSW = 0`}
+/>
+
+Open the CHGCAR in the viewer above. With ISPIN = 2 you can switch to the magnetization. LELF = .TRUE. writes ELFCAR, a different quantity.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                   | ...then                                          |
+| --------------------------- | ------------------------------------------------ |
+| Raise the isosurface level  | Only the dense cores are enclosed                |
+| Lower the isosurface level  | The surface grows and joins neighbouring atoms   |
+| Switch to the magnetization | Positive and negative lobes appear (two colours) |
+
+Why check the electron count: it catches a wrong file or a wrong cell. What happens if you skip it: you may analyse a density for a different system.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Treating an isosurface as the bond">
+
+The surface depends on the level you choose. Compare surfaces only at the same level.
+
+</Callout>
+
+<Callout variant="mistake" title="Forgetting to divide by the volume">
+
+The raw numbers in CHGCAR are density times the cell volume.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-cd-1', 'q-cd-2', 'q-cd-3', 'q-cd-4', 'q-cd-5']} />
+
+<GoDeeper>
+
+- The output files overview in module 6 and the band structure topic <Cite id="S-041" />.
+
+</GoDeeper>

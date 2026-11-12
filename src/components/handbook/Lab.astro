@@ -17,6 +17,12 @@ import PawLab from '../labs/PawLab';
 import FunctionalLadder from '../labs/FunctionalLadder';
 import SpinCartoon from '../labs/SpinCartoon';
 import OutputReader from '../labs/OutputReader';
+import ErrorFinder from '../labs/ErrorFinder';
+import RelaxationViewer from '../labs/RelaxationViewer';
+import DosViewer from '../labs/DosViewer';
+import BandViewer from '../labs/BandViewer';
+import DensityViewer from '../labs/DensityViewer';
+import ToleranceLab from '../labs/ToleranceLab';
 // Labs are registered by id. An id with no component yet shows the placeholder, so topics can be written ahead of their labs.
 interface Props {
   id: string;
@@ -91,6 +97,30 @@ const { id, title, also } = Astro.props;
   ) : id === 'output-reader' ? (
     <div data-lab-id={id}>
       <OutputReader client:visible />
+    </div>
+  ) : id === 'error-finder' ? (
+    <div data-lab-id={id}>
+      <ErrorFinder client:visible />
+    </div>
+  ) : id === 'relaxation-viewer' ? (
+    <div data-lab-id={id}>
+      <RelaxationViewer client:visible />
+    </div>
+  ) : id === 'dos-viewer' ? (
+    <div data-lab-id={id}>
+      <DosViewer client:visible />
+    </div>
+  ) : id === 'band-viewer' ? (
+    <div data-lab-id={id}>
+      <BandViewer client:visible />
+    </div>
+  ) : id === 'density-viewer' ? (
+    <div data-lab-id={id}>
+      <DensityViewer client:visible />
+    </div>
+  ) : id === 'tolerance-explorer' ? (
+    <div data-lab-id={id}>
+      <ToleranceLab client:visible />
     </div>
   ) : (
     <div class="lab-placeholder" data-lab-id={id}>
