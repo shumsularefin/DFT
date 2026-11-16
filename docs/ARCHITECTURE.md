@@ -30,7 +30,7 @@ src/
     tools/<tool>/     tool UIs (React islands), one folder per tool
   content/handbook/   MDX topics: <NN-module-slug>/<topic>.mdx   (content collection)
   lib/                PURE TypeScript domain logic, no DOM, no React, fully unit-tested
-    crystal/ vasp/ perovskite/ chem/ physics/ learning/ mp/
+    crystal/ vasp/ perovskite/ chem/ physics/ learning/ mp/ magnetism/ scene/ review/ (last three from plan v3)
     handoff.ts storage.ts site.ts
   workers/            thin worker entry points that call lib/
   stores/             zustand vanilla stores (level, theme, progress, learner)
@@ -79,7 +79,7 @@ export interface Structure {
 
 ## 4. Routes (all prerendered)
 
-`/` landing · `/handbook/` map of modules · `/handbook/<module>/<topic>/` · `/tools/` index · `/tools/tolerance-factor/` · `/tools/input-builder/` · `/tools/convergence/` · `/tools/kpath/` · `/studio/` · `/builder/` · `/practice/` review queue · `/progress/` mastery map · `/errors/` error finder · `/references/` · `/changelog/` · `/about/` (method, disclaimer) · `/privacy/` · `/design/` (component gallery, `noindex`) · `/offline/` · `404`.
+`/` landing · `/handbook/` map of modules · `/handbook/<module>/<topic>/` · `/tools/` index · `/tools/tolerance-factor/` · `/tools/input-builder/` · `/tools/convergence/` · `/tools/kpath/` · `/tools/magnetic/` · `/tools/eos/` · `/tools/review/` · `/tools/planner/` · `/tools/work-function/` · `/learn/` (plan v3) · `/studio/` · `/builder/` · `/practice/` review queue · `/progress/` mastery map · `/errors/` error finder · `/references/` · `/changelog/` · `/about/` (method, disclaimer) · `/privacy/` · `/design/` (component gallery, `noindex`) · `/offline/` · `404`.
 Trailing slash always (`trailingSlash: 'always'`).
 
 ## 5. Tool hand-off

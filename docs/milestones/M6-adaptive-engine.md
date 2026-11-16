@@ -70,7 +70,8 @@ An on-device adaptive tutor (D-013): Bayesian knowledge tracing (BKT) and an Elo
 ## M6.4 Practice UI, quizzes, mastery map and gentle gamification
 
 **Goal**: Learners answer questions inside topics, review due items on `/practice/`, and see their mastery map on `/progress/`, with motivation that respects them.
-**Depends on**: M6.3, M1.3
+**Depends on**: M6.3, M1.3, M12.1
+**Plan v3 note**: build `Check` so a question can carry a `visual` field (M12.3 fills it for every question); render nothing for it yet if M12.2 is not done, but leave the slot above the stem.
 **Size**: L
 **Deliverables**:
 - `Check` component (replaces the M1.2 placeholder): renders the listed questions one at a time, hints on request, explanation after answering (for every option), "I am not sure" path, updates the learner state through the store; works without JavaScript as a static list of questions with answers hidden in `<details>`.

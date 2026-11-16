@@ -38,9 +38,10 @@ Golden data: `tests/reference/element_reference.json` (Pauling electronegativity
 ## M10.2 Crystal operations and exports
 
 **Goal**: Clean-up and conversion operations for crystals, with undo and redo, and exporters.
-**Depends on**: M10.1
+**Depends on**: M10.1, M13.1
 **Size**: M
 **Sources**: S-032, S-036
+**Plan v3 note**: `supercell(matrix)` already exists in `src/lib/crystal/supercell.ts` (M13.1); `ops.ts` re-exports it and adds no second implementation.
 **Deliverables**:
 - `src/lib/crystal/ops.ts`: `symmetrize` (moyo standardization and refinement back to the user's setting), `standardizePrimitive`, `standardizeConventional`, `wrap`, `mergeDuplicates(tol)`, `snapToWyckoff` (idealized positions from moyo's standardized cell mapped back with `std_linear` and the origin shift), `supercell(matrix)`, `setLattice`, `gentleRelax` (moves only atoms in B001/B002 contacts, soft pair repulsion, maximum step 0.05 Angstrom, at most 200 steps, never changes the cell; labelled "geometric clean-up, not a physical relaxation").
 - `src/lib/history.ts`: undo/redo as an immutable command stack with a size cap.
@@ -81,7 +82,8 @@ Golden data: `tests/reference/element_reference.json` (Pauling electronegativity
 ## M10.4 Crystal editor UI
 
 **Goal**: `/builder/` crystal mode: build or import a crystal, see it in 3D, edit atoms and cell, watch the validity panel react, fix issues in one click, export or hand off.
-**Depends on**: M10.2, M5.5, M8.3
+**Depends on**: M10.2, M5.5, M8.3, M13.5, M12.2
+**Plan v3 note** (D-055): the editor should feel like a small 3D program, not a form. Viewport first (the 3D view takes most of the screen; the palette, site table, lattice and validity panels are collapsible side panels, stacked under the view at 360 px); keyboard shortcuts shown in a `?` overlay (`A` add atom of the selected element, `Delete` remove, `G` move on the constrained plane, `Ctrl+Z` and `Ctrl+Shift+Z` undo and redo, `1`/`2`/`3` view along a, b, c, `S` supercell); selection highlight by outline and label, not colour alone; the toolbar gains the M13.5 operations (slab, vacancy, substitution, doping) and a "Magnetic ordering" hand-off to `/tools/magnetic/`; rendering through the M12.2 scene library (spin arrows and polyhedra come free).
 **Size**: L
 **Deliverables**:
 - Layout: periodic table palette (shared component), 3D view (`CellScene` with atom picking by raycasting), site table (element, fractional coordinates, editable), lattice panel (a, b, c, alpha, beta, gamma or vectors), validity panel (grouped issues with fix buttons), toolbar (undo, redo, symmetrize, standardize, wrap, merge, snap, gentle relax, supercell, templates, import, export, hand off).

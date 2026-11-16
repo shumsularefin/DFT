@@ -39,6 +39,15 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-033 | open | author |
 | Q-034 | open | author |
 | Q-035 | open | author |
+| Q-036 | open | author |
+| Q-037 | open | author |
+| Q-038 | open | author |
+| Q-039 | open | author |
+| Q-040 | open | builder (M13.1, needs vasp.at) or author |
+| Q-041 | open | builder (M13.1) |
+| Q-042 | open | author + builder (M13.3) |
+| Q-043 | open | author |
+| Q-044 | open | builder (M13.5) |
 
 ## Q-001. Repository licence
 Which licence for the code and which for the written content and data (a common split: MIT for code, CC BY 4.0 for original text)? Affects `LICENSE`, the footer and the references page. Until decided: no LICENSE file; `THIRD_PARTY_NOTICES.md` lists upstream licences. **Update 2026-11-04:** the secrets `FIREBASE_SERVICE_ACCOUNT` and `FIREBASE_PROJECT_ID` are set (screenshot from the author) and the deploy workflow has succeeded on every merge to main since; the live site URL was not opened from the builder environment, so please confirm it shows the latest stage. **Owner: author.**
@@ -161,3 +170,19 @@ Statements in `src/content/handbook/03-many-electrons/` that rest on general kno
 
 ## Q-039. M5.6 VASPKIT KPATH.in layout and other items to confirm
 (1) The `KPATH.in` download is VASPKIT-style (the same line-mode content as KPOINTS, which the protocol in S-042 relies on with `cp KPATH.in KPOINTS`); the exact layout VASPKIT writes was **not** compared with a real file. **Close (author, ~5 min):** send me a `KPATH.in` that VASPKIT wrote and I compare it with `writeKpathIn`. An `it.todo` names this question. (2) VASP line mode takes one point count for the whole file, so hand-set per-segment counts apply to the table, the animation and the CSV/JSON but a KPOINTS file uses the largest count; the page says so. Confirm that is the behaviour you want (D-050). (3) The `KPOINTS_OPT` route A/B text follows your protocol (S-042); please check the wording matches how you run it.
+
+## Q-040. Does VASP use collinear MAGMOM in its symmetry analysis?
+The magnetic tool (M13.1, D-056) relies on VASP lowering the symmetry from the MAGMOM pattern, so an antiferromagnetic cell does not need separate POTCAR species for up and down sites. This is the widely used practice and what the author's handbooks imply, but the VASP wiki pages ISYM and MAGMOM (S-065) have not been read from a builder session. **Close:** read those pages (allow vasp.at), or the author confirms from a run where an AFM cell keeps its pattern with ISYM at its default. Until then the tool states the assumption and offers the "split species" export. **Owner: builder (M13.1) or author.**
+
+## Q-041. Magnetic symmetry in moyo-wasm 0.21.0
+The Rust moyo crate has magnetic-cell support in recent versions; whether `@spglib/moyo-wasm` 0.21.0 exposes it to JavaScript is unknown. **Close (builder, M13.1):** read the package's typings and record the answer. If absent, de-duplication of configurations uses the parent space group acting on sites (planned anyway) and the tool does not report a magnetic space group. **Owner: builder.**
+
+## Q-042. Heisenberg energy-mapping convention shown by default
+Exchange constants change by factors of 2 or S^2 between conventions (pairs counted once or twice; unit spins or moments of size S; sign of J for antiferromagnetic coupling). M13.3 prints the convention with every result and lets the user switch; the default must be chosen by the author and checked against S-060. No transition-temperature estimate ships until a cited formula and its known error are agreed. **Owner: author + builder (M13.3).**
+
+## Q-043. Approval of the v3 look
+M12.1 changes colours and makes monospace the interface face (D-054). **Close:** the author approves the screenshots in `docs/reports/M12.1.md` or asks for changes. **Owner: author.**
+
+## Q-044. Slab polarity heuristic
+The polar-slab warning (M13.5) uses nominal oxidation states and the dipole of the repeat unit along the normal (Tasker type III, S-063). The threshold for "non-zero" and the treatment of mixed-valence or metallic systems are conventions. **Close (builder, M13.5):** record the threshold as a D entry and compare the flag with pymatgen's `is_polar` on the golden slabs. **Owner: builder.**
+

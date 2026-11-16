@@ -29,7 +29,8 @@ Golden data used here: `tests/reference/scf1d_reference.json` (M7.1), `tests/ref
 ## M7.2 Module 5: Practical choices
 
 **Goal**: The heart of the course: every practical choice in a DFT calculation, what it does, why the usual value, what breaks.
-**Depends on**: M7.1, M4.4, M4.5, M5.5
+**Depends on**: M7.1, M4.4, M4.5, M5.5, M12.2
+**Plan v3 note**: lab 4 `spin-cartoon` is built from M12.2 scene presets, and M13.4 later replaces its hand-set spins with generated orderings and adds the in-depth magnetism topics; keep `spin-and-magnetism` an overview that links to them.
 **Size**: L (plan for two sessions: topics 1 to 4, then 5 to 8; mark `partial` in between)
 **Sources**: S-008, S-009, S-013, S-014, S-015, S-016, S-017, S-025, S-026, S-027, S-028, S-040, S-042, S-046, S-049
 **Deliverables**:

@@ -9,6 +9,7 @@ Read this file at the start of every session. It is short on purpose.
 1. Read this file, `SPEC.md`, `docs/WORKFLOW.md`, `docs/PROGRESS.md`, then **only your assigned stage** in `docs/milestones/` and the docs that stage cites.
 2. Confirm the stage's dependencies are `done` in `docs/PROGRESS.md`. If not, stop and report. Do not build on missing foundations.
 3. Do **only the stage you were named**. Never start the next one, even if time remains.
+4. Plan v3 (stages M12 to M14 and the new build order): `docs/ROADMAP_V3.md`. Its section 5 (working lean) applies to every stage.
 
 ## Hard rules
 

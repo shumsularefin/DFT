@@ -175,8 +175,24 @@ Each stage is a self-contained work order in `docs/milestones/`. A stage is one 
 | M9 Screening Studio | M9.1 pipeline and sample data · M9.2 explorer UI · M9.3 feasibility and first project · M9.4 hooks and integration |
 | M10 Material Builder | M10.1 chemistry and validity · M10.2 crystal operations and exports · M10.3 molecule engine · M10.4 crystal editor UI · M10.5 molecule editor UI |
 | M11 Polish | M11.1 performance and offline · M11.2 accessibility and security · M11.3 content integrity and release |
+| M12 Visual layer (v3) | M12.1 design language v3, command palette, status line · M12.2 scene library · M12.3 a visual for every question · M12.4 guided 3D path |
+| M13 Magnetism and structures (v3) | M13.1 supercells and magnetic orderings · M13.2 magnetic configuration tool · M13.3 ground state and exchange analysis · M13.4 magnetism topics · M13.5 slabs and defects · M13.6 equation of state |
+| M14 Research guidance (v3) | M14.1 calculation review · M14.2 research planner · M14.3 density difference, spin density, work function |
 
-Order is mostly sequential; dependencies are explicit in each stage ("Depends on"). M6 and M8 can swap or run in either order after M5.
+Order is mostly sequential; dependencies are explicit in each stage ("Depends on"). The build order is the row order of `docs/PROGRESS.md` (changed in plan v3, `docs/ROADMAP_V3.md` section 3).
+
+## 15a. Plan v3 additions (2026-11-16, D-055)
+
+After the first 29 stages an audit compared the build with the author's vision (`docs/ROADMAP_V3.md`). Added:
+
+- **Visual first.** One scene format for every 3D picture with a computed SVG fallback (M12.2); every question carries a visual (M12.3, D-057); a guided 3D path through the whole subject at `/learn/` (M12.4).
+- **Interface.** A calm, terminal-minimal design language with a keyboard command palette and a status line (M12.1, D-054).
+- **Magnetism.** Supercells, FM and A-, C-, G-type and rock-salt type-II antiferromagnetic orderings, enumeration of symmetry-distinct collinear configurations, MAGMOM in POSCAR order (M13.1, D-056); a tool at `/tools/magnetic/` with 3D spin arrows and a zip per ordering (M13.2); ground-state ranking, final-moment checks and an exchange fit with an explicit convention (M13.3); five magnetism topics and a Stoner toy (M13.4).
+- **Structure toolkit.** Slabs with terminations and polarity warnings, vacancies, substitutions and doping at symmetry-distinct sites (M13.5), wired into the Material Builder, which now behaves like a small 3D program (M10.4 note).
+- **Research guidance.** Equation-of-state fits (M13.6); pre-flight and post-flight review of a calculation folder (M14.1); a goal-to-workflow planner whose every step is sourced and guarded (M14.2); charge-density difference, spin density and work function (M14.3).
+- New routes: `/learn/`, `/tools/magnetic/`, `/tools/eos/`, `/tools/review/`, `/tools/planner/`, `/tools/work-function/`.
+
+The rules of sections 3, 10 and 12 apply unchanged to all of it.
 
 ## 15. Acceptance criteria
 
@@ -185,6 +201,7 @@ Order is mostly sequential; dependencies are explicit in each stage ("Depends on
 - Every parameter page explains why, what changes and common mistakes.
 - The three research tools reproduce the golden reference values in `tests/reference/` and any published values confirmed in the open questions.
 - The builder rejects absurd structures with explanations and fixes.
+- Every question shows a visual; the magnetic tool reproduces the golden orderings of `tests/reference/magnetic_reference.json`; every research-planner step is sourced (plan v3).
 - Performance, responsiveness and accessibility targets in section 10 are met, with measured evidence in the stage reports.
 - `docs/OPEN_QUESTIONS.md` has no entry that silently affects a user-visible number.
 
