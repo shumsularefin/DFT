@@ -10,11 +10,12 @@ BASE: main
 
 Follow the project's own process exactly:
 1. Read CLAUDE.md, SPEC.md, docs/WORKFLOW.md and docs/PROGRESS.md.
-2. Do only the stage named above. Read its section in docs/milestones/ completely, including "Not in this stage". If STAGE is NEXT, pick the first stage in docs/PROGRESS.md that is todo or partial and whose dependencies are all done.
-3. Use BASE as described in docs/WORKFLOW.md section 1 and 2. If BASE is main, build on main. If BASE is another branch name, build on that branch.
-4. Complete every task, pass every gate, write the report, update docs/PROGRESS.md, push, and open the pull request. I authorise opening the pull request.
-5. Do not invent science, data, reference values or sources. If something cannot be verified, record it in docs/OPEN_QUESTIONS.md and say so in your summary.
-6. When finished, reply with a short summary: built, gates, not done, and anything I must do.
+2. Tier check first: find the stage's Tier in docs/PROGRESS.md and state it. Tier A needs the strongest model, Tier B the fast model. If you are the fast model and the stage is Tier A, stop and tell me to switch models; build nothing.
+3. Do only the stage named above. Read its section in docs/milestones/ completely, including "Not in this stage". If STAGE is NEXT, pick the first stage in docs/PROGRESS.md that is todo or partial and whose dependencies are all done.
+4. Use BASE as described in docs/WORKFLOW.md section 1 and 2. If BASE is main, build on main. If BASE is another branch name, build on that branch.
+5. Complete every task, pass every gate, write the report, update docs/PROGRESS.md, push, and open the pull request. I authorise opening the pull request.
+6. Do not invent science, data, reference values or sources. If something cannot be verified, record it in docs/OPEN_QUESTIONS.md and say so in your summary.
+7. When finished, reply with a short summary: built, gates, not done, and anything I must do.
 ```
 
 ## How to use it
@@ -23,7 +24,8 @@ Follow the project's own process exactly:
 - Next stage after you merged the previous PR: change `STAGE` to the next id (see the table in `docs/PROGRESS.md`), keep `BASE: main`.
 - Stacked mode (you will merge later): set `BASE` to the previous stage's branch name, copied from the "Branch" column of `docs/PROGRESS.md`.
 - Resume a partial stage: same `STAGE`, same `BASE`.
-- Lazy mode: `STAGE: NEXT`.
+- Lazy mode: `STAGE: NEXT`. The top of `docs/PROGRESS.md` always names the next stage and its tier, so you know which model to open before you paste the prompt.
+- Pick the model by the **Tier** column: A = strongest model (Opus class), B = fast model (Sonnet class). To let an open session take the next stage that suits its model, add a line `TIER: A` or `TIER: B` under `STAGE: NEXT`.
 
 ## Slash command alternative
 

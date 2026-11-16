@@ -54,7 +54,7 @@ Two tiers. **Tier A**: the strongest reasoning model available, for stages where
 |---|---|
 | M7.1, M7.5, M8.1, M8.2, M9.1, M10.1, M10.2, M10.3, M11.3, M13.1, M13.3, M13.5, M13.6, M14.1, M14.2, M14.3 | M6.4, M6.5, M7.2, M7.3, M7.4, M7.6, M8.3, M8.4, M9.2, M9.3, M9.4, M10.4, M10.5, M11.1, M11.2, M12.1, M12.2, M12.3, M12.4, M13.2, M13.4 |
 
-The tier is also noted in the Note column of `docs/PROGRESS.md`.
+The tier of every stage is the **Tier** column of `docs/PROGRESS.md` (that column is the source of truth, this table is a summary; M12.5 and M12.6 are Tier B). A session checks it before building (`docs/WORKFLOW.md` section 2, step 0).
 
 ## 5. Working lean (time and tokens) without losing accuracy
 

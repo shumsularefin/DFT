@@ -7,11 +7,14 @@ Roles: **author** (the human), **builder** (the model doing a stage), **auditor*
 ## 1. Inputs
 
 - `STAGE`: an id such as `M3.2`, or `NEXT`. `NEXT` means the first stage in `docs/PROGRESS.md` with status `todo` or `partial` whose dependencies are all `done`.
+- `TIER` (optional, `A` or `B`, only with `STAGE: NEXT`): take the first eligible stage of that tier. Use it when you have a session open on one model and want it to do the next stage that suits it.
 - `BASE`: the branch to build on. `main` when the previous stage has been merged. Otherwise the previous stage's branch name, taken from `docs/PROGRESS.md` ("Branch" column). This is how stages stack when the author merges later.
 
 ## 2. Start-up checklist
 
 Run these in order and do not skip any.
+
+0. **Tier check.** Look up your stage's **Tier** column in `docs/PROGRESS.md` and say it in your first reply. Tier A stages are built by the strongest model (Opus class), Tier B stages by the fast model (Sonnet class). If you are the fast model and the stage is Tier A, do not build: reply "Stage <id> is Tier A, please restart this session with the strongest model" and stop. If you are the strongest model on a Tier B stage, say so in one line and continue (it is safe, only slower and more costly). If `STAGE` is `NEXT` and a `TIER` was given, take the first eligible stage of that tier and name any earlier eligible stage of the other tier that you skipped.
 
 1. `git status` must be clean. `git fetch origin`.
 2. Branching. The harness may have given you a branch already. Use it. If you must create one, name it `claude/<stage-id>-<slug>` (for example `claude/m3-2-incar-engine`). Bring the base in:
@@ -52,7 +55,7 @@ The report must contain real output, trimmed: the test summary line, bundle size
 
 ## 6. Finish
 
-1. Update `docs/PROGRESS.md`: status, branch, PR link (fill after opening), date, one-line note.
+1. Update `docs/PROGRESS.md`: status, branch, PR link (fill after opening), date, one-line note; rewrite the "Next stage to build" line at its top (stage, title, tier, size of the first `todo` or `partial` row whose dependencies are all `done`).
 2. Complete `docs/reports/<stage>.md`.
 3. If user-facing, add a line to `CHANGELOG.md` (created in M1.3).
 4. Final commit, then `git push -u origin <branch>`. On network failure retry up to 4 times with waits of 2, 4, 8, 16 seconds.

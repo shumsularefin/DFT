@@ -2,80 +2,85 @@
 
 Updated by every build session (see `docs/WORKFLOW.md` section 6). The table order is the build order; `STAGE: NEXT` takes the first row that is `todo` or `partial` and whose dependencies are all `done`. Status values: `todo`, `in-progress`, `partial`, `blocked`, `done`. The **Branch** column is what you paste as `BASE` for the next stage when you stack stages without merging (Mode B).
 
-Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reordered after an audit; reasoning, model tiers (Tier A or Tier B, shown in the Note column) and lean-session rules are in [ROADMAP_V3.md](ROADMAP_V3.md).
+Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reordered after an audit; reasoning, model tiers (Tier A or Tier B, shown in the Tier column) and lean-session rules are in [ROADMAP_V3.md](ROADMAP_V3.md).
 
-Planning baseline (2026-10-27): environment, rules, work orders, golden reference data and guards are in place; no application code exists yet. Start with `STAGE: M0.1`, `BASE: main` after merging the planning branch.
+## How to read this table
 
-| Stage | Title | Status | Depends on | Size | Branch | PR | Updated | Note |
-|---|---|---|---|---|---|---|---|---|
-| M0.1 | Scaffold the project | done | none | M | claude/vigilant-newton-ws593b | | 2026-10-28 | [work order](milestones/M0-scaffold.md) |
-| M0.2 | Hosting, CI/CD, budgets and first deploy | done | M0.1 | M | claude/vigilant-newton-ws593b | [#1](https://github.com/shumsularefin/DFT/pull/1) | 2026-10-28 | [work order](milestones/M0-scaffold.md) |
-| M1.1 | Design tokens, themes and UI primitives | done | M0.2 | M | claude/vigilant-newton-ws593b | | 2026-10-28 | [work order](milestones/M1-design-and-shell.md) |
-| M1.2 | Content system and topic anatomy | done | M1.1 | L | claude/vigilant-newton-ws593b | | 2026-10-28 | [work order](milestones/M1-design-and-shell.md) |
-| M1.3 | Handbook shell, level switch, progress, search and SEO | done | M1.2 | M | claude/vigilant-newton-ws593b | | 2026-10-29 | [work order](milestones/M1-design-and-shell.md) |
-| M2.1 | Lab framework | done | M1.3 | M | claude/vigilant-newton-ws593b | | 2026-10-29 | [work order](milestones/M2-modules-1-3.md) |
-| M2.2 | Module 1: Why DFT exists | done | M1.3 | M | claude/vigilant-newton-ws593b | | 2026-10-29 | [work order](milestones/M2-modules-1-3.md) |
-| M2.3 | Module 2: Quantum basics without math (with labs) | done | M2.1, M2.2 | L | claude/vigilant-newton-ws593b | | 2026-11-03 | [work order](milestones/M2-modules-1-3.md) |
-| M2.4 | Module 3: The many-electron problem and why density helps (with labs) | done | M2.3 | L | claude/vigilant-newton-ws593b | | 2026-11-03 | [work order](milestones/M2-modules-1-3.md) |
-| M3.1 | Structure core: lattice math and POSCAR | done | M0.2 | M | claude/vigilant-newton-ws593b | | 2026-11-03 | [report](reports/M3.1.md), [work order](milestones/M3-input-builder.md) |
-| M3.2 | KPOINTS generation | done | M3.1 | M | claude/vigilant-newton-ws593b | | 2026-11-03 | [report](reports/M3.2.md), [work order](milestones/M3-input-builder.md) |
-| M3.3 | INCAR data model, presets and handbook extraction | done | M3.1 | L | claude/vigilant-newton-ws593b | | 2026-11-03 | [report](reports/M3.3.md), [work order](milestones/M3-input-builder.md) |
-| M3.4 | INCAR validation rules engine | done | M3.2, M3.3 | L | claude/vigilant-newton-ws593b | | 2026-11-03 | [report](reports/M3.4.md), [work order](milestones/M3-input-builder.md) |
-| M3.5 | Input Builder UI | done | M3.4, M1.3 | L | claude/vigilant-newton-ws593b | | 2026-11-03 | [report](reports/M3.5.md), [work order](milestones/M3-input-builder.md) |
-| M3.6 | Clickable file explorer | done | M3.3, M1.2 | S | claude/vigilant-newton-ws593b | | 2026-11-03 | [report](reports/M3.6.md), [work order](milestones/M3-input-builder.md) |
-| M4.1 | Output parsers and convergence analysis | done | M3.2 | L | claude/vigilant-newton-ws593b | | 2026-11-03 | [report](reports/M4.1.md), [work order](milestones/M4-convergence.md) |
-| M4.2 | Convergence series generator | done | M3.5, M4.1 | M | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M4.2.md), [work order](milestones/M4-convergence.md) |
-| M4.3 | Convergence plotter UI | done | M4.1 | M | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M4.3.md), [work order](milestones/M4-convergence.md) |
-| M4.4 | ENCUT lab and toy plane-wave solver | done | M2.1, M3.1 | L | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M4.4.md), [work order](milestones/M4-convergence.md) |
-| M4.5 | K-point mesh lab | done | M4.4, M3.2 | L | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M4.5.md), [work order](milestones/M4-convergence.md) |
-| M5.1 | Symmetry (moyo), CIF and standardization | done | M3.1 | L | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M5.1.md), [work order](milestones/M5-brillouin-zone.md) |
-| M5.2 | Brillouin zone geometry | done | M3.1 | M | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M5.2.md), [work order](milestones/M5-brillouin-zone.md) |
-| M5.3 | HPKOT k-paths (default convention) | done | M5.1, M5.2 | L | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M5.3.md), [work order](milestones/M5-brillouin-zone.md) |
-| M5.4 | Setyawan-Curtarolo k-paths (second convention) | done | M5.3 | L | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M5.4.md), [work order](milestones/M5-brillouin-zone.md) |
-| M5.5 | 3D Brillouin zone and lattice viewer | done | M5.2, M2.1 | M | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M5.5.md), [work order](milestones/M5-brillouin-zone.md) |
-| M5.6 | k-path tool page and exports | done | M5.3, M5.4, M5.5, M3.2 | M | claude/vigilant-newton-ws593b | | 2026-11-05 | [report](reports/M5.6.md), [work order](milestones/M5-brillouin-zone.md) |
-| M6.1 | Concept graph and question bank | done | M2.4 | M | claude/vigilant-newton-ws593b | | 2026-11-06 | [report](reports/M6.1.md), [work order](milestones/M6-adaptive-engine.md) |
-| M6.2 | Mastery and spacing models | done | M6.1 | M | claude/vigilant-newton-ws593b | | 2026-11-10 | [report](reports/M6.2.md), [work order](milestones/M6-adaptive-engine.md) |
-| M6.3 | Thompson-sampling policy | done | M6.2 | M | claude/vigilant-newton-ws593b | | 2026-11-10 | [report](reports/M6.3.md), [work order](milestones/M6-adaptive-engine.md) |
-| M12.1 | Design language v3: terminal-minimal look, command palette and status line | todo | M1.3, M5.6 | M | | | | Tier B; [work order](milestones/M12-visual-layer.md) |
-| M12.2 | Scene library: one data format for every 3D picture, with a flat fallback | todo | M5.5, M12.1 | L | | | | Tier B; [work order](milestones/M12-visual-layer.md) |
-| M13.1 | Supercells and collinear magnetic orderings (library) | todo | M5.1, M3.1, M3.4 | L | | | | Tier A; [work order](milestones/M13-magnetism-and-structures.md) |
-| M13.2 | Magnetic configuration tool (UI) | todo | M13.1, M12.2, M3.5 | L | | | | Tier B; [work order](milestones/M13-magnetism-and-structures.md) |
-| M12.6 | A structure view wherever a POSCAR appears | todo | M12.2, M3.5, M3.6 | S | | | | Tier B; [work order](milestones/M12-visual-layer.md) |
-| M6.4 | Practice UI, quizzes, mastery map and gentle gamification | todo | M6.3, M1.3, M12.1 | L | | | | Tier B; [work order](milestones/M6-adaptive-engine.md) |
-| M12.3 | Every question gets a visual | todo | M6.4, M12.2 | M | | | | Tier B; [work order](milestones/M12-visual-layer.md) |
-| M7.1 | Module 4: Hohenberg-Kohn, Kohn-Sham and the SCF loop (with SCF lab) | todo | M6.1, M2.4 | L | | | | Tier A; [work order](milestones/M7-remaining-modules.md) |
-| M7.2 | Module 5: Practical choices | todo | M7.1, M4.4, M4.5, M5.5, M12.2 | L | | | | Tier B; [work order](milestones/M7-remaining-modules.md) |
-| M12.5 | See what a tag does | todo | M12.3, M7.2, M3.5 | M | | | | Tier B; [work order](milestones/M12-visual-layer.md) |
-| M13.3 | Magnetic ground state and exchange analysis | todo | M13.2, M4.1 | L | | | | Tier A; [work order](milestones/M13-magnetism-and-structures.md) |
-| M13.4 | Handbook: spin-polarized DFT and magnetism, visually | todo | M7.2, M13.3, M12.2 | L | | | | Tier B; [work order](milestones/M13-magnetism-and-structures.md) |
-| M8.1 | Shannon radii dataset and lookup | todo | M0.2 | M | | | | Tier A; [work order](milestones/M8-tolerance-factor.md) |
-| M8.2 | Factors, checks and mixed sites | todo | M8.1 | M | | | | Tier A; [work order](milestones/M8-tolerance-factor.md) |
-| M8.3 | Explorer UI and the shared periodic table | todo | M8.2, M1.3 | M | | | | Tier B; [work order](milestones/M8-tolerance-factor.md) |
-| M10.1 | Chemistry data and validity engine | todo | M8.2, M5.1 | L | | | | Tier A; [work order](milestones/M10-material-builder.md) |
-| M10.2 | Crystal operations and exports | todo | M10.1, M13.1 | M | | | | Tier A; [work order](milestones/M10-material-builder.md) |
-| M13.5 | Structure toolkit: slabs, vacancies, substitutions and doping (library) | todo | M13.1, M5.1 | L | | | | Tier A; [work order](milestones/M13-magnetism-and-structures.md) |
-| M10.4 | Crystal editor UI | todo | M10.2, M5.5, M8.3, M13.5, M12.2 | L | | | | Tier B; [work order](milestones/M10-material-builder.md) |
-| M10.3 | Molecule engine (RDKit 2D, in-house 3D) | todo | M10.1 | L | | | | Tier A; [work order](milestones/M10-material-builder.md) |
-| M10.5 | Molecule editor UI | todo | M10.3, M10.4 | L | | | | Tier B; [work order](milestones/M10-material-builder.md) |
-| M7.3 | Modules 6 and 7: VASP files and running a calculation | todo | M3.6, M4.1 | L | | | | Tier B; [work order](milestones/M7-remaining-modules.md) |
-| M7.4 | Module 8: Convergence testing and common errors (with error finder) | todo | M7.3, M4.3 | M | | | | Tier B; [work order](milestones/M7-remaining-modules.md) |
-| M13.6 | Equation of state and lattice-constant tool | todo | M4.1, M4.2 | M | | | | Tier A; [work order](milestones/M13-magnetism-and-structures.md) |
-| M7.5 | Module 9: Analysis (with relaxation, DOS/band and charge-density tools) | todo | M7.4, M5.6, M2.1 | L | | | | Tier A; [work order](milestones/M7-remaining-modules.md) |
-| M14.3 | Charge-density difference, spin density and planar averages | todo | M7.5, M13.5 | M | | | | Tier A; [work order](milestones/M14-research-guidance.md) |
-| M14.1 | Calculation review: pre-flight and post-flight checks | todo | M7.4, M13.3 | L | | | | Tier A; [work order](milestones/M14-research-guidance.md) |
-| M8.4 | Maps, family trend and hand-offs | todo | M8.3, M4.3 | M | | | | Tier B; [work order](milestones/M8-tolerance-factor.md) |
-| M9.1 | Data pipeline, schema, validation and sample data | todo | M5.1 | L | | | | Tier A; [work order](milestones/M9-screening-studio.md) |
-| M9.2 | Explorer UI | todo | M9.1, M8.3 | L | | | | Tier B; [work order](milestones/M9-screening-studio.md) |
-| M9.3 | Feasibility check and first-project builder | todo | M9.2, M3.5, M4.2 | L | | | | Tier B; [work order](milestones/M9-screening-studio.md) |
-| M9.4 | Hooks, attribution, offline and integration | todo | M9.3 | S | | | | Tier B; [work order](milestones/M9-screening-studio.md) |
-| M14.2 | Research planner: goal to a sourced, step-by-step workflow | todo | M14.1, M13.5, M13.6, M9.3 | L | | | | Tier A; [work order](milestones/M14-research-guidance.md) |
-| M6.5 | Optional progress sync with Firebase (Spark) | todo | M6.4, M0.2 | M | | | | Tier B; [work order](milestones/M6-adaptive-engine.md) |
-| M12.4 | Guided path: learn DFT step by step in 3D | todo | M12.2, M7.2, M13.2 | L | | | | Tier B; [work order](milestones/M12-visual-layer.md) |
-| M7.6 | Modules 10 and 11: Worked example and tool tour | todo | M7.5, M8.4, M9.3, M10.5 | L | | | | Tier B; [work order](milestones/M7-remaining-modules.md) |
-| M11.1 | Performance and offline audit | todo | M10.5, M9.4, M7.6, M6.5, M12.3, M12.4, M12.5, M12.6, M13.4, M14.2, M14.3 | M | | | | Tier B; [work order](milestones/M11-polish.md) |
-| M11.2 | Accessibility and security audit | todo | M11.1 | M | | | | Tier B; [work order](milestones/M11-polish.md) |
-| M11.3 | Content integrity and release preparation | todo | M11.2 | M | | | | Tier A; [work order](milestones/M11-polish.md) |
+- **Next stage to build: M12.1 (Design language v3: terminal-minimal look, command palette and status line), Tier B, size M.** Start it with `STAGE: NEXT`, `BASE: main`. Each builder session rewrites this line for the stage that follows.
+- **Tier** says which model to open the session with. **A** = the strongest model (Opus class): stages where a subtle mistake would put a wrong number in front of a researcher. **B** = the fast model (Sonnet class): UI, content and wiring on top of tested libraries. `-` = already done.
+- **Size** says how much work it is: **S** short session, **M** one normal session, **L** a long session that may stop as `partial` and need a second one.
+- A session started on the wrong tier does not build. It names the model to switch to and stops (`docs/WORKFLOW.md` section 2, step 0).
+
+| Stage | Title | Status | Depends on | Size | Tier | Branch | PR | Updated | Note |
+|---|---|---|---|---|---|---|---|---|---|
+| M0.1 | Scaffold the project | done | none | M | - | claude/vigilant-newton-ws593b | | 2026-10-28 | [work order](milestones/M0-scaffold.md) |
+| M0.2 | Hosting, CI/CD, budgets and first deploy | done | M0.1 | M | - | claude/vigilant-newton-ws593b | [#1](https://github.com/shumsularefin/DFT/pull/1) | 2026-10-28 | [work order](milestones/M0-scaffold.md) |
+| M1.1 | Design tokens, themes and UI primitives | done | M0.2 | M | - | claude/vigilant-newton-ws593b | | 2026-10-28 | [work order](milestones/M1-design-and-shell.md) |
+| M1.2 | Content system and topic anatomy | done | M1.1 | L | - | claude/vigilant-newton-ws593b | | 2026-10-28 | [work order](milestones/M1-design-and-shell.md) |
+| M1.3 | Handbook shell, level switch, progress, search and SEO | done | M1.2 | M | - | claude/vigilant-newton-ws593b | | 2026-10-29 | [work order](milestones/M1-design-and-shell.md) |
+| M2.1 | Lab framework | done | M1.3 | M | - | claude/vigilant-newton-ws593b | | 2026-10-29 | [work order](milestones/M2-modules-1-3.md) |
+| M2.2 | Module 1: Why DFT exists | done | M1.3 | M | - | claude/vigilant-newton-ws593b | | 2026-10-29 | [work order](milestones/M2-modules-1-3.md) |
+| M2.3 | Module 2: Quantum basics without math (with labs) | done | M2.1, M2.2 | L | - | claude/vigilant-newton-ws593b | | 2026-11-03 | [work order](milestones/M2-modules-1-3.md) |
+| M2.4 | Module 3: The many-electron problem and why density helps (with labs) | done | M2.3 | L | - | claude/vigilant-newton-ws593b | | 2026-11-03 | [work order](milestones/M2-modules-1-3.md) |
+| M3.1 | Structure core: lattice math and POSCAR | done | M0.2 | M | - | claude/vigilant-newton-ws593b | | 2026-11-03 | [report](reports/M3.1.md), [work order](milestones/M3-input-builder.md) |
+| M3.2 | KPOINTS generation | done | M3.1 | M | - | claude/vigilant-newton-ws593b | | 2026-11-03 | [report](reports/M3.2.md), [work order](milestones/M3-input-builder.md) |
+| M3.3 | INCAR data model, presets and handbook extraction | done | M3.1 | L | - | claude/vigilant-newton-ws593b | | 2026-11-03 | [report](reports/M3.3.md), [work order](milestones/M3-input-builder.md) |
+| M3.4 | INCAR validation rules engine | done | M3.2, M3.3 | L | - | claude/vigilant-newton-ws593b | | 2026-11-03 | [report](reports/M3.4.md), [work order](milestones/M3-input-builder.md) |
+| M3.5 | Input Builder UI | done | M3.4, M1.3 | L | - | claude/vigilant-newton-ws593b | | 2026-11-03 | [report](reports/M3.5.md), [work order](milestones/M3-input-builder.md) |
+| M3.6 | Clickable file explorer | done | M3.3, M1.2 | S | - | claude/vigilant-newton-ws593b | | 2026-11-03 | [report](reports/M3.6.md), [work order](milestones/M3-input-builder.md) |
+| M4.1 | Output parsers and convergence analysis | done | M3.2 | L | - | claude/vigilant-newton-ws593b | | 2026-11-03 | [report](reports/M4.1.md), [work order](milestones/M4-convergence.md) |
+| M4.2 | Convergence series generator | done | M3.5, M4.1 | M | - | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M4.2.md), [work order](milestones/M4-convergence.md) |
+| M4.3 | Convergence plotter UI | done | M4.1 | M | - | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M4.3.md), [work order](milestones/M4-convergence.md) |
+| M4.4 | ENCUT lab and toy plane-wave solver | done | M2.1, M3.1 | L | - | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M4.4.md), [work order](milestones/M4-convergence.md) |
+| M4.5 | K-point mesh lab | done | M4.4, M3.2 | L | - | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M4.5.md), [work order](milestones/M4-convergence.md) |
+| M5.1 | Symmetry (moyo), CIF and standardization | done | M3.1 | L | - | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M5.1.md), [work order](milestones/M5-brillouin-zone.md) |
+| M5.2 | Brillouin zone geometry | done | M3.1 | M | - | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M5.2.md), [work order](milestones/M5-brillouin-zone.md) |
+| M5.3 | HPKOT k-paths (default convention) | done | M5.1, M5.2 | L | - | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M5.3.md), [work order](milestones/M5-brillouin-zone.md) |
+| M5.4 | Setyawan-Curtarolo k-paths (second convention) | done | M5.3 | L | - | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M5.4.md), [work order](milestones/M5-brillouin-zone.md) |
+| M5.5 | 3D Brillouin zone and lattice viewer | done | M5.2, M2.1 | M | - | claude/vigilant-newton-ws593b | | 2026-11-04 | [report](reports/M5.5.md), [work order](milestones/M5-brillouin-zone.md) |
+| M5.6 | k-path tool page and exports | done | M5.3, M5.4, M5.5, M3.2 | M | - | claude/vigilant-newton-ws593b | | 2026-11-05 | [report](reports/M5.6.md), [work order](milestones/M5-brillouin-zone.md) |
+| M6.1 | Concept graph and question bank | done | M2.4 | M | - | claude/vigilant-newton-ws593b | | 2026-11-06 | [report](reports/M6.1.md), [work order](milestones/M6-adaptive-engine.md) |
+| M6.2 | Mastery and spacing models | done | M6.1 | M | - | claude/vigilant-newton-ws593b | | 2026-11-10 | [report](reports/M6.2.md), [work order](milestones/M6-adaptive-engine.md) |
+| M6.3 | Thompson-sampling policy | done | M6.2 | M | - | claude/vigilant-newton-ws593b | | 2026-11-10 | [report](reports/M6.3.md), [work order](milestones/M6-adaptive-engine.md) |
+| M12.1 | Design language v3: terminal-minimal look, command palette and status line | todo | M1.3, M5.6 | M | B | | | | [work order](milestones/M12-visual-layer.md) |
+| M12.2 | Scene library: one data format for every 3D picture, with a flat fallback | todo | M5.5, M12.1 | L | B | | | | [work order](milestones/M12-visual-layer.md) |
+| M13.1 | Supercells and collinear magnetic orderings (library) | todo | M5.1, M3.1, M3.4 | L | A | | | | [work order](milestones/M13-magnetism-and-structures.md) |
+| M13.2 | Magnetic configuration tool (UI) | todo | M13.1, M12.2, M3.5 | L | B | | | | [work order](milestones/M13-magnetism-and-structures.md) |
+| M12.6 | A structure view wherever a POSCAR appears | todo | M12.2, M3.5, M3.6 | S | B | | | | [work order](milestones/M12-visual-layer.md) |
+| M6.4 | Practice UI, quizzes, mastery map and gentle gamification | todo | M6.3, M1.3, M12.1 | L | B | | | | [work order](milestones/M6-adaptive-engine.md) |
+| M12.3 | Every question gets a visual | todo | M6.4, M12.2 | M | B | | | | [work order](milestones/M12-visual-layer.md) |
+| M7.1 | Module 4: Hohenberg-Kohn, Kohn-Sham and the SCF loop (with SCF lab) | todo | M6.1, M2.4 | L | A | | | | [work order](milestones/M7-remaining-modules.md) |
+| M7.2 | Module 5: Practical choices | todo | M7.1, M4.4, M4.5, M5.5, M12.2 | L | B | | | | [work order](milestones/M7-remaining-modules.md) |
+| M12.5 | See what a tag does | todo | M12.3, M7.2, M3.5 | M | B | | | | [work order](milestones/M12-visual-layer.md) |
+| M13.3 | Magnetic ground state and exchange analysis | todo | M13.2, M4.1 | L | A | | | | [work order](milestones/M13-magnetism-and-structures.md) |
+| M13.4 | Handbook: spin-polarized DFT and magnetism, visually | todo | M7.2, M13.3, M12.2 | L | B | | | | [work order](milestones/M13-magnetism-and-structures.md) |
+| M8.1 | Shannon radii dataset and lookup | todo | M0.2 | M | A | | | | [work order](milestones/M8-tolerance-factor.md) |
+| M8.2 | Factors, checks and mixed sites | todo | M8.1 | M | A | | | | [work order](milestones/M8-tolerance-factor.md) |
+| M8.3 | Explorer UI and the shared periodic table | todo | M8.2, M1.3 | M | B | | | | [work order](milestones/M8-tolerance-factor.md) |
+| M10.1 | Chemistry data and validity engine | todo | M8.2, M5.1 | L | A | | | | [work order](milestones/M10-material-builder.md) |
+| M10.2 | Crystal operations and exports | todo | M10.1, M13.1 | M | A | | | | [work order](milestones/M10-material-builder.md) |
+| M13.5 | Structure toolkit: slabs, vacancies, substitutions and doping (library) | todo | M13.1, M5.1 | L | A | | | | [work order](milestones/M13-magnetism-and-structures.md) |
+| M10.4 | Crystal editor UI | todo | M10.2, M5.5, M8.3, M13.5, M12.2 | L | B | | | | [work order](milestones/M10-material-builder.md) |
+| M10.3 | Molecule engine (RDKit 2D, in-house 3D) | todo | M10.1 | L | A | | | | [work order](milestones/M10-material-builder.md) |
+| M10.5 | Molecule editor UI | todo | M10.3, M10.4 | L | B | | | | [work order](milestones/M10-material-builder.md) |
+| M7.3 | Modules 6 and 7: VASP files and running a calculation | todo | M3.6, M4.1 | L | B | | | | [work order](milestones/M7-remaining-modules.md) |
+| M7.4 | Module 8: Convergence testing and common errors (with error finder) | todo | M7.3, M4.3 | M | B | | | | [work order](milestones/M7-remaining-modules.md) |
+| M13.6 | Equation of state and lattice-constant tool | todo | M4.1, M4.2 | M | A | | | | [work order](milestones/M13-magnetism-and-structures.md) |
+| M7.5 | Module 9: Analysis (with relaxation, DOS/band and charge-density tools) | todo | M7.4, M5.6, M2.1 | L | A | | | | [work order](milestones/M7-remaining-modules.md) |
+| M14.3 | Charge-density difference, spin density and planar averages | todo | M7.5, M13.5 | M | A | | | | [work order](milestones/M14-research-guidance.md) |
+| M14.1 | Calculation review: pre-flight and post-flight checks | todo | M7.4, M13.3 | L | A | | | | [work order](milestones/M14-research-guidance.md) |
+| M8.4 | Maps, family trend and hand-offs | todo | M8.3, M4.3 | M | B | | | | [work order](milestones/M8-tolerance-factor.md) |
+| M9.1 | Data pipeline, schema, validation and sample data | todo | M5.1 | L | A | | | | [work order](milestones/M9-screening-studio.md) |
+| M9.2 | Explorer UI | todo | M9.1, M8.3 | L | B | | | | [work order](milestones/M9-screening-studio.md) |
+| M9.3 | Feasibility check and first-project builder | todo | M9.2, M3.5, M4.2 | L | B | | | | [work order](milestones/M9-screening-studio.md) |
+| M9.4 | Hooks, attribution, offline and integration | todo | M9.3 | S | B | | | | [work order](milestones/M9-screening-studio.md) |
+| M14.2 | Research planner: goal to a sourced, step-by-step workflow | todo | M14.1, M13.5, M13.6, M9.3 | L | A | | | | [work order](milestones/M14-research-guidance.md) |
+| M6.5 | Optional progress sync with Firebase (Spark) | todo | M6.4, M0.2 | M | B | | | | [work order](milestones/M6-adaptive-engine.md) |
+| M12.4 | Guided path: learn DFT step by step in 3D | todo | M12.2, M7.2, M13.2 | L | B | | | | [work order](milestones/M12-visual-layer.md) |
+| M7.6 | Modules 10 and 11: Worked example and tool tour | todo | M7.5, M8.4, M9.3, M10.5 | L | B | | | | [work order](milestones/M7-remaining-modules.md) |
+| M11.1 | Performance and offline audit | todo | M10.5, M9.4, M7.6, M6.5, M12.3, M12.4, M12.5, M12.6, M13.4, M14.2, M14.3 | M | B | | | | [work order](milestones/M11-polish.md) |
+| M11.2 | Accessibility and security audit | todo | M11.1 | M | B | | | | [work order](milestones/M11-polish.md) |
+| M11.3 | Content integrity and release preparation | todo | M11.2 | M | A | | | | [work order](milestones/M11-polish.md) |
 
 ## Session log
 
