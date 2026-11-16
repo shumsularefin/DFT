@@ -41,10 +41,12 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 | M12.2 | Scene library: one data format for every 3D picture, with a flat fallback | todo | M5.5, M12.1 | L | | | | Tier B; [work order](milestones/M12-visual-layer.md) |
 | M13.1 | Supercells and collinear magnetic orderings (library) | todo | M5.1, M3.1, M3.4 | L | | | | Tier A; [work order](milestones/M13-magnetism-and-structures.md) |
 | M13.2 | Magnetic configuration tool (UI) | todo | M13.1, M12.2, M3.5 | L | | | | Tier B; [work order](milestones/M13-magnetism-and-structures.md) |
+| M12.6 | A structure view wherever a POSCAR appears | todo | M12.2, M3.5, M3.6 | S | | | | Tier B; [work order](milestones/M12-visual-layer.md) |
 | M6.4 | Practice UI, quizzes, mastery map and gentle gamification | todo | M6.3, M1.3, M12.1 | L | | | | Tier B; [work order](milestones/M6-adaptive-engine.md) |
 | M12.3 | Every question gets a visual | todo | M6.4, M12.2 | M | | | | Tier B; [work order](milestones/M12-visual-layer.md) |
 | M7.1 | Module 4: Hohenberg-Kohn, Kohn-Sham and the SCF loop (with SCF lab) | todo | M6.1, M2.4 | L | | | | Tier A; [work order](milestones/M7-remaining-modules.md) |
 | M7.2 | Module 5: Practical choices | todo | M7.1, M4.4, M4.5, M5.5, M12.2 | L | | | | Tier B; [work order](milestones/M7-remaining-modules.md) |
+| M12.5 | See what a tag does | todo | M12.3, M7.2, M3.5 | M | | | | Tier B; [work order](milestones/M12-visual-layer.md) |
 | M13.3 | Magnetic ground state and exchange analysis | todo | M13.2, M4.1 | L | | | | Tier A; [work order](milestones/M13-magnetism-and-structures.md) |
 | M13.4 | Handbook: spin-polarized DFT and magnetism, visually | todo | M7.2, M13.3, M12.2 | L | | | | Tier B; [work order](milestones/M13-magnetism-and-structures.md) |
 | M8.1 | Shannon radii dataset and lookup | todo | M0.2 | M | | | | Tier A; [work order](milestones/M8-tolerance-factor.md) |
@@ -71,13 +73,15 @@ Planning baseline (2026-10-27): environment, rules, work orders, golden referenc
 | M6.5 | Optional progress sync with Firebase (Spark) | todo | M6.4, M0.2 | M | | | | Tier B; [work order](milestones/M6-adaptive-engine.md) |
 | M12.4 | Guided path: learn DFT step by step in 3D | todo | M12.2, M7.2, M13.2 | L | | | | Tier B; [work order](milestones/M12-visual-layer.md) |
 | M7.6 | Modules 10 and 11: Worked example and tool tour | todo | M7.5, M8.4, M9.3, M10.5 | L | | | | Tier B; [work order](milestones/M7-remaining-modules.md) |
-| M11.1 | Performance and offline audit | todo | M10.5, M9.4, M7.6, M6.5, M12.3, M12.4, M13.4, M14.2, M14.3 | M | | | | Tier B; [work order](milestones/M11-polish.md) |
+| M11.1 | Performance and offline audit | todo | M10.5, M9.4, M7.6, M6.5, M12.3, M12.4, M12.5, M12.6, M13.4, M14.2, M14.3 | M | | | | Tier B; [work order](milestones/M11-polish.md) |
 | M11.2 | Accessibility and security audit | todo | M11.1 | M | | | | Tier B; [work order](milestones/M11-polish.md) |
 | M11.3 | Content integrity and release preparation | todo | M11.2 | M | | | | Tier A; [work order](milestones/M11-polish.md) |
 
 ## Session log
 
 Newest first. One line per session: date, stage, outcome, branch.
+
+- 2026-11-16, review (second pass): independent re-read of the repository and of plan v3; verify green. Added M12.5 (tag visuals), M12.6 (structure view wherever a POSCAR appears, measuring), `commonSupercell` and the "one cell for all" default in M13.1 and M13.2, and D-058. Branch `main`.
 
 - 2026-11-16, planning v3: audit of `main` (verify green, 1215 tests); added M12 visual layer, M13 magnetism and structure toolkit, M14 research guidance (13 stages), reordered the build, D-054 to D-057, Q-040 to Q-044, S-058 to S-068. The sessions for M5.4 to M6.3 did not add log lines; their reports are linked in the table.
 

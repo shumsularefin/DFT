@@ -2,7 +2,7 @@
 
 Added in plan v3 (D-055, `docs/ROADMAP_V3.md`). The goal of this milestone is that **every idea on the site can be seen**: a reusable library of small 3D scenes (with a flat SVG fallback) that labs, questions and a guided path all share, inside a calm, minimal, keyboard-first interface.
 
-Rules that apply to every stage here: 3D and WebAssembly load lazily (after a user action or when visible and idle); every scene has a text alternative and a static SVG projection; reduced motion turns animation into stepped states; every scene is labelled `computed`, `toy-model` or `illustrative`; 360 px works.
+Rules that apply to every stage here: 3D and WebAssembly load lazily (after a user action or when visible and idle); every scene has a text alternative and a static SVG projection; reduced motion turns animation into stepped states; every scene is labelled `computed`, `toy-model` or `illustrative`; 360 px works. **Only one WebGL canvas is live on a page at a time** (D-058): every other scene shows its SVG projection until the user activates it, and activating one releases the previous one. Use 3D when the subject is spatial and a computed 2D plot when it is a curve; no decorative scenes.
 
 ## M12.1 Design language v3: terminal-minimal look, command palette and status line
 
@@ -95,3 +95,41 @@ Rules that apply to every stage here: 3D and WebAssembly load lazily (after a us
 **Done when**:
 - [ ] All stations written, labelled honestly and linked; the page meets the island budget and Lighthouse floor.
 **Not in this stage**: new physics labs (reuse existing ones).
+
+## M12.5 See what a tag does
+
+**Goal**: The most used INCAR tags show, inside their card in the Input Builder and in the handbook, a small picture of what the tag changes, so a learner remembers `ISPIN = 2` as "two sets of electrons, up and down" and not as a number.
+**Depends on**: M12.3, M7.2, M3.5
+**Size**: M
+**Sources**: S-041, S-042 (tag meanings exactly as the handbook data in `src/data/vasp-tags.json` states them)
+**Deliverables**:
+- `src/data/tag-visuals.json`: for each covered tag a `visual` in the M12.3 shape (a scene preset with overrides, or a plot id), a pure mapping from the tag's value to the overrides or plot params, a one-sentence caption per level, a badge, and source ids. First set, each reusing a scene or lab view-model that already exists by then: `ISPIN` (one occupation ladder versus separate up and down ladders; arrows on the user's own structure when one is loaded), `MAGMOM` (arrows per atom in POSCAR order, the count shown against the atom count, tied to V001), `ENCUT` (cutoff sphere, M4.4), `KSPACING` and the KPOINTS mesh (mesh in the zone, M4.5), `ISMEAR` and `SIGMA` (smearing lab, M7.2), `LDAUU` and `LDAUJ` (the DFT+U toy, M7.2), `IBRION`, `ISIF` and `NSW` (which degrees of freedom may move: atoms, cell shape, cell volume, on a small cell; the ISIF table comes from the tag data and nothing else), `EDIFF` and `EDIFFG` (a convergence trace with the threshold band), `NELM` (the SCF loop of M7.1 stopping early).
+- `src/lib/vasp/tagVisual.ts` (pure, tested): `visualFor(tag, value, structure?)`.
+- `TagCard` shows the figure behind a "Show me" disclosure, so nothing loads until asked; changing the value in the builder updates the picture and its text alternative.
+- MDX component `<TagVisual tag="ISPIN" />`.
+- A tag without an entry shows no figure. The report lists uncovered tags; the linter does not fail on them.
+**Tasks**: 1. Data file with a schema test (every preset, plot and source id exists). 2. `tagVisual.ts` mappings with unit tests. 3. `TagCard` and `<TagVisual>`. 4. e2e and axe. 5. Coverage table in the report.
+**Tests and reference values**:
+- Each mapping: the tag values documented in `src/data/vasp-tags.json` produce the documented params (for example `ISPIN = 1` gives one ladder and `ISPIN = 2` gives two); an unknown value gives no figure, not a wrong one.
+- e2e: open the ISPIN card, switch 1 to 2, the figure and its text alternative change; no three.js request before "Show me".
+**Done when**:
+- [ ] The first set is covered; every caption carries its badge and says no more than the tag data does.
+**Not in this stage**: new physics, tags outside the handbook data.
+
+## M12.6 A structure view wherever a POSCAR appears
+
+**Goal**: Whenever the site shows or receives a structure, the learner also sees it: in the Input Builder, in the file explorer and in every tool that accepts a POSCAR or CIF, with simple measuring.
+**Depends on**: M12.2, M3.5, M3.6
+**Size**: S
+**Sources**: S-021
+**Deliverables**:
+- `src/lib/crystal/measure.ts` (pure): minimum-image distance, angle and dihedral between sites; coordination number within the bond rule of M12.2.
+- `StructureView` (a thin wrapper that turns a `Structure` into a `SceneSpec` and renders `Scene`): SVG first, 3D on demand, a site table as the keyboard path (selecting a row highlights the atom), a measure mode (pick two or three sites, read distance or angle), and the text summary (formula, cell parameters, atom count).
+- Embedded in: the Input Builder structure step (the user sees the POSCAR they loaded, with MAGMOM arrows when a hand-off carries them), the file explorer when the file is a POSCAR (focusing a coordinate line highlights that atom and the reverse), and the k-path tool's real-space panel in place of its private scene code.
+**Tasks**: 1. `measure.ts` with tests. 2. `StructureView`. 3. The three embeddings. 4. e2e, axe, size.
+**Tests and reference values**:
+- Rock-salt NaCl from `tests/reference/kpaths.json`: Na to nearest Cl equals half the cubic lattice parameter (computed from the golden lattice in the test); Cl-Na-Cl angles are 90 and 180 degrees within 1e-9; a pair across the cell boundary uses the minimum image.
+- e2e: load a POSCAR in the Input Builder and see the view; measure a distance by keyboard only; a page with two views has one live canvas.
+**Done when**:
+- [ ] One component, three embeddings, no duplicated scene code left in the tools; budgets hold.
+**Not in this stage**: editing atoms (M10.4).

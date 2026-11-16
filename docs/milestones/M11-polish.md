@@ -5,7 +5,7 @@ These stages measure and fix; they add no new features. Each finishes with numbe
 ## M11.1 Performance and offline audit
 
 **Goal**: Every page class meets the budgets and Lighthouse targets with measured evidence, and the site works offline as designed.
-**Depends on**: M10.5, M9.4, M7.6, M6.5, M12.3, M12.4, M13.4, M14.2, M14.3
+**Depends on**: M10.5, M9.4, M7.6, M6.5, M12.3, M12.4, M12.5, M12.6, M13.4, M14.2, M14.3
 **Size**: M
 **Deliverables**:
 - A route inventory (`docs/reports/M11.1.md`) listing every route, its page class, initial JS, CSS, fonts, LCP element, and Lighthouse mobile scores (performance, accessibility, best practices, individual SEO audits), before and after fixes.
