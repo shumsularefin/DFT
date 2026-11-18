@@ -1,0 +1,118 @@
+---
+id: when-scf-goes-wrong
+title: When the SCF loop goes wrong
+module: 4
+order: 5
+summary: How to recognize a loop that oscillates or crawls, why metals, slabs and magnets are harder, and which mixing tags VASP gives you to calm it.
+concepts: [scf-mixing]
+requires: [scf-loop]
+vaspTags: [AMIX, BMIX, IMIX, NELM, ALGO]
+sources: [S-010, S-019, S-041, S-042, S-049]
+status: draft
+updated: 2026-11-18
+noLab: true
+---
+
+<Why>
+
+A calculation whose electronic loop does not converge gives you energies and forces that mean nothing, and it can waste hours of cluster time before you notice. Most convergence problems come from the mixing step. Knowing the symptoms and the few tags that control mixing turns a frustrating failure into a short fix. Module 8 goes further, with a full error finder.
+
+</Why>
+
+<Intuition>
+
+The lab on the previous page showed two ways the loop can fail:
+
+- **Too slow.** Small mixing steps are stable, but the loop may not reach the stopping rule before it runs out of iterations.
+- **Oscillating.** Large steps overshoot, the next step overshoots back, and the loop swings instead of settling.
+
+In a real crystal there is a third, related problem called <Term id="charge-sloshing">charge sloshing</Term>. In a large cell, especially a metal, a long cell or a slab with vacuum, charge can move a long way at little cost. The mixer then pushes charge to one end of the cell, the next step pushes it back, and the energy in `OSZICAR` jumps up and down instead of settling <Cite id="S-010" /> <Cite id="S-041" />.
+
+The usual cure is the one you found in the lab: gentler mixing. VASP's mixer is smarter than the lab's simple linear step. It remembers earlier iterations and uses them to choose a better next density (Pulay and Broyden methods), and it treats long-wavelength changes more cautiously than short ones (Kerker mixing). But it still has a step size, and you can turn it down <Cite id="S-019" />.
+
+<Level min="intermediate">
+
+Magnetic systems and DFT+U add their own difficulty: several spin arrangements can be nearly as good, and the loop can wander between them. More iterations and gentler mixing help; a good starting `MAGMOM` helps most (module 5) <Cite id="S-042" />.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+The lab's linear mixing is $n_{\text{in}}^{\text{next}} = (1-\alpha)\,n_{\text{in}} + \alpha\,n_{\text{out}}$. Pulay (also called DIIS) mixing instead looks for the combination of the last few input densities whose residuals cancel best, and steps from there; Broyden methods build up an approximate inverse of the density response from the history <Cite id="S-010" /> <Cite id="S-049" />.
+
+Kerker mixing scales each Fourier component of the density change with wave vector $q$ by
+
+$$A\,\frac{q^2}{q^2 + B^2},$$
+
+so long-wavelength (small $q$) changes, the ones that slosh, are damped. In VASP $A$ is `AMIX` and $B$ is `BMIX`. With a very small `BMIX` such as 0.0001 the factor is close to $A$ for every $q$, which is plain linear mixing with step `AMIX` <Cite id="S-019" />.
+
+</TheMath>
+
+<InVasp>
+
+Tags, with the defaults the VASP wiki pages give (VASP 6) <Cite id="S-019" />:
+
+| Tag    | Default                 | What it does                                                                           |
+| ------ | ----------------------- | -------------------------------------------------------------------------------------- |
+| `IMIX` | 4 (Broyden and Pulay)   | Chooses the mixer. Leave it at 4 unless you know why not.                              |
+| `AMIX` | 0.4 with PAW potentials | Mixing step size. The wiki notes that metals often need it much smaller, such as 0.02. |
+| `BMIX` | 1.0                     | Wave vector below which the Kerker scheme damps changes; near 0 means no damping.      |
+| `NELM` | 60                      | Most electronic steps per ionic step.                                                  |
+
+What the author's handbooks suggest when `OSZICAR` oscillates or `NELM` is reached, in this order <Cite id="S-041" /> <Cite id="S-042" />:
+
+1. Check the structure first: overlapping atoms or a broken geometry cause most loops that "cannot" converge.
+2. Use a more robust algorithm, `ALGO = All` (or `Damped`), and raise `NELM` to 150 to 200.
+3. Damp the mixing: `AMIX = 0.1`, `BMIX = 0.0001` (linear mixing, for slabs and charge sloshing); for magnets also `AMIX_MAG = 0.4`, `BMIX_MAG = 0.0001`.
+
+These are rules of thumb that work often, not guarantees.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change... | ...then                                                                |
+| ---------------- | ---------------------------------------------------------------------- |
+| Lower `AMIX`     | Steadier loop, often more iterations; the usual first fix for sloshing |
+| `BMIX` near 0    | Kerker damping off: plain linear mixing with step `AMIX`               |
+| Raise `NELM`     | More room to converge; on its own it does not stop an oscillation      |
+| `ALGO = All`     | A different, more robust way of finding the orbitals, at higher cost   |
+
+Why this matters: an unconverged loop gives wrong forces, which spoil relaxations. What happens if you only raise `NELM`: an oscillating loop oscillates for longer.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Raising NELM alone and hoping">
+
+If the energy swings back and forth, more steps with the same mixing only cost more time. Change the algorithm or damp the mixing as well.
+
+</Callout>
+
+<Callout variant="mistake" title="Changing mixing tags before checking the structure">
+
+Atoms too close together, a wrong cell or a strange `MAGMOM` also stop the loop from converging, and no mixing setting fixes them.
+
+</Callout>
+
+<Callout variant="mistake" title="Comparing runs that did not converge">
+
+An energy from a step that hit `NELM` is not a ground-state energy. Do not use it in a comparison.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-mix-1', 'q-mix-2', 'q-mix-3', 'q-mix-4']} />
+
+<GoDeeper>
+
+- Kresse and Furthmuller on the iterative schemes and mixing used in VASP <Cite id="S-010" />.
+- Martin, chapter on solving the self-consistent equations <Cite id="S-049" />.
+- VASP wiki pages IMIX, AMIX, BMIX, NELM and ALGO (by page name) <Cite id="S-019" />.
+- The author's handbooks, troubleshooting sections <Cite id="S-041" /> <Cite id="S-042" />.
+
+</GoDeeper>

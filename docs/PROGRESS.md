@@ -6,7 +6,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 
 ## How to read this table
 
-- **Next stage to build: M12.2 (Scene library: one data format for every 3D picture, with a flat fallback), Tier B, size L.** Start it with `STAGE: NEXT`, `BASE: main`. Each builder session rewrites this line for the stage that follows.
+- **Next stage to build: M12.2 (Scene library: one data format for every 3D picture, with a flat fallback), Tier B, size L.** Start it with `STAGE: NEXT`, `BASE: main`. The next Tier A stage is M8.1 (Shannon radii dataset and lookup), size M: start it with `STAGE: NEXT`, `TIER: A`. Each builder session rewrites this line for the stage that follows.
 - **Tier** says which model to open the session with. **A** = the strongest model (Opus class): stages where a subtle mistake would put a wrong number in front of a researcher. **B** = the fast model (Sonnet class): UI, content and wiring on top of tested libraries. `-` = already done.
 - **Size** says how much work it is: **S** short session, **M** one normal session, **L** a long session that may stop as `partial` and need a second one.
 - A session started on the wrong tier does not build. It names the model to switch to and stops (`docs/WORKFLOW.md` section 2, step 0).
@@ -44,12 +44,12 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M6.3 | Thompson-sampling policy | done | M6.2 | M | - | claude/vigilant-newton-ws593b | | 2026-11-10 | [report](reports/M6.3.md), [work order](milestones/M6-adaptive-engine.md) |
 | M12.1 | Design language v3: terminal-minimal look, command palette and status line | done | M1.3, M5.6 | M | B | claude/m12-1-design-language | PR pending | 2026-11-18 | [report](reports/M12.1.md), [work order](milestones/M12-visual-layer.md) |
 | M12.2 | Scene library: one data format for every 3D picture, with a flat fallback | todo | M5.5, M12.1 | L | B | | | | [work order](milestones/M12-visual-layer.md) |
-| M13.1 | Supercells and collinear magnetic orderings (library) | todo | M5.1, M3.1, M3.4 | L | A | | | | [work order](milestones/M13-magnetism-and-structures.md) |
+| M13.1 | Supercells and collinear magnetic orderings (library) | done | M5.1, M3.1, M3.4 | L | A | main | none (pushed to main) | 2026-11-18 | [report](reports/M13.1.md), [work order](milestones/M13-magnetism-and-structures.md) |
 | M13.2 | Magnetic configuration tool (UI) | todo | M13.1, M12.2, M3.5 | L | B | | | | [work order](milestones/M13-magnetism-and-structures.md) |
 | M12.6 | A structure view wherever a POSCAR appears | todo | M12.2, M3.5, M3.6 | S | B | | | | [work order](milestones/M12-visual-layer.md) |
 | M6.4 | Practice UI, quizzes, mastery map and gentle gamification | todo | M6.3, M1.3, M12.1 | L | B | | | | [work order](milestones/M6-adaptive-engine.md) |
 | M12.3 | Every question gets a visual | todo | M6.4, M12.2 | M | B | | | | [work order](milestones/M12-visual-layer.md) |
-| M7.1 | Module 4: Hohenberg-Kohn, Kohn-Sham and the SCF loop (with SCF lab) | todo | M6.1, M2.4 | L | A | | | | [work order](milestones/M7-remaining-modules.md) |
+| M7.1 | Module 4: Hohenberg-Kohn, Kohn-Sham and the SCF loop (with SCF lab) | done | M6.1, M2.4 | L | A | main | none (pushed to main) | 2026-11-18 | [report](reports/M7.1.md), [work order](milestones/M7-remaining-modules.md) |
 | M7.2 | Module 5: Practical choices | todo | M7.1, M4.4, M4.5, M5.5, M12.2 | L | B | | | | [work order](milestones/M7-remaining-modules.md) |
 | M12.5 | See what a tag does | todo | M12.3, M7.2, M3.5 | M | B | | | | [work order](milestones/M12-visual-layer.md) |
 | M13.3 | Magnetic ground state and exchange analysis | todo | M13.2, M4.1 | L | A | | | | [work order](milestones/M13-magnetism-and-structures.md) |
@@ -86,7 +86,9 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 
 Newest first. One line per session: date, stage, outcome, branch.
 
-- 2026-11-18, M12.1: design language v3 (tokens, mono interface face, bracketed badges, step idioms), `commands.ts` + index builder, lazy command palette, status line, session landing; 1226 unit and 319 e2e pass, contrast OK. D-059. Branch `claude/m12-1-design-language`.
+- 2026-11-18, M12.1: design language v3 (tokens, mono interface face, bracketed badges, step idioms), `commands.ts` + index builder, lazy command palette, status line, session landing; 1226 unit and 319 e2e pass, contrast OK. D-060. Branch `claude/m12-1-design-language`.
+- 2026-11-18, M7.1: `scf1d.ts` matches `scf1d_reference.json` (energies within 1e-6, same 64 iterations); SCF lab, five module 4 topics, 33 questions, 7 glossary terms, module 4 concepts published; observed mixing behaviour recorded (Z = 1, alpha = 1 oscillates). `TIER: A`, so M12.1 (Tier B) is still next. Pushed directly to `main`.
+- 2026-11-18, M13.1: supercells (`supercell.ts`), magnetic sublattice, FM/A/C/G/rock-salt II/k/custom orderings, common supercell, enumeration, MAGMOM with the V001/V002 hook; golden `magnetic_reference.json` (pymatgen, spglib); D-059; Q-040 and Q-041 closed. Built with `TIER: A`, so M12.1 (Tier B) was skipped and is still next. Pushed directly to `main` at the author's request (no PR).
 - 2026-11-16, review (second pass): independent re-read of the repository and of plan v3; verify green. Added M12.5 (tag visuals), M12.6 (structure view wherever a POSCAR appears, measuring), `commonSupercell` and the "one cell for all" default in M13.1 and M13.2, and D-058. Branch `main`.
 
 - 2026-11-16, planning v3: audit of `main` (verify green, 1215 tests); added M12 visual layer, M13 magnetism and structure toolkit, M14 research guidance (13 stages), reordered the build, D-054 to D-057, Q-040 to Q-044, S-058 to S-068. The sessions for M5.4 to M6.3 did not add log lines; their reports are linked in the table.

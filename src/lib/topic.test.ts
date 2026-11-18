@@ -29,6 +29,7 @@ describe('topic helpers', () => {
 
   it('labels a module folder', () => {
     expect(moduleLabel('02-quantum-basics')).toBe('Quantum basics');
+    expect(moduleLabel('04-kohn-sham')).toBe('Kohn-Sham');
   });
 });
 

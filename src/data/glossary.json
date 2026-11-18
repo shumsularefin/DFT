@@ -636,5 +636,72 @@
     "sources": [
       "S-011"
     ]
+  },
+  {
+    "id": "variational-principle",
+    "label": "Variational principle",
+    "short": "Any trial state gives an energy at or above the true ground-state energy, so the lowest energy you can find is the best estimate. In DFT the same holds for trial densities.",
+    "level": "intermediate",
+    "sources": [
+      "S-011",
+      "S-047"
+    ]
+  },
+  {
+    "id": "kohn-sham-orbital",
+    "label": "Kohn-Sham orbital",
+    "short": "A one-electron wavefunction of the imaginary non-interacting system that Kohn and Sham use. Filled with electrons, the orbitals give the same density as the real interacting electrons.",
+    "level": "intermediate",
+    "sources": [
+      "S-012"
+    ]
+  },
+  {
+    "id": "effective-potential",
+    "label": "Effective potential",
+    "short": "The single potential that every electron of the Kohn-Sham system feels: the attraction of the nuclei plus the Hartree repulsion plus the exchange-correlation potential. It depends on the density.",
+    "level": "intermediate",
+    "sources": [
+      "S-012"
+    ]
+  },
+  {
+    "id": "hartree-potential",
+    "label": "Hartree potential",
+    "short": "The classical electrostatic repulsion that an electron feels from the whole electron density, treated as a smooth cloud of charge.",
+    "level": "intermediate",
+    "sources": [
+      "S-012",
+      "S-048"
+    ]
+  },
+  {
+    "id": "density-mixing",
+    "label": "Density mixing",
+    "short": "In each self-consistency step, the new input density is a blend of the old input and the new output, instead of the new output alone. Blending too much can make the loop oscillate; too little makes it slow.",
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-049"
+    ]
+  },
+  {
+    "id": "scf-residual",
+    "label": "Residual (SCF)",
+    "short": "How far the density that comes out of a self-consistency step is from the density that went in. The loop has converged when the residual is close to zero.",
+    "level": "intermediate",
+    "sources": [
+      "S-049"
+    ]
+  },
+  {
+    "id": "charge-sloshing",
+    "label": "Charge sloshing",
+    "short": "A slow back-and-forth movement of electron charge from one side of a large cell to the other during the self-consistency loop, common in metals, long cells and slabs. Smaller mixing damps it.",
+    "level": "pro",
+    "sources": [
+      "S-010",
+      "S-041"
+    ]
   }
 ]

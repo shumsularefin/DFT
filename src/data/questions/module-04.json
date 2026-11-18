@@ -1,0 +1,1108 @@
+[
+  {
+    "id": "q-hkt-1",
+    "concepts": [
+      "hohenberg-kohn-theorems"
+    ],
+    "type": "single",
+    "prompt": "What does the first Hohenberg-Kohn theorem say?",
+    "options": [
+      {
+        "text": "The ground-state density fixes the external potential, up to a constant, and so everything about the ground state",
+        "correct": true,
+        "why": "That is why a function of three variables can stand in for the many-electron wavefunction."
+      },
+      {
+        "text": "The density can be computed without any approximation",
+        "correct": false,
+        "why": "Tempting because the theorem is exact, but it says nothing about how to compute the density in practice."
+      },
+      {
+        "text": "Every electron has its own density",
+        "correct": false,
+        "why": "Tempting from the Kohn-Sham orbitals, but the theorem is about the total density of all electrons."
+      }
+    ],
+    "hints": [
+      "Think about what the density lets you recover.",
+      "If you know the density, which potential could have made it?"
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-011"
+    ]
+  },
+  {
+    "id": "q-hkt-2",
+    "concepts": [
+      "hohenberg-kohn-theorems"
+    ],
+    "type": "single",
+    "prompt": "Two different crystals, with their nuclei in different places, are claimed to have exactly the same ground-state density. What do the Hohenberg-Kohn theorems say?",
+    "options": [
+      {
+        "text": "That cannot happen: different external potentials (beyond a constant) give different ground-state densities",
+        "correct": true,
+        "why": "The map from potential to density can be inverted up to a constant."
+      },
+      {
+        "text": "It happens often, because the density ignores the nuclei",
+        "correct": false,
+        "why": "Tempting because the density only describes electrons, but it is shaped by the nuclei that attract them."
+      },
+      {
+        "text": "It can happen only for metals",
+        "correct": false,
+        "why": "Tempting because metals are special in many ways, but the theorem holds for any ground state."
+      }
+    ],
+    "hints": [
+      "The first theorem is a one-to-one statement.",
+      "Different nuclei mean a different external potential."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-011"
+    ]
+  },
+  {
+    "id": "q-hkt-3",
+    "concepts": [
+      "hohenberg-kohn-theorems"
+    ],
+    "type": "single",
+    "prompt": "What do the Hohenberg-Kohn theorems NOT give you?",
+    "options": [
+      {
+        "text": "The exact form of the energy functional",
+        "correct": true,
+        "why": "They prove the functional exists; finding a good approximation is the practical work of DFT."
+      },
+      {
+        "text": "A reason to use the density instead of the wavefunction",
+        "correct": false,
+        "why": "Tempting because they are abstract, but that is exactly what they provide."
+      },
+      {
+        "text": "A way to find the ground state by minimizing an energy",
+        "correct": false,
+        "why": "Tempting, but the second theorem is precisely that variational statement."
+      }
+    ],
+    "hints": [
+      "Existence is not the same as a formula.",
+      "Which part of DFT still needs an approximation?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-011",
+      "S-049"
+    ]
+  },
+  {
+    "id": "q-hkt-4",
+    "concepts": [
+      "hohenberg-kohn-theorems"
+    ],
+    "type": "single",
+    "prompt": "In the energy functional E[n] = F[n] + integral of v n, what is special about F[n]?",
+    "options": [
+      {
+        "text": "It is universal: the same functional for every atom, molecule and crystal",
+        "correct": true,
+        "why": "F contains only the kinetic energy and the electron-electron repulsion; the material enters through v."
+      },
+      {
+        "text": "It is different for every material",
+        "correct": false,
+        "why": "Tempting because materials differ, but all material-specific information sits in the external-potential term."
+      },
+      {
+        "text": "It is zero for the ground state",
+        "correct": false,
+        "why": "Tempting because the ground state is special, but F holds the kinetic and interaction energy, which are not zero."
+      }
+    ],
+    "hints": [
+      "Which term knows where the nuclei are?",
+      "The other term only knows about electrons."
+    ],
+    "difficulty": 1,
+    "level": "pro",
+    "sources": [
+      "S-011"
+    ]
+  },
+  {
+    "id": "q-var-1",
+    "concepts": [
+      "variational-principle"
+    ],
+    "type": "single",
+    "prompt": "You evaluate the exact energy functional for a trial density that is not the true ground-state density. What can you say about the result?",
+    "options": [
+      {
+        "text": "It is higher than the true ground-state energy",
+        "correct": true,
+        "why": "The second theorem makes the ground-state energy the minimum over trial densities."
+      },
+      {
+        "text": "It is lower than the true ground-state energy",
+        "correct": false,
+        "why": "Tempting if you think a wrong guess can undershoot, but the ground state is the minimum."
+      },
+      {
+        "text": "It can be anything",
+        "correct": false,
+        "why": "Tempting because the trial is arbitrary, but the variational principle bounds it from below."
+      }
+    ],
+    "hints": [
+      "The ground state is the lowest-energy state.",
+      "A minimum cannot be beaten by another trial."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-011",
+      "S-047"
+    ]
+  },
+  {
+    "id": "q-var-2",
+    "concepts": [
+      "variational-principle"
+    ],
+    "type": "single",
+    "prompt": "In the site's SCF lab, the exact two-electron energy on the same grid is lower than the Hartree-Fock energy. Why does that fit the variational principle?",
+    "options": [
+      {
+        "text": "Hartree-Fock is a restricted trial wavefunction, so its energy is an upper bound to the exact one",
+        "correct": true,
+        "why": "A trial from a restricted family cannot go below the true ground-state energy."
+      },
+      {
+        "text": "Because the exact calculation uses more grid points",
+        "correct": false,
+        "why": "Tempting, but both use the same grid; that is why the comparison is fair."
+      },
+      {
+        "text": "Because Hartree-Fock includes too much correlation",
+        "correct": false,
+        "why": "Tempting from the word correlation, but Hartree-Fock leaves correlation out entirely."
+      }
+    ],
+    "hints": [
+      "Which of the two is the restricted one?",
+      "A restricted trial can only reach the minimum or stay above it."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-048",
+      "S-047"
+    ]
+  },
+  {
+    "id": "q-var-3",
+    "concepts": [
+      "variational-principle"
+    ],
+    "type": "single",
+    "prompt": "Why is the variational principle useful in practice?",
+    "options": [
+      {
+        "text": "It turns finding the ground state into a minimization: lower energy means a better trial",
+        "correct": true,
+        "why": "That is what the SCF loop and VASP's electronic minimizer rely on."
+      },
+      {
+        "text": "It makes every calculation exact",
+        "correct": false,
+        "why": "Tempting, but it only says the minimum is the ground state for the functional you use."
+      },
+      {
+        "text": "It tells you the band gap",
+        "correct": false,
+        "why": "Tempting because it gives energies, but it concerns the ground state, not excitations."
+      }
+    ],
+    "hints": [
+      "Think of searching for the bottom of a valley.",
+      "If lower is always closer, what strategy follows?"
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-011",
+      "S-047"
+    ]
+  },
+  {
+    "id": "q-var-4",
+    "concepts": [
+      "variational-principle"
+    ],
+    "type": "single",
+    "prompt": "Two runs with the same approximate functional give energies of -10.20 eV and -10.25 eV for the same structure, from different starting guesses. Both are converged. Which is the better ground-state estimate for that functional?",
+    "options": [
+      {
+        "text": "The lower one, -10.25 eV",
+        "correct": true,
+        "why": "For a fixed functional, a lower minimum is a better estimate of that functional's ground state; the other run stopped in a higher local minimum."
+      },
+      {
+        "text": "The higher one, -10.20 eV",
+        "correct": false,
+        "why": "Tempting if you think higher is safer, but the variational principle favours the lower energy."
+      },
+      {
+        "text": "Their average",
+        "correct": false,
+        "why": "Tempting as a compromise, but the two runs found different states, and the lower one is closer to the minimum."
+      }
+    ],
+    "hints": [
+      "Both used the same functional.",
+      "Which state is closer to the bottom?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-011"
+    ]
+  },
+  {
+    "id": "q-ksi-1",
+    "concepts": [
+      "kohn-sham-idea"
+    ],
+    "type": "single",
+    "prompt": "What is the central trick of the Kohn-Sham approach?",
+    "options": [
+      {
+        "text": "Replace the interacting electrons by non-interacting ones that have the same density",
+        "correct": true,
+        "why": "Non-interacting electrons are easy to solve, and the shared density keeps the Hohenberg-Kohn link to the real system."
+      },
+      {
+        "text": "Ignore the repulsion between electrons",
+        "correct": false,
+        "why": "Tempting because the invented electrons do not repel directly, but the repulsion is kept in the effective potential."
+      },
+      {
+        "text": "Treat the electrons as classical particles",
+        "correct": false,
+        "why": "Tempting as a simplification, but Kohn-Sham orbitals are quantum wavefunctions."
+      }
+    ],
+    "hints": [
+      "What is the same between the real and the invented system?",
+      "Which system is easier to solve?"
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-012"
+    ]
+  },
+  {
+    "id": "q-ksi-2",
+    "concepts": [
+      "kohn-sham-idea"
+    ],
+    "type": "single",
+    "prompt": "Why can the kinetic energy of the Kohn-Sham electrons be computed exactly?",
+    "options": [
+      {
+        "text": "They do not interact, so their kinetic energy follows directly from their orbitals",
+        "correct": true,
+        "why": "For non-interacting electrons the kinetic energy is a sum over orbitals, which is easy to evaluate."
+      },
+      {
+        "text": "Because it is the same as the true kinetic energy",
+        "correct": false,
+        "why": "Tempting, but it differs from the true one; the difference goes into the exchange-correlation term."
+      },
+      {
+        "text": "Because it is set to zero",
+        "correct": false,
+        "why": "Tempting as a shortcut, but the kinetic energy is a large, essential part of the total."
+      }
+    ],
+    "hints": [
+      "What makes non-interacting electrons easy?",
+      "Each electron has its own orbital."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-012",
+      "S-049"
+    ]
+  },
+  {
+    "id": "q-ksi-3",
+    "concepts": [
+      "kohn-sham-idea"
+    ],
+    "type": "single",
+    "prompt": "Which quantity is meant to be the same in the real system and the Kohn-Sham system?",
+    "options": [
+      {
+        "text": "The ground-state electron density",
+        "correct": true,
+        "why": "That is the defining requirement of the Kohn-Sham system."
+      },
+      {
+        "text": "The many-electron wavefunction",
+        "correct": false,
+        "why": "Tempting, but the Kohn-Sham system is built from single orbitals and its wavefunction differs from the real one."
+      },
+      {
+        "text": "The individual orbital energies",
+        "correct": false,
+        "why": "Tempting because VASP prints them, but they belong to the invented system."
+      }
+    ],
+    "hints": [
+      "Kohn-Sham is built to reproduce one thing.",
+      "Hohenberg-Kohn say that one thing is enough."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-012"
+    ]
+  },
+  {
+    "id": "q-ksi-4",
+    "concepts": [
+      "kohn-sham-idea"
+    ],
+    "type": "single",
+    "prompt": "Where did the difficulty of the many-electron problem go in the Kohn-Sham approach?",
+    "options": [
+      {
+        "text": "Into the exchange-correlation term, the one part that must be approximated",
+        "correct": true,
+        "why": "Kohn and Sham moved everything hard into one, usually small, term."
+      },
+      {
+        "text": "It disappeared",
+        "correct": false,
+        "why": "Tempting because the equations look simple, but the unknown part is still there."
+      },
+      {
+        "text": "Into the Hartree potential",
+        "correct": false,
+        "why": "Tempting because it handles repulsion, but the Hartree term is known exactly."
+      }
+    ],
+    "hints": [
+      "Which term is not known exactly?",
+      "The others are all simple formulas."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-012"
+    ]
+  },
+  {
+    "id": "q-kse-1",
+    "concepts": [
+      "kohn-sham-equations"
+    ],
+    "type": "single",
+    "prompt": "Which parts make up the Kohn-Sham effective potential?",
+    "options": [
+      {
+        "text": "The external potential of the nuclei, the Hartree potential and the exchange-correlation potential",
+        "correct": true,
+        "why": "Those three together are the potential every Kohn-Sham electron feels."
+      },
+      {
+        "text": "The external potential only",
+        "correct": false,
+        "why": "Tempting because it is the only outside force, but then the electrons would ignore each other completely."
+      },
+      {
+        "text": "The kinetic energy and the external potential",
+        "correct": false,
+        "why": "Tempting because both appear in the equation, but kinetic energy is an operator, not part of the potential."
+      }
+    ],
+    "hints": [
+      "Count the sources of push and pull on an electron.",
+      "One is from the nuclei, two from the other electrons."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-012"
+    ]
+  },
+  {
+    "id": "q-kse-2",
+    "concepts": [
+      "kohn-sham-equations"
+    ],
+    "type": "single",
+    "prompt": "Why must the Kohn-Sham equations be solved in a loop?",
+    "options": [
+      {
+        "text": "The potential depends on the density, which depends on the orbitals of that potential",
+        "correct": true,
+        "why": "Neither can be found first, so you iterate until they agree."
+      },
+      {
+        "text": "Because computers cannot solve one equation at once",
+        "correct": false,
+        "why": "Tempting, but a fixed potential could be solved directly; the loop comes from the dependence on the density."
+      },
+      {
+        "text": "Because each electron is solved separately",
+        "correct": false,
+        "why": "Tempting, but all orbitals are found in the same potential at each step."
+      }
+    ],
+    "hints": [
+      "What does the effective potential depend on?",
+      "And where does that come from?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-012"
+    ]
+  },
+  {
+    "id": "q-kse-3",
+    "concepts": [
+      "kohn-sham-equations"
+    ],
+    "type": "single",
+    "prompt": "Without spin polarization, how is the Kohn-Sham density built from the orbitals?",
+    "options": [
+      {
+        "text": "Fill the lowest orbitals with two electrons each and add up their squared magnitudes",
+        "correct": true,
+        "why": "n = sum of occupation times |psi|^2, with two electrons per filled spatial orbital."
+      },
+      {
+        "text": "Take the lowest orbital only",
+        "correct": false,
+        "why": "Tempting from the toy lab, where two electrons share one orbital, but in general many orbitals are filled."
+      },
+      {
+        "text": "Average all orbitals, filled or empty",
+        "correct": false,
+        "why": "Tempting for symmetry, but empty orbitals carry no electrons."
+      }
+    ],
+    "hints": [
+      "Each orbital holds up to two electrons of opposite spin.",
+      "Density is how much charge is at each point."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-012",
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-kse-4",
+    "concepts": [
+      "kohn-sham-equations"
+    ],
+    "type": "single",
+    "prompt": "Why is the Kohn-Sham total energy not the sum of the occupied eigenvalues?",
+    "options": [
+      {
+        "text": "The sum counts the Hartree repulsion twice and uses the exchange-correlation potential instead of the energy",
+        "correct": true,
+        "why": "The total energy needs corrections for both, which is why VASP reports them separately."
+      },
+      {
+        "text": "Because eigenvalues are always positive",
+        "correct": false,
+        "why": "Tempting, but bound-state eigenvalues are usually negative."
+      },
+      {
+        "text": "Because empty orbitals must be added too",
+        "correct": false,
+        "why": "Tempting, but empty orbitals do not contribute to the energy."
+      }
+    ],
+    "hints": [
+      "Each pair of electrons appears in both of their eigenvalues.",
+      "How many times is each repulsion counted then?"
+    ],
+    "difficulty": 1,
+    "level": "pro",
+    "sources": [
+      "S-049"
+    ]
+  },
+  {
+    "id": "q-kseig-1",
+    "concepts": [
+      "kohn-sham-eigenvalues"
+    ],
+    "type": "single",
+    "prompt": "What are the Kohn-Sham eigenvalues that VASP writes to EIGENVAL?",
+    "options": [
+      {
+        "text": "The energies of the orbitals of the invented non-interacting system",
+        "correct": true,
+        "why": "They are useful for band structures and densities of states, but they belong to the auxiliary system."
+      },
+      {
+        "text": "Exact energies to remove an electron from the real material",
+        "correct": false,
+        "why": "Tempting because they look like that, but in general they are not."
+      },
+      {
+        "text": "Total energies of the crystal",
+        "correct": false,
+        "why": "Tempting because they are energies, but the total energy is a separate quantity."
+      }
+    ],
+    "hints": [
+      "Whose orbitals are they?",
+      "Is that system the real one?"
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-049"
+    ]
+  },
+  {
+    "id": "q-kseig-2",
+    "concepts": [
+      "kohn-sham-eigenvalues"
+    ],
+    "type": "single",
+    "prompt": "A PBE band structure gives a gap of 0.6 eV for a semiconductor whose measured gap is 1.1 eV. Is that surprising?",
+    "options": [
+      {
+        "text": "No: gaps from Kohn-Sham eigenvalues with LDA or GGA are commonly too small",
+        "correct": true,
+        "why": "This underestimate is well known; better methods exist at higher cost."
+      },
+      {
+        "text": "Yes: DFT gaps are exact",
+        "correct": false,
+        "why": "Tempting because the theorems are exact, but they concern the ground state, not excitation energies."
+      },
+      {
+        "text": "Yes: DFT gaps are always too large",
+        "correct": false,
+        "why": "Tempting as a guess, but the common error goes the other way."
+      }
+    ],
+    "hints": [
+      "The Hohenberg-Kohn theorems are about the ground state.",
+      "Which direction is the usual error?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-049"
+    ]
+  },
+  {
+    "id": "q-kseig-3",
+    "concepts": [
+      "kohn-sham-eigenvalues"
+    ],
+    "type": "single",
+    "prompt": "What are Kohn-Sham eigenvalues reliably good for in everyday VASP work?",
+    "options": [
+      {
+        "text": "A qualitative picture of bands and density of states, such as which states are occupied and the band shapes",
+        "correct": true,
+        "why": "They give a useful picture, as long as you remember their limits for gaps and excitations."
+      },
+      {
+        "text": "Exact optical absorption energies",
+        "correct": false,
+        "why": "Tempting because they are energies, but excitations need more than the eigenvalues."
+      },
+      {
+        "text": "Nothing at all",
+        "correct": false,
+        "why": "Tempting after hearing they are auxiliary, but they are widely and usefully plotted."
+      }
+    ],
+    "hints": [
+      "They are not exact, but are they useless?",
+      "Band structure plots are made from them."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-049"
+    ]
+  },
+  {
+    "id": "q-kseig-4",
+    "concepts": [
+      "kohn-sham-eigenvalues"
+    ],
+    "type": "single",
+    "prompt": "Which quantity from a converged Kohn-Sham calculation is meant to be exact if the exchange-correlation functional were exact?",
+    "options": [
+      {
+        "text": "The ground-state density and total energy",
+        "correct": true,
+        "why": "The construction guarantees these; the eigenvalues carry no such general guarantee."
+      },
+      {
+        "text": "Every eigenvalue",
+        "correct": false,
+        "why": "Tempting, but only the density and energy are guaranteed by the construction."
+      },
+      {
+        "text": "The band gap",
+        "correct": false,
+        "why": "Tempting because gaps come from the eigenvalues, but those carry no general guarantee."
+      }
+    ],
+    "hints": [
+      "What did Kohn and Sham build the invented system to reproduce?",
+      "The energy follows from that."
+    ],
+    "difficulty": 1,
+    "level": "pro",
+    "sources": [
+      "S-012",
+      "S-049"
+    ]
+  },
+  {
+    "id": "q-xc-1",
+    "concepts": [
+      "exchange-correlation-term"
+    ],
+    "type": "single",
+    "prompt": "Which term in Kohn-Sham DFT must be approximated?",
+    "options": [
+      {
+        "text": "The exchange-correlation energy",
+        "correct": true,
+        "why": "Every other term is known exactly; this one holds everything that is hard."
+      },
+      {
+        "text": "The attraction of the nuclei",
+        "correct": false,
+        "why": "Tempting because nuclei are complicated, but their potential on the electrons is known exactly."
+      },
+      {
+        "text": "The Hartree repulsion",
+        "correct": false,
+        "why": "Tempting because it involves repulsion, but the Hartree energy has a simple exact formula."
+      }
+    ],
+    "hints": [
+      "Only one piece is not known exactly.",
+      "It is named after two effects."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-012"
+    ]
+  },
+  {
+    "id": "q-xc-2",
+    "concepts": [
+      "exchange-correlation-term"
+    ],
+    "type": "single",
+    "prompt": "What does exchange describe?",
+    "options": [
+      {
+        "text": "Electrons of the same spin avoid each other because of the Pauli principle",
+        "correct": true,
+        "why": "This lowers the repulsion compared to a smooth cloud of charge."
+      },
+      {
+        "text": "Electrons swapping places with nuclei",
+        "correct": false,
+        "why": "Tempting from the word exchange, but nuclei and electrons do not swap."
+      },
+      {
+        "text": "Energy exchanged with the surroundings",
+        "correct": false,
+        "why": "Tempting from everyday language, but exchange here is a quantum effect between electrons."
+      }
+    ],
+    "hints": [
+      "Think about the Pauli principle from module 2.",
+      "Two same-spin electrons cannot share a state."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-xc-3",
+    "concepts": [
+      "exchange-correlation-term"
+    ],
+    "type": "single",
+    "prompt": "What is the difference between LDA and GGA?",
+    "options": [
+      {
+        "text": "LDA uses only the density at each point; GGA also uses how fast the density changes there",
+        "correct": true,
+        "why": "GGA adds the gradient of the density."
+      },
+      {
+        "text": "LDA is exact and GGA is approximate",
+        "correct": false,
+        "why": "Tempting because LDA is older, but both are approximations."
+      },
+      {
+        "text": "GGA ignores exchange",
+        "correct": false,
+        "why": "Tempting from the name, but GGAs include both exchange and correlation."
+      }
+    ],
+    "hints": [
+      "The G is for gradient.",
+      "A gradient says how quickly something changes."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-012",
+      "S-013",
+      "S-049"
+    ]
+  },
+  {
+    "id": "q-xc-4",
+    "concepts": [
+      "exchange-correlation-term"
+    ],
+    "type": "single",
+    "prompt": "You do not set GGA, METAGGA or XC in your INCAR. Which functional does VASP use?",
+    "options": [
+      {
+        "text": "The one recorded in the POTCAR files (the LEXCH entry)",
+        "correct": true,
+        "why": "The VASP wiki page GGA states this default; for PBE POTCARs that means PBE."
+      },
+      {
+        "text": "Always LDA",
+        "correct": false,
+        "why": "Tempting because LDA is the oldest, but VASP follows the POTCAR."
+      },
+      {
+        "text": "Hartree-Fock",
+        "correct": false,
+        "why": "Tempting from the toy lab, but VASP does not default to Hartree-Fock."
+      }
+    ],
+    "hints": [
+      "The POTCAR carries information beyond the potential itself.",
+      "Look for an entry named LEXCH."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-019"
+    ]
+  },
+  {
+    "id": "q-scf-1",
+    "concepts": [
+      "scf-loop"
+    ],
+    "type": "single",
+    "prompt": "When is a self-consistent field calculation converged?",
+    "options": [
+      {
+        "text": "When the density that comes out matches the density that went in, within the tolerance",
+        "correct": true,
+        "why": "Then the potential and the density are consistent with each other."
+      },
+      {
+        "text": "After a fixed number of iterations",
+        "correct": false,
+        "why": "Tempting because codes have a maximum, but hitting the maximum means it did not converge."
+      },
+      {
+        "text": "When the energy is negative",
+        "correct": false,
+        "why": "Tempting, but bound systems have negative energies long before convergence."
+      }
+    ],
+    "hints": [
+      "Self-consistent means input and output agree.",
+      "What is compared between steps?"
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-012"
+    ]
+  },
+  {
+    "id": "q-scf-2",
+    "concepts": [
+      "scf-loop"
+    ],
+    "type": "single",
+    "prompt": "In the SCF loop, what comes right after solving the one-electron equations?",
+    "options": [
+      {
+        "text": "Build a new density from the filled orbitals",
+        "correct": true,
+        "why": "The new orbitals give the output density, which is then compared and mixed."
+      },
+      {
+        "text": "Move the nuclei",
+        "correct": false,
+        "why": "Tempting from relaxations, but that is the outer ionic loop, not the SCF loop."
+      },
+      {
+        "text": "Stop",
+        "correct": false,
+        "why": "Tempting, but you can only stop after checking that the density agrees."
+      }
+    ],
+    "hints": [
+      "The orbitals are what you just computed.",
+      "What do you make from orbitals?"
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-012"
+    ]
+  },
+  {
+    "id": "q-scf-3",
+    "concepts": [
+      "scf-loop"
+    ],
+    "type": "numeric",
+    "prompt": "In the toy lab, two electrons share one orbital. The density is normalized correctly. What does it integrate to?",
+    "answer": 2,
+    "tolerance": 0.001,
+    "unit": "electrons",
+    "hints": [
+      "The density counts electrons.",
+      "Integrating it over all space gives the number of electrons."
+    ],
+    "difficulty": -2,
+    "level": "beginner",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-scf-4",
+    "concepts": [
+      "scf-loop"
+    ],
+    "type": "single",
+    "prompt": "In the lab you switch off the electron repulsion. Why does the loop then finish in one step?",
+    "options": [
+      {
+        "text": "The potential no longer depends on the density, so the first solution is already consistent",
+        "correct": true,
+        "why": "Without repulsion there is nothing to feed back."
+      },
+      {
+        "text": "Because the lab skips the calculation",
+        "correct": false,
+        "why": "Tempting, but it still solves the equation once."
+      },
+      {
+        "text": "Because mixing is switched off",
+        "correct": false,
+        "why": "Tempting, but mixing does not matter when the output equals the input."
+      }
+    ],
+    "hints": [
+      "What makes the potential change from step to step?",
+      "Without repulsion, is anything left that depends on the density?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-012",
+      "S-048"
+    ]
+  },
+  {
+    "id": "q-scf-5",
+    "concepts": [
+      "scf-loop"
+    ],
+    "type": "single",
+    "prompt": "A VASP run reaches NELM electronic steps without meeting EDIFF. What should you conclude?",
+    "options": [
+      {
+        "text": "That electronic step did not converge, so its energy and forces should not be trusted",
+        "correct": true,
+        "why": "NELM is only a safety limit."
+      },
+      {
+        "text": "The result is converged because VASP finished",
+        "correct": false,
+        "why": "Tempting because the run ended, but ending is not the same as converging."
+      },
+      {
+        "text": "EDIFF was too tight, so the result is fine",
+        "correct": false,
+        "why": "Tempting, but the result still did not meet the criterion you set."
+      }
+    ],
+    "hints": [
+      "NELM is a maximum, not a target.",
+      "Which tag defines convergence?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-041"
+    ]
+  },
+  {
+    "id": "q-mix-1",
+    "concepts": [
+      "scf-mixing"
+    ],
+    "type": "numeric",
+    "prompt": "With linear mixing, alpha = 0.3. At one point the input density is 1.0 and the output density is 2.0. What is the next input density there?",
+    "answer": 1.3,
+    "tolerance": 0.001,
+    "unit": "",
+    "hints": [
+      "The rule is (1 - alpha) times old plus alpha times new.",
+      "0.7 times 1.0 plus 0.3 times 2.0."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-049"
+    ]
+  },
+  {
+    "id": "q-mix-2",
+    "concepts": [
+      "scf-mixing"
+    ],
+    "type": "single",
+    "prompt": "In the lab, Z = 1 with alpha = 1.0 never converges. What does the residual plot show?",
+    "options": [
+      {
+        "text": "The residual stops falling and the density swings between two states",
+        "correct": true,
+        "why": "Full steps overshoot, so the loop swings instead of settling."
+      },
+      {
+        "text": "The residual falls straight to zero",
+        "correct": false,
+        "why": "Tempting because full steps are the largest, but here they overshoot."
+      },
+      {
+        "text": "The lab refuses to run",
+        "correct": false,
+        "why": "Tempting, but the lab runs and shows the oscillation."
+      }
+    ],
+    "hints": [
+      "Try it in the lab.",
+      "Watch whether consecutive updates go in the same direction."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-049"
+    ]
+  },
+  {
+    "id": "q-mix-3",
+    "concepts": [
+      "scf-mixing"
+    ],
+    "type": "single",
+    "prompt": "OSZICAR shows the energy of a metal slab jumping up and down from step to step without settling. What is the usual first mixing fix from the handbooks?",
+    "options": [
+      {
+        "text": "Damp the mixing, for example AMIX = 0.1 and BMIX = 0.0001",
+        "correct": true,
+        "why": "Gentler mixing calms charge sloshing in metals and slabs."
+      },
+      {
+        "text": "Raise AMIX to 1.0",
+        "correct": false,
+        "why": "Tempting to speed things up, but larger steps make sloshing worse."
+      },
+      {
+        "text": "Remove the vacuum",
+        "correct": false,
+        "why": "Tempting as a guess, but the vacuum is part of the slab model you want."
+      }
+    ],
+    "hints": [
+      "Large steps overshoot.",
+      "Which tag sets the step size?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-041",
+      "S-042"
+    ]
+  },
+  {
+    "id": "q-mix-4",
+    "concepts": [
+      "scf-mixing"
+    ],
+    "type": "single",
+    "prompt": "What does a very small BMIX, such as 0.0001, do in VASP's Kerker mixing?",
+    "options": [
+      {
+        "text": "It makes the Kerker factor close to AMIX at every wave vector, which is plain linear mixing",
+        "correct": true,
+        "why": "The VASP wiki page IMIX says a very small BMIX gives straight mixing."
+      },
+      {
+        "text": "It damps long-wavelength changes as strongly as possible",
+        "correct": false,
+        "why": "Tempting because small sounds gentle, but the factor q^2/(q^2 + B^2) goes to 1 as B goes to 0."
+      },
+      {
+        "text": "It switches mixing off",
+        "correct": false,
+        "why": "Tempting, but AMIX still sets the step size."
+      }
+    ],
+    "hints": [
+      "The factor is A q^2 / (q^2 + B^2).",
+      "What happens to it when B is tiny?"
+    ],
+    "difficulty": 1,
+    "level": "pro",
+    "sources": [
+      "S-019"
+    ]
+  }
+]

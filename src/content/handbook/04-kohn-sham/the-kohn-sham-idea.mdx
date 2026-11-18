@@ -1,0 +1,119 @@
+---
+id: the-kohn-sham-idea
+title: The Kohn-Sham idea
+module: 4
+order: 2
+summary: Replace the real, interacting electrons by imaginary non-interacting ones that have the same density, and push everything hard into one term.
+concepts: [kohn-sham-idea, kohn-sham-equations, kohn-sham-eigenvalues]
+requires: [variational-principle]
+vaspTags: [NBANDS]
+sources: [S-012, S-019, S-048, S-049]
+status: draft
+updated: 2026-11-18
+noLab: true
+---
+
+<Why>
+
+The Hohenberg-Kohn theorems say the energy is a functional of the density, but nobody knows how to write the kinetic energy of interacting electrons directly from the density. Early attempts to do so gave poor results. Kohn and Sham found a way around it in 1965 <Cite id="S-012" />, and it is what VASP solves: when VASP talks about bands, orbitals and eigenvalues, it means the Kohn-Sham ones. Understanding the trick tells you what those orbitals and eigenvalues mean, and what they do not.
+
+</Why>
+
+<Intuition>
+
+Here is the trick in one sentence: **invent a system of electrons that do not repel each other, chosen so that their density is exactly the density of the real electrons.**
+
+Non-interacting electrons are easy. Each one moves on its own in a single shared potential, so you solve a one-electron equation and fill the lowest orbitals, two electrons per orbital. Their kinetic energy can be computed exactly from those orbitals. Because their density equals the real one, the Hohenberg-Kohn theorems say it contains the same information.
+
+The price is that the shared potential is not just the pull of the nuclei. It is an <Term id="effective-potential">effective potential</Term> with three parts <Cite id="S-012" />:
+
+1. the attraction of the nuclei (the external potential);
+2. the <Term id="hartree-potential">Hartree potential</Term>: the plain electrostatic repulsion from the electron cloud as a whole;
+3. the <Term id="exchange-correlation">exchange-correlation</Term> potential: a correction for everything the first two leave out.
+
+The orbitals of the invented system are the <Term id="kohn-sham-orbital">Kohn-Sham orbitals</Term>, and the one-electron equations are the <Term id="kohn-sham-equations">Kohn-Sham equations</Term>. Only the third part is unknown. Kohn and Sham did not make the problem easier to state exactly; they moved all the difficulty into one, usually small, term that can be approximated well.
+
+There is a twist that the next pages build on: the effective potential depends on the density, and the density comes from the orbitals, which come from the potential. You cannot solve it in one go. You have to go round in a loop.
+
+<Level min="intermediate">
+
+The Kohn-Sham eigenvalues are the energies of the invented electrons. They are not, in general, the energies needed to add or remove a real electron. In practice their pattern is a useful picture of the band structure, and VASP's bands and density of states are built from them, but band gaps read from them are typically too small <Cite id="S-049" />.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+For orbitals $\psi_i$ with occupations $f_i$ (2 for a filled orbital without spin polarization), the density is $n(\mathbf{r}) = \sum_i f_i |\psi_i(\mathbf{r})|^2$ and the orbitals solve
+
+$$\Big[-\frac{\hbar^2}{2m}\nabla^2 + v_{\text{eff}}(\mathbf{r})\Big]\psi_i(\mathbf{r}) = \varepsilon_i\,\psi_i(\mathbf{r}),$$
+
+$$v_{\text{eff}}(\mathbf{r}) = v_{\text{ext}}(\mathbf{r}) + \underbrace{e^2\!\int \frac{n(\mathbf{r}')}{|\mathbf{r}-\mathbf{r}'|}\,d\mathbf{r}'}_{v_H(\mathbf{r})} + v_{xc}(\mathbf{r}), \qquad v_{xc} = \frac{\delta E_{xc}[n]}{\delta n(\mathbf{r})}$$
+
+<Cite id="S-012" />. The total energy is
+
+$$E[n] = T_s[n] + \int v_{\text{ext}}\, n\, d\mathbf{r} + E_H[n] + E_{xc}[n],$$
+
+where $T_s$ is the kinetic energy of the non-interacting electrons and $E_H = \tfrac{1}{2}\int v_H\,n\,d\mathbf{r}$. Everything not in the first three terms, including the difference between the true kinetic energy and $T_s$, is defined to be $E_{xc}$.
+
+<Level min="pro">
+
+The total energy is not the sum of the eigenvalues: $\sum_i f_i \varepsilon_i$ counts the Hartree energy twice and contains $\int v_{xc}\,n$ instead of $E_{xc}$, so $E = \sum_i f_i\varepsilon_i - E_H + E_{xc} - \int v_{xc}\,n\,d\mathbf{r}$ <Cite id="S-049" />. This is why VASP reports a "band-structure energy" and a total energy separately.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+- The number of Kohn-Sham orbitals VASP computes is `NBANDS`. The VASP wiki page NBANDS asks for all occupied states plus at least one empty band (VASP warns otherwise) and recommends the default, about `NELECT/2 + NIONS/2`, because the highest computed orbitals converge slowest <Cite id="S-019" />.
+- The Kohn-Sham eigenvalues are what `EIGENVAL` and `DOSCAR` contain, and what band-structure plots show.
+- The orbitals themselves are stored in `WAVECAR`; the density in `CHGCAR`.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...                       | ...then                                                                        |
+| -------------------------------------- | ------------------------------------------------------------------------------ |
+| The density                            | The Hartree and exchange-correlation potentials change, so the orbitals change |
+| The exchange-correlation approximation | The effective potential changes; orbitals, eigenvalues and energy all shift    |
+| NBANDS too small                       | VASP warns; with no empty band to spare the electronic loop converges badly    |
+| Reading the gap from eigenvalues       | You get the Kohn-Sham gap, which is usually smaller than the measured one      |
+
+Why this matters: the trick lets a computer solve for many electrons with one-electron equations. What happens if you forget it is a trick: you may read the Kohn-Sham eigenvalues as measured energies.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Thinking the Kohn-Sham electrons are the real electrons">
+
+They are an invented system with the same density. Their density and the total energy are meant to be right; their individual orbitals and eigenvalues are tools.
+
+</Callout>
+
+<Callout variant="mistake" title="Thinking Kohn-Sham ignores the repulsion">
+
+The invented electrons do not repel each other directly, but the repulsion is still there through the Hartree and exchange-correlation parts of the potential they all feel.
+
+</Callout>
+
+<Callout variant="mistake" title="Adding up eigenvalues to get the total energy">
+
+The sum of eigenvalues double-counts the repulsion. The total energy needs the corrections in the math section.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-ksi-1', 'q-ksi-2', 'q-kse-1', 'q-kse-2', 'q-kseig-1', 'q-kseig-2']} />
+
+<GoDeeper>
+
+- Kohn and Sham, the 1965 paper <Cite id="S-012" />.
+- Martin, chapters on the Kohn-Sham auxiliary system and the meaning of the eigenvalues <Cite id="S-049" />.
+- Szabo and Ostlund, for the closely related Hartree-Fock equations <Cite id="S-048" />.
+
+</GoDeeper>

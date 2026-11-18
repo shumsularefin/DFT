@@ -147,9 +147,9 @@
     "id": "S-019",
     "citation": "VASP Wiki, https://www.vasp.at/wiki (pages cited by name, e.g. ENCUT, ISMEAR, KSPACING, IBRION, LOPTICS)",
     "usedFor": "Tag meaning, defaults, rules",
-    "access": "web; unreachable from the build sandbox",
+    "access": "web; reachable from builder sessions since 2026-11-18",
     "status": "cited-from-memory",
-    "notes": "The author's handbooks quote it; direct checks pending (Q-007). Always cite the page name"
+    "notes": "The author's handbooks quote it. Always cite the page name. Read on 2026-11-18 for M7.1 (status kept for the wiki as a whole): GGA (default from POTCAR LEXCH), IMIX (default 4, Broyden and Pulay; Kerker formula A G^2/(G^2+B^2)), AMIX (0.4 with PAW; metals often much smaller, e.g. 0.02), BMIX (1.0), NELM (60), NBANDS (all occupied states plus one empty band, default about NELECT/2 + NIONS/2)"
   },
   {
     "id": "S-020",
@@ -454,5 +454,93 @@
     "access": "open web",
     "status": "cited-from-memory",
     "notes": "The hex values are those already used by the k-mesh lab; no simulation of colour vision is claimed, only that the set is the published colour-blind-safe one and that each colour keeps contrast on both themes"
+  },
+  {
+    "id": "S-058",
+    "citation": "E. O. Wollan, W. C. Koehler, \"Neutron diffraction study of the magnetic properties of the series of perovskite-type compounds [(1-x)La, xCa]MnO3\", Phys. Rev. 100, 545 (1955)",
+    "usedFor": "Names and definitions of A-, C- and G-type antiferromagnetic orderings (M13.1, M13.4)",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": "Added in plan v3; the neighbour-count invariants used in tests follow from the definitions and are checked against pymatgen-built cells, not against the paper"
+  },
+  {
+    "id": "S-059",
+    "citation": "S. Blundell, \"Magnetism in Condensed Matter\", Oxford University Press (2001)",
+    "usedFor": "Heisenberg Hamiltonian conventions, Stoner criterion (M13.3, M13.4)",
+    "access": "book",
+    "status": "cited-from-memory",
+    "notes": "Added in plan v3"
+  },
+  {
+    "id": "S-060",
+    "citation": "H. J. Xiang, E. J. Kan, S.-H. Wei, M.-H. Whangbo, X. G. Gong, \"Predicting the spin-lattice order of frustrated systems from first principles\", Phys. Rev. B 84, 224429 (2011)",
+    "usedFor": "Energy-mapping analysis of exchange constants (M13.3)",
+    "access": "paywalled; arXiv preprint may exist",
+    "status": "cited-from-memory",
+    "notes": "Added in plan v3; Q-042"
+  },
+  {
+    "id": "S-061",
+    "citation": "F. Birch, \"Finite elastic strain of cubic crystals\", Phys. Rev. 71, 809 (1947)",
+    "usedFor": "Third-order Birch-Murnaghan equation of state (M13.6)",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": "Added in plan v3; the energy form is cross-checked through pymatgen's implementation in the M13.6 generator"
+  },
+  {
+    "id": "S-062",
+    "citation": "F. D. Murnaghan, \"The compressibility of media under extreme pressures\", Proc. Natl. Acad. Sci. 30, 244 (1944)",
+    "usedFor": "Murnaghan equation of state (M13.6)",
+    "access": "open (PNAS archive)",
+    "status": "cited-from-memory",
+    "notes": "Added in plan v3"
+  },
+  {
+    "id": "S-063",
+    "citation": "P. W. Tasker, \"The stability of ionic crystal surfaces\", J. Phys. C 12, 4977 (1979)",
+    "usedFor": "Polar-surface classification behind the slab polarity warning (M13.5)",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": "Added in plan v3; the warning is a heuristic (Q-044)"
+  },
+  {
+    "id": "S-064",
+    "citation": "W. Sun, G. Ceder, \"Efficient creation and convergence of surface slabs\", Surf. Sci. 617, 53 (2013)",
+    "usedFor": "Slab construction method used by pymatgen's SlabGenerator, the golden reference for M13.5",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": "Added in plan v3"
+  },
+  {
+    "id": "S-065",
+    "citation": "VASP wiki pages, by page name, for VASP 6.4: MAGMOM, ISPIN, NUPDOWN, LORBIT, LNONCOLLINEAR, LSORBIT, SAXIS, ISYM, LDIPOL, IDIPOL, LVHAR, LOCPOT, ISIF",
+    "usedFor": "Tag meanings for the magnetism, review, planner and potential tools (M13, M14)",
+    "access": "open web (vasp.at; reachable from the M13.1 session on 2026-11-18)",
+    "status": "cited-from-memory",
+    "notes": "Added in plan v3. Status kept for the register as a whole: only the MAGMOM page was read, on 2026-11-18 (revision 36612) for M13.1: one value per ion for ISPIN = 2, symmetry lowered by MAGMOM (Q-040 closed), starting moments slightly above the expected value (experimental moment times 1.2 to 1.5). The other pages are still cited from memory"
+  },
+  {
+    "id": "S-066",
+    "citation": "J. Neugebauer, M. Scheffler, \"Adsorbate-substrate and adsorbate-adsorbate interactions of Na and K adlayers on Al(111)\", Phys. Rev. B 46, 16067 (1992)",
+    "usedFor": "Dipole correction for slabs (M13.5, M14.3)",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": "Added in plan v3"
+  },
+  {
+    "id": "S-067",
+    "citation": "C. Freysoldt, B. Grabowski, T. Hickel, J. Neugebauer, G. Kresse, A. Janotti, C. G. Van de Walle, \"First-principles calculations for point defects in solids\", Rev. Mod. Phys. 86, 253 (2014)",
+    "usedFor": "Neutral defect formation energy (M13.5, M14.2)",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": "Added in plan v3; charged defects are out of scope"
+  },
+  {
+    "id": "S-068",
+    "citation": "W. H. Press, S. A. Teukolsky, W. T. Vetterling, B. P. Flannery, \"Numerical Recipes\", 3rd ed., Cambridge University Press (2007), section 15.5 (Levenberg-Marquardt)",
+    "usedFor": "Non-linear least-squares fit for the equation of state (M13.6)",
+    "access": "book",
+    "status": "cited-from-memory",
+    "notes": "Added in plan v3; results are checked against scipy and pymatgen fits, not against the book"
   }
 ]

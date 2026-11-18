@@ -86,7 +86,8 @@ describe('shipped concept graph', () => {
       for (const k of q.concepts) expect(ids.has(k), k).toBe(true);
     }
   });
-  it('marks every module 4 to 11 concept as planned', () => {
-    expect(g.filter((x) => x.module >= 4).every((x) => x.status === 'planned')).toBe(true);
+  it('publishes module 4 (M7.1) and marks every module 5 to 11 concept as planned', () => {
+    expect(g.filter((x) => x.module === 4).every((x) => x.status === 'published')).toBe(true);
+    expect(g.filter((x) => x.module >= 5).every((x) => x.status === 'planned')).toBe(true);
   });
 });
