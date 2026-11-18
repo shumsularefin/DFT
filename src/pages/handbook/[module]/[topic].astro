@@ -18,6 +18,7 @@ import VaspFile from '../../../components/handbook/VaspFile.astro';
 import VaspFileExplorer from '../../../components/handbook/VaspFileExplorer.astro';
 import PseudopotentialHeader from '../../../components/handbook/PseudopotentialHeader.astro';
 import Callout from '../../../components/ui/Callout.astro';
+import Scene from '../../../components/scene/Scene.astro';
 import { citeOrder, levelNotes, presentSections, splitId, topicPageClass } from '../../../lib/topic';
 import { moduleName } from '../../../lib/site';
 
@@ -51,6 +52,7 @@ const components = {
   VaspFileExplorer,
   PseudopotentialHeader,
   Callout,
+  Scene,
 };
 const statusLabel = { draft: 'Draft', review: 'Awaiting verification', verified: 'Verified' }[
   entry.data.status

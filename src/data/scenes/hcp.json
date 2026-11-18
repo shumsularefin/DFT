@@ -1,0 +1,21 @@
+{
+ "id": "hcp",
+ "badge": "illustrative",
+ "alt": "Hexagonal close-packed cell: a rhombic prism with two atoms in layers one half of c apart.",
+ "caption": "Hexagonal close-packed: two atoms per cell, the second layer sits over the hollows of the first.",
+ "structure": {
+  "ref": "hcp"
+ },
+ "camera": {
+  "azimuth": 20,
+  "elevation": 25
+ },
+ "repeat": [
+  2,
+  2,
+  1
+ ],
+ "show": {
+  "bonds": true
+ }
+}

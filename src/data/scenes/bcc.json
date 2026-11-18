@@ -1,0 +1,13 @@
+{
+ "id": "bcc",
+ "badge": "illustrative",
+ "alt": "Body-centred cubic cell: an atom at each corner of a cube and one in its centre.",
+ "caption": "Body-centred cubic: the conventional cell holds 2 atoms.",
+ "structure": {
+  "ref": "bcc"
+ },
+ "camera": "iso",
+ "show": {
+  "bonds": true
+ }
+}

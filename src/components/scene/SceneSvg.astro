@@ -1,0 +1,40 @@
+---
+// The scene as a static SVG at build time: no JavaScript, so a content page can show a picture with no island.
+import Badge from '../ui/Badge.astro';
+import { getScene, lookupStructure } from '../../lib/scene/library';
+import { projectScene } from '../../lib/scene/project';
+import { resolveScene, structureOf } from '../../lib/scene/resolve';
+import { projectionToSvg } from '../../lib/scene/svg';
+import './scene.css';
+
+interface Props {
+  id: string;
+}
+const { id } = Astro.props;
+const spec = getScene(id);
+const resolved = resolveScene(spec, lookupStructure);
+const svg = projectionToSvg(
+  projectScene(resolved, structureOf(spec, lookupStructure).lattice),
+  spec.alt,
+  `scs-${id}`,
+);
+---
+
+<figure class="scene" data-scene-id={id} data-static="true">
+  <div class="scene-head">
+    <Badge variant={spec.badge} />
+  </div>
+  <div class="scene-stage" set:html={svg} />
+  <ul class="scene-legend" aria-label="Elements">
+    {resolved.legend.map((l) => (
+      <li>
+        <span class="scene-swatch" style={`background:${l.color}`} aria-hidden="true"></span> {l.symbol}
+      </li>
+    ))}
+  </ul>
+  {spec.caption && <figcaption>{spec.caption}</figcaption>}
+  <details class="scene-alt">
+    <summary>Text description</summary>
+    <p>{spec.alt}</p>
+  </details>
+</figure>

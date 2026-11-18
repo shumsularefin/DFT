@@ -1,0 +1,35 @@
+---
+// Demo page of the scene library (M12.2): every preset, first as the build-time SVG (no JavaScript), then as the island that
+// can load 3D on request. Not indexed.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Scene from '../../components/scene/Scene.astro';
+import SceneSvg from '../../components/scene/SceneSvg.astro';
+import { sceneIds } from '../../lib/scene/library';
+
+const ids = sceneIds();
+---
+
+<BaseLayout
+  title="Scene library"
+  description="Every preset 3D scene, as a flat picture first and in 3D on request."
+  pageClass="island"
+>
+  <div class="container">
+    <h1>Scene library</h1>
+    <p>
+      Every picture here comes from a few lines of JSON. It starts as a flat drawing; the 3D code is not
+      downloaded until you press "View in 3D". Only one scene can hold a live 3D canvas at a time.
+    </p>
+    <h2>Static pictures (no JavaScript)</h2>
+    <SceneSvg id="perovskite-octahedra" />
+    <h2>Interactive scenes</h2>
+    {ids.map((id) => (
+      <section aria-labelledby={`h-${id}`} data-demo-scene={id}>
+        <h3 id={`h-${id}`}>
+          <code>{id}</code>
+        </h3>
+        <Scene id={id} />
+      </section>
+    ))}
+  </div>
+</BaseLayout>

@@ -1,0 +1,16 @@
+---
+// <Scene id="..." /> for MDX content: the preset's SVG is rendered on the server, then the island takes over when it scrolls
+// into view (still flat; three.js loads only when the reader presses "View in 3D").
+import SceneIsland from './Scene';
+import { getScene, lookupStructure } from '../../lib/scene/library';
+import { structureOf } from '../../lib/scene/resolve';
+
+interface Props {
+  id: string;
+}
+const { id } = Astro.props;
+const spec = getScene(id);
+const withStructure = { ...spec, structure: structureOf(spec, lookupStructure) };
+---
+
+<SceneIsland client:visible spec={withStructure} />

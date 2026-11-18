@@ -1,0 +1,10 @@
+{
+ "id": "sc",
+ "badge": "illustrative",
+ "alt": "Simple cubic cell: one atom at each of the eight corners of a cube, shown with the cell edges.",
+ "caption": "Simple cubic: one lattice point per cell.",
+ "structure": {
+  "ref": "sc"
+ },
+ "camera": "iso"
+}
