@@ -2,24 +2,15 @@
 // never modified. Labels and selective-dynamics flags follow their sites.
 import { cartToFrac, wrapFrac } from '../crystal/lattice';
 import { add, norm, scale, sub, vecMat } from '../crystal/linalg';
-import { wrapStructure } from '../crystal/structure';
+import { deleteSites, wrapStructure } from '../crystal/structure';
+import { mergeDuplicates as mergeDuplicatesOp } from '../crystal/ops';
 import type { Mat3, Structure, Vec3 } from '../crystal/types';
-import { contacts } from './geometry';
 import { THRESHOLDS } from './rules';
 
 export const wrapAll = (s: Structure): Structure => wrapStructure(s);
 
 /** Remove the listed sites. */
-export function deleteAtoms(s: Structure, indices: readonly number[]): Structure {
-  const drop = new Set(indices);
-  const keep = <T>(a: readonly T[]) => a.filter((_, i) => !drop.has(i));
-  const out: Structure = { ...s, species: keep(s.species), frac: keep(s.frac) };
-  return {
-    ...out,
-    ...(s.labels ? { labels: keep(s.labels) } : {}),
-    ...(s.selective ? { selective: keep(s.selective) } : {}),
-  };
-}
+export const deleteAtoms = deleteSites;
 
 /** Replace site i by the midpoint of i and the image of j (translation `image`), then delete j. */
 export function mergeAtoms(s: Structure, i: number, j: number, image: Vec3 = [0, 0, 0]): Structure {
@@ -57,9 +48,5 @@ export function scaleCell(s: Structure, factor: number): Structure {
 }
 
 /** Keep the first of every group of same-species atoms within 0.1 angstrom (after wrapping); delete the rest. */
-export function mergeDuplicates(s: Structure): Structure {
-  const drop = new Set<number>();
-  for (const c of contacts(s, THRESHOLDS.mergeDistance))
-    if (c.i !== c.j && s.species[c.i] === s.species[c.j] && !drop.has(c.i)) drop.add(c.j);
-  return deleteAtoms(s, [...drop]);
-}
+export const mergeDuplicates = (s: Structure): Structure =>
+  mergeDuplicatesOp(s, THRESHOLDS.mergeDistance).structure;

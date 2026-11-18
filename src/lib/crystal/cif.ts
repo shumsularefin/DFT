@@ -376,3 +376,83 @@ export function writeCif(s: Structure, opts: WriteCifOptions = {}): string {
   });
   return lines.join('\n') + '\n';
 }
+
+/** "x", "-y+1/2", "x-y" for one row of an operation (translation wrapped into [0, 1), written as a fraction). */
+export function formatSymopComponent(row: readonly number[], t: number): string {
+  let out = '';
+  row.forEach((c, k) => {
+    if (c === 0) return;
+    const v = 'xyz'[k]!;
+    const term = Math.abs(c) === 1 ? v : `${Math.abs(c)}*${v}`;
+    out += c < 0 ? `-${term}` : out ? `+${term}` : term;
+  });
+  let w = t - Math.floor(t);
+  if (w > 1 - 1e-9) w = 0;
+  if (w > 1e-9) {
+    let frac = '';
+    for (let q = 1; q <= 12 && !frac; q++) {
+      const n = Math.round(w * q);
+      if (Math.abs(w * q - n) < 1e-6) frac = `${n}/${q}`;
+    }
+    out += `+${frac || w.toFixed(10)}`;
+  }
+  return out || '0';
+}
+
+export interface WriteCifSymmetryOptions {
+  name?: string;
+  /** Digits for coordinates and cell parameters (default 10, so symmetry expansion stays within 1e-8). */
+  decimals?: number;
+}
+
+/**
+ * Write a CIF with symmetry: the cell `s` in its own basis, the operations of that basis (fractional x' = R x + t) and
+ * only the listed representative sites. A reader expands the representatives with the operations.
+ */
+export function writeCifWithSymmetry(
+  s: Structure,
+  ops: readonly { rotation: readonly (readonly number[])[]; translation: Vec3 }[],
+  representatives: readonly number[],
+  sym: { number: number; hmSymbol: string },
+  opts: WriteCifSymmetryOptions = {},
+): string {
+  const d = opts.decimals ?? 10;
+  const fx = (x: number) => x.toFixed(d);
+  const p = latticeParameters(s.lattice as Mat3);
+  const name = (opts.name ?? 'structure').replace(/\s+/g, '_');
+  const lines = [
+    `# written by DFT Handbook (space group ${sym.hmSymbol}, number ${sym.number}; symmetry-unique atoms only)`,
+    `data_${name}`,
+    `_symmetry_space_group_name_H-M   '${sym.hmSymbol}'`,
+    `_symmetry_Int_Tables_number   ${sym.number}`,
+    `_cell_length_a   ${fx(p.a)}`,
+    `_cell_length_b   ${fx(p.b)}`,
+    `_cell_length_c   ${fx(p.c)}`,
+    `_cell_angle_alpha   ${fx(p.alpha)}`,
+    `_cell_angle_beta   ${fx(p.beta)}`,
+    `_cell_angle_gamma   ${fx(p.gamma)}`,
+    'loop_',
+    ' _symmetry_equiv_pos_site_id',
+    ' _symmetry_equiv_pos_as_xyz',
+    ...ops.map(
+      (o, i) =>
+        `  ${i + 1}  '${o.rotation.map((r, k) => formatSymopComponent(r, o.translation[k]!)).join(', ')}'`,
+    ),
+    'loop_',
+    ' _atom_site_type_symbol',
+    ' _atom_site_label',
+    ' _atom_site_fract_x',
+    ' _atom_site_fract_y',
+    ' _atom_site_fract_z',
+    ' _atom_site_occupancy',
+  ];
+  const seen = new Map<string, number>();
+  for (const i of representatives) {
+    const el = s.species[i]!;
+    const k = seen.get(el) ?? 0;
+    seen.set(el, k + 1);
+    const f = s.frac[i]!;
+    lines.push(`  ${el}  ${el}${k + 1}  ${fx(f[0])}  ${fx(f[1])}  ${fx(f[2])}  1`);
+  }
+  return lines.join('\n') + '\n';
+}
