@@ -7,6 +7,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- Scene library: any page can now show a 3D picture of a crystal (atoms, bonds, coordination octahedra, spin arrows, planes, lattice vectors) from a few lines of data. It starts as a flat picture, turns with the arrow keys, and loads real 3D only when you press "View in 3D". Fourteen presets, including sc, bcc, fcc, hcp, rock salt, perovskite and four magnetic orderings (marked as toy models).
 - New look: warm neutral surfaces, one clay accent, monospace interface text, bracketed tags such as `[computed]` and `[toy model]`, a landing page that is a single prompt line plus starting points, and a status line (level, theme, modules done, network). Press Ctrl+K, Cmd+K or `/` for a command palette that reaches every page, tool, handbook topic, INCAR tag and glossary term; `/theme dark`, `/level pro` and `/kpath` style shortcuts work too. The palette loads only when first opened.
 - Shannon radii: the full table of ionic and crystal radii (492 entries, 94 elements) with a lookup that tells you why a radius is missing, or that a spin state must be chosen, instead of quietly substituting a nearby value (no UI yet).
 - Module 4, Hohenberg-Kohn, Kohn-Sham and the SCF loop: five topics, 33 practice questions and 7 glossary terms, with a self-consistency lab (a one-dimensional two-electron toy model, clearly labelled) where you play the loop iteration by iteration, change the mixing and watch it converge, crawl or oscillate.
