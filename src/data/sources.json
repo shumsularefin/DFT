@@ -147,9 +147,9 @@
     "id": "S-019",
     "citation": "VASP Wiki, https://www.vasp.at/wiki (pages cited by name, e.g. ENCUT, ISMEAR, KSPACING, IBRION, LOPTICS)",
     "usedFor": "Tag meaning, defaults, rules",
-    "access": "web; unreachable from the build sandbox",
+    "access": "web; reachable from builder sessions since 2026-11-18",
     "status": "cited-from-memory",
-    "notes": "The author's handbooks quote it; direct checks pending (Q-007). Always cite the page name"
+    "notes": "The author's handbooks quote it. Always cite the page name. Read on 2026-11-18 for M7.1 (status kept for the wiki as a whole): GGA (default from POTCAR LEXCH), IMIX (default 4, Broyden and Pulay; Kerker formula A G^2/(G^2+B^2)), AMIX (0.4 with PAW; metals often much smaller, e.g. 0.02), BMIX (1.0), NELM (60), NBANDS (all occupied states plus one empty band, default about NELECT/2 + NIONS/2)"
   },
   {
     "id": "S-020",

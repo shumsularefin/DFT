@@ -7,6 +7,8 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- Module 4, Hohenberg-Kohn, Kohn-Sham and the SCF loop: five topics, 33 practice questions and 7 glossary terms, with a self-consistency lab (a one-dimensional two-electron toy model, clearly labelled) where you play the loop iteration by iteration, change the mixing and watch it converge, crawl or oscillate.
+- Magnetism library: supercells from any integer matrix, ferromagnetic, A-, C-, G-type and rock-salt type II orderings, one common cell for comparing orderings, enumeration of distinct spin arrangements, and MAGMOM in POSCAR order (no UI yet).
 - Practice policy: a Thompson-sampling helper with fixed guard rails that picks the next practice action, a seeded simulator for testing it, and the plain-language "How this works" text (no UI yet).
 - Learning models: Bayesian knowledge tracing, an Elo/IRT difficulty estimate, SM-2 spaced repetition and a mergeable learner state (no UI yet).
 - Concept graph (73 concepts with prerequisites) and a validated question bank with a grader, plus a content lint that requires at least 4 questions per concept; module 1 now has 40 questions and every question has two hints.

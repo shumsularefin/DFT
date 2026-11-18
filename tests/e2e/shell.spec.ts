@@ -1,5 +1,11 @@
 import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { readdirSync } from 'node:fs';
+
+// Every handbook topic counts towards progress; derived from the files so a new module does not break the test.
+const TOPIC_COUNT = readdirSync('src/content/handbook', { recursive: true }).filter((f) =>
+  String(f).endsWith('.mdx'),
+).length;
 
 const TOPIC = '/handbook/00-start/how-to-use-this-site/';
 const BEGINNER_TEXT = 'At the Beginner level you see the simplest correct version';
@@ -58,26 +64,26 @@ test.describe('level, theme and progress', () => {
   test('progress: visit, mark complete, persist, reset with confirmation', async ({ page }) => {
     await page.goto(TOPIC);
     await openMenu(page);
-    await expect(page.locator('[data-progress-count]')).toHaveText('0 of 16');
+    await expect(page.locator('[data-progress-count]')).toHaveText(`0 of ${TOPIC_COUNT}`);
     await page.getByRole('button', { name: 'Mark complete' }).click();
-    await expect(page.locator('[data-progress-count]')).toHaveText('1 of 16');
+    await expect(page.locator('[data-progress-count]')).toHaveText(`1 of ${TOPIC_COUNT}`);
     // the sidebar is collapsed on phones, so check the tick's state rather than its visibility
     await expect(page.locator('[data-topic-item="00-start/how-to-use-this-site"] .tick')).not.toHaveAttribute(
       'hidden',
     );
     await page.reload();
     await openMenu(page);
-    await expect(page.locator('[data-progress-count]')).toHaveText('1 of 16');
+    await expect(page.locator('[data-progress-count]')).toHaveText(`1 of ${TOPIC_COUNT}`);
     await expect(page.getByRole('button', { name: /Completed/ })).toHaveAttribute('aria-pressed', 'true');
 
     await page.getByRole('button', { name: /Progress:/ }).click();
     await page.getByRole('button', { name: 'Reset progress' }).click();
     await expect(page.getByText('Erase all progress on this device?')).toBeVisible();
     await page.getByRole('button', { name: 'Cancel' }).click();
-    await expect(page.locator('[data-progress-count]')).toHaveText('1 of 16');
+    await expect(page.locator('[data-progress-count]')).toHaveText(`1 of ${TOPIC_COUNT}`);
     await page.getByRole('button', { name: 'Reset progress' }).click();
     await page.getByRole('button', { name: 'Yes, reset' }).click();
-    await expect(page.locator('[data-progress-count]')).toHaveText('0 of 16');
+    await expect(page.locator('[data-progress-count]')).toHaveText(`0 of ${TOPIC_COUNT}`);
   });
 
   test('keyboard shortcuts: help dialog, theme, level', async ({ page, isMobile }) => {
@@ -114,7 +120,7 @@ test.describe('storage blocked', () => {
     await page.getByRole('radio', { name: 'Intermediate' }).click();
     await expect(page.locator('html')).toHaveAttribute('data-level', 'intermediate');
     await page.getByRole('button', { name: 'Mark complete' }).click();
-    await expect(page.locator('[data-progress-count]')).toHaveText('1 of 16');
+    await expect(page.locator('[data-progress-count]')).toHaveText(`1 of ${TOPIC_COUNT}`);
     await page.reload();
     await expect(page.locator('html')).not.toHaveAttribute('data-level', 'intermediate');
     await expect(page.locator('h1')).toHaveCount(1);
