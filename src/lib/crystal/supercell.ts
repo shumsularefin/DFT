@@ -83,7 +83,7 @@ export function supercellTranslations(M: IntMat3): Int3[] {
       for (let k = lo[2]!; k <= hi[2]!; k++) {
         let inside = true;
         for (let c = 0; c < 3 && inside; c++) {
-          const u = i * adj[0][c] + j * adj[1][c] + k * adj[2][c];
+          const u = i * adj[0][c]! + j * adj[1][c]! + k * adj[2][c]!;
           if (u < 0 || u >= d) inside = false;
         }
         if (inside) out.push([i, j, k]);
@@ -111,7 +111,7 @@ export function buildSupercell(s: Structure, M: IntMat3): SupercellResult {
   for (const T of ts)
     s.frac.forEach((f, n) => {
       const x: Vec3 = [f[0] + T[0], f[1] + T[1], f[2] + T[2]];
-      const nf = [0, 1, 2].map((c) => wrap((x[0] * adj[0][c] + x[1] * adj[1][c] + x[2] * adj[2][c]) / d));
+      const nf = [0, 1, 2].map((c) => wrap((x[0] * adj[0][c]! + x[1] * adj[1][c]! + x[2] * adj[2][c]!) / d));
       frac.push(nf as unknown as Vec3);
       species.push(s.species[n]!);
       if (s.labels) labels.push(s.labels[n]!);

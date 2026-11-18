@@ -517,7 +517,7 @@
     "usedFor": "Tag meanings for the magnetism, review, planner and potential tools (M13, M14)",
     "access": "open web (vasp.at, unreachable from builder sessions so far)",
     "status": "cited-from-memory",
-    "notes": "Added in plan v3; statements that matter for a displayed result go to Q-040 until read"
+    "notes": "Added in plan v3. Status kept for the register as a whole: only the MAGMOM page was read, on 2026-11-18 (revision 36612) for M13.1: one value per ion for ISPIN = 2, symmetry lowered by MAGMOM (Q-040 closed), starting moments slightly above the expected value (experimental moment times 1.2 to 1.5). The other pages are still cited from memory"
   },
   {
     "id": "S-066",

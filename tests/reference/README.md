@@ -14,6 +14,7 @@ python -m venv .venv && .venv/bin/pip install -r scripts/reference/requirements.
 .venv/bin/python scripts/reference/gen_scf1d_reference.py
 .venv/bin/python scripts/reference/gen_vasp_output_fixtures.py
 .venv/bin/python scripts/reference/gen_element_reference.py   # downloads the SMACT wheel for its data file
+.venv/bin/python scripts/reference/gen_magnetic_reference.py  # after gen_kpaths.py (reuses its fixtures)
 ```
 
 | File | Content | Used by | Caveat |
@@ -28,5 +29,6 @@ python -m venv .venv && .venv/bin/pip install -r scripts/reference/requirements.
 | `scf1d_reference.json` | 1D two-electron restricted Hartree-Fock toy (soft-Coulomb, Z = 1 and 2): energies, orbital energy, plus the exact two-electron energy on the same grid as a variational bound | M7.1 | Model and grid must be reproduced exactly (see the generator) |
 | `vasp-outputs/*`, `vasp-outputs/expected.json` | SYNTHETIC CHGCAR (spin and non-spin, non-cubic grid), EIGENVAL (ISPIN 1, 2), OSZICAR, XDATCAR written or read back by pymatgen; DOSCAR from the documented layout | M4.1, M7.3, M7.5 | Parser tests only, never results; DOSCAR not independently validated (Q-008) |
 | `element_reference.json` | 30 elements: Pauling electronegativity, mass, vdW radius (pymatgen), Cordero covalent radius (via ASE), ICSD 2024 oxidation-state counts and shares (SMACT) | M8.2, M10.1 | Recalled anchors asserted at generation |
+| `magnetic_reference.json` | FM, A-, C-, G-type orderings of the cubic and Pnma perovskite fixtures and rock-salt type II of the NaCl fixture: wave vector, minimal and diagonal supercell, per-site parallel and antiparallel nearest-neighbour counts (pymatgen cells and neighbours); common supercell determinants; numbers of symmetry-distinct collinear configurations (brute force with spglib operations) | M13.1 | Supercells found by brute force over matrices with entries in [-2, 2]; pseudocubic axes typed in per fixture, not detected |
 
 Provenance and versions are inside each file's `_meta`.

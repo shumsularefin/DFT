@@ -190,7 +190,6 @@ export interface BuildOptions extends SiteChoice {
 }
 
 function assemble(
-  s: Structure,
   sites: number[],
   sc: SupercellResult,
   signOf: (siteIdx: number, T: Int3) => 1 | -1,
@@ -224,7 +223,7 @@ export function namedOrdering(
   const M = chooseMatrix(s, [k], opts.cell ?? 'minimal', opts.maxDet);
   const sc = buildSupercell(s, M);
   const g = p.grid;
-  const { magneticSites, signs } = assemble(s, sites, sc, (i, T) => {
+  const { magneticSites, signs } = assemble(sites, sc, (i, T) => {
     if (!g) return 1;
     const c = [0, 1, 2].map(
       (a) =>
@@ -290,7 +289,7 @@ export function orderingFromK(s: Structure, kIn: Vec3, opts: BuildOptions = {}):
   const sites = sitesOf(s, opts);
   const M = chooseMatrix(s, [k], opts.cell ?? 'minimal', opts.maxDet);
   const sc = buildSupercell(s, M);
-  const { magneticSites, signs } = assemble(s, sites, sc, (_i, T) =>
+  const { magneticSites, signs } = assemble(sites, sc, (_i, T) =>
     signOfPhase(Math.round(2 * (k[0] * T[0] + k[1] * T[1] + k[2] * T[2]))),
   );
   return {
