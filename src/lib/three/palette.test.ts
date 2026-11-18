@@ -39,8 +39,8 @@ describe('atom palette (Okabe-Ito, S-057)', () => {
     expect(css).toContain(`--bg: ${LIGHT_BG}`);
     expect(css).toContain(`--bg: ${DARK_BG}`);
   });
-  it('records which colours need the outline: yellow, sky and orange on light, grey on dark', () => {
-    expect(lowContrastOn(LIGHT_BG).sort()).toEqual(['#56b4e9', '#e69f00', '#f0e442']);
+  it('records which colours need the outline: yellow, sky, orange and pink on light (pink is 2.91:1 on the warm background of D-054), grey on dark', () => {
+    expect(lowContrastOn(LIGHT_BG).sort()).toEqual(['#56b4e9', '#cc79a7', '#e69f00', '#f0e442']);
     expect(lowContrastOn(DARK_BG)).toEqual(['#595959']);
   });
   it('no colour is low contrast on both themes, so each one reads on at least one', () => {

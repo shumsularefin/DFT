@@ -1,0 +1,259 @@
+/* Design language v3 (D-054): terminal-minimal. Interface text is JetBrains Mono, prose stays IBM Plex Sans.
+   One accent (clay), 1 px borders, no gradients, no deep shadows. Colour values live in tokens.css. */
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+main {
+  flex: 1 0 auto;
+}
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 500;
+}
+
+/* Interface face: nav, sidebar, buttons, badges, readouts, tables of numbers, breadcrumbs, status line, palette. */
+.site-header,
+.site-footer,
+.breadcrumbs,
+.sidebar,
+.prevnext,
+.btn,
+.badge,
+.readout,
+.level-switch button,
+.progress-btn,
+.progress-pop,
+.theme-toggle,
+.menu-btn,
+.search-form input,
+.search-results,
+.stepper,
+.skip-link,
+.card-title,
+td.num,
+table.numeric,
+button,
+summary {
+  font-family: var(--font-mono);
+}
+.brand {
+  font-weight: 500;
+}
+.brand::before {
+  content: '> ';
+  color: var(--accent);
+}
+.site-footer {
+  border-top: 1px solid var(--border);
+}
+
+/* Navigation: the active item is the accent. */
+.nav-list a {
+  font-size: var(--step--1);
+}
+.nav-list a[aria-current='page'] {
+  color: var(--accent);
+  font-weight: 500;
+  border-bottom-width: 2px;
+}
+
+/* Panels: 1 px bordered blocks, no shadow. */
+.card,
+.callout,
+.readout,
+.search-results,
+.progress-pop,
+.help-dialog {
+  box-shadow: none;
+  border: 1px solid var(--border);
+}
+
+/* Step lists: filled circle for a step, corner connector for a nested result. Text equivalents live in the markup. */
+.step-list {
+  list-style: none;
+  padding: 0;
+  max-width: none;
+}
+.step-list > li::before {
+  content: '\25CF\00a0';
+  color: var(--accent);
+  font-family: var(--font-mono);
+}
+.step-result {
+  display: block;
+  padding-inline-start: 1.5ch;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+.step-result::before {
+  content: '\23BF\00a0';
+}
+
+/* Busy indicator: a short monospace label with a slow pulse; static under reduced motion. */
+.busy {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--text-muted);
+}
+.busy::before {
+  content: '\25CF\00a0';
+  color: var(--accent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .busy::before {
+    animation: busy-pulse 2s ease-in-out infinite;
+  }
+}
+@keyframes busy-pulse {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* Landing: a session prompt and a short list of starting points. */
+.session {
+  padding-block: var(--space-6);
+}
+.session-prompt {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 3.5rem;
+  padding: 0 var(--space-4);
+  font: inherit;
+  font-family: var(--font-mono);
+  font-size: var(--step-0);
+  color: var(--text-muted);
+  text-align: start;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.session-prompt:hover {
+  border-color: var(--accent);
+}
+.session-prompt .prompt-mark {
+  color: var(--accent);
+}
+.session-prompt kbd {
+  margin-inline-start: auto;
+  font-size: var(--step--1);
+}
+.starts {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-5) 0;
+  max-width: none;
+  font-family: var(--font-mono);
+}
+.starts li {
+  margin: 0;
+  border-bottom: 1px solid var(--border);
+}
+.starts a {
+  display: flex;
+  gap: var(--space-3);
+  align-items: baseline;
+  min-height: var(--target);
+  padding: var(--space-2) var(--space-1);
+  color: var(--text);
+  text-decoration: none;
+}
+.starts a:hover {
+  background: var(--surface);
+}
+.starts a::before {
+  content: '>';
+  color: var(--accent);
+}
+.starts small {
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+}
+
+/* Command palette (created on first open by chrome/palette.ts). */
+.palette {
+  width: min(40rem, 100vw - 1.5rem);
+  max-height: 80dvh;
+  margin: 10dvh auto auto;
+  padding: 0;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  overflow: hidden;
+}
+.palette[open] {
+  display: flex;
+  flex-direction: column;
+}
+.palette::backdrop {
+  background: rgb(0 0 0 / 0.45);
+}
+.palette-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+.palette-prompt {
+  color: var(--accent);
+}
+.palette-input {
+  flex: 1;
+  min-height: 3rem;
+  font: inherit;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+}
+.palette-input:focus-visible {
+  outline: none;
+}
+.palette-row:focus-within {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+.palette-list {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-1);
+  max-width: none;
+  overflow-y: auto;
+}
+.palette-opt {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  align-items: baseline;
+  min-height: var(--target);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: var(--step--1);
+}
+.palette-opt[aria-selected='true'] {
+  background: var(--surface-2);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+.palette-group {
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.palette-hint {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  max-width: none;
+  color: var(--text-muted);
+  font-size: var(--step--1);
+  border-top: 1px solid var(--border);
+}

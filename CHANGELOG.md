@@ -7,6 +7,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- New look: warm neutral surfaces, one clay accent, monospace interface text, bracketed tags such as `[computed]` and `[toy model]`, a landing page that is a single prompt line plus starting points, and a status line (level, theme, modules done, network). Press Ctrl+K, Cmd+K or `/` for a command palette that reaches every page, tool, handbook topic, INCAR tag and glossary term; `/theme dark`, `/level pro` and `/kpath` style shortcuts work too. The palette loads only when first opened.
 - Practice policy: a Thompson-sampling helper with fixed guard rails that picks the next practice action, a seeded simulator for testing it, and the plain-language "How this works" text (no UI yet).
 - Learning models: Bayesian knowledge tracing, an Elo/IRT difficulty estimate, SM-2 spaced repetition and a mergeable learner state (no UI yet).
 - Concept graph (73 concepts with prerequisites) and a validated question bank with a grader, plus a content lint that requires at least 4 questions per concept; module 1 now has 40 questions and every question has two hints.

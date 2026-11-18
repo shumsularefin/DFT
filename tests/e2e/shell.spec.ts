@@ -143,11 +143,10 @@ test.describe('search', () => {
     await expect(page.locator('[data-search-results] a[href*="/design/"]')).toHaveCount(0);
   });
 
-  test('"/" focuses search and Escape closes the results', async ({ page, isMobile }) => {
+  test('the search box finds text and Escape closes the results', async ({ page, isMobile }) => {
     test.skip(!!isMobile, 'shortcut test');
     await page.goto('/');
-    await page.keyboard.press('/');
-    await expect(page.getByRole('searchbox')).toBeFocused();
+    await page.getByRole('searchbox').focus();
     await page.keyboard.type('density');
     await expect(page.locator('[data-search-results]')).toBeVisible();
     await page.keyboard.press('Escape');
