@@ -30,6 +30,12 @@ export const PAGES = [
     'Tools',
     ['kpath', 'bands', 'bandstructure', 'hpkot', 'zone'],
   ],
+  [
+    '/tools/magnetic/',
+    'Magnetic configuration tool',
+    'Tools',
+    ['magnetic', 'magmom', 'antiferromagnetic', 'ferromagnetic', 'spin', 'ordering'],
+  ],
 ];
 
 /** Reads `key: value` lines from the front matter block of an MDX file. Enough for id, title, module. */

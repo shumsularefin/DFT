@@ -11,7 +11,14 @@ export default function StructureStep() {
 
   useEffect(() => {
     const h = takeHandoff(['structure']);
-    if (h && h.kind === 'structure') setStructure(h.structure, h.label);
+    if (h && h.kind === 'structure') {
+      setStructure(h.structure, h.label);
+      if (h.magmom) {
+        // from the magnetic tool: MAGMOM refers to this POSCAR's atom order
+        useBuilder.getState().setEntry('ISPIN', '2');
+        useBuilder.getState().setEntry('MAGMOM', h.magmom);
+      }
+    }
   }, [setStructure]);
 
   const onFile = async (f: File | undefined) => {

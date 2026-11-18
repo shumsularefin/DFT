@@ -39,6 +39,13 @@ describe('handoff', () => {
     expect(s.m.has(HANDOFF_KEY)).toBe(false); // read once
     expect(takeHandoff([h.kind], s)).toBeNull();
   });
+  it('carries an optional MAGMOM string from the magnetic tool and rejects a non-string', () => {
+    const s = mem();
+    const h = { ...struct, from: 'magnetic' as const, magmom: '2*0.0 4.0 -4.0' };
+    sendHandoff(h, '/tools/input-builder/', s, () => {});
+    expect(takeHandoff(['structure'], s)).toEqual(h);
+    expect(validateHandoff({ ...h, magmom: 4 })).toBeNull();
+  });
   it('wrong kind is rejected and still cleared', () => {
     const s = mem();
     sendHandoff(struct, '/x/', s, () => {});
