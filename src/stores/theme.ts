@@ -1,5 +1,5 @@
 import { createStore } from 'zustand/vanilla';
-import { getJSON, setJSON } from '../lib/storage';
+import { getJSON, remove, setJSON } from '../lib/storage';
 
 export type Theme = 'light' | 'dark';
 
@@ -28,4 +28,11 @@ export function setTheme(theme: Theme): void {
 
 export function toggleTheme(): void {
   setTheme(effectiveTheme() === 'dark' ? 'light' : 'dark');
+}
+
+/** Back to following the system preference (the palette's `/theme system`). */
+export function clearTheme(): void {
+  themeStore.setState({ explicit: null });
+  remove('theme');
+  delete document.documentElement.dataset.theme;
 }

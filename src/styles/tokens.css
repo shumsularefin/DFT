@@ -3,55 +3,55 @@
    selectors exactly as written and keep the media block identical to the data-theme="dark" block. */
 :root {
   color-scheme: light;
-  --bg: #ffffff;
-  --surface: #f5f6f8;
-  --surface-2: #e9ecf1;
-  --text: #131821;
-  --text-muted: #4b5563;
-  --border: #d3d8e0;
-  --border-strong: #7b8494;
-  --accent: #1d4ed8;
+  --bg: #faf9f6;
+  --surface: #f2f0ea;
+  --surface-2: #e7e4db;
+  --text: #1f1d1a;
+  --text-muted: #58534b;
+  --border: #dcd8cd;
+  --border-strong: #7d776b;
+  --accent: #a2431f;
   --accent-contrast: #ffffff;
-  --danger: #b42318;
+  --danger: #b0123f;
   --warn: #8a4b00;
   --ok: #17653a;
-  --focus: #1d4ed8;
+  --focus: #a2431f;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
-    --bg: #0e1218;
-    --surface: #161b23;
-    --surface-2: #202733;
-    --text: #e7eaf0;
-    --text-muted: #a4aebd;
-    --border: #2c3542;
-    --border-strong: #7a8596;
-    --accent: #8ab0ff;
-    --accent-contrast: #0b1020;
-    --danger: #ff8f85;
+    --bg: #1c1b19;
+    --surface: #262421;
+    --surface-2: #312e2a;
+    --text: #ece8e0;
+    --text-muted: #b3ac9f;
+    --border: #3b3832;
+    --border-strong: #857e71;
+    --accent: #e58a62;
+    --accent-contrast: #1c1b19;
+    --danger: #ff8fa6;
     --warn: #f5b942;
     --ok: #62d58f;
-    --focus: #8ab0ff;
+    --focus: #e58a62;
   }
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --bg: #0e1218;
-  --surface: #161b23;
-  --surface-2: #202733;
-  --text: #e7eaf0;
-  --text-muted: #a4aebd;
-  --border: #2c3542;
-  --border-strong: #7a8596;
-  --accent: #8ab0ff;
-  --accent-contrast: #0b1020;
-  --danger: #ff8f85;
+  --bg: #1c1b19;
+  --surface: #262421;
+  --surface-2: #312e2a;
+  --text: #ece8e0;
+  --text-muted: #b3ac9f;
+  --border: #3b3832;
+  --border-strong: #857e71;
+  --accent: #e58a62;
+  --accent-contrast: #1c1b19;
+  --danger: #ff8fa6;
   --warn: #f5b942;
   --ok: #62d58f;
-  --focus: #8ab0ff;
+  --focus: #e58a62;
 }
 
 :root {
@@ -81,10 +81,10 @@
   --space-8: 4rem;
 
   --radius-sm: 4px;
-  --radius: 8px;
-  --radius-lg: 12px;
-  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.08);
-  --shadow-2: 0 4px 12px rgb(0 0 0 / 0.12);
+  --radius: 6px;
+  --radius-lg: 8px;
+  --shadow-1: 0 1px 0 rgb(0 0 0 / 0.06);
+  --shadow-2: 0 1px 0 rgb(0 0 0 / 0.12);
   --target: 2.75rem; /* 44px touch target */
 
   /* Motion is off unless the user allows it. */

@@ -2,11 +2,13 @@
 import '../styles/fonts.css';
 import '../styles/tokens.css';
 import '../styles/base.css';
+import '../styles/interface.css';
 import plexRegular from '@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-400-normal.woff2?url';
 import { getCollection } from 'astro:content';
 import { INDEXING_ENABLED, SITE } from '../lib/site';
 import Header from '../components/chrome/Header.astro';
 import Footer from '../components/chrome/Footer.astro';
+import StatusLine from '../components/chrome/StatusLine.astro';
 
 interface Props {
   title?: string;
@@ -66,7 +68,7 @@ const jsonLd = JSON.stringify({
     </script>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <meta name="theme-color" content="#1f3a5f" />
+    <meta name="theme-color" content="#1c1b19" />
     <link rel="canonical" href={canonical.href} />
   </head>
   <body>
@@ -78,6 +80,7 @@ const jsonLd = JSON.stringify({
       <slot />
     </main>
     <Footer />
+    <StatusLine />
   </body>
 </html>
 

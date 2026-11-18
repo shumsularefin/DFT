@@ -59,3 +59,8 @@ export function parseProgress(value: unknown): Progress {
     updated: typeof v.updated === 'string' ? v.updated : '',
   };
 }
+
+/** Number of modules whose topics are all completed. A module with no topics yet never counts. */
+export function modulesDone(p: Progress, modules: readonly (readonly string[])[]): number {
+  return modules.filter((ids) => ids.length > 0 && ids.every((id) => p.completed.includes(id))).length;
+}
