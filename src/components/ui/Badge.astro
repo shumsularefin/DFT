@@ -17,5 +17,5 @@ const { variant } = Astro.props;
     focusable="false"
     set:html={BADGE_SHAPES[variant]}
   />
-  {BADGE_LABELS[variant]}
+  <span class="badge-text">[{BADGE_LABELS[variant].toLowerCase()}]</span>
 </span>

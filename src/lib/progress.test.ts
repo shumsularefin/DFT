@@ -8,6 +8,7 @@ import {
   percent,
   uncomplete,
   visit,
+  modulesDone,
 } from './progress';
 
 const T1 = '2026-10-29T10:00:00.000Z';
@@ -69,5 +70,16 @@ describe('progress', () => {
       completed: [],
       updated: '',
     });
+  });
+});
+
+describe('modulesDone', () => {
+  const p = { visited: [], completed: ['a', 'b', 'c'], updated: '' };
+  it('counts modules whose topics are all completed', () => {
+    expect(modulesDone(p, [['a', 'b'], ['c', 'd'], ['c']])).toBe(2);
+  });
+  it('never counts a module without topics', () => {
+    expect(modulesDone(p, [[], ['a']])).toBe(1);
+    expect(modulesDone(p, [])).toBe(0);
   });
 });

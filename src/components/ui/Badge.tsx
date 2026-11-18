@@ -13,7 +13,7 @@ export default function Badge({ variant }: { variant: BadgeVariant }) {
         focusable="false"
         dangerouslySetInnerHTML={{ __html: BADGE_SHAPES[variant] }}
       />
-      {BADGE_LABELS[variant]}
+      <span className="badge-text">[{BADGE_LABELS[variant].toLowerCase()}]</span>
     </span>
   );
 }

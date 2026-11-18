@@ -6,7 +6,7 @@ import KpointsStep from './KpointsStep';
 import SeriesPanel from './SeriesPanel';
 import SettingsStep from './SettingsStep';
 import StructureStep from './StructureStep';
-import TagCard from './TagCard';
+import TagCard, { tagByName } from './TagCard';
 import TaskStep from './TaskStep';
 import { useLevel } from './hooks';
 import { STEPS, useBuilder } from './store';
@@ -21,6 +21,14 @@ export default function InputBuilder() {
     if (!m?.[1]) return;
     applyShare(m[1]);
   }, [applyShare]);
+
+  // Deep link from the command palette: /tools/input-builder/?tag=ENCUT opens the settings step on that tag card.
+  useEffect(() => {
+    const name = new URLSearchParams(location.search).get('tag');
+    if (!name || !tagByName(name)) return;
+    set('selectedTag', name);
+    setStep(2);
+  }, [set, setStep]);
 
   const body = [StructureStep, TaskStep, SettingsStep, CheckStep, KpointsStep, JobStep][step];
   const Body = body ?? StructureStep;

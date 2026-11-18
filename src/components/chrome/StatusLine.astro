@@ -1,0 +1,71 @@
+---
+// One monospace line at the bottom of every page: level, theme, handbook progress (modules done of 11), offline state.
+// Each item is a button that opens the matching control (wired in src/scripts/chrome.ts). Hidden when printing.
+import { getCollection } from 'astro:content';
+import { MODULES } from '../../lib/site';
+
+const entries = await getCollection('handbook');
+const byModule: Record<number, string[]> = {};
+for (const e of entries) (byModule[e.data.module] ??= []).push(e.id);
+const modules = MODULES.map((_, i) => (byModule[i + 1] ?? []).join(','));
+---
+
+<aside
+  class="status-line js-only"
+  aria-label="Status"
+  data-status-line
+  data-modules={JSON.stringify(modules)}
+>
+  <button type="button" data-status="level">
+    <span class="status-key">level</span>
+    <span data-status-level>beginner</span>
+  </button>
+  <button type="button" data-status="theme">
+    <span class="status-key">theme</span>
+    <span data-status-theme>system</span>
+  </button>
+  <button type="button" data-status="progress">
+    <span class="status-key">modules</span>
+    <span data-status-modules>0/{MODULES.length}</span>
+  </button>
+  <button type="button" data-status="offline">
+    <span class="status-key">network</span>
+    <span data-status-network>online</span>
+  </button>
+</aside>
+
+<style is:global>
+  .status-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-2);
+    padding: 0 max(1rem, calc((100% - 80rem) / 2));
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+  }
+  .status-line button {
+    display: inline-flex;
+    gap: var(--space-2);
+    align-items: center;
+    min-height: var(--target);
+    padding: 0 var(--space-2);
+    font: inherit;
+    color: var(--text);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+  }
+  .status-line button:hover {
+    background: var(--surface-2);
+  }
+  .status-key {
+    color: var(--text-muted);
+  }
+  @media print {
+    .status-line {
+      display: none;
+    }
+  }
+</style>

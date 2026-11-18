@@ -1,7 +1,7 @@
 // Client behaviour for the site chrome. Vanilla TypeScript, no framework (D-001). Everything here is an
 // enhancement: without JavaScript the page is complete and the .js-only controls stay hidden.
 import { LEVELS, normalizeLevel, type Level } from '../lib/levels';
-import { modulePercent, percent } from '../lib/progress';
+import { modulePercent, modulesDone, percent } from '../lib/progress';
 import { levelStore, setLevel } from '../stores/level';
 import { effectiveTheme, themeStore, toggleTheme } from '../stores/theme';
 import { markComplete, markIncomplete, markVisited, progressStore, resetProgress } from '../stores/progress';
@@ -216,6 +216,48 @@ document.addEventListener('click', (e) => {
   if (panel && !panel.hidden && !(e.target as Element).closest('[data-search]')) panel.hidden = true;
 });
 
+/* Command palette: the code and the index load on first open, never before (M12.1) */
+const openPalette = (from?: HTMLElement | null) =>
+  void import('../components/chrome/palette').then((m) => m.openPalette(from));
+for (const b of $$<HTMLElement>('[data-palette-open]')) b.addEventListener('click', () => openPalette(b));
+
+/* Status line */
+const statusLine = $<HTMLElement>('[data-status-line]');
+if (statusLine) {
+  const modules: string[][] = (JSON.parse(statusLine.dataset.modules ?? '[]') as string[]).map((s) =>
+    s.split(',').filter(Boolean),
+  );
+  const renderStatus = () => {
+    $('[data-status-level]', statusLine)!.textContent = levelStore.getState().level;
+    const explicit = themeStore.getState().explicit;
+    $('[data-status-theme]', statusLine)!.textContent = explicit ?? `system (${effectiveTheme()})`;
+    $('[data-status-modules]', statusLine)!.textContent =
+      `${modulesDone(progressStore.getState(), modules)}/${modules.length}`;
+    $('[data-status-network]', statusLine)!.textContent = navigator.onLine ? 'online' : 'offline';
+  };
+  levelStore.subscribe(renderStatus);
+  themeStore.subscribe(renderStatus);
+  progressStore.subscribe(renderStatus);
+  addEventListener('online', renderStatus);
+  addEventListener('offline', renderStatus);
+  renderStatus();
+  // Each item opens the control it reports on. On narrow screens the controls sit in the closed menu.
+  const reveal = () => {
+    if (menu && menuBtn?.offsetParent && !menu.hasAttribute('data-open')) setMenu(true, false);
+  };
+  statusLine.addEventListener('click', (e) => {
+    const kind = (e.target as Element).closest<HTMLElement>('[data-status]')?.dataset.status;
+    if (kind === 'offline') {
+      location.assign('/offline/');
+      return;
+    }
+    reveal();
+    if (kind === 'level') $<HTMLElement>('[data-level-option][aria-checked="true"]')?.focus();
+    else if (kind === 'theme') themeButton?.focus();
+    else if (kind === 'progress') $<HTMLElement>('.progress-btn')?.click();
+  });
+}
+
 /* Keyboard shortcuts (documented in the help dialog) */
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
@@ -225,12 +267,16 @@ document.addEventListener('keydown', (e) => {
     } else if (menu?.hasAttribute('data-open')) setMenu(false);
     return;
   }
+  if ((e.ctrlKey || e.metaKey) && !e.altKey && e.key.toLowerCase() === 'k') {
+    e.preventDefault();
+    openPalette();
+    return;
+  }
   const t = e.target as HTMLElement;
   if (e.ctrlKey || e.metaKey || e.altKey || t.closest('input, textarea, select, [contenteditable]')) return;
   if (e.key === '/') {
     e.preventDefault();
-    if (menu && !menu.hasAttribute('data-open') && menuBtn?.offsetParent) setMenu(true, false);
-    searchInput?.focus();
+    openPalette();
   } else if (e.key === '?') help?.showModal();
   else if (e.key === 't') toggleTheme();
   else if (e.key === 'm') toggleComplete();
