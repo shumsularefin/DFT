@@ -4,8 +4,10 @@ import FileExplorer from '../labs/FileExplorer';
 interface Props {
   kind: 'POSCAR' | 'KPOINTS' | 'INCAR' | 'OSZICAR' | 'OUTCAR-excerpt';
   code: string;
+  /** POSCAR only: show the structure beside the file and link atoms to lines. */
+  view?: boolean;
 }
-const { kind, code } = Astro.props;
+const { kind, code, view = false } = Astro.props;
 ---
 
-<FileExplorer client:visible kind={kind} text={code} />
+<FileExplorer client:visible kind={kind} text={code} view={view} />

@@ -1,0 +1,47 @@
+.sv {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.sv-summary,
+.sv-readout,
+.sv-note {
+  margin-block: var(--space-1);
+  font-size: 0.9rem;
+}
+.sv-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+.sv-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+}
+.sv-table-wrap {
+  max-height: 16rem;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+}
+.sv-table {
+  border-collapse: collapse;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.85rem;
+  width: 100%;
+}
+.sv-table th,
+.sv-table td {
+  padding: 0.15rem 0.5rem;
+  text-align: start;
+}
+.sv-table button {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+}
+.sv-table .is-sel {
+  background: var(--surface-2, rgba(128, 128, 128, 0.15));
+}
