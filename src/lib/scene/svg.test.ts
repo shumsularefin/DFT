@@ -32,5 +32,5 @@ describe('projectionToSvg', () => {
     expect((s.match(/>\+<\/text>/g) ?? []).length).toBe(14);
     expect((s.match(/>\u2212<\/text>/g) ?? []).length).toBe(13);
   });
-  it('contains no em dash', () => expect(svgOf('afm-a')).not.toContain('—'));
+  it('contains no em dash', () => expect(svgOf('afm-a')).not.toContain(String.fromCharCode(0x2014)));
 });
