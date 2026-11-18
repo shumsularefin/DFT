@@ -10,6 +10,7 @@ import EncutLab from '../labs/EncutLab';
 import KmeshLab from '../labs/KmeshLab';
 import BrillouinLab from '../labs/BrillouinLab';
 import UnitCellLab from '../labs/UnitCellLab';
+import ScfLab from '../labs/ScfLab';
 // Labs are registered by id. An id with no component yet shows the placeholder, so topics can be written ahead of their labs.
 interface Props {
   id: string;
@@ -50,6 +51,10 @@ const { id, title } = Astro.props;
   ) : id === 'brillouin-zone' ? (
     <div data-lab-id={id}>
       <BrillouinLab client:visible />
+    </div>
+  ) : id === 'scf-loop' ? (
+    <div data-lab-id={id}>
+      <ScfLab client:visible />
     </div>
   ) : id === 'unit-cell' ? (
     <div data-lab-id={id}>

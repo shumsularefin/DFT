@@ -515,7 +515,7 @@
     "id": "S-065",
     "citation": "VASP wiki pages, by page name, for VASP 6.4: MAGMOM, ISPIN, NUPDOWN, LORBIT, LNONCOLLINEAR, LSORBIT, SAXIS, ISYM, LDIPOL, IDIPOL, LVHAR, LOCPOT, ISIF",
     "usedFor": "Tag meanings for the magnetism, review, planner and potential tools (M13, M14)",
-    "access": "open web (vasp.at, unreachable from builder sessions so far)",
+    "access": "open web (vasp.at; reachable from the M13.1 session on 2026-11-18)",
     "status": "cited-from-memory",
     "notes": "Added in plan v3. Status kept for the register as a whole: only the MAGMOM page was read, on 2026-11-18 (revision 36612) for M13.1: one value per ion for ISPIN = 2, symmetry lowered by MAGMOM (Q-040 closed), starting moments slightly above the expected value (experimental moment times 1.2 to 1.5). The other pages are still cited from memory"
   },

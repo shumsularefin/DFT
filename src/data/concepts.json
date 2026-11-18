@@ -231,7 +231,7 @@
       "approximations-needed"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "variational-principle",
@@ -242,7 +242,7 @@
       "hohenberg-kohn-theorems"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "kohn-sham-idea",
@@ -253,7 +253,7 @@
       "variational-principle"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "kohn-sham-equations",
@@ -264,7 +264,7 @@
       "kohn-sham-idea"
     ],
     "level": "pro",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "exchange-correlation-term",
@@ -275,7 +275,7 @@
       "kohn-sham-idea"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "scf-loop",
@@ -286,7 +286,7 @@
       "kohn-sham-equations"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "scf-mixing",
@@ -297,7 +297,7 @@
       "scf-loop"
     ],
     "level": "pro",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "kohn-sham-eigenvalues",
@@ -308,7 +308,7 @@
       "kohn-sham-equations"
     ],
     "level": "pro",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "plane-waves",

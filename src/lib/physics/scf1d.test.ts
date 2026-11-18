@@ -55,6 +55,19 @@ describe('scf1d against the golden file (scf1d_reference.json)', () => {
     expect(z2.behaviour).toBe('converged');
     expect(z2.iterations.length).toBe(14);
   });
+  it('the iteration counts quoted in the-scf-loop topic: fastest alpha is 0.9 for Z = 2 and 0.7 for Z = 1', () => {
+    const alphas = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
+    for (const [Z, best] of [
+      [2, 0.9],
+      [1, 0.7],
+    ] as const) {
+      const counts = alphas.map((a) => {
+        const r = runScf({ Z, alpha: a, maxIterations: 400 });
+        return r.converged ? r.iterations.length : Infinity;
+      });
+      expect(alphas[counts.indexOf(Math.min(...counts))]).toBe(best);
+    }
+  });
   it('too little mixing is slow: alpha = 0.05 has not converged after 400 steps but the residual keeps falling', () => {
     const r = runScf({ Z: 2, alpha: 0.05, maxIterations: 400 });
     expect(r.converged).toBe(false);

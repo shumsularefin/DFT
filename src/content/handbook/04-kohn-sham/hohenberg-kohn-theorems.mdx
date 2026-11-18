@@ -1,0 +1,113 @@
+---
+id: hohenberg-kohn-theorems
+title: The Hohenberg-Kohn theorems
+module: 4
+order: 1
+summary: Two statements that turn the electron density into a full description of the ground state, and give a way to find it by minimizing an energy.
+concepts: [hohenberg-kohn-theorems, variational-principle]
+requires: [approximations-needed]
+vaspTags: []
+sources: [S-011, S-047, S-048, S-049]
+status: draft
+updated: 2026-11-18
+noLab: true
+---
+
+<Why>
+
+Module 3 ended with a promise: the <Term id="electron-density">electron density</Term> needs only three variables, so if it could replace the wavefunction, the exponential wall would disappear. The <Term id="hohenberg-kohn-theorems">Hohenberg-Kohn theorems</Term> are the reason that promise is not wishful thinking <Cite id="S-011" />. Every DFT calculation you will ever run, VASP included, rests on them. Knowing what they say, and what they do not say, tells you which numbers from a DFT run you can trust.
+
+</Why>
+
+<Intuition>
+
+Think of a crystal as a stage with the nuclei fixed in place. The electrons feel the pull of the nuclei, which we call the <Term id="external-potential">external potential</Term>. Change the nuclei and you change the stage.
+
+**First statement: the density identifies the stage.** If someone shows you the ground-state density of a system and nothing else, there is only one external potential that could have produced it (apart from adding a constant everywhere, which changes nothing physical). The potential fixes the Hamiltonian, and the Hamiltonian fixes everything: the energy, the wavefunction, every ground-state property. So the density, a function of three variables, carries all the ground-state information <Cite id="S-011" />.
+
+**Second statement: the right density has the lowest energy.** There is a rule, a <Term id="functional">functional</Term>, that takes any reasonable trial density and returns an energy. The true ground-state density gives the lowest value of all. That turns the hunt for the ground state into a search: try densities, keep the one with the lowest energy. This is the <Term id="variational-principle">variational principle</Term>, carried over from wavefunctions to densities <Cite id="S-011" /> <Cite id="S-047" />.
+
+The catch is in the word "there is". The theorems prove that the energy functional exists. They do not tell you its exact form. Everything practical in the next pages is about how to write a good enough version of it.
+
+<Level min="intermediate">
+
+The first statement is proved by contradiction: assume two potentials that differ by more than a constant give the same ground-state density, apply the variational principle to each system with the other's ground state as a trial, add the two inequalities, and you get a strict inequality of a number with itself. The original proof assumes a non-degenerate ground state; later work removed that restriction, which is beyond this page <Cite id="S-049" />.
+
+</Level>
+
+<Level min="pro">
+
+The functional splits as $E_v[n] = F[n] + \int v(\mathbf{r})\,n(\mathbf{r})\,d\mathbf{r}$, where $F[n]$ is universal: the same for an atom, a molecule or a crystal, because it contains only the kinetic energy and the electron-electron interaction. All the material-specific information sits in the simple second term. The difficulty of DFT is entirely in $F[n]$ <Cite id="S-011" />.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+Write $v(\mathbf{r})$ for the external potential and $n(\mathbf{r})$ for the ground-state density of $N$ electrons.
+
+**Theorem 1.** The map $v \mapsto n$ can be inverted up to a constant: $n$ determines $v(\mathbf{r}) + \text{const}$, hence the Hamiltonian and every ground-state property <Cite id="S-011" />.
+
+**Theorem 2.** There is a functional
+
+$$E_v[n] = F[n] + \int v(\mathbf{r})\,n(\mathbf{r})\,d\mathbf{r}, \qquad F[n] = \min_{\Psi \to n} \langle \Psi | \hat T + \hat W | \Psi \rangle,$$
+
+with $\hat T$ the kinetic energy and $\hat W$ the electron-electron repulsion, such that for every trial density $\tilde n$ with $\int \tilde n = N$,
+
+$$E_v[\tilde n] \ge E_0, \qquad \text{with equality for the ground-state density}.$$
+
+The constrained-search form of $F[n]$ shown here (minimize over all wavefunctions that give the density $n$) is a later and more general formulation than the 1964 paper <Cite id="S-049" />. In words: the energy of any trial density is an upper bound, and the minimum is the true ground-state energy.
+
+</TheMath>
+
+<InVasp>
+
+VASP never prints the words "Hohenberg-Kohn", but every run uses the second theorem: the electronic loop lowers the energy until it stops changing, and the energy it reports at the end (`free energy TOTEN` in `OUTCAR`, `F` and `E0` in `OSZICAR`) is the minimum it found for the chosen approximate functional. The theorems are about the ground state, which is why ordinary DFT in VASP gives ground-state energies, densities and forces reliably, and excitation energies only approximately.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...                       | ...then                                                                                                   |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| The positions of the nuclei            | The external potential changes, so the ground-state density and energy change                             |
+| The potential by a constant everywhere | Nothing physical: same density, every energy shifted by the constant                                      |
+| The trial density                      | The functional gives a higher energy unless the trial density is the ground-state density                 |
+| The approximation to $F[n]$            | The minimum moves: the result is the ground state of the approximate functional, not exactly the true one |
+
+Why this matters: the theorems justify using the density at all. What happens if you forget the last row: you may treat a DFT energy as exact, when it is exact only for the functional you chose.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Thinking the theorems tell you the functional">
+
+They prove that it exists and that it is universal. Its exact form is unknown; that gap is filled by approximations (see the exchange-correlation page).
+
+</Callout>
+
+<Callout variant="mistake" title="Using the theorems for excited states">
+
+Both statements are about the ground state. Band gaps and excitation energies from ordinary DFT are not guaranteed by them and are often underestimated <Cite id="S-049" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Reading the variational principle backwards">
+
+A lower energy from an approximate functional does not prove a better density in an absolute sense. The bound holds for the exact functional; with an approximate one, the minimum is the best answer that approximation can give.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-hkt-1', 'q-hkt-2', 'q-hkt-3', 'q-var-1', 'q-var-2']} />
+
+<GoDeeper>
+
+- Hohenberg and Kohn, the 1964 paper with both theorems <Cite id="S-011" />.
+- Martin, chapter on the foundations of density functional theory, including the constrained-search formulation <Cite id="S-049" />.
+- Szabo and Ostlund, for the variational principle for wavefunctions <Cite id="S-048" />.
+
+</GoDeeper>

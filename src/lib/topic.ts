@@ -24,8 +24,11 @@ export function presentSections(body: string): { id: string; heading: string }[]
 }
 
 /** "00-start" -> "Start". Display name for a module folder. */
+const PROPER_NAMES: Record<string, string> = { 'kohn-sham': 'Kohn-Sham' };
 export function moduleLabel(slug: string): string {
-  const name = slug.replace(/^\d+-/, '').replace(/-/g, ' ');
+  const bare = slug.replace(/^\d+-/, '');
+  if (PROPER_NAMES[bare]) return PROPER_NAMES[bare];
+  const name = bare.replace(/-/g, ' ');
   return name.charAt(0).toUpperCase() + name.slice(1);
 }
 
@@ -58,6 +61,7 @@ export const REGISTERED_LABS = [
   'orbitals',
   'exponential-wall',
   'density-as-a-map',
+  'scf-loop',
 ] as const;
 
 /** Page class for a topic: "island" if its body embeds a registered lab, else "content". */

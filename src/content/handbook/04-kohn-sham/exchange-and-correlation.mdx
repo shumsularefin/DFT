@@ -1,0 +1,117 @@
+---
+id: exchange-and-correlation
+title: Exchange and correlation, the one approximation
+module: 4
+order: 3
+summary: What the exchange-correlation term holds, why it is the only part of Kohn-Sham DFT that must be approximated, and how VASP picks the approximation.
+concepts: [exchange-correlation-term]
+requires: [kohn-sham-idea]
+vaspTags: [GGA]
+sources: [S-012, S-013, S-019, S-048, S-049]
+status: draft
+updated: 2026-11-18
+noLab: true
+---
+
+<Why>
+
+Every number a DFT calculation gives you, a lattice constant, a formation energy, a band gap, depends on one choice: the approximation to the <Term id="exchange-correlation">exchange-correlation</Term> energy. In Kohn-Sham DFT it is the only term that is not known exactly <Cite id="S-012" />. Knowing what it contains helps you understand why different functionals give different answers, and why you must report which one you used.
+
+</Why>
+
+<Intuition>
+
+Go back to the effective potential of the Kohn-Sham page. The nuclei's pull is exact. The Hartree repulsion is exact too, but it treats the electrons as a smooth cloud of charge, and that is too simple in two ways.
+
+- **Exchange.** Electrons with the same spin cannot be in the same place, because of the Pauli principle. Each electron is surrounded by a small region where other same-spin electrons are rare. That lowers the repulsion compared to the smooth-cloud picture <Cite id="S-048" />.
+- **Correlation.** Electrons also avoid each other simply because they repel, whatever their spin. The smooth cloud ignores this too <Cite id="S-048" />.
+
+The smooth-cloud picture also lets each electron feel its own charge, a self-repulsion that is not physical; exchange is what cancels it. On top of this, the kinetic energy of the invented Kohn-Sham electrons is not quite the true kinetic energy, and the difference is folded into the same term. So "exchange-correlation" is the name for everything that the simple pieces leave out <Cite id="S-012" />.
+
+Nobody knows the exact form of this term for real materials, so it is approximated. The two oldest and still most used families are:
+
+- **LDA (local density approximation):** at each point, use the exchange-correlation energy of a uniform electron gas with the density found at that point.
+- **GGA (generalized gradient approximation):** also use how fast the density changes there. PBE is the most common GGA in materials work <Cite id="S-013" />.
+
+<Level min="intermediate">
+
+Typical trends, as rules of thumb: LDA tends to overbind (lattice constants a little too small), PBE tends to underbind (a little too large), and both give band gaps that are too small <Cite id="S-049" />. Module 5 compares functionals and their costs.
+
+</Level>
+
+</Intuition>
+
+<TheMath>
+
+By definition,
+
+$$E_{xc}[n] = \big(T[n] - T_s[n]\big) + \big(W[n] - E_H[n]\big),$$
+
+the kinetic-energy difference between the interacting and the non-interacting electrons plus the electron-electron energy beyond the Hartree term <Cite id="S-012" />. Its potential is $v_{xc}(\mathbf{r}) = \delta E_{xc}/\delta n(\mathbf{r})$.
+
+In the local density approximation,
+
+$$E_{xc}^{\text{LDA}}[n] = \int n(\mathbf{r})\,\varepsilon_{xc}^{\text{unif}}\big(n(\mathbf{r})\big)\,d\mathbf{r},$$
+
+with $\varepsilon_{xc}^{\text{unif}}(n)$ the exchange-correlation energy per electron of the uniform electron gas of density $n$. A GGA uses $\varepsilon_{xc}(n, |\nabla n|)$ <Cite id="S-049" /> <Cite id="S-013" />.
+
+<Level min="pro">
+
+The site's toy SCF lab on the next page uses Hartree-Fock, not DFT: exchange is treated exactly and correlation is left out entirely. For its two electrons the difference between the Hartree-Fock energy and an exact calculation on the same grid is the correlation energy of that model, which the lab shows when the loop has converged. That is a picture of what correlation is, not of what an approximate functional does.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+- VASP takes the functional from the POTCAR files (the `LEXCH` entry) unless you set `GGA` (or `METAGGA` or `XC`) in the INCAR. The VASP wiki page GGA states this default <Cite id="S-019" />. For PBE POTCARs that means PBE.
+- Write the functional in every report or paper, and use the same one for every calculation you compare: energies from different functionals cannot be subtracted.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...                | ...then                                                                             |
+| ------------------------------- | ----------------------------------------------------------------------------------- |
+| LDA to PBE                      | Lattice constants usually grow a little, binding usually weakens (rule of thumb)    |
+| The functional between two runs | Their energies can no longer be compared                                            |
+| Nothing (no GGA tag)            | VASP uses the functional the POTCAR was made for                                    |
+| The functional for the band gap | Gaps from LDA or GGA are usually too small; better functionals cost more (module 5) |
+
+Why this matters: it is the only approximation in Kohn-Sham DFT itself, so it decides how far your numbers are from the exact ones. What happens if you skip thinking about it: you may compare energies from runs that used different functionals.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Thinking exchange-correlation is a small afterthought">
+
+It is usually a modest part of the total energy, but energy differences, which are what you compare, are sensitive to it.
+
+</Callout>
+
+<Callout variant="mistake" title="Mixing POTCARs and functionals by accident">
+
+Without a GGA tag, VASP follows the POTCAR. Using LDA POTCARs in one run and PBE in another changes the functional silently.
+
+</Callout>
+
+<Callout variant="mistake" title="Thinking the toy lab shows a functional">
+
+The SCF lab is Hartree-Fock for two electrons. It shows the loop, and what correlation is in that model, not how LDA or PBE behave.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-xc-1', 'q-xc-2', 'q-xc-3', 'q-xc-4']} />
+
+<GoDeeper>
+
+- Kohn and Sham, where the exchange-correlation term and the LDA are introduced <Cite id="S-012" />.
+- Perdew, Burke and Ernzerhof on PBE <Cite id="S-013" />.
+- Martin, chapters on the uniform electron gas and on functionals <Cite id="S-049" />.
+- VASP wiki pages GGA and LEXCH (by page name) <Cite id="S-019" />.
+
+</GoDeeper>

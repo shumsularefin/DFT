@@ -1,0 +1,130 @@
+---
+id: the-scf-loop
+title: The self-consistency loop
+module: 4
+order: 4
+summary: Why the Kohn-Sham equations are solved in a loop, what each step does, and a live toy lab where you can make the loop converge, crawl or oscillate.
+concepts: [scf-loop]
+requires: [kohn-sham-equations]
+vaspTags: [EDIFF, NELM, ICHARG]
+sources: [S-012, S-019, S-031, S-041, S-047, S-048, S-049]
+status: draft
+updated: 2026-11-18
+---
+
+<Why>
+
+The effective potential depends on the density, and the density comes from the orbitals of that potential. It is a chicken-and-egg problem, and the way out is a loop called the <Term id="self-consistent-field">self-consistent field</Term> (SCF) <Cite id="S-012" />. Every VASP run spends most of its time in this loop. The lines in `OSZICAR` are its iterations, and the most common way a calculation fails is that this loop does not converge. Seeing the loop work, and fail, makes those messages readable.
+
+</Why>
+
+<Intuition>
+
+The loop has six steps:
+
+1. **Guess** a density. VASP usually starts from a superposition of atomic densities.
+2. **Build the potential** from that density: nuclei, Hartree and exchange-correlation parts.
+3. **Solve** the one-electron equations in that potential.
+4. **Make a new density** by filling the lowest orbitals.
+5. **Mix**: do not jump straight to the new density; take a step from the old one towards it.
+6. **Check**: if the density that came out matches the density that went in, the potential and the density are consistent with each other. Stop. Otherwise, go back to step 2.
+
+The difference between the density in and the density out is the <Term id="scf-residual">residual</Term>. "Self-consistent" means the residual is zero to the accuracy you asked for: the density makes a potential whose orbitals give back the same density.
+
+Step 5, <Term id="density-mixing">density mixing</Term>, is where the art is. Jump all the way to the new density and the loop can overshoot, so the next step overshoots the other way, and the loop swings back and forth. Take tiny steps and it is stable but slow. The lab lets you feel both.
+
+**About the lab.** It is a toy model, chosen because it is small enough to run in your browser and shows the loop exactly. Two electrons share one orbital in a one-dimensional well with softened Coulomb forces. The method is Hartree-Fock, not Kohn-Sham DFT: there is no exchange-correlation functional, exchange is treated exactly and correlation is missing <Cite id="S-048" />. The loop, the residual and the mixing are the same as in DFT.
+
+Try this:
+
+- Leave the defaults (Z = 2, alpha = 0.3) and play the iterations. The residual falls steadily on the log plot.
+- Set alpha to 0.05. The loop still converges, but far more slowly.
+- Set Z = 1 and alpha = 1. The residual first falls, then the loop locks into swinging between two densities and never converges.
+- Switch on "non-interacting". Without repulsion the potential does not depend on the density, so one step is enough.
+
+<Level min="intermediate">
+
+Why Z = 1 is harder is not proved on this page. A plausible reading: with a weaker nucleus the electrons are held less tightly, so the density reacts more strongly to a change in the potential, and a big mixing step overcorrects. Metals, slabs and long cells in VASP are also known to need gentler mixing (next page) <Cite id="S-019" />.
+
+</Level>
+
+</Intuition>
+
+<Lab id="scf-loop" title="The self-consistency loop" />
+
+<TheMath>
+
+The lab works in atomic units (energies in hartree, 1 hartree = 27.211386245988 eV, lengths in bohr) <Cite id="S-031" />. The nucleus is $v_{\text{ext}}(x) = -Z/\sqrt{x^2 + 1}$ and the electrons interact through $w(x - x') = 1/\sqrt{(x - x')^2 + 1}$. Both electrons occupy one orbital $\phi$, so $n = 2|\phi|^2$ and
+
+$$\Big[-\tfrac{1}{2}\tfrac{d^2}{dx^2} + v_{\text{ext}}(x) + \tfrac{1}{2}v_H(x)\Big]\phi = \varepsilon\,\phi, \qquad v_H(x) = \int n(x')\,w(x-x')\,dx'.$$
+
+The factor $\tfrac12$ is exchange: for two electrons in one orbital it cancels exactly half of the Hartree repulsion, the part that is each electron repelling itself <Cite id="S-048" />. The energy is $E = 2\langle\phi|h_0|\phi\rangle + J$ with $J = \tfrac14\iint n(x)\,w(x-x')\,n(x')\,dx\,dx'$.
+
+The equation is solved on 299 grid points spaced 0.1 bohr with a three-point second derivative <Cite id="S-047" />. Each iteration builds the potential from $n_{\text{in}}$, solves for $\phi$, sets $n_{\text{out}} = 2|\phi|^2$, records the residual $R = \big(\int (n_{\text{out}} - n_{\text{in}})^2 dx\big)^{1/2}$, and mixes linearly:
+
+$$n_{\text{in}}^{\text{next}} = (1 - \alpha)\, n_{\text{in}} + \alpha\, n_{\text{out}}.$$
+
+It stops when $R < 10^{-12}$. The converged energies match the site's reference script (`scripts/reference/gen_scf1d_reference.py`, an independent Python implementation) to better than $10^{-6}$ hartree, and that script also diagonalizes the full two-electron problem on the same grid. The exact energy lies below the Hartree-Fock one, as the variational principle requires; the difference is the correlation energy of this model.
+
+<Level min="pro">
+
+The "loop behaviour" readout is a heuristic: it calls the loop oscillating when at least half of the last 20 density updates reversed direction and the residual did not fall by half, and diverging when the residual has grown tenfold from its smallest value. Near the solution, linear mixing behaves like a linear map; it converges when every eigenvalue of that map lies inside the unit circle. An eigenvalue just past $-1$ would give a growing swing that alternates in sign, which is consistent with what the lab shows at Z = 1, alpha = 1 before the swing settles into two fixed densities. The lab does not compute these eigenvalues.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+- Each line of `OSZICAR` that starts with a method name (`DAV:`, `RMM:`) is one SCF iteration. The columns show the energy and its change.
+- `EDIFF` is the stopping rule: the loop stops when the energy changes by less than `EDIFF` (in eV) between steps. Default 1E-4 <Cite id="S-019" /> <Cite id="S-041" />.
+- `NELM` is the most iterations VASP will do for one ionic step. Default 60 (VASP wiki page NELM) <Cite id="S-019" />. Hitting `NELM` means that step did not converge.
+- `ICHARG` sets the starting density: 2 builds it from atoms, 1 reads it from `CHGCAR` <Cite id="S-041" />.
+- VASP mixes with Pulay and Broyden methods (`IMIX = 4` by default), not with the simple linear step of the lab <Cite id="S-019" />. The next page covers what to do when the loop struggles.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...           | ...in the lab                                         | ...in VASP                                                |
+| -------------------------- | ----------------------------------------------------- | --------------------------------------------------------- |
+| Mixing smaller             | Slower but steadier                                   | Smaller `AMIX`: steadier for difficult systems            |
+| Mixing too large           | Overshoots; for Z = 1 at alpha = 1 it never converges | Oscillating energies in `OSZICAR`, then `NELM` is reached |
+| Tighter stopping threshold | A few more iterations                                 | Smaller `EDIFF`: more iterations, more accurate forces    |
+| Repulsion off              | One step: nothing depends on the density              | No equivalent: real electrons always repel                |
+
+Why mix at all: the new density alone overshoots. Why this value: small enough to stay stable, large enough to be quick. What happens if you get it wrong: the loop crawls, or swings and never finishes.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Taking an unconverged SCF result">
+
+If VASP hit `NELM` before reaching `EDIFF`, the energy and forces of that step are not self-consistent. Check `OSZICAR` before using the numbers.
+
+</Callout>
+
+<Callout variant="mistake" title="Thinking the lab is a DFT calculation">
+
+It is a one-dimensional two-electron Hartree-Fock toy. The loop is real; the physics is deliberately simplified.
+
+</Callout>
+
+<Callout variant="mistake" title="Thinking more mixing is always faster">
+
+In the lab, for Z = 2 the iteration count falls as alpha grows up to about 0.9; for Z = 1 it is lowest near 0.7, and at 1.0 the loop never converges. There is a sweet spot, and it depends on the system.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-scf-1', 'q-scf-2', 'q-scf-3', 'q-scf-4', 'q-scf-5']} />
+
+<GoDeeper>
+
+- Kohn and Sham, where the self-consistent equations are set out <Cite id="S-012" />.
+- Martin, chapter on solving the Kohn-Sham equations and on mixing <Cite id="S-049" />.
+- VASP wiki pages EDIFF, NELM, IMIX and ICHARG (by page name) <Cite id="S-019" />.
+
+</GoDeeper>
