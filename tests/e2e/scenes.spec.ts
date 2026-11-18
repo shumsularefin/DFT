@@ -5,9 +5,14 @@ const URL = '/design/scenes/';
 
 async function open(page: Page) {
   await page.goto(URL);
-  await page.waitForFunction(() => document.querySelectorAll('astro-island[ssr]').length === 0);
 }
-const scene = (page: Page, id: string) => page.locator(`[data-demo-scene="${id}"]`);
+/** Islands hydrate when visible: scroll the scene in and wait for its island. */
+async function scene(page: Page, id: string) {
+  const s = page.locator(`[data-demo-scene="${id}"]`);
+  await s.scrollIntoViewIfNeeded();
+  await expect(s.locator('astro-island[ssr]')).toHaveCount(0);
+  return s;
+}
 async function axe(page: Page) {
   const r = await new AxeBuilder({ page }).analyze();
   expect(r.violations).toEqual([]);
@@ -19,18 +24,18 @@ test.describe('scene library', () => {
     page.on('response', (r) => r.url().endsWith('.js') && scripts.push(r.url()));
     await open(page);
     await expect(page.locator('canvas')).toHaveCount(0);
-    await expect(scene(page, 'fcc').locator('svg.scene-svg')).toBeVisible();
+    await expect((await scene(page, 'fcc')).locator('svg.scene-svg')).toBeVisible();
     for (const url of scripts)
       expect(await (await page.request.get(url)).text(), url).not.toContain('WebGLRenderer');
     const before = scripts.length;
-    await scene(page, 'fcc').getByRole('button', { name: 'View in 3D' }).click();
+    await (await scene(page, 'fcc')).getByRole('button', { name: 'View in 3D' }).click();
     await expect(page.locator('canvas')).toHaveCount(1);
     expect(scripts.length).toBeGreaterThan(before);
   });
 
   test('3D: arrow keys rotate, R resets; a second scene takes over the single canvas', async ({ page }) => {
     await open(page);
-    const a = scene(page, 'sc');
+    const a = await scene(page, 'sc');
     await a.getByRole('button', { name: 'View in 3D' }).click();
     const view = a.getByRole('group', { name: /3D view\. Arrow keys rotate/ });
     await expect(view).toBeVisible();
@@ -40,7 +45,7 @@ test.describe('scene library', () => {
     expect(await view.getAttribute('data-camera')).not.toBe(home);
     await page.keyboard.press('r');
     expect(await view.getAttribute('data-camera')).toBe(home);
-    await scene(page, 'bcc').getByRole('button', { name: 'View in 3D' }).click();
+    await (await scene(page, 'bcc')).getByRole('button', { name: 'View in 3D' }).click();
     await expect(page.locator('canvas')).toHaveCount(1);
     await expect(a.locator('canvas')).toHaveCount(0);
     await expect(a.locator('svg.scene-svg')).toBeVisible();
@@ -48,7 +53,7 @@ test.describe('scene library', () => {
 
   test('flat view turns with the keyboard and resets', async ({ page }) => {
     await open(page);
-    const flat = scene(page, 'diamond').getByRole('group', { name: /Flat view/ });
+    const flat = (await scene(page, 'diamond')).getByRole('group', { name: /Flat view/ });
     await flat.focus();
     const home = await flat.getAttribute('data-view');
     await page.keyboard.press('ArrowLeft');
@@ -59,7 +64,7 @@ test.describe('scene library', () => {
 
   test('steps are discrete and change the picture', async ({ page }) => {
     await open(page);
-    const s = scene(page, 'perovskite-octahedra');
+    const s = await scene(page, 'perovskite-octahedra');
     await expect(s.getByText('Step 1 of 3')).toBeVisible();
     const polys = () => s.locator('svg.scene-svg polygon.sc-accent').count();
     expect(await polys()).toBe(0);
@@ -71,7 +76,7 @@ test.describe('scene library', () => {
 
   test('magnetic scene: up and down differ by head shape and sign', async ({ page }) => {
     await open(page);
-    const svg = scene(page, 'afm-g').locator('svg.scene-svg');
+    const svg = (await scene(page, 'afm-g')).locator('svg.scene-svg');
     await expect(svg.locator('polygon.sc-open').first()).toBeAttached();
     await expect(svg.locator('text', { hasText: '+' }).first()).toBeAttached();
     await expect(svg.locator('text', { hasText: '−' }).first()).toBeAttached();
@@ -90,13 +95,13 @@ test.describe('scene library', () => {
       } as never;
     });
     await open(page);
-    const s = scene(page, 'rocksalt');
+    const s = await scene(page, 'rocksalt');
     await s.getByRole('button', { name: 'View in 3D' }).click();
     await expect(page.locator('canvas')).toHaveCount(0);
     await expect(s.locator('svg.scene-svg')).toBeVisible();
     await expect(s.getByText(/cannot draw 3D/)).toBeVisible();
     await s.getByText('Text description').click();
-    await expect(s.getByText(/sodium and chlorine atoms alternate/)).toBeVisible();
+    await expect(s.locator('details.scene-alt p')).toContainText(/sodium and chlorine atoms alternate/);
   });
 
   for (const scheme of ['light', 'dark'] as const) {
@@ -104,7 +109,7 @@ test.describe('scene library', () => {
       await page.emulateMedia({ colorScheme: scheme });
       await open(page);
       await axe(page);
-      await scene(page, 'afm-a').getByRole('button', { name: 'View in 3D' }).click();
+      await (await scene(page, 'afm-a')).getByRole('button', { name: 'View in 3D' }).click();
       await expect(page.locator('canvas')).toHaveCount(1);
       await axe(page);
     });
@@ -113,7 +118,7 @@ test.describe('scene library', () => {
   test('static SVG at the top of the page needs no island', async ({ page }) => {
     await open(page);
     const fig = page.locator('figure[data-static="true"]');
-    await expect(fig.locator('svg')).toBeVisible();
+    await expect(fig.locator('svg.scene-svg')).toBeVisible();
     await expect(fig.getByRole('button')).toHaveCount(0);
   });
 

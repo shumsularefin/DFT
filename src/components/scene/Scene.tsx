@@ -176,14 +176,8 @@ export default function Scene({ spec }: Props) {
           </button>
         )}
         {(['a', 'b', 'c', 'iso'] as const).map((c) => (
-          <button
-            key={c}
-            type="button"
-            className="btn"
-            onClick={() => preset(c)}
-            aria-label={c === 'iso' ? 'Isometric view' : `View along ${c}`}
-          >
-            {c === 'iso' ? 'iso' : `along ${c}`}
+          <button key={c} type="button" className="btn" onClick={() => preset(c)}>
+            {c === 'iso' ? 'Isometric' : `Along ${c}`}
           </button>
         ))}
         <button type="button" className="btn" onClick={reset}>
