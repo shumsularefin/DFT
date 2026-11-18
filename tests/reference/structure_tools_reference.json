@@ -1,0 +1,1093 @@
+{
+ "_meta": {
+  "generator": "scripts/reference/gen_structure_tools_reference.py",
+  "milestone": "M13.5",
+  "sources": [
+   "S-063",
+   "S-064"
+  ],
+  "versions": {
+   "pymatgen": "2026.10.24",
+   "spglib": "2.8.0",
+   "numpy": "2.5.4",
+   "scipy": "1.18.1"
+  },
+  "symprec": 0.0001,
+  "slab_defaults": {
+   "primitive": true,
+   "ftol": 0.1,
+   "min_vacuum_size": 10.0,
+   "center_slab": true,
+   "filter_out_sym_slabs": true,
+   "oxidation_states": {
+    "Cu": 0,
+    "Na": 1,
+    "Cl": -1,
+    "Ti": 4,
+    "O": -2
+   }
+  },
+  "note": "Golden file. Never hand-edit; rerun the generator."
+ },
+ "slabs": [
+  {
+   "structure": "fcc_Cu",
+   "hkl": [
+    1,
+    0,
+    0
+   ],
+   "d_hkl_input": 3.61,
+   "proj_height": 3.61,
+   "n_terminations": 1,
+   "thicknesses": [
+    {
+     "min_slab_size": 5.0,
+     "n_input_spacings": 2,
+     "slabs": [
+      {
+       "n_atoms": 4,
+       "composition": {
+        "Cu": 4
+       },
+       "surface_area": 6.516050000000001,
+       "polar": false,
+       "symmetric": true
+      }
+     ]
+    },
+    {
+     "min_slab_size": 10.0,
+     "n_input_spacings": 3,
+     "slabs": [
+      {
+       "n_atoms": 6,
+       "composition": {
+        "Cu": 6
+       },
+       "surface_area": 6.516050000000001,
+       "polar": false,
+       "symmetric": true
+      }
+     ]
+    },
+    {
+     "min_slab_size": 15.0,
+     "n_input_spacings": 5,
+     "slabs": [
+      {
+       "n_atoms": 10,
+       "composition": {
+        "Cu": 10
+       },
+       "surface_area": 6.516050000000001,
+       "polar": false,
+       "symmetric": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "structure": "fcc_Cu",
+   "hkl": [
+    1,
+    1,
+    0
+   ],
+   "d_hkl_input": 2.5526554800834362,
+   "proj_height": 2.5526554800834367,
+   "n_terminations": 1,
+   "thicknesses": [
+    {
+     "min_slab_size": 5.0,
+     "n_input_spacings": 2,
+     "slabs": [
+      {
+       "n_atoms": 4,
+       "composition": {
+        "Cu": 4
+       },
+       "surface_area": 9.215086283101206,
+       "polar": false,
+       "symmetric": true
+      }
+     ]
+    },
+    {
+     "min_slab_size": 10.0,
+     "n_input_spacings": 4,
+     "slabs": [
+      {
+       "n_atoms": 8,
+       "composition": {
+        "Cu": 8
+       },
+       "surface_area": 9.215086283101206,
+       "polar": false,
+       "symmetric": true
+      }
+     ]
+    },
+    {
+     "min_slab_size": 15.0,
+     "n_input_spacings": 6,
+     "slabs": [
+      {
+       "n_atoms": 12,
+       "composition": {
+        "Cu": 12
+       },
+       "surface_area": 9.215086283101206,
+       "polar": false,
+       "symmetric": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "structure": "fcc_Cu",
+   "hkl": [
+    1,
+    1,
+    1
+   ],
+   "d_hkl_input": 2.0842344717745487,
+   "proj_height": 2.0842344717745487,
+   "n_terminations": 1,
+   "thicknesses": [
+    {
+     "min_slab_size": 5.0,
+     "n_input_spacings": 3,
+     "slabs": [
+      {
+       "n_atoms": 3,
+       "composition": {
+        "Cu": 3
+       },
+       "surface_area": 5.643064832329592,
+       "polar": false,
+       "symmetric": true
+      }
+     ]
+    },
+    {
+     "min_slab_size": 10.0,
+     "n_input_spacings": 5,
+     "slabs": [
+      {
+       "n_atoms": 5,
+       "composition": {
+        "Cu": 5
+       },
+       "surface_area": 5.643064832329592,
+       "polar": false,
+       "symmetric": true
+      }
+     ]
+    },
+    {
+     "min_slab_size": 15.0,
+     "n_input_spacings": 8,
+     "slabs": [
+      {
+       "n_atoms": 8,
+       "composition": {
+        "Cu": 8
+       },
+       "surface_area": 5.643064832329592,
+       "polar": false,
+       "symmetric": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "structure": "rocksalt_NaCl",
+   "hkl": [
+    1,
+    0,
+    0
+   ],
+   "d_hkl_input": 5.64,
+   "proj_height": 5.64,
+   "n_terminations": 1,
+   "thicknesses": [
+    {
+     "min_slab_size": 5.0,
+     "n_input_spacings": 1,
+     "slabs": [
+      {
+       "n_atoms": 4,
+       "composition": {
+        "Cl": 2,
+        "Na": 2
+       },
+       "surface_area": 15.904799999999998,
+       "polar": false,
+       "symmetric": true
+      }
+     ]
+    },
+    {
+     "min_slab_size": 10.0,
+     "n_input_spacings": 2,
+     "slabs": [
+      {
+       "n_atoms": 8,
+       "composition": {
+        "Cl": 4,
+        "Na": 4
+       },
+       "surface_area": 15.904799999999998,
+       "polar": false,
+       "symmetric": true
+      }
+     ]
+    },
+    {
+     "min_slab_size": 15.0,
+     "n_input_spacings": 3,
+     "slabs": [
+      {
+       "n_atoms": 12,
+       "composition": {
+        "Cl": 6,
+        "Na": 6
+       },
+       "surface_area": 15.904799999999998,
+       "polar": false,
+       "symmetric": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "structure": "rocksalt_NaCl",
+   "hkl": [
+    1,
+    1,
+    1
+   ],
+   "d_hkl_input": 3.2562555182294894,
+   "proj_height": 3.2562555182294894,
+   "n_terminations": 1,
+   "thicknesses": [
+    {
+     "min_slab_size": 5.0,
+     "n_input_spacings": 2,
+     "slabs": [
+      {
+       "n_atoms": 4,
+       "composition": {
+        "Cl": 2,
+        "Na": 2
+       },
+       "surface_area": 13.77396084211074,
+       "polar": true,
+       "symmetric": false
+      }
+     ]
+    },
+    {
+     "min_slab_size": 10.0,
+     "n_input_spacings": 4,
+     "slabs": [
+      {
+       "n_atoms": 8,
+       "composition": {
+        "Cl": 4,
+        "Na": 4
+       },
+       "surface_area": 13.77396084211074,
+       "polar": true,
+       "symmetric": false
+      }
+     ]
+    },
+    {
+     "min_slab_size": 15.0,
+     "n_input_spacings": 5,
+     "slabs": [
+      {
+       "n_atoms": 10,
+       "composition": {
+        "Cl": 5,
+        "Na": 5
+       },
+       "surface_area": 13.77396084211074,
+       "polar": true,
+       "symmetric": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "structure": "rutile_TiO2_tetragonal_P",
+   "hkl": [
+    1,
+    1,
+    0
+   ],
+   "d_hkl_input": 3.248448552771,
+   "proj_height": 3.248448552771,
+   "n_terminations": 2,
+   "thicknesses": [
+    {
+     "min_slab_size": 5.0,
+     "n_input_spacings": 2,
+     "slabs": [
+      {
+       "n_atoms": 12,
+       "composition": {
+        "Ti": 4,
+        "O": 8
+       },
+       "surface_area": 19.224318535298774,
+       "polar": false,
+       "symmetric": true
+      },
+      {
+       "n_atoms": 12,
+       "composition": {
+        "Ti": 4,
+        "O": 8
+       },
+       "surface_area": 19.224318535298774,
+       "polar": true,
+       "symmetric": false
+      }
+     ]
+    },
+    {
+     "min_slab_size": 10.0,
+     "n_input_spacings": 4,
+     "slabs": [
+      {
+       "n_atoms": 24,
+       "composition": {
+        "Ti": 8,
+        "O": 16
+       },
+       "surface_area": 19.224318535298774,
+       "polar": false,
+       "symmetric": true
+      },
+      {
+       "n_atoms": 24,
+       "composition": {
+        "Ti": 8,
+        "O": 16
+       },
+       "surface_area": 19.224318535298774,
+       "polar": true,
+       "symmetric": false
+      }
+     ]
+    },
+    {
+     "min_slab_size": 15.0,
+     "n_input_spacings": 5,
+     "slabs": [
+      {
+       "n_atoms": 30,
+       "composition": {
+        "Ti": 10,
+        "O": 20
+       },
+       "surface_area": 19.224318535298774,
+       "polar": false,
+       "symmetric": true
+      },
+      {
+       "n_atoms": 30,
+       "composition": {
+        "Ti": 10,
+        "O": 20
+       },
+       "surface_area": 19.224318535298774,
+       "polar": true,
+       "symmetric": false
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "orbits": {
+  "fcc_Cu": {
+   "n_orbits": 1,
+   "equivalent_atoms": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spacegroup_number": 225
+  },
+  "bcc_Fe": {
+   "n_orbits": 1,
+   "equivalent_atoms": [
+    0,
+    0
+   ],
+   "spacegroup_number": 229
+  },
+  "sc_Po_like": {
+   "n_orbits": 1,
+   "equivalent_atoms": [
+    0
+   ],
+   "spacegroup_number": 221
+  },
+  "hcp_Mg": {
+   "n_orbits": 1,
+   "equivalent_atoms": [
+    0,
+    0
+   ],
+   "spacegroup_number": 194
+  },
+  "rocksalt_NaCl": {
+   "n_orbits": 2,
+   "equivalent_atoms": [
+    0,
+    0,
+    0,
+    0,
+    4,
+    4,
+    4,
+    4
+   ],
+   "spacegroup_number": 225
+  },
+  "cubic_perovskite_SrTiO3": {
+   "n_orbits": 3,
+   "equivalent_atoms": [
+    0,
+    1,
+    2,
+    2,
+    2
+   ],
+   "spacegroup_number": 221
+  },
+  "rutile_TiO2_tetragonal_P": {
+   "n_orbits": 2,
+   "equivalent_atoms": [
+    0,
+    0,
+    2,
+    2,
+    2,
+    2
+   ],
+   "spacegroup_number": 136
+  },
+  "bct_I41amd_test": {
+   "n_orbits": 2,
+   "equivalent_atoms": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8
+   ],
+   "spacegroup_number": 141
+  },
+  "pnma_perovskite_like": {
+   "n_orbits": 4,
+   "equivalent_atoms": [
+    0,
+    0,
+    0,
+    0,
+    4,
+    4,
+    4,
+    4,
+    8,
+    8,
+    8,
+    8,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12
+   ],
+   "spacegroup_number": 62
+  },
+  "cmcm_orthorhombic_C": {
+   "n_orbits": 2,
+   "equivalent_atoms": [
+    0,
+    0,
+    0,
+    0,
+    4,
+    4,
+    4,
+    4
+   ],
+   "spacegroup_number": 63
+  },
+  "fmmm_orthorhombic_F": {
+   "n_orbits": 1,
+   "equivalent_atoms": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spacegroup_number": 69
+  },
+  "immm_orthorhombic_I": {
+   "n_orbits": 1,
+   "equivalent_atoms": [
+    0,
+    0
+   ],
+   "spacegroup_number": 71
+  },
+  "monoclinic_P21c_ZrO2_like": {
+   "n_orbits": 3,
+   "equivalent_atoms": [
+    0,
+    0,
+    0,
+    0,
+    4,
+    4,
+    4,
+    4,
+    8,
+    8,
+    8,
+    8
+   ],
+   "spacegroup_number": 14
+  },
+  "monoclinic_C2m": {
+   "n_orbits": 2,
+   "equivalent_atoms": [
+    0,
+    0,
+    0,
+    0,
+    4,
+    4,
+    4,
+    4
+   ],
+   "spacegroup_number": 12
+  },
+  "triclinic_P1bar": {
+   "n_orbits": 3,
+   "equivalent_atoms": [
+    0,
+    0,
+    2,
+    2,
+    4,
+    4
+   ],
+   "spacegroup_number": 2
+  },
+  "rhombohedral_Bi_like": {
+   "n_orbits": 1,
+   "equivalent_atoms": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "spacegroup_number": 166
+  },
+  "rhombohedral_alpha_Al2O3": {
+   "n_orbits": 2,
+   "equivalent_atoms": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12
+   ],
+   "spacegroup_number": 167
+  },
+  "graphite_hex": {
+   "n_orbits": 2,
+   "equivalent_atoms": [
+    0,
+    0,
+    2,
+    2
+   ],
+   "spacegroup_number": 194
+  },
+  "diamond_Si": {
+   "n_orbits": 1,
+   "equivalent_atoms": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "spacegroup_number": 227
+  },
+  "v_cP1_P2_13": {
+   "n_orbits": 1,
+   "equivalent_atoms": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spacegroup_number": 198
+  },
+  "v_cF1_F23": {
+   "n_orbits": 2,
+   "equivalent_atoms": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    48,
+    48,
+    48,
+    48
+   ],
+   "spacegroup_number": 196
+  },
+  "v_tI1_c_lt_a": {
+   "n_orbits": 1,
+   "equivalent_atoms": [
+    0,
+    0
+   ],
+   "spacegroup_number": 139
+  },
+  "v_tI2_c_gt_a": {
+   "n_orbits": 1,
+   "equivalent_atoms": [
+    0,
+    0
+   ],
+   "spacegroup_number": 139
+  },
+  "v_oF2_Fdd2": {
+   "n_orbits": 2,
+   "equivalent_atoms": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    16,
+    16,
+    16,
+    16,
+    16,
+    16,
+    16,
+    16
+   ],
+   "spacegroup_number": 43
+  },
+  "v_oF3_Fmmm": {
+   "n_orbits": 1,
+   "equivalent_atoms": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spacegroup_number": 69
+  },
+  "v_oI2_Ima2": {
+   "n_orbits": 2,
+   "equivalent_atoms": [
+    0,
+    0,
+    0,
+    0,
+    4,
+    4,
+    4,
+    4
+   ],
+   "spacegroup_number": 46
+  },
+  "v_oI3_Imm2": {
+   "n_orbits": 2,
+   "equivalent_atoms": [
+    0,
+    0,
+    2,
+    2
+   ],
+   "spacegroup_number": 44
+  },
+  "v_oC2_Cmcm": {
+   "n_orbits": 2,
+   "equivalent_atoms": [
+    0,
+    0,
+    0,
+    0,
+    4,
+    4,
+    4,
+    4
+   ],
+   "spacegroup_number": 63
+  },
+  "v_oA1_Amm2": {
+   "n_orbits": 2,
+   "equivalent_atoms": [
+    0,
+    0,
+    2,
+    2,
+    2,
+    2
+   ],
+   "spacegroup_number": 38
+  },
+  "v_oA2_Amm2": {
+   "n_orbits": 2,
+   "equivalent_atoms": [
+    0,
+    0,
+    2,
+    2,
+    2,
+    2
+   ],
+   "spacegroup_number": 38
+  },
+  "v_hP1_P-3": {
+   "n_orbits": 2,
+   "equivalent_atoms": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    6,
+    6
+   ],
+   "spacegroup_number": 147
+  },
+  "v_hR1_rhl1": {
+   "n_orbits": 1,
+   "equivalent_atoms": [
+    0,
+    0,
+    0
+   ],
+   "spacegroup_number": 166
+  },
+  "v_hR2_rhl2": {
+   "n_orbits": 1,
+   "equivalent_atoms": [
+    0,
+    0,
+    0
+   ],
+   "spacegroup_number": 166
+  },
+  "v_mC1_mclc1": {
+   "n_orbits": 1,
+   "equivalent_atoms": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spacegroup_number": 12
+  },
+  "v_mC2_mclc3": {
+   "n_orbits": 1,
+   "equivalent_atoms": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spacegroup_number": 12
+  },
+  "v_mC3_mclc5": {
+   "n_orbits": 1,
+   "equivalent_atoms": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spacegroup_number": 12
+  },
+  "v_aP2_tria": {
+   "n_orbits": 1,
+   "equivalent_atoms": [
+    0,
+    0
+   ],
+   "spacegroup_number": 2
+  },
+  "v_aP2_trib": {
+   "n_orbits": 1,
+   "equivalent_atoms": [
+    0,
+    0
+   ],
+   "spacegroup_number": 2
+  },
+  "v_aP3_trib": {
+   "n_orbits": 1,
+   "equivalent_atoms": [
+    0,
+    0
+   ],
+   "spacegroup_number": 2
+  }
+ },
+ "pairs": [
+  {
+   "structure": "rocksalt_NaCl",
+   "supercell_diagonal": [
+    1,
+    1,
+    1
+   ],
+   "n_atoms": 8,
+   "r_max": 4.0,
+   "n_pairs": 24,
+   "n_classes": 3,
+   "classes": [
+    {
+     "distance": 2.82,
+     "species": [
+      "Cl",
+      "Na"
+     ],
+     "multiplicity": 12
+    },
+    {
+     "distance": 3.98808225,
+     "species": [
+      "Na",
+      "Na"
+     ],
+     "multiplicity": 6
+    },
+    {
+     "distance": 3.98808225,
+     "species": [
+      "Cl",
+      "Cl"
+     ],
+     "multiplicity": 6
+    }
+   ]
+  },
+  {
+   "structure": "fcc_Cu",
+   "supercell_diagonal": [
+    2,
+    2,
+    2
+   ],
+   "n_atoms": 32,
+   "r_max": 3.7,
+   "n_pairs": 240,
+   "n_classes": 2,
+   "classes": [
+    {
+     "distance": 2.55265548,
+     "species": [
+      "Cu",
+      "Cu"
+     ],
+     "multiplicity": 192
+    },
+    {
+     "distance": 3.61,
+     "species": [
+      "Cu",
+      "Cu"
+     ],
+     "multiplicity": 48
+    }
+   ]
+  },
+  {
+   "structure": "rutile_TiO2_tetragonal_P",
+   "supercell_diagonal": [
+    1,
+    1,
+    1
+   ],
+   "n_atoms": 6,
+   "r_max": 3.6,
+   "n_pairs": 15,
+   "n_classes": 5,
+   "classes": [
+    {
+     "distance": 1.94780467,
+     "species": [
+      "O",
+      "Ti"
+     ],
+     "multiplicity": 4
+    },
+    {
+     "distance": 1.98155362,
+     "species": [
+      "O",
+      "Ti"
+     ],
+     "multiplicity": 4
+    },
+    {
+     "distance": 2.53378987,
+     "species": [
+      "O",
+      "O"
+     ],
+     "multiplicity": 2
+    },
+    {
+     "distance": 2.77857837,
+     "species": [
+      "O",
+      "O"
+     ],
+     "multiplicity": 4
+    },
+    {
+     "distance": 3.56950112,
+     "species": [
+      "Ti",
+      "Ti"
+     ],
+     "multiplicity": 1
+    }
+   ]
+  }
+ ]
+}

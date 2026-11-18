@@ -6,7 +6,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 
 ## How to read this table
 
-- **Next stage to build: M12.2 (Scene library: one data format for every 3D picture, with a flat fallback), Tier B, size L.** Start it with `STAGE: NEXT`, `BASE: main`. The next Tier A stage is M13.5 (Structure toolkit: slabs, vacancies, substitutions and doping), size L: start it with `STAGE: NEXT`, `TIER: A`. Each builder session rewrites this line for the stage that follows.
+- **Next stage to build: M12.2 (Scene library: one data format for every 3D picture, with a flat fallback), Tier B, size L.** Start it with `STAGE: NEXT`, `BASE: main`. The next Tier A stage is M10.3 (Molecule engine: RDKit 2D, in-house 3D), size L: start it with `STAGE: NEXT`, `TIER: A`. Each builder session rewrites this line for the stage that follows.
 - **Tier** says which model to open the session with. **A** = the strongest model (Opus class): stages where a subtle mistake would put a wrong number in front of a researcher. **B** = the fast model (Sonnet class): UI, content and wiring on top of tested libraries. `-` = already done.
 - **Size** says how much work it is: **S** short session, **M** one normal session, **L** a long session that may stop as `partial` and need a second one.
 - A session started on the wrong tier does not build. It names the model to switch to and stops (`docs/WORKFLOW.md` section 2, step 0).
@@ -59,7 +59,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M8.3 | Explorer UI and the shared periodic table | todo | M8.2, M1.3 | M | B | | | | [work order](milestones/M8-tolerance-factor.md) |
 | M10.1 | Chemistry data and validity engine | done | M8.2, M5.1 | L | A | main | none (pushed to main) | 2026-11-18 | [report](reports/M10.1.md), [work order](milestones/M10-material-builder.md) |
 | M10.2 | Crystal operations and exports | done | M10.1, M13.1 | M | A | main | none (pushed to main) | 2026-11-18 | [report](reports/M10.2.md), [work order](milestones/M10-material-builder.md) |
-| M13.5 | Structure toolkit: slabs, vacancies, substitutions and doping (library) | todo | M13.1, M5.1 | L | A | | | | [work order](milestones/M13-magnetism-and-structures.md) |
+| M13.5 | Structure toolkit: slabs, vacancies, substitutions and doping (library) | done | M13.1, M5.1 | L | A | main | none (pushed to main) | 2026-11-18 | [report](reports/M13.5.md), [work order](milestones/M13-magnetism-and-structures.md) |
 | M10.4 | Crystal editor UI | todo | M10.2, M5.5, M8.3, M13.5, M12.2 | L | B | | | | [work order](milestones/M10-material-builder.md) |
 | M10.3 | Molecule engine (RDKit 2D, in-house 3D) | todo | M10.1 | L | A | | | | [work order](milestones/M10-material-builder.md) |
 | M10.5 | Molecule editor UI | todo | M10.3, M10.4 | L | B | | | | [work order](milestones/M10-material-builder.md) |

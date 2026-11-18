@@ -47,7 +47,7 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-041 | closed | builder (M13.1) |
 | Q-042 | open | author + builder (M13.3) |
 | Q-043 | open | author |
-| Q-044 | open | builder (M13.5) |
+| Q-044 | closed | builder (M13.5) |
 
 ## Q-001. Repository licence
 Which licence for the code and which for the written content and data (a common split: MIT for code, CC BY 4.0 for original text)? Affects `LICENSE`, the footer and the references page. Until decided: no LICENSE file; `THIRD_PARTY_NOTICES.md` lists upstream licences. **Update 2026-11-04:** the secrets `FIREBASE_SERVICE_ACCOUNT` and `FIREBASE_PROJECT_ID` are set (screenshot from the author) and the deploy workflow has succeeded on every merge to main since; the live site URL was not opened from the builder environment, so please confirm it shows the latest stage. **Owner: author.**
@@ -191,5 +191,5 @@ Exchange constants change by factors of 2 or S^2 between conventions (pairs coun
 M12.1 changes colours and makes monospace the interface face (D-054). **Close:** the author approves the screenshots in `docs/reports/M12.1.md` or asks for changes. **Owner: author.**
 
 ## Q-044. Slab polarity heuristic
-The polar-slab warning (M13.5) uses nominal oxidation states and the dipole of the repeat unit along the normal (Tasker type III, S-063). The threshold for "non-zero" and the treatment of mixed-valence or metallic systems are conventions. **Close (builder, M13.5):** record the threshold as a D entry and compare the flag with pymatgen's `is_polar` on the golden slabs. **Owner: builder.**
+The polar-slab warning (M13.5) uses nominal oxidation states and the dipole of the repeat unit along the normal (Tasker type III, S-063). The threshold for "non-zero" and the treatment of mixed-valence or metallic systems are conventions. **Close (builder, M13.5):** record the threshold as a D entry and compare the flag with pymatgen's `is_polar` on the golden slabs. **Owner: builder.** **Closed 2026-11-18 (M13.5):** the threshold is pymatgen's, 1e-3 e per Angstrom of dipole per surface area (D-069). Mixed valence uses the average nominal charge per element, an element alone gets charge 0, and a composition with no charge-neutral assignment is reported as "not assessed" (`polar: null`), never as non-polar. The flag equals pymatgen's `is_polar` for every termination of the six golden slabs (Cu (100), (110), (111), NaCl (100), (111), rutile TiO2 (110)) in `slab.test.ts`.
 
