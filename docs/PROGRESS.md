@@ -44,7 +44,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M6.3 | Thompson-sampling policy | done | M6.2 | M | - | claude/vigilant-newton-ws593b | | 2026-11-10 | [report](reports/M6.3.md), [work order](milestones/M6-adaptive-engine.md) |
 | M12.1 | Design language v3: terminal-minimal look, command palette and status line | todo | M1.3, M5.6 | M | B | | | | [work order](milestones/M12-visual-layer.md) |
 | M12.2 | Scene library: one data format for every 3D picture, with a flat fallback | todo | M5.5, M12.1 | L | B | | | | [work order](milestones/M12-visual-layer.md) |
-| M13.1 | Supercells and collinear magnetic orderings (library) | done | M5.1, M3.1, M3.4 | L | A | claude/m13-1-magnetic-orderings | | 2026-11-18 | [report](reports/M13.1.md), [work order](milestones/M13-magnetism-and-structures.md) |
+| M13.1 | Supercells and collinear magnetic orderings (library) | done | M5.1, M3.1, M3.4 | L | A | main | none (pushed to main) | 2026-11-18 | [report](reports/M13.1.md), [work order](milestones/M13-magnetism-and-structures.md) |
 | M13.2 | Magnetic configuration tool (UI) | todo | M13.1, M12.2, M3.5 | L | B | | | | [work order](milestones/M13-magnetism-and-structures.md) |
 | M12.6 | A structure view wherever a POSCAR appears | todo | M12.2, M3.5, M3.6 | S | B | | | | [work order](milestones/M12-visual-layer.md) |
 | M6.4 | Practice UI, quizzes, mastery map and gentle gamification | todo | M6.3, M1.3, M12.1 | L | B | | | | [work order](milestones/M6-adaptive-engine.md) |
@@ -86,7 +86,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 
 Newest first. One line per session: date, stage, outcome, branch.
 
-- 2026-11-18, M13.1: supercells (`supercell.ts`), magnetic sublattice, FM/A/C/G/rock-salt II/k/custom orderings, common supercell, enumeration, MAGMOM with the V001/V002 hook; golden `magnetic_reference.json` (pymatgen, spglib); D-059; Q-040 and Q-041 closed. Built with `TIER: A`, so M12.1 (Tier B) was skipped and is still next. Branch `claude/m13-1-magnetic-orderings`.
+- 2026-11-18, M13.1: supercells (`supercell.ts`), magnetic sublattice, FM/A/C/G/rock-salt II/k/custom orderings, common supercell, enumeration, MAGMOM with the V001/V002 hook; golden `magnetic_reference.json` (pymatgen, spglib); D-059; Q-040 and Q-041 closed. Built with `TIER: A`, so M12.1 (Tier B) was skipped and is still next. Pushed directly to `main` at the author's request (no PR).
 - 2026-11-16, review (second pass): independent re-read of the repository and of plan v3; verify green. Added M12.5 (tag visuals), M12.6 (structure view wherever a POSCAR appears, measuring), `commonSupercell` and the "one cell for all" default in M13.1 and M13.2, and D-058. Branch `main`.
 
 - 2026-11-16, planning v3: audit of `main` (verify green, 1215 tests); added M12 visual layer, M13 magnetism and structure toolkit, M14 research guidance (13 stages), reordered the build, D-054 to D-057, Q-040 to Q-044, S-058 to S-068. The sessions for M5.4 to M6.3 did not add log lines; their reports are linked in the table.
