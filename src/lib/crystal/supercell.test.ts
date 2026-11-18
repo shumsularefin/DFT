@@ -48,21 +48,27 @@ describe('hermiteNormalForms', () => {
 
 describe('buildSupercell', () => {
   it('rejects non-integer matrices and det <= 0', () => {
-    expect(() => supercell(sto, [
-      [1, 0, 0],
-      [0, 1, 0],
-      [0, 0, 0],
-    ])).toThrow(RangeError);
-    expect(() => supercell(sto, [
-      [0, 1, 0],
-      [1, 0, 0],
-      [0, 0, 1],
-    ])).toThrow(RangeError);
-    expect(() => supercell(sto, [
-      [1.5, 0, 0],
-      [0, 1, 0],
-      [0, 0, 1],
-    ] as unknown as IntMat3)).toThrow(RangeError);
+    expect(() =>
+      supercell(sto, [
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 0],
+      ]),
+    ).toThrow(RangeError);
+    expect(() =>
+      supercell(sto, [
+        [0, 1, 0],
+        [1, 0, 0],
+        [0, 0, 1],
+      ]),
+    ).toThrow(RangeError);
+    expect(() =>
+      supercell(sto, [
+        [1.5, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1],
+      ] as unknown as IntMat3),
+    ).toThrow(RangeError);
   });
 
   it('a diagonal matrix gives the same sites in the same order as the existing na x nb x nc repeat', () => {

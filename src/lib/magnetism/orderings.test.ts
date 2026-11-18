@@ -56,13 +56,16 @@ const cases = (name: string) =>
 /** Compare a built configuration with the golden counts for that cell. */
 function expectCounts(c: MagneticConfiguration, g: CellCounts) {
   expect(c.structure.frac.length).toBe(g.n_atoms);
+  expect(c.signs[c.magneticSites[0]!]).toBe(1); // D-059: the first magnetic site is up
   expect(c.magneticSites.length).toBe(g.n_magnetic);
   expect(c.signs.filter((x) => x === 1).length).toBe(g.n_up);
   expect(c.signs.filter((x) => x === -1).length).toBe(g.n_down);
   expect(netMoment(c)).toBe(g.net_moment_unit);
   const b = bondStatistics(c);
   expect(b.shells[0]).toBeCloseTo(g.nn_distance, 6);
-  const got = b.sites.map((s) => [s.shells[0]!.parallel, s.shells[0]!.antiparallel]).sort((x, y) => x[0]! - y[0]! || x[1]! - y[1]!);
+  const got = b.sites
+    .map((s) => [s.shells[0]!.parallel, s.shells[0]!.antiparallel])
+    .sort((x, y) => x[0]! - y[0]! || x[1]! - y[1]!);
   expect(got).toEqual(g.nn_parallel_antiparallel_per_site);
 }
 
@@ -74,7 +77,9 @@ describe('magnetic site selection and grids', () => {
   });
   it('cubic perovskite: three perpendicular axes of length a; default axis c', () => {
     const g = pseudocubicGrid(sto, [1]);
-    expect(g.axes.map((e) => Math.hypot(...e))).toEqual([3.905, 3.905, 3.905].map((x) => expect.closeTo(x, 9)));
+    expect(g.axes.map((e) => Math.hypot(...e))).toEqual(
+      [3.905, 3.905, 3.905].map((x) => expect.closeTo(x, 9)),
+    );
     expect(g.defaultAxis).toBe(2);
     expect(Math.abs(g.axes[2]![2])).toBeCloseTo(3.905, 9);
   });
@@ -123,7 +128,9 @@ describe('named orderings: cubic perovskite (golden)', () => {
   });
 
   it('common supercell for FM, A, C, G has the golden determinant; every ordering lives in the same cell', () => {
-    const r = commonSupercell(sto, [{ kind: 'FM' }, { kind: 'A' }, { kind: 'C' }, { kind: 'G' }], { elements: ['Ti'] });
+    const r = commonSupercell(sto, [{ kind: 'FM' }, { kind: 'A' }, { kind: 'C' }, { kind: 'G' }], {
+      elements: ['Ti'],
+    });
     expect(determinant(r.matrix)).toBe(golden.common_supercell.cubic_perovskite_SrTiO3.det);
     const ref = r.configurations[0]!.structure;
     for (const c of r.configurations) {
@@ -152,7 +159,9 @@ describe('named orderings: cubic perovskite (golden)', () => {
     expect(f.fits).toBe(false);
     expect(determinant(f.proposal!)).toBe(g.G!.minimal_det);
     expect(f.message).toMatch(/does not fit/);
-    expect(() => namedOrdering(sto, { kind: 'G' }, { elements: ['Ti'], cell: 'as-given' })).toThrow(/does not fit/);
+    expect(() => namedOrdering(sto, { kind: 'G' }, { elements: ['Ti'], cell: 'as-given' })).toThrow(
+      /does not fit/,
+    );
     expect(fitCheck(sto, { kind: 'FM' }, { elements: ['Ti'] }).fits).toBe(true);
   });
 });
@@ -168,7 +177,9 @@ describe('named orderings: Pnma perovskite-like (golden)', () => {
     });
   }
   it('common supercell is the cell itself', () => {
-    const r = commonSupercell(pnma, [{ kind: 'FM' }, { kind: 'A' }, { kind: 'C' }, { kind: 'G' }], { elements: ['Cu'] });
+    const r = commonSupercell(pnma, [{ kind: 'FM' }, { kind: 'A' }, { kind: 'C' }, { kind: 'G' }], {
+      elements: ['Cu'],
+    });
     expect(determinant(r.matrix)).toBe(golden.common_supercell.pnma_perovskite_like.det);
   });
 });
@@ -182,7 +193,8 @@ describe('rock-salt type II (golden)', () => {
     expect(c.k).toEqual(g.RS2!.k_parent);
     expect(determinant(c.matrix)).toBe(g.RS2!.minimal_det);
     expectCounts(c, g.RS2!.minimal_cell);
-    for (const s of bondStatistics(c).sites) expect([s.shells[0]!.parallel, s.shells[0]!.antiparallel]).toEqual([6, 6]);
+    for (const s of bondStatistics(c).sites)
+      expect([s.shells[0]!.parallel, s.shells[0]!.antiparallel]).toEqual([6, 6]);
     const d = namedOrdering(nacl, { kind: 'RS2' }, { elements: ['Na'], cell: 'diagonal' });
     expectCounts(d, g.RS2!.diagonal_cell);
   });
@@ -205,7 +217,11 @@ describe('propagation vector and custom orderings', () => {
     expect(k.signs).toEqual(gt.signs);
   });
   it('custom signs and magnitudes give the net moment; validation of lengths', () => {
-    const c = customOrdering(pnma, pnma.species.map((x, i) => (x === 'Cu' ? (i % 2 ? 1 : -1) : 0)), pnma.species.map((x) => (x === 'Cu' ? 2 : 0)));
+    const c = customOrdering(
+      pnma,
+      pnma.species.map((x, i) => (x === 'Cu' ? (i % 2 ? 1 : -1) : 0)),
+      pnma.species.map((x) => (x === 'Cu' ? 2 : 0)),
+    );
     expect(netMoment(c)).toBe(0);
     expect(() => customOrdering(pnma, [1, -1])).toThrow(MagneticError);
   });
@@ -228,7 +244,12 @@ describe('enumerateCollinear (golden brute force with spglib operations)', () =>
   ];
   for (const [name, make, el] of runs) {
     it(`${name}: number of classes and multiplicities`, () => {
-      const g = (golden.enumeration as unknown as Record<string, { n_classes: number; multiplicities_sorted: number[]; n_spglib_operations: number }>)[name]!;
+      const g = (
+        golden.enumeration as unknown as Record<
+          string,
+          { n_classes: number; multiplicities_sorted: number[]; n_spglib_operations: number }
+        >
+      )[name]!;
       const s = make();
       const sym = analyzeWith(api, s, { symprec: golden._meta.symprec });
       expect(sym.operations.length).toBe(g.n_spglib_operations);
@@ -241,7 +262,9 @@ describe('enumerateCollinear (golden brute force with spglib operations)', () =>
   }
   it('refuses more than maxSites magnetic sites', () => {
     const s = diagonalSupercell(sto, 2, 2, 2);
-    expect(() => enumerateCollinear(s, selectMagneticSites(s, ['Ti']), [], { maxSites: 6 })).toThrow(/limit is 6/);
+    expect(() => enumerateCollinear(s, selectMagneticSites(s, ['Ti']), [], { maxSites: 6 })).toThrow(
+      /limit is 6/,
+    );
   });
   it.todo('Q-041: moyo-wasm 0.21.0 has no magnetic-cell analysis, so no magnetic space group is reported');
 });

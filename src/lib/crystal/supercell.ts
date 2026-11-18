@@ -15,7 +15,8 @@ export const determinant = (m: IntMat3): number =>
 
 /** Adjugate: adj(M) * M = det(M) * I. */
 function adjugate(m: IntMat3): IntMat3 {
-  const c = (r0: number, r1: number, c0: number, c1: number) => m[r0]![c0]! * m[r1]![c1]! - m[r0]![c1]! * m[r1]![c0]!;
+  const c = (r0: number, r1: number, c0: number, c1: number) =>
+    m[r0]![c0]! * m[r1]![c1]! - m[r0]![c1]! * m[r1]![c0]!;
   return [
     [c(1, 2, 1, 2), -c(0, 2, 1, 2), c(0, 1, 1, 2)],
     [-c(1, 2, 0, 2), c(0, 2, 0, 2), -c(0, 1, 0, 2)],
@@ -145,7 +146,8 @@ export function diagonalSupercell(s: Structure, n1: number, n2: number, n3: numb
   ]);
 }
 
-const divisors = (n: number): number[] => Array.from({ length: n }, (_, i) => i + 1).filter((x) => n % x === 0);
+const divisors = (n: number): number[] =>
+  Array.from({ length: n }, (_, i) => i + 1).filter((x) => n % x === 0);
 
 /**
  * All lower-triangular Hermite normal forms of determinant n, rows [a 0 0], [b c 0], [d e f] with a c f = n,

@@ -48,9 +48,7 @@ export interface SiteChoice {
   elements?: readonly string[];
 }
 
-export type OrderingRequest =
-  | { kind: NamedKind; axis?: 0 | 1 | 2; diagonal?: Int3 }
-  | { kind: 'k'; k: Vec3 };
+export type OrderingRequest = { kind: NamedKind; axis?: 0 | 1 | 2; diagonal?: Int3 } | { kind: 'k'; k: Vec3 };
 
 export interface MagneticConfiguration {
   kind: NamedKind | 'k' | 'custom';
@@ -84,7 +82,10 @@ const isIntegerK = (k: Vec3) => k.every((x) => x === 0);
 const sitesOf = (s: Structure, c: SiteChoice): number[] => {
   if (c.sites) {
     if (c.sites.length === 0 || c.sites.some((i) => !Number.isInteger(i) || i < 0 || i >= s.species.length))
-      throw new MagneticError('bad-input', 'The magnetic site list is empty or names a site that does not exist.');
+      throw new MagneticError(
+        'bad-input',
+        'The magnetic site list is empty or names a site that does not exist.',
+      );
     return [...c.sites];
   }
   return selectMagneticSites(s, c.elements);
@@ -98,20 +99,35 @@ interface Phase {
   axis?: MagneticConfiguration['axis'];
 }
 
-function phaseFor(s: Structure, sites: number[], req: Extract<OrderingRequest, { kind: NamedKind }>, nopts?: NeighbourOptions): Phase {
+function phaseFor(
+  s: Structure,
+  sites: number[],
+  req: Extract<OrderingRequest, { kind: NamedKind }>,
+  nopts?: NeighbourOptions,
+): Phase {
   if (req.kind === 'FM') return { w: [0, 0, 0], den: 1 };
   if (req.kind === 'RS2') {
     const grid = fccGrid(s, sites, nopts);
     const d = req.diagonal ?? [1, 1, 1];
-    if (d.some((x) => Math.abs(x) !== 1)) throw new MagneticError('bad-input', 'The (111) diagonal must have entries +1 or -1.');
+    if (d.some((x) => Math.abs(x) !== 1))
+      throw new MagneticError('bad-input', 'The (111) diagonal must have entries +1 or -1.');
     return { grid, w: d, den: 2 };
   }
   const grid = pseudocubicGrid(s, sites, nopts);
   const ax = req.axis ?? grid.defaultAxis;
   const w: Int3 =
-    req.kind === 'G' ? [1, 1, 1] : req.kind === 'A' ? ([0, 1, 2].map((i) => (i === ax ? 1 : 0)) as unknown as Int3) : ([0, 1, 2].map((i) => (i === ax ? 0 : 1)) as unknown as Int3);
+    req.kind === 'G'
+      ? [1, 1, 1]
+      : req.kind === 'A'
+        ? ([0, 1, 2].map((i) => (i === ax ? 1 : 0)) as unknown as Int3)
+        : ([0, 1, 2].map((i) => (i === ax ? 0 : 1)) as unknown as Int3);
   const reason = req.axis === undefined ? `default: ${grid.defaultAxisReason}` : 'chosen by the user';
-  return { grid, w, den: 1, ...(req.kind !== 'G' ? { axis: { index: ax, vector: grid.axes[ax]!, reason } } : {}) };
+  return {
+    grid,
+    w,
+    den: 1,
+    ...(req.kind !== 'G' ? { axis: { index: ax, vector: grid.axes[ax]!, reason } } : {}),
+  };
 }
 
 const dotI = (a: Int3, b: Int3) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -159,7 +175,10 @@ function chooseMatrix(s: Structure, ks: readonly Vec3[], cell: CellChoice, maxDe
     ];
   }
   if (!ks.every((k) => commensurateFor(cell, k)))
-    throw new MagneticError('does-not-fit', `The chosen supercell does not hold k = ${ks.map(fmtK).join(', ')}.`);
+    throw new MagneticError(
+      'does-not-fit',
+      `The chosen supercell does not hold k = ${ks.map(fmtK).join(', ')}.`,
+    );
   return cell;
 }
 
@@ -187,11 +206,18 @@ function assemble(
       signs.push(signOf(i, sc.translations[j]!));
     }
   });
+  // global-flip convention (D-059): the first magnetic site of the cell is up
+  if (magneticSites.length > 0 && signs[magneticSites[0]!] === -1)
+    for (const j of magneticSites) signs[j] = -signs[j]! as Sign;
   return { magneticSites, signs };
 }
 
 /** A named ordering (FM, A, C, G, rock-salt type II), built in the requested cell (default the minimal one). */
-export function namedOrdering(s: Structure, req: Extract<OrderingRequest, { kind: NamedKind }>, opts: BuildOptions = {}): MagneticConfiguration {
+export function namedOrdering(
+  s: Structure,
+  req: Extract<OrderingRequest, { kind: NamedKind }>,
+  opts: BuildOptions = {},
+): MagneticConfiguration {
   const sites = sitesOf(s, opts);
   const p = phaseFor(s, sites, req, opts.neighbour);
   const k = kOfPhase(p);
@@ -200,12 +226,22 @@ export function namedOrdering(s: Structure, req: Extract<OrderingRequest, { kind
   const g = p.grid;
   const { magneticSites, signs } = assemble(s, sites, sc, (i, T) => {
     if (!g) return 1;
-    const c = [0, 1, 2].map((a) => g.coords[i]![a]! + T[0] * g.latticeCoords[0][a]! + T[1] * g.latticeCoords[1][a]! + T[2] * g.latticeCoords[2][a]!) as unknown as Int3;
+    const c = [0, 1, 2].map(
+      (a) =>
+        g.coords[i]![a]! +
+        T[0] * g.latticeCoords[0][a]! +
+        T[1] * g.latticeCoords[1][a]! +
+        T[2] * g.latticeCoords[2][a]!,
+    ) as unknown as Int3;
     return signOfPhase(phaseValue(p, c));
   });
   const notes: string[] = [];
-  if (determinant(M) > 1) notes.push(`Built in a supercell of ${determinant(M)} copies of the input cell (k = ${fmtK(k)}).`);
-  if (g && g.maxResidual > 0.05) notes.push(`The magnetic sublattice is distorted (largest offset ${g.maxResidual.toFixed(2)} grid units); the names follow the nearest ideal grid.`);
+  if (determinant(M) > 1)
+    notes.push(`Built in a supercell of ${determinant(M)} copies of the input cell (k = ${fmtK(k)}).`);
+  if (g && g.maxResidual > 0.05)
+    notes.push(
+      `The magnetic sublattice is distorted (largest offset ${g.maxResidual.toFixed(2)} grid units); the names follow the nearest ideal grid.`,
+    );
   return {
     kind: req.kind,
     label: NAMED_LABEL[req.kind],
@@ -221,7 +257,11 @@ export function namedOrdering(s: Structure, req: Extract<OrderingRequest, { kind
 }
 
 /** Wave vector a request needs, relative to the input cell (no supercell built). */
-export function requiredK(s: Structure, req: OrderingRequest, opts: SiteChoice & { neighbour?: NeighbourOptions } = {}): Vec3 {
+export function requiredK(
+  s: Structure,
+  req: OrderingRequest,
+  opts: SiteChoice & { neighbour?: NeighbourOptions } = {},
+): Vec3 {
   if (req.kind === 'k') return checkCollinearK(req.k);
   return kOfPhase(phaseFor(s, sitesOf(s, opts), req, opts.neighbour));
 }
@@ -250,7 +290,9 @@ export function orderingFromK(s: Structure, kIn: Vec3, opts: BuildOptions = {}):
   const sites = sitesOf(s, opts);
   const M = chooseMatrix(s, [k], opts.cell ?? 'minimal', opts.maxDet);
   const sc = buildSupercell(s, M);
-  const { magneticSites, signs } = assemble(s, sites, sc, (_i, T) => signOfPhase(Math.round(2 * (k[0] * T[0] + k[1] * T[1] + k[2] * T[2]))));
+  const { magneticSites, signs } = assemble(s, sites, sc, (_i, T) =>
+    signOfPhase(Math.round(2 * (k[0] * T[0] + k[1] * T[1] + k[2] * T[2]))),
+  );
   return {
     kind: 'k',
     label: `Propagation vector k = ${fmtK(k)}`,
@@ -259,16 +301,28 @@ export function orderingFromK(s: Structure, kIn: Vec3, opts: BuildOptions = {}):
     magneticSites,
     signs,
     k,
-    notes: ['Every magnetic site of one copy of the input cell gets the same sign; only the lattice translation sets it.'],
+    notes: [
+      'Every magnetic site of one copy of the input cell gets the same sign; only the lattice translation sets it.',
+    ],
   };
 }
 
 /** Custom per-site signs (+1, -1 or 0 per site of `s`) and optional magnitudes, in the cell as given. */
-export function customOrdering(s: Structure, signs: readonly number[], magnitudes?: readonly number[]): MagneticConfiguration {
+export function customOrdering(
+  s: Structure,
+  signs: readonly number[],
+  magnitudes?: readonly number[],
+): MagneticConfiguration {
   if (signs.length !== s.species.length || signs.some((x) => x !== 1 && x !== -1 && x !== 0))
     throw new MagneticError('bad-input', `Give one sign (+1, -1 or 0) per site: ${s.species.length} values.`);
-  if (magnitudes && (magnitudes.length !== s.species.length || magnitudes.some((m) => !Number.isFinite(m) || m < 0)))
-    throw new MagneticError('bad-input', `Give one non-negative magnitude per site: ${s.species.length} values.`);
+  if (
+    magnitudes &&
+    (magnitudes.length !== s.species.length || magnitudes.some((m) => !Number.isFinite(m) || m < 0))
+  )
+    throw new MagneticError(
+      'bad-input',
+      `Give one non-negative magnitude per site: ${s.species.length} values.`,
+    );
   return {
     kind: 'custom',
     label: 'Custom',
@@ -286,20 +340,29 @@ export function customOrdering(s: Structure, signs: readonly number[], magnitude
  * The smallest cell that holds every requested ordering at once, and each ordering built in it (same lattice, same
  * atom order). Comparing energies from differently shaped cells mixes in k-point sampling differences (D-058).
  */
-export function commonSupercell(s: Structure, reqs: readonly OrderingRequest[], opts: BuildOptions = {}): { matrix: IntMat3; configurations: MagneticConfiguration[] } {
+export function commonSupercell(
+  s: Structure,
+  reqs: readonly OrderingRequest[],
+  opts: BuildOptions = {},
+): { matrix: IntMat3; configurations: MagneticConfiguration[] } {
   if (reqs.length === 0) throw new MagneticError('bad-input', 'Ask for at least one ordering.');
   const ks = reqs.map((r) => requiredK(s, r, opts));
   const matrix = minimalCommonSupercell(s, ks, { maxDet: opts.maxDet ?? 16 }).matrix;
   const configurations = reqs.map((r) =>
-    r.kind === 'k' ? orderingFromK(s, r.k, { ...opts, cell: matrix }) : namedOrdering(s, r, { ...opts, cell: matrix }),
+    r.kind === 'k'
+      ? orderingFromK(s, r.k, { ...opts, cell: matrix })
+      : namedOrdering(s, r, { ...opts, cell: matrix }),
   );
   return { matrix, configurations };
 }
 
 // ---------- checks ----------
 
-const magnitudeAt = (c: MagneticConfiguration, j: number, byElement?: Readonly<Record<string, number>>): number =>
-  c.magnitudes?.[j] ?? byElement?.[c.structure.species[j]!] ?? 1;
+const magnitudeAt = (
+  c: MagneticConfiguration,
+  j: number,
+  byElement?: Readonly<Record<string, number>>,
+): number => c.magnitudes?.[j] ?? byElement?.[c.structure.species[j]!] ?? 1;
 
 /** Net moment per cell: sum of sign times magnitude (magnitudes per element, default 1 so the result is in site units). */
 export function netMoment(c: MagneticConfiguration, byElement?: Readonly<Record<string, number>>): number {
@@ -313,9 +376,12 @@ export interface SiteBonds {
 }
 
 /** Parallel and antiparallel neighbour counts per magnetic site and shell (periodic images included). */
-export function bondStatistics(c: MagneticConfiguration, opts: NeighbourOptions = {}): { shells: number[]; sites: SiteBonds[] } {
+export function bondStatistics(
+  c: MagneticConfiguration,
+  opts: NeighbourOptions = {},
+): { shells: number[]; sites: SiteBonds[] } {
   const n = opts.shells ?? 1;
-  const mags = c.signs.flatMap((x, j) => (c.magneticSites.includes(j) ? [j] : []));
+  const mags = c.magneticSites;
   const nb = magneticNeighbours(c.structure, mags, { ...opts, shells: n });
   const sites = mags.map((j, i) => {
     const shells = Array.from({ length: n }, () => ({ parallel: 0, antiparallel: 0, zero: 0 }));
@@ -333,7 +399,10 @@ export function bondStatistics(c: MagneticConfiguration, opts: NeighbourOptions 
 }
 
 /** Zero net moment, at least one non-zero moment, and at least one antiparallel nearest-neighbour bond. */
-export function isTrulyAntiferro(c: MagneticConfiguration, byElement?: Readonly<Record<string, number>>): boolean {
+export function isTrulyAntiferro(
+  c: MagneticConfiguration,
+  byElement?: Readonly<Record<string, number>>,
+): boolean {
   if (Math.abs(netMoment(c, byElement)) > 1e-9) return false;
   if (!c.signs.some((x, j) => x !== 0 && magnitudeAt(c, j, byElement) > 0)) return false;
   return bondStatistics(c).sites.some((s) => s.shells[0]!.antiparallel > 0);
@@ -354,17 +423,28 @@ export interface ConfigurationClass {
  * Site permutations of the magnetic sites under symmetry operations x' = R x + t (fractional, column convention, as
  * moyo returns them). Operations that do not map the magnetic sites onto themselves are skipped.
  */
-export function sitePermutations(s: Structure, sites: readonly number[], ops: readonly SymmetryOperation[], tolA = 0.01): number[][] {
+export function sitePermutations(
+  s: Structure,
+  sites: readonly number[],
+  ops: readonly SymmetryOperation[],
+  tolA = 0.01,
+): number[][] {
   const out = new Map<string, number[]>();
   for (const { rotation: R, translation: t } of ops) {
     const perm: number[] = [];
     for (const i of sites) {
       const f = s.frac[i]!;
-      const x: Vec3 = [0, 1, 2].map((r) => R[r]![0]! * f[0] + R[r]![1]! * f[1] + R[r]![2]! * f[2] + t[r]!) as unknown as Vec3;
+      const x: Vec3 = [0, 1, 2].map(
+        (r) => R[r]![0]! * f[0] + R[r]![1]! * f[1] + R[r]![2]! * f[2] + t[r]!,
+      ) as unknown as Vec3;
       const hit = sites.findIndex((j) => {
         if (s.species[j] !== s.species[i]) return false;
         const d = sub(x, s.frac[j]!);
-        return norm(vecMat([d[0] - Math.round(d[0]), d[1] - Math.round(d[1]), d[2] - Math.round(d[2])], s.lattice)) < tolA;
+        return (
+          norm(
+            vecMat([d[0] - Math.round(d[0]), d[1] - Math.round(d[1]), d[2] - Math.round(d[2])], s.lattice),
+          ) < tolA
+        );
       });
       if (hit < 0) break;
       perm.push(hit);
@@ -388,7 +468,10 @@ export function enumerateCollinear(
   const max = opts.maxSites ?? 12;
   if (N === 0) throw new MagneticError('no-magnetic-sites', 'No magnetic sites given.');
   if (N > max)
-    throw new MagneticError('too-many-sites', `${N} magnetic sites give 2^${N} assignments; the limit is ${max} sites. Use a smaller cell.`);
+    throw new MagneticError(
+      'too-many-sites',
+      `${N} magnetic sites give 2^${N} assignments; the limit is ${max} sites. Use a smaller cell.`,
+    );
   const perms = sitePermutations(s, sites, ops, opts.tolerance);
   if (perms.length === 0) perms.push([...Array(N).keys()]);
   const full = (1 << N) - 1;
@@ -438,9 +521,18 @@ const cmpSigns = (a: readonly number[], b: readonly number[]) => {
 };
 
 /** A configuration from one enumerated class, in the cell it was enumerated in. */
-export function configurationFromClass(s: Structure, sites: readonly number[], cls: ConfigurationClass, index: number): MagneticConfiguration {
+export function configurationFromClass(
+  s: Structure,
+  sites: readonly number[],
+  cls: ConfigurationClass,
+  index: number,
+): MagneticConfiguration {
   const signs: number[] = s.species.map(() => 0);
   sites.forEach((j, a) => (signs[j] = cls.signs[a]!));
   const c = customOrdering(s, signs);
-  return { ...c, label: `Configuration ${String(index + 1).padStart(2, '0')}`, notes: [`${cls.multiplicity} equivalent assignment(s) up to a global flip.`] };
+  return {
+    ...c,
+    label: `Configuration ${String(index + 1).padStart(2, '0')}`,
+    notes: [`${cls.multiplicity} equivalent assignment(s) up to a global flip.`],
+  };
 }

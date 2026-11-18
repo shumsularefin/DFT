@@ -128,7 +128,8 @@ export function magneticNeighbours(
     bounds();
   }
   const shellOf = (d: number): number => {
-    for (let k = shells.length - 1; k >= 0; k--) if (d >= shells[k]! - SAME) return d <= shells[k]! * (1 + tol) ? k + 1 : 0;
+    for (let k = shells.length - 1; k >= 0; k--)
+      if (d >= shells[k]! - SAME) return d <= shells[k]! * (1 + tol) ? k + 1 : 0;
     return 0;
   };
   const neighbours = lists.map((l) =>
@@ -167,8 +168,12 @@ function axesFromVectors(vs: readonly Vec3[], label: string): Vec3[] {
   const axes: Vec3[] = [];
   vs.forEach((v, i) => {
     if (used.has(i)) return;
-    const j = vs.findIndex((w, jj) => jj !== i && !used.has(jj) && norm([v[0] + w[0], v[1] + w[1], v[2] + w[2]]) < PAIR_TOL * norm(v));
-    if (j < 0) throw new MagneticError('not-pseudocubic', `The ${label} vectors do not come in opposite pairs.`);
+    const j = vs.findIndex(
+      (w, jj) =>
+        jj !== i && !used.has(jj) && norm([v[0] + w[0], v[1] + w[1], v[2] + w[2]]) < PAIR_TOL * norm(v),
+    );
+    if (j < 0)
+      throw new MagneticError('not-pseudocubic', `The ${label} vectors do not come in opposite pairs.`);
     used.add(i).add(j);
     const w = vs[j]!;
     axes.push([(v[0] - w[0]) / 2, (v[1] - w[1]) / 2, (v[2] - w[2]) / 2]);
@@ -179,9 +184,14 @@ function axesFromVectors(vs: readonly Vec3[], label: string): Vec3[] {
 function orthogonal(axes: readonly Vec3[], code: 'not-pseudocubic' | 'not-fcc', label: string): void {
   for (let i = 0; i < 3; i++)
     for (let j = i + 1; j < 3; j++) {
-      const c = Math.abs(axes[i]![0] * axes[j]![0] + axes[i]![1] * axes[j]![1] + axes[i]![2] * axes[j]![2]) / (norm(axes[i]!) * norm(axes[j]!));
+      const c =
+        Math.abs(axes[i]![0] * axes[j]![0] + axes[i]![1] * axes[j]![1] + axes[i]![2] * axes[j]![2]) /
+        (norm(axes[i]!) * norm(axes[j]!));
       if (c > ORTHO_TOL)
-        throw new MagneticError(code, `The ${label} axes are far from perpendicular (angle ${((Math.acos(c) * 180) / Math.PI).toFixed(1)} degrees).`);
+        throw new MagneticError(
+          code,
+          `The ${label} axes are far from perpendicular (angle ${((Math.acos(c) * 180) / Math.PI).toFixed(1)} degrees).`,
+        );
     }
 }
 
@@ -228,23 +238,42 @@ function gridCoords(s: Structure, sites: readonly number[], axes: Mat3, code: 'n
     const res = Math.max(...c.map((v, i) => Math.abs(v - r[i]!)));
     maxResidual = Math.max(maxResidual, res);
     if (res > GRID_TOL)
-      throw new MagneticError(code, `${what} is ${res.toFixed(2)} grid units away from the nearest grid point; the sublattice is too distorted for the named orderings. Use a propagation vector or custom signs.`);
+      throw new MagneticError(
+        code,
+        `${what} is ${res.toFixed(2)} grid units away from the nearest grid point; the sublattice is too distorted for the named orderings. Use a propagation vector or custom signs.`,
+      );
     return [r[0] + 0, r[1] + 0, r[2] + 0];
   };
   const r0 = vecMat(s.frac[sites[0]!]!, s.lattice);
   const coords = sites.map((j) => round(sub(vecMat(s.frac[j]!, s.lattice), r0), `Site ${j + 1}`));
-  const latticeCoords = s.lattice.map((row, i) => round(row, `Lattice vector ${'abc'[i]}`)) as unknown as [Int3, Int3, Int3];
+  const latticeCoords = s.lattice.map((row, i) => round(row, `Lattice vector ${'abc'[i]}`)) as unknown as [
+    Int3,
+    Int3,
+    Int3,
+  ];
   return { coords, latticeCoords, maxResidual };
 }
 
-function matchAll(lists: readonly Neighbour[][], shell: number, targets: readonly Vec3[], code: 'not-pseudocubic' | 'not-fcc', label: string) {
+function matchAll(
+  lists: readonly Neighbour[][],
+  shell: number,
+  targets: readonly Vec3[],
+  code: 'not-pseudocubic' | 'not-fcc',
+  label: string,
+) {
   lists.forEach((l, i) => {
     const vs = l.filter((n) => n.shell === shell).map((n) => n.vector);
     if (vs.length !== targets.length)
-      throw new MagneticError(code, `Magnetic site ${i + 1} has ${vs.length} ${label} neighbours, expected ${targets.length}.`);
+      throw new MagneticError(
+        code,
+        `Magnetic site ${i + 1} has ${vs.length} ${label} neighbours, expected ${targets.length}.`,
+      );
     for (const v of vs)
       if (!targets.some((t) => norm(sub(v, t)) < PAIR_TOL * norm(t)))
-        throw new MagneticError(code, `A ${label} neighbour of magnetic site ${i + 1} does not lie along the common axes.`);
+        throw new MagneticError(
+          code,
+          `A ${label} neighbour of magnetic site ${i + 1} does not lie along the common axes.`,
+        );
   });
 }
 
@@ -252,18 +281,38 @@ function matchAll(lists: readonly Neighbour[][], shell: number, targets: readonl
  * Pseudocubic grid of a perovskite-like magnetic sublattice: every magnetic site has six nearest magnetic neighbours
  * along three roughly perpendicular axis pairs, the same at every site. Refuses with MagneticError('not-pseudocubic').
  */
-export function pseudocubicGrid(s: Structure, sites: readonly number[], opts: NeighbourOptions = {}): SiteGrid {
+export function pseudocubicGrid(
+  s: Structure,
+  sites: readonly number[],
+  opts: NeighbourOptions = {},
+): SiteGrid {
   const { neighbours } = magneticNeighbours(s, sites, { ...opts, shells: 1 });
   const first = neighbours[0]!.filter((n) => n.shell === 1).map((n) => n.vector);
   if (first.length !== 6)
-    throw new MagneticError('not-pseudocubic', `The first magnetic site has ${first.length} nearest magnetic neighbours; a pseudocubic sublattice has 6.`);
+    throw new MagneticError(
+      'not-pseudocubic',
+      `The first magnetic site has ${first.length} nearest magnetic neighbours; a pseudocubic sublattice has 6.`,
+    );
   const raw = axesFromVectors(first, 'nearest-neighbour');
   orthogonal(raw, 'not-pseudocubic', 'pseudocubic');
   const axes = orderAxes(raw, s.lattice);
-  matchAll(neighbours, 1, axes.flatMap((e) => [e, [-e[0], -e[1], -e[2]] as Vec3]), 'not-pseudocubic', 'nearest');
+  matchAll(
+    neighbours,
+    1,
+    axes.flatMap((e) => [e, [-e[0], -e[1], -e[2]] as Vec3]),
+    'not-pseudocubic',
+    'nearest',
+  );
   const g = gridCoords(s, sites, axes, 'not-pseudocubic');
   const d = defaultAxisFor(axes, s.lattice);
-  return { kind: 'pseudocubic', axes, ...g, defaultAxis: d.axis, defaultAxisReason: d.reason, sites: [...sites] };
+  return {
+    kind: 'pseudocubic',
+    axes,
+    ...g,
+    defaultAxis: d.axis,
+    defaultAxisReason: d.reason,
+    sites: [...sites],
+  };
 }
 
 /**
@@ -274,7 +323,10 @@ export function fccGrid(s: Structure, sites: readonly number[], opts: NeighbourO
   const { neighbours } = magneticNeighbours(s, sites, { ...opts, shells: 2 });
   const second = neighbours[0]!.filter((n) => n.shell === 2).map((n) => n.vector);
   if (second.length !== 6 || neighbours[0]!.filter((n) => n.shell === 1).length !== 12)
-    throw new MagneticError('not-fcc', 'The magnetic sublattice is not face-centred cubic (12 nearest and 6 second neighbours expected).');
+    throw new MagneticError(
+      'not-fcc',
+      'The magnetic sublattice is not face-centred cubic (12 nearest and 6 second neighbours expected).',
+    );
   const cube = axesFromVectors(second, 'second-neighbour');
   orthogonal(cube, 'not-fcc', 'cubic');
   const u = orderAxes(cube, s.lattice);
@@ -286,7 +338,20 @@ export function fccGrid(s: Structure, sites: readonly number[], opts: NeighbourO
         for (const b of [1, -1])
           nn.push([0, 1, 2].map((c) => a * half[i]![c]! + b * half[j]![c]!) as unknown as Vec3);
   matchAll(neighbours, 1, nn, 'not-fcc', 'nearest');
-  matchAll(neighbours, 2, u.flatMap((e) => [e, [-e[0], -e[1], -e[2]] as Vec3]), 'not-fcc', 'second');
+  matchAll(
+    neighbours,
+    2,
+    u.flatMap((e) => [e, [-e[0], -e[1], -e[2]] as Vec3]),
+    'not-fcc',
+    'second',
+  );
   const g = gridCoords(s, sites, half, 'not-fcc');
-  return { kind: 'fcc-half-cube', axes: half, ...g, defaultAxis: 2, defaultAxisReason: 'the [111] body diagonal of the grid', sites: [...sites] };
+  return {
+    kind: 'fcc-half-cube',
+    axes: half,
+    ...g,
+    defaultAxis: 2,
+    defaultAxisReason: 'the [111] body diagonal of the grid',
+    sites: [...sites],
+  };
 }
