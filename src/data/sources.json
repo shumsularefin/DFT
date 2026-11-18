@@ -5,7 +5,7 @@
     "usedFor": "Ionic radii (M8, M10)",
     "access": "paywalled; table widely mirrored",
     "status": "cited-from-memory",
-    "notes": "34 textbook anchor values agree with pymatgen's table (`tests/reference/perovskite_reference.json`), but the anchors were not independent of pymatgen output (several had been seen first), so this is a consistency check only. Independent check and completeness: Q-002"
+    "notes": "34 textbook anchor values agree with pymatgen's table (`tests/reference/perovskite_reference.json`), but the anchors were not independent of pymatgen output (several had been seen first), so this is a consistency check only. M8.1 (2026-11-18): all 491 shared entries of `src/data/shannon-radii.json` equal the Imperial College online database (http://abulafia.mt.ic.ac.uk/shannon/radius.php, which states its data are from this paper) exactly, ionic and crystal; that database is a second transcription, not the paper itself. Details: Q-002"
   },
   {
     "id": "S-002",
