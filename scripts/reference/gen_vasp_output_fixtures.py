@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Format-validated VASP output fixtures for the parsers (stages M4.1 and M7.5).
+"""Format-validated VASP output fixtures for the parsers (stages M4.1, M7.5 and M13.3).
 
 These are synthetic files (made-up numbers, NOT results of any calculation). What makes them
 useful as golden data is that an independent implementation, pymatgen, either wrote them (CHGCAR)
@@ -17,7 +17,7 @@ import warnings
 import numpy as np
 from pymatgen.core import Lattice, Structure
 from pymatgen.io.vasp import Poscar
-from pymatgen.io.vasp.outputs import Chgcar, Eigenval, Oszicar, Xdatcar
+from pymatgen.io.vasp.outputs import Chgcar, Eigenval, Outcar, Oszicar, Xdatcar
 
 warnings.filterwarnings("ignore")
 OUT = pathlib.Path(__file__).resolve().parents[2] / "tests" / "reference" / "vasp-outputs"
@@ -165,6 +165,43 @@ def doscar_fixture(expected):
     }
 
 
+def _mag_table(rows, cols):
+    """The per-site 'magnetization (x)' block as VASP prints it with LORBIT = 11 (columns s p d [f] tot)."""
+    out = [" magnetization (x)", " ", "# of ion       " + "       ".join(cols) + "       tot", "-" * 42]
+    for i, r in enumerate(rows, 1):
+        out.append(f"    {i}" + "".join(f"   {v:7.3f}" for v in r) + f"   {sum(r):7.3f}")
+    out.append("-" * 50)
+    out.append("tot    " + "".join(f"   {sum(r[k] for r in rows):7.3f}" for k in range(len(cols)))
+               + f"   {sum(map(sum, rows)):7.3f}")
+    return out
+
+
+def _outcar_head(nions):
+    # Header lines pymatgen's Outcar needs before it reaches the magnetization tables.
+    return [" vasp.6.4.2 18Apr23 (build) complex",
+            f"   number of dos      NEDOS =    301   number of ions     NIONS =      {nions}",
+            "   k-points           NKPTS =      4   k-points in BZ     NKDIM =      4   number of bands    NBANDS=     24",
+            " total plane-waves  NPLWV =  32768",
+            "   ISPIN  =      2    spin polarized calculation?",
+            "   IBRION =     -1    ionic relax: 0-MD 1-quasi-New 2-CG"]
+
+
+def outcar_magnetization_fixture(expected):
+    # Two tables in one file: the reader must keep the last one (the final ionic step).
+    spd = _outcar_head(3) + _mag_table([[0.01, 0.02, 2.0], [0.0, 0.0, -1.9], [0.0, 0.0, 0.0]], ["s", "p", "d"]) + [
+        "", " number of electron      40.0000000 magnetization       0.0010000", ""] + _mag_table(
+        [[-0.012, -0.034, 3.456], [0.012, 0.034, -3.456], [0.0, 0.001, 0.0]], ["s", "p", "d"]) + [""]
+    spdf = _outcar_head(2) + _mag_table([[0.002, 0.011, 0.105, 6.812], [-0.002, -0.011, -0.105, -6.790]],
+                                        ["s", "p", "d", "f"]) + [
+        "", " number of electron      30.0000000 magnetization       0.0220000", ""]
+    for name, lines in (("OUTCAR_mag_spd", spd), ("OUTCAR_mag_spdf", spdf)):
+        (OUT / name).write_text("\n".join(lines) + "\n")
+        o = Outcar(str(OUT / name))
+        expected[name] = {"reader": "pymatgen Outcar (magnetization, total_mag)",
+                          "magnetization": [{k: float(v) for k, v in site.items()} for site in o.magnetization],
+                          "total_mag": float(o.total_mag)}
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     expected = {"_meta": {"generator": "scripts/reference/gen_vasp_output_fixtures.py",
@@ -174,6 +211,7 @@ def main():
     oszicar_fixture(expected)
     xdatcar_fixture(expected)
     doscar_fixture(expected)
+    outcar_magnetization_fixture(expected)
     (OUT / "expected.json").write_text(json.dumps(expected, indent=1) + "\n")
     for k, v in expected.items():
         if k != "_meta":

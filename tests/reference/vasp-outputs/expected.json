@@ -426,5 +426,49 @@
    4.3066e-07,
    1.4447e-10
   ]
+ },
+ "OUTCAR_mag_spd": {
+  "reader": "pymatgen Outcar (magnetization, total_mag)",
+  "magnetization": [
+   {
+    "s": -0.012,
+    "p": -0.034,
+    "d": 3.456,
+    "tot": 3.41
+   },
+   {
+    "s": 0.012,
+    "p": 0.034,
+    "d": -3.456,
+    "tot": -3.41
+   },
+   {
+    "s": 0.0,
+    "p": 0.001,
+    "d": 0.0,
+    "tot": 0.001
+   }
+  ],
+  "total_mag": 0.001
+ },
+ "OUTCAR_mag_spdf": {
+  "reader": "pymatgen Outcar (magnetization, total_mag)",
+  "magnetization": [
+   {
+    "s": 0.002,
+    "p": 0.011,
+    "d": 0.105,
+    "f": 6.812,
+    "tot": 6.93
+   },
+   {
+    "s": -0.002,
+    "p": -0.011,
+    "d": -0.105,
+    "f": -6.79,
+    "tot": -6.908
+   }
+  ],
+  "total_mag": 0.022
  }
 }

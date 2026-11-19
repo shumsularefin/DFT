@@ -1,5 +1,5 @@
 // OUTCAR parser. Pure, tolerant: a missing optional item is simply absent, unknown formats produce warnings.
-// @source S-019, S-041 (Field Handbook OUTCAR grep list), S-042, D-015
+// @source S-019, S-041 (Field Handbook OUTCAR grep list), S-042, D-015, S-034 (pymatgen Outcar magnetization table)
 // Line formats are from the documentation and hand-written fixtures; not yet validated on real output (Q-008).
 import { NUM_SRC, toNum } from './num';
 
@@ -24,6 +24,26 @@ export interface ForcesBlock {
   drift?: [number, number, number];
 }
 
+/** One row of the per-site "magnetization (x)" table (LORBIT = 10 or 11). Bohr magnetons. */
+export interface SiteMagnetization {
+  /** 1-based ion number as printed. */
+  ion: number;
+  /** Orbital columns in the order printed (s, p, d, and f when present). A missing column is simply absent. */
+  values: Record<string, number>;
+  /** The printed "tot" column, or the sum of the orbital columns when the file has no tot column. */
+  tot: number;
+}
+
+export interface MagnetizationTable {
+  /** Line of the "magnetization (x)" heading. */
+  line: number;
+  /** Orbital column names from the header, without "tot". */
+  columns: string[];
+  sites: SiteMagnetization[];
+  /** The "tot" row at the foot of the table, by column (including "tot"), when printed. */
+  total?: Record<string, number>;
+}
+
 export interface OutcarResult {
   /** VASP version string such as "6.3.2" when found. */
   version?: string;
@@ -44,6 +64,8 @@ export interface OutcarResult {
   elapsedSec?: Found<number>;
   /** Last "magnetization" value in the electron count line. */
   magnetization?: Found<number>;
+  /** The last per-site "magnetization (x)" table, which belongs to the final ionic step. */
+  siteMagnetization?: MagnetizationTable;
   /** Last "volume of cell :" value, cubic angstrom (S-042 reads the E(V) volume from this line). */
   volume?: Found<number>;
   /** One per electronic loop: true when EDIFF was reached. */
@@ -72,6 +94,49 @@ const R = {
   ediffYes: /aborting loop because EDIFF is reached/,
   ediffNo: /aborting loop EDIFF was not reached/,
 };
+
+/** Read one "magnetization (x)" table starting at its heading line i. Same layout pymatgen's Outcar reads (S-034). */
+function readMagTable(lines: string[], i: number): MagnetizationTable | undefined {
+  let h = i + 1;
+  while (h < lines.length && h <= i + 4 && !lines[h]!.trim().startsWith('# of ion')) h++;
+  const head = lines[h]?.trim();
+  if (!head?.startsWith('# of ion')) return undefined;
+  const names = head.slice('# of ion'.length).trim().split(/\s+/).filter(Boolean);
+  const totAt = names.indexOf('tot');
+  const columns = names.filter((n) => n !== 'tot');
+  const sites: SiteMagnetization[] = [];
+  let total: Record<string, number> | undefined;
+  for (let j = h + 1; j < lines.length; j++) {
+    const t = lines[j]!.trim();
+    if (/^-+$/.test(t)) continue;
+    if (t === '') break;
+    const parts = t.split(/\s+/);
+    if (parts[0] === 'tot') {
+      const v = parts.slice(1).map(toNum);
+      total = {};
+      names.forEach((n, k) => {
+        if (k < v.length && Number.isFinite(v[k]!)) total![n] = v[k]!;
+      });
+      break;
+    }
+    if (!/^\d+$/.test(parts[0]!)) break;
+    const v = parts.slice(1).map(toNum);
+    if (!v.length || !v.every(Number.isFinite)) break;
+    const values: Record<string, number> = {};
+    let tot: number | undefined;
+    names.forEach((n, k) => {
+      if (k >= v.length) return;
+      if (k === totAt) tot = v[k]!;
+      else values[n] = v[k]!;
+    });
+    sites.push({
+      ion: Number(parts[0]),
+      values,
+      tot: tot ?? Object.values(values).reduce((a, b) => a + b, 0),
+    });
+  }
+  return sites.length ? { line: i + 1, columns, sites, ...(total ? { total } : {}) } : undefined;
+}
 
 /** Parse OUTCAR text. Never throws; see `warnings` for what could not be read. */
 export function parseOutcar(text: string): OutcarResult {
@@ -133,6 +198,10 @@ export function parseOutcar(text: string): OutcarResult {
       out.reachedRequiredAccuracyLine = ln;
     }
     if ((m = R.elapsed.exec(s))) out.elapsedSec = { value: toNum(m[1]!), line: ln };
+    if (s.trim() === 'magnetization (x)') {
+      const tab = readMagTable(lines, i);
+      if (tab) out.siteMagnetization = tab;
+    }
     if ((m = R.magnet.exec(s))) out.magnetization = { value: toNum(m[2]!), line: ln };
     if (R.ediffYes.test(s)) out.electronicLoops.push({ line: ln, reached: true });
     else if (R.ediffNo.test(s)) out.electronicLoops.push({ line: ln, reached: false });

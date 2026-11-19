@@ -173,6 +173,60 @@ test.describe('magnetic tool', () => {
     await expect(page.getByRole('checkbox', { name: /Configuration 01/ })).toBeVisible();
   });
 
+  test('analyse: typed energies rank per magnetic ion, the J fit carries its convention, and an OUTCAR is checked', async ({
+    page,
+  }) => {
+    await load(page, STO, mag.orderings[STO]!.magnetic_element);
+    await page.getByRole('tab', { name: 'FM' }).click();
+    const magmom = (await page.getByTestId('magmom').textContent())!.trim();
+    await page.getByRole('tab', { name: 'Analyse' }).click();
+    const nMag = mag.common_supercell[STO]!.det;
+    // Energies from J1 = 3 meV, H = +J sum over bonds once, unit spins: per ion c1 = (parallel - antiparallel) / 2.
+    const c1: Record<string, number> = { FM: 3, A: 1, C: -1, G: -3 };
+    for (const [k, c] of Object.entries(c1))
+      await page.getByLabel(`Total energy of ${k}, eV per cell`).fill(String((-10 + c * 0.003) * nMag));
+    const rank = page.getByTestId('mg-ranking');
+    await expect(rank.locator('tbody tr').first()).toContainText('G');
+    await expect(rank).toContainText('-18.00');
+    await expect(page.getByRole('img', { name: /Bar chart of energy relative to FM/ })).toBeVisible();
+    await expect(page.getByTestId('mg-convention')).toContainText('each bond');
+    const fit = page.getByTestId('mg-fit');
+    await expect(fit).toContainText('J1');
+    await expect(fit).toContainText('3.00');
+    await expect(fit).toContainText('Convention: H = E0 +');
+    await expect(page.getByText(/No Néel or Curie temperature/)).toBeVisible();
+    await page.getByLabel('Pairs').selectOption('twice');
+    await expect(fit).toContainText('1.50');
+
+    // An OUTCAR written here from the FM MAGMOM, with every moment at 90 percent of its start.
+    const values = magmom.split(/\s+/).flatMap((t) => {
+      const [n, v] = t.includes('*') ? t.split('*') : ['1', t];
+      return Array.from({ length: Number(n) }, () => Number(v));
+    });
+    const table = [
+      ' vasp.6.4.2 18Apr23 (build) complex',
+      ' magnetization (x)',
+      ' ',
+      '# of ion       s       p       d       tot',
+      '------------------------------------------',
+      ...values.map(
+        (v, i) => `    ${i + 1}    0.000   0.000   ${(0.9 * v).toFixed(3)}   ${(0.9 * v).toFixed(3)}`,
+      ),
+      '------------------------------------------',
+      '',
+    ].join('\n');
+    await page.getByLabel('OSZICAR or OUTCAR for FM').setInputFiles({
+      name: 'OUTCAR',
+      mimeType: 'text/plain',
+      buffer: Buffer.from(table),
+    });
+    await expect(page.getByRole('heading', { name: /FM: pattern kept/ })).toBeVisible();
+    await expect(page.getByTestId('mg-sites-FM').locator('tbody tr')).toHaveCount(nMag);
+    await axe(page);
+    const w = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
+    expect(w).toBe(true);
+  });
+
   test('works at 360 px, axe clean', async ({ page }) => {
     await load(page, STO, mag.orderings[STO]!.magnetic_element);
     await axe(page);

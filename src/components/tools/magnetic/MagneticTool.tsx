@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import Scene from '../../scene/Scene';
 import Badge from '../../ui/Badge';
 import { readStructure } from '../../../lib/crystal/io';
@@ -45,8 +45,11 @@ import {
 } from './magneticModel';
 import './magnetic.css';
 
+const AnalysePanel = lazy(() => import('./AnalysePanel'));
+
 const MAX_BYTES = 25 * 1024 * 1024;
-type Tab = NamedKind | 'custom' | 'enumerate';
+type BuildTab = NamedKind | 'custom' | 'enumerate';
+type Tab = BuildTab | 'analyse';
 const TABS: { id: Tab; label: string }[] = [
   { id: 'FM', label: 'FM' },
   { id: 'A', label: 'A-type' },
@@ -55,6 +58,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'RS2', label: 'Rock-salt II' },
   { id: 'custom', label: 'Custom' },
   { id: 'enumerate', label: 'Enumerate' },
+  { id: 'analyse', label: 'Analyse' },
 ];
 const num = (t: string | undefined): number => (t === undefined || t.trim() === '' ? NaN : Number(t));
 
@@ -68,6 +72,12 @@ export default function MagneticTool() {
   const [elements, setElements] = useState<string[]>([]);
   const [mags, setMags] = useState<Record<string, string>>({});
   const [tab, setTab] = useState<Tab>('G');
+  // The Analyse tab works on the set from the last build tab (named batch, custom or enumerated).
+  const [lastBuild, setLastBuild] = useState<BuildTab>('G');
+  useEffect(() => {
+    if (tab !== 'analyse') setLastBuild(tab);
+  }, [tab]);
+  const bt: BuildTab = tab === 'analyse' ? lastBuild : tab;
   const [axis, setAxis] = useState<Axis>('auto');
   const [common, setCommon] = useState(true);
   const [batch, setBatch] = useState<NamedKind[]>([...BATCH_DEFAULT]);
@@ -136,13 +146,13 @@ export default function MagneticTool() {
   }, [elements, mags]);
   const missing = elements.filter((e) => !((magnitudes[e] ?? 0) > 0));
 
-  const named = tab !== 'custom' && tab !== 'enumerate';
+  const named = bt !== 'custom' && bt !== 'enumerate';
   const built = useMemo(
     () =>
       structure && elements.length
-        ? buildNamed(structure, batch, named ? (tab as NamedKind) : null, axis, elements, common)
+        ? buildNamed(structure, batch, named ? (bt as NamedKind) : null, axis, elements, common)
         : { batch: [], det: 1 },
-    [structure, elements, batch, tab, named, axis, common],
+    [structure, elements, batch, bt, named, axis, common],
   );
 
   const customConfig = useMemo<MagneticConfiguration | null>(() => {
@@ -162,18 +172,18 @@ export default function MagneticTool() {
   }, [structure, signs, siteMags, magnitudes]);
 
   const active: MagneticConfiguration | null =
-    tab === 'custom'
+    bt === 'custom'
       ? customConfig
-      : tab === 'enumerate'
+      : bt === 'enumerate'
         ? (classes?.find((_, i) => chosen[0] === i) ?? classes?.[0] ?? null)
         : (built.current ?? null);
 
   const exportSet: MagneticConfiguration[] =
-    tab === 'custom'
+    bt === 'custom'
       ? customConfig && customConfig.magneticSites.length
         ? [customConfig]
         : []
-      : tab === 'enumerate'
+      : bt === 'enumerate'
         ? (classes ?? []).filter((_, i) => chosen.includes(i))
         : built.batch;
 
@@ -213,9 +223,9 @@ export default function MagneticTool() {
   const files = useMemo(
     () =>
       outputs.list.length
-        ? buildFiles(outputs.list, { magnitudes, separateCells: !common && tab !== 'custom' })
+        ? buildFiles(outputs.list, { magnitudes, separateCells: !common && bt !== 'custom' })
         : [],
-    [outputs.list, magnitudes, common, tab],
+    [outputs.list, magnitudes, common, bt],
   );
 
   const spec = useMemo(
@@ -241,7 +251,7 @@ export default function MagneticTool() {
   };
 
   const download = async (name: string, list: ConfigOutput[]) => {
-    const sub = buildFiles(list, { magnitudes, separateCells: !common && tab !== 'custom' });
+    const sub = buildFiles(list, { magnitudes, separateCells: !common && bt !== 'custom' });
     try {
       const zipped = totalBytes(sub) > ZIP_WORKER_THRESHOLD ? await zipProjectAsync(sub) : zipProject(sub);
       downloadBlob(name, zipped as BlobPart, 'application/zip');
@@ -487,7 +497,7 @@ export default function MagneticTool() {
         </div>
         <div role="tabpanel" aria-labelledby={`mg-tab-${tab}`} className="mg-panel">
           {!structure && <p>Give a cell on the left to see the ordering.</p>}
-          {structure && named && (
+          {structure && named && tab !== 'analyse' && (
             <>
               <p className="mg-note">
                 {NAMED_LABEL[tab as NamedKind]}. <a href="/handbook/">Why orderings differ (handbook)</a>.
@@ -658,7 +668,23 @@ export default function MagneticTool() {
               )}
             </>
           )}
-          {spec && (
+          {structure && tab === 'analyse' && (
+            <>
+              <p className="mg-note">
+                Analysing the {outputs.list.length} configuration(s) from the{' '}
+                {TABS.find((x) => x.id === lastBuild)!.label} tab
+                {named ? ' ("Download all" set)' : ''}. Their MAGMOM is the intended pattern.
+              </p>
+              {outputs.list.length === 0 ? (
+                <p className="mg-note">{outputs.error || 'Build some configurations first.'}</p>
+              ) : (
+                <Suspense fallback={<p>Loading the analysis...</p>}>
+                  <AnalysePanel outputs={outputs.list} />
+                </Suspense>
+              )}
+            </>
+          )}
+          {spec && tab !== 'analyse' && (
             <>
               <div className="mg-toggles">
                 <label className="mg-check">

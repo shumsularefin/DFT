@@ -1,0 +1,17 @@
+ vasp.6.4.2 18Apr23 (build) complex
+   number of dos      NEDOS =    301   number of ions     NIONS =      2
+   k-points           NKPTS =      4   k-points in BZ     NKDIM =      4   number of bands    NBANDS=     24
+ total plane-waves  NPLWV =  32768
+   ISPIN  =      2    spin polarized calculation?
+   IBRION =     -1    ionic relax: 0-MD 1-quasi-New 2-CG
+ magnetization (x)
+ 
+# of ion       s       p       d       f       tot
+------------------------------------------
+    1     0.002     0.011     0.105     6.812     6.930
+    2    -0.002    -0.011    -0.105    -6.790    -6.908
+--------------------------------------------------
+tot         0.000     0.000     0.000     0.022     0.022
+
+ number of electron      30.0000000 magnetization       0.0220000
+

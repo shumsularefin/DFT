@@ -126,3 +126,27 @@
 .mg-file input {
   max-width: 100%;
 }
+.mg-bars {
+  width: 100%;
+  max-width: 32rem;
+  height: auto;
+  font-size: 0.75rem;
+}
+.mg-bars text {
+  fill: currentColor;
+}
+.mg-bar {
+  fill: var(--accent, currentColor);
+}
+.mg-axis {
+  stroke: currentColor;
+  stroke-width: 1;
+}
+.mg-analyse h4 {
+  margin-block: var(--space-3) var(--space-1, 0.25rem);
+}
+.mg-table caption {
+  text-align: start;
+  font-size: 0.9rem;
+  padding-block: 0.25rem;
+}
