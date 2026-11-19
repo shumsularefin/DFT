@@ -108,13 +108,13 @@ const folderName = (kind: 'encut' | 'kpt', label: string) =>
 
 const header = (what: string) => `#!/bin/bash\n# ${what}\n`;
 
-export function runAllScript(folders: readonly string[], job: JobOptions): string {
+export function runAllScript(folders: readonly string[], job: JobOptions, root: string = ROOT): string {
   return [
     header('Run every test folder one after another on this machine or inside one job.'),
     '# Build POTCAR first: bash make_potcar.sh (see README.txt).',
     `NP=\${NP:-${totalCores(job)}}`,
     'cd "$(dirname "$0")" || exit 1',
-    `for d in ${folders.map((f) => `${ROOT}/${f}`).join(' ')}; do`,
+    `for d in ${folders.map((f) => `${root}/${f}`).join(' ')}; do`,
     '  if [ ! -f "$d/POTCAR" ]; then echo "No POTCAR in $d. Run make_potcar.sh first." >&2; exit 1; fi',
     `  (cd "$d" && mpirun -np "$NP" ${job.executable} > vasp.out) || echo "Run failed in $d" >&2`,
     'done',
@@ -142,7 +142,11 @@ export function collectScript(folders: readonly string[]): string {
   ].join('\n');
 }
 
-export function makePotcarScript(labels: readonly string[], folders: readonly string[]): string {
+export function makePotcarScript(
+  labels: readonly string[],
+  folders: readonly string[],
+  root: string = ROOT,
+): string {
   return [
     header(
       'Join the per-element POTCAR files of YOUR licensed library into POTCAR and copy it into every folder.',
@@ -156,7 +160,7 @@ export function makePotcarScript(labels: readonly string[], folders: readonly st
     '  if [ ! -f "$POTCAR_DIR/$l/POTCAR" ]; then echo "Missing $POTCAR_DIR/$l/POTCAR" >&2; exit 1; fi',
     'done',
     `cat ${labels.map((l) => `"$POTCAR_DIR/${l}/POTCAR"`).join(' ')} > POTCAR`,
-    `for d in ${folders.map((f) => `${ROOT}/${f}`).join(' ')}; do cp POTCAR "$d/POTCAR"; done`,
+    `for d in ${folders.map((f) => `${root}/${f}`).join(' ')}; do cp POTCAR "$d/POTCAR"; done`,
     'grep -E "ENMAX|ZVAL" POTCAR | head -n 4',
     'echo "POTCAR written and copied. Check ENMAX against the value you typed in the builder."',
     '',
@@ -301,6 +305,218 @@ export function projectReadme(
     'Plot',
     '  Drop results.csv (or the OUTCAR files) into the convergence plotter on the site. Nothing is uploaded.',
     '  Pick the smallest setting where the energy per atom changes by less than 1 meV from the next larger one.',
+    '',
+  ].join('\n');
+}
+
+// ---- equation of state (M13.6) ----------------------------------------------------------------------------
+// @source S-042 (E-V scan: 7 to 11 fixed-volume points, ISIF = 4 or 2 for cubic, IBRION = 2, NSW = 100,
+// EDIFF = 1E-6, EDIFFG = -0.005, the same ENCUT and k-mesh everywhere), S-041 (ISIF = 4 / 2 for E-V, ISTART = 2)
+
+export const EOS_ROOT = '01_eos';
+/** 0.94 to 1.06 of V0 in 7 equal steps: a convention inside the handbook's 7 to 11 points over +-5 to 10 % (D-071). */
+export const DEFAULT_VOLUME_FRACTIONS: readonly number[] = [0.94, 0.96, 0.98, 1, 1.02, 1.04, 1.06];
+
+const det3 = (m: Mat3): number =>
+  m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) -
+  m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) +
+  m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+
+/** Cell volume in cubic angstrom. */
+export const cellVolume = (lattice: Mat3): number => Math.abs(det3(lattice));
+
+export interface VolumeRun {
+  /** V / V_start. */
+  fraction: number;
+  folder: string;
+  structure: Structure;
+  /** Cubic angstrom. */
+  volume: number;
+}
+
+/** Scale the cell isotropically: every lattice vector by f^(1/3), fractional coordinates unchanged. */
+export function volumeSeries(
+  structure: Structure,
+  { fractions = DEFAULT_VOLUME_FRACTIONS }: { fractions?: readonly number[] } = {},
+): VolumeRun[] {
+  if (fractions.length === 0) throw new RangeError('Choose at least one volume.');
+  if (fractions.length > MAX_RUNS)
+    throw new RangeError(`A series of ${fractions.length} runs is too long. The limit is ${MAX_RUNS}.`);
+  const v0 = cellVolume(structure.lattice);
+  const runs = [...fractions]
+    .sort((a, b) => a - b)
+    .map((f) => {
+      if (!Number.isFinite(f) || f <= 0)
+        throw new RangeError(`Volume fraction ${f} must be a positive number.`);
+      const s = Math.cbrt(f);
+      const lattice = structure.lattice.map((r) => r.map((x) => x * s)) as unknown as Mat3;
+      return {
+        fraction: f,
+        folder: `vol_${f.toFixed(3)}`,
+        structure: { ...structure, lattice },
+        volume: v0 * f,
+      };
+    });
+  if (new Set(runs.map((r) => r.folder)).size !== runs.length)
+    throw new RangeError('Two volumes round to the same folder name (3 decimals); space them further apart.');
+  return runs;
+}
+
+/** Equal lengths and equal angles of 90, 60 or 109.47 degrees: simple, fcc or bcc primitive cubic. Heuristic. */
+export function looksCubic(lattice: Mat3, tol = 1e-4): boolean {
+  const len = lattice.map((r) => Math.hypot(...r));
+  const cos = (i: number, j: number) =>
+    (lattice[i]![0] * lattice[j]![0] + lattice[i]![1] * lattice[j]![1] + lattice[i]![2] * lattice[j]![2]) /
+    (len[i]! * len[j]!);
+  const c = [cos(0, 1), cos(0, 2), cos(1, 2)];
+  if (Math.max(...len) - Math.min(...len) > tol * Math.max(...len)) return false;
+  if (Math.max(...c) - Math.min(...c) > tol) return false;
+  // 90 (sc), 60 (fcc primitive), 109.47 (bcc primitive, cos = -1/3)
+  return [0, 0.5, -1 / 3].some((t) => Math.abs(c[0]! - t) < tol);
+}
+
+/** INCAR settings per E-V point (S-042). ENCUT and the k-mesh must stay the same in every folder. */
+export function eosEntries(base: readonly IncarEntry[], encut: number, cubic: boolean): IncarEntry[] {
+  const set: IncarEntry[] = [
+    {
+      name: 'ISIF',
+      value: cubic ? '2' : '4',
+      comment: cubic
+        ? 'cubic cell: ions only, the cell is fixed at this volume'
+        : 'shape and ions relax, the volume stays fixed',
+    },
+    { name: 'IBRION', value: '2', comment: 'conjugate gradient' },
+    { name: 'NSW', value: '100' },
+    { name: 'EDIFF', value: '1E-6' },
+    { name: 'EDIFFG', value: '-0.005', comment: 'stop when every force is below 0.005 eV/A' },
+  ];
+  const names = new Set(set.map((e) => e.name));
+  const kept = withEncut(base, encut).filter((e) => !names.has(e.name));
+  return [...kept, ...set];
+}
+
+export interface EosProjectInput {
+  structure: Structure;
+  entries: readonly IncarEntry[];
+  job: JobOptions;
+  encut: number;
+  mesh: Mesh;
+  cubic: boolean;
+  fractions?: readonly number[];
+  centering?: MeshKind;
+}
+
+export function eosCollectScript(folders: readonly string[]): string {
+  return [
+    header(
+      'Print label,volume_A3,E_sigma0,nions for every finished folder (CSV for the equation-of-state tool).',
+    ),
+    '# Volume: last "volume of cell" line. Energy: last field of "energy  without entropy" (energy(sigma->0)).',
+    'cd "$(dirname "$0")" || exit 1',
+    'echo "label,volume_A3,E_sigma0,nions"',
+    `for d in ${folders.join(' ')}; do`,
+    `  o="${EOS_ROOT}/$d/OUTCAR"`,
+    '  [ -f "$o" ] || continue',
+    '  grep -q "reached required accuracy" "$o" || echo "Not converged: $d" >&2',
+    '  V=$(grep "volume of cell" "$o" | tail -1 | awk \'{print $NF}\')',
+    '  E=$(grep "energy  without entropy" "$o" | tail -1 | awk \'{print $NF}\')',
+    '  N=$(grep "NIONS" "$o" | head -1 | awk \'{print $NF}\')',
+    '  echo "$d,$V,$E,$N"',
+    'done',
+    '',
+  ].join('\n');
+}
+
+/** One folder per volume, the same INCAR (fixed ENCUT) and KPOINTS everywhere, scripts and a README. */
+export function buildEosProject(p: EosProjectInput): Project {
+  const runs = volumeSeries(p.structure, p.fractions ? { fractions: p.fractions } : {});
+  const kind: MeshKind = p.centering ?? 'gamma';
+  const incar = writeIncar(eosEntries(p.entries, p.encut, p.cubic));
+  const kpoints = writeMeshKpoints(p.mesh, kind, [0, 0, 0], `fixed mesh for every volume`);
+  const files: VirtualFile[] = [];
+  const folders = runs.map((r) => r.folder);
+  for (const r of runs) {
+    const base = `${EOS_ROOT}/${r.folder}`;
+    files.push(
+      {
+        path: `${base}/POSCAR`,
+        content: writePoscar({
+          ...r.structure,
+          comment: `V = ${r.volume.toFixed(4)} A^3 (${r.fraction} x start)`,
+        }).text,
+      },
+      { path: `${base}/INCAR`, content: incar },
+      { path: `${base}/KPOINTS`, content: kpoints },
+      { path: `${base}/job.sh`, content: jobScript({ ...p.job, jobName: r.folder }) },
+    );
+  }
+  const warnings: string[] = [];
+  if (runs.length < 7)
+    warnings.push(
+      `${runs.length} volumes: the handbook asks for 7 to 11 points, and the fit needs at least 5 to be checked.`,
+    );
+  const lo = runs[0]!.fraction;
+  const hi = runs.at(-1)!.fraction;
+  if (lo > 1 || hi < 1)
+    warnings.push(
+      'The starting volume is outside the scanned range, so the minimum may be too. Scan on both sides.',
+    );
+  const cost = estimateCost(
+    p.structure.species.length,
+    runs.map(() => ({ mesh: p.mesh })),
+  );
+  if (cost.warn)
+    warnings.push(
+      `Heuristic size check: ${cost.atomKpoints.toLocaleString('en-US')} atom x k-point units over ${runs.length} runs. Consider fewer runs or a smaller cell.`,
+    );
+  const labels = potcarLabels(p.structure);
+  files.push(
+    { path: 'run_all.sh', content: runAllScript(folders, p.job, EOS_ROOT) },
+    { path: 'collect.sh', content: eosCollectScript(folders) },
+    { path: 'make_potcar.sh', content: makePotcarScript(labels, folders, EOS_ROOT) },
+    { path: 'README.txt', content: eosReadme(p, runs, labels) },
+  );
+  return { files, folders, warnings, cost };
+}
+
+export function eosReadme(p: EosProjectInput, runs: readonly VolumeRun[], labels: readonly string[]): string {
+  return [
+    'Equation of state: energy-volume scan',
+    'Generated by the DFT Handbook Input Builder. Check every file before you run it.',
+    '',
+    `Atoms: ${p.structure.species.length}. ${runs.length} volumes from ${runs[0]!.volume.toFixed(3)} to ${runs.at(-1)!.volume.toFixed(3)} A^3 (${runs.map((r) => r.fraction).join(', ')} x the starting cell).`,
+    `ENCUT ${p.encut} eV and the mesh ${p.mesh.join('x')} are the same in every folder.`,
+    '',
+    'Why these settings',
+    p.cubic
+      ? '  ISIF = 2: the cell is cubic, so its shape is fixed by symmetry; only ions relax (none move when every atom sits on a fixed site, which makes the run a static point).'
+      : '  ISIF = 4: ions and cell shape relax while the volume stays fixed, so each point is the lowest energy at that volume.',
+    '  Each volume is a separate fixed-volume run. An E(V) curve gives V0 and B0 without the stress tensor, so it is free of',
+    '  Pulay stress at a fixed cutoff (Workflow Handbook, EOS). Do not use ISIF = 3 for this: a volume relaxation follows',
+    '  the stress, which needs about 30 % more cutoff to converge (ENCUT = 1.3 x ENMAX for variable-cell runs).',
+    '  ISIF = 4 still changes the cell shape at a fixed cutoff; if the shape changes a lot, raise ENCUT and rerun.',
+    '  ISTART = 2 (constant basis set, read from a WAVECAR) is the other way to get a curve without Pulay contamination.',
+    '  EDIFF = 1E-6 and EDIFFG = -0.005: B0 comes from a small curvature, so noisy energies spoil it.',
+    '',
+    'Layout',
+    `  ${EOS_ROOT}/vol_<fraction>/   POSCAR INCAR KPOINTS job.sh`,
+    '  make_potcar.sh   builds POTCAR from your licensed library and copies it into every folder',
+    '  run_all.sh       runs every folder one after another (mpirun), then writes results.csv',
+    '  collect.sh       prints label,volume_A3,E_sigma0,nions as CSV',
+    '',
+    'POTCAR (you must build it yourself)',
+    `  ${POTCAR_NOTE}`,
+    `  Species order in POSCAR: ${labels.join(' ')}`,
+    '  POTCAR_DIR=/path/to/your/library bash make_potcar.sh',
+    '',
+    'Run',
+    '  Locally or inside one job:  bash run_all.sh',
+    `  On a cluster, one job per folder:  for d in ${EOS_ROOT}/*/; do (cd "$d" && ${submitCommand(p.job.scheduler, 'job.sh')}); done`,
+    '  Then collect:  bash collect.sh > results.csv',
+    '',
+    'Fit',
+    '  Drop results.csv (or the OUTCAR files) into the equation-of-state tool on the site (/tools/eos/). Nothing is uploaded.',
+    '  Check that the minimum lies inside the scanned range. If the lowest energy is at an edge, extend the scan.',
     '',
   ].join('\n');
 }

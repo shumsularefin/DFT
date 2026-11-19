@@ -44,6 +44,8 @@ export interface OutcarResult {
   elapsedSec?: Found<number>;
   /** Last "magnetization" value in the electron count line. */
   magnetization?: Found<number>;
+  /** Last "volume of cell :" value, cubic angstrom (S-042 reads the E(V) volume from this line). */
+  volume?: Found<number>;
   /** One per electronic loop: true when EDIFF was reached. */
   electronicLoops: { line: number; reached: boolean }[];
   warnings: string[];
@@ -66,6 +68,7 @@ const R = {
   accuracy: /reached required accuracy/,
   elapsed: new RegExp(String.raw`Elapsed time \(sec\):\s*${N}`),
   magnet: new RegExp(String.raw`number of electron\s+${N}\s+magnetization\s+${N}`),
+  volume: new RegExp(String.raw`volume of cell\s*:\s*${N}`),
   ediffYes: /aborting loop because EDIFF is reached/,
   ediffNo: /aborting loop EDIFF was not reached/,
 };
@@ -92,6 +95,7 @@ export function parseOutcar(text: string): OutcarResult {
     if ((m = R.enmax.exec(s))) out.enmax.push({ value: toNum(m[1]!), line: ln });
     if (!out.nkpts && (m = R.nkpts.exec(s))) out.nkpts = { value: Number(m[1]), line: ln };
     if (!out.nbands && (m = R.nbands.exec(s))) out.nbands = { value: Number(m[1]), line: ln };
+    if ((m = R.volume.exec(s))) out.volume = { value: toNum(m[1]!), line: ln };
     if ((m = R.toten.exec(s))) {
       current = { line: ln, freeEnergyTOTEN: toNum(m[1]!) };
       out.ionic.push(current);

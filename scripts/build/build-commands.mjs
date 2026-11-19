@@ -30,6 +30,12 @@ export const PAGES = [
     'Tools',
     ['kpath', 'bands', 'bandstructure', 'hpkot', 'zone'],
   ],
+  [
+    '/tools/eos/',
+    'Equation of state fit',
+    'Tools',
+    ['eos', 'birch', 'murnaghan', 'bulk', 'modulus', 'lattice', 'volume'],
+  ],
 ];
 
 /** Reads `key: value` lines from the front matter block of an MDX file. Enough for id, title, module. */

@@ -5,8 +5,11 @@ import {
   totalBytes,
   zipProject,
   zipProjectAsync,
+  DEFAULT_VOLUME_FRACTIONS,
+  buildEosProject,
   buildProject,
   encutSeries,
+  looksCubic,
   kmeshSeries,
   parseMesh,
   treeLines,
@@ -48,6 +51,10 @@ export default function SeriesPanel() {
   const [fixedText, setFixedText] = useState('');
   const [spin, setSpin] = useState(false);
   const [msg, setMsg] = useState('');
+  const [mode, setMode] = useState<'conv' | 'eos'>('conv');
+  const [fracText, setFracText] = useState(DEFAULT_VOLUME_FRACTIONS.join(' '));
+  const [cubicChoice, setCubicChoice] = useState<boolean | null>(null);
+  const cubic = cubicChoice ?? (structure ? looksCubic(structure.lattice) : false);
 
   const enm = positive(enmax);
   const sug = enm ? suggestEncut('convergence', enm) : null;
@@ -57,12 +64,19 @@ export default function SeriesPanel() {
     const errors: string[] = [];
     if (!structure) return { errors: ['Load a structure first.'], issues: [] };
     if (!enm) return { errors: ['Type the largest ENMAX from your POTCAR (in eV).'], issues: [] };
-    if (!fixedEncut) errors.push('Give the fixed ENCUT used by the k-mesh runs.');
+    if (!fixedEncut)
+      errors.push(
+        mode === 'eos'
+          ? 'Give the ENCUT used by every volume.'
+          : 'Give the fixed ENCUT used by the k-mesh runs.',
+      );
+    const fractions = mode === 'eos' ? list(fracText) : [];
+    if (!fractions) errors.push('Volume fractions must be positive numbers separated by spaces.');
     let encuts: number[] = [];
     let kruns: ReturnType<typeof kmeshSeries> = [];
     try {
-      if (doEncut) encuts = encutSeries(enm);
-      if (doK) {
+      if (mode === 'conv' && doEncut) encuts = encutSeries(enm);
+      if (mode === 'conv' && doK) {
         if (kMode === 'resolution') {
           const r = list(resText);
           if (!r) errors.push('Resolutions must be positive numbers separated by spaces.');
@@ -95,10 +109,13 @@ export default function SeriesPanel() {
     } else {
       entries = removeEntry(upsert(entries, 'ISPIN', '1'), 'MAGMOM');
     }
-    if (errors.length > 0 || !encutMesh || !fixedEncut) return { errors, issues: [] };
+    if (errors.length > 0 || !encutMesh || !fixedEncut || !fractions) return { errors, issues: [] };
     const input: ProjectInput = { structure, entries, job, encuts, encutMesh, kruns, fixedEncut };
     try {
-      const project = buildProject(input);
+      const project =
+        mode === 'eos'
+          ? buildEosProject({ structure, entries, job, encut: fixedEncut, mesh: encutMesh, cubic, fractions })
+          : buildProject(input);
       const issues: string[] = [];
       for (const f of project.files.filter((x) => x.path.endsWith('/INCAR'))) {
         const k = project.files.find((x) => x.path === f.path.replace(/INCAR$/, 'KPOINTS'))!.content;
@@ -130,6 +147,9 @@ export default function SeriesPanel() {
     job,
     rule,
     version,
+    mode,
+    fracText,
+    cubic,
   ]);
 
   const project = built.project;
@@ -142,20 +162,42 @@ export default function SeriesPanel() {
     if (!project) return;
     const big = totalBytes(project.files) > ZIP_WORKER_THRESHOLD;
     const data = big ? await zipProjectAsync(project.files) : zipProject(project.files);
-    downloadBlob('convergence-series.zip', data as BlobPart, 'application/zip');
-    setMsg('Downloaded convergence-series.zip');
+    const name = mode === 'eos' ? 'eos-series.zip' : 'convergence-series.zip';
+    downloadBlob(name, data as BlobPart, 'application/zip');
+    setMsg(`Downloaded ${name}`);
   };
 
   return (
     <div className="ib-series">
       <StructureStep />
       <section aria-labelledby="ib-cs2">
-        <h2 id="ib-cs2">2. Convergence series</h2>
-        <p>
-          Builds one folder per test run, using the <strong>convergence</strong> preset: static runs at a
-          fixed structure. Run them all, then pick the smallest setting where the energy per atom stops
-          changing.
-        </p>
+        <h2 id="ib-cs2">2. {mode === 'eos' ? 'Equation-of-state series' : 'Convergence series'}</h2>
+        <fieldset className="ib-fieldset">
+          <legend>Series type</legend>
+          <label>
+            <input type="radio" name="cs-mode" checked={mode === 'conv'} onChange={() => setMode('conv')} />{' '}
+            Convergence tests (ENCUT, k-mesh)
+          </label>
+          <label>
+            <input type="radio" name="cs-mode" checked={mode === 'eos'} onChange={() => setMode('eos')} />{' '}
+            Equation of state (energy-volume scan)
+          </label>
+        </fieldset>
+        {mode === 'eos' ? (
+          <p>
+            Builds one folder per volume: the cell is scaled the same way in every direction, and each point
+            is a fixed-volume run with the same ENCUT and k-mesh. Fit the energies in the{' '}
+            <a href="/tools/eos/">equation-of-state tool</a>. Use the ENCUT and mesh your convergence tests
+            chose. A fixed-volume E(V) curve avoids Pulay stress, so do not use ISIF = 3 here (see README.txt
+            in the zip).
+          </p>
+        ) : (
+          <p>
+            Builds one folder per test run, using the <strong>convergence</strong> preset: static runs at a
+            fixed structure. Run them all, then pick the smallest setting where the energy per atom stops
+            changing.
+          </p>
+        )}
         <p className="ib-note" role="note">
           Heuristic: the series values and the size check are rules of thumb, not predictions. Nothing is
           uploaded and no POTCAR content is made.
@@ -173,7 +215,9 @@ export default function SeriesPanel() {
             <small id="cs-enmax-help">From grep ENMAX POTCAR on your own machine.</small>
           </div>
           <div className="ib-field">
-            <label htmlFor="cs-fixed">Fixed ENCUT for the k-mesh runs (eV)</label>
+            <label htmlFor="cs-fixed">
+              {mode === 'eos' ? 'ENCUT for every volume (eV)' : 'Fixed ENCUT for the k-mesh runs (eV)'}
+            </label>
             <input
               id="cs-fixed"
               inputMode="decimal"
@@ -183,7 +227,9 @@ export default function SeriesPanel() {
             />
           </div>
           <div className="ib-field">
-            <label htmlFor="cs-emesh">Fixed mesh for the ENCUT runs</label>
+            <label htmlFor="cs-emesh">
+              {mode === 'eos' ? 'k-mesh for every volume' : 'Fixed mesh for the ENCUT runs'}
+            </label>
             <input
               id="cs-emesh"
               value={encutMeshText}
@@ -192,18 +238,48 @@ export default function SeriesPanel() {
             />
           </div>
         </div>
-        <fieldset className="ib-fieldset">
-          <legend>Which series</legend>
-          <label>
-            <input type="checkbox" checked={doEncut} onChange={(e) => setDoEncut(e.target.checked)} /> ENCUT
-            series
-            {enm ? ` (${encutSeries(enm).join(', ')} eV)` : ''}
-          </label>
-          <label>
-            <input type="checkbox" checked={doK} onChange={(e) => setDoK(e.target.checked)} /> k-mesh series
-          </label>
-        </fieldset>
-        {doK && (
+        {mode === 'eos' && (
+          <div className="ib-row">
+            <div className="ib-field">
+              <label htmlFor="cs-frac">Volumes as fractions of the loaded cell</label>
+              <input
+                id="cs-frac"
+                value={fracText}
+                onChange={(e) => setFracText(e.target.value)}
+                aria-describedby="cs-frac-help"
+              />
+              <small id="cs-frac-help">
+                Default 0.94 to 1.06 in 7 steps (a convention; the handbook asks for 7 to 11 points over 5 to
+                10 % on each side).
+              </small>
+            </div>
+            <div className="ib-field">
+              <label>
+                <input type="checkbox" checked={cubic} onChange={(e) => setCubicChoice(e.target.checked)} />{' '}
+                The cell is cubic (ISIF = 2: only ions relax). Otherwise ISIF = 4 relaxes shape and ions at
+                fixed volume.
+              </label>
+              <small>
+                Heuristic guess from the lattice:{' '}
+                {structure && looksCubic(structure.lattice) ? 'cubic' : 'not cubic'}.
+              </small>
+            </div>
+          </div>
+        )}
+        {mode === 'conv' && (
+          <fieldset className="ib-fieldset">
+            <legend>Which series</legend>
+            <label>
+              <input type="checkbox" checked={doEncut} onChange={(e) => setDoEncut(e.target.checked)} /> ENCUT
+              series
+              {enm ? ` (${encutSeries(enm).join(', ')} eV)` : ''}
+            </label>
+            <label>
+              <input type="checkbox" checked={doK} onChange={(e) => setDoK(e.target.checked)} /> k-mesh series
+            </label>
+          </fieldset>
+        )}
+        {mode === 'conv' && doK && (
           <div className="ib-row">
             <div className="ib-field">
               <label htmlFor="cs-kmode">k-mesh series from</label>

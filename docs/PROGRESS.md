@@ -6,7 +6,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 
 ## How to read this table
 
-- **Next stage to build: M12.2 (Scene library: one data format for every 3D picture, with a flat fallback), Tier B, size L.** Start it with `STAGE: NEXT`, `BASE: main`. The next Tier A stage is M13.6 (Equation of state and lattice-constant tool), size M: start it with `STAGE: NEXT`, `TIER: A`. Each builder session rewrites this line for the stage that follows.
+- **Next stage to build: M12.2 (Scene library: one data format for every 3D picture, with a flat fallback), Tier B, size L.** Start it with `STAGE: NEXT`, `BASE: main`. The next Tier A stage is M9.1 (Data pipeline, schema, validation and sample data), size L: start it with `STAGE: NEXT`, `TIER: A`. Each builder session rewrites this line for the stage that follows.
 - **Tier** says which model to open the session with. **A** = the strongest model (Opus class): stages where a subtle mistake would put a wrong number in front of a researcher. **B** = the fast model (Sonnet class): UI, content and wiring on top of tested libraries. `-` = already done.
 - **Size** says how much work it is: **S** short session, **M** one normal session, **L** a long session that may stop as `partial` and need a second one.
 - A session started on the wrong tier does not build. It names the model to switch to and stops (`docs/WORKFLOW.md` section 2, step 0).
@@ -65,7 +65,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M10.5 | Molecule editor UI | todo | M10.3, M10.4 | L | B | | | | [work order](milestones/M10-material-builder.md) |
 | M7.3 | Modules 6 and 7: VASP files and running a calculation | todo | M3.6, M4.1 | L | B | | | | [work order](milestones/M7-remaining-modules.md) |
 | M7.4 | Module 8: Convergence testing and common errors (with error finder) | todo | M7.3, M4.3 | M | B | | | | [work order](milestones/M7-remaining-modules.md) |
-| M13.6 | Equation of state and lattice-constant tool | todo | M4.1, M4.2 | M | A | | | | [work order](milestones/M13-magnetism-and-structures.md) |
+| M13.6 | Equation of state and lattice-constant tool | done | M4.1, M4.2 | M | A | main | none (pushed to main) | 2026-11-19 | [report](reports/M13.6.md), [work order](milestones/M13-magnetism-and-structures.md) |
 | M7.5 | Module 9: Analysis (with relaxation, DOS/band and charge-density tools) | todo | M7.4, M5.6, M2.1 | L | A | | | | [work order](milestones/M7-remaining-modules.md) |
 | M14.3 | Charge-density difference, spin density and planar averages | todo | M7.5, M13.5 | M | A | | | | [work order](milestones/M14-research-guidance.md) |
 | M14.1 | Calculation review: pre-flight and post-flight checks | todo | M7.4, M13.3 | L | A | | | | [work order](milestones/M14-research-guidance.md) |
@@ -86,6 +86,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 
 Newest first. One line per session: date, stage, outcome, branch.
 
+- 2026-11-19, M13.6: `physics/eos.ts` (Birch-Murnaghan and Murnaghan, Levenberg-Marquardt from the parabola start, standard errors, sampling and residual warnings) against `eos_reference.json` (pymatgen EOS and scipy curve_fit); OUTCAR volume, `eosInput.ts`, `volumeSeries` and the EOS project in `series.ts` (ISIF 4, or 2 for cubic), EOS mode in the Input Builder series step, `/tools/eos/` with residual plot and SVG/PNG/CSV export. D-071. main.
 - 2026-11-19, M10.3: `chem/molgraph.ts` (graph, SMILES and MOL through RDKit, B012 sanitization issues, CoordGen layout, SVG), `geom3d.ts` (rough 3D, L-BFGS, planarity terms; methane, CO2, ethene, benzene, water within the work-order tolerances, each under 8 ms), `molexport.ts` (XYZ, MOL, molecule in a box), RDKit worker and client, `/design/molecule-check/`, `lazy.rdkit` 2391/2500 KB; D-070, Q-045. `TIER: A`, so M12.2 (Tier B) is still next. Pushed directly to `main`.
 - 2026-11-18, M13.5: `crystal/slab.ts` and `defects.ts` (terminations, polarity, orbits, defect pairs, supercell suggestion, neutral formation energy) against `structure_tools_reference.json` (pymatgen, spglib); D-069, Q-044 closed. `TIER: A`. Pushed directly to `main`.
 - 2026-11-18, M10.2: `crystal/ops.ts` (symmetrize in the user's setting, snap to Wyckoff, standardize, wrap, merge duplicates, supercell, set lattice, geometric clean-up), `history.ts` (undo/redo), exporters POSCAR, CIF P1, CIF with symmetry and extended XYZ, all round-tripping to 1e-8; moyo mapping convention verified; D-068. Pushed directly to `main`.

@@ -24,6 +24,11 @@ const tools = [
     title: 'Brillouin zone and k-path viewer',
     text: 'See the Brillouin zone of your structure in 3D and export a k-path for a band-structure run.',
   },
+  {
+    id: 'eos',
+    title: 'Equation of state fit',
+    text: 'Fit energy-volume points to Birch-Murnaghan or Murnaghan and read V0, the bulk modulus and the lattice constant.',
+  },
 ];
 const more = [
   {
@@ -46,13 +51,14 @@ const more = [
 
 <BaseLayout
   title="Tools"
-  description="Research tools for the DFT Handbook. The input builder, convergence plotter and k-path tool are available; the others are planned."
+  description="Research tools for the DFT Handbook. The input builder, convergence plotter, k-path tool and equation-of-state fit are available; the others are planned."
 >
   <div class="container">
     <h1>Tools</h1>
     <p>
-      These tools run entirely in your browser. The input builder, the convergence plotter and the k-path tool
-      are available now. The others are not built yet, so they have no link. Each card says what it will do.
+      These tools run entirely in your browser. The input builder, the convergence plotter, the k-path tool
+      and the equation-of-state fit are available now. The others are not built yet, so they have no link.
+      Each card says what it will do.
     </p>
     <h2>Research tools</h2>
     <div class="tool-grid">
@@ -73,6 +79,10 @@ const more = [
           ) : t.id === 'kpath' ? (
             <p>
               <a href="/tools/kpath/">Open the k-path tool</a>
+            </p>
+          ) : t.id === 'eos' ? (
+            <p>
+              <a href="/tools/eos/">Open the equation-of-state fit</a>
             </p>
           ) : (
             <p>
