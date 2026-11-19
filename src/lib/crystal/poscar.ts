@@ -2,7 +2,7 @@
 // @source S-019 (VASP wiki: POSCAR), S-041 (author's Field Handbook, "Input and output files")
 import { ParseError } from './errors';
 import { cartToFrac } from './lattice';
-import { det3, scale as vscale } from './linalg';
+import { det3, scale as vscale, vecMat } from './linalg';
 import type { Mat3, Structure, Vec3 } from './types';
 
 export interface PoscarResult {
@@ -133,6 +133,8 @@ export interface WritePoscarOptions {
   comment?: string;
   /** Digits after the decimal point; default 16. */
   decimals?: number;
+  /** Coordinate mode; default 'direct' (fractional). 'cartesian' writes angstrom (scale 1.0). */
+  coordinates?: 'direct' | 'cartesian';
 }
 
 export interface WritePoscarResult {
@@ -174,10 +176,14 @@ export function writePoscar(s: Structure, opts: WritePoscarOptions = {}): WriteP
     order.map((k) => groups.get(k)!.length).join(' '),
   ];
   if (s.selective) out.push('Selective dynamics');
-  out.push('Direct');
+  const cart = opts.coordinates === 'cartesian';
+  out.push(cart ? 'Cartesian' : 'Direct');
   for (const old of permutation) {
     const f = s.selective?.[old];
-    out.push(row(s.frac[old]!) + (f ? `  ${f.map((b) => (b ? 'T' : 'F')).join(' ')}` : ''));
+    const p = s.frac[old]!;
+    out.push(
+      row(cart ? vecMat(p, s.lattice) : p) + (f ? `  ${f.map((b) => (b ? 'T' : 'F')).join(' ')}` : ''),
+    );
   }
   return { text: out.join('\n') + '\n', permutation, reordered };
 }

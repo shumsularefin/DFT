@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import MoleculeCheck from '../../components/labs/MoleculeCheck';
+---
+
+<BaseLayout
+  title="Molecule check"
+  description="Read a molecule with RDKit, check its valence, draw it, and build a rough 3D starting geometry."
+  pageClass="tool"
+>
+  <div class="container">
+    <h1>Molecule check</h1>
+    <p>
+      This page proves the molecule engine runs in a worker. RDKit (about 2.4 MB, compiled to WebAssembly) is
+      not downloaded until you press a button, and your browser keeps it for the next visit.
+    </p>
+    <MoleculeCheck client:load headingLevel={2} />
+  </div>
+</BaseLayout>
