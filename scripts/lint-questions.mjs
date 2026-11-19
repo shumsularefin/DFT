@@ -43,6 +43,10 @@ export const PLOT_IDS = [
   'ediff-trace',
   'force-band',
   'sigma-width',
+  'file-flow',
+  'restart-chain',
+  'oszicar-trace',
+  'parallel-split',
 ];
 
 function walk(dir) {

@@ -307,6 +307,9 @@
   stroke: var(--accent);
   stroke-width: 2.5;
 }
+.vp-hot .vp-curve {
+  stroke-width: 4;
+}
 .qc-figure-static {
   margin: var(--space-2) 0;
 }

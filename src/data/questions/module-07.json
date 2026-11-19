@@ -1,0 +1,884 @@
+[
+  {
+    "id": "q-wf-1",
+    "concepts": [
+      "five-step-protocol"
+    ],
+    "type": "single",
+    "prompt": "In the author's protocol, why does the SCF follow the relaxation in the same folder?",
+    "options": [
+      {
+        "text": "ISTART = 1 reads the WAVECAR the relaxation left, so the SCF starts close to the answer",
+        "correct": true,
+        "why": "The same folder carries the wavefunctions over to the next stage."
+      },
+      {
+        "text": "Because VASP requires every run in one folder",
+        "correct": false,
+        "why": "Runs in separate folders work; the author keeps this pair together for the restart."
+      },
+      {
+        "text": "Because the SCF needs a different POTCAR",
+        "correct": false,
+        "why": "The POTCAR stays the same between the two stages."
+      }
+    ],
+    "hints": [
+      "What does ISTART = 1 read?",
+      "Where did the relaxation write it?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "restart-chain",
+      "params": {
+        "focus": ""
+      },
+      "caption": "Relaxation writes files, and the SCF reads them from the same folder.",
+      "alt": "Three stages in a row, relaxation then SCF in the same folder then a band or density-of-states run, with the file that travels along each arrow."
+    }
+  },
+  {
+    "id": "q-wf-2",
+    "concepts": [
+      "five-step-protocol"
+    ],
+    "type": "single",
+    "prompt": "Which settings must be identical between the SCF and a band run with ICHARG = 11?",
+    "options": [
+      {
+        "text": "ENCUT, ISPIN, MAGMOM, LMAXMIX, the functional and any LDAU tags",
+        "correct": true,
+        "why": "The run inherits its physics from the CHGCAR, so these must match."
+      },
+      {
+        "text": "Only NSW and LWAVE",
+        "correct": false,
+        "why": "These control what to write, not the physics."
+      },
+      {
+        "text": "Nothing, because ICHARG = 11 ignores the INCAR",
+        "correct": false,
+        "why": "Only the density is fixed; the other tags still define the problem."
+      }
+    ],
+    "hints": [
+      "What does the CHGCAR carry?",
+      "Which tags define the energy functional?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "restart-chain",
+      "params": {
+        "focus": "CHGCAR"
+      },
+      "caption": "The CHGCAR travels from the SCF to the band run.",
+      "alt": "Three stages in a row, relaxation then SCF in the same folder then a band or density-of-states run, with the file that travels along each arrow."
+    }
+  },
+  {
+    "id": "q-wf-3",
+    "concepts": [
+      "five-step-protocol"
+    ],
+    "type": "single",
+    "prompt": "Why does the author comment out NCORE for the elastic-constants run?",
+    "options": [
+      {
+        "text": "IBRION = 6 runs without band parallelisation, so NCORE can stop the run",
+        "correct": true,
+        "why": "The finite-difference elastic run does not use band groups."
+      },
+      {
+        "text": "NCORE only works for relaxations",
+        "correct": false,
+        "why": "NCORE is used in many kinds of runs."
+      },
+      {
+        "text": "NCORE makes the elastic constants wrong",
+        "correct": false,
+        "why": "It affects whether the run starts, not the numbers."
+      }
+    ],
+    "hints": [
+      "What does NCORE set?",
+      "What does IBRION = 6 not use?"
+    ],
+    "difficulty": 2,
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-041"
+    ],
+    "visual": {
+      "plot": "parallel-split",
+      "params": {
+        "ranks": 16,
+        "kpar": 1,
+        "ncore": 4
+      },
+      "caption": "NCORE is the number of ranks that share one band.",
+      "alt": "A row of MPI ranks split into k-point groups by KPAR, and each group split into band groups by NCORE."
+    }
+  },
+  {
+    "id": "q-wf-4",
+    "concepts": [
+      "five-step-protocol"
+    ],
+    "type": "single",
+    "prompt": "For the optical step, the author triples NBANDS and rounds up. Why round up?",
+    "options": [
+      {
+        "text": "VASP wants NBANDS divisible by the number of cores (or by NCORE)",
+        "correct": true,
+        "why": "VASP itself raises NBANDS to a divisible number, so choosing one saves surprises."
+      },
+      {
+        "text": "Because a smaller NBANDS crashes",
+        "correct": false,
+        "why": "A smaller NBANDS gives poorer optics, not a crash."
+      },
+      {
+        "text": "Because the OUTCAR lists only round numbers",
+        "correct": false,
+        "why": "The OUTCAR lists whatever number VASP used."
+      }
+    ],
+    "hints": [
+      "What must divide NBANDS?",
+      "What does VASP do if it does not?"
+    ],
+    "difficulty": 2,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "INCAR",
+          "OUTCAR"
+        ]
+      },
+      "caption": "NBANDS is read from the OUTCAR and set in the INCAR.",
+      "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
+    }
+  },
+  {
+    "id": "q-js-1",
+    "concepts": [
+      "job-scripts"
+    ],
+    "type": "single",
+    "prompt": "What are the three parts of a job script?",
+    "options": [
+      {
+        "text": "Requests to the scheduler, setup of the folder and modules, and the launch line",
+        "correct": true,
+        "why": "The script asks for resources, prepares the environment and starts VASP."
+      },
+      {
+        "text": "INCAR, KPOINTS and POSCAR",
+        "correct": false,
+        "why": "These are the input files, not parts of the job script."
+      },
+      {
+        "text": "Relax, SCF and bands",
+        "correct": false,
+        "why": "These are calculation stages, not parts of a script."
+      }
+    ],
+    "hints": [
+      "What does #SBATCH ask for?",
+      "What does srun vasp_std do?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "INCAR",
+          "POSCAR",
+          "KPOINTS",
+          "POTCAR"
+        ]
+      },
+      "caption": "The job script launches VASP, which reads the four input files.",
+      "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
+    }
+  },
+  {
+    "id": "q-js-2",
+    "concepts": [
+      "job-scripts"
+    ],
+    "type": "single",
+    "prompt": "You request 32 ranks and set KPAR = 5. What happens?",
+    "options": [
+      {
+        "text": "The ranks cannot be split evenly into 5 groups, so VASP stops with an error",
+        "correct": true,
+        "why": "The number of ranks must be divisible by KPAR."
+      },
+      {
+        "text": "VASP uses 30 ranks and ignores 2",
+        "correct": false,
+        "why": "VASP does not silently drop ranks."
+      },
+      {
+        "text": "The run is correct but slow",
+        "correct": false,
+        "why": "It does not start with unequal groups."
+      }
+    ],
+    "hints": [
+      "Is 32 divisible by 5?",
+      "What must divide the number of ranks?"
+    ],
+    "difficulty": 2,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "parallel-split",
+      "params": {
+        "ranks": 32,
+        "kpar": 5,
+        "ncore": 1
+      },
+      "caption": "KPAR must divide the number of ranks.",
+      "alt": "A row of MPI ranks split into k-point groups by KPAR, and each group split into band groups by NCORE."
+    }
+  },
+  {
+    "id": "q-js-3",
+    "concepts": [
+      "job-scripts"
+    ],
+    "type": "single",
+    "prompt": "With 32 ranks, KPAR = 4 and NCORE = 4, how many ranks share one k-point group?",
+    "options": [
+      {
+        "text": "8, because 32 divided by 4 groups gives 8 ranks per group",
+        "correct": true,
+        "why": "KPAR splits the ranks into 4 groups, each of 8."
+      },
+      {
+        "text": "4, because NCORE is 4",
+        "correct": false,
+        "why": "NCORE splits each group again into bands, it does not give the group size."
+      },
+      {
+        "text": "32, because every group uses all ranks",
+        "correct": false,
+        "why": "The groups share the ranks between them."
+      }
+    ],
+    "hints": [
+      "First divide by KPAR.",
+      "NCORE then divides the ranks inside a group."
+    ],
+    "difficulty": 2,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "parallel-split",
+      "params": {
+        "ranks": 32,
+        "kpar": 4,
+        "ncore": 4
+      },
+      "caption": "Ranks split into k-point groups by KPAR, then into band groups by NCORE.",
+      "alt": "A row of MPI ranks split into k-point groups by KPAR, and each group split into band groups by NCORE."
+    }
+  },
+  {
+    "id": "q-js-4",
+    "concepts": [
+      "job-scripts"
+    ],
+    "type": "single",
+    "prompt": "What should you do about the module and queue names in a template job script?",
+    "options": [
+      {
+        "text": "Replace them with the names from your own cluster's documentation",
+        "correct": true,
+        "why": "They are placeholders; clusters differ."
+      },
+      {
+        "text": "Keep them, because they are universal",
+        "correct": false,
+        "why": "They are placeholders and differ between clusters."
+      },
+      {
+        "text": "Delete the lines, because VASP does not need modules",
+        "correct": false,
+        "why": "Most clusters need the module line to find VASP."
+      }
+    ],
+    "hints": [
+      "Are cluster names the same everywhere?",
+      "Where would you find yours?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "none": "The answer is about cluster-specific names, so a picture would only restate the answer text."
+    }
+  },
+  {
+    "id": "q-rs-1",
+    "concepts": [
+      "restart-files"
+    ],
+    "type": "single",
+    "prompt": "Which tag setting reads the charge density from CHGCAR and keeps it fixed?",
+    "options": [
+      {
+        "text": "ICHARG = 11",
+        "correct": true,
+        "why": "11 is the non-self-consistent choice used for band structures and dense-mesh DOS."
+      },
+      {
+        "text": "ISTART = 0",
+        "correct": false,
+        "why": "ISTART = 0 starts fresh with random wavefunctions."
+      },
+      {
+        "text": "ICHARG = 2",
+        "correct": false,
+        "why": "2 builds the density from atomic densities."
+      }
+    ],
+    "hints": [
+      "Which tag concerns the charge density?",
+      "Which value means fixed?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "restart-chain",
+      "params": {
+        "focus": "CHGCAR"
+      },
+      "caption": "ICHARG = 11 reads the CHGCAR and keeps it fixed.",
+      "alt": "Three stages in a row, relaxation then SCF in the same folder then a band or density-of-states run, with the file that travels along each arrow."
+    }
+  },
+  {
+    "id": "q-rs-2",
+    "concepts": [
+      "restart-files"
+    ],
+    "type": "single",
+    "prompt": "Why can you not trust the total energy from an ICHARG = 11 run?",
+    "options": [
+      {
+        "text": "The potential is frozen at the SCF density, so the run only gives eigenvalues for that density",
+        "correct": true,
+        "why": "The density is not iterated, so the energy is not comparable with a self-consistent one."
+      },
+      {
+        "text": "Because the run uses a different POTCAR",
+        "correct": false,
+        "why": "The POTCAR does not change."
+      },
+      {
+        "text": "Because ICHARG = 11 uses fewer k-points",
+        "correct": false,
+        "why": "The k-points are whatever you gave, usually a path."
+      }
+    ],
+    "hints": [
+      "Does the density update in this run?",
+      "What does the run compute then?"
+    ],
+    "difficulty": 2,
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "oszicar-trace",
+      "params": {
+        "dE": [
+          10,
+          0.1,
+          0.001,
+          1e-05,
+          1e-07
+        ],
+        "ediff": 0.0001
+      },
+      "caption": "An SCF loop converges; an ICHARG = 11 run skips this iteration.",
+      "alt": "Curve of the change in energy per electronic step on a logarithmic axis, falling step by step, with a dashed horizontal line at the EDIFF threshold."
+    }
+  },
+  {
+    "id": "q-rs-3",
+    "concepts": [
+      "restart-files"
+    ],
+    "type": "single",
+    "prompt": "What does ISTART = 1 do?",
+    "options": [
+      {
+        "text": "Reads the WAVECAR and keeps ENCUT constant, rebuilding the basis for the new cell",
+        "correct": true,
+        "why": "It is the default when a WAVECAR exists and is the SCF-after-relax setting."
+      },
+      {
+        "text": "Starts from random wavefunctions",
+        "correct": false,
+        "why": "That is ISTART = 0."
+      },
+      {
+        "text": "Reads CHGCAR and fixes it",
+        "correct": false,
+        "why": "That is ICHARG = 11."
+      }
+    ],
+    "hints": [
+      "Which file does it read?",
+      "Which tag chooses the density?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "restart-chain",
+      "params": {
+        "focus": "CONTCAR"
+      },
+      "caption": "The SCF stage copies the geometry and reads the wavefunctions from the relaxation.",
+      "alt": "Three stages in a row, relaxation then SCF in the same folder then a band or density-of-states run, with the file that travels along each arrow."
+    }
+  },
+  {
+    "id": "q-rs-4",
+    "concepts": [
+      "restart-files"
+    ],
+    "type": "single",
+    "prompt": "You change MAGMOM between the SCF and the band run. What is the problem?",
+    "options": [
+      {
+        "text": "The band run reads a density from a different magnetic state than the one you ask for",
+        "correct": true,
+        "why": "The CHGCAR carries the physics, so ISPIN and MAGMOM must match."
+      },
+      {
+        "text": "None, because MAGMOM only affects speed",
+        "correct": false,
+        "why": "MAGMOM sets the magnetic state, not the speed."
+      },
+      {
+        "text": "The band run will recompute the SCF",
+        "correct": false,
+        "why": "It keeps the density fixed."
+      }
+    ],
+    "hints": [
+      "What carries the magnetic state from the SCF?",
+      "Does the band run iterate?"
+    ],
+    "difficulty": 2,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "restart-chain",
+      "params": {
+        "focus": "CHGCAR"
+      },
+      "caption": "The CHGCAR carries the magnetic state to the band run.",
+      "alt": "Three stages in a row, relaxation then SCF in the same folder then a band or density-of-states run, with the file that travels along each arrow."
+    }
+  },
+  {
+    "id": "q-ro-1",
+    "concepts": [
+      "output-files"
+    ],
+    "type": "single",
+    "prompt": "In OSZICAR, how do you tell that an electronic loop converged?",
+    "options": [
+      {
+        "text": "The last energy change is below EDIFF and the loop ended before NELM",
+        "correct": true,
+        "why": "EDIFF is the electronic threshold and NELM is the step limit."
+      },
+      {
+        "text": "The loop printed a line for every step",
+        "correct": false,
+        "why": "A line is printed for every step, converged or not."
+      },
+      {
+        "text": "The ionic step number went up",
+        "correct": false,
+        "why": "That is a different loop."
+      }
+    ],
+    "hints": [
+      "Which tag sets the electronic threshold?",
+      "What does reaching NELM mean?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-041",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "oszicar-trace",
+      "params": {
+        "dE": [
+          10,
+          0.1,
+          0.001,
+          1e-05,
+          1e-07
+        ],
+        "ediff": 0.0001
+      },
+      "caption": "The change in energy per electronic step falls below the EDIFF line.",
+      "alt": "Curve of the change in energy per electronic step on a logarithmic axis, falling step by step, with a dashed horizontal line at the EDIFF threshold."
+    }
+  },
+  {
+    "id": "q-ro-2",
+    "concepts": [
+      "output-files"
+    ],
+    "type": "single",
+    "prompt": "An electronic loop used all NELM steps. What does it mean?",
+    "options": [
+      {
+        "text": "It did not converge, and the forces from that step are not reliable",
+        "correct": true,
+        "why": "Hitting NELM means the energy change never passed EDIFF."
+      },
+      {
+        "text": "It converged slowly, which is fine",
+        "correct": false,
+        "why": "Slow is not the same as converged; the loop stopped at the limit."
+      },
+      {
+        "text": "The ionic loop converged",
+        "correct": false,
+        "why": "The two loops are separate."
+      }
+    ],
+    "hints": [
+      "Is NELM a target or a limit?",
+      "What does reaching a limit say?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-041",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "oszicar-trace",
+      "params": {
+        "dE": [
+          10,
+          1,
+          0.5,
+          0.4,
+          0.3
+        ],
+        "ediff": 0.0001
+      },
+      "caption": "A loop whose change never falls below the EDIFF line.",
+      "alt": "Curve of the change in energy per electronic step on a logarithmic axis, falling step by step, with a dashed horizontal line at the EDIFF threshold."
+    }
+  },
+  {
+    "id": "q-ro-3",
+    "concepts": [
+      "output-files"
+    ],
+    "type": "single",
+    "prompt": "Which command gives the final free energy from the OUTCAR?",
+    "options": [
+      {
+        "text": "grep TOTEN OUTCAR | tail -1",
+        "correct": true,
+        "why": "TOTEN lines hold the free energy; the last one is the final step."
+      },
+      {
+        "text": "grep E-fermi OUTCAR",
+        "correct": false,
+        "why": "That gives the Fermi level."
+      },
+      {
+        "text": "grep NBANDS OUTCAR",
+        "correct": false,
+        "why": "That gives the number of bands."
+      }
+    ],
+    "hints": [
+      "Which keyword is the total energy?",
+      "tail -1 gives the last match."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "OUTCAR"
+        ]
+      },
+      "caption": "The OUTCAR holds the final energies and the Fermi level.",
+      "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
+    }
+  },
+  {
+    "id": "q-ro-4",
+    "concepts": [
+      "output-files"
+    ],
+    "type": "single",
+    "prompt": "A relaxation job ended without error. How do you know the ionic loop converged?",
+    "options": [
+      {
+        "text": "The OUTCAR says reached required accuracy, or the forces are below your EDIFFG",
+        "correct": true,
+        "why": "The scheduler only tells you the process ended."
+      },
+      {
+        "text": "The job exited with status 0",
+        "correct": false,
+        "why": "That says the process finished, not that the physics converged."
+      },
+      {
+        "text": "The OSZICAR has many lines",
+        "correct": false,
+        "why": "Many lines can mean a long unconverged run."
+      }
+    ],
+    "hints": [
+      "Which tag sets the force threshold?",
+      "What does grep reached required accuracy find?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-041",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "force-band",
+      "params": {
+        "tol": 0.01
+      },
+      "caption": "Forces fall until they pass below the tolerance band.",
+      "alt": "Curve of the largest force falling over ionic steps on a logarithmic axis, with a horizontal band at the force tolerance."
+    }
+  },
+  {
+    "id": "q-vk-1",
+    "concepts": [
+      "vaspkit"
+    ],
+    "type": "single",
+    "prompt": "What does VASPKIT task 109 do before you submit a job?",
+    "options": [
+      {
+        "text": "It fixes the INCAR and POSCAR format and checks that POTCAR matches POSCAR",
+        "correct": true,
+        "why": "The author runs it before every submission as a check."
+      },
+      {
+        "text": "It runs the calculation",
+        "correct": false,
+        "why": "VASPKIT prepares and processes files; VASP runs the calculation."
+      },
+      {
+        "text": "It downloads the POTCAR files",
+        "correct": false,
+        "why": "It reads your own library and does not provide one."
+      }
+    ],
+    "hints": [
+      "Is it a generator or a checker?",
+      "What can go wrong with POTCAR order?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-020"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "INCAR",
+          "POSCAR",
+          "POTCAR"
+        ]
+      },
+      "caption": "A check compares the inputs before you submit.",
+      "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
+    }
+  },
+  {
+    "id": "q-vk-2",
+    "concepts": [
+      "vaspkit"
+    ],
+    "type": "single",
+    "prompt": "Why can the number for a task in an old VASPKIT note be wrong in your install?",
+    "options": [
+      {
+        "text": "Menus are renumbered and extended between releases",
+        "correct": true,
+        "why": "Check the code in your own version's menu before relying on it."
+      },
+      {
+        "text": "Because VASPKIT uses random numbers",
+        "correct": false,
+        "why": "The numbering is fixed within a release."
+      },
+      {
+        "text": "Because VASP changes the numbers",
+        "correct": false,
+        "why": "The numbering belongs to VASPKIT, not VASP."
+      }
+    ],
+    "hints": [
+      "Who defines the menu codes?",
+      "What changes between releases?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "none": "The answer is about software versions, so a picture would only restate the answer text."
+    }
+  },
+  {
+    "id": "q-vk-3",
+    "concepts": [
+      "vaspkit"
+    ],
+    "type": "single",
+    "prompt": "By default, what happens to a hand-edited INCAR when you run task 101?",
+    "options": [
+      {
+        "text": "It is overwritten, unless you set SET_INCAR_WRITE_MODE to keep a backup",
+        "correct": true,
+        "why": "The default write mode replaces the file."
+      },
+      {
+        "text": "It is merged with the template",
+        "correct": false,
+        "why": "VASPKIT does not merge files."
+      },
+      {
+        "text": "It is kept and the template is ignored",
+        "correct": false,
+        "why": "The default replaces it."
+      }
+    ],
+    "hints": [
+      "Which setting controls the write mode?",
+      "What does BACK-UP-OLD suggest?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "INCAR"
+        ]
+      },
+      "caption": "Task 101 writes a template INCAR, which can replace your own.",
+      "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
+    }
+  },
+  {
+    "id": "q-vk-4",
+    "concepts": [
+      "vaspkit"
+    ],
+    "type": "single",
+    "prompt": "Why should you read an INCAR template that VASPKIT wrote before running it?",
+    "options": [
+      {
+        "text": "A template does not know your system, so it may carry tags from another task or miss MAGMOM",
+        "correct": true,
+        "why": "Templates are starting points to check and edit."
+      },
+      {
+        "text": "Because VASPKIT often writes invalid syntax",
+        "correct": false,
+        "why": "The syntax is usually fine; the content may not suit your job."
+      },
+      {
+        "text": "Because VASP rejects any template",
+        "correct": false,
+        "why": "VASP reads it like any INCAR."
+      }
+    ],
+    "hints": [
+      "Does VASPKIT know your atoms' moments?",
+      "What is a template for?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-020"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "INCAR"
+        ]
+      },
+      "caption": "The INCAR you run is the one you checked.",
+      "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
+    }
+  }
+]

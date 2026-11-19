@@ -1,0 +1,127 @@
+---
+id: restarts-istart-icharg
+title: Restarts with ISTART and ICHARG
+module: 7
+order: 3
+summary: How ISTART and ICHARG choose the starting wavefunctions and charge density, which files each one reads, and the settings that must stay identical when one run reads another.
+concepts: [restart-files]
+requires: [vasp-workflow]
+vaspTags: [ISTART, ICHARG]
+sources: [S-019, S-041, S-042]
+noLab: true
+status: draft
+updated: 2026-11-19
+---
+
+<Why>
+
+Starting from scratch is slow and, for hard cases, may not converge. A second run can instead pick up the wavefunctions (`WAVECAR`) or the charge density (`CHGCAR`) from the first. Two tags, `ISTART` and `ICHARG`, decide what is read. The speed-up is real, but reading the wrong file, or reading it with different settings, gives results that look fine and are wrong <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+`ISTART` is about the **wavefunctions**: start fresh, or read `WAVECAR`. `ICHARG` is about the **charge density**: build it from the wavefunctions or atoms, or read `CHGCAR`.
+
+| `ISTART` | Meaning                                                                                                                                           |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0        | Fresh start, random wavefunctions. The default when no `WAVECAR` exists.                                                                          |
+| 1        | Read `WAVECAR`, keep `ENCUT` constant (the basis is rebuilt for the new cell). The default when a `WAVECAR` exists. Your SCF-after-relax setting. |
+| 2        | Read `WAVECAR`, keep the basis set constant. Used rarely, for example along a strained series.                                                    |
+
+The Field Handbook also notes that `ISTART = 3` is a full restart of a molecular dynamics run <Cite id="S-041" />.
+
+| `ICHARG` | Meaning                                                                                    |
+| -------- | ------------------------------------------------------------------------------------------ |
+| 0        | Density built from the initial wavefunctions. The default when `ISTART` is above 0.        |
+| 1        | Read `CHGCAR` and continue self-consistently. Use to restart a stalled SCF.                |
+| 2        | Superposition of atomic densities. The default for a fresh start.                          |
+| 11       | Read `CHGCAR` and keep it fixed (non-self-consistent). Band structures and dense-mesh DOS. |
+
+Both tables are from the Workflow Handbook <Cite id="S-042" />.
+
+</Intuition>
+
+<TheMath>
+
+<Level min="intermediate">
+
+With `ICHARG = 11` the Kohn-Sham equations are solved once, for the fixed density in the `CHGCAR`. The effective potential never updates, so the run gives eigenvalues at new k-points for that density and does not give a total energy you can compare with other runs. This is why the density must come from a converged SCF with the same functional, cutoff and spin setup <Cite id="S-019" />.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+**What must match.** An `ICHARG = 11` run inherits its physics from the `CHGCAR`. Keep these identical to the run that wrote it, and keep the cell the same <Cite id="S-042" />:
+
+- `ENCUT`
+- `ISPIN` and `MAGMOM`
+- `LMAXMIX`
+- the functional (`GGA`, `METAGGA`, `LHFCALC`)
+- any `LDAU` tags
+
+**Who reads what.**
+
+- The SCF after a relaxation: `ISTART = 1`, reads `WAVECAR`.
+- A band run on a path: `ICHARG = 11`, reads `CHGCAR` (route B in the workflow topic).
+- A hybrid-functional run: start from a converged PBE `WAVECAR` with `ISTART = 1` <Cite id="S-042" />.
+
+To keep the files: write them with `LWAVE = .TRUE.` and `LCHARG = .TRUE.` in the first run, and copy them to the next folder.
+
+<VaspFile
+  name="INCAR"
+  code={`ICHARG  = 11           # read CHGCAR, keep it fixed
+ENCUT   = 520          # same as the run that wrote CHGCAR
+ISPIN   = 2            # same spin settings
+MAGMOM  = 2*5.0 4*0.6  # same moments
+NSW     = 0`}
+/>
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...                       | ...in the restart                    | ...what to expect                                                                          |
+| -------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------ |
+| `ISTART` 1 to 0                        | Wavefunctions are random again       | More electronic steps, same answer                                                         |
+| `ICHARG` 2 to 1                        | The density is read and iterated     | A stalled SCF can recover                                                                  |
+| `ICHARG = 11` with a different `ENCUT` | The `CHGCAR` no longer matches       | Eigenvalues for the wrong problem                                                          |
+| A different cell                       | The files describe another structure | Errors or nonsense; restart only on the same cell (except `ISTART = 1` after a relaxation) |
+
+Why restart: it saves steps. Why match settings: the file carries the physics. What happens if you skip the check: a band structure that does not belong to the SCF.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Changing MAGMOM or ENCUT between linked runs">
+
+A band run with other moments reads a density from a different magnetic state <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Using ICHARG = 11 for a total energy">
+
+The potential is frozen, so the energy is not comparable. Use it for eigenvalues only.
+
+</Callout>
+
+<Callout variant="mistake" title="Forgetting LWAVE and LCHARG in the first run">
+
+If the file was never written, the next run starts fresh without telling you. Check the folder.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-rs-1', 'q-rs-2', 'q-rs-3', 'q-rs-4']} />
+
+<GoDeeper>
+
+- VASP wiki pages ISTART and ICHARG <Cite id="S-019" />.
+- The Field Handbook `WAVECAR`, `CHGCAR` and `CONTCAR` entries <Cite id="S-041" />.
+- The Workflow Handbook restart tables <Cite id="S-042" />.
+
+</GoDeeper>

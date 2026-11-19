@@ -809,5 +809,131 @@
     "sources": [
       "S-042"
     ]
+  },
+  {
+    "id": "poscar",
+    "label": "POSCAR",
+    "short": "The VASP input file that holds the cell, the elements and the position of every atom.",
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "incar",
+    "label": "INCAR",
+    "short": "The VASP input file of TAG = value lines that says what to calculate and how carefully.",
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "kpoints-file",
+    "label": "KPOINTS file",
+    "short": "The VASP input file that says how the Brillouin zone is sampled: a mesh, a path or a list of points.",
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "potcar",
+    "label": "POTCAR",
+    "short": "The licensed VASP input file with the pseudopotential dataset of each element. This site never shows its contents.",
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "oszicar",
+    "label": "OSZICAR",
+    "short": "A short VASP log with one line per electronic step and one per ionic step, good for watching a run live.",
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "outcar",
+    "label": "OUTCAR",
+    "short": "The long VASP log of a run: setup, every step, forces, stress, Fermi level and timing.",
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "contcar",
+    "label": "CONTCAR",
+    "short": "The most recent geometry of a run, written in POSCAR format. It is the structure you restart from.",
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "chgcar",
+    "label": "CHGCAR",
+    "short": "The file with the charge density of the last electronic step, used to restart or to run bands on a fixed density.",
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "wavecar",
+    "label": "WAVECAR",
+    "short": "The large binary file with the wavefunctions. It is the most valuable file to restart from.",
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "restart",
+    "label": "Restart",
+    "short": "Starting a new run from the wavefunctions or charge density of an earlier run, chosen with ISTART and ICHARG.",
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "ionic-step",
+    "label": "Ionic step",
+    "short": "One move of the atoms (and perhaps the cell) in a relaxation, with a full electronic calculation at each geometry.",
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "job-script",
+    "label": "Job script",
+    "short": "A short batch file that asks a cluster scheduler for cores and time and then starts VASP.",
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "mpi-rank",
+    "label": "MPI rank",
+    "short": "One of the parallel processes VASP runs on. NCORE and KPAR decide how the ranks share the work.",
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "vaspkit",
+    "label": "VASPKIT",
+    "short": "A free command-line helper that writes VASP inputs and processes outputs through numbered menu codes.",
+    "level": "beginner",
+    "sources": [
+      "S-020"
+    ]
   }
 ]

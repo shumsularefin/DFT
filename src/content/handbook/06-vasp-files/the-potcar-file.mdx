@@ -1,0 +1,113 @@
+---
+id: the-potcar-file
+title: POTCAR, the pseudopotential file
+module: 6
+order: 4
+summary: What a POTCAR is and how it is built, which header lines to read, and how to check cutoffs and valence electrons without ever opening or sharing the contents.
+concepts: [potcar-file]
+requires: [vasp-workflow]
+vaspTags: [ENCUT]
+sources: [S-019, S-041]
+noLab: true
+status: draft
+updated: 2026-11-19
+---
+
+<Why>
+
+`POTCAR` supplies the pseudopotential datasets that describe how each atom's valence electrons interact with its core. It sets the recommended cutoff (`ENMAX`), the number of valence electrons (`ZVAL`) and the functional the dataset was made for. Every `ENCUT` choice and every electron count in your run traces back to it <Cite id="S-041" />.
+
+</Why>
+
+<Intuition>
+
+VASP uses the projector augmented-wave (PAW) method. The core electrons are frozen into a dataset that rebuilds the full behaviour near the nucleus, so the plane-wave basis only has to describe the smooth valence part <Cite id="S-041" />.
+
+A `POTCAR` for several elements is the individual files joined in the same order as the element line of `POSCAR`.
+
+<Callout variant="warning" title="Licence: this site never shows POTCAR contents">
+
+The files are distributed under the VASP licence. This page explains the structure and the header fields only. You get the datasets from the VASP portal with your own licence and keep them out of public repositories and shared folders. Do not paste any part of a `POTCAR` into a chat or a forum post.
+
+</Callout>
+
+The header block of each dataset is where you read what you need. The widget below describes the fields in words, with no real data.
+
+<PseudopotentialHeader />
+
+</Intuition>
+
+<TheMath>
+
+<Level min="intermediate">
+
+The number of electrons in the run is the sum of `ZVAL` over all atoms (less any charge you add or remove with `NELECT`). The default number of bands follows from it, so a dataset with more semicore electrons (a `_pv` or `_sv` variant) raises the cost of the run <Cite id="S-041" />.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+Build the file in the same order as `POSCAR` line 6, then read only the header lines you need:
+
+<VaspFile
+  name="shell"
+  code={`cat Si/POTCAR O/POTCAR > POTCAR    # same order as POSCAR line 6
+grep TITEL  POTCAR                 # which datasets
+grep ENMAX  POTCAR                 # default cutoffs
+grep ZVAL   POTCAR                 # valence electrons
+grep LEXCH  POTCAR                 # PE = PBE, CA = LDA`}
+/>
+
+- **`TITEL`** names each dataset, so you can compare with line 6 of `POSCAR`.
+- **`ENMAX`** is the dataset's recommended cutoff. Use the largest one for `ENCUT`; for variable-cell relaxations the author uses 1.3 times it <Cite id="S-041" />.
+- **`ZVAL`** is the number of valence electrons per atom.
+- **`LEXCH`** names the functional the dataset was made for. `PE` is PBE and `CA` is LDA. VASP takes the functional from here unless `GGA`, `METAGGA` or `LHFCALC` in the `INCAR` overrides it, so keep both consistent <Cite id="S-041" />.
+- **Variants.** `_pv` and `_sv` put semicore states in the valence, `_h` is harder and `_s` is softer. They trade accuracy against cost <Cite id="S-041" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...                | ...in the dataset                | ...in VASP                                      |
+| ------------------------------- | -------------------------------- | ----------------------------------------------- |
+| A `_pv` or `_sv` variant        | More valence electrons           | Higher cost, often better transferability       |
+| Datasets in a different order   | Species no longer match `POSCAR` | A valid run with the wrong atoms: wrong results |
+| LDA datasets with a PBE `INCAR` | A mismatch of functional         | Inconsistent physics, so keep one family        |
+
+Why read the header: it is the only way to get the cutoff and electron count right. Why match the order: VASP pairs datasets and species by position. What happens if you skip the check: a clean-looking run for the wrong system.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Concatenating in the wrong order">
+
+Compare `grep TITEL POTCAR` with line 6 of `POSCAR` every time you build the file.
+
+</Callout>
+
+<Callout variant="mistake" title="Sharing a POTCAR">
+
+The licence forbids redistribution. Share the `TITEL` lines or the dataset names instead.
+
+</Callout>
+
+<Callout variant="mistake" title="Mixing functional families">
+
+Do not combine datasets made for different functionals in one `POTCAR` <Cite id="S-041" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-pot-1', 'q-pot-2', 'q-pot-3', 'q-pot-4']} />
+
+<GoDeeper>
+
+- The Field Handbook `POTCAR` entry <Cite id="S-041" />.
+- VASP wiki pages POTCAR and the PAW dataset list <Cite id="S-019" />.
+- The pseudopotential module of this handbook (module 5).
+
+</GoDeeper>

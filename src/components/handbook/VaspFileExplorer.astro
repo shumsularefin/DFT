@@ -6,8 +6,10 @@ interface Props {
   code: string;
   /** POSCAR only: show the structure beside the file and link atoms to lines. */
   view?: boolean;
+  /** Needed for OSZICAR and OUTCAR-excerpt, which have no built-in annotations. */
+  annotations?: { line: number; label: string; beginner: string; intermediate: string; pro?: string }[];
 }
-const { kind, code, view = false } = Astro.props;
+const { kind, code, view = false, annotations } = Astro.props;
 ---
 
-<FileExplorer client:visible kind={kind} text={code} view={view} />
+<FileExplorer client:visible kind={kind} text={code} view={view} annotations={annotations} />

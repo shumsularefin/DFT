@@ -1,0 +1,884 @@
+[
+  {
+    "id": "q-pos-1",
+    "concepts": [
+      "poscar-file"
+    ],
+    "type": "single",
+    "prompt": "In a POSCAR, what does line 2 (for example 5.43) do?",
+    "options": [
+      {
+        "text": "It multiplies all the lattice vectors, so the cell is scaled by that factor",
+        "correct": true,
+        "why": "That is the scaling factor: lengths in the next three lines are multiplied by it."
+      },
+      {
+        "text": "It is the number of atoms in the cell",
+        "correct": false,
+        "why": "The atom counts are on their own line, after the element symbols."
+      },
+      {
+        "text": "It is the cutoff energy in eV",
+        "correct": false,
+        "why": "The cutoff is set by ENCUT in the INCAR, not in the structure file."
+      }
+    ],
+    "hints": [
+      "Look at what follows line 2: three lattice vectors.",
+      "Which quantity would you rescale to make the whole cell bigger?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "POSCAR"
+        ]
+      },
+      "caption": "The POSCAR is one of the four inputs VASP reads.",
+      "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
+    }
+  },
+  {
+    "id": "q-pos-2",
+    "concepts": [
+      "poscar-file"
+    ],
+    "type": "single",
+    "prompt": "The POSCAR lists the elements Si then O, but your POTCAR was built O then Si. What happens?",
+    "options": [
+      {
+        "text": "VASP may still run, but each atom gets the wrong dataset, so the results are wrong",
+        "correct": true,
+        "why": "VASP pairs datasets and species by position, so a swapped order gives a valid-looking run for the wrong system."
+      },
+      {
+        "text": "VASP sorts them out by name",
+        "correct": false,
+        "why": "The file order is what counts; nothing re-matches them by name."
+      },
+      {
+        "text": "The run is slower but correct",
+        "correct": false,
+        "why": "The error is in the physics, not in the speed."
+      }
+    ],
+    "hints": [
+      "Where does VASP learn which dataset belongs to which atom type?",
+      "Think of what grep TITEL POTCAR is for."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "POSCAR",
+          "POTCAR"
+        ]
+      },
+      "caption": "POSCAR and POTCAR must list the elements in the same order.",
+      "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
+    }
+  },
+  {
+    "id": "q-pos-3",
+    "concepts": [
+      "poscar-file"
+    ],
+    "type": "single",
+    "prompt": "A POSCAR says Direct and gives 0.25 0.25 0.25 for an atom. Where is the atom?",
+    "options": [
+      {
+        "text": "A quarter of the way along each lattice vector from the origin",
+        "correct": true,
+        "why": "Direct coordinates are fractions of the three lattice vectors."
+      },
+      {
+        "text": "0.25 angstrom from the origin along x, y and z",
+        "correct": false,
+        "why": "That would be Cartesian coordinates, which are in angstrom."
+      },
+      {
+        "text": "At the centre of the cell",
+        "correct": false,
+        "why": "The centre is 0.5 0.5 0.5."
+      }
+    ],
+    "hints": [
+      "What does Direct mean for the unit of the numbers?",
+      "Compare with the cell centre."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "POSCAR"
+        ]
+      },
+      "caption": "The POSCAR holds the atom positions.",
+      "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
+    }
+  },
+  {
+    "id": "q-pos-4",
+    "concepts": [
+      "poscar-file"
+    ],
+    "type": "single",
+    "prompt": "After a relaxation, which file holds the final geometry in POSCAR format?",
+    "options": [
+      {
+        "text": "CONTCAR",
+        "correct": true,
+        "why": "CONTCAR is rewritten after every ionic step and holds the latest structure."
+      },
+      {
+        "text": "OSZICAR",
+        "correct": false,
+        "why": "OSZICAR is a short log of energies, not a structure file."
+      },
+      {
+        "text": "CHGCAR",
+        "correct": false,
+        "why": "CHGCAR holds the charge density, not the atom positions."
+      }
+    ],
+    "hints": [
+      "Which file has a name that sounds like a continuation of POSCAR?",
+      "Which file would you copy to POSCAR for the next stage?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "CONTCAR"
+        ]
+      },
+      "caption": "CONTCAR is one of the output files; copy it to POSCAR for the next stage.",
+      "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
+    }
+  },
+  {
+    "id": "q-kpf-1",
+    "concepts": [
+      "kpoints-file"
+    ],
+    "type": "single",
+    "prompt": "Why do many groups use Gamma-centred meshes for hexagonal cells?",
+    "options": [
+      {
+        "text": "A Gamma-centred mesh keeps the lattice symmetry, while a shifted mesh can break it",
+        "correct": true,
+        "why": "A mesh that always contains the zone centre respects the point-group symmetry."
+      },
+      {
+        "text": "Gamma-centred meshes always have fewer points",
+        "correct": false,
+        "why": "The number of points depends on the subdivisions, not the centring."
+      },
+      {
+        "text": "Monkhorst-Pack meshes are not allowed in VASP",
+        "correct": false,
+        "why": "They are allowed; they can just break the symmetry on some lattices."
+      }
+    ],
+    "hints": [
+      "Which point does a Gamma-centred mesh always include?",
+      "What does a shifted grid do to the symmetry of the lattice?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-041",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "kmesh-grid",
+      "params": {
+        "n": 4,
+        "gamma": true
+      },
+      "caption": "A Gamma-centred mesh always includes the zone centre.",
+      "alt": "A square grid of k-points in the Brillouin zone, with the point at the centre marked or not depending on the centring."
+    }
+  },
+  {
+    "id": "q-kpf-2",
+    "concepts": [
+      "kpoints-file"
+    ],
+    "type": "single",
+    "prompt": "Which KPOINTS layout is right for a band structure along a path?",
+    "options": [
+      {
+        "text": "Line mode, with the start and end of each segment",
+        "correct": true,
+        "why": "Line mode fills in the points between the ends of each straight segment."
+      },
+      {
+        "text": "A single automatic mesh with 1 1 1",
+        "correct": false,
+        "why": "That is one point, not a path."
+      },
+      {
+        "text": "No KPOINTS file at all",
+        "correct": false,
+        "why": "Without a file VASP uses a default mesh, not a path."
+      }
+    ],
+    "hints": [
+      "A band plot follows straight lines between special points.",
+      "Which layout lets you list segment ends?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "KPOINTS"
+        ]
+      },
+      "caption": "The KPOINTS file sets the sampling.",
+      "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
+    }
+  },
+  {
+    "id": "q-kpf-3",
+    "concepts": [
+      "kpoints-file"
+    ],
+    "type": "single",
+    "prompt": "How should you decide whether your k-mesh is dense enough?",
+    "options": [
+      {
+        "text": "Compare several meshes, such as 4x4x4, 6x6x6 and 8x8x8, until the energy stops changing by about 1 meV per atom",
+        "correct": true,
+        "why": "Convergence is judged by the energy settling, and metals need more points than insulators."
+      },
+      {
+        "text": "Use the smallest mesh that runs",
+        "correct": false,
+        "why": "A mesh that runs can still be unconverged."
+      },
+      {
+        "text": "Trust one mesh if the run finished",
+        "correct": false,
+        "why": "A finished run says nothing about the sampling error."
+      }
+    ],
+    "hints": [
+      "One number cannot show a trend.",
+      "What do you compare between meshes?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "kmesh-grid",
+      "params": {
+        "n": 6,
+        "gamma": true
+      },
+      "caption": "A denser Gamma-centred mesh samples the zone more finely.",
+      "alt": "A square grid of k-points in the Brillouin zone, with the point at the centre marked or not depending on the centring."
+    }
+  },
+  {
+    "id": "q-kpf-4",
+    "concepts": [
+      "kpoints-file"
+    ],
+    "type": "single",
+    "prompt": "Which file can build a k-mesh when no KPOINTS file is given?",
+    "options": [
+      {
+        "text": "The INCAR, through the KSPACING tag",
+        "correct": true,
+        "why": "KSPACING lets VASP make the mesh from a spacing, without a KPOINTS file."
+      },
+      {
+        "text": "The POTCAR",
+        "correct": false,
+        "why": "The POTCAR holds pseudopotential data, not sampling."
+      },
+      {
+        "text": "The OSZICAR",
+        "correct": false,
+        "why": "OSZICAR is an output log, not an input."
+      }
+    ],
+    "hints": [
+      "The answer is an input file that holds tags.",
+      "Which tag name contains the word space?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-041",
+      "S-019"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "INCAR"
+        ]
+      },
+      "caption": "The INCAR is an input file; KSPACING sets the mesh from it.",
+      "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
+    }
+  },
+  {
+    "id": "q-inc-1",
+    "concepts": [
+      "incar-file"
+    ],
+    "type": "single",
+    "prompt": "You leave NSW out of an INCAR. What kind of run do you get?",
+    "options": [
+      {
+        "text": "A single-point calculation, because the default number of ionic steps is zero",
+        "correct": true,
+        "why": "Many defaults depend on other tags; with no ionic steps, IBRION also falls back to -1."
+      },
+      {
+        "text": "A relaxation with 100 steps",
+        "correct": false,
+        "why": "A relaxation needs NSW above zero."
+      },
+      {
+        "text": "VASP refuses to start",
+        "correct": false,
+        "why": "A missing tag is not an error; it takes its default."
+      }
+    ],
+    "hints": [
+      "What does an omitted tag take?",
+      "What does NSW count?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-041",
+      "S-019"
+    ],
+    "visual": {
+      "plot": "ionic-steps",
+      "params": {
+        "nsw": 0
+      },
+      "caption": "With NSW equal to zero there is one electronic calculation and no ionic moves.",
+      "alt": "A row of boxes for ionic steps; with zero ionic steps a single box is highlighted."
+    }
+  },
+  {
+    "id": "q-inc-2",
+    "concepts": [
+      "incar-file"
+    ],
+    "type": "single",
+    "prompt": "You misspell a tag in the INCAR. How can you check what VASP actually used?",
+    "options": [
+      {
+        "text": "Read the parameter echo at the top of the OUTCAR",
+        "correct": true,
+        "why": "The echo lists the values VASP used, so a misspelled tag shows up as missing."
+      },
+      {
+        "text": "Look at the file size of the INCAR",
+        "correct": false,
+        "why": "The size says nothing about whether a tag was recognised."
+      },
+      {
+        "text": "A misspelled tag always stops the run with an error",
+        "correct": false,
+        "why": "It may be ignored silently, which is why you check."
+      }
+    ],
+    "hints": [
+      "Which output file repeats the settings?",
+      "Where does the OUTCAR start?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "OUTCAR"
+        ]
+      },
+      "caption": "The OUTCAR echoes the settings VASP used.",
+      "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
+    }
+  },
+  {
+    "id": "q-inc-3",
+    "concepts": [
+      "incar-file"
+    ],
+    "type": "single",
+    "prompt": "A relaxation INCAR sets EDIFFG = -0.005. What does the negative sign mean?",
+    "options": [
+      {
+        "text": "Stop when every force is below 0.005 eV per angstrom",
+        "correct": true,
+        "why": "A negative EDIFFG is a force criterion; a positive one is an energy-change criterion."
+      },
+      {
+        "text": "Stop when the energy change is below 0.005 eV",
+        "correct": false,
+        "why": "That is what a positive EDIFFG means."
+      },
+      {
+        "text": "Ignore ionic convergence",
+        "correct": false,
+        "why": "The sign chooses the criterion; it does not switch it off."
+      }
+    ],
+    "hints": [
+      "Which quantity does a negative EDIFFG compare?",
+      "Forces are in eV per angstrom."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "force-band",
+      "params": {
+        "tol": 0.005
+      },
+      "caption": "Forces fall step by step; the relaxation stops when they pass below the band.",
+      "alt": "Curve of the largest force falling over ionic steps on a logarithmic axis, with a horizontal band at the force tolerance."
+    }
+  },
+  {
+    "id": "q-inc-4",
+    "concepts": [
+      "incar-file"
+    ],
+    "type": "single",
+    "prompt": "Why must MAGMOM have one value per atom, in POSCAR order?",
+    "options": [
+      {
+        "text": "Each value is the starting moment of the atom at that position in the file",
+        "correct": true,
+        "why": "The list is matched to atoms by position, so order and count matter."
+      },
+      {
+        "text": "VASP averages the list over all atoms",
+        "correct": false,
+        "why": "It uses the individual values; no averaging happens."
+      },
+      {
+        "text": "The order does not matter if the sum is right",
+        "correct": false,
+        "why": "The moments are assigned atom by atom, so the order does matter."
+      }
+    ],
+    "hints": [
+      "How does VASP know which number goes with which atom?",
+      "What does a short list do?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "INCAR",
+          "POSCAR"
+        ]
+      },
+      "caption": "MAGMOM in the INCAR follows the atom order of the POSCAR.",
+      "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
+    }
+  },
+  {
+    "id": "q-pot-1",
+    "concepts": [
+      "potcar-file"
+    ],
+    "type": "single",
+    "prompt": "Which command shows the recommended cutoff of each dataset without opening the file?",
+    "options": [
+      {
+        "text": "grep ENMAX POTCAR",
+        "correct": true,
+        "why": "ENMAX is the recommended cutoff in each dataset header, and grep prints only that line."
+      },
+      {
+        "text": "grep ENCUT POTCAR",
+        "correct": false,
+        "why": "ENCUT is an INCAR tag; the dataset header uses ENMAX."
+      },
+      {
+        "text": "cat POTCAR",
+        "correct": false,
+        "why": "That prints the whole file, which you should not do or share."
+      }
+    ],
+    "hints": [
+      "Which header name is the dataset's own cutoff?",
+      "You want only the header line."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "POTCAR"
+        ]
+      },
+      "caption": "The POTCAR is one of the four inputs.",
+      "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
+    }
+  },
+  {
+    "id": "q-pot-2",
+    "concepts": [
+      "potcar-file"
+    ],
+    "type": "single",
+    "prompt": "What is the safe way to share your setup with a collaborator?",
+    "options": [
+      {
+        "text": "Share the TITEL lines or dataset names, and let them use their own licence",
+        "correct": true,
+        "why": "The POTCAR is licensed and may not be redistributed, but its dataset names are fine to share."
+      },
+      {
+        "text": "Email the POTCAR file",
+        "correct": false,
+        "why": "The licence forbids redistribution."
+      },
+      {
+        "text": "Paste the first 50 lines into a forum post",
+        "correct": false,
+        "why": "Any part of the file is licensed content."
+      }
+    ],
+    "hints": [
+      "What is licensed: the names or the files?",
+      "What do collaborators need to rebuild it?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "POTCAR"
+        ]
+      },
+      "caption": "The POTCAR is an input file you build yourself from a licensed library.",
+      "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
+    }
+  },
+  {
+    "id": "q-pot-3",
+    "concepts": [
+      "potcar-file"
+    ],
+    "type": "single",
+    "prompt": "What does ZVAL in a POTCAR header tell you?",
+    "options": [
+      {
+        "text": "The number of valence electrons of that dataset per atom",
+        "correct": true,
+        "why": "ZVAL counts the electrons treated explicitly; summing over atoms gives the electron count."
+      },
+      {
+        "text": "The cutoff energy in eV",
+        "correct": false,
+        "why": "That is ENMAX."
+      },
+      {
+        "text": "The atomic mass",
+        "correct": false,
+        "why": "That is POMASS."
+      }
+    ],
+    "hints": [
+      "Z stands for charge and VAL for valence.",
+      "Which header value changes with _pv or _sv?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "POTCAR"
+        ]
+      },
+      "caption": "The POTCAR header lists the valence electrons.",
+      "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
+    }
+  },
+  {
+    "id": "q-pot-4",
+    "concepts": [
+      "potcar-file"
+    ],
+    "type": "single",
+    "prompt": "What does a _pv or _sv variant of a dataset change?",
+    "options": [
+      {
+        "text": "It treats semicore states as valence, which costs more and is often more accurate",
+        "correct": true,
+        "why": "The variants trade accuracy against cost by adding electrons to the valence."
+      },
+      {
+        "text": "It switches the functional from PBE to LDA",
+        "correct": false,
+        "why": "LEXCH names the functional; the suffix does not change it."
+      },
+      {
+        "text": "It makes the cutoff smaller",
+        "correct": false,
+        "why": "The variants usually need the same or a higher cutoff."
+      }
+    ],
+    "hints": [
+      "What do p and s refer to in the name?",
+      "More valence electrons means what for cost?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "POTCAR"
+        ]
+      },
+      "caption": "The POTCAR variant is chosen when you build the file.",
+      "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
+    }
+  },
+  {
+    "id": "q-of-1",
+    "concepts": [
+      "output-file-reference"
+    ],
+    "type": "single",
+    "prompt": "Which file is the most valuable one to restart from, and why is it large?",
+    "options": [
+      {
+        "text": "WAVECAR, because it holds the wavefunctions",
+        "correct": true,
+        "why": "Starting from converged wavefunctions cuts the number of electronic steps, but they take a lot of space."
+      },
+      {
+        "text": "OSZICAR, because it is the log",
+        "correct": false,
+        "why": "It is small and cannot be read back as a starting point."
+      },
+      {
+        "text": "CONTCAR, because it holds the density",
+        "correct": false,
+        "why": "CONTCAR holds the geometry only."
+      }
+    ],
+    "hints": [
+      "Which file name sounds like wavefunctions?",
+      "Which is binary?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "WAVECAR"
+        ]
+      },
+      "caption": "WAVECAR is one of the output files you can restart from.",
+      "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
+    }
+  },
+  {
+    "id": "q-of-2",
+    "concepts": [
+      "output-file-reference"
+    ],
+    "type": "single",
+    "prompt": "You set LCHARG = .FALSE. in the SCF run. What goes wrong in a later band run with ICHARG = 11?",
+    "options": [
+      {
+        "text": "There is no CHGCAR to read, so the band run has nothing to start from",
+        "correct": true,
+        "why": "ICHARG = 11 reads the charge density the SCF wrote."
+      },
+      {
+        "text": "Nothing, because the band run recomputes it",
+        "correct": false,
+        "why": "ICHARG = 11 keeps the density fixed; it does not recompute it."
+      },
+      {
+        "text": "The band run reads WAVECAR instead",
+        "correct": false,
+        "why": "ICHARG = 11 reads CHGCAR."
+      }
+    ],
+    "hints": [
+      "Which tag controls whether CHGCAR is written?",
+      "What does ICHARG = 11 read?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-041",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "restart-chain",
+      "params": {
+        "focus": "CHGCAR"
+      },
+      "caption": "The band run reads the CHGCAR the SCF wrote.",
+      "alt": "Three stages in a row, relaxation then SCF in the same folder then a band or density-of-states run, with the file that travels along each arrow."
+    }
+  },
+  {
+    "id": "q-of-3",
+    "concepts": [
+      "output-file-reference"
+    ],
+    "type": "single",
+    "prompt": "Which file would you use to plot projected bands?",
+    "options": [
+      {
+        "text": "PROCAR, written when LORBIT is 10 or more",
+        "correct": true,
+        "why": "PROCAR holds band and orbital projections at every k-point."
+      },
+      {
+        "text": "IBZKPT",
+        "correct": false,
+        "why": "That is the list of irreducible k-points."
+      },
+      {
+        "text": "XDATCAR",
+        "correct": false,
+        "why": "That is the trajectory of positions."
+      }
+    ],
+    "hints": [
+      "Projections need LORBIT.",
+      "Which file name starts with PRO?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "OUTCAR",
+          "OSZICAR",
+          "CONTCAR",
+          "CHGCAR",
+          "WAVECAR"
+        ]
+      },
+      "caption": "Output files that a run can leave behind.",
+      "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
+    }
+  },
+  {
+    "id": "q-of-4",
+    "concepts": [
+      "output-file-reference"
+    ],
+    "type": "single",
+    "prompt": "A job stopped early. Which file still holds the latest geometry?",
+    "options": [
+      {
+        "text": "CONTCAR, because it is rewritten after every ionic step",
+        "correct": true,
+        "why": "The geometry is saved at each step, so an early stop still leaves it."
+      },
+      {
+        "text": "POSCAR, because VASP updates it",
+        "correct": false,
+        "why": "POSCAR is an input that VASP does not change."
+      },
+      {
+        "text": "DOSCAR, because it holds the structure",
+        "correct": false,
+        "why": "DOSCAR holds the density of states."
+      }
+    ],
+    "hints": [
+      "Which file is rewritten as the run goes?",
+      "Is the input file ever touched?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "CONTCAR"
+        ]
+      },
+      "caption": "CONTCAR is updated after each ionic step.",
+      "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
+    }
+  }
+]

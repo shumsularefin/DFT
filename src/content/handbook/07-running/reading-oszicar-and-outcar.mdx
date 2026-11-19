@@ -1,0 +1,119 @@
+---
+id: reading-oszicar-and-outcar
+title: Reading OSZICAR and OUTCAR
+module: 7
+order: 4
+summary: How to read the two logs of a run, what the electronic and ionic lines say, and a reader that checks a file against your convergence settings without sending it anywhere.
+concepts: [output-files]
+requires: [vasp-workflow]
+vaspTags: [EDIFF, EDIFFG, NELM]
+sources: [S-019, S-041, S-042]
+status: draft
+updated: 2026-11-19
+---
+
+<Why>
+
+A run that finished is not a run that worked. VASP can stop because it ran out of electronic steps, because the forces never dropped below your threshold, or simply because the job ended. The two logs, `OSZICAR` and `OUTCAR`, tell you which. Reading them is the habit that separates a result from a hope <Cite id="S-041" />.
+
+</Why>
+
+<Intuition>
+
+`OSZICAR` is the short log. It has one line for each electronic step (the energy and how much it changed) and one line for each ionic step (a new geometry and its energy). Watch it live with `tail -f OSZICAR`.
+
+`OUTCAR` is the long log. It repeats the numbers with more detail and adds the forces, the pressure, the Fermi level and the timing. You search it with `grep`.
+
+Ask three questions in order:
+
+1. **Did each electronic loop converge?** The last energy change in each loop should be below `EDIFF`, and the loop should end before `NELM`.
+2. **Did the ionic loop converge?** The forces should be below your `EDIFFG`, or the energy change below it if `EDIFFG` is positive.
+3. **Does the energy look sane?** It should fall along a relaxation. A rise is worth a look.
+
+<Lab id="output-reader" title="The output reader" />
+
+</Intuition>
+
+<TheMath>
+
+<Level min="intermediate">
+
+In `OSZICAR` the ionic-step line gives `F`, `E0` and `d E`. `F` is the free energy including the smearing term, `E0` the energy extrapolated to zero smearing, and `d E` the change from the previous ionic step. `mag=` follows when `ISPIN = 2`. In `OUTCAR`, the free energy appears after `TOTEN`, and the energy without entropy and the "sigma to 0" energy appear on the lines below it <Cite id="S-041" />.
+
+The reader's entropy check compares the two: a gap of more than about 1 meV per atom between them is a hint that `SIGMA` is too large. That is a rule of thumb, not a VASP rule, and the reader labels it that way.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+Greps from the Field Handbook, with what each one answers <Cite id="S-041" />:
+
+<VaspFile
+  name="shell"
+  code={`grep "E-fermi" OUTCAR | tail -1                 # Fermi level
+grep "TOTEN" OUTCAR | tail -1                    # final free energy
+grep -A 10 "TOTAL-FORCE" OUTCAR | tail -10       # last forces (NIONS+2 lines)
+grep NBANDS OUTCAR                               # bands, for the optics step
+grep "reached required accuracy" OUTCAR          # ionic convergence`}
+/>
+
+A few signals, in the author's order of use:
+
+- A relaxation that ends with "reached required accuracy" met your `EDIFFG`.
+- An electronic loop that used every one of `NELM` steps did not converge: fix the mixing or the start before raising `NELM` <Cite id="S-042" />.
+- The echo at the top of `OUTCAR` shows the values VASP used for `EDIFF`, `EDIFFG` and `NELM`. The reader fills its three boxes from it when it can.
+
+<Callout variant="warning" title="The sample files here are synthetic">
+
+The examples in the reader are made up to show each situation. No real VASP output was available when this page was written, so the line formats are the ones in the handbooks and are not checked against a run (open question Q-008). Paste your own file to test it.
+
+</Callout>
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...   | ...in the log                        | ...what to expect                                              |
+| ------------------ | ------------------------------------ | -------------------------------------------------------------- |
+| A tighter `EDIFF`  | More electronic steps per ionic step | Longer `OSZICAR` loops, cleaner forces                         |
+| A smaller `NELM`   | A loop may stop early                | The reader flags a loop that reached `NELM` without converging |
+| A tighter `EDIFFG` | More ionic steps                     | A longer relaxation                                            |
+| `ISPIN = 2`        | A `mag=` column                      | A magnetic moment per step to watch                            |
+
+Why read the logs: they are the only evidence the run worked. Why these thresholds: they are your settings. What happens if you skip it: you build on a result that never converged.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Taking a finished job as a converged job">
+
+The scheduler reports that the process ended, not that the physics converged.
+
+</Callout>
+
+<Callout variant="mistake" title="Judging convergence from the last line only">
+
+An early loop that hit `NELM` can hide behind a later one that converged. Read every ionic step.
+
+</Callout>
+
+<Callout variant="mistake" title="Comparing F and E0 as if they were the same number">
+
+They differ by the smearing term. Quote the line you used <Cite id="S-041" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-ro-1', 'q-ro-2', 'q-ro-3', 'q-ro-4']} />
+
+<GoDeeper>
+
+- The Field Handbook `OSZICAR` and `OUTCAR` entries <Cite id="S-041" />.
+- VASP wiki pages OSZICAR and OUTCAR <Cite id="S-019" />.
+- Convergence and errors: module 8.
+
+</GoDeeper>

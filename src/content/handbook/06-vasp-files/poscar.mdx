@@ -1,0 +1,139 @@
+---
+id: poscar
+title: POSCAR, the structure file
+module: 6
+order: 1
+summary: What every line of a POSCAR means, how the scaling factor, species line and Direct or Cartesian coordinates work, and the mistakes that put atoms in the wrong place.
+concepts: [poscar-file]
+requires: [vasp-workflow]
+vaspTags: []
+sources: [S-019, S-041, S-042]
+noLab: true
+status: draft
+updated: 2026-11-19
+---
+
+<Why>
+
+VASP knows nothing about your material until the `POSCAR` file tells it. The file says which atoms are present, how many of each, where they sit and how big the repeating cell is. Every other input depends on it: the order of the elements decides which pseudopotential goes with which atom, and the number of atoms decides how many `MAGMOM` values you must write. A wrong `POSCAR` gives a wrong answer that looks perfectly healthy, so it pays to read this file line by line once <Cite id="S-041" />.
+
+</Why>
+
+<Intuition>
+
+A crystal is a small box (the <Term id="unit-cell">unit cell</Term>) repeated forever in all directions. `POSCAR` describes that one box. The first lines give the box, as three vectors. The next lines list the atoms, grouped by element. The last block gives the position of each atom inside the box.
+
+Click any line in the example below to see what it does. The structure beside it is drawn from the file itself, so a change in the file is a change in the picture.
+
+<VaspFileExplorer
+  kind="POSCAR"
+  view
+  code={`Si diamond
+5.43
+0.0 0.5 0.5
+0.5 0.0 0.5
+0.5 0.5 0.0
+Si
+2
+Direct
+0.00 0.00 0.00
+0.25 0.25 0.25`}
+/>
+
+Two details trip up beginners:
+
+- **The scaling factor multiplies the lattice vectors.** Line 2 is 5.43 here, so the first vector is 0.5 times 5.43 angstrom on two axes. A negative value is read as the cell volume instead <Cite id="S-041" />.
+- **Positions are fractions of the cell by default.** `Direct` means each coordinate is a fraction of the three lattice vectors. `Cartesian` means angstroms, and the scaling factor applies to those too <Cite id="S-041" />.
+
+</Intuition>
+
+<TheMath>
+
+With lattice vectors $\mathbf{a}_1,\mathbf{a}_2,\mathbf{a}_3$ (already multiplied by the scaling factor) and fractional coordinates $(f_1,f_2,f_3)$, an atom sits at the Cartesian position
+
+$$\mathbf{r} = f_1\,\mathbf{a}_1 + f_2\,\mathbf{a}_2 + f_3\,\mathbf{a}_3 .$$
+
+The cell volume is $V = \lvert \mathbf{a}_1 \cdot (\mathbf{a}_2 \times \mathbf{a}_3) \rvert$. For the example, with the scaling factor $a = 5.43$ angstrom, $V = a^3/4 \approx 40.0$ cubic angstrom for the two-atom primitive cell.
+
+<Level min="intermediate">
+
+Line 4 of an old-style `POSCAR` is the second lattice vector. The element symbols are on line 6 and the counts on line 7 (VASP 5 and later). An older note in the handbooks that put the symbols on line 4 was corrected <Cite id="S-041" />.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+- **Line by line:** 1 comment; 2 scaling factor; 3 to 5 the three lattice vectors; 6 element symbols; 7 atoms per element; an optional `Selective dynamics` line; `Direct` or `Cartesian`; then one line per atom <Cite id="S-041" />.
+- **Species order.** The element symbols on line 6 must follow the same order as the datasets in `POTCAR`, and the `MAGMOM` list follows the atom order of this file <Cite id="S-041" />.
+- **Selective dynamics.** Only the first letter of the keyword is read. Each atom line then ends with three flags, `T` (may move) or `F` (frozen), one for each direction <Cite id="S-041" />.
+- **Where it comes from.** VASPkit task 105 makes a `POSCAR` from a CIF file (it does not accept fractional occupancy), 602 writes a standardised primitive cell and 401 builds a supercell <Cite id="S-042" />. This site's input builder and structure tools write the same format.
+- **After a run.** `CONTCAR` has the same format and holds the latest geometry <Cite id="S-041" />.
+
+<VaspFile
+  name="POSCAR"
+  code={`Si diamond, one atom frozen
+5.43
+0.0 0.5 0.5
+0.5 0.0 0.5
+0.5 0.5 0.0
+Si
+2
+Selective dynamics
+Direct
+0.00 0.00 0.00 T T T
+0.25 0.25 0.25 F F F`}
+  annotations={{
+    8: 'optional line; only the first letter S is read',
+    10: 'T T T: this atom may move along x, y and z',
+    11: 'F F F: this atom is frozen',
+  }}
+/>
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...                       | ...in the structure                              | ...in VASP                                                                             |
+| -------------------------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| The scaling factor                     | Every length scales, including the cell volume   | Different energy; stress and the plane-wave count change                               |
+| Direct to Cartesian (and not the data) | Atoms land in the wrong places                   | "Distance between some ions is very small" or a nonsense energy                        |
+| The order of the elements              | The same coordinates now belong to other species | A valid run with the wrong pseudopotential on every atom: check against `POTCAR` order |
+| Add `Selective dynamics` flags         | Chosen atoms stay fixed during relaxation        | Those atoms get no displacement; useful for the bottom layers of a slab                |
+
+Why a careful `POSCAR` matters: it is the one file whose mistakes do not make VASP complain. Why this order of elements: `POTCAR` is assembled in the same order. What happens if you skip the check: an energy that looks fine for the wrong material.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Direct coordinates read as Cartesian (or the reverse)">
+
+Atoms end up on top of each other, and VASP prints "distance between some ions is very small". Check the keyword line before the positions <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Element order different from POTCAR">
+
+The run is valid but each atom uses the wrong dataset. Compare line 6 with `grep TITEL POTCAR` <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="A conventional cell where a primitive cell would do">
+
+It works, but it costs several times more. Standardise to the primitive cell first (VASPkit 602) <Cite id="S-042" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-pos-1', 'q-pos-2', 'q-pos-3', 'q-pos-4']} />
+
+<GoDeeper>
+
+- VASP wiki page POSCAR (by page name) <Cite id="S-019" />.
+- The author's Field Handbook entries for `POSCAR` and `CONTCAR` <Cite id="S-041" />.
+- VASPkit structure tools, codes 105, 400 to 403 and 601 to 608 <Cite id="S-042" />.
+
+</GoDeeper>

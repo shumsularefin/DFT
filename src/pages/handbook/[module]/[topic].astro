@@ -133,6 +133,19 @@ const statusLabel = { draft: 'Draft', review: 'Awaiting verification', verified:
   .prose math[display='block'] {
     margin-block: var(--space-4);
   }
+  /* Tables of facts must wrap, not scroll sideways, at 360 px (M7.3). */
+  .prose table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .prose th,
+  .prose td {
+    overflow-wrap: anywhere;
+    text-align: left;
+    vertical-align: top;
+    padding: var(--space-1) var(--space-2);
+    border-bottom: 1px solid var(--border);
+  }
   .cite-list {
     padding-left: var(--space-5);
   }

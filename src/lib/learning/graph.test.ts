@@ -90,8 +90,21 @@ describe('shipped concept graph', () => {
       for (const k of q.concepts) expect(ids.has(k), k).toBe(true);
     }
   });
-  it('publishes module 4 (M7.1) and publishes the module 5 concepts of M7.2 and marks module 6 to 11 as planned', () => {
+  it('publishes module 4 (M7.1), the module 5 concepts of M7.2 and the file and running concepts of M7.3, and keeps the rest planned', () => {
     expect(g.filter((x) => x.module === 4).every((x) => x.status === 'published')).toBe(true);
-    expect(g.filter((x) => x.module >= 6).every((x) => x.status === 'planned')).toBe(true);
+    const m73 = new Set([
+      'poscar-file',
+      'kpoints-file',
+      'incar-file',
+      'potcar-file',
+      'output-file-reference',
+      'five-step-protocol',
+      'job-scripts',
+      'restart-files',
+      'output-files',
+      'vaspkit',
+    ]);
+    for (const x of g.filter((y) => y.module >= 6))
+      expect(x.status, x.id).toBe(m73.has(x.id) ? 'published' : 'planned');
   });
 });

@@ -6,7 +6,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 
 ## How to read this table
 
-- **Next stage to build: M7.3 (Modules 6 and 7: VASP files and running a calculation), Tier B**. Start it with `STAGE: NEXT`, `TIER: B`. The next Tier A stage is M8.2 (Factors, checks and mixed sites), size M: start it with `STAGE: NEXT`, `TIER: A` (it cannot be marked done until Q-003, the Bartel tau equation, is closed or the UI says the formula is unconfirmed).
+- **Next stage to build: M7.4 (Module 8: Convergence testing and common errors, with error finder), Tier B**. Start it with `STAGE: NEXT`, `TIER: B`. The next Tier A stage is M8.2 (Factors, checks and mixed sites), size M: start it with `STAGE: NEXT`, `TIER: A` (it cannot be marked done until Q-003, the Bartel tau equation, is closed or the UI says the formula is unconfirmed).
 - **Tier** says which model to open the session with. **A** = the strongest model (Opus class): stages where a subtle mistake would put a wrong number in front of a researcher. **B** = the fast model (Sonnet class): UI, content and wiring on top of tested libraries. `-` = already done.
 - **Size** says how much work it is: **S** short session, **M** one normal session, **L** a long session that may stop as `partial` and need a second one.
 - A session started on the wrong tier does not build. It names the model to switch to and stops (`docs/WORKFLOW.md` section 2, step 0).
@@ -63,7 +63,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M10.4 | Crystal editor UI | todo | M10.2, M5.5, M8.3, M13.5, M12.2 | L | B | | | | [work order](milestones/M10-material-builder.md) |
 | M10.3 | Molecule engine (RDKit 2D, in-house 3D) | todo | M10.1 | L | A | | | | [work order](milestones/M10-material-builder.md) |
 | M10.5 | Molecule editor UI | todo | M10.3, M10.4 | L | B | | | | [work order](milestones/M10-material-builder.md) |
-| M7.3 | Modules 6 and 7: VASP files and running a calculation | todo | M3.6, M4.1 | L | B | | | | [work order](milestones/M7-remaining-modules.md) |
+| M7.3 | Modules 6 and 7: VASP files and running a calculation | done | M3.6, M4.1 | L | B | claude/m7-3-vasp-files-running | PR pending (stacked on M12.5) | 2026-11-19 | [report](reports/M7.3.md), [work order](milestones/M7-remaining-modules.md) |
 | M7.4 | Module 8: Convergence testing and common errors (with error finder) | todo | M7.3, M4.3 | M | B | | | | [work order](milestones/M7-remaining-modules.md) |
 | M13.6 | Equation of state and lattice-constant tool | todo | M4.1, M4.2 | M | A | | | | [work order](milestones/M13-magnetism-and-structures.md) |
 | M7.5 | Module 9: Analysis (with relaxation, DOS/band and charge-density tools) | todo | M7.4, M5.6, M2.1 | L | A | | | | [work order](milestones/M7-remaining-modules.md) |
@@ -122,6 +122,7 @@ See `docs/SETUP_FIREBASE.md` and the "author" rows of `docs/OPEN_QUESTIONS.md` (
 - 2026-11-04, M5.1: moyo symmetry (`symmetry.ts`, worker + client, `/design/symmetry-check/`), standardization message (`standardize.ts`), CIF reader/writer (`cif.ts`), format detection (`io.ts`), element table; 39/39 golden space groups and atom counts; 10 seekpath primitive-metric differences listed in the report; `lazy.moyo` budget. See [report](reports/M5.1.md).
 - 2026-11-04, M5.2: exact first Brillouin zone by half-space clipping (`brillouin.ts`), shared basis reduction (`reduction.ts`); 12/12 golden lattices, 300 seeded random cells, median 0.3 to 1.2 ms per zone. See [report](reports/M5.2.md).
 - 2026-11-04, M5.3: HPKOT k-paths (`kpath/hpkot.ts`, `kpath/expr.ts`, `niggli.ts`, tables in `src/data/kpath/hpkot/`); 39/39 golden structures and all 29 variants match. D-047, Q-037. See [report](reports/M5.3.md).
+- 2026-11-19, M7.3: modules 6 and 7 (10 topics, 40 questions with pictures, 14 glossary terms, 3 new concepts), the output reader lab and `outputReader.ts` (OSZICAR and OUTCAR checks, all samples synthetic), four new question plots; the author's protocol quoted word for word; every INCAR shown passes the validator; D-069. Stacked on M12.5 (PR #38).
 - 2026-11-18, M13.2: `/tools/magnetic/` (FM, A, C, G, rock-salt II, custom, enumerate), `export.ts` (outputs, README, zip, LDAU block), scene with spin arrows and polyhedra, hand-off with MAGMOM to the Input Builder; D-062. Stacked on M12.2 (PR #32).
 - 2026-11-18, M12.2: `SceneSpec` format and validator, `resolveScene`, SVG projection with painter's order, coordination polyhedra (convex hull, periodic images), `SpecScene` (3D on demand), `Scene` island, `SceneSvg.astro`, 14 presets, `/design/scenes/`, MDX `<Scene id>`; one live canvas per page (D-058); 1364 tests, 20 e2e on the demo page, three chunk 136.8 of 150 KB gz.
 - 2026-11-18, M12.6: `StructureView` (picks give distance, angle, dihedral; coordination of one site) in the file explorer, Input Builder and k-path tool; `measure.ts` and `poscarLines.ts`. Stacked on M13.2 (PR #33).

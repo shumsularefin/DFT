@@ -1,0 +1,119 @@
+---
+id: vaspkit-in-practice
+title: VASPKIT in practice
+module: 7
+order: 5
+summary: A map of the VASPKIT menu codes the author uses for inputs, k-paths, structures and analysis, how to protect hand-edited files, and why menu numbers must be checked against your release.
+concepts: [vaspkit]
+requires: [vasp-workflow]
+vaspTags: []
+sources: [S-019, S-020, S-042]
+noLab: true
+status: draft
+updated: 2026-11-19
+---
+
+<Why>
+
+VASPKIT is a free command-line helper that prepares VASP inputs and processes outputs. It removes much of the typing: a template `INCAR`, a `KPOINTS` file for a chosen resolution, a band path, a primitive cell, a plotted band structure. Knowing what it does for you also tells you what to check by hand <Cite id="S-020" />.
+
+</Why>
+
+<Intuition>
+
+VASPKIT is a menu: you run `vaspkit`, type a number, and answer a few prompts. Codes group by purpose, and the author's workflow touches a handful of them <Cite id="S-042" />.
+
+<Callout variant="warning" title="Menu numbers change between releases">
+
+The codes below are the ones in the author's Workflow Handbook (VASPKIT 1.5 era). Menus are renumbered and extended between releases, so confirm a code in your installed version's menu before you rely on it <Cite id="S-042" />.
+
+</Callout>
+
+</Intuition>
+
+<TheMath>
+
+<Level min="intermediate">
+
+VASPKIT does not change the physics. It writes files from rules (templates, resolutions in 2 pi per angstrom, symmetry from the structure) and reads files you could read yourself. The settings that matter are in `~/.vaspkit`, for example where your POTCAR library lives (`PBE_PATH`), whether recommended datasets are used (`RECOMMENDED_POTCAR`), and `SET_FERMI_ENERGY_ZERO`, which shifts plotted DOS and bands so the Fermi level is at 0 <Cite id="S-042" />.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+The command map, from the Workflow Handbook <Cite id="S-042" />:
+
+| Code       | What it does                                                                                                                                                                 |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 101        | `INCAR` template from task codes (ST static, SR relax, LR lattice, MG magnetic, H6 HSE06, PU +U, OP optics, DC elastic, BD Bader, and others); codes combine, such as `SRMG` |
+| 102        | `KPOINTS` for an SCF run: asks Monkhorst-Pack or Gamma, then the resolution in 2 pi per angstrom                                                                             |
+| 103 / 104  | `POTCAR` from default or user-chosen datasets (needs `~/.vaspkit` paths)                                                                                                     |
+| 105 / 106  | `POSCAR` from a CIF (no fractional occupancy) or a Materials Studio file                                                                                                     |
+| 107        | Reorder the elements of `POSCAR`                                                                                                                                             |
+| 108 / 109  | Generate all inputs / check all input files before submitting                                                                                                                |
+| 601 / 602  | Space group of `POSCAR` / standardised primitive cell (run before relaxing)                                                                                                  |
+| 603 / 604  | Conventional cell / standardised crystal cell (use for elastic constants)                                                                                                    |
+| 303        | `KPATH.in`: the k-path for a band run                                                                                                                                        |
+| 251        | `KPOINTS` for hybrid-functional bands                                                                                                                                        |
+| 111 / 113  | Density of states from the SCF run                                                                                                                                           |
+| 211        | Band structure data from the run on the path                                                                                                                                 |
+| 203        | Elastic moduli read from `OUTCAR`                                                                                                                                            |
+| 311 to 314 | `CHGCAR` analysis                                                                                                                                                            |
+| 426        | Work function from `LOCPOT`                                                                                                                                                  |
+| 711        | Optical properties from `vasprun.xml`                                                                                                                                        |
+
+Habits that protect you:
+
+- **Run 109 before every submission.** It fixes the `INCAR` and `POSCAR` format and checks that `POTCAR` matches `POSCAR` <Cite id="S-042" />.
+- **Set `SET_INCAR_WRITE_MODE`.** By default 101 overrides an existing `INCAR`. Set `BACK-UP-OLD` or `BACK-UP-NEW` in `~/.vaspkit` to protect a hand-edited file.
+- **Read what it wrote.** A template is a starting point: check `ENCUT` against your `POTCAR` and add `MAGMOM` yourself.
+- **VASPKIT never replaces your licence.** It reads your POTCAR library; it does not provide one.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...        | ...in VASPKIT's output     | ...what to expect                                 |
+| ----------------------- | -------------------------- | ------------------------------------------------- |
+| The resolution in 102   | The mesh density           | Denser means slower; 0.03 to 0.04 is often enough |
+| The task code in 101    | A different template       | Different tags: check them against your job       |
+| `SET_FERMI_ENERGY_ZERO` | Energies on a shifted axis | Plots are relative to the Fermi level             |
+| Your VASPKIT release    | Menu numbers               | The same task may have another code               |
+
+Why use it: fewer typing errors. Why check the output: templates do not know your system. What happens if you skip the check: a tag left over from another task, such as `IBRION = 6` in a DOS run.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Overwriting a hand-edited INCAR with 101">
+
+The default write mode replaces the file. Change `SET_INCAR_WRITE_MODE` first.
+
+</Callout>
+
+<Callout variant="mistake" title="Trusting a menu number from an old note">
+
+Check the code in your own release's menu <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Running a template without reading it">
+
+A leftover tag from another task is a common cause of a wrong run <Cite id="S-042" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-vk-1', 'q-vk-2', 'q-vk-3', 'q-vk-4']} />
+
+<GoDeeper>
+
+- The VASPKIT paper <Cite id="S-020" />.
+- The Workflow Handbook's VASPkit sections <Cite id="S-042" />.
+- The VASP wiki for the tags a template sets <Cite id="S-019" />.
+
+</GoDeeper>

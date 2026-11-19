@@ -67,6 +67,7 @@ export const REGISTERED_LABS = [
   'paw-picture',
   'functional-ladder',
   'spin-cartoon',
+  'output-reader',
 ] as const;
 
 /** Page class for a topic: "island" if its body embeds a registered lab, a `<Scene>` or the `<Check>` questions (React islands), else "content". */

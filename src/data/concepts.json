@@ -498,7 +498,7 @@
       "vasp-workflow"
     ],
     "level": "beginner",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "kpoints-file",
@@ -510,7 +510,7 @@
       "vasp-workflow"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "incar-file",
@@ -521,7 +521,7 @@
       "vasp-workflow"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "potcar-file",
@@ -533,7 +533,7 @@
       "vasp-workflow"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "job-scripts",
@@ -544,7 +544,7 @@
       "vasp-workflow"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "output-files",
@@ -556,7 +556,7 @@
       "scf-loop"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "restart-files",
@@ -567,7 +567,7 @@
       "output-files"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "convergence-testing",
@@ -809,5 +809,38 @@
     ],
     "level": "intermediate",
     "status": "planned"
+  },
+  {
+    "id": "output-file-reference",
+    "label": "The output files, a field guide",
+    "module": 6,
+    "summary": "What each file VASP can write holds, and which ones you restart from or read.",
+    "prerequisites": [
+      "vasp-workflow"
+    ],
+    "level": "beginner",
+    "status": "published"
+  },
+  {
+    "id": "five-step-protocol",
+    "label": "The five-step protocol",
+    "module": 7,
+    "summary": "Relax, SCF, bands, elastic and optics in order, with the settings that must stay the same between steps.",
+    "prerequisites": [
+      "vasp-workflow"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "vaspkit",
+    "label": "VASPKIT",
+    "module": 7,
+    "summary": "A command-line helper that writes VASP inputs and processes outputs, and why its menu codes must be checked.",
+    "prerequisites": [
+      "vasp-workflow"
+    ],
+    "level": "intermediate",
+    "status": "published"
   }
 ]

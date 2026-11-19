@@ -60,6 +60,10 @@ export const PLOT_IDS = [
   'ediff-trace',
   'force-band',
   'sigma-width',
+  'file-flow',
+  'restart-chain',
+  'oszicar-trace',
+  'parallel-split',
 ] as const;
 export type PlotId = (typeof PLOT_IDS)[number];
 
@@ -1066,6 +1070,125 @@ function sigmaWidth(p: P): string {
   return wrap(p.alt as string, c.h, body);
 }
 
+/* ---- modules 6 and 7: files and running a calculation (M7.3) ---- */
+// @source S-041 and S-042 (the file lists, restart rules and KPAR/NCORE entries of the author's handbooks), S-019
+
+/** The four input files going into VASP and the main output files coming out. Which ones to emphasise is a parameter. */
+function fileFlow(p: P): string {
+  const hot = new Set(arr<string>(p, 'highlight', []));
+  const ins = ['INCAR', 'POSCAR', 'KPOINTS', 'POTCAR'];
+  const outs = ['OUTCAR', 'OSZICAR', 'CONTCAR', 'CHGCAR', 'WAVECAR'];
+  const rowH = 30;
+  const h = Math.max(ins.length, outs.length) * rowH + 24;
+  const box = (x: number, y: number, w: number, label: string) =>
+    `<rect class="vp-step${hot.has(label) ? ' vp-active' : ''}" x="${r1(x)}" y="${r1(y)}" width="${w}" height="24" rx="5"/>` +
+    text(x + w / 2, y + 16, label, 'vp-t');
+  let body = '';
+  const yIn = (i: number) => 12 + i * rowH + ((outs.length - ins.length) * rowH) / 2;
+  ins.forEach((n, i) => {
+    body += box(8, yIn(i), 78, n);
+    body += line(86, yIn(i) + 12, 130, h / 2, 'vp-guide');
+  });
+  body +=
+    `<rect class="vp-box" x="130" y="${r1(h / 2 - 22)}" width="86" height="44" rx="8"/>` +
+    text(173, h / 2 + 5, 'VASP', 'vp-t');
+  outs.forEach((n, i) => {
+    body += box(274, 12 + i * rowH, 78, n);
+    body += line(216, h / 2, 274, 12 + i * rowH + 12, 'vp-guide');
+  });
+  return wrap(p.alt as string, h, body);
+}
+
+/** Relaxation, then SCF, then a band or DOS run: which file travels along each arrow. `focus` emphasises one arrow. */
+function restartChain(p: P): string {
+  const focus = typeof p.focus === 'string' ? (p.focus as string) : '';
+  const stages = [
+    ['Relaxation', 'writes CONTCAR, WAVECAR'],
+    ['SCF, same folder', 'ISTART = 1; writes CHGCAR'],
+    ['Band or DOS run', 'ICHARG = 11 reads CHGCAR'],
+  ];
+  const links = [
+    ['CONTCAR', 'copied to POSCAR'],
+    ['CHGCAR', 'kept fixed'],
+  ];
+  const h = 210;
+  let body = '';
+  stages.forEach(([a, b], i) => {
+    const y = 10 + i * 72;
+    body += `<rect class="vp-box" x="70" y="${y}" width="220" height="42" rx="7"/>`;
+    body += text(180, y + 18, a!, 'vp-t') + text(180, y + 34, b!, 'vp-t');
+  });
+  links.forEach(([f, n], i) => {
+    const y0 = 52 + i * 72;
+    const on = focus === f;
+    body += `<g class="${on ? 'vp-hot' : ''}">${arrowDown(180, y0, y0 + 30)}</g>`;
+    body += text(190, y0 + 18, `${f}: ${n}`, 'vp-t', 'start');
+  });
+  return wrap(p.alt as string, h, body);
+}
+
+/** Energy change at each electronic step of a run, on a log axis, with the EDIFF threshold. `dE` lists |dE| in eV. */
+function oszicarTrace(p: P): string {
+  const dE = arr<number>(p, 'dE', [1e1, 1e-1, 1e-3, 1e-5, 1e-7]).map((d) => Math.max(Math.abs(d), 1e-16));
+  const ediff = Math.max(1e-16, num(p, 'ediff', 1e-4));
+  const ys = dE.map((d) => Math.log10(d));
+  const t = Math.log10(ediff);
+  const lo = Math.floor(Math.min(...ys, t)) - 1;
+  const hi = Math.ceil(Math.max(...ys, t)) + 1;
+  const c = chart(
+    1,
+    Math.max(dE.length, 2),
+    lo,
+    hi,
+    'electronic step',
+    'change in energy (powers of ten, eV)',
+  );
+  const pts = ys.map((y, i) => [c.sx(i + 1), c.sy(y)] as [number, number]);
+  let body = c.axes + line(c.x0, c.sy(t), c.x1, c.sy(t), 'vp-guide') + path(pts, 'vp-curve');
+  body += text(c.x1 - 4, c.sy(t) - 5, 'EDIFF', 'vp-t', 'end');
+  body += pts
+    .map(([x, y]) => `<circle class="vp-node vp-solid" cx="${r1(x)}" cy="${r1(y)}" r="3"/>`)
+    .join('');
+  return wrap(p.alt as string, c.h, body);
+}
+
+/** How the MPI ranks are split by KPAR (k-point groups) and NCORE (cores per band). Pure arithmetic. */
+function parallelSplit(p: P): string {
+  const ranks = Math.min(64, Math.max(1, Math.round(num(p, 'ranks', 16))));
+  const kpar = Math.max(1, Math.round(num(p, 'kpar', 1)));
+  const ncore = Math.max(1, Math.round(num(p, 'ncore', 1)));
+  if (ranks % kpar !== 0) {
+    const body =
+      text(W / 2, 40, `${ranks} ranks cannot be split into KPAR = ${kpar} equal groups.`, 'vp-t') +
+      text(W / 2, 60, 'The number of ranks must be divisible by KPAR.', 'vp-t');
+    return wrap(p.alt as string, 90, body);
+  }
+  const per = ranks / kpar;
+  const cols = Math.min(per, 16);
+  const cell = Math.min(18, (W - 60) / cols);
+  const rowH = Math.ceil(per / cols) * (cell + 4) + 22;
+  const h = kpar * (rowH + 8) + 28;
+  let body = '';
+  for (let g = 0; g < kpar; g++) {
+    const y = 8 + g * (rowH + 8);
+    body += `<rect class="vp-box" x="8" y="${y}" width="${W - 16}" height="${rowH}" rx="6"/>`;
+    body += text(14, y + 14, `k-point group ${g + 1}`, 'vp-t', 'start');
+    for (let i = 0; i < per; i++) {
+      const cx = 20 + (i % cols) * (cell + 4);
+      const cy = y + 20 + Math.floor(i / cols) * (cell + 4);
+      const band = Math.floor(i / ncore);
+      body += `<rect class="vp-step${band % 2 === 0 ? ' vp-active' : ''}" x="${r1(cx)}" y="${r1(cy)}" width="${r1(cell)}" height="${r1(cell)}" rx="3"/>`;
+    }
+  }
+  body += text(
+    W / 2,
+    h - 8,
+    `${kpar} group${kpar === 1 ? '' : 's'} of ${per} ranks; ${per / ncore >= 1 ? Math.floor(per / ncore) : 0} band group${Math.floor(per / ncore) === 1 ? '' : 's'} of ${ncore} per k-point group`,
+    'vp-t',
+  );
+  return wrap(p.alt as string, h, body);
+}
+
 const RENDER: Record<PlotId, { fn: (p: P) => string; badge: PlotBadge }> = {
   'box-levels': { fn: boxLevels, badge: 'computed' },
   'box-wave': { fn: boxWave, badge: 'computed' },
@@ -1099,6 +1222,10 @@ const RENDER: Record<PlotId, { fn: (p: P) => string; badge: PlotBadge }> = {
   'ediff-trace': { fn: ediffTrace, badge: 'toy-model' },
   'force-band': { fn: forceBand, badge: 'illustrative' },
   'sigma-width': { fn: sigmaWidth, badge: 'computed' },
+  'file-flow': { fn: fileFlow, badge: 'illustrative' },
+  'restart-chain': { fn: restartChain, badge: 'illustrative' },
+  'oszicar-trace': { fn: oszicarTrace, badge: 'illustrative' },
+  'parallel-split': { fn: parallelSplit, badge: 'computed' },
 };
 
 export function isPlotId(id: string): id is PlotId {
