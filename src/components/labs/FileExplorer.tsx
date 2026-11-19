@@ -3,6 +3,7 @@ import { annotate, mergeAnnotations, type Annotation, type FileKind } from '../.
 import StructureView from '../structure/StructureView';
 import { parsePoscar } from '../../lib/crystal/poscar';
 import { poscarAtomLines } from '../../lib/vasp/poscarLines';
+import { parseIncar } from '../../lib/vasp/incar';
 import TagCard from '../tools/input-builder/TagCard';
 import { useLevel } from '../tools/input-builder/hooks';
 import '../tools/input-builder/input-builder.css';
@@ -32,6 +33,15 @@ export default function FileExplorer({ kind, text, annotations, view = false }: 
     return m;
   }, [notes]);
   const order = useMemo(() => [...byLine.keys()].sort((a, b) => a - b), [byLine]);
+
+  const incar = useMemo(() => {
+    if (kind !== 'INCAR') return undefined;
+    try {
+      return Object.fromEntries(parseIncar(text).entries.map((e) => [e.name, e.value]));
+    } catch {
+      return undefined;
+    }
+  }, [kind, text]);
 
   const [atom, setAtom] = useState<number | null>(null);
   const structure = useMemo(() => {
@@ -176,7 +186,13 @@ export default function FileExplorer({ kind, text, annotations, view = false }: 
                 {a.tag && a.known && (
                   <details onToggle={() => setTag(a.tag!)}>
                     <summary>Full tag card for {a.tag}</summary>
-                    <TagCard name={tag ?? a.tag} level={level} onSelect={setTag} />
+                    <TagCard
+                      name={tag ?? a.tag}
+                      level={level}
+                      onSelect={setTag}
+                      value={incar?.[tag ?? a.tag]}
+                      incar={incar}
+                    />
                   </details>
                 )}
               </div>

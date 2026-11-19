@@ -56,6 +56,8 @@ In the full method the penalty is a trace over the occupation matrix of the corr
 
 <InVasp>
 
+<TagVisual tag="LDAUU" />
+
 - `LDAU = .TRUE.` switches the correction on, `LDAUTYPE = 2` selects the Dudarev form in which only `U - J` matters <Cite id="S-042" />.
 - `LDAUL` gives, for each species in `POSCAR` order, the orbital channel: `-1` for none, `2` for d, `3` for f. `LDAUU` and `LDAUJ` give `U` and `J` per species in the same order, in eV. One entry per species is required <Cite id="S-042" />.
 - Set `LMAXMIX = 4` for d elements and `6` for f elements: the handbook calls this vital for +U runs. Keep it the same in every run in a chain, such as an SCF run followed by a band run <Cite id="S-042" />. Where the handbook's own example INCARs are inconsistent about this is recorded as Q-019.

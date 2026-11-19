@@ -68,6 +68,8 @@ Plane-wave energies converge variationally: more waves can only lower the total 
 
 <InVasp>
 
+<TagVisual tag="ENCUT" />
+
 - `ENCUT` sets the cutoff in eV. If you leave it out, VASP uses the largest `ENMAX` among the `POTCAR` files you use (for `PREC = Normal` or `Accurate`) <Cite id="S-019" />. `ENMAX` is a recommended minimum stored in each `POTCAR`. Read it with `grep ENMAX POTCAR`; this prints one number and never exposes the file's contents.
 - The author's rule: for runs that change the cell (relaxations with `ISIF = 3`, elastic constants, equations of state), use `ENCUT = 1.3 × max(ENMAX)`. For other runs, at least `max(ENMAX)` <Cite id="S-041" /> <Cite id="S-042" />.
 - **Pulay stress.** When the cell volume changes, the number of plane waves under a fixed cutoff changes too, which adds an artificial pressure. Stress converges much more slowly than energy, so cell relaxations need the extra 30 percent margin <Cite id="S-040" />.

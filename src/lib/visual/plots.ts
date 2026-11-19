@@ -14,7 +14,7 @@ import {
   realYlm,
 } from '../physics/hydrogen';
 import { log10RelativeCost, methodById, type MethodId } from '../physics/scaling';
-import { runScf, type ScfOptions, type ScfResult } from '../physics/scf1d';
+import { HARTREE_EV, runScf, type ScfOptions, type ScfResult } from '../physics/scf1d';
 import { dispersion } from '../physics/tightbinding2d';
 import { allElectronLike, pseudo as pawPseudo } from '../physics/paw';
 import { dudarevEnergy, dudarevPotential } from '../physics/dftu';
@@ -54,6 +54,12 @@ export const PLOT_IDS = [
   'bz-1d',
   'paw-radial',
   'ladder-rungs',
+  'ispin-ladders',
+  'dof-cell',
+  'ionic-steps',
+  'ediff-trace',
+  'force-band',
+  'sigma-width',
 ] as const;
 export type PlotId = (typeof PLOT_IDS)[number];
 
@@ -704,8 +710,8 @@ function arrowDown(x: number, y0: number, y1: number): string {
 
 /** Kinetic energy of a plane wave against its wave vector, with the cutoff drawn as a line when asked. */
 function pwParabola(p: P): string {
-  const kmax = 4;
   const ecut = num(p, 'cutoff', 30);
+  const kmax = Math.max(num(p, 'kmax', 4), 0);
   const emax = HBAR2_OVER_2M_EV_A2 * kmax * kmax;
   const c = chart(-kmax, kmax, 0, emax, 'wave vector k', 'kinetic energy');
   let body = c.axes;
@@ -806,7 +812,8 @@ function dftuPenalty(p: P): string {
 
 /** Gamma-centred or Monkhorst-Pack mesh in a 2D reciprocal cell (fractions of the reciprocal vectors). */
 function kmeshGrid(p: P): string {
-  const n = Math.max(1, Math.round(num(p, 'n', 4)));
+  const n = Math.min(40, Math.max(1, Math.round(num(p, 'n', 4))));
+  const m = Math.min(40, Math.max(1, Math.round(num(p, 'm', n))));
   const gamma = p.gamma !== false;
   const angle = (num(p, 'angle', 90) * Math.PI) / 180;
   const ratio = num(p, 'ratio', 1);
@@ -821,11 +828,12 @@ function kmeshGrid(p: P): string {
     cy + u * b1[1] + w * b2[1],
   ];
   let body = path([pt(-0.5, -0.5), pt(0.5, -0.5), pt(0.5, 0.5), pt(-0.5, 0.5)], 'vp-guide', true);
-  const s = gamma ? 0 : n % 2 === 0 ? 0.5 : 0;
+  const sx = gamma ? 0 : n % 2 === 0 ? 0.5 : 0;
+  const sy = gamma ? 0 : m % 2 === 0 ? 0.5 : 0;
   const wrapU = (u: number) => (u >= 0.5 - 1e-9 ? u - 1 : u);
   for (let i = 0; i < n; i++)
-    for (let j = 0; j < n; j++) {
-      const [x, y] = pt(wrapU((i + s) / n), wrapU((j + s) / n));
+    for (let j = 0; j < m; j++) {
+      const [x, y] = pt(wrapU((i + sx) / n), wrapU((j + sy) / m));
       body += `<circle class="vp-node vp-solid" cx="${r1(x)}" cy="${r1(y)}" r="3.5"/>`;
     }
   const [gx, gy] = pt(0, 0);
@@ -908,6 +916,156 @@ function ladderRungs(p: P): string {
   return wrap(p.alt as string, h, body);
 }
 
+/* ---- tag visuals (M12.5): pictures for INCAR tag cards ---- */
+// @source S-019 and S-042 for what each tag means; the SCF energy change uses the toy of M7.1 (S-011, S-031 for hartree to eV)
+
+/** ISPIN: one set of orbitals holding two electrons each, or separate up and down sets. */
+function ispinLadders(p: P): string {
+  if (num(p, 'spin', 2) !== 1) return spinLadders({ ...p, levels: 3, up: [1, 1, 1], down: [1, 1, 0] });
+  const h = 40 + 3 * 36;
+  const cx = W / 2;
+  let body = text(cx, 16, 'one set of orbitals', 'vp-t');
+  for (let i = 0; i < 3; i++) {
+    const y = h - 22 - i * 36;
+    body += line(cx - 42, y, cx + 42, y, 'vp-curve');
+    if (i < 2) body += arrow(cx - 10, y - 1, y - 24) + arrow(cx + 10, y - 24, y - 1);
+  }
+  return wrap(p.alt as string, h, body);
+}
+
+/** ISIF and IBRION: which of atoms, cell shape and cell volume may change (solid: start, dashed: after a change). */
+function dofCell(p: P): string {
+  const atoms = p.atoms === true;
+  const shape = p.shape === true;
+  const volume = p.volume === true;
+  const h = 210;
+  const A: [number, number] = [90, 150];
+  const B: [number, number] = [220, 150];
+  const D: [number, number] = [120, 56];
+  const at = (u: number, w: number): [number, number] => [
+    A[0] + u * (B[0] - A[0]) + w * (D[0] - A[0]),
+    A[1] + u * (B[1] - A[1]) + w * (D[1] - A[1]),
+  ];
+  const cell = (s: number, shear: number, cls: string) => {
+    const c: [number, number] = [W / 2, 103];
+    const f = (q: [number, number]): [number, number] => [
+      c[0] + (q[0] - c[0]) * s + (q[1] < 100 ? shear : 0),
+      c[1] + (q[1] - c[1]) * s,
+    ];
+    const C: [number, number] = [B[0] + D[0] - A[0], D[1]];
+    return path([f(A), f(B), f(C), f(D)], cls, true);
+  };
+  let body = cell(1, 0, 'vp-curve');
+  if (volume) body += cell(1.22, 0, 'vp-guide');
+  if (shape && !volume) body += cell(1, 30, 'vp-guide');
+  if (shape && volume) body += cell(1.22, 30, 'vp-guide');
+  for (const [u, w, up] of [
+    [0.25, 0.3, true],
+    [0.7, 0.7, false],
+  ] as const) {
+    const [x, y] = at(u, w);
+    body += `<circle class="vp-node vp-solid" cx="${r1(x)}" cy="${r1(y)}" r="5"/>`;
+    if (atoms) body += up ? arrow(x + 10, y + 4, y - 20) : arrow(x + 10, y - 4, y + 20);
+  }
+  const moves = [atoms && 'ions', shape && 'cell shape', volume && 'cell volume'].filter(Boolean) as string[];
+  body += text(W / 2, h - 12, moves.length ? `may change: ${moves.join(', ')}` : 'nothing changes', 'vp-t');
+  return wrap(p.alt as string, h, body);
+}
+
+/** NSW: the upper limit on ionic steps, as a row of boxes. */
+function ionicSteps(p: P): string {
+  const nsw = Math.max(0, Math.round(num(p, 'nsw', 0)));
+  const shown = Math.min(Math.max(nsw, 1), 8);
+  const h = 120;
+  const bw = Math.min(34, (W - 60) / shown);
+  const x0 = (W - shown * bw - (shown - 1) * 6) / 2;
+  let body = '';
+  for (let i = 0; i < shown; i++) {
+    const x = x0 + i * (bw + 6);
+    body += `<rect class="vp-step${nsw === 0 ? ' vp-active' : ''}" x="${r1(x)}" y="30" width="${r1(bw)}" height="34" rx="5"/>`;
+    body += text(x + bw / 2, 52, nsw === 0 ? '1' : String(i + 1), 'vp-t');
+  }
+  if (nsw > 8) body += text(W / 2, 86, `... up to step ${nsw}`, 'vp-t');
+  body += text(
+    W / 2,
+    nsw > 8 ? 106 : 92,
+    nsw === 0 ? 'one calculation, no ionic movement' : `at most ${nsw} ionic step${nsw === 1 ? '' : 's'}`,
+    'vp-t',
+  );
+  return wrap(p.alt as string, h, body);
+}
+
+/** EDIFF: energy change between electronic steps of the toy SCF of module 4, with the stop threshold. */
+function ediffTrace(p: P): string {
+  const ediff = Math.max(1e-16, num(p, 'ediff', 1e-4));
+  const r = scf({ Z: 2, alpha: 0.3, tol: 1e-13 });
+  const its = r.iterations;
+  const dE = its
+    .slice(1)
+    .map((it, i) => Math.max(Math.abs(it.totalEnergy - its[i]!.totalEnergy) * HARTREE_EV, 1e-16));
+  const ys = dE.map((d) => Math.log10(d));
+  const t = Math.log10(ediff);
+  const lo = Math.min(...ys, t) - 0.5;
+  const hi = Math.max(...ys, t) + 0.5;
+  const n = Math.min(ys.length, 40);
+  const c = chart(1, Math.max(n, 2), lo, hi, 'electronic step', 'energy change (powers of ten, eV)');
+  const pts = ys.slice(0, n).map((y, i) => [c.sx(i + 1), c.sy(y)] as [number, number]);
+  const stop = dE.findIndex((d) => d < ediff);
+  let body = c.axes + line(c.x0, c.sy(t), c.x1, c.sy(t), 'vp-guide') + path(pts, 'vp-curve');
+  body += text(c.x1 - 4, c.sy(t) - 5, 'EDIFF', 'vp-t', 'end');
+  body += pts
+    .map(([x, y]) => `<circle class="vp-node vp-solid" cx="${r1(x)}" cy="${r1(y)}" r="2.5"/>`)
+    .join('');
+  if (stop >= 0 && stop < n) {
+    body += `<circle class="vp-node" cx="${r1(c.sx(stop + 1))}" cy="${r1(c.sy(ys[stop]!))}" r="6"/>`;
+  }
+  return wrap(p.alt as string, c.h, body);
+}
+
+/** EDIFFG < 0: the largest force on any ion at each ionic step (illustrative decay) with the stop band. */
+function forceBand(p: P): string {
+  const tol = Math.max(1e-6, Math.abs(num(p, 'tol', 0.01)));
+  const n = 12;
+  const f = (i: number) => 0.4 * 0.62 ** i;
+  const ys = Array.from({ length: n }, (_, i) => Math.log10(f(i)));
+  const t = Math.log10(tol);
+  const lo = Math.min(...ys, t) - 0.3;
+  const hi = Math.max(...ys, t) + 0.3;
+  const c = chart(1, n, lo, hi, 'ionic step', 'largest force (powers of ten, eV/A)');
+  const pts = ys.map((y, i) => [c.sx(i + 1), c.sy(y)] as [number, number]);
+  const stop = ys.findIndex((y) => y < t);
+  let body = c.axes + line(c.x0, c.sy(t), c.x1, c.sy(t), 'vp-guide') + path(pts, 'vp-curve');
+  body += text(c.x1 - 4, c.sy(t) - 5, '|EDIFFG|', 'vp-t', 'end');
+  body += pts
+    .map(([x, y]) => `<circle class="vp-node vp-solid" cx="${r1(x)}" cy="${r1(y)}" r="2.5"/>`)
+    .join('');
+  if (stop >= 0)
+    body += `<circle class="vp-node" cx="${r1(c.sx(stop + 1))}" cy="${r1(c.sy(ys[stop]!))}" r="6"/>`;
+  return wrap(p.alt as string, c.h, body);
+}
+
+/** ISMEAR and SIGMA: occupation against energy in eV for one scheme and one width. */
+function sigmaWidth(p: P): string {
+  const id = (typeof p.scheme === 'string' ? p.scheme : 'gaussian') as SmearingId;
+  const scheme = SMEARINGS.some((s) => s.id === id) ? id : 'gaussian';
+  const sigma = Math.max(1e-3, num(p, 'sigma', 0.1));
+  const span = 0.6;
+  const es = sample(-span, span, 160);
+  const ys = es.map((e) => smearOcc(scheme, e / sigma));
+  const ymin = Math.min(0, ...ys);
+  const ymax = Math.max(1, ...ys) * 1.05;
+  const c = chart(-span, span, ymin * 1.05, ymax, 'energy from the Fermi level (eV)', 'occupation');
+  let body = c.axes + line(c.sx(0), c.y0, c.sx(0), c.y1, 'vp-guide');
+  if (ymin < 0) body += line(c.x0, c.sy(0), c.x1, c.sy(0), 'vp-zero');
+  body += path(
+    es.map((e, i) => [c.sx(e), c.sy(ys[i]!)]),
+    'vp-curve',
+  );
+  body += line(c.sx(-sigma), c.sy(0.5), c.sx(sigma), c.sy(0.5), 'vp-guide');
+  body += text(c.sx(0), c.sy(0.5) - 6, `SIGMA = ${sigma} eV`, 'vp-t');
+  return wrap(p.alt as string, c.h, body);
+}
+
 const RENDER: Record<PlotId, { fn: (p: P) => string; badge: PlotBadge }> = {
   'box-levels': { fn: boxLevels, badge: 'computed' },
   'box-wave': { fn: boxWave, badge: 'computed' },
@@ -935,6 +1093,12 @@ const RENDER: Record<PlotId, { fn: (p: P) => string; badge: PlotBadge }> = {
   'bz-1d': { fn: bz1d, badge: 'illustrative' },
   'paw-radial': { fn: pawRadial, badge: 'illustrative' },
   'ladder-rungs': { fn: ladderRungs, badge: 'illustrative' },
+  'ispin-ladders': { fn: ispinLadders, badge: 'illustrative' },
+  'dof-cell': { fn: dofCell, badge: 'illustrative' },
+  'ionic-steps': { fn: ionicSteps, badge: 'illustrative' },
+  'ediff-trace': { fn: ediffTrace, badge: 'toy-model' },
+  'force-band': { fn: forceBand, badge: 'illustrative' },
+  'sigma-width': { fn: sigmaWidth, badge: 'computed' },
 };
 
 export function isPlotId(id: string): id is PlotId {

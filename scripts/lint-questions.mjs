@@ -37,6 +37,12 @@ export const PLOT_IDS = [
   'bz-1d',
   'paw-radial',
   'ladder-rungs',
+  'ispin-ladders',
+  'dof-cell',
+  'ionic-steps',
+  'ediff-trace',
+  'force-band',
+  'sigma-width',
 ];
 
 function walk(dir) {

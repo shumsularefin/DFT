@@ -1,0 +1,11 @@
+---
+// <TagVisual tag="ISPIN" /> in a handbook topic: a "Show me" picture for one INCAR tag, using the tag's example value.
+import { TagLevel } from '../tools/input-builder/TagLevel';
+interface Props {
+  tag: string;
+  value?: string;
+}
+const { tag, value = '' } = Astro.props;
+---
+
+<TagLevel client:visible tag={tag} value={value} />

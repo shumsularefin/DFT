@@ -366,3 +366,12 @@
   outline: 3px solid var(--focus);
   outline-offset: 2px;
 }
+
+/* "Show me" under a tag card (M12.5) */
+.tv {
+  margin: 0.75rem 0;
+}
+.tv > summary {
+  cursor: pointer;
+  font-weight: 600;
+}

@@ -46,6 +46,8 @@ Write the up and down densities as $n_\uparrow(\mathbf r)$ and $n_\downarrow(\ma
 
 <InVasp>
 
+<TagVisual tag="ISPIN" />
+
 - `ISPIN = 2` turns on collinear spin polarization (default 1). It roughly doubles the time and memory <Cite id="S-042" />.
 - `MAGMOM` takes one value per atom, in `POSCAR` order, in $\mu_B$. The shorthand `4*3.0` means four atoms at 3.0. The count must equal the number of atoms; a count mismatch is a common mistake <Cite id="S-042" />. An antiferromagnetic example from the tag card: `5 -5 4*0`.
 - The author's rule for the starting moment of 3d magnetic ions is 3 to 5 $\mu_B$; if it is too small, the moment can collapse to zero. Compare energies and check that `ISPIN = 2` is set <Cite id="S-042" />.

@@ -12,7 +12,8 @@ import { useLevel } from './hooks';
 import { STEPS, useBuilder } from './store';
 
 export default function InputBuilder() {
-  const { step, setStep, selectedTag, applyShare, set } = useBuilder();
+  const { step, setStep, selectedTag, applyShare, set, entries, structure } = useBuilder();
+  const incar = Object.fromEntries(entries.map((e) => [e.name, e.value]));
   const level = useLevel();
   const [mode, setMode] = useState<'single' | 'series'>('single');
 
@@ -83,7 +84,14 @@ export default function InputBuilder() {
             </div>
             {step === 2 && (
               <div className="ib-aside">
-                <TagCard name={selectedTag} level={level} onSelect={(n) => set('selectedTag', n)} />
+                <TagCard
+                  name={selectedTag}
+                  level={level}
+                  onSelect={(n) => set('selectedTag', n)}
+                  value={selectedTag ? incar[selectedTag] : undefined}
+                  structure={structure}
+                  incar={incar}
+                />
               </div>
             )}
           </div>

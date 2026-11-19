@@ -68,6 +68,8 @@ The sign convention for $x$ in the cold scheme is an open question on this site 
 
 <InVasp>
 
+<TagVisual tag="ISMEAR" />
+
 - `ISMEAR` picks the scheme and `SIGMA` the width in eV. `ISMEAR = 0` is Gaussian, `1` and `2` are Methfessel-Paxton of order 1 and 2, `-1` is Fermi-Dirac and `-5` is the tetrahedron method with Blochl corrections <Cite id="S-019" /> <Cite id="S-017" />. The sources used here do not give an `ISMEAR` value for cold smearing, so none is claimed.
 - The VASP default is `ISMEAR = 1` with `SIGMA = 0.2`. That suits metals only, so set both explicitly every time <Cite id="S-042" />.
 - Author's rules: `ISMEAR = 0` with a small `SIGMA` (0.05 is the usual) is safe for anything. Use 0.01 to 0.05 eV for insulators and semiconductors, and 0.1 to 0.2 eV with `ISMEAR = 1` for metals <Cite id="S-041" /> <Cite id="S-042" />.
