@@ -1,0 +1,281 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dft-handbook.local/schemas/mp/1.json",
+  "title": "DFT Handbook Screening Studio data (Materials Project derived)",
+  "description": "Shared by scripts/mp/validate.py (jsonschema) and src/lib/mp/validate.ts (a small interpreter of the keywords used here). Only the keywords listed in x-keywords may appear. Field names follow the Materials Project summary endpoint (S-044).",
+  "x-schemaVersion": 1,
+  "x-keywords": [
+    "$schema",
+    "$id",
+    "$ref",
+    "$defs",
+    "title",
+    "description",
+    "type",
+    "const",
+    "enum",
+    "properties",
+    "required",
+    "additionalProperties",
+    "items",
+    "minItems",
+    "maxItems",
+    "minimum",
+    "exclusiveMinimum",
+    "maximum",
+    "minLength",
+    "pattern"
+  ],
+  "x-budgets": {
+    "indexGzipBytes": 1572864,
+    "shardGzipTargetBytes": 102400,
+    "shardGzipMaxBytes": 131072,
+    "totalGzipBytes": 10485760
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z]+-[0-9]+$" },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "dbVersion": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+    "shardId": { "type": "string", "pattern": "^[0-9]{3}$" },
+    "isoTime": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$" },
+    "ordering": { "enum": ["NM", "FM", "FiM", "AFM", "Unknown", null] },
+    "vec3": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+    "current": {
+      "description": "public/data/mp/current.json: which committed snapshot the site loads. Written only for real data.",
+      "type": "object",
+      "required": ["schemaVersion", "dbVersion", "manifest"],
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "dbVersion": { "$ref": "#/$defs/dbVersion" },
+        "manifest": { "type": "string", "pattern": "^[A-Za-z0-9._-]+/manifest\\.json$" }
+      }
+    },
+    "manifest": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "synthetic",
+        "dbVersion",
+        "generated",
+        "count",
+        "starterCount",
+        "shardTargetGzipBytes",
+        "licence",
+        "attribution",
+        "source",
+        "files"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "synthetic": { "type": "boolean" },
+        "dbVersion": { "$ref": "#/$defs/dbVersion" },
+        "generated": { "$ref": "#/$defs/isoTime" },
+        "count": { "type": "integer", "minimum": 0 },
+        "starterCount": { "type": "integer", "minimum": 0 },
+        "shardTargetGzipBytes": { "type": "integer", "minimum": 1 },
+        "licence": { "type": "string", "minLength": 1 },
+        "attribution": { "type": "string", "minLength": 1 },
+        "source": {
+          "type": "object",
+          "required": ["client", "clientVersion", "query", "fetched", "mock"],
+          "additionalProperties": false,
+          "properties": {
+            "client": { "type": "string", "minLength": 1 },
+            "clientVersion": { "type": "string", "minLength": 1 },
+            "query": { "type": "object" },
+            "fetched": { "$ref": "#/$defs/isoTime" },
+            "mock": { "type": "boolean" },
+            "skipped": { "type": "object" }
+          }
+        },
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["path", "sha256", "bytes", "gzipBytes"],
+            "additionalProperties": false,
+            "properties": {
+              "path": { "type": "string", "pattern": "^(index\\.json|s/[0-9]{3}\\.json)$" },
+              "sha256": { "$ref": "#/$defs/sha256" },
+              "bytes": { "type": "integer", "minimum": 1 },
+              "gzipBytes": { "type": "integer", "minimum": 1 }
+            }
+          }
+        }
+      }
+    },
+    "index": {
+      "description": "Columnar: one array per field, all of length count. elements holds indices into symbols, spacegroup an index into spaceGroups, shard the starter shard id or null.",
+      "type": "object",
+      "required": ["schemaVersion", "dbVersion", "count", "symbols", "spaceGroups", "columns"],
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "dbVersion": { "$ref": "#/$defs/dbVersion" },
+        "count": { "type": "integer", "minimum": 0 },
+        "symbols": { "type": "array", "items": { "type": "string", "pattern": "^[A-Z][a-z]?$" } },
+        "spaceGroups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["number", "symbol", "crystalSystem"],
+            "additionalProperties": false,
+            "properties": {
+              "number": { "type": "integer", "minimum": 1, "maximum": 230 },
+              "symbol": { "type": "string", "minLength": 1 },
+              "crystalSystem": {
+                "enum": ["Triclinic", "Monoclinic", "Orthorhombic", "Tetragonal", "Trigonal", "Hexagonal", "Cubic"]
+              }
+            }
+          }
+        },
+        "columns": {
+          "type": "object",
+          "required": [
+            "material_id",
+            "formula_pretty",
+            "elements",
+            "nsites",
+            "volume",
+            "density",
+            "energy_above_hull",
+            "formation_energy_per_atom",
+            "band_gap",
+            "is_gap_direct",
+            "is_metal",
+            "is_magnetic",
+            "ordering",
+            "total_magnetization",
+            "num_magnetic_sites",
+            "spacegroup",
+            "is_stable",
+            "theoretical",
+            "shard"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "material_id": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+            "formula_pretty": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+            "elements": {
+              "type": "array",
+              "items": { "type": "array", "minItems": 1, "items": { "type": "integer", "minimum": 0 } }
+            },
+            "nsites": { "type": "array", "items": { "type": "integer", "minimum": 1 } },
+            "volume": { "type": "array", "items": { "type": "number", "exclusiveMinimum": 0 } },
+            "density": { "type": "array", "items": { "type": "number", "exclusiveMinimum": 0 } },
+            "energy_above_hull": { "type": "array", "items": { "type": "number", "minimum": 0 } },
+            "formation_energy_per_atom": { "type": "array", "items": { "type": ["number", "null"] } },
+            "band_gap": { "type": "array", "items": { "type": "number", "minimum": 0 } },
+            "is_gap_direct": { "type": "array", "items": { "type": ["boolean", "null"] } },
+            "is_metal": { "type": "array", "items": { "type": ["boolean", "null"] } },
+            "is_magnetic": { "type": "array", "items": { "type": ["boolean", "null"] } },
+            "ordering": { "type": "array", "items": { "$ref": "#/$defs/ordering" } },
+            "total_magnetization": { "type": "array", "items": { "type": ["number", "null"] } },
+            "num_magnetic_sites": { "type": "array", "items": { "type": ["integer", "null"], "minimum": 0 } },
+            "spacegroup": { "type": "array", "items": { "type": "integer", "minimum": 0 } },
+            "is_stable": { "type": "array", "items": { "type": "boolean" } },
+            "theoretical": { "type": "array", "items": { "type": "boolean" } },
+            "shard": { "type": "array", "items": { "type": ["string", "null"], "pattern": "^[0-9]{3}$" } }
+          }
+        }
+      }
+    },
+    "structure": {
+      "type": "object",
+      "required": ["lattice", "species", "frac"],
+      "additionalProperties": false,
+      "properties": {
+        "lattice": { "description": "Rows are the lattice vectors a, b, c in angstrom.", "type": "array", "items": { "$ref": "#/$defs/vec3" }, "minItems": 3, "maxItems": 3 },
+        "species": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^[A-Z][a-z]?$" } },
+        "frac": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/vec3" } }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "material_id",
+        "formula_pretty",
+        "chemsys",
+        "elements",
+        "nelements",
+        "nsites",
+        "volume",
+        "density",
+        "energy_above_hull",
+        "formation_energy_per_atom",
+        "is_stable",
+        "band_gap",
+        "is_gap_direct",
+        "is_metal",
+        "is_magnetic",
+        "ordering",
+        "total_magnetization",
+        "num_magnetic_sites",
+        "symmetry",
+        "theoretical"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "material_id": { "$ref": "#/$defs/id" },
+        "formula_pretty": { "type": "string", "minLength": 1 },
+        "chemsys": { "type": "string", "pattern": "^[A-Z][a-z]?(-[A-Z][a-z]?)*$" },
+        "elements": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^[A-Z][a-z]?$" } },
+        "nelements": { "type": "integer", "minimum": 1 },
+        "nsites": { "type": "integer", "minimum": 1 },
+        "volume": { "type": "number", "exclusiveMinimum": 0 },
+        "density": { "type": "number", "exclusiveMinimum": 0 },
+        "energy_above_hull": { "type": "number", "minimum": 0 },
+        "formation_energy_per_atom": { "type": ["number", "null"] },
+        "is_stable": { "type": "boolean" },
+        "band_gap": { "type": "number", "minimum": 0 },
+        "is_gap_direct": { "type": ["boolean", "null"] },
+        "is_metal": { "type": ["boolean", "null"] },
+        "is_magnetic": { "type": ["boolean", "null"] },
+        "ordering": { "$ref": "#/$defs/ordering" },
+        "total_magnetization": { "type": ["number", "null"] },
+        "num_magnetic_sites": { "type": ["integer", "null"], "minimum": 0 },
+        "symmetry": {
+          "type": "object",
+          "required": ["crystal_system", "symbol", "number", "point_group"],
+          "additionalProperties": false,
+          "properties": {
+            "crystal_system": {
+              "enum": ["Triclinic", "Monoclinic", "Orthorhombic", "Tetragonal", "Trigonal", "Hexagonal", "Cubic"]
+            },
+            "symbol": { "type": "string", "minLength": 1 },
+            "number": { "type": "integer", "minimum": 1, "maximum": 230 },
+            "point_group": { "type": "string", "minLength": 1 }
+          }
+        },
+        "theoretical": { "type": "boolean" }
+      }
+    },
+    "shard": {
+      "type": "object",
+      "required": ["schemaVersion", "dbVersion", "shard", "entries"],
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "dbVersion": { "$ref": "#/$defs/dbVersion" },
+        "shard": { "$ref": "#/$defs/shardId" },
+        "entries": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["material_id", "structure", "summary"],
+            "additionalProperties": false,
+            "properties": {
+              "material_id": { "$ref": "#/$defs/id" },
+              "structure": { "$ref": "#/$defs/structure" },
+              "summary": { "$ref": "#/$defs/summary" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

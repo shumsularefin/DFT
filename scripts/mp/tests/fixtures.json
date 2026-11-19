@@ -1,0 +1,19 @@
+{
+  "description": "Corruptions of the sample dataset (public/data/mp/sample). Applied by scripts/mp/tests/test_pipeline.py and src/lib/mp/validate.test.ts; both validators must report every code in expect. set: replace the value at a JSON path; delete: remove the array item at a path; appendText: change the raw bytes; remove: delete the file; rehash: update the file's sha256 and bytes in the manifest so only the content check fires.",
+  "cases": [
+    { "name": "corrupted hash", "edits": [{ "file": "index.json", "appendText": " " }], "expect": ["hash-mismatch", "size-mismatch"] },
+    { "name": "index over budget", "budgets": { "indexGzipBytes": 500 }, "expect": ["over-budget"] },
+    { "name": "shard over budget", "budgets": { "shardGzipMaxBytes": 300 }, "expect": ["over-budget"] },
+    { "name": "total over budget", "budgets": { "totalGzipBytes": 2000 }, "expect": ["over-budget"] },
+    { "name": "negative energy above hull", "edits": [{ "file": "index.json", "set": ["columns", "energy_above_hull", 0], "value": -0.01, "rehash": true }], "expect": ["schema"] },
+    { "name": "negative band gap", "edits": [{ "file": "index.json", "set": ["columns", "band_gap", 3], "value": -0.5, "rehash": true }], "expect": ["schema"] },
+    { "name": "zero sites", "edits": [{ "file": "index.json", "set": ["columns", "nsites", 2], "value": 0, "rehash": true }], "expect": ["schema"] },
+    { "name": "duplicate id", "edits": [{ "file": "index.json", "set": ["columns", "material_id", 1], "value": "sample-0001", "rehash": true }], "expect": ["duplicate-id"] },
+    { "name": "missing shard entry", "edits": [{ "file": "s/000.json", "delete": ["entries", 0], "rehash": true }], "expect": ["missing-shard-entry"] },
+    { "name": "missing shard file", "edits": [{ "file": "s/001.json", "remove": true }], "expect": ["missing-file"] },
+    { "name": "column length", "edits": [{ "file": "index.json", "delete": ["columns", "density", 0], "rehash": true }], "expect": ["column-length"] },
+    { "name": "shard site count", "edits": [{ "file": "s/000.json", "set": ["entries", 0, "summary", "nsites"], "value": 99, "rehash": true }], "expect": ["entry"] },
+    { "name": "sample marked real", "edits": [{ "file": "manifest.json", "set": ["synthetic"], "value": false }], "expect": ["synthetic-mismatch"] },
+    { "name": "unknown manifest field", "edits": [{ "file": "manifest.json", "set": ["extra"], "value": 1 }], "expect": ["schema"] }
+  ]
+}

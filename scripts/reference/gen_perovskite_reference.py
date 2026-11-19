@@ -13,10 +13,9 @@ Sources:
       Bartel tau = rX/rB - nA * (nA - (rA/rB) / ln(rA/rB)); perovskite predicted if tau < 4.18
         (C. J. Bartel et al., Sci. Adv. 5, eaav0693 (2019)).
 
-STATUS OF THE tau FORMULA: written from memory; the paper could not be fetched when this file
-was created (arxiv.org / PMC unreachable from the sandbox). docs/OPEN_QUESTIONS.md Q-003 requires
-confirming the equation, the 4.18 threshold and the radius convention against the paper
-before milestone M8.2 is accepted.
+STATUS OF THE tau FORMULA: first written from memory; confirmed in M8.2 (2026-11-18) against the
+arXiv version of the paper (arXiv:1801.07700v2, equation 2, the 4.18 threshold and the Methods section
+"Radii assignment"); the published Science Advances text was not reachable. See docs/OPEN_QUESTIONS.md Q-003.
 
 Output: tests/reference/perovskite_reference.json
 """
@@ -129,7 +128,7 @@ def main():
         "_meta": {
             "generator": "scripts/reference/gen_perovskite_reference.py",
             "radii_source": "pymatgen periodic_table.json (Shannon 1976 data); anchors are a consistency check only, not independent (Q-002)",
-            "tau_status": "FORMULA FROM MEMORY, UNCONFIRMED AGAINST PAPER (see docs/OPEN_QUESTIONS.md Q-003)",
+            "tau_status": "Equation 2 and the 4.18 threshold confirmed against arXiv:1801.07700v2 in M8.2; published version not compared (Q-003)",
             "radius_kind": "Shannon effective IONIC radius (not crystal radius)",
         },
         "anchor_radii": anchors_out,

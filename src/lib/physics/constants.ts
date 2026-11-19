@@ -24,3 +24,10 @@ export const BOHR_RADIUS_ANGSTROM = 0.529177210903;
 
 /** Rydberg energy h c R_infinity in eV (CODATA 2018). The hydrogen ground-state energy is minus this. */
 export const RYDBERG_ENERGY_EV = 13.605693122994;
+
+/**
+ * 1 eV/Angstrom^3 in GPa: e * 1e30 / 1e9 = 160.2176634 (exact, from the exact elementary charge). Bulk moduli from
+ * an E(V) fit come out in eV/Angstrom^3 and are shown in GPa with this factor (M13.6). The Workflow Handbook
+ * (S-042) rounds it to 160.2177; the golden file takes it from scipy.constants.
+ */
+export const EV_PER_A3_IN_GPA = (ELEMENTARY_CHARGE_C * 1e30) / 1e9;

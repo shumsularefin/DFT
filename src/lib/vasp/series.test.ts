@@ -13,7 +13,14 @@ import { parseIncar } from './incar';
 import {
   DEFAULT_RESOLUTIONS,
   MAX_RUNS,
+  DEFAULT_VOLUME_FRACTIONS,
+  EOS_ROOT,
+  buildEosProject,
   buildProject,
+  cellVolume,
+  eosEntries,
+  looksCubic,
+  volumeSeries,
   collectScript,
   encutSeries,
   kmeshSeries,
@@ -27,6 +34,7 @@ import {
 } from './series';
 import { validate } from './validate';
 import { parseSeriesCsv } from './csv';
+import { eosPointsFromRows, ingestEosCsv } from './eosInput';
 
 const cu = parsePoscar(
   readFileSync(new URL('../crystal/__fixtures__/cu-fcc.vasp', import.meta.url), 'utf8'),
@@ -244,5 +252,172 @@ describe('zip', () => {
     }
     expect(modes.get('run_all.sh')).toBe(0o755);
     expect(modes.get('README.txt')).toBe(0o644);
+  });
+});
+
+describe('equation-of-state volume series (M13.6, S-042)', () => {
+  const v0 = cellVolume(cu.lattice);
+  it('fcc Cu primitive cell volume is a^3 / 4', () => {
+    expect(v0).toBeCloseTo(3.61 ** 3 / 4, 12);
+  });
+  it('default is 7 volumes from 0.94 to 1.06, scaled isotropically with unchanged fractional coordinates', () => {
+    expect(DEFAULT_VOLUME_FRACTIONS).toEqual([0.94, 0.96, 0.98, 1, 1.02, 1.04, 1.06]);
+    const runs = volumeSeries(cu);
+    expect(runs.map((r) => r.folder)).toEqual([
+      'vol_0.940',
+      'vol_0.960',
+      'vol_0.980',
+      'vol_1.000',
+      'vol_1.020',
+      'vol_1.040',
+      'vol_1.060',
+    ]);
+    for (const r of runs) {
+      expect(cellVolume(r.structure.lattice) / v0).toBeCloseTo(r.fraction, 12);
+      expect(r.volume).toBeCloseTo(v0 * r.fraction, 12);
+      expect(r.structure.frac).toEqual(cu.frac);
+      // isotropic: every vector keeps its direction and grows by f^(1/3)
+      r.structure.lattice.forEach((row, i) =>
+        row.forEach((x, j) => expect(x).toBeCloseTo(cu.lattice[i]![j]! * Math.cbrt(r.fraction), 12)),
+      );
+    }
+  });
+  it('custom fractions are sorted; bad ones are refused', () => {
+    expect(volumeSeries(cu, { fractions: [1.1, 0.9, 1] }).map((r) => r.fraction)).toEqual([0.9, 1, 1.1]);
+    expect(() => volumeSeries(cu, { fractions: [] })).toThrow(/at least one/);
+    expect(() => volumeSeries(cu, { fractions: [1, -0.5] })).toThrow(/positive/);
+    expect(() => volumeSeries(cu, { fractions: [1, 1.0001] })).toThrow(/same folder/);
+    expect(() =>
+      volumeSeries(cu, { fractions: Array.from({ length: MAX_RUNS + 1 }, (_, i) => 0.8 + i / 100) }),
+    ).toThrow(/too long/);
+  });
+  it('recognises cubic cells (sc, fcc and bcc primitive) and nothing else', () => {
+    expect(looksCubic(cu.lattice)).toBe(true);
+    expect(
+      looksCubic([
+        [3, 0, 0],
+        [0, 3, 0],
+        [0, 0, 3],
+      ]),
+    ).toBe(true);
+    expect(
+      looksCubic([
+        [-1.5, 1.5, 1.5],
+        [1.5, -1.5, 1.5],
+        [1.5, 1.5, -1.5],
+      ]),
+    ).toBe(true);
+    expect(
+      looksCubic([
+        [3, 0, 0],
+        [0, 3, 0],
+        [0, 0, 3.2],
+      ]),
+    ).toBe(false);
+    expect(
+      looksCubic([
+        [3, 0, 0],
+        [-1.5, 2.598076, 0],
+        [0, 0, 3],
+      ]),
+    ).toBe(false);
+  });
+  it('INCAR per point: ISIF 4 (2 for cubic), IBRION 2, NSW 100, EDIFF 1E-6, EDIFFG -0.005, fixed ENCUT, no KSPACING', () => {
+    const tags = (cubic: boolean) =>
+      Object.fromEntries(eosEntries(base(), 520, cubic).map((e) => [e.name, e.value] as const));
+    const t = tags(false);
+    expect([t.ISIF, t.IBRION, t.NSW, t.EDIFF, t.EDIFFG, t.ENCUT]).toEqual([
+      '4',
+      '2',
+      '100',
+      '1E-6',
+      '-0.005',
+      '520',
+    ]);
+    expect(t.KSPACING).toBeUndefined();
+    expect(tags(true).ISIF).toBe('2');
+    expect(new Set(eosEntries(base(), 520, false).map((e) => e.name)).size).toBe(
+      eosEntries(base(), 520, false).length,
+    );
+  });
+  const eosInput = {
+    structure: cu,
+    entries: base(),
+    job: DEFAULT_JOB,
+    encut: 520,
+    mesh: [12, 12, 12] as const,
+    cubic: true,
+  };
+  it('project: one folder per volume, identical INCAR and KPOINTS, POSCAR at the scaled volume, valid INCAR', () => {
+    const p = buildEosProject({ ...eosInput, mesh: [12, 12, 12] });
+    expect(p.folders).toHaveLength(7);
+    expect(p.warnings).toEqual([]);
+    const get = (path: string) => p.files.find((f) => f.path === path)!.content;
+    const incars = new Set(p.folders.map((f) => get(`${EOS_ROOT}/${f}/INCAR`)));
+    const kpts = new Set(p.folders.map((f) => get(`${EOS_ROOT}/${f}/KPOINTS`)));
+    expect(incars.size).toBe(1);
+    expect(kpts.size).toBe(1);
+    expect(() => parseKpoints(get(`${EOS_ROOT}/vol_1.000/KPOINTS`))).not.toThrow();
+    const incar = [...incars][0]!;
+    const issues = validate({
+      incar: parseIncar(incar).entries,
+      kpoints: parseKpoints(get(`${EOS_ROOT}/vol_1.000/KPOINTS`)),
+      structure: cu,
+      enmaxEv: 400,
+      vaspVersion: '6.4',
+    });
+    expect(issues.filter((f) => f.severity === 'error')).toEqual([]);
+    const pos = parsePoscar(get(`${EOS_ROOT}/vol_0.940/POSCAR`)).structure;
+    expect(cellVolume(pos.lattice) / v0).toBeCloseTo(0.94, 6);
+    const readme = get('README.txt');
+    expect(readme).toMatch(/Pulay/);
+    expect(readme).toMatch(/ISIF = 2/);
+    expect(readme).toMatch(/ISTART = 2/);
+    expect(
+      buildEosProject({ ...eosInput, mesh: [12, 12, 12], cubic: false }).files.find(
+        (f) => f.path === 'README.txt',
+      )!.content,
+    ).toMatch(/ISIF = 4/);
+    expect(get('run_all.sh')).toContain(`for d in ${EOS_ROOT}/vol_0.940 `);
+    expect(get('make_potcar.sh')).toContain(`${EOS_ROOT}/vol_1.060; do cp POTCAR`);
+    expect(get('make_potcar.sh')).not.toMatch(/PAW_PBE|TITEL|VRHFIN|End of Dataset/);
+  });
+  it('project warnings: fewer than 7 volumes, start volume outside the scan', () => {
+    const w = buildEosProject({
+      ...eosInput,
+      mesh: [12, 12, 12],
+      fractions: [1.02, 1.04, 1.06],
+    }).warnings.join(' ');
+    expect(w).toMatch(/7 to 11/);
+    expect(w).toMatch(/outside the scanned range/);
+  });
+  const hasBash = spawnSync('bash', ['--version']).status === 0;
+  it.skipIf(!hasBash)('scripts pass bash -n and collect.sh output feeds the EOS CSV reader', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'eos-'));
+    const p = buildEosProject({ ...eosInput, mesh: [12, 12, 12], fractions: [0.98, 1] });
+    for (const f of p.files.filter((x) => x.path.endsWith('.sh') && !x.path.includes('/'))) {
+      const file = join(dir, f.path);
+      writeFileSync(file, f.content);
+      expect(() => execFileSync('bash', ['-n', file]), f.path).not.toThrow();
+    }
+    execFileSync('bash', ['-c', `mkdir -p ${dir}/${EOS_ROOT}/vol_0.980 ${dir}/${EOS_ROOT}/vol_1.000`]);
+    const outcar = (v: string, e: string) =>
+      `   number of dos      NEDOS =  301   number of ions     NIONS =      1\n  volume of cell :       ${v}\n  energy  without entropy=      ${e}  energy(sigma->0) =      ${e}\n reached required accuracy - stopping structural energy minimisation\n`;
+    writeFileSync(join(dir, `${EOS_ROOT}/vol_0.980/OUTCAR`), outcar('11.53', '-3.7101'));
+    writeFileSync(join(dir, `${EOS_ROOT}/vol_1.000/OUTCAR`), outcar('11.76', '-3.7150'));
+    const out = execFileSync('bash', [join(dir, 'collect.sh')], { encoding: 'utf8' });
+    expect(out).toBe(
+      'label,volume_A3,E_sigma0,nions\nvol_0.980,11.53,-3.7101,1\nvol_1.000,11.76,-3.7150,1\n',
+    );
+    const rows = ingestEosCsv(out).rows.map((r, id) => ({ ...r, id }));
+    expect(eosPointsFromRows(rows)).toEqual({
+      points: [
+        { volume: 11.53, energy: -3.7101, label: 'vol_0.980' },
+        { volume: 11.76, energy: -3.715, label: 'vol_1.000' },
+      ],
+      skipped: [],
+      natoms: 1,
+      natomsMismatch: false,
+    });
   });
 });

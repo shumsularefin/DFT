@@ -124,3 +124,16 @@ export function clearSelective(s: Structure): Structure {
 /** Number of sites with at least one frozen direction. */
 export const frozenCount = (s: Structure): number =>
   s.selective ? s.selective.filter((f) => !(f[0] && f[1] && f[2])).length : 0;
+
+/** Remove the listed sites; labels and selective-dynamics flags follow their sites. */
+export function deleteSites(s: Structure, indices: readonly number[]): Structure {
+  const drop = new Set(indices);
+  const keep = <T>(a: readonly T[]) => a.filter((_, i) => !drop.has(i));
+  return {
+    ...s,
+    species: keep(s.species),
+    frac: keep(s.frac),
+    ...(s.labels ? { labels: keep(s.labels) } : {}),
+    ...(s.selective ? { selective: keep(s.selective) } : {}),
+  };
+}

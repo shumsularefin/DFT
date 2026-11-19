@@ -20,3 +20,5 @@ scripts/reference/
 scripts/build/check-real-data.mjs
 README.md
 scripts/__generated__/
+public/data/mp/
+scripts/mp/

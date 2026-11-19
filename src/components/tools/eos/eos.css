@@ -1,0 +1,24 @@
+.eos-results {
+  display: grid;
+  grid-template-columns: minmax(8rem, max-content) 1fr;
+  gap: 0.25rem var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: var(--space-3);
+  background: var(--surface);
+}
+.eos-results dt {
+  font-weight: 600;
+}
+.eos-results dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 480px) {
+  .eos-results {
+    grid-template-columns: 1fr;
+  }
+  .eos-results dd {
+    margin-bottom: var(--space-2);
+  }
+}

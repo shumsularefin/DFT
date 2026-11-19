@@ -2,7 +2,7 @@
  "_meta": {
   "generator": "scripts/reference/gen_perovskite_reference.py",
   "radii_source": "pymatgen periodic_table.json (Shannon 1976 data); anchors are a consistency check only, not independent (Q-002)",
-  "tau_status": "FORMULA FROM MEMORY, UNCONFIRMED AGAINST PAPER (see docs/OPEN_QUESTIONS.md Q-003)",
+  "tau_status": "Equation 2 and the 4.18 threshold confirmed against arXiv:1801.07700v2 in M8.2; published version not compared (Q-003)",
   "radius_kind": "Shannon effective IONIC radius (not crystal radius)"
  },
  "anchor_radii": [
