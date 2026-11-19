@@ -49,6 +49,10 @@ describe('queries', () => {
   it('orders prerequisites first, deterministically', () => {
     expect(topologicalOrder(diamond())).toEqual(['a', 'b', 'c', 'd']);
   });
+  it('orders a subset whose prerequisites are not all in it (published concepts)', () => {
+    const subset = diamond().filter((c) => c.id !== 'a');
+    expect(topologicalOrder(subset)).toHaveLength(subset.length);
+  });
   it('finds ancestors and descendants', () => {
     const g = diamond();
     expect(ancestors(g, 'd')).toEqual(['a', 'b', 'c']);

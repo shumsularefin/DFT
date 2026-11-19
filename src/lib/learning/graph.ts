@@ -123,13 +123,17 @@ export function loadConcepts(raw: unknown): Concept[] {
 
 /** Topological order: prerequisites first, ties broken by module then id (stable). */
 export function topologicalOrder(concepts: readonly Concept[]): string[] {
-  const indeg = new Map<string, number>(concepts.map((c) => [c.id, c.prerequisites.length]));
+  // A subset (the published concepts) may name prerequisites that are not in it yet; only those inside count.
+  const inSet = new Set(concepts.map((c) => c.id));
+  const indeg = new Map<string, number>(
+    concepts.map((c) => [c.id, c.prerequisites.filter((x) => inSet.has(x)).length]),
+  );
   const dependents = dependentsMap(concepts);
   const byId = new Map(concepts.map((c) => [c.id, c]));
   const cmp = (a: string, b: string) =>
     (byId.get(a)?.module ?? 0) - (byId.get(b)?.module ?? 0) || (a < b ? -1 : a > b ? 1 : 0);
   const ready = concepts
-    .filter((c) => c.prerequisites.length === 0)
+    .filter((c) => indeg.get(c.id) === 0)
     .map((c) => c.id)
     .sort(cmp);
   const out: string[] = [];

@@ -789,7 +789,15 @@
       "S-041"
     ],
     "visual": {
-      "none": "The question asks which input tag exists, so a picture would only restate the tag list."
+      "plot": "kmesh-grid",
+      "params": {
+        "n": 5,
+        "gamma": true,
+        "angle": 90,
+        "ratio": 1
+      },
+      "caption": "A mesh of k-points in a reciprocal cell.",
+      "alt": "Square reciprocal cell with a grid of dots for the k-points and a circle marking the Gamma point at the centre."
     }
   },
   {
