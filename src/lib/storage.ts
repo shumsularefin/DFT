@@ -43,3 +43,10 @@ export function remove(key: string): void {
     /* ignore */
   }
 }
+
+/** True when a write to storage works right now (false in some private windows or with site data blocked). */
+export function canPersist(): boolean {
+  const ok = setJSON('probe', 1);
+  remove('probe');
+  return ok;
+}

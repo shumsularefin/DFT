@@ -51,14 +51,14 @@ const more = [
 
 <BaseLayout
   title="Tools"
-  description="Research tools for the DFT Handbook. The input builder, convergence plotter, k-path tool and magnetic configuration tool are available; the others are planned."
+  description="Research tools for the DFT Handbook. The input builder, convergence plotter, k-path tool, magnetic configuration tool and practice are available; the others are planned."
 >
   <div class="container">
     <h1>Tools</h1>
     <p>
       These tools run entirely in your browser. The input builder, the convergence plotter, the k-path tool
-      and the magnetic configuration tool are available now. The others are not built yet, so they have no
-      link. Each card says what it will do.
+      and the magnetic configuration tool are available now, and so is practice. The others are not built yet,
+      so they have no link. Each card says what it will do.
     </p>
     <h2>Research tools</h2>
     <div class="tool-grid">
@@ -100,9 +100,15 @@ const more = [
             {t.title}
           </h3>
           <p>{t.text}</p>
-          <p>
-            <Badge variant="draft" /> Coming soon
-          </p>
+          {t.id === 'practice' ? (
+            <p>
+              <a href="/practice/">Open practice</a> or see <a href="/progress/">your progress</a>
+            </p>
+          ) : (
+            <p>
+              <Badge variant="draft" /> Coming soon
+            </p>
+          )}
         </Card>
       ))}
     </div>

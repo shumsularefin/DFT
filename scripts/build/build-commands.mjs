@@ -36,6 +36,8 @@ export const PAGES = [
     'Tools',
     ['magnetic', 'magmom', 'antiferromagnetic', 'ferromagnetic', 'spin', 'ordering'],
   ],
+  ['/practice/', 'Practice', 'Pages', ['quiz', 'questions', 'review', 'flashcards', 'spaced']],
+  ['/progress/', 'Your progress', 'Pages', ['mastery', 'map', 'streak', 'export', 'reset', 'data']],
 ];
 
 /** Reads `key: value` lines from the front matter block of an MDX file. Enough for id, title, module. */

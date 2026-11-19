@@ -1,16 +1,77 @@
 ---
 import Section from './Section.astro';
-import Badge from '../ui/Badge.astro';
-// Placeholder until the practice UI (M6.4). ids are question ids from src/data/questions.
+import CheckIsland from '../practice/Check';
+import { conceptGraph, questionBank } from '../../lib/learning/loadBank';
+
 interface Props {
   ids: string[];
 }
 const { ids } = Astro.props;
+const bank = questionBank();
+const questions = ids.map((id) => {
+  const q = bank.find((x) => x.id === id);
+  if (!q) throw new Error(`<Check> lists unknown question id "${id}"`);
+  return q;
+});
+const topic = Astro.locals.topic;
+const labels = Object.fromEntries(conceptGraph().map((c) => [c.id, c.label]));
 ---
 
 <Section id="check" heading="Check your understanding">
-  <p>
-    <Badge variant="draft" /> Practice questions arrive with the adaptive engine.
+  <p class="check-lede">
+    Answer at your own pace. You can ask for a hint, or say "I am not sure". Your answers stay in this
+    browser.
   </p>
-  <p class="check-ids">Planned questions: {ids.join(', ')}</p>
+  <div class="js-only">
+    <CheckIsland
+      client:idle
+      questions={questions}
+      topicId={topic?.id}
+      topicConcepts={topic?.concepts ?? []}
+      labels={labels}
+    />
+  </div>
+  <noscript>
+    <p>With JavaScript off, here are the questions with the answers hidden. Open one to see it.</p>
+    <ol class="check-static">
+      {questions.map((q) => (
+        <li>
+          <p>{q.prompt}</p>
+          {(q.type === 'single' || q.type === 'multi') && (
+            <ul>
+              {q.options.map((o) => (
+                <li>{o.text}</li>
+              ))}
+            </ul>
+          )}
+          {q.type === 'order' && (
+            <ul>
+              {q.items.map((o) => (
+                <li>{o}</li>
+              ))}
+            </ul>
+          )}
+          <details>
+            <summary>Show the answer</summary>
+            {(q.type === 'single' || q.type === 'multi') && (
+              <ul>
+                {q.options.map((o) => (
+                  <li>
+                    {o.correct ? 'Correct' : 'Not correct'}: {o.text}. {o.why}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {q.type === 'numeric' && (
+              <p>
+                {q.answer}
+                {q.unit ? ` ${q.unit}` : ''} (within {q.tolerance}).
+              </p>
+            )}
+            {q.type === 'order' && <p>Order: {q.items.join(', then ')}.</p>}
+          </details>
+        </li>
+      ))}
+    </ol>
+  </noscript>
 </Section>

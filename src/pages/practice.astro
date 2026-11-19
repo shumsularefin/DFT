@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Practice from '../components/practice/Practice';
+import HowThisWorks from '../components/practice/HowThisWorks.astro';
+import { conceptGraph, questionBank, topicsByConcept } from '../lib/learning/loadBank';
+
+const concepts = conceptGraph().filter((c) => c.status === 'published');
+const ids = new Set(concepts.map((c) => c.id));
+const bank = questionBank().filter((q) => q.concepts.some((c) => ids.has(c)));
+const topics = topicsByConcept(await getCollection('handbook'));
+const links = Object.fromEntries(
+  Object.entries(topics).map(([k, v]) => [k, { href: v.href, title: v.title }]),
+);
+---
+
+<BaseLayout
+  title="Practice"
+  description="Short practice sessions that pick your next question, with reviews when they are due. Everything stays in your browser."
+  pageClass="island"
+>
+  <div class="container">
+    <h1>Practice</h1>
+    <p>
+      Short sessions of questions from the handbook, chosen to fit where you are. Reviews come back when they
+      are due. Everything stays on this device. No sign-in, no timers, no ranking.
+    </p>
+    <noscript>
+      <p>Practice needs JavaScript. The handbook pages list their questions with the answers hidden.</p>
+    </noscript>
+    <div class="js-only">
+      <Practice client:load bank={bank} concepts={concepts} topics={links} />
+    </div>
+    <HowThisWorks />
+  </div>
+</BaseLayout>

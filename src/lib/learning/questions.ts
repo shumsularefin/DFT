@@ -29,6 +29,8 @@ const common = {
   a: z.number().positive().default(1),
   level: z.enum(['beginner', 'intermediate', 'pro']),
   sources: z.array(sourceId),
+  /** Optional picture for the stem (filled for every question in M12.3); the Check slot exists, nothing renders yet. */
+  visual: z.unknown().optional(),
   /** Timers are not allowed anywhere on this site. */
   timeLimitSec: z.undefined().optional(),
 };

@@ -6,7 +6,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 
 ## How to read this table
 
-- **Next stage to build: M6.4 (Practice UI), Tier B, size L**. Start it with `STAGE: NEXT`, `TIER: B`. The next Tier A stage is M8.2 (Factors, checks and mixed sites), size M: start it with `STAGE: NEXT`, `TIER: A` (it cannot be marked done until Q-003, the Bartel tau equation, is closed or the UI says the formula is unconfirmed).
+- **Next stage to build: M12.3 (Every question gets a visual), Tier B, size M**. Start it with `STAGE: NEXT`, `TIER: B`. The next Tier A stage is M8.2 (Factors, checks and mixed sites), size M: start it with `STAGE: NEXT`, `TIER: A` (it cannot be marked done until Q-003, the Bartel tau equation, is closed or the UI says the formula is unconfirmed).
 - **Tier** says which model to open the session with. **A** = the strongest model (Opus class): stages where a subtle mistake would put a wrong number in front of a researcher. **B** = the fast model (Sonnet class): UI, content and wiring on top of tested libraries. `-` = already done.
 - **Size** says how much work it is: **S** short session, **M** one normal session, **L** a long session that may stop as `partial` and need a second one.
 - A session started on the wrong tier does not build. It names the model to switch to and stops (`docs/WORKFLOW.md` section 2, step 0).
@@ -47,7 +47,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M13.1 | Supercells and collinear magnetic orderings (library) | done | M5.1, M3.1, M3.4 | L | A | main | none (pushed to main) | 2026-11-18 | [report](reports/M13.1.md), [work order](milestones/M13-magnetism-and-structures.md) |
 | M13.2 | Magnetic configuration tool (UI) | done | M13.1, M12.2, M3.5 | L | B | claude/m13-2-magnetic-tool | PR pending (stacked on M12.2) | 2026-11-18 | [report](reports/M13.2.md), [work order](milestones/M13-magnetism-and-structures.md) |
 | M12.6 | A structure view wherever a POSCAR appears | done | M12.2, M3.5, M3.6 | S | B | claude/m12-6-structure-view | PR pending (stacked on M13.2) | 2026-11-18 | [report](reports/M12.6.md), [work order](milestones/M12-visual-layer.md) |
-| M6.4 | Practice UI, quizzes, mastery map and gentle gamification | todo | M6.3, M1.3, M12.1 | L | B | | | | [work order](milestones/M6-adaptive-engine.md) |
+| M6.4 | Practice UI, quizzes, mastery map and gentle gamification | done | M6.3, M1.3, M12.1 | L | B | claude/m6-4-practice-ui | PR pending (stacked on M12.6) | 2026-11-19 | [report](reports/M6.4.md), [work order](milestones/M6-adaptive-engine.md) |
 | M12.3 | Every question gets a visual | todo | M6.4, M12.2 | M | B | | | | [work order](milestones/M12-visual-layer.md) |
 | M7.1 | Module 4: Hohenberg-Kohn, Kohn-Sham and the SCF loop (with SCF lab) | done | M6.1, M2.4 | L | A | main | none (pushed to main) | 2026-11-18 | [report](reports/M7.1.md), [work order](milestones/M7-remaining-modules.md) |
 | M7.2 | Module 5: Practical choices | todo | M7.1, M4.4, M4.5, M5.5, M12.2 | L | B | | | | [work order](milestones/M7-remaining-modules.md) |
@@ -125,3 +125,4 @@ See `docs/SETUP_FIREBASE.md` and the "author" rows of `docs/OPEN_QUESTIONS.md` (
 - 2026-11-18, M13.2: `/tools/magnetic/` (FM, A, C, G, rock-salt II, custom, enumerate), `export.ts` (outputs, README, zip, LDAU block), scene with spin arrows and polyhedra, hand-off with MAGMOM to the Input Builder; D-062. Stacked on M12.2 (PR #32).
 - 2026-11-18, M12.2: `SceneSpec` format and validator, `resolveScene`, SVG projection with painter's order, coordination polyhedra (convex hull, periodic images), `SpecScene` (3D on demand), `Scene` island, `SceneSvg.astro`, 14 presets, `/design/scenes/`, MDX `<Scene id>`; one live canvas per page (D-058); 1364 tests, 20 e2e on the demo page, three chunk 136.8 of 150 KB gz.
 - 2026-11-18, M12.6: `StructureView` (picks give distance, angle, dihedral; coordination of one site) in the file explorer, Input Builder and k-path tool; `measure.ts` and `poscarLines.ts`. Stacked on M13.2 (PR #33).
+- 2026-11-19, M6.4: `Check` (one question at a time, hints, "I am not sure", every option explained, no-JS fallback), `/practice/` (policy-chosen sessions of up to 10), `/progress/` (build-time mastery map plus list, streak that forgives rest days, milestones, export, import, erase), learner store; D-064. Stacked on M12.6 (PR #34).
