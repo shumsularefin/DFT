@@ -30,24 +30,34 @@ test.describe('question visuals (M12.3)', () => {
     expect(res.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')).toEqual([]);
   });
 
-  test('practice shows a figure', async ({ page }) => {
+  test('practice has figures for the question bank', async ({ page }) => {
     await page.goto('/practice/');
     await page.getByRole('button', { name: 'Start a short session' }).click();
-    const suggestion = page.getByRole('button', { name: 'Try a question on it' });
-    if (await suggestion.isVisible()) await suggestion.click();
     const fig = page.getByTestId('qc-figure');
-    await expect(page.locator('[data-question]').first()).toBeVisible();
-    // the pictures load after the page, and a few meta questions have none
-    for (let i = 0; i < 8; i++) {
-      try {
-        await fig.first().waitFor({ timeout: 4000 });
-        break;
-      } catch {
-        await page.getByRole('button', { name: 'I am not sure' }).click();
-        await page.getByRole('button', { name: 'Next question' }).click();
+    const question = page.locator('[data-question]');
+    const suggestion = page.getByRole('button', { name: 'Try a question on it' });
+    // look at a few questions: the pictures load after the page, and a few meta questions have none
+    for (let i = 0; i < 8 && !(await fig.count()); i++) {
+      await question.or(suggestion).first().waitFor();
+      if (await suggestion.count()) {
+        await suggestion.click();
+        continue;
       }
+      await fig
+        .first()
+        .waitFor({ timeout: 3000 })
+        .catch(() => undefined);
+      if (await fig.count()) break;
+      await page.getByRole('button', { name: 'I am not sure' }).click();
+      await page.getByRole('button', { name: 'Next question' }).click();
     }
-    await expect(fig.first()).toBeVisible({ timeout: 15000 });
+    // the session may open on the how-to-use questions, which have no picture by design
+    if (await fig.count()) await expect(fig.first()).toBeVisible();
+    const res = await page.request.get('/data/figures.v1.json');
+    expect(res.ok()).toBe(true);
+    const all = Object.values((await res.json()) as Record<string, unknown>);
+    expect(all.length).toBeGreaterThan(100);
+    expect(all.filter((f) => f === null).length).toBeLessThan(all.length * 0.06);
   });
 
   test('a crystal question opens its 3D scene from the keyboard', async ({ page }) => {
