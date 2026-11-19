@@ -2,6 +2,8 @@
 import Section from './Section.astro';
 import CheckIsland from '../practice/Check';
 import { conceptGraph, questionBank } from '../../lib/learning/loadBank';
+import '../practice/practice.css';
+import { figuresFor } from '../../lib/visual/figures';
 
 interface Props {
   ids: string[];
@@ -13,6 +15,7 @@ const questions = ids.map((id) => {
   if (!q) throw new Error(`<Check> lists unknown question id "${id}"`);
   return q;
 });
+const figures = figuresFor(questions);
 const topic = Astro.locals.topic;
 const labels = Object.fromEntries(conceptGraph().map((c) => [c.id, c.label]));
 ---
@@ -29,6 +32,7 @@ const labels = Object.fromEntries(conceptGraph().map((c) => [c.id, c.label]));
       topicId={topic?.id}
       topicConcepts={topic?.concepts ?? []}
       labels={labels}
+      figures={figures}
     />
   </div>
   <noscript>
@@ -36,6 +40,12 @@ const labels = Object.fromEntries(conceptGraph().map((c) => [c.id, c.label]));
     <ol class="check-static">
       {questions.map((q) => (
         <li>
+          {figures[q.id] && (
+            <figure class="qc-figure qc-figure-static">
+              <div class="qc-figure-flat" set:html={figures[q.id]?.svg} />
+              <figcaption>{figures[q.id]?.caption}</figcaption>
+            </figure>
+          )}
           <p>{q.prompt}</p>
           {(q.type === 'single' || q.type === 'multi') && (
             <ul>

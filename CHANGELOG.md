@@ -43,6 +43,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 - Module 1, "Why DFT exists": four topics, an interactive lab on how the cost of methods grows with system size, practice questions and 14 new glossary terms (all draft).
 - Module 2, "Quantum basics without math": six topics, two interactive labs (a particle in a box and hydrogen orbitals as a 3D point cloud with a flat fallback), practice questions and 9 new glossary terms (all draft).
 - Module 3, "The many-electron problem": five topics, two interactive labs (counting the exponential wall, and a density-to-potential map with N non-interacting electrons), practice questions and 6 new glossary terms (all draft).
+- Every practice question now shows a picture (a crystal, a plot or a diagram) with a caption and a text description. Crystals can be opened in 3D. A few questions about using the site have none.
 - Design system, content system and one sample topic (draft).
 
 ### Notes

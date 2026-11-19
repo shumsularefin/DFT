@@ -6,6 +6,7 @@ import { mulberry32 } from '../../lib/learning/random';
 import { MAX_HINTS, buildContext, dueCount, stateOf } from '../../lib/learning/session';
 import { answerQuestion, learnerStore } from '../../stores/learner';
 import { useLearner } from '../../stores/useLearner';
+import { useFigures } from './useFigures';
 import QuestionCard, { type QuestionResult } from './QuestionCard';
 import './practice.css';
 
@@ -37,6 +38,7 @@ interface Suggestion {
 
 export default function Practice({ bank, concepts, topics }: Props) {
   const { learner, persisted } = useLearner();
+  const figures = useFigures(); // starts loading when the page opens, well before the first question
   const label = useMemo(() => Object.fromEntries(concepts.map((c) => [c.id, c.label])), [concepts]);
   const [phase, setPhase] = useState<'start' | 'asking' | 'between' | 'end' | 'suggest'>('start');
   const [cur, setCur] = useState<Current | null>(null);
@@ -201,6 +203,7 @@ export default function Practice({ bank, concepts, topics }: Props) {
           <QuestionCard
             key={`${cur.q.id}-${cur.n}`}
             question={cur.q}
+            figure={figures?.[cur.q.id]}
             onResult={onResult}
             startHints={cur.startHints}
           >

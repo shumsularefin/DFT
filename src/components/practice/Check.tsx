@@ -4,6 +4,7 @@ import { stateOf, topicMastered } from '../../lib/learning/session';
 import { answerQuestion, learnerStore } from '../../stores/learner';
 import { useLearner } from '../../stores/useLearner';
 import { markComplete } from '../../stores/progress';
+import type { Figure } from '../../lib/visual/resolve';
 import QuestionCard, { type QuestionResult } from './QuestionCard';
 import './practice.css';
 
@@ -12,12 +13,13 @@ interface Props {
   topicId?: string;
   topicConcepts?: string[];
   labels?: Record<string, string>;
+  figures?: Record<string, Figure | null>;
 }
 
 const STATE_TEXT = { new: 'not started', learning: 'learning', mastered: 'mastered' } as const;
 
 /** The questions at the end of a topic, one at a time. Answers update the learner state on this device. */
-export default function Check({ questions, topicId, topicConcepts = [], labels = {} }: Props) {
+export default function Check({ questions, topicId, topicConcepts = [], labels = {}, figures = {} }: Props) {
   const [i, setI] = useState(0);
   const [right, setRight] = useState(0);
   const [completed, setCompleted] = useState(false);
@@ -53,7 +55,7 @@ export default function Check({ questions, topicId, topicConcepts = [], labels =
           <p className="ck-count">
             Question {i + 1} of {questions.length}. Your answers stay in this browser.
           </p>
-          <QuestionCard key={q.id} question={q} onResult={onResult}>
+          <QuestionCard key={q.id} question={q} figure={figures[q.id]} onResult={onResult}>
             <div className="ck-next">
               <button
                 type="button"

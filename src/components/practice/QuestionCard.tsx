@@ -1,5 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { grade, type Question, type Response } from '../../lib/learning/questions';
+import type { Figure } from '../../lib/visual/resolve';
+import QuestionFigure from './QuestionFigure';
 import './practice.css';
 
 export interface QuestionResult {
@@ -10,6 +12,8 @@ export interface QuestionResult {
 
 interface Props {
   question: Question;
+  /** The picture for the stem, made at build time (M12.3). */
+  figure?: Figure | null;
   /** Called once, when the learner answers or says "I am not sure". */
   onResult: (r: QuestionResult) => void;
   /** Hints already shown before the card opened (a retry with a hint). */
@@ -20,7 +24,7 @@ interface Props {
 const rotate = (items: string[]) => (items.length < 2 ? items : [...items.slice(1), items[0] as string]);
 
 /** One question: stem, hints on request, an "I am not sure" path, and an explanation for every option. */
-export default function QuestionCard({ question: q, onResult, startHints = 0, children }: Props) {
+export default function QuestionCard({ question: q, figure, onResult, startHints = 0, children }: Props) {
   const uid = useId();
   const [picked, setPicked] = useState<number[]>([]);
   const [text, setText] = useState('');
@@ -93,8 +97,7 @@ export default function QuestionCard({ question: q, onResult, startHints = 0, ch
 
   return (
     <div className="qc" data-question={q.id}>
-      {/* M12.3 fills `visual`; the slot sits above the stem so questions do not shift when it arrives. */}
-      {q.visual ? <div className="qc-visual" data-visual-slot /> : null}
+      {figure ? <QuestionFigure figure={figure} /> : null}
       <fieldset className="qc-set" disabled={done}>
         <legend className="qc-stem">{q.prompt}</legend>
         {(q.type === 'single' || q.type === 'multi') && (

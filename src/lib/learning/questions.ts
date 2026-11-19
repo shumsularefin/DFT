@@ -18,6 +18,24 @@ const optionSchema = z.object({
   why: z.string().min(1),
 });
 
+/** What a question's picture is made from. The linter requires one on every question. */
+export const visualSchema = z.union([
+  z.object({
+    scene: idSchema,
+    overrides: z.record(z.string(), z.unknown()).optional(),
+    caption: z.string().min(1),
+    alt: z.string().min(1),
+  }),
+  z.object({
+    plot: idSchema,
+    params: z.record(z.string(), z.unknown()).default({}),
+    caption: z.string().min(1),
+    alt: z.string().min(1),
+  }),
+  z.object({ none: z.string().min(1) }),
+]);
+export type Visual = z.infer<typeof visualSchema>;
+
 const common = {
   id: idSchema,
   concepts: z.array(idSchema).min(1),
@@ -29,8 +47,8 @@ const common = {
   a: z.number().positive().default(1),
   level: z.enum(['beginner', 'intermediate', 'pro']),
   sources: z.array(sourceId),
-  /** Optional picture for the stem (filled for every question in M12.3); the Check slot exists, nothing renders yet. */
-  visual: z.unknown().optional(),
+  /** Picture for the stem (M12.3): a scene preset, a computed plot, or an exemption with a reason. */
+  visual: visualSchema.optional(),
   /** Timers are not allowed anywhere on this site. */
   timeLimitSec: z.undefined().optional(),
 };

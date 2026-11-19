@@ -31,7 +31,17 @@
     "level": "beginner",
     "sources": [
       "S-011"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-density",
+      "params": {
+        "Zs": [
+          2
+        ]
+      },
+      "caption": "A density and the potential well of the toy system.",
+      "alt": "Curve of electron density as a hump and a dashed curve of the potential well."
+    }
   },
   {
     "id": "q-hkt-2",
@@ -65,7 +75,18 @@
     "level": "intermediate",
     "sources": [
       "S-011"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-density",
+      "params": {
+        "Zs": [
+          1,
+          2
+        ]
+      },
+      "caption": "Different nuclear charge, different density (toy system).",
+      "alt": "Two density curves for the toy system, nuclear charge 1 (solid) and 2 (dashed), clearly different."
+    }
   },
   {
     "id": "q-hkt-3",
@@ -100,7 +121,24 @@
     "sources": [
       "S-011",
       "S-049"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Theorem 1",
+            "note": "the ground-state density fixes the external potential"
+          },
+          {
+            "label": "Theorem 2",
+            "note": "the true density minimises the energy"
+          }
+        ]
+      },
+      "caption": "The two theorems. Illustrative.",
+      "alt": "A two-box list: the first and second Hohenberg-Kohn theorems."
+    }
   },
   {
     "id": "q-hkt-4",
@@ -134,7 +172,20 @@
     "level": "pro",
     "sources": [
       "S-011"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "E[n] = F[n] + integral of v n",
+            "note": ""
+          }
+        ]
+      },
+      "caption": "The energy functional. Illustrative.",
+      "alt": "One box showing the energy functional E of n equals F of n plus the integral of v times n."
+    }
   },
   {
     "id": "q-var-1",
@@ -169,7 +220,18 @@
     "sources": [
       "S-011",
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-trace",
+      "params": {
+        "Z": 2,
+        "alpha": 0.3,
+        "series": "energy",
+        "show": 25
+      },
+      "caption": "Energy of each iteration in the toy SCF lab (Hartree-Fock energy, alpha 0.3).",
+      "alt": "Curve of the energy against iteration number in the toy self-consistent loop, settling to a steady value."
+    }
   },
   {
     "id": "q-var-2",
@@ -204,7 +266,17 @@
     "sources": [
       "S-048",
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-density",
+      "params": {
+        "Zs": [
+          2
+        ]
+      },
+      "caption": "The toy two-electron system, density and potential.",
+      "alt": "Curve of electron density and a dashed curve of the potential well for the toy system."
+    }
   },
   {
     "id": "q-var-3",
@@ -239,7 +311,18 @@
     "sources": [
       "S-011",
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-trace",
+      "params": {
+        "Z": 2,
+        "alpha": 0.3,
+        "series": "energy",
+        "show": 25
+      },
+      "caption": "Energy of each iteration in the toy SCF lab (Hartree-Fock energy, alpha 0.3).",
+      "alt": "Curve of the energy against iteration number in the toy self-consistent loop, settling to a steady value."
+    }
   },
   {
     "id": "q-var-4",
@@ -273,7 +356,24 @@
     "level": "intermediate",
     "sources": [
       "S-011"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Run 1",
+            "note": "-10.20 eV"
+          },
+          {
+            "label": "Run 2",
+            "note": "-10.25 eV"
+          }
+        ]
+      },
+      "caption": "Two energies of the same structure with the same functional. Illustrative.",
+      "alt": "A two-box list: run 1 gives -10.20 eV, run 2 gives -10.25 eV."
+    }
   },
   {
     "id": "q-ksi-1",
@@ -307,7 +407,17 @@
     "level": "beginner",
     "sources": [
       "S-012"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-density",
+      "params": {
+        "Zs": [
+          2
+        ]
+      },
+      "caption": "Density and potential of the toy system.",
+      "alt": "Curve of electron density as a hump and a dashed curve of the potential well."
+    }
   },
   {
     "id": "q-ksi-2",
@@ -342,7 +452,16 @@
     "sources": [
       "S-012",
       "S-049"
-    ]
+    ],
+    "visual": {
+      "plot": "density-box",
+      "params": {
+        "L": 5,
+        "electrons": 4
+      },
+      "caption": "Orbitals, each holding two electrons, build the density.",
+      "alt": "Filled curve of the density of four electrons in a box, two humps."
+    }
   },
   {
     "id": "q-ksi-3",
@@ -376,7 +495,17 @@
     "level": "beginner",
     "sources": [
       "S-012"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-density",
+      "params": {
+        "Zs": [
+          2
+        ]
+      },
+      "caption": "The density the two systems are meant to share (toy system).",
+      "alt": "Curve of electron density as a single hump with a dashed potential well."
+    }
   },
   {
     "id": "q-ksi-4",
@@ -410,7 +539,28 @@
     "level": "intermediate",
     "sources": [
       "S-012"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Kinetic energy of the non-interacting electrons"
+          },
+          {
+            "label": "Energy in the external potential"
+          },
+          {
+            "label": "Classical Coulomb (Hartree) energy"
+          },
+          {
+            "label": "Exchange-correlation energy"
+          }
+        ]
+      },
+      "caption": "The four parts of the Kohn-Sham energy. Illustrative.",
+      "alt": "A four-box list: kinetic energy of the non-interacting electrons, energy in the external potential, the classical Coulomb energy, the exchange-correlation energy."
+    }
   },
   {
     "id": "q-kse-1",
@@ -444,7 +594,17 @@
     "level": "beginner",
     "sources": [
       "S-012"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-density",
+      "params": {
+        "Zs": [
+          2
+        ]
+      },
+      "caption": "Density and potential of the toy system.",
+      "alt": "Curve of electron density as a hump and a dashed curve of the potential well."
+    }
   },
   {
     "id": "q-kse-2",
@@ -478,7 +638,18 @@
     "level": "intermediate",
     "sources": [
       "S-012"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-trace",
+      "params": {
+        "Z": 2,
+        "alpha": 0.3,
+        "tol": 1e-08,
+        "show": 40
+      },
+      "caption": "Change in density per iteration in the toy lab.",
+      "alt": "Curve of the change in density per iteration, falling."
+    }
   },
   {
     "id": "q-kse-3",
@@ -513,7 +684,16 @@
     "sources": [
       "S-012",
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "density-box",
+      "params": {
+        "L": 5,
+        "electrons": 4
+      },
+      "caption": "Density of four electrons in a box, built from two filled levels.",
+      "alt": "Filled curve of the density of four electrons in a box with two humps."
+    }
   },
   {
     "id": "q-kse-4",
@@ -547,7 +727,22 @@
     "level": "pro",
     "sources": [
       "S-049"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Sum of the occupied eigenvalues"
+          },
+          {
+            "label": "Total energy"
+          }
+        ]
+      },
+      "caption": "Two quantities from a calculation. Illustrative.",
+      "alt": "A two-box list: the sum of the occupied eigenvalues and the total energy."
+    }
   },
   {
     "id": "q-kseig-1",
@@ -581,7 +776,28 @@
     "level": "beginner",
     "sources": [
       "S-049"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Orbital energies",
+            "note": "of the auxiliary non-interacting system"
+          },
+          {
+            "label": "Eigenvalues in EIGENVAL",
+            "note": "one per orbital and k-point"
+          },
+          {
+            "label": "Used for bands and the density of states",
+            "note": ""
+          }
+        ]
+      },
+      "caption": "What the eigenvalues are. Illustrative.",
+      "alt": "A three-box flow: auxiliary orbital energies, the eigenvalues written to EIGENVAL, used for bands and the density of states."
+    }
   },
   {
     "id": "q-kseig-2",
@@ -615,7 +831,24 @@
     "level": "intermediate",
     "sources": [
       "S-049"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Kohn-Sham gap",
+            "note": "0.6 eV"
+          },
+          {
+            "label": "Measured gap",
+            "note": "1.1 eV"
+          }
+        ]
+      },
+      "caption": "A computed gap next to a measured one. Illustrative.",
+      "alt": "A two-box list: the Kohn-Sham gap 0.6 eV and the measured gap 1.1 eV."
+    }
   },
   {
     "id": "q-kseig-3",
@@ -649,7 +882,28 @@
     "level": "intermediate",
     "sources": [
       "S-049"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Orbital energies",
+            "note": "of the auxiliary non-interacting system"
+          },
+          {
+            "label": "Eigenvalues in EIGENVAL",
+            "note": "one per orbital and k-point"
+          },
+          {
+            "label": "Used for bands and the density of states",
+            "note": ""
+          }
+        ]
+      },
+      "caption": "What the eigenvalues are. Illustrative.",
+      "alt": "A three-box flow: auxiliary orbital energies, the eigenvalues written to EIGENVAL, used for bands and the density of states."
+    }
   },
   {
     "id": "q-kseig-4",
@@ -684,7 +938,25 @@
     "sources": [
       "S-012",
       "S-049"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Ground-state density"
+          },
+          {
+            "label": "Eigenvalues"
+          },
+          {
+            "label": "Total energy"
+          }
+        ]
+      },
+      "caption": "Quantities from a converged calculation. Illustrative.",
+      "alt": "A three-box list: ground-state density, eigenvalues, total energy."
+    }
   },
   {
     "id": "q-xc-1",
@@ -718,7 +990,28 @@
     "level": "beginner",
     "sources": [
       "S-012"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Kinetic energy of the non-interacting electrons"
+          },
+          {
+            "label": "Energy in the external potential"
+          },
+          {
+            "label": "Classical Coulomb (Hartree) energy"
+          },
+          {
+            "label": "Exchange-correlation energy"
+          }
+        ]
+      },
+      "caption": "The four parts of the Kohn-Sham energy. Illustrative.",
+      "alt": "A four-box list: kinetic energy of the non-interacting electrons, energy in the external potential, the classical Coulomb energy, the exchange-correlation energy."
+    }
   },
   {
     "id": "q-xc-2",
@@ -752,7 +1045,28 @@
     "level": "beginner",
     "sources": [
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Kinetic energy of the non-interacting electrons"
+          },
+          {
+            "label": "Energy in the external potential"
+          },
+          {
+            "label": "Classical Coulomb (Hartree) energy"
+          },
+          {
+            "label": "Exchange-correlation energy"
+          }
+        ]
+      },
+      "caption": "The four parts of the Kohn-Sham energy. Illustrative.",
+      "alt": "A four-box list: kinetic energy of the non-interacting electrons, energy in the external potential, the classical Coulomb energy, the exchange-correlation energy."
+    }
   },
   {
     "id": "q-xc-3",
@@ -788,7 +1102,18 @@
       "S-012",
       "S-013",
       "S-049"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-density",
+      "params": {
+        "Zs": [
+          2
+        ],
+        "potential": false
+      },
+      "caption": "A density, and how it changes with position.",
+      "alt": "Curve of electron density as a hump against position."
+    }
   },
   {
     "id": "q-xc-4",
@@ -822,7 +1147,24 @@
     "level": "intermediate",
     "sources": [
       "S-019"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "INCAR",
+            "note": "no GGA, METAGGA or XC line"
+          },
+          {
+            "label": "VASP runs",
+            "note": "which functional?"
+          }
+        ]
+      },
+      "caption": "An INCAR with no functional tag. Illustrative.",
+      "alt": "A two-box flow: an INCAR with no GGA, METAGGA or XC line, then VASP runs."
+    }
   },
   {
     "id": "q-scf-1",
@@ -856,7 +1198,18 @@
     "level": "beginner",
     "sources": [
       "S-012"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-trace",
+      "params": {
+        "Z": 2,
+        "alpha": 0.3,
+        "tol": 1e-08,
+        "show": 40
+      },
+      "caption": "Change in density at each iteration in the toy SCF lab (alpha 0.3).",
+      "alt": "Curve of the change in density against iteration number on a logarithmic axis, falling steadily."
+    }
   },
   {
     "id": "q-scf-2",
@@ -890,7 +1243,18 @@
     "level": "beginner",
     "sources": [
       "S-012"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-trace",
+      "params": {
+        "Z": 2,
+        "alpha": 0.3,
+        "tol": 1e-08,
+        "show": 40
+      },
+      "caption": "Change in density per iteration in the toy lab.",
+      "alt": "Curve of the change in density per iteration, falling."
+    }
   },
   {
     "id": "q-scf-3",
@@ -910,7 +1274,18 @@
     "level": "beginner",
     "sources": [
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-density",
+      "params": {
+        "Zs": [
+          2
+        ],
+        "potential": false
+      },
+      "caption": "The toy two-electron density.",
+      "alt": "Curve of the electron density of the toy two-electron system, a single hump."
+    }
   },
   {
     "id": "q-scf-4",
@@ -945,7 +1320,19 @@
     "sources": [
       "S-012",
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-trace",
+      "params": {
+        "Z": 2,
+        "alpha": 0.3,
+        "tol": 1e-08,
+        "nonInteracting": true,
+        "show": 10
+      },
+      "caption": "Change in density per iteration, with electron repulsion switched off.",
+      "alt": "The change in density plotted against iteration number for the toy lab with repulsion off."
+    }
   },
   {
     "id": "q-scf-5",
@@ -980,7 +1367,18 @@
     "sources": [
       "S-019",
       "S-041"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-trace",
+      "params": {
+        "Z": 1,
+        "alpha": 0.3,
+        "tol": 1e-12,
+        "maxIterations": 8
+      },
+      "caption": "A run capped at 8 iterations, with the change in density still above the tolerance (toy lab, Z = 1, alpha 0.3).",
+      "alt": "Curve of the change in density against iteration number for eight iterations, ending above the convergence tolerance."
+    }
   },
   {
     "id": "q-mix-1",
@@ -1000,7 +1398,18 @@
     "level": "beginner",
     "sources": [
       "S-049"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-trace",
+      "params": {
+        "Z": 2,
+        "alpha": 0.3,
+        "tol": 1e-08,
+        "show": 40
+      },
+      "caption": "Linear mixing in the toy lab with alpha 0.3.",
+      "alt": "Curve of the change in density per iteration for linear mixing with alpha 0.3, falling."
+    }
   },
   {
     "id": "q-mix-2",
@@ -1034,7 +1443,18 @@
     "level": "intermediate",
     "sources": [
       "S-049"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-trace",
+      "params": {
+        "Z": 1,
+        "alpha": 1.0,
+        "tol": 1e-08,
+        "maxIterations": 30
+      },
+      "caption": "Z = 1 with alpha = 1.0 in the toy lab.",
+      "alt": "Curve of the change in density per iteration for Z = 1 and alpha 1.0, not settling."
+    }
   },
   {
     "id": "q-mix-3",
@@ -1069,7 +1489,18 @@
     "sources": [
       "S-041",
       "S-042"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-trace",
+      "params": {
+        "Z": 1,
+        "alpha": 1.0,
+        "series": "energy",
+        "maxIterations": 30
+      },
+      "caption": "Energy at each step with Z = 1 and alpha = 1.0 in the toy lab.",
+      "alt": "Curve of the energy against iteration for Z = 1 and alpha 1.0, jumping up and down."
+    }
   },
   {
     "id": "q-mix-4",
@@ -1103,6 +1534,17 @@
     "level": "pro",
     "sources": [
       "S-019"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-trace",
+      "params": {
+        "Z": 2,
+        "alpha": 0.05,
+        "tol": 1e-08,
+        "show": 120
+      },
+      "caption": "Linear mixing with a small alpha in the toy lab (0.05): slow but steady.",
+      "alt": "Curve of the change in density per iteration for linear mixing with alpha 0.05, falling slowly."
+    }
   }
 ]
