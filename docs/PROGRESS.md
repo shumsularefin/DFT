@@ -6,7 +6,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 
 ## How to read this table
 
-- **Next stage to build: M7.2 session two (Module 5: topics 3, 4, 6, 8 and labs paw-picture, functional-ladder, spin-cartoon), Tier B**. Start it with `STAGE: NEXT`, `TIER: B`. The next Tier A stage is M8.2 (Factors, checks and mixed sites), size M: start it with `STAGE: NEXT`, `TIER: A` (it cannot be marked done until Q-003, the Bartel tau equation, is closed or the UI says the formula is unconfirmed).
+- **Next stage to build: M12.5 (See what a tag does), Tier B**. Start it with `STAGE: NEXT`, `TIER: B`. The next Tier A stage is M8.2 (Factors, checks and mixed sites), size M: start it with `STAGE: NEXT`, `TIER: A` (it cannot be marked done until Q-003, the Bartel tau equation, is closed or the UI says the formula is unconfirmed).
 - **Tier** says which model to open the session with. **A** = the strongest model (Opus class): stages where a subtle mistake would put a wrong number in front of a researcher. **B** = the fast model (Sonnet class): UI, content and wiring on top of tested libraries. `-` = already done.
 - **Size** says how much work it is: **S** short session, **M** one normal session, **L** a long session that may stop as `partial` and need a second one.
 - A session started on the wrong tier does not build. It names the model to switch to and stops (`docs/WORKFLOW.md` section 2, step 0).
@@ -50,7 +50,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M6.4 | Practice UI, quizzes, mastery map and gentle gamification | done | M6.3, M1.3, M12.1 | L | B | claude/m6-4-practice-ui | PR pending (stacked on M12.6) | 2026-11-19 | [report](reports/M6.4.md), [work order](milestones/M6-adaptive-engine.md) |
 | M12.3 | Every question gets a visual | done | M6.4, M12.2 | M | B | claude/m12-3-question-visuals | PR pending (stacked on M6.4) | 2026-11-19 | [work order](milestones/M12-visual-layer.md) |
 | M7.1 | Module 4: Hohenberg-Kohn, Kohn-Sham and the SCF loop (with SCF lab) | done | M6.1, M2.4 | L | A | main | none (pushed to main) | 2026-11-18 | [report](reports/M7.1.md), [work order](milestones/M7-remaining-modules.md) |
-| M7.2 | Module 5: Practical choices | partial | M7.1, M4.4, M4.5, M5.5, M12.2 | L | B | claude/m7-2-practical-choices | see PR | 2026-11-19 | [report](reports/M7.2.md), [work order](milestones/M7-remaining-modules.md) |
+| M7.2 | Module 5: Practical choices | done | M7.1, M4.4, M4.5, M5.5, M12.2 | L | B | claude/m7-2-practical-choices | see PR | 2026-11-19 | [report](reports/M7.2.md), [work order](milestones/M7-remaining-modules.md) |
 | M12.5 | See what a tag does | todo | M12.3, M7.2, M3.5 | M | B | | | | [work order](milestones/M12-visual-layer.md) |
 | M13.3 | Magnetic ground state and exchange analysis | todo | M13.2, M4.1 | L | A | | | | [work order](milestones/M13-magnetism-and-structures.md) |
 | M13.4 | Handbook: spin-polarized DFT and magnetism, visually | todo | M7.2, M13.3, M12.2 | L | B | | | | [work order](milestones/M13-magnetism-and-structures.md) |

@@ -64,6 +64,9 @@ export const REGISTERED_LABS = [
   'scf-loop',
   'smearing',
   'dft-plus-u',
+  'paw-picture',
+  'functional-ladder',
+  'spin-cartoon',
 ] as const;
 
 /** Page class for a topic: "island" if its body embeds a registered lab, a `<Scene>` or the `<Check>` questions (React islands), else "content". */

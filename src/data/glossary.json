@@ -760,5 +760,54 @@
     "sources": [
       "S-049"
     ]
+  },
+  {
+    "id": "paw",
+    "label": "PAW",
+    "short": "Projector augmented wave: the plane waves carry a smooth function and a correction inside each atomic sphere restores the true wiggles near the nucleus.",
+    "level": "intermediate",
+    "sources": [
+      "S-008",
+      "S-009"
+    ]
+  },
+  {
+    "id": "hybrid-functional",
+    "label": "Hybrid functional",
+    "short": "A functional that mixes a fraction of exact (Hartree-Fock) exchange into a semilocal one. More expensive, often better for band gaps.",
+    "level": "intermediate",
+    "sources": [
+      "S-025",
+      "S-042"
+    ]
+  },
+  {
+    "id": "meta-gga",
+    "label": "Meta-GGA",
+    "short": "A functional that also depends on the kinetic-energy density of the orbitals, such as SCAN and r2SCAN.",
+    "level": "intermediate",
+    "sources": [
+      "S-026",
+      "S-046"
+    ]
+  },
+  {
+    "id": "dispersion-correction",
+    "label": "Dispersion correction",
+    "short": "An added pairwise attraction that stands in for the weak van der Waals force that common functionals miss.",
+    "level": "intermediate",
+    "sources": [
+      "S-028",
+      "S-042"
+    ]
+  },
+  {
+    "id": "magnetic-moment",
+    "label": "Magnetic moment",
+    "short": "The difference between the up and down electron counts around an atom or in the cell, in units of the Bohr magneton.",
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ]
   }
 ]

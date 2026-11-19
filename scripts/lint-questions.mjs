@@ -35,6 +35,8 @@ export const PLOT_IDS = [
   'dftu-penalty',
   'kmesh-grid',
   'bz-1d',
+  'paw-radial',
+  'ladder-rungs',
 ];
 
 function walk(dir) {

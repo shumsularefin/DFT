@@ -16,6 +16,7 @@ import {
 import { log10RelativeCost, methodById, type MethodId } from '../physics/scaling';
 import { runScf, type ScfOptions, type ScfResult } from '../physics/scf1d';
 import { dispersion } from '../physics/tightbinding2d';
+import { allElectronLike, pseudo as pawPseudo } from '../physics/paw';
 import { dudarevEnergy, dudarevPotential } from '../physics/dftu';
 import { SMEARINGS, delta as smearDelta, occupation as smearOcc, type SmearingId } from '../physics/smearing';
 
@@ -51,6 +52,8 @@ export const PLOT_IDS = [
   'dftu-penalty',
   'kmesh-grid',
   'bz-1d',
+  'paw-radial',
+  'ladder-rungs',
 ] as const;
 export type PlotId = (typeof PLOT_IDS)[number];
 
@@ -862,6 +865,49 @@ function bz1d(p: P): string {
   return wrap(p.alt as string, h, body);
 }
 
+/** Schematic radial functions (invented shapes): a smooth one and one with nodes inside rc. */
+function pawRadial(p: P): string {
+  const rc = num(p, 'rc', 2);
+  const both = p.curves !== 'smooth';
+  const rs = sample(0.02, 6, 200);
+  const ae = rs.map((r) => allElectronLike(r, rc));
+  const ps = rs.map((r) => pawPseudo(r));
+  const ymax = Math.max(...ae, ...ps) * 1.1;
+  const ymin = Math.min(...ae, ...ps) * 1.1;
+  const c = chart(0, 6, ymin, ymax, 'distance from the nucleus (made-up units)', 'amplitude');
+  let body = c.axes + line(c.x0, c.sy(0), c.x1, c.sy(0), 'vp-zero');
+  if (p.showRc !== false)
+    body +=
+      line(c.sx(rc), c.y0, c.sx(rc), c.y1, 'vp-guide') +
+      text(c.sx(rc) + 4, c.y1 + 10, 'r_c', 'vp-t', 'start');
+  body += path(
+    ps.map((y, i) => [c.sx(rs[i]!), c.sy(y)]),
+    both ? 'vp-curve2' : 'vp-curve',
+  );
+  if (both)
+    body += path(
+      ae.map((y, i) => [c.sx(rs[i]!), c.sy(y)]),
+      'vp-curve',
+    );
+  return wrap(p.alt as string, c.h, body);
+}
+
+/** The five rungs as a stacked list; `highlight` is the index (0 = bottom) of the rung to mark. */
+function ladderRungs(p: P): string {
+  const names = ['LDA', 'GGA', 'Meta-GGA', 'Hybrid', 'Beyond'];
+  const hi = num(p, 'highlight', -1);
+  const h = 190;
+  let body = '';
+  names.forEach((n, i) => {
+    const y = h - 30 - i * 32;
+    body +=
+      `<rect class="${i === hi ? 'vp-fill' : 'vp-box'}" x="110" y="${y}" width="140" height="26" rx="4"/>` +
+      text(180, y + 18, n, 'vp-t');
+  });
+  body += text(60, h - 17, 'cheaper', 'vp-t') + text(60, 24, 'costlier', 'vp-t');
+  return wrap(p.alt as string, h, body);
+}
+
 const RENDER: Record<PlotId, { fn: (p: P) => string; badge: PlotBadge }> = {
   'box-levels': { fn: boxLevels, badge: 'computed' },
   'box-wave': { fn: boxWave, badge: 'computed' },
@@ -887,6 +933,8 @@ const RENDER: Record<PlotId, { fn: (p: P) => string; badge: PlotBadge }> = {
   'dftu-penalty': { fn: dftuPenalty, badge: 'computed' },
   'kmesh-grid': { fn: kmeshGrid, badge: 'computed' },
   'bz-1d': { fn: bz1d, badge: 'illustrative' },
+  'paw-radial': { fn: pawRadial, badge: 'illustrative' },
+  'ladder-rungs': { fn: ladderRungs, badge: 'illustrative' },
 };
 
 export function isPlotId(id: string): id is PlotId {

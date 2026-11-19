@@ -13,6 +13,9 @@ import UnitCellLab from '../labs/UnitCellLab';
 import ScfLab from '../labs/ScfLab';
 import SmearingLab from '../labs/SmearingLab';
 import DftuLab from '../labs/DftuLab';
+import PawLab from '../labs/PawLab';
+import LadderLab from '../labs/LadderLab';
+import SpinLab from '../labs/SpinLab';
 // Labs are registered by id. An id with no component yet shows the placeholder, so topics can be written ahead of their labs.
 interface Props {
   id: string;
@@ -65,6 +68,18 @@ const { id, title } = Astro.props;
   ) : id === 'dft-plus-u' ? (
     <div data-lab-id={id}>
       <DftuLab client:visible />
+    </div>
+  ) : id === 'paw-picture' ? (
+    <div data-lab-id={id}>
+      <PawLab client:visible />
+    </div>
+  ) : id === 'functional-ladder' ? (
+    <div data-lab-id={id}>
+      <LadderLab client:visible />
+    </div>
+  ) : id === 'spin-cartoon' ? (
+    <div data-lab-id={id}>
+      <SpinLab client:visible />
     </div>
   ) : id === 'unit-cell' ? (
     <div data-lab-id={id}>

@@ -1447,5 +1447,998 @@
     "visual": {
       "none": "The question is about reporting a method choice, so any picture would restate the answer."
     }
+  },
+  {
+    "id": "q-pp-1",
+    "concepts": [
+      "pseudopotentials"
+    ],
+    "type": "single",
+    "prompt": "Why does a plane-wave calculation replace the nucleus and core electrons by a pseudopotential?",
+    "options": [
+      {
+        "text": "The true valence wavefunction wiggles fast near the nucleus, which would need very many plane waves; a smooth stand-in needs far fewer",
+        "correct": true,
+        "why": "The core hardly takes part in bonding, so replacing it by a smooth effective potential saves a great deal of work."
+      },
+      {
+        "text": "Because core electrons do not exist",
+        "correct": false,
+        "why": "They do exist; they are just not treated explicitly in the calculation."
+      },
+      {
+        "text": "Because it makes the nucleus lighter",
+        "correct": false,
+        "why": "The nuclear mass plays no part; the point is a smoother potential."
+      }
+    ],
+    "hints": [
+      "Think about what many short waves would cost.",
+      "Which electrons take part in bonding?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-049",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "paw-radial",
+      "params": {
+        "rc": 2
+      },
+      "caption": "Curves near a nucleus.",
+      "alt": "Two curves of amplitude against distance from the nucleus: a smooth one without nodes and one that oscillates inside a marked radius, the two joined beyond it. Invented shapes."
+    }
+  },
+  {
+    "id": "q-pp-2",
+    "concepts": [
+      "pseudopotentials"
+    ],
+    "type": "single",
+    "prompt": "Which valence function is the real one: the smooth stand-in, or the true function with nodes?",
+    "options": [
+      {
+        "text": "Outside the cutoff radius they are the same; inside it only the one with nodes is real",
+        "correct": true,
+        "why": "The stand-in is built to match outside r_c and to differ inside."
+      },
+      {
+        "text": "The smooth one everywhere",
+        "correct": false,
+        "why": "Inside the sphere it is a stand-in, not the true function."
+      },
+      {
+        "text": "Neither: they are both artefacts",
+        "correct": false,
+        "why": "Outside r_c the true function and the stand-in coincide."
+      }
+    ],
+    "hints": [
+      "Look at where the two curves agree.",
+      "The matching radius is r_c."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-008",
+      "S-049"
+    ],
+    "visual": {
+      "plot": "paw-radial",
+      "params": {
+        "rc": 2
+      },
+      "caption": "Two curves with a marked radius.",
+      "alt": "Two curves of amplitude against distance from the nucleus: a smooth one without nodes and one that oscillates inside a marked radius, the two joined beyond it. Invented shapes."
+    }
+  },
+  {
+    "id": "q-pp-3",
+    "concepts": [
+      "pseudopotentials"
+    ],
+    "type": "single",
+    "prompt": "A calculation has Fe and O in POSCAR in that order. In what order should the POTCAR files be joined?",
+    "options": [
+      {
+        "text": "Fe first, then O: the same order as the species in POSCAR",
+        "correct": true,
+        "why": "The datasets are assigned to species by position, so the order must match."
+      },
+      {
+        "text": "Alphabetical, always",
+        "correct": false,
+        "why": "Alphabetical order only works when POSCAR happens to follow it."
+      },
+      {
+        "text": "Any order; VASP sorts them",
+        "correct": false,
+        "why": "VASP does not reorder them; a swapped order puts the wrong dataset on each species."
+      }
+    ],
+    "hints": [
+      "VASP matches datasets to species by position.",
+      "The check is grep TITEL POTCAR."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "none": "The question is about file order, so a picture would only restate the answer text."
+    }
+  },
+  {
+    "id": "q-pp-4",
+    "concepts": [
+      "pseudopotentials"
+    ],
+    "type": "single",
+    "prompt": "What does the line ENMAX in a POTCAR give you?",
+    "options": [
+      {
+        "text": "The recommended minimum plane-wave cutoff for that dataset",
+        "correct": true,
+        "why": "VASP uses the largest ENMAX among the files as the default ENCUT."
+      },
+      {
+        "text": "The maximum number of electrons",
+        "correct": false,
+        "why": "The valence electron count is ZVAL."
+      },
+      {
+        "text": "The largest allowed k-mesh",
+        "correct": false,
+        "why": "ENMAX is an energy, not a mesh."
+      }
+    ],
+    "hints": [
+      "It is an energy.",
+      "Which tag does it set by default?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "paw-radial",
+      "params": {
+        "rc": 2
+      },
+      "caption": "Curves near a nucleus.",
+      "alt": "Two curves of amplitude against distance from the nucleus: a smooth one without nodes and one that oscillates inside a marked radius, the two joined beyond it. Invented shapes."
+    }
+  },
+  {
+    "id": "q-paw-1",
+    "concepts": [
+      "paw-method"
+    ],
+    "type": "single",
+    "prompt": "What does the PAW method add to a plain pseudopotential?",
+    "options": [
+      {
+        "text": "It keeps the smooth function for the plane waves and adds back, inside each sphere, the difference from the true function",
+        "correct": true,
+        "why": "That is how the true wiggles near the nucleus remain accounted for."
+      },
+      {
+        "text": "It removes the sphere altogether",
+        "correct": false,
+        "why": "The spheres are central to PAW."
+      },
+      {
+        "text": "It uses only core electrons",
+        "correct": false,
+        "why": "PAW treats the valence electrons explicitly and the core in a frozen form."
+      }
+    ],
+    "hints": [
+      "The name is projector augmented wave.",
+      "Augmented means something is added back."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-008",
+      "S-009"
+    ],
+    "visual": {
+      "plot": "paw-radial",
+      "params": {
+        "rc": 2
+      },
+      "caption": "Smooth and true curves; the difference lies inside the radius.",
+      "alt": "Two curves of amplitude against distance from the nucleus: a smooth one without nodes and one that oscillates inside a marked radius, the two joined beyond it. Invented shapes."
+    }
+  },
+  {
+    "id": "q-paw-2",
+    "concepts": [
+      "paw-method"
+    ],
+    "type": "single",
+    "prompt": "The cutoff radius r_c of a dataset is made larger. What is the usual trade-off?",
+    "options": [
+      {
+        "text": "A smoother function and a lower cutoff, but a poorer description when atoms come close and spheres overlap",
+        "correct": true,
+        "why": "A softer dataset is cheaper but can be less accurate in compressed structures."
+      },
+      {
+        "text": "A harder function and a higher cutoff, with better accuracy always",
+        "correct": false,
+        "why": "The reverse: a larger radius makes the function smoother, not harder."
+      },
+      {
+        "text": "No change at all",
+        "correct": false,
+        "why": "The radius sets how much is replaced, so it changes both the cutoff and the accuracy."
+      }
+    ],
+    "hints": [
+      "Smoother means fewer plane waves.",
+      "What happens when two spheres overlap?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-008",
+      "S-049"
+    ],
+    "visual": {
+      "plot": "paw-radial",
+      "params": {
+        "rc": 3
+      },
+      "caption": "The same curves with a larger radius.",
+      "alt": "Two curves of amplitude against distance from the nucleus: a smooth one without nodes and one that oscillates inside a marked radius, the two joined beyond it. Invented shapes."
+    }
+  },
+  {
+    "id": "q-paw-3",
+    "concepts": [
+      "paw-method"
+    ],
+    "type": "single",
+    "prompt": "In the lab the smooth stand-in has no nodes. Why does the all-electron-like curve have nodes inside r_c?",
+    "options": [
+      {
+        "text": "The true valence function must stay orthogonal to the core states, which makes it oscillate near the nucleus",
+        "correct": true,
+        "why": "This is exactly the wiggling a smooth stand-in avoids."
+      },
+      {
+        "text": "Because the lab has a bug",
+        "correct": false,
+        "why": "The nodes are the point of the picture."
+      },
+      {
+        "text": "Because outside r_c the electron has less energy",
+        "correct": false,
+        "why": "The nodes have to do with the core region, not with energy outside the radius."
+      }
+    ],
+    "hints": [
+      "Think about the core states.",
+      "Orthogonality forces oscillation."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-049",
+      "S-008"
+    ],
+    "visual": {
+      "plot": "paw-radial",
+      "params": {
+        "rc": 2
+      },
+      "caption": "Curves with a node region marked.",
+      "alt": "Two curves of amplitude against distance from the nucleus: a smooth one without nodes and one that oscillates inside a marked radius, the two joined beyond it. Invented shapes."
+    }
+  },
+  {
+    "id": "q-paw-4",
+    "concepts": [
+      "paw-method"
+    ],
+    "type": "single",
+    "prompt": "Which INCAR tag does the author recommend switching on for d and f elements, because the PAW spheres otherwise treat the density as spherical?",
+    "options": [
+      {
+        "text": "LASPH = .TRUE.",
+        "correct": true,
+        "why": "It includes the non-spherical contributions inside the PAW spheres; also recommended for +U and hybrids, and required for meta-GGA."
+      },
+      {
+        "text": "ISPIN = 2",
+        "correct": false,
+        "why": "ISPIN turns on spin polarization, which is unrelated to the shape of the density inside the spheres."
+      },
+      {
+        "text": "PREC = Low",
+        "correct": false,
+        "why": "That lowers accuracy; it is not about the spheres."
+      }
+    ],
+    "hints": [
+      "The name suggests aspherical.",
+      "It is in the accuracy group."
+    ],
+    "difficulty": 2,
+    "level": "pro",
+    "sources": [
+      "S-042",
+      "S-019"
+    ],
+    "visual": {
+      "plot": "paw-radial",
+      "params": {
+        "rc": 2
+      },
+      "caption": "Curves with a sphere radius marked.",
+      "alt": "Two curves of amplitude against distance from the nucleus: a smooth one without nodes and one that oscillates inside a marked radius, the two joined beyond it. Invented shapes."
+    }
+  },
+  {
+    "id": "q-func-1",
+    "concepts": [
+      "functionals"
+    ],
+    "type": "single",
+    "prompt": "What distinguishes a GGA such as PBE from LDA?",
+    "options": [
+      {
+        "text": "A GGA also depends on how quickly the density changes, not only on its value",
+        "correct": true,
+        "why": "The gradient of the density is the added ingredient."
+      },
+      {
+        "text": "It uses exact exchange",
+        "correct": false,
+        "why": "That is the hybrid rung."
+      },
+      {
+        "text": "It uses empty orbitals",
+        "correct": false,
+        "why": "That is a higher rung than hybrids."
+      }
+    ],
+    "hints": [
+      "Rung 1 uses the density only.",
+      "What new quantity appears on rung 2?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-046",
+      "S-013"
+    ],
+    "visual": {
+      "plot": "ladder-rungs",
+      "params": {
+        "highlight": 1
+      },
+      "caption": "The five rungs of the functional ladder, cheaper at the bottom.",
+      "alt": "Five stacked boxes named LDA, GGA, Meta-GGA, Hybrid and Beyond from bottom to top, with one box shaded."
+    }
+  },
+  {
+    "id": "q-func-2",
+    "concepts": [
+      "functionals"
+    ],
+    "type": "single",
+    "prompt": "According to the author's rule of thumb, how do PBE and LDA lattice constants compare with experiment?",
+    "options": [
+      {
+        "text": "PBE tends to overestimate them by about 1 to 2 percent and LDA to underestimate them by about 1 to 2 percent",
+        "correct": true,
+        "why": "This is the usual pattern, and a rule of thumb, not a law."
+      },
+      {
+        "text": "Both are exact",
+        "correct": false,
+        "why": "Neither is exact."
+      },
+      {
+        "text": "Both overestimate by 10 percent",
+        "correct": false,
+        "why": "The usual deviations are around one to two percent."
+      }
+    ],
+    "hints": [
+      "The two errors have opposite signs.",
+      "The size is a few percent at most."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "ladder-rungs",
+      "params": {
+        "highlight": 0
+      },
+      "caption": "The five rungs of the functional ladder, cheaper at the bottom.",
+      "alt": "Five stacked boxes named LDA, GGA, Meta-GGA, Hybrid and Beyond from bottom to top, with one box shaded."
+    }
+  },
+  {
+    "id": "q-func-3",
+    "concepts": [
+      "functionals"
+    ],
+    "type": "single",
+    "prompt": "Which statement about climbing the functional ladder is correct?",
+    "options": [
+      {
+        "text": "Each rung adds ingredients and cost, but the result is not guaranteed to be better for every property",
+        "correct": true,
+        "why": "The ladder orders the ingredients, not the quality of every answer."
+      },
+      {
+        "text": "A higher rung is always more accurate for every property",
+        "correct": false,
+        "why": "That is not guaranteed."
+      },
+      {
+        "text": "All rungs cost the same",
+        "correct": false,
+        "why": "Higher rungs cost more."
+      }
+    ],
+    "hints": [
+      "Think about what the ladder describes.",
+      "Cost grows."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-046",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "ladder-rungs",
+      "params": {
+        "highlight": 2
+      },
+      "caption": "The five rungs of the functional ladder, cheaper at the bottom.",
+      "alt": "Five stacked boxes named LDA, GGA, Meta-GGA, Hybrid and Beyond from bottom to top, with one box shaded."
+    }
+  },
+  {
+    "id": "q-func-4",
+    "concepts": [
+      "functionals"
+    ],
+    "type": "single",
+    "prompt": "Which INCAR line selects the r2SCAN meta-GGA?",
+    "options": [
+      {
+        "text": "METAGGA = R2SCAN, with any GGA tag removed and LASPH = .TRUE.",
+        "correct": true,
+        "why": "Meta-GGA runs need LASPH and compatible POTCARs."
+      },
+      {
+        "text": "LHFCALC = .TRUE.",
+        "correct": false,
+        "why": "That switches on exact exchange (a hybrid)."
+      },
+      {
+        "text": "IVDW = 12",
+        "correct": false,
+        "why": "That is a dispersion correction."
+      }
+    ],
+    "hints": [
+      "The tag name contains META.",
+      "It needs LASPH."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-026"
+    ],
+    "visual": {
+      "plot": "ladder-rungs",
+      "params": {
+        "highlight": 2
+      },
+      "caption": "The five rungs of the functional ladder, cheaper at the bottom.",
+      "alt": "Five stacked boxes named LDA, GGA, Meta-GGA, Hybrid and Beyond from bottom to top, with one box shaded."
+    }
+  },
+  {
+    "id": "q-hyb-1",
+    "concepts": [
+      "hybrid-functionals"
+    ],
+    "type": "single",
+    "prompt": "What does a hybrid functional add to a semilocal one?",
+    "options": [
+      {
+        "text": "A fraction of exact (Hartree-Fock) exchange",
+        "correct": true,
+        "why": "That is what makes it a hybrid, and what makes it expensive."
+      },
+      {
+        "text": "A van der Waals correction",
+        "correct": false,
+        "why": "That is a separate patch."
+      },
+      {
+        "text": "A spin-orbit term",
+        "correct": false,
+        "why": "That is controlled by LSORBIT, not by the functional."
+      }
+    ],
+    "hints": [
+      "The ingredient has the name of a method from module 3.",
+      "It is rung 4."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-025",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "ladder-rungs",
+      "params": {
+        "highlight": 3
+      },
+      "caption": "The five rungs of the functional ladder, cheaper at the bottom.",
+      "alt": "Five stacked boxes named LDA, GGA, Meta-GGA, Hybrid and Beyond from bottom to top, with one box shaded."
+    }
+  },
+  {
+    "id": "q-hyb-2",
+    "concepts": [
+      "hybrid-functionals"
+    ],
+    "type": "single",
+    "prompt": "Which pair of tags gives HSE06 in VASP, according to the author's tag cards?",
+    "options": [
+      {
+        "text": "LHFCALC = .TRUE. with HFSCREEN = 0.2 and AEXX = 0.25",
+        "correct": true,
+        "why": "HFSCREEN = 0 with AEXX = 0.25 would be PBE0."
+      },
+      {
+        "text": "HFSCREEN = 0 and AEXX = 0.25 only",
+        "correct": false,
+        "why": "That is PBE0, and LHFCALC is still needed."
+      },
+      {
+        "text": "METAGGA = HSE06",
+        "correct": false,
+        "why": "HSE06 is not a METAGGA value."
+      }
+    ],
+    "hints": [
+      "The screening length is 0.2.",
+      "LHFCALC must be on."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-025"
+    ],
+    "visual": {
+      "plot": "ladder-rungs",
+      "params": {
+        "highlight": 3
+      },
+      "caption": "The five rungs of the functional ladder, cheaper at the bottom.",
+      "alt": "Five stacked boxes named LDA, GGA, Meta-GGA, Hybrid and Beyond from bottom to top, with one box shaded."
+    }
+  },
+  {
+    "id": "q-hyb-3",
+    "concepts": [
+      "hybrid-functionals"
+    ],
+    "type": "single",
+    "prompt": "Why are hybrid runs much slower?",
+    "options": [
+      {
+        "text": "The exact exchange couples every pair of orbitals, which is far more work than a semilocal functional",
+        "correct": true,
+        "why": "That is why settings such as PRECFOCK and NKRED exist to cut the cost."
+      },
+      {
+        "text": "Because they use more electrons",
+        "correct": false,
+        "why": "The electron count is the same."
+      },
+      {
+        "text": "Because they need a bigger cell",
+        "correct": false,
+        "why": "The cell is the same."
+      }
+    ],
+    "hints": [
+      "Exact exchange is non-local.",
+      "Think of the cost of Hartree-Fock."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-025"
+    ],
+    "visual": {
+      "plot": "ladder-rungs",
+      "params": {
+        "highlight": 3
+      },
+      "caption": "The five rungs of the functional ladder, cheaper at the bottom.",
+      "alt": "Five stacked boxes named LDA, GGA, Meta-GGA, Hybrid and Beyond from bottom to top, with one box shaded."
+    }
+  },
+  {
+    "id": "q-hyb-4",
+    "concepts": [
+      "hybrid-functionals"
+    ],
+    "type": "single",
+    "prompt": "You change AEXX to reproduce a known band gap. What does the author's card say to do?",
+    "options": [
+      {
+        "text": "Report it, because it is a different functional from the one you named",
+        "correct": true,
+        "why": "A tuned AEXX is no longer the standard HSE06."
+      },
+      {
+        "text": "Nothing: it is still HSE06",
+        "correct": false,
+        "why": "The standard HSE06 uses AEXX = 0.25."
+      },
+      {
+        "text": "Reset it before submitting",
+        "correct": false,
+        "why": "Tuning is allowed if you say so."
+      }
+    ],
+    "hints": [
+      "The functional you report must be the one you ran.",
+      "Transparency is the rule."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "ladder-rungs",
+      "params": {
+        "highlight": 3
+      },
+      "caption": "The five rungs of the functional ladder, cheaper at the bottom.",
+      "alt": "Five stacked boxes named LDA, GGA, Meta-GGA, Hybrid and Beyond from bottom to top, with one box shaded."
+    }
+  },
+  {
+    "id": "q-mag-1",
+    "concepts": [
+      "spin-polarization"
+    ],
+    "type": "single",
+    "prompt": "When is ISPIN = 2 needed?",
+    "options": [
+      {
+        "text": "For ferromagnets, antiferromagnets, radicals and many open-shell d or f systems",
+        "correct": true,
+        "why": "In these systems the up and down electrons differ."
+      },
+      {
+        "text": "For every calculation",
+        "correct": false,
+        "why": "It doubles the cost, so it is used when the physics needs it."
+      },
+      {
+        "text": "Only for metals",
+        "correct": false,
+        "why": "Metals can be non-magnetic; spin is about magnetism, not about being a metal."
+      }
+    ],
+    "hints": [
+      "Think about when up and down differ.",
+      "The cost roughly doubles."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042",
+      "S-041"
+    ],
+    "visual": {
+      "scene": "fm-cubic",
+      "caption": "A ferromagnetic arrangement. Toy model.",
+      "alt": "Eight atoms in a cubic cell, all moments pointing the same way."
+    }
+  },
+  {
+    "id": "q-mag-2",
+    "concepts": [
+      "spin-polarization"
+    ],
+    "type": "single",
+    "prompt": "An antiferromagnetic cell has 4 atoms. How many values does MAGMOM need?",
+    "options": [
+      {
+        "text": "4, one per atom in POSCAR order",
+        "correct": true,
+        "why": "The count must equal the number of atoms."
+      },
+      {
+        "text": "2, one per spin direction",
+        "correct": false,
+        "why": "There is one value per atom, not per direction."
+      },
+      {
+        "text": "1, a single number for the cell",
+        "correct": false,
+        "why": "A single number cannot describe different atoms."
+      }
+    ],
+    "hints": [
+      "The rule is one value per atom.",
+      "The order is POSCAR order."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "scene": "afm-g",
+      "caption": "An antiferromagnetic arrangement. Toy model.",
+      "alt": "Eight atoms in a cubic cell with every neighbour pointing the opposite way."
+    }
+  },
+  {
+    "id": "q-mag-3",
+    "concepts": [
+      "spin-polarization"
+    ],
+    "type": "single",
+    "prompt": "Why do you compare ferromagnetic and antiferromagnetic energies only in the same cell?",
+    "options": [
+      {
+        "text": "Different cells use different k-meshes, cutoffs and atom counts, so their energies are not comparable",
+        "correct": true,
+        "why": "The comparison must change only the spin arrangement."
+      },
+      {
+        "text": "Because energies of magnetic states are identical in any cell",
+        "correct": false,
+        "why": "They differ, and the cell must be the same to see the difference."
+      },
+      {
+        "text": "Because the cell has no effect on energy",
+        "correct": false,
+        "why": "The cell affects the energy through the basis and the sampling."
+      }
+    ],
+    "hints": [
+      "What else would change besides the spins?",
+      "Same settings for each."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "scene": "afm-a",
+      "caption": "An arrangement that needs a cell larger than one atom. Toy model.",
+      "alt": "Eight atoms in a cubic cell with layers pointing alternately up and down."
+    }
+  },
+  {
+    "id": "q-mag-4",
+    "concepts": [
+      "spin-polarization"
+    ],
+    "type": "single",
+    "prompt": "A run with a starting moment of 0.1 on a known magnet ends with zero moment. What does the author's guidance suggest?",
+    "options": [
+      {
+        "text": "The starting moment may be too small; start at 3 to 5 muB for 3d magnetic ions and compare energies",
+        "correct": true,
+        "why": "A moment can collapse to zero if the start is too small."
+      },
+      {
+        "text": "The material must be non-magnetic",
+        "correct": false,
+        "why": "Not necessarily: the start may have been too small."
+      },
+      {
+        "text": "Increase ENCUT",
+        "correct": false,
+        "why": "The cutoff is unrelated to the starting moment."
+      }
+    ],
+    "hints": [
+      "Starting values matter.",
+      "The collapse is a known symptom."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "scene": "afm-c",
+      "caption": "An arrangement with alternating columns. Toy model.",
+      "alt": "Eight atoms in a cubic cell with chains of atoms alternating up and down."
+    }
+  },
+  {
+    "id": "q-vdw-1",
+    "concepts": [
+      "van-der-waals"
+    ],
+    "type": "single",
+    "prompt": "Why does a plain PBE calculation of graphite bind its layers too weakly?",
+    "options": [
+      {
+        "text": "Semilocal functionals barely describe the weak dispersion attraction between neutral layers",
+        "correct": true,
+        "why": "A dispersion correction adds it back."
+      },
+      {
+        "text": "Because graphite has no electrons between layers",
+        "correct": false,
+        "why": "The attraction comes from correlated fluctuations, not from a charge between layers."
+      },
+      {
+        "text": "Because the cutoff was too high",
+        "correct": false,
+        "why": "A high cutoff does not change the physics of the missing term."
+      }
+    ],
+    "hints": [
+      "Which attraction acts between neutral layers?",
+      "It is long-ranged and weak."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042",
+      "S-028"
+    ],
+    "visual": {
+      "scene": "graphite",
+      "caption": "Layers of graphite. Illustrative.",
+      "alt": "Graphite: hexagonal layers of carbon atoms stacked along one axis."
+    }
+  },
+  {
+    "id": "q-vdw-2",
+    "concepts": [
+      "van-der-waals"
+    ],
+    "type": "single",
+    "prompt": "Which IVDW values does the author's dictionary list?",
+    "options": [
+      {
+        "text": "11 (D3), 12 (D3-BJ) and 20 (TS)",
+        "correct": true,
+        "why": "Use one consistently for every run you compare."
+      },
+      {
+        "text": "0, 1 and 2",
+        "correct": false,
+        "why": "Those are not the listed values."
+      },
+      {
+        "text": "1 for PBE and 2 for LDA",
+        "correct": false,
+        "why": "IVDW is about dispersion corrections, not about the functional."
+      }
+    ],
+    "hints": [
+      "D3 and D3-BJ are consecutive.",
+      "TS is 20."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042",
+      "S-028"
+    ],
+    "visual": {
+      "scene": "graphite",
+      "caption": "Layers of graphite. Illustrative.",
+      "alt": "Graphite: hexagonal layers of carbon atoms stacked along one axis."
+    }
+  },
+  {
+    "id": "q-vdw-3",
+    "concepts": [
+      "van-der-waals"
+    ],
+    "type": "single",
+    "prompt": "In which calculation should IVDW be applied for a layered crystal?",
+    "options": [
+      {
+        "text": "In the relaxation, so the structure sees it",
+        "correct": true,
+        "why": "The correction changes forces and therefore the structure."
+      },
+      {
+        "text": "Only in a final single point",
+        "correct": false,
+        "why": "Then the structure would not have been relaxed with it."
+      },
+      {
+        "text": "Never: it only changes the printed energy",
+        "correct": false,
+        "why": "It changes forces too."
+      }
+    ],
+    "hints": [
+      "Forces determine the structure.",
+      "Which run moves atoms?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "none": "The question is about when to switch a tag on, so a picture would only restate the answer text."
+    }
+  },
+  {
+    "id": "q-vdw-4",
+    "concepts": [
+      "van-der-waals"
+    ],
+    "type": "single",
+    "prompt": "What does a pairwise dispersion correction add for each pair of atoms?",
+    "options": [
+      {
+        "text": "A small attractive term that falls off with distance and is damped at short range",
+        "correct": true,
+        "why": "D3 and D3(BJ) differ in the damping."
+      },
+      {
+        "text": "A repulsive term that grows with distance",
+        "correct": false,
+        "why": "The dispersion term is attractive and decays."
+      },
+      {
+        "text": "A new electron",
+        "correct": false,
+        "why": "It adds energy and forces, not electrons."
+      }
+    ],
+    "hints": [
+      "It is a patch on the energy.",
+      "Attractive and fading with distance."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-028"
+    ],
+    "visual": {
+      "scene": "graphite",
+      "caption": "Layers of graphite. Illustrative.",
+      "alt": "Graphite: hexagonal layers of carbon atoms stacked along one axis."
+    }
   }
 ]
