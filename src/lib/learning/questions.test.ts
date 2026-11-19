@@ -3,6 +3,7 @@ import m1 from '../../data/questions/module-01.json';
 import m2 from '../../data/questions/module-02.json';
 import m3 from '../../data/questions/module-03.json';
 import m4 from '../../data/questions/module-04.json';
+import m5 from '../../data/questions/module-05.json';
 import { grade, loadQuestionBank, parseQuestions, MalformedResponseError, type Question } from './questions';
 
 const base = {
@@ -22,7 +23,7 @@ const mk = (extra: Record<string, unknown>) =>
 
 describe('schema', () => {
   it('accepts the shipped banks and defaults discrimination to 1', () => {
-    const bank = loadQuestionBank({ m1, m2, m3, m4 });
+    const bank = loadQuestionBank({ m1, m2, m3, m4, m5 });
     expect(bank.length).toBeGreaterThanOrEqual(105);
     expect(bank.every((q) => q.a === 1 || q.a > 0)).toBe(true);
   });

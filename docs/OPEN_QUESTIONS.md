@@ -188,3 +188,6 @@ M12.1 changes colours and makes monospace the interface face (D-054). **Close:**
 ## Q-044. Slab polarity heuristic
 The polar-slab warning (M13.5) uses nominal oxidation states and the dipole of the repeat unit along the normal (Tasker type III, S-063). The threshold for "non-zero" and the treatment of mixed-valence or metallic systems are conventions. **Close (builder, M13.5):** record the threshold as a D entry and compare the flag with pymatgen's `is_polar` on the golden slabs. **Owner: builder.**
 
+
+## Q-045. Cold smearing: sign convention and ISMEAR value
+The smearing lab (M7.2) implements cold smearing (Marzari-Vanderbilt, S-016) as delta(x) = e^(-(x-1/sqrt2)^2)(2 - sqrt2 x)/sqrt(pi), so its negative lobe lies above the Fermi level. The original paper and the VASP wiki page ISMEAR (S-019) have not been read from a builder session, so the sign convention of x, and the ISMEAR value VASP uses for cold smearing, are unconfirmed; the lab claims no ISMEAR value for it and the topic says so. The invariants (unit integral, zero first moment, delta = -df/dx, entropy as the integral of t delta) hold in either convention. **Close:** read S-016 and the ISMEAR page (allow vasp.at, arxiv.org) and fix the sign or confirm it; add the ISMEAR value to `SMEARINGS`. **Owner: builder or author.**

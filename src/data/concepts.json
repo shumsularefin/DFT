@@ -319,7 +319,7 @@
       "kohn-sham-equations"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "bloch-theorem",
@@ -330,7 +330,7 @@
       "plane-waves"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "reciprocal-space",
@@ -341,7 +341,7 @@
       "bloch-theorem"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "cutoff-energy",
@@ -352,7 +352,7 @@
       "plane-waves"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "brillouin-zone",
@@ -363,7 +363,7 @@
       "reciprocal-space"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "k-points",
@@ -374,7 +374,7 @@
       "brillouin-zone"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "kpoint-mesh",
@@ -385,7 +385,7 @@
       "k-points"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "pseudopotentials",
@@ -451,7 +451,7 @@
       "k-points"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "spin-polarization",
@@ -475,7 +475,7 @@
       "spin-polarization"
     ],
     "level": "pro",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "lattice-vectors",
@@ -775,7 +775,7 @@
       "kohn-sham-idea"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "space-group-symmetry",

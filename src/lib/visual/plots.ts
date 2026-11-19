@@ -16,6 +16,8 @@ import {
 import { log10RelativeCost, methodById, type MethodId } from '../physics/scaling';
 import { runScf, type ScfOptions, type ScfResult } from '../physics/scf1d';
 import { dispersion } from '../physics/tightbinding2d';
+import { dudarevEnergy, dudarevPotential } from '../physics/dftu';
+import { SMEARINGS, delta as smearDelta, occupation as smearOcc, type SmearingId } from '../physics/smearing';
 
 export type PlotBadge = 'computed' | 'toy-model' | 'illustrative';
 export interface PlotOut {
@@ -43,6 +45,12 @@ export const PLOT_IDS = [
   'scf-density',
   'density-box',
   'steps',
+  'pw-parabola',
+  'pw-count',
+  'smearing-curves',
+  'dftu-penalty',
+  'kmesh-grid',
+  'bz-1d',
 ] as const;
 export type PlotId = (typeof PLOT_IDS)[number];
 
@@ -688,6 +696,172 @@ function arrowDown(x: number, y0: number, y1: number): string {
   return `${line(x, y0, x, y1 - 4, 'vp-curve')}<path class="vp-arrowhead" d="M${r1(x)} ${r1(y1)}l-4 -6h8Z"/>`;
 }
 
+/* ---- module 5: plane waves, k-points, smearing, DFT+U (M7.2) ---- */
+// @source S-049 (plane waves), S-036 (reciprocal lattice, Brillouin zone), S-007 (mesh points), S-015 and S-016 (smearing), S-014 (DFT+U)
+
+/** Kinetic energy of a plane wave against its wave vector, with the cutoff drawn as a line when asked. */
+function pwParabola(p: P): string {
+  const kmax = 4;
+  const ecut = num(p, 'cutoff', 30);
+  const emax = HBAR2_OVER_2M_EV_A2 * kmax * kmax;
+  const c = chart(-kmax, kmax, 0, emax, 'wave vector k', 'kinetic energy');
+  let body = c.axes;
+  body += path(
+    sample(-kmax, kmax, 80).map((k) => [c.sx(k), c.sy(HBAR2_OVER_2M_EV_A2 * k * k)]),
+    'vp-curve',
+  );
+  if (p.showCutoff !== false) {
+    const kc = Math.sqrt(ecut / HBAR2_OVER_2M_EV_A2);
+    body += line(c.x0, c.sy(ecut), c.x1, c.sy(ecut), 'vp-guide');
+    body +=
+      line(c.sx(-kc), c.y0, c.sx(-kc), c.sy(ecut), 'vp-guide') +
+      line(c.sx(kc), c.y0, c.sx(kc), c.sy(ecut), 'vp-guide');
+    body += text(c.x1 - 4, c.sy(ecut) - 5, 'cutoff', 'vp-t', 'end');
+  }
+  return wrap(p.alt as string, c.h, body);
+}
+
+/** Number of plane waves below an energy: N proportional to E^(3/2), drawn relative to the largest energy. */
+function pwCount(p: P): string {
+  const c = chart(0, 1, 0, 1, 'cutoff energy', 'number of plane waves');
+  const body =
+    c.axes +
+    path(
+      sample(0, 1, 60).map((e) => [c.sx(e), c.sy(e ** 1.5)]),
+      'vp-curve',
+    );
+  return wrap(p.alt as string, c.h, body);
+}
+
+const SMEAR_CLASS = ['vp-curve', 'vp-curve2', 'vp-curve3', 'vp-curve4'];
+/** Occupation f(x) or broadened delta(x) for chosen smearing schemes, x in units of the width. */
+function smearingCurves(p: P): string {
+  const ids = arr<SmearingId>(p, 'schemes', ['gaussian']).filter((i) => SMEARINGS.some((s) => s.id === i));
+  const occ = p.series !== 'delta';
+  const f = (id: SmearingId, x: number) => (occ ? smearOcc(id, x) : smearDelta(id, x));
+  const xs = sample(-4, 4, 160);
+  const all = ids.flatMap((id) => xs.map((x) => f(id, x)));
+  const ymin = Math.min(0, ...all);
+  const ymax = Math.max(occ ? 1 : 0, ...all) * 1.05;
+  const c = chart(
+    -4,
+    4,
+    ymin * 1.05,
+    ymax,
+    'energy from the Fermi level, in units of the width',
+    occ ? 'occupation' : 'broadened delta function',
+  );
+  let body = c.axes + line(c.sx(0), c.y0, c.sx(0), c.y1, 'vp-guide');
+  if (ymin < 0) body += line(c.x0, c.sy(0), c.x1, c.sy(0), 'vp-zero');
+  ids.forEach((id, i) => {
+    body += path(
+      xs.map((x) => [c.sx(x), c.sy(f(id, x))]),
+      SMEAR_CLASS[i % SMEAR_CLASS.length]!,
+    );
+  });
+  body += legend(
+    c,
+    ids.map((id, i) => [SMEAR_CLASS[i % SMEAR_CLASS.length]!, SMEARINGS.find((s) => s.id === id)!.label]),
+  );
+  return wrap(p.alt as string, c.h, body);
+}
+
+/** The Dudarev penalty (and optionally its potential) against the occupation of one orbital. */
+function dftuPenalty(p: P): string {
+  const U = num(p, 'U', 4);
+  const both = p.series === 'both';
+  const ns = sample(0, 1, 80);
+  const e = (n: number) => dudarevEnergy(U, n);
+  const v = (n: number) => dudarevPotential(U, n);
+  const lo = both ? -U / 2 : 0;
+  const hi = both ? U / 2 : U / 8;
+  const c = chart(
+    0,
+    1,
+    lo * 1.1,
+    hi * 1.2,
+    'occupation n of one orbital',
+    both ? 'energy and potential' : 'penalty energy',
+  );
+  let body = c.axes + line(c.x0, c.sy(0), c.x1, c.sy(0), 'vp-zero');
+  body += path(
+    ns.map((n) => [c.sx(n), c.sy(e(n))]),
+    'vp-curve',
+  );
+  if (both)
+    body += path(
+      ns.map((n) => [c.sx(n), c.sy(v(n))]),
+      'vp-curve2',
+    );
+  if (both)
+    body += legend(c, [
+      ['vp-curve', 'penalty energy'],
+      ['vp-curve2', 'potential'],
+    ]);
+  return wrap(p.alt as string, c.h, body);
+}
+
+/** Gamma-centred or Monkhorst-Pack mesh in a 2D reciprocal cell (fractions of the reciprocal vectors). */
+function kmeshGrid(p: P): string {
+  const n = Math.max(1, Math.round(num(p, 'n', 4)));
+  const gamma = p.gamma !== false;
+  const angle = (num(p, 'angle', 90) * Math.PI) / 180;
+  const ratio = num(p, 'ratio', 1);
+  const h = 220;
+  const cx = W / 2;
+  const cy = h / 2;
+  const scale = 120;
+  const b1: [number, number] = [scale, 0];
+  const b2: [number, number] = [ratio * scale * Math.cos(angle), -ratio * scale * Math.sin(angle)];
+  const pt = (u: number, w: number): [number, number] => [
+    cx + u * b1[0] + w * b2[0],
+    cy + u * b1[1] + w * b2[1],
+  ];
+  let body = path([pt(-0.5, -0.5), pt(0.5, -0.5), pt(0.5, 0.5), pt(-0.5, 0.5)], 'vp-guide', true);
+  const s = gamma ? 0 : n % 2 === 0 ? 0.5 : 0;
+  const wrapU = (u: number) => (u >= 0.5 - 1e-9 ? u - 1 : u);
+  for (let i = 0; i < n; i++)
+    for (let j = 0; j < n; j++) {
+      const [x, y] = pt(wrapU((i + s) / n), wrapU((j + s) / n));
+      body += `<circle class="vp-node vp-solid" cx="${r1(x)}" cy="${r1(y)}" r="3.5"/>`;
+    }
+  const [gx, gy] = pt(0, 0);
+  body +=
+    `<circle class="vp-node" cx="${r1(gx)}" cy="${r1(gy)}" r="7"/>` +
+    text(gx + 14, gy - 8, 'Γ', 'vp-t', 'start');
+  body += text(W / 2, h - 6, 'reciprocal cell with the k-points of the mesh', 'vp-t');
+  return wrap(p.alt as string, h, body);
+}
+
+/** A row of atoms and the matching reciprocal axis, marked only with symbols. */
+function bz1d(p: P): string {
+  const atoms = Math.max(2, Math.round(num(p, 'atoms', 7)));
+  const h = 150;
+  const a = (W - 60) / (atoms - 1);
+  let body = text(W / 2, 14, 'real space: a row of atoms', 'vp-t');
+  for (let i = 0; i < atoms; i++)
+    body += `<circle class="vp-node vp-solid" cx="${r1(30 + i * a)}" cy="38" r="5"/>`;
+  body += line(30, 56, 30 + a, 56, 'vp-axis') + text(30 + a / 2, 70, 'a', 'vp-t');
+  const x0 = 40;
+  const x1 = W - 40;
+  const mid = (x0 + x1) / 2;
+  const q = (x1 - x0) / 4;
+  body += text(W / 2, 92, 'reciprocal space: wave vector k', 'vp-t');
+  body += line(x0, 112, x1, 112, 'vp-axis');
+  body += `<rect class="vp-fill" x="${r1(mid - q)}" y="104" width="${r1(2 * q)}" height="16"/>`;
+  [
+    [-2, '-2π/a'],
+    [-1, '-π/a'],
+    [0, '0'],
+    [1, 'π/a'],
+    [2, '2π/a'],
+  ].forEach(([m, label]) => {
+    const x = mid + (m as number) * q;
+    body += line(x, 108, x, 116, 'vp-tick') + text(x, 134, label as string, 'vp-t');
+  });
+  return wrap(p.alt as string, h, body);
+}
+
 const RENDER: Record<PlotId, { fn: (p: P) => string; badge: PlotBadge }> = {
   'box-levels': { fn: boxLevels, badge: 'computed' },
   'box-wave': { fn: boxWave, badge: 'computed' },
@@ -707,6 +881,12 @@ const RENDER: Record<PlotId, { fn: (p: P) => string; badge: PlotBadge }> = {
   'scf-density': { fn: scfDensity, badge: 'toy-model' },
   'density-box': { fn: densityBox, badge: 'computed' },
   steps: { fn: steps, badge: 'illustrative' },
+  'pw-parabola': { fn: pwParabola, badge: 'computed' },
+  'pw-count': { fn: pwCount, badge: 'computed' },
+  'smearing-curves': { fn: smearingCurves, badge: 'computed' },
+  'dftu-penalty': { fn: dftuPenalty, badge: 'computed' },
+  'kmesh-grid': { fn: kmeshGrid, badge: 'computed' },
+  'bz-1d': { fn: bz1d, badge: 'illustrative' },
 };
 
 export function isPlotId(id: string): id is PlotId {

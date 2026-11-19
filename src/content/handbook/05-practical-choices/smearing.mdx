@@ -1,0 +1,126 @@
+---
+id: smearing
+title: Smearing and the Fermi level
+module: 5
+order: 5
+summary: Why metals need fractional occupations near the Fermi level, what each smearing scheme does, how to choose SIGMA and how to check the entropy term.
+concepts: [smearing, fermi-level]
+requires: [k-points]
+vaspTags: [ISMEAR, SIGMA]
+sources: [S-015, S-016, S-017, S-019, S-041, S-042, S-049]
+status: draft
+updated: 2026-11-19
+---
+
+<Why>
+
+In a metal the highest filled energy level sits in the middle of a band. At absolute zero every level below it holds an electron and every level above it is empty, so the occupation drops from 1 to 0 in one sharp step. That step is hard on a calculation: a tiny change in the orbitals can move a level across the step, so the energy and the forces jump around and the SCF loop struggles. Smearing replaces the step with a smooth ramp of width `SIGMA`. It makes metals converge with a reasonable k-mesh, and it is one of the settings that most often goes wrong when it is left at the default <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+The <Term id="fermi-level">Fermi level</Term> is the energy up to which levels are filled at zero temperature. Smearing lets levels near it be partly filled: one half full, say, rather than all or nothing. Picture blurring the edge of a sharp cliff into a slope.
+
+Two ideas to keep in mind:
+
+- **It is a numerical aid first.** The width is not a measured temperature (except for Fermi-Dirac, below). The blur helps the k-sum converge; the price is a small error that grows with the width.
+- **Different blurs have different shapes.** All the schemes ramp the occupation from 1 to 0, but they differ in how far the energy is changed. Gaussian and Fermi-Dirac are always positive and always between 0 and 1. The Methfessel-Paxton and cold schemes are designed to change the energy less, and in return their occupations dip below 0 or rise above 1 a little. That looks odd, and it is expected.
+
+The lab shows each scheme. The upper plot uses the variable $x = (\varepsilon - \mu)/\sigma$, the distance from the Fermi level in units of the width, so the schemes can be compared on one axis. The lower plot uses a made-up metal: a flat band with a peak just below the Fermi level. Move `SIGMA` and watch the band energy shift, the entropy term appear and the free energy move.
+
+**The entropy term.** A blurred occupation behaves like a finite electronic temperature, so VASP adds an entropy term `-T*S` to the energy. In `OUTCAR` this is `EENTRO`. Divided by the number of atoms it should stay below about 1 meV; if it is larger, reduce `SIGMA` <Cite id="S-042" />. The lab flags this as a rule of thumb (a heuristic), not a law.
+
+<Level min="intermediate">
+
+The three energies in `OUTCAR` are the free energy (`free energy TOTEN`), the energy without entropy and the energy extrapolated to zero width, `energy(sigma->0)`. The handbook says to quote `E0` (the σ → 0 value) for insulators and semiconductors <Cite id="S-042" />. For the Gaussian scheme the σ → 0 value is the average of the free energy and the energy without entropy; whether other schemes use the same average is not stated in the sources we cite here, so the lab does not show an extrapolated value.
+
+</Level>
+
+</Intuition>
+
+<Lab id="smearing" title="Smearing and the entropy term" />
+
+<TheMath>
+
+Let $x = (\varepsilon - \mu)/\sigma$, with $\varepsilon$ a level energy, $\mu$ the Fermi level and $\sigma$ the width. A smearing scheme gives an occupation $f(x)$ that goes from 1 to 0, and a broadened delta function $\delta(x) = -\,df/dx$ that integrates to 1.
+
+| Scheme                       | Occupation $f(x)$                                                       | $\delta(x)$                              |
+| ---------------------------- | ----------------------------------------------------------------------- | ---------------------------------------- |
+| Fermi-Dirac                  | $1/(1+e^{x})$                                                           | $1/\big(4\cosh^2(x/2)\big)$              |
+| Gaussian                     | $\tfrac12\,\mathrm{erfc}(x)$                                            | $e^{-x^2}/\sqrt{\pi}$                    |
+| Methfessel-Paxton, order $N$ | $\tfrac12\,\mathrm{erfc}(x) + \sum_{n=1}^{N} A_n H_{2n-1}(x)\,e^{-x^2}$ | $\sum_{n=0}^{N} A_n H_{2n}(x)\,e^{-x^2}$ |
+| Cold (Marzari-Vanderbilt)    | $\tfrac12\,\mathrm{erfc}(u) - e^{-u^2}/\sqrt{2\pi}$                     | $e^{-u^2}\,(2-\sqrt{2}\,x)/\sqrt{\pi}$   |
+
+Here $H_m$ is the Hermite polynomial, $A_n = (-1)^n/(n!\,4^n\sqrt{\pi})$ <Cite id="S-015" />, and $u = x - 1/\sqrt{2}$ for the cold scheme <Cite id="S-016" />. The order-1 case reads $\delta_1 = (3/2 - x^2)\,e^{-x^2}/\sqrt{\pi}$.
+
+The code behind the lab checks each scheme against facts that must hold: every $\delta$ integrates to 1; the Gaussian second moment is $1/2$; Methfessel-Paxton of order $N$ has zero moments from 1 to $2N+1$; the cold delta has zero first moment; $-df/dx$ equals $\delta$; and the entropy equals the integral defined below.
+
+The per-level entropy is $S(x) = \int_x^{\infty} t\,\delta(t)\,dt$, and the free energy is $E_{\text{band}} - \sigma\sum S$. For Fermi-Dirac this is the usual $-[f\ln f + (1-f)\ln(1-f)]$, and $S(0) = \ln 2$.
+
+<Level min="pro">
+
+The sign convention for $x$ in the cold scheme is an open question on this site (Q-045): the form above has its negative lobe above the Fermi level ($x > \sqrt{2}$), and it was not confirmed against the original paper. The other schemes do not depend on it. In this convention, over $|x| \le 5$ the computed occupation of the order-1 scheme runs from about $-0.036$ to $1.036$, of order 2 from about $-0.052$ to $1.052$, and of the cold scheme from about $-0.083$ to 1; these are outputs of the site's own code, not quotes.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+- `ISMEAR` picks the scheme and `SIGMA` the width in eV. `ISMEAR = 0` is Gaussian, `1` and `2` are Methfessel-Paxton of order 1 and 2, `-1` is Fermi-Dirac and `-5` is the tetrahedron method with Blochl corrections <Cite id="S-019" /> <Cite id="S-017" />. The sources used here do not give an `ISMEAR` value for cold smearing, so none is claimed.
+- The VASP default is `ISMEAR = 1` with `SIGMA = 0.2`. That suits metals only, so set both explicitly every time <Cite id="S-042" />.
+- Author's rules: `ISMEAR = 0` with a small `SIGMA` (0.05 is the usual) is safe for anything. Use 0.01 to 0.05 eV for insulators and semiconductors, and 0.1 to 0.2 eV with `ISMEAR = 1` for metals <Cite id="S-041" /> <Cite id="S-042" />.
+- Never use `ISMEAR = 1` for a semiconductor: it gives wrong energies <Cite id="S-042" />.
+- `ISMEAR = -5` gives accurate total energies and densities of states for a bulk cell on a uniform mesh with at least 4 k-points. Do not use it for band paths or for forces in metals <Cite id="S-042" />.
+- `ISMEAR = -1` is the physical electronic temperature, for finite-temperature DFT: `SIGMA` is then $k_B T$ in eV.
+- Check the entropy: `grep EENTRO OUTCAR | tail -1`, divide by the number of atoms, keep it below about 1 meV per atom. If it is larger, reduce `SIGMA` <Cite id="S-042" />.
+- Smearing and the k-mesh go together: smearing does not rescue a mesh that is too coarse. Test them as a pair <Cite id="S-041" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...              | ...in the lab                               | ...in VASP                                                    |
+| ----------------------------- | ------------------------------------------- | ------------------------------------------------------------- |
+| `SIGMA` wider                 | Bigger band shift and bigger entropy term   | Easier convergence, but `EENTRO` grows and gaps blur          |
+| `SIGMA` narrower              | Smaller shift and entropy                   | Needs a denser k-mesh and may converge slowly in the SCF loop |
+| Gaussian to Methfessel-Paxton | Much smaller entropy term at the same width | Less width error for metals; wrong for semiconductors         |
+| Fermi-Dirac                   | Largest entropy term at the same width      | A true electronic temperature; use it when you mean it        |
+
+Why smear: the step in occupation is hard to converge. Why this value: wide enough to converge, narrow enough that `EENTRO` stays below about 1 meV per atom. What happens if you get it wrong: a blurred band gap, a shifted energy, or a metal that will not converge.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Leaving the default smearing on an insulator">
+
+The default (`ISMEAR = 1`, `SIGMA = 0.2`) can partly fill the conduction band of a semiconductor and spoil the energy. Set `ISMEAR = 0` and a small `SIGMA`.
+
+</Callout>
+
+<Callout variant="mistake" title="Skipping the EENTRO check">
+
+A free energy that looks converged can still carry a smearing error. Read `EENTRO` once per system.
+
+</Callout>
+
+<Callout variant="mistake" title="Treating the toy metal as a prediction">
+
+The density of states in the lab is invented to show the effect. Its numbers show the trend with width and scheme, not any real metal.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-smear-1', 'q-smear-2', 'q-smear-3', 'q-ef-1', 'q-ef-2', 'q-ef-3']} />
+
+<GoDeeper>
+
+- Methfessel and Paxton, the original description of the schemes <Cite id="S-015" />.
+- Marzari, Vanderbilt and co-workers on cold smearing <Cite id="S-016" />.
+- Blochl, Jepsen and Andersen on the tetrahedron method <Cite id="S-017" />.
+- VASP wiki pages ISMEAR and SIGMA (by page name) <Cite id="S-019" />.
+
+</GoDeeper>

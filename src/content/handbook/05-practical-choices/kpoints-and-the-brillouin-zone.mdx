@@ -1,0 +1,125 @@
+---
+id: kpoints-and-the-brillouin-zone
+title: k-points and the Brillouin zone
+module: 5
+order: 2
+summary: Why a crystal calculation needs a mesh of k-points, how to read the Brillouin zone, and how to choose and test a mesh.
+concepts: [bloch-theorem, reciprocal-space, brillouin-zone, k-points, kpoint-mesh]
+requires: [plane-waves]
+vaspTags: [KSPACING]
+sources: [S-007, S-019, S-036, S-041, S-042, S-049, S-050]
+status: draft
+updated: 2026-11-19
+---
+
+<Why>
+
+A crystal repeats forever, so it has an endless number of electrons. The trick that makes it finite is to calculate one repeat unit and use the repetition itself. What is left over is a sum over a continuous set of wave vectors called <Term id="k-point">k-points</Term>. A computer cannot sum a continuous set, so it uses a finite mesh. The mesh is the second setting, after `ENCUT`, that you must test on every system <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+**Repetition gives waves with a label.** In a repeating crystal every orbital can be written as a wave that runs through the crystal, times a pattern that repeats from cell to cell. This is <Term id="bloch-theorem">Bloch's theorem</Term> <Cite id="S-050" />. The label on the wave, its wave vector $\mathbf{k}$, tells you how the phase changes from one cell to the next.
+
+**The label lives in its own space.** Wave vectors have a natural home called <Term id="reciprocal-lattice">reciprocal space</Term>, which has a lattice of its own (the reciprocal lattice). Two labels that differ by a reciprocal lattice vector describe the same wave, so you only need the labels inside one repeat unit of reciprocal space. The most common choice of that unit is the <Term id="brillouin-zone">Brillouin zone</Term>: all points closer to the centre (called Gamma) than to any other reciprocal lattice point <Cite id="S-036" />.
+
+**Sampling replaces the integral.** For every k there is a set of energy levels, which together form the bands. Properties such as the total energy are averages over the whole zone. A k-mesh is a short list of points in the zone, each with a weight, that stands in for the average. It is like estimating the average height of a crowd by measuring a regular sample of people.
+
+**Symmetry shrinks the list.** Many k-points are equivalent by the symmetry of the crystal, so VASP computes only the different ones (the irreducible points) and counts the others by weight. The lab shows how many points a mesh has before and after.
+
+**Metals need more.** In an insulator the bands are full or empty and vary smoothly, so a coarse mesh is enough. In a metal the Fermi level cuts through bands, so the energy changes sharply with k and you need a denser mesh, together with smearing (the smearing topic, later in this module).
+
+<Level min="intermediate">
+
+A mesh is called Gamma-centred if it contains the point Gamma, and Monkhorst-Pack in VASP's convention if its points are placed at $k = (2r - N - 1)/(2N)$ for $r = 1 \dots N$ <Cite id="S-007" />. For odd $N$ that formula includes Gamma; for even $N$ it does not, and the mesh is shifted off Gamma. On a hexagonal lattice a shifted mesh breaks the six-fold symmetry. The safe rule is to use Gamma-centred meshes for hexagonal and trigonal cells. See the note on an erratum in the author's handbook at the end of this page.
+
+</Level>
+
+</Intuition>
+
+<Lab id="kpoint-mesh" title="k-point meshes" />
+
+<TheMath>
+
+A Bloch orbital has the form
+
+$$\psi_{n\mathbf{k}}(\mathbf{r}) = e^{i\mathbf{k}\cdot\mathbf{r}}\,u_{n\mathbf{k}}(\mathbf{r}), \qquad u_{n\mathbf{k}}(\mathbf{r}+\mathbf{R}) = u_{n\mathbf{k}}(\mathbf{r}),$$
+
+with $n$ the band index, $\mathbf{R}$ any lattice vector, and $u$ the part that repeats <Cite id="S-050" />. The reciprocal lattice vectors $\mathbf{b}_i$ satisfy $\mathbf{b}_i\cdot\mathbf{a}_j = 2\pi\delta_{ij}$, where $\mathbf{a}_j$ are the lattice vectors.
+
+A property is an average over the zone, approximated by a weighted sum over the mesh:
+
+$$\frac{1}{V_{\text{BZ}}}\int_{\text{BZ}} F(\mathbf{k})\,d\mathbf{k} \;\approx\; \sum_{j} w_j\,F(\mathbf{k}_j), \qquad \sum_j w_j = 1.$$
+
+The mesh in the lab is the set of points $\mathbf{k} = \sum_i (m_i/N_i)\,\mathbf{b}_i$ for Gamma-centred meshes, and the shifted version for Monkhorst-Pack <Cite id="S-007" />. The count of irreducible points uses the point-group operations of the lattice plus time reversal ($\mathbf{k} \to -\mathbf{k}$).
+
+</TheMath>
+
+<InVasp>
+
+- The `KPOINTS` file sets the mesh. A Gamma-centred mesh looks like the block below <Cite id="S-041" />; the site's input builder writes this file for you.
+- `KSPACING` (in `INCAR`) builds a mesh from a spacing in inverse angstroms (it includes the factor 2 pi), without a `KPOINTS` file. VASPkit's resolution times 2 pi is about the same number: a resolution of 0.03 is a `KSPACING` of about 0.19 <Cite id="S-042" />.
+- VASPkit option 102 writes `KPOINTS` for an SCF run and asks for Monkhorst-Pack (1) or Gamma (2), then a resolution in 2 pi per angstrom. The author lists 0.03 to 0.04 as usually enough, finer (0.02 to 0.01) for metals or accurate density of states, and Gamma-only for large cells <Cite id="S-042" />.
+- **Convergence test.** Run static calculations on rising meshes (for example 4x4x4, 6x6x6, 8x8x8) until the energy changes by less than about 1 meV per atom <Cite id="S-041" />. Test metals more carefully than insulators.
+- Use a Gamma-centred mesh for hexagonal and trigonal cells <Cite id="S-042" />.
+
+<VaspFile
+  name="KPOINTS"
+  code={`Gamma-centred 6x6x6 mesh
+0
+Gamma
+6 6 6
+0 0 0`}
+  annotations={{
+    3: 'Gamma: the mesh includes the point Gamma',
+    4: 'subdivisions along each reciprocal vector',
+  }}
+/>
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...                            | ...in the lab                             | ...in VASP                                                        |
+| ------------------------------------------- | ----------------------------------------- | ----------------------------------------------------------------- |
+| A denser mesh                               | More points (and more irreducible points) | Run time grows in proportion to the irreducible points            |
+| A coarser mesh for a metal                  | The toy metal curve is still moving       | Noisy energies and forces; wrong magnetic or Fermi-surface detail |
+| An even Monkhorst-Pack mesh, hexagonal cell | The mesh loses the lattice symmetry       | Lower symmetry and more k-points to compute                       |
+| A larger cell                               | Fewer k-points needed per direction       | A cell twice as long needs about half the mesh in that direction  |
+
+Why a mesh at all: the zone is continuous. Why this density: the smallest mesh after which your energy stops changing. What happens if you get it wrong: an answer that depends on a setting rather than on the material.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Using one mesh for every cell">
+
+A long cell has a short reciprocal vector, so it needs fewer points along that direction. Use the same spacing, not the same numbers.
+
+</Callout>
+
+<Callout variant="mistake" title="Testing the mesh on an insulator and reusing it for a metal">
+
+Insulators converge with few points. Metals do not. Test the mesh on the system you will compute.
+
+</Callout>
+
+<Callout variant="note" title="A known disagreement with the author's handbook">
+
+The author's Workflow Handbook lists "odd Monkhorst-Pack meshes on hexagonal cells" as a common mistake. A numerical test on hexagonal magnesium shows the opposite: with VASP's formula an odd mesh includes Gamma and keeps the symmetry, while an even mesh is shifted and breaks it. The advice to use a Gamma-centred mesh for hexagonal cells is unaffected, because it works for both parities. This page uses the tested statement; the question is recorded as Q-017 for the author to confirm.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-kp-1', 'q-kp-2', 'q-bz-1', 'q-bz-4', 'q-kmesh-1', 'q-kmesh-2']} />
+
+<GoDeeper>
+
+- Kittel and Ashcroft and Mermin on the reciprocal lattice, Bloch's theorem and the Brillouin zone <Cite id="S-050" /> <Cite id="S-036" />.
+- Monkhorst and Pack, the paper behind the mesh formula <Cite id="S-007" />.
+- VASP wiki pages KPOINTS and KSPACING (by page name) <Cite id="S-019" />.
+
+</GoDeeper>

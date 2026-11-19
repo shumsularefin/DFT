@@ -703,5 +703,62 @@
       "S-010",
       "S-041"
     ]
+  },
+  {
+    "id": "cutoff-energy",
+    "label": "Cutoff energy",
+    "short": "The largest kinetic energy of plane wave kept in the basis. In VASP it is ENCUT. Higher means more accurate and slower.",
+    "level": "beginner",
+    "sources": [
+      "S-049",
+      "S-019"
+    ]
+  },
+  {
+    "id": "k-point",
+    "label": "k-point",
+    "short": "One wave vector in reciprocal space at which the orbitals are calculated. A calculation uses a finite set of them to approximate an average over the whole Brillouin zone.",
+    "level": "beginner",
+    "sources": [
+      "S-036",
+      "S-049"
+    ]
+  },
+  {
+    "id": "reciprocal-lattice",
+    "label": "Reciprocal lattice",
+    "short": "The set of wave vectors G for which a plane wave repeats with the crystal lattice. Its spacings are inversely related to the real-space ones.",
+    "level": "intermediate",
+    "sources": [
+      "S-036"
+    ]
+  },
+  {
+    "id": "bloch-theorem",
+    "label": "Bloch theorem",
+    "short": "In a perfect crystal each orbital is a plane wave times a function that repeats with the lattice, so it is labelled by a wave vector k.",
+    "level": "intermediate",
+    "sources": [
+      "S-036",
+      "S-049"
+    ]
+  },
+  {
+    "id": "brillouin-zone",
+    "label": "Brillouin zone",
+    "short": "The Wigner-Seitz cell of the reciprocal lattice: the region of wave vectors that holds one copy of every distinct Bloch state.",
+    "level": "intermediate",
+    "sources": [
+      "S-036"
+    ]
+  },
+  {
+    "id": "fermi-level",
+    "label": "Fermi level",
+    "short": "The energy up to which levels are filled at zero temperature. In a metal it lies inside a band.",
+    "level": "beginner",
+    "sources": [
+      "S-049"
+    ]
   }
 ]

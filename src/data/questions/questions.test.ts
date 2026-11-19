@@ -4,6 +4,7 @@ import q1 from './module-01.json';
 import q2 from './module-02.json';
 import q3 from './module-03.json';
 import q4 from './module-04.json';
+import q5 from './module-05.json';
 
 interface Q {
   id: string;
@@ -23,6 +24,7 @@ const MODULES = [
   { name: 'module 3', perConcept: true, dir: 'src/content/handbook/03-many-electrons', questions: q3 as Q[] },
   { name: 'module 2', perConcept: true, dir: 'src/content/handbook/02-quantum-basics', questions: q2 as Q[] },
   { name: 'module 4', perConcept: true, dir: 'src/content/handbook/04-kohn-sham', questions: q4 as Q[] },
+  { name: 'module 5', perConcept: true, dir: 'src/content/handbook/05-practical-choices', questions: q5 as Q[] },
 ];
 const sourceIds = new Set([...readFileSync('docs/SCIENCE_SOURCES.md', 'utf8').matchAll(/^\| (S-\d{3}) /gm)].map((m) => m[1]));
 

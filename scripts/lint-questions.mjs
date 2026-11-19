@@ -29,6 +29,12 @@ export const PLOT_IDS = [
   'scf-density',
   'density-box',
   'steps',
+  'pw-parabola',
+  'pw-count',
+  'smearing-curves',
+  'dftu-penalty',
+  'kmesh-grid',
+  'bz-1d',
 ];
 
 function walk(dir) {
