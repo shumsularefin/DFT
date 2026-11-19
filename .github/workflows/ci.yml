@@ -106,3 +106,20 @@ jobs:
           path: dist
       - if: steps.detect.outputs.present == 'true'
         run: npx lhci autorun
+
+  firestore-rules:
+    name: Firestore rules (emulator)
+    runs-on: ubuntu-latest
+    needs: guards
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - run: npm run test:rules

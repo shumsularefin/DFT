@@ -27,16 +27,40 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <h2>What is not done</h2>
     <ul>
       <li>No analytics, no advertising and no tracking scripts.</li>
-      <li>No accounts and no cookies set by this site.</li>
+      <li>No accounts unless you choose the optional sync, and no cookies set by this site.</li>
       <li>Files you open in the tools are read in your browser and never uploaded.</li>
       <li>Search runs on an index shipped with the site, in your browser.</li>
     </ul>
 
     <h2>Optional sync</h2>
     <p>
-      An optional way to keep your progress across devices is planned. It would be off by default and would
-      ask before sending anything. It does not exist yet, so today nothing is sent.
+      Some builds of the site offer an optional way to keep your practice progress across devices. It is off
+      by default and nothing is sent until you press "Sign in to sync" on the{' '}
+      <a href="/progress/">progress page</a>. The code that talks to the sync service is not even downloaded
+      before that.
     </p>
+    <ul>
+      <li>
+        <strong>What is stored:</strong> one private document per account holding your practice answers and
+        the site's estimates of what you know (the same data as the export file), the time it was last saved,
+        and the account id that Google sign-in provides. Topic progress, your practice run and your settings
+        stay on each device.
+      </li>
+      <li>
+        <strong>Where:</strong> Google's Firebase (Cloud Firestore). Access rules allow only you, signed in,
+        to read, change or delete that document.
+      </li>
+      <li>
+        <strong>How often:</strong> at most about once a minute while you practise, and when you leave the
+        page.
+      </li>
+      <li>
+        <strong>How to delete it:</strong> the sync section of the progress page has a "Delete my synced data"
+        button. It removes the cloud copy and signs you out; the copy on this device is not changed. Erasing
+        your progress on this device does not delete the cloud copy, so that a mistake on one device cannot
+        wipe your other devices.
+      </li>
+    </ul>
 
     <h2>Hosting</h2>
     <p>

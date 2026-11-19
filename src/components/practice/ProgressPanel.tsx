@@ -89,8 +89,9 @@ export default function ProgressPanel({ modules }: Props) {
 
       <h2>Your data</h2>
       <p>
-        Everything above is stored in this browser only. Nothing is uploaded and there is no account. You can
-        take a copy, bring one back, or erase it all.
+        Everything above is stored in this browser only. Nothing is uploaded and there is no account, unless
+        you turn on the optional sync where it is offered. You can take a copy, bring one back, or erase it
+        all.
       </p>
       <div className="qc-actions">
         <button type="button" className="btn" onClick={download}>

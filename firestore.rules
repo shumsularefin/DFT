@@ -1,0 +1,34 @@
+rules_version = '2';
+
+// Progress sync (M6.5). One document per user: users/{uid}/state/main.
+// Only the signed-in owner may read, write or delete it. The shape is fixed:
+// { version: 1, learner: <JSON text, at most 900000 characters>, updatedAt: <server timestamp> }.
+// Everything else is denied.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function validState() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['version', 'learner', 'updatedAt'])
+        && d.keys().hasAll(['version', 'learner', 'updatedAt'])
+        && d.version == 1
+        && d.learner is string
+        && d.learner.size() <= 900000
+        && d.updatedAt == request.time;
+    }
+
+    match /users/{uid}/state/main {
+      allow read: if isOwner(uid);
+      allow create, update: if isOwner(uid) && validState();
+      allow delete: if isOwner(uid);
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

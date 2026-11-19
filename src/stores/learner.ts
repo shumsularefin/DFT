@@ -85,6 +85,11 @@ function persist(next: LearnerStore): void {
   learnerStore.setState({ ...next, persisted: ok }, true);
 }
 
+/** Replace the learner state, for example with the result of a sync merge. */
+export function setLearner(learner: LearnerState): void {
+  persist({ ...learnerStore.getState(), learner });
+}
+
 /** Record one answer for the question and return the new store state. */
 export function answerQuestion(q: BankQuestion, input: Omit<AnswerInput, 'nowMs'>): LearnerStore {
   const s = learnerStore.getState();

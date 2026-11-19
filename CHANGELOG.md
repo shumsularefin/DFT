@@ -7,6 +7,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- Optional progress sync (only on builds with Firebase configured): sign in with Google on the progress page to merge your practice progress across devices. Off by default, the sync code is not downloaded until you press the button, writes are at most one a minute, and a "Delete my synced data" button removes the cloud copy. The privacy page explains what is stored.
 - Module 8: six topics on convergence testing (what converges, ENCUT, the k-mesh and smearing) and on common failures (SCF trouble, relaxation trouble, reading error messages), 24 practice questions with pictures, and one new question picture for convergence series.
 - Error finder at `/errors/` and inside the common-errors topic: paste a VASP log excerpt or describe a symptom and get likely causes and fixes in order, matched in your browser (33 entries from the Field Handbook and the Workflow Handbook; nothing is uploaded).
 - Modules 6 and 7: ten topics on the VASP files (POSCAR, KPOINTS, INCAR, POTCAR structure, the sixteen output files) and on running a calculation (the author's five-step protocol quoted as written and the project folder, SLURM and PBS job scripts with NCORE and KPAR, ISTART and ICHARG restarts, reading OSZICAR and OUTCAR, VASPKIT command map). The POTCAR topic never shows contents. 40 practice questions with pictures and 14 glossary terms.

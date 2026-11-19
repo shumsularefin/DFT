@@ -3,9 +3,12 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import MasteryMap from '../components/practice/MasteryMap.astro';
 import ProgressPanel from '../components/practice/ProgressPanel';
+import SyncPanel from '../components/practice/SyncPanel';
+import { readConfig } from '../lib/sync/config';
 import { conceptGraph, topicsByConcept } from '../lib/learning/loadBank';
 import { moduleName } from '../lib/site';
 
+const syncEnabled = readConfig(import.meta.env) !== null;
 const concepts = conceptGraph();
 const entries = await getCollection('handbook');
 const topics = topicsByConcept(entries);
@@ -30,6 +33,7 @@ const moduleNames = Object.fromEntries(Array.from({ length: 12 }, (_, i) => [i, 
     </p>
     <div class="js-only">
       <ProgressPanel client:load modules={modules} />
+      {syncEnabled && <SyncPanel client:visible />}
     </div>
     <MasteryMap concepts={concepts} topics={links} moduleNames={moduleNames} />
   </div>

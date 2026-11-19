@@ -59,3 +59,15 @@ These take minutes and turn guesses into facts. Details in `docs/OPEN_QUESTIONS.
 ## 7. The Materials Project key (only at stage M9.1)
 
 The builder writes the pipeline; you run it once on your own machine with `MP_API_KEY` in your shell (never in a file in this repository), then commit the generated data. Instructions are in the stage.
+
+## 6. Optional progress sync (M6.5)
+
+Skip this and the site works exactly as before, with no sync button. To turn sync on:
+
+1. In the Firebase console, Build, **Firestore Database**: create a database in a region near you (stay on Spark; do not enable billing).
+2. Build, **Authentication**, Sign-in method: enable **Google**. Under Settings, Authorized domains, make sure your Hosting domain (and the preview channel domain, `*.web.app`) is listed.
+3. Deploy the rules from your own computer: `npx firebase-tools@15.34.1 login`, then `npx firebase-tools@15.34.1 deploy --only firestore:rules --project <your-project-id>`. The Hosting workflow deploys only Hosting, so the rules are deployed by hand whenever `firestore.rules` changes.
+4. In GitHub, Settings, Secrets and variables, Actions, **Variables**, set `PUBLIC_FIREBASE_API_KEY`, `PUBLIC_FIREBASE_AUTH_DOMAIN`, `PUBLIC_FIREBASE_PROJECT_ID`, `PUBLIC_FIREBASE_APP_ID` (the web app's config in Project settings). They are public by design and are not secrets.
+5. Run the deploy workflow. Sign in once on the progress page, answer a practice question, check the document appears under `users/<uid>/state/main`, then try "Delete my synced data".
+6. Run the rules tests locally with `npm run test:rules` (needs Java); CI runs them in the `firestore-rules` job.
+

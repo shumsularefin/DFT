@@ -6,7 +6,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 
 ## How to read this table
 
-- **Next stage to build: M6.5 (Optional progress sync with Firebase (Spark)), Tier B**. Start it with `STAGE: NEXT`, `TIER: B`. The next Tier A stage is M8.2 (Factors, checks and mixed sites), size M: start it with `STAGE: NEXT`, `TIER: A` (it cannot be marked done until Q-003, the Bartel tau equation, is closed or the UI says the formula is unconfirmed).
+- **Next stage to build: M12.4 (Guided path: learn DFT step by step in 3D), Tier B**, size L. Start it with `STAGE: NEXT`, `TIER: B`. The next Tier A stage is M8.2 (Factors, checks and mixed sites), size M: start it with `STAGE: NEXT`, `TIER: A` (it cannot be marked done until Q-003, the Bartel tau equation, is closed or the UI says the formula is unconfirmed).
 - **Tier** says which model to open the session with. **A** = the strongest model (Opus class): stages where a subtle mistake would put a wrong number in front of a researcher. **B** = the fast model (Sonnet class): UI, content and wiring on top of tested libraries. `-` = already done.
 - **Size** says how much work it is: **S** short session, **M** one normal session, **L** a long session that may stop as `partial` and need a second one.
 - A session started on the wrong tier does not build. It names the model to switch to and stops (`docs/WORKFLOW.md` section 2, step 0).
@@ -75,7 +75,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M9.3 | Feasibility check and first-project builder | todo | M9.2, M3.5, M4.2 | L | B | | | | [work order](milestones/M9-screening-studio.md) |
 | M9.4 | Hooks, attribution, offline and integration | todo | M9.3 | S | B | | | | [work order](milestones/M9-screening-studio.md) |
 | M14.2 | Research planner: goal to a sourced, step-by-step workflow | todo | M14.1, M13.5, M13.6, M9.3 | L | A | | | | [work order](milestones/M14-research-guidance.md) |
-| M6.5 | Optional progress sync with Firebase (Spark) | todo | M6.4, M0.2 | M | B | | | | [work order](milestones/M6-adaptive-engine.md) |
+| M6.5 | Optional progress sync with Firebase (Spark) | done | M6.4, M0.2 | M | B | claude/m6-5-progress-sync | PR pending (stacked on M7.4, PR #40) | 2026-11-19 | [report](reports/M6.5.md), [work order](milestones/M6-adaptive-engine.md) |
 | M12.4 | Guided path: learn DFT step by step in 3D | todo | M12.2, M7.2, M13.2 | L | B | | | | [work order](milestones/M12-visual-layer.md) |
 | M7.6 | Modules 10 and 11: Worked example and tool tour | todo | M7.5, M8.4, M9.3, M10.5 | L | B | | | | [work order](milestones/M7-remaining-modules.md) |
 | M11.1 | Performance and offline audit | todo | M10.5, M9.4, M7.6, M6.5, M12.3, M12.4, M12.5, M12.6, M13.4, M14.2, M14.3 | M | B | | | | [work order](milestones/M11-polish.md) |
