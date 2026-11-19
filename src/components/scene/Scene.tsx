@@ -14,6 +14,10 @@ import './scene.css';
 interface Props {
   /** A spec whose structure is inline (the Astro wrapper resolves named structures at build time). */
   spec: SceneSpec;
+  /** Start with the 3D view open (the guided path keeps one canvas across its scene stations). */
+  initialLive?: boolean;
+  /** Called when the reader opens or closes the 3D view. */
+  onLiveChange?: (live: boolean) => void;
 }
 
 const css = (name: string, fallback: string): string => {
@@ -25,12 +29,12 @@ const css = (name: string, fallback: string): string => {
 };
 const never = (): undefined => undefined;
 
-export default function Scene({ spec }: Props) {
+export default function Scene({ spec, initialLive = false, onLiveChange }: Props) {
   const uid = useId().replace(/:/g, '');
   const steps = spec.steps ?? [];
   const [step, setStep] = useState(steps.length ? 0 : -1);
   const [camera, setCamera] = useState<Camera | undefined>(undefined);
-  const [live, setLive] = useState(false);
+  const [live, setLive] = useState(initialLive);
   const [loading, setLoading] = useState(false);
   const [note, setNote] = useState('');
   const host = useRef<HTMLDivElement>(null);
@@ -47,6 +51,20 @@ export default function Scene({ spec }: Props) {
 
   // a step that sets its own camera wins over a manual turn
   useEffect(() => setCamera(undefined), [step]);
+
+  // a different preset (or its own camera) starts from its own step and view
+  const camKey = JSON.stringify(spec.camera ?? null);
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    setStep(spec.steps?.length ? 0 : -1);
+    setCamera(undefined);
+  }, [spec.id, camKey]);
+
+  useEffect(() => onLiveChange?.(live), [live]);
 
   const draw = useCallback(
     (reset: boolean) => {

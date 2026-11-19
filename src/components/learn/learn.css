@@ -1,0 +1,124 @@
+/* Guided path (M12.4). Colours come from the theme tokens. */
+.lp {
+  display: grid;
+  gap: var(--space-4);
+  margin-block: var(--space-4);
+}
+.lp-jump ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.lp-dot {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+.lp-dot[aria-current='step'] {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+.lp-dot:focus-visible,
+.lp-title:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.lp-count {
+  margin: 0;
+  color: var(--text-muted);
+}
+.lp-title {
+  margin: 0;
+}
+.lp-body {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+@media (min-width: 52rem) {
+  .lp-body {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+.lp-visual,
+.lp-text {
+  min-width: 0;
+}
+.lp-plot {
+  margin: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+.lp-plot-svg svg {
+  width: 100%;
+  height: auto;
+  max-height: 28rem;
+}
+.lp-wait {
+  min-height: 12rem;
+  color: var(--text-muted);
+}
+.lp-try {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  margin: var(--space-4) 0;
+}
+.lp-try-head {
+  font-weight: 600;
+  margin: 0 0 var(--space-2);
+  padding: 0 var(--space-1);
+}
+.lp-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.lp-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 2.75rem;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.lp-choice.is-on {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+.lp-choice:focus-within {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.lp-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+.lp-hint,
+.lp-sources {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+.lp-links a + a {
+  margin-left: var(--space-4);
+}
+@media (prefers-reduced-motion: reduce) {
+  .lp * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

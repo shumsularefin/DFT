@@ -1,0 +1,561 @@
+[
+  {
+    "id": "atom-cloud",
+    "title": "An atom and its electron cloud",
+    "badge": "computed",
+    "alt": "Curve of the probability of finding the electron of a hydrogen atom at each distance from the nucleus, with the most probable distance marked.",
+    "sentences": [
+      "An atom is a nucleus with electrons around it, but an electron is not a tiny ball on an orbit.",
+      "Quantum mechanics gives a cloud of probability instead: the curve shows how likely the electron is to be found at each distance from the nucleus.",
+      "Everything later in DFT is about these clouds, and about how they overlap and rearrange when atoms meet."
+    ],
+    "visual": {
+      "kind": "plot",
+      "plot": "hydrogen-radial",
+      "params": {
+        "n": 1,
+        "l": 0
+      }
+    },
+    "try": {
+      "kind": "slider",
+      "label": "Shell number n (hydrogen, s state)",
+      "param": "n",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "value": 1
+    },
+    "topic": "02-quantum-basics/the-wavefunction",
+    "sources": ["S-047"]
+  },
+  {
+    "id": "orbital",
+    "title": "A wavefunction and an orbital",
+    "badge": "computed",
+    "alt": "Slices through the electron clouds of hydrogen s, p and d orbitals, showing a round s cloud and clouds with lobes for p and d.",
+    "sentences": [
+      "The wavefunction is the quantity that holds everything about one electron, and an orbital is the shape of one allowed wavefunction.",
+      "The s cloud is a ball, the p clouds have two lobes, and the d clouds are more complex still.",
+      "These shapes decide which neighbouring atoms an electron can bond with, which is why they matter for materials."
+    ],
+    "visual": {
+      "kind": "plot",
+      "plot": "orbital-slice",
+      "params": {
+        "orbitals": [
+          {
+            "l": 0,
+            "m": 0,
+            "label": "s"
+          },
+          {
+            "l": 1,
+            "m": 0,
+            "plane": "xz",
+            "label": "p"
+          },
+          {
+            "l": 2,
+            "m": 0,
+            "plane": "xz",
+            "label": "d"
+          }
+        ]
+      }
+    },
+    "try": {
+      "kind": "choice",
+      "label": "Show",
+      "initial": 0,
+      "options": [
+        {
+          "label": "s, p and d",
+          "params": {
+            "orbitals": [
+              {
+                "l": 0,
+                "m": 0,
+                "label": "s"
+              },
+              {
+                "l": 1,
+                "m": 0,
+                "plane": "xz",
+                "label": "p"
+              },
+              {
+                "l": 2,
+                "m": 0,
+                "plane": "xz",
+                "label": "d"
+              }
+            ]
+          }
+        },
+        {
+          "label": "s only",
+          "params": {
+            "orbitals": [
+              {
+                "l": 0,
+                "m": 0,
+                "label": "s"
+              }
+            ]
+          }
+        },
+        {
+          "label": "p only",
+          "params": {
+            "orbitals": [
+              {
+                "l": 1,
+                "m": 0,
+                "plane": "xz",
+                "label": "p"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "topic": "02-quantum-basics/orbitals",
+    "sources": ["S-047", "S-031"]
+  },
+  {
+    "id": "exponential-wall",
+    "title": "The exponential wall",
+    "badge": "computed",
+    "alt": "Curve of how fast the number of values needed to describe many electrons together grows as electrons are added, rising far faster than a straight line.",
+    "sentences": [
+      "Describing N electrons exactly, all together, needs a number of values that grows exponentially with N.",
+      "The curve counts the values needed on a coarse grid as electrons are added, and it soon passes anything a computer could store.",
+      "That wall is why DFT replaces the many-electron problem with something much smaller."
+    ],
+    "visual": {
+      "kind": "plot",
+      "plot": "exp-wall",
+      "params": {
+        "perElectron": 4,
+        "maxN": 20
+      }
+    },
+    "try": {
+      "kind": "slider",
+      "label": "Number of electrons shown",
+      "param": "maxN",
+      "min": 4,
+      "max": 20,
+      "step": 1,
+      "value": 20
+    },
+    "topic": "03-many-electrons/the-exponential-wall",
+    "sources": ["S-048", "S-047"]
+  },
+  {
+    "id": "density-map",
+    "title": "Density as a map",
+    "badge": "computed",
+    "alt": "Map of electron density along a box for a chosen number of electrons, higher where the electrons are more likely to be.",
+    "sentences": [
+      "Instead of following every electron, DFT follows one map: how much electron charge sits at each point in space.",
+      "The picture is the density of electrons in a one-dimensional box, and its shape follows the levels that the electrons fill.",
+      "A theorem of Hohenberg and Kohn says that, in principle, this one map is enough to fix the ground-state energy."
+    ],
+    "visual": {
+      "kind": "plot",
+      "plot": "density-box",
+      "params": {
+        "L": 5,
+        "electrons": 2
+      }
+    },
+    "try": {
+      "kind": "slider",
+      "label": "Number of electrons in the box",
+      "param": "electrons",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "value": 2
+    },
+    "topic": "03-many-electrons/electron-density",
+    "sources": ["S-011", "S-047", "S-048"]
+  },
+  {
+    "id": "kohn-sham",
+    "title": "The Kohn-Sham idea",
+    "badge": "toy-model",
+    "alt": "A one-dimensional toy atom showing the electron density and, optionally, the effective potential that the density produces, after a self-consistent run.",
+    "sentences": [
+      "Kohn and Sham replaced the hard problem by electrons that do not see each other directly but move in one shared effective potential.",
+      "That potential depends on the density, and the density comes from the electrons moving in it, so the two must agree with each other.",
+      "The picture is a one-dimensional toy model and not a real calculation."
+    ],
+    "visual": {
+      "kind": "plot",
+      "plot": "scf-density",
+      "params": {
+        "Zs": [2]
+      }
+    },
+    "try": {
+      "kind": "choice",
+      "label": "Effective potential",
+      "initial": 0,
+      "options": [
+        {
+          "label": "Shown",
+          "params": {
+            "potential": true
+          }
+        },
+        {
+          "label": "Hidden",
+          "params": {
+            "potential": false
+          }
+        }
+      ]
+    },
+    "topic": "04-kohn-sham/the-kohn-sham-idea",
+    "sources": ["S-012", "S-019", "S-048", "S-049"]
+  },
+  {
+    "id": "scf-loop",
+    "title": "The self-consistency loop",
+    "badge": "toy-model",
+    "alt": "Curve of how much the electron density changes from one step of a toy self-consistency loop to the next, falling as the loop settles.",
+    "sentences": [
+      "Guess a density, build the potential from it, solve for the electrons, and compare the new density with the guess.",
+      "Repeat until the density stops changing; the curve shows how the change shrinks from step to step in a toy model.",
+      "In this toy model a larger mixing fraction settles in fewer steps; real calculations can behave differently, so VASP's mixing settings are worth knowing."
+    ],
+    "visual": {
+      "kind": "plot",
+      "plot": "scf-trace",
+      "params": {
+        "Z": 2,
+        "alpha": 0.3,
+        "tol": 1e-8,
+        "show": 60
+      }
+    },
+    "try": {
+      "kind": "slider",
+      "label": "Mixing fraction",
+      "param": "alpha",
+      "min": 0.1,
+      "max": 0.9,
+      "step": 0.1,
+      "value": 0.3
+    },
+    "topic": "04-kohn-sham/the-scf-loop",
+    "sources": ["S-012", "S-019", "S-031", "S-041", "S-047", "S-048", "S-049"]
+  },
+  {
+    "id": "unit-cell",
+    "title": "The crystal and its unit cell",
+    "badge": "illustrative",
+    "alt": "A cube-based unit cell with its atoms drawn inside the cell edges.",
+    "sentences": [
+      "A crystal is one small block of atoms, the unit cell, repeated in every direction.",
+      "The box in the picture is the cell; its lengths and angles and the positions of the atoms inside it are all that VASP needs to know about the structure.",
+      "Change the cell type to see how one idea gives different arrangements of atoms."
+    ],
+    "visual": {
+      "kind": "scene",
+      "scene": "sc"
+    },
+    "try": {
+      "kind": "choice",
+      "label": "Cell type",
+      "initial": 0,
+      "options": [
+        {
+          "label": "Simple cubic",
+          "scene": "sc"
+        },
+        {
+          "label": "Body-centred cubic",
+          "scene": "bcc"
+        },
+        {
+          "label": "Face-centred cubic",
+          "scene": "fcc"
+        },
+        {
+          "label": "Diamond",
+          "scene": "diamond"
+        }
+      ]
+    },
+    "topic": "06-vasp-files/poscar",
+    "sources": ["S-019", "S-041", "S-042"]
+  },
+  {
+    "id": "periodic-images",
+    "title": "Periodic images",
+    "badge": "illustrative",
+    "alt": "Rock-salt unit cell shown once or repeated in all directions, so that the same block of atoms appears in every neighbouring cell.",
+    "sentences": [
+      "VASP treats your cell as repeating forever, so an atom that leaves one side comes back in on the opposite side.",
+      "Repeating the cell in the picture shows this: every copy holds the same atoms in the same places.",
+      "That is why a small cell can stand in for a whole crystal, and why a molecule needs empty space around it so that its copies do not interact."
+    ],
+    "visual": {
+      "kind": "scene",
+      "scene": "rocksalt"
+    },
+    "try": {
+      "kind": "choice",
+      "label": "Copies of the cell",
+      "initial": 0,
+      "options": [
+        {
+          "label": "One cell",
+          "repeat": [1, 1, 1]
+        },
+        {
+          "label": "2 by 2 by 2 cells",
+          "repeat": [2, 2, 2]
+        }
+      ]
+    },
+    "topic": "06-vasp-files/poscar",
+    "sources": ["S-019", "S-041", "S-042"]
+  },
+  {
+    "id": "plane-waves",
+    "title": "Plane waves and the ENCUT sphere",
+    "badge": "computed",
+    "alt": "Curve of plane-wave energy against wavevector with a horizontal cutoff line, keeping the waves below the line and dropping the ones above it.",
+    "sentences": [
+      "VASP writes each electron's wavefunction as a sum of plane waves, which are simple waves that repeat across the cell.",
+      "ENCUT sets the largest plane-wave energy that is kept; on the picture the cutoff line separates the waves that are kept from the ones that are dropped.",
+      "A higher cutoff keeps more waves and costs more time, and a cutoff that is too low gives unreliable energies, which is why you test it."
+    ],
+    "visual": {
+      "kind": "plot",
+      "plot": "pw-parabola",
+      "params": {
+        "cutoff": 30,
+        "kmax": 4
+      }
+    },
+    "try": {
+      "kind": "slider",
+      "label": "Cutoff energy (eV)",
+      "param": "cutoff",
+      "min": 10,
+      "max": 80,
+      "step": 5,
+      "value": 30
+    },
+    "topic": "05-practical-choices/plane-waves-and-encut",
+    "sources": ["S-019", "S-031", "S-040", "S-041", "S-042", "S-049"]
+  },
+  {
+    "id": "reciprocal-space",
+    "title": "Reciprocal space and the Brillouin zone",
+    "badge": "illustrative",
+    "alt": "The three real-space lattice vectors of a face-centred cubic cell and the three reciprocal vectors that go with them, drawn in one picture.",
+    "sentences": [
+      "Every crystal has a partner space called reciprocal space, where the repeating pattern is described by waves instead of positions.",
+      "Its repeat unit is the Brillouin zone, and each point in the zone is a k-point: one wave pattern that electrons in the crystal can have.",
+      "The picture shows the real-space cell vectors with the reciprocal vectors that match them; only directions and relative lengths are meaningful."
+    ],
+    "visual": {
+      "kind": "scene",
+      "scene": "reciprocal-fcc"
+    },
+    "try": {
+      "kind": "choice",
+      "label": "View",
+      "initial": 0,
+      "options": [
+        {
+          "label": "Isometric",
+          "camera": "iso"
+        },
+        {
+          "label": "Along a",
+          "camera": "a"
+        },
+        {
+          "label": "Along c",
+          "camera": "c"
+        }
+      ]
+    },
+    "topic": "05-practical-choices/kpoints-and-the-brillouin-zone",
+    "sources": ["S-007", "S-019", "S-036", "S-041", "S-042", "S-049", "S-050"]
+  },
+  {
+    "id": "kpoint-mesh",
+    "title": "k-points: sampling the zone",
+    "badge": "computed",
+    "alt": "A grid of k-points laid over a square Brillouin zone, with the number of points along each direction set by the slider.",
+    "sentences": [
+      "VASP cannot visit every k-point, so it samples the zone on a regular grid, the mesh you write in KPOINTS.",
+      "A finer mesh samples the zone better and costs more time, because each k-point is a separate calculation.",
+      "How fine is fine enough is found by testing, not by a fixed rule."
+    ],
+    "visual": {
+      "kind": "plot",
+      "plot": "kmesh-grid",
+      "params": {
+        "n": 4,
+        "gamma": true,
+        "angle": 90,
+        "ratio": 1
+      }
+    },
+    "try": {
+      "kind": "slider",
+      "label": "Points along each direction",
+      "param": "n",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "value": 4
+    },
+    "topic": "05-practical-choices/kpoints-and-the-brillouin-zone",
+    "sources": ["S-007", "S-019", "S-036", "S-041", "S-042", "S-049", "S-050"]
+  },
+  {
+    "id": "bands-dos",
+    "title": "Bands and the density of states",
+    "badge": "toy-model",
+    "alt": "Energy levels of a toy crystal drawn as bands, or as a density of states, with a gap between the bands.",
+    "sentences": [
+      "The allowed electron energies in a crystal form bands, ranges of energy with many states, separated by gaps with none.",
+      "A band structure plots those energies along a path through the zone, and the density of states counts how many states sit at each energy.",
+      "Whether the Fermi level lies in a gap or inside a band tells you if a material is an insulator or a metal; the picture is a toy model."
+    ],
+    "visual": {
+      "kind": "plot",
+      "plot": "band-gap",
+      "params": {
+        "labels": true
+      }
+    },
+    "try": {
+      "kind": "choice",
+      "label": "Show",
+      "initial": 0,
+      "options": [
+        {
+          "label": "Bands",
+          "params": {
+            "dos": false
+          }
+        },
+        {
+          "label": "Density of states",
+          "params": {
+            "dos": true
+          }
+        }
+      ]
+    },
+    "topic": "02-quantum-basics/why-energy-levels-matter-for-materials",
+    "sources": ["S-047", "S-050", "S-036", "S-049"]
+  },
+  {
+    "id": "spin-orderings",
+    "title": "Spin up and down, and magnetic orderings",
+    "badge": "toy-model",
+    "alt": "Eight atoms in a cube each carrying an arrow for the direction of its magnetic moment, arranged as ferromagnetic or as A, C or G type antiferromagnetic.",
+    "sentences": [
+      "Electrons carry spin, so a magnetic atom acts like a tiny arrow, and VASP follows spin up and spin down separately when you set ISPIN = 2.",
+      "Neighbouring arrows can all point the same way (ferromagnetic) or alternate in the patterns called A, C and G antiferromagnetic.",
+      "The picture is a hand-set arrangement of arrows and not a result: which pattern has the lowest energy is for a calculation to say."
+    ],
+    "visual": {
+      "kind": "scene",
+      "scene": "fm-cubic"
+    },
+    "try": {
+      "kind": "choice",
+      "label": "Ordering",
+      "initial": 0,
+      "options": [
+        {
+          "label": "Ferromagnetic",
+          "scene": "fm-cubic"
+        },
+        {
+          "label": "A-type",
+          "scene": "afm-a"
+        },
+        {
+          "label": "C-type",
+          "scene": "afm-c"
+        },
+        {
+          "label": "G-type",
+          "scene": "afm-g"
+        }
+      ]
+    },
+    "topic": "05-practical-choices/spin-and-magnetism",
+    "sources": ["S-019", "S-041", "S-042"]
+  },
+  {
+    "id": "first-folder",
+    "title": "Your first VASP folder",
+    "badge": "illustrative",
+    "alt": "Flow diagram of the four input files in a VASP folder, POSCAR, INCAR, KPOINTS and POTCAR, going into the program that writes the output files.",
+    "sentences": [
+      "A VASP run reads four input files from one folder: POSCAR, INCAR, KPOINTS and POTCAR.",
+      "POSCAR holds the structure, INCAR the settings, KPOINTS the sampling mesh and POTCAR the pseudopotentials.",
+      "The Input Builder writes the first three for you; POTCAR comes from your VASP licence and this site never hosts it."
+    ],
+    "visual": {
+      "kind": "plot",
+      "plot": "file-flow",
+      "params": {
+        "highlight": ["POSCAR"]
+      }
+    },
+    "try": {
+      "kind": "choice",
+      "label": "Highlight",
+      "initial": 0,
+      "options": [
+        {
+          "label": "POSCAR",
+          "params": {
+            "highlight": ["POSCAR"]
+          }
+        },
+        {
+          "label": "INCAR",
+          "params": {
+            "highlight": ["INCAR"]
+          }
+        },
+        {
+          "label": "KPOINTS",
+          "params": {
+            "highlight": ["KPOINTS"]
+          }
+        },
+        {
+          "label": "POTCAR",
+          "params": {
+            "highlight": ["POTCAR"]
+          }
+        }
+      ]
+    },
+    "topic": "07-running/the-workflow",
+    "sources": ["S-019", "S-041", "S-042"],
+    "tool": {
+      "href": "/tools/input-builder/",
+      "label": "Open the Input Builder"
+    }
+  }
+]

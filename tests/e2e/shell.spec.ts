@@ -181,6 +181,10 @@ test.describe('navigation', () => {
     } else {
       await page.keyboard.press('Tab');
       await expect(
+        page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Learn' }),
+      ).toBeFocused();
+      await page.keyboard.press('Tab');
+      await expect(
         page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Handbook' }),
       ).toBeFocused();
     }

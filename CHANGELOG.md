@@ -7,6 +7,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- Guided path at `/learn/`: fourteen short stations from one atom to your first VASP folder (electron cloud, orbitals, the exponential wall, density, the Kohn-Sham idea, the SCF loop, the unit cell, periodic images, plane waves, reciprocal space, k-points, bands, spin orderings, the four input files). Each has one picture marked computed, toy model or illustrative, three plain sentences, one thing to try and a link to the full topic. Move with the buttons or the arrow keys; 3D loads only when you press "View in 3D". There is a new Learn link in the header.
 - Optional progress sync (only on builds with Firebase configured): sign in with Google on the progress page to merge your practice progress across devices. Off by default, the sync code is not downloaded until you press the button, writes are at most one a minute, and a "Delete my synced data" button removes the cloud copy. The privacy page explains what is stored.
 - Module 8: six topics on convergence testing (what converges, ENCUT, the k-mesh and smearing) and on common failures (SCF trouble, relaxation trouble, reading error messages), 24 practice questions with pictures, and one new question picture for convergence series.
 - Error finder at `/errors/` and inside the common-errors topic: paste a VASP log excerpt or describe a symptom and get likely causes and fixes in order, matched in your browser (33 entries from the Field Handbook and the Workflow Handbook; nothing is uploaded).
