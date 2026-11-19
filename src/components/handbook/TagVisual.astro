@@ -8,4 +8,4 @@ interface Props {
 const { tag, value = '' } = Astro.props;
 ---
 
-<TagLevel client:visible tag={tag} value={value} />
+<TagLevel client:idle tag={tag} value={value} />

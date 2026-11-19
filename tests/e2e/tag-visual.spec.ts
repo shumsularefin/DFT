@@ -36,7 +36,6 @@ test.describe('See what a tag does (M12.5)', () => {
 
   test('handbook topic: Show me, no overflow, axe clean', async ({ page }) => {
     await page.goto('/handbook/05-practical-choices/plane-waves-and-encut/');
-    await page.getByTestId('tag-visual').first().scrollIntoViewIfNeeded();
     const tv = page.locator('astro-island:not([ssr]) [data-testid="tag-visual"]').first();
     await tv.waitFor();
     await tv.locator('summary').focus();
