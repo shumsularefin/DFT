@@ -1,0 +1,1450 @@
+{
+  "categories": {
+    "start-up": "Starting a run",
+    "electronic": "Electronic convergence",
+    "ionic": "Ionic relaxation",
+    "symmetry-kpoints": "Symmetry and k-points",
+    "magnetism": "Magnetism",
+    "output": "Output and post-processing",
+    "performance": "Performance and parallel runs",
+    "advanced": "Phonons and elastic constants"
+  },
+  "entries": [
+    {
+      "id": "job-died",
+      "title": "The job died and I do not know why",
+      "category": "start-up",
+      "messages": [],
+      "keywords": [
+        "job died",
+        "crashed",
+        "killed",
+        "no output",
+        "where to look"
+      ],
+      "symptoms": [
+        "The job died. Where do I look first?",
+        "tail -30 vasp.out    (standard output / scheduler log)\ntail -5  OSZICAR     (electronic or ionic phase?)\ntail -40 OUTCAR      (last thing VASP did)"
+      ],
+      "plain": "The run stopped and you do not know why. VASP writes its errors to the screen log, not to OUTCAR, so start there.",
+      "causes": [
+        "VASP prints errors to standard output, not to OUTCAR. OSZICAR tells you whether the run stopped during an electronic loop or between ionic steps."
+      ],
+      "fixes": [
+        {
+          "text": "Read the error text in standard output and search this handbook for its keyword."
+        },
+        {
+          "text": "No message at all: usually wall-time limit or out of memory. Check the scheduler log."
+        },
+        {
+          "text": "Before restarting, check CONTCAR and WAVECAR are not empty."
+        }
+      ],
+      "related": [
+        "outcar",
+        "oszicar",
+        "others"
+      ],
+      "sources": [
+        "t-crash"
+      ]
+    },
+    {
+      "id": "wavecar-mismatch",
+      "title": "Error reading WAVECAR, or a stop right after start-up",
+      "category": "start-up",
+      "messages": [
+        "Error reading WAVECAR",
+        "the number of k-points / bands changed, WAVECAR mismatch"
+      ],
+      "keywords": [
+        "wavecar",
+        "restart",
+        "istart"
+      ],
+      "symptoms": [
+        "\"Error reading WAVECAR\" or the run stops right after start-up",
+        "ls -l WAVECAR     → 0 bytes",
+        "ERROR: the number of k-points / bands changed, WAVECAR mismatch"
+      ],
+      "plain": "VASP tried to reuse the saved wavefunctions from an earlier run, but the file is broken or does not match this run.",
+      "causes": [
+        "The previous job was killed while writing WAVECAR, or it comes from a different build, k-mesh or spin setting.",
+        "Reading WAVECAR from a different setup",
+        "Reading WAVECAR from a different setup (workflow handbook)."
+      ],
+      "fixes": [
+        {
+          "text": "Delete the WAVECAR, or set ISTART = 0.",
+          "incar": {
+            "ISTART": "0"
+          }
+        },
+        {
+          "text": "Restart from CONTCAR (copied to POSCAR) if the geometry is worth keeping."
+        },
+        {
+          "text": "ISTART = 0 or delete WAVECAR"
+        }
+      ],
+      "related": [
+        "wavecar",
+        "istart"
+      ],
+      "sources": [
+        "t-wavecar",
+        "w-16"
+      ]
+    },
+    {
+      "id": "ions-too-close",
+      "title": "The distance between some ions is very small",
+      "category": "start-up",
+      "messages": [
+        "The distance between some ions is very small"
+      ],
+      "keywords": [
+        "overlapping atoms",
+        "duplicate atoms",
+        "scale",
+        "cartesian direct"
+      ],
+      "symptoms": [
+        "\"The distance between some ions is very small\"",
+        "Warning in standard output / OUTCAR",
+        "The distance between some ions is very small"
+      ],
+      "plain": "Two atoms sit almost on top of each other, which nearly always means the structure file was read wrongly.",
+      "causes": [
+        "Coordinates in the wrong mode (Cartesian read as Direct or vice versa), a wrong scaling factor, or duplicated atoms.",
+        "Overlapping atoms; wrong scale or coordinate type",
+        "Duplicate sites from a CIF (workflow handbook)."
+      ],
+      "fixes": [
+        {
+          "text": "Open POSCAR in VESTA and look at it."
+        },
+        {
+          "text": "Check the Direct/Cartesian line and line 2 (scale)."
+        },
+        {
+          "text": "Check the atom counts on line 7 match the coordinates."
+        },
+        {
+          "text": "Check POSCAR line 2, Direct vs Cartesian, duplicate sites from CIF"
+        }
+      ],
+      "related": [
+        "poscar"
+      ],
+      "sources": [
+        "t-ions",
+        "w-13"
+      ]
+    },
+    {
+      "id": "ibzkpt-lattice-class",
+      "title": "IBZKPT: k-lattice belongs to a different class of lattices",
+      "category": "symmetry-kpoints",
+      "messages": [
+        "VERY BAD NEWS! internal error in subroutine IBZKPT",
+        "Reciprocal lattice and k-lattice belong to different class of lattices"
+      ],
+      "keywords": [
+        "ibzkpt",
+        "monkhorst",
+        "k mesh symmetry",
+        "hexagonal"
+      ],
+      "symptoms": [
+        "\"VERY BAD NEWS! internal error in subroutine IBZKPT: Reciprocal lattice and k-lattice belong to different class of lattices\"",
+        "Appears during setup"
+      ],
+      "plain": "The k-point mesh does not have the same symmetry as the crystal, so VASP cannot reduce it.",
+      "causes": [
+        "The k-mesh does not share the lattice's symmetry: typically a shifted Monkhorst-Pack mesh on a hexagonal or fcc cell, or unequal subdivisions on equivalent axes."
+      ],
+      "fixes": [
+        {
+          "text": "Switch to a Γ-centred mesh."
+        },
+        {
+          "text": "Use the same subdivision along symmetry-equivalent directions."
+        },
+        {
+          "text": "Last resort: ISYM = 0.",
+          "incar": {
+            "ISYM": "0"
+          }
+        }
+      ],
+      "related": [
+        "kpoints",
+        "isym"
+      ],
+      "sources": [
+        "t-ibzkpt"
+      ]
+    },
+    {
+      "id": "tetrahedron-few-kpoints",
+      "title": "Tetrahedron method fails (fewer than 4 k-points)",
+      "category": "symmetry-kpoints",
+      "messages": [
+        "Tetrahedron method fails for NKPT<4",
+        "Tetrahedron method fails (number of k-points < 4)",
+        "Tetrahedron method fails"
+      ],
+      "keywords": [
+        "tetrahedron",
+        "ismear -5",
+        "few k points",
+        "gamma only"
+      ],
+      "symptoms": [
+        "\"Tetrahedron method fails for NKPT<4\"",
+        "Error at start-up",
+        "Tetrahedron method fails (number of k-points < 4)"
+      ],
+      "plain": "The tetrahedron method needs at least four distinct k-points and your run has fewer.",
+      "causes": [
+        "ISMEAR = −5 needs at least 4 irreducible k-points; large supercells or Γ-only runs have fewer.",
+        "ISMEAR = −5 set somewhere (e.g. copied INCAR)",
+        "ISMEAR = -5 set somewhere, for example copied from another INCAR (workflow handbook)."
+      ],
+      "fixes": [
+        {
+          "text": "Use ISMEAR = 0 with SIGMA = 0.05.",
+          "incar": {
+            "ISMEAR": "0",
+            "SIGMA": "0.05"
+          }
+        },
+        {
+          "text": "Or increase the k-mesh if the cell is small."
+        },
+        {
+          "text": "ISMEAR = 0, SIGMA = 0.05 as in this workflow"
+        }
+      ],
+      "related": [
+        "ismear",
+        "kpoints"
+      ],
+      "sources": [
+        "t-tetra",
+        "w-11"
+      ]
+    },
+    {
+      "id": "relax-became-md",
+      "title": "A relaxation ran as molecular dynamics",
+      "category": "ionic",
+      "messages": [],
+      "keywords": [
+        "temperature",
+        "T=",
+        "molecular dynamics",
+        "atoms fly",
+        "ibrion default"
+      ],
+      "symptoms": [
+        "I asked for a relaxation but OSZICAR shows temperatures (T=) and the atoms fly around",
+        "OSZICAR lines like:  1 T= 312. E= ... EK= ..."
+      ],
+      "plain": "You asked for several ionic steps without choosing a relaxation method, so VASP ran molecular dynamics.",
+      "causes": [
+        "NSW > 1 was set without IBRION, so IBRION defaulted to 0 (molecular dynamics)."
+      ],
+      "fixes": [
+        {
+          "text": "Set IBRION = 2 (or 1) explicitly in every relaxation INCAR.",
+          "incar": {
+            "IBRION": "2"
+          }
+        }
+      ],
+      "related": [
+        "ibrion",
+        "nsw"
+      ],
+      "sources": [
+        "t-md"
+      ]
+    },
+    {
+      "id": "primitive-cell",
+      "title": "Found a more primitive cell",
+      "category": "symmetry-kpoints",
+      "messages": [
+        "PRICEL: found a more primitive cell",
+        "Found a more primitive cell"
+      ],
+      "keywords": [
+        "primitive cell",
+        "bravais",
+        "supercell"
+      ],
+      "symptoms": [
+        "\"Found a more primitive cell\" / Bravais-lattice warnings",
+        "Warning in standard output / OUTCAR",
+        "PRICEL: found a more primitive cell"
+      ],
+      "plain": "VASP found that your cell is a repeat of a smaller one. That is fine for a supercell you built on purpose.",
+      "causes": [
+        "Your supercell has a smaller primitive cell, or the lattice symmetry VASP detects differs from the one you set.",
+        "Cell is a supercell of a smaller one"
+      ],
+      "fixes": [
+        {
+          "text": "Usually harmless for intended supercells."
+        },
+        {
+          "text": "If unexpected, compare the space group in OUTCAR with the one you meant to build."
+        },
+        {
+          "text": "Use the primitive cell, or ignore deliberately (supercell intended)"
+        },
+        {
+          "text": "ISYM = 0 if it breaks things"
+        }
+      ],
+      "related": [
+        "outcar",
+        "isym"
+      ],
+      "sources": [
+        "t-prim",
+        "w-09"
+      ]
+    },
+    {
+      "id": "scf-not-converging",
+      "title": "The electronic loop does not converge",
+      "category": "electronic",
+      "messages": [],
+      "keywords": [
+        "nelm",
+        "not converge",
+        "charge sloshing",
+        "oscillates",
+        "stalls",
+        "scf"
+      ],
+      "symptoms": [
+        "Electronic loop does not converge (NELM reached, dE oscillates or stalls)",
+        "OSZICAR: 60 DAV/RMM lines per ionic step, dE jumping by ±1E-2"
+      ],
+      "plain": "The electronic loop keeps going without settling, which is usually a sign that the structure or the mixing needs attention.",
+      "causes": [
+        "Charge sloshing in metals, slabs or large cells; a poor starting guess; a magnetic state flipping between solutions; too few empty bands; an unsuitable algorithm."
+      ],
+      "fixes": [
+        {
+          "text": "Check the structure first: overlapping atoms or a broken geometry cause most \"unconvergeable\" cases."
+        },
+        {
+          "text": "ALGO = All (or Damped), and raise NELM to 150–200.",
+          "incar": {
+            "ALGO": "All",
+            "NELM": "200"
+          }
+        },
+        {
+          "text": "Reduce mixing: AMIX = 0.1, BMIX = 0.0001 (linear mixing for slabs and charge sloshing); for magnets also AMIX_MAG = 0.4, BMIX_MAG = 0.0001.",
+          "incar": {
+            "AMIX": "0.1",
+            "BMIX": "0.0001"
+          }
+        },
+        {
+          "text": "Slightly larger smearing for metals (SIGMA 0.1–0.2) during the hard phase."
+        },
+        {
+          "text": "Increase NBANDS by ~20% when the highest bands are occupied."
+        },
+        {
+          "text": "Start from a converged WAVECAR of a simpler setting (e.g. PBE before HSE, or non-magnetic before magnetic)."
+        }
+      ],
+      "related": [
+        "algo",
+        "nelm",
+        "ediff",
+        "oszicar"
+      ],
+      "sources": [
+        "t-scf"
+      ]
+    },
+    {
+      "id": "davidson-zhegv",
+      "title": "Sub-Space-Matrix is not hermitian, or EDDDAV ZHEGV failed",
+      "category": "electronic",
+      "messages": [
+        "Sub-Space-Matrix is not hermitian in DAV",
+        "Sub-Space-Matrix is not hermitian",
+        "Error EDDDAV: Call to ZHEGV failed",
+        "EDDDAV: Call to ZHEGV failed"
+      ],
+      "keywords": [
+        "davidson",
+        "eddav",
+        "subspace",
+        "hermitian",
+        "zhegv"
+      ],
+      "symptoms": [
+        "\"Sub-Space-Matrix is not hermitian in DAV\" or \"Error EDDDAV: Call to ZHEGV failed\"",
+        "Error in standard output during the Davidson step",
+        "Sub-Space-Matrix is not hermitian in DAV",
+        "EDDDAV: Call to ZHEGV failed"
+      ],
+      "plain": "The numerical solver for the electron states broke down, often because of a bad structure or a clumsy starting point.",
+      "causes": [
+        "Numerical breakdown of the Davidson diagonalization, often from a bad geometry, an unstable start, or aggressive settings.",
+        "Davidson instability (ALGO = Fast/Normal)",
+        "Ill-conditioned subspace, often bad geometry or random start",
+        "Ill-conditioned subspace, often bad geometry or random start (workflow handbook)."
+      ],
+      "fixes": [
+        {
+          "text": "Check the geometry for very short distances."
+        },
+        {
+          "text": "Change ALGO (e.g. Normal → Fast, or All)."
+        },
+        {
+          "text": "Restart without WAVECAR (ISTART = 0).",
+          "incar": {
+            "ISTART": "0"
+          }
+        },
+        {
+          "text": "Try a different NCORE or fewer ranks to rule out parallel issues."
+        },
+        {
+          "text": "ALGO = All or Normal"
+        },
+        {
+          "text": "Change core count/NCORE"
+        },
+        {
+          "text": "Check geometry"
+        },
+        {
+          "text": "ALGO = All / Damped"
+        },
+        {
+          "text": "Delete WAVECAR"
+        },
+        {
+          "text": "Check interatomic distances"
+        },
+        {
+          "text": "Change parallelization"
+        },
+        {
+          "text": "ALGO = All or Damped, delete WAVECAR, check interatomic distances (workflow handbook)."
+        }
+      ],
+      "related": [
+        "algo",
+        "ncore"
+      ],
+      "sources": [
+        "t-zhegv",
+        "w-02",
+        "w-03"
+      ]
+    },
+    {
+      "id": "brmix",
+      "title": "BRMIX: very serious problems",
+      "category": "electronic",
+      "messages": [
+        "BRMIX: very serious problems the old and the new charge density differ",
+        "BRMIX: very serious problems"
+      ],
+      "keywords": [
+        "brmix",
+        "charge density differ",
+        "mixer"
+      ],
+      "symptoms": [
+        "\"BRMIX: very serious problems the old and the new charge density differ\"",
+        "Warning in standard output",
+        "BRMIX: very serious problems"
+      ],
+      "plain": "The charge density that was read in does not belong to the structure now being calculated.",
+      "causes": [
+        "The density read or mixed is inconsistent with the current setup, often after restarting with a changed structure, cell or symmetry.",
+        "Mixer confused, e.g. CHGCAR/WAVECAR from a different structure",
+        "CHGCAR or WAVECAR from a different structure (workflow handbook)."
+      ],
+      "fixes": [
+        {
+          "text": "Restart without CHGCAR/WAVECAR (ICHARG = 2, ISTART = 0).",
+          "incar": {
+            "ICHARG": "2",
+            "ISTART": "0"
+          }
+        },
+        {
+          "text": "Set ISYM = 0 if symmetry changes between steps.",
+          "incar": {
+            "ISYM": "0"
+          }
+        },
+        {
+          "text": "Reduce AMIX/BMIX if it recurs during normal SCF."
+        },
+        {
+          "text": "Remove old CHGCAR/WAVECAR"
+        },
+        {
+          "text": "Restart"
+        },
+        {
+          "text": "Adjust AMIX/BMIX"
+        }
+      ],
+      "related": [
+        "icharg",
+        "isym"
+      ],
+      "sources": [
+        "t-brmix",
+        "w-06"
+      ]
+    },
+    {
+      "id": "large-entropy",
+      "title": "Large entropy term (T*S) in OUTCAR",
+      "category": "electronic",
+      "messages": [],
+      "keywords": [
+        "entropy",
+        "eentro",
+        "t*s",
+        "sigma too large"
+      ],
+      "symptoms": [
+        "Large \"entropy T*S\" in OUTCAR",
+        "grep \"EENTRO\" OUTCAR | tail -1"
+      ],
+      "plain": "The smearing is so wide that the smeared energy no longer matches the energy at zero smearing.",
+      "causes": [
+        "SIGMA is too large for the system, so the smeared energy is far from the zero-smearing energy."
+      ],
+      "fixes": [
+        {
+          "text": "Reduce SIGMA until |T·S| / atoms < 1 meV/atom."
+        },
+        {
+          "text": "For insulators use ISMEAR = 0 with SIGMA = 0.05, or ISMEAR = −5 for static runs.",
+          "incar": {
+            "ISMEAR": "0",
+            "SIGMA": "0.05"
+          }
+        }
+      ],
+      "related": [
+        "ismear"
+      ],
+      "sources": [
+        "t-entropy"
+      ]
+    },
+    {
+      "id": "relax-not-finishing",
+      "title": "The relaxation does not finish in NSW steps",
+      "category": "ionic",
+      "messages": [],
+      "keywords": [
+        "not finish",
+        "nsw reached",
+        "forces oscillate",
+        "ediffg",
+        "required accuracy"
+      ],
+      "symptoms": [
+        "Relaxation does not finish in NSW steps, or forces oscillate just above EDIFFG",
+        "OSZICAR energies go up and down; OUTCAR never prints \"reached required accuracy\""
+      ],
+      "plain": "The relaxation keeps stepping without reaching your force target.",
+      "causes": [
+        "Noisy forces from loose electronic convergence, a step size too large near the minimum, or a very flat energy surface."
+      ],
+      "fixes": [
+        {
+          "text": "Copy CONTCAR to POSCAR and continue."
+        },
+        {
+          "text": "Tighten EDIFF (1E-6 or 1E-7) and set NELMIN = 4–6.",
+          "incar": {
+            "EDIFF": "1E-6",
+            "NELMIN": "4"
+          }
+        },
+        {
+          "text": "Reduce POTIM to ~0.1.",
+          "incar": {
+            "POTIM": "0.1"
+          }
+        },
+        {
+          "text": "Switch IBRION = 2 → 1 for the final steps (or 3 for poor starts).",
+          "incar": {
+            "IBRION": "1"
+          }
+        },
+        {
+          "text": "Use PREC = Accurate and LREAL = .FALSE. for small cells; test ADDGRID.",
+          "incar": {
+            "PREC": "Accurate",
+            "LREAL": ".FALSE."
+          }
+        }
+      ],
+      "related": [
+        "ediffg",
+        "ediff",
+        "potim",
+        "ibrion"
+      ],
+      "sources": [
+        "t-relax"
+      ]
+    },
+    {
+      "id": "zbrent",
+      "title": "ZBRENT: fatal error in bracketing",
+      "category": "ionic",
+      "messages": [
+        "ZBRENT: fatal error in bracketing"
+      ],
+      "keywords": [
+        "zbrent",
+        "bracketing",
+        "line search",
+        "conjugate gradient"
+      ],
+      "symptoms": [
+        "\"ZBRENT: fatal error in bracketing\"",
+        "Error in standard output during an IBRION = 2 relaxation",
+        "ZBRENT: fatal error in bracketing"
+      ],
+      "plain": "The relaxation algorithm could not find the bottom of the energy valley along its search direction.",
+      "causes": [
+        "The conjugate-gradient line search could not bracket a minimum, usually because forces are noisy or the structure is already near the minimum.",
+        "Line minimization in CG failed; poor forces or step",
+        "Line minimization in CG failed; poor forces or step (workflow handbook)."
+      ],
+      "fixes": [
+        {
+          "text": "Copy CONTCAR to POSCAR and restart."
+        },
+        {
+          "text": "Tighten EDIFF.",
+          "incar": {
+            "EDIFF": "1E-6"
+          }
+        },
+        {
+          "text": "Switch to IBRION = 1, or reduce POTIM.",
+          "incar": {
+            "IBRION": "1"
+          }
+        },
+        {
+          "text": "If forces are already below your target, the structure may simply be converged."
+        },
+        {
+          "text": "Cp CONTCAR POSCAR and restart"
+        },
+        {
+          "text": "Lower POTIM"
+        },
+        {
+          "text": "Tighten EDIFF"
+        },
+        {
+          "text": "IBRION = 1 near minimum"
+        }
+      ],
+      "related": [
+        "ibrion",
+        "ediff",
+        "contcar"
+      ],
+      "sources": [
+        "t-zbrent",
+        "w-01"
+      ]
+    },
+    {
+      "id": "pulay-stress",
+      "title": "The lattice keeps changing when ISIF = 3 is rerun (Pulay stress)",
+      "category": "ionic",
+      "messages": [],
+      "keywords": [
+        "pulay",
+        "volume changes",
+        "isif 3",
+        "external pressure",
+        "static energy disagrees"
+      ],
+      "symptoms": [
+        "Lattice keeps changing when I rerun ISIF = 3, or static energy disagrees with the relaxation",
+        "OUTCAR \"external pressure\" and \"Pulay stress\"; volume differs between successive runs"
+      ],
+      "plain": "The basis set was fixed for the starting cell, so a cell that changes size feels a false pressure.",
+      "causes": [
+        "Pulay stress. The plane-wave basis is set up for the starting cell; as the volume changes, the effective cutoff changes and the stress is biased."
+      ],
+      "fixes": [
+        {
+          "text": "Use ENCUT ≈ 1.3 × max ENMAX for cell relaxations."
+        },
+        {
+          "text": "Rerun from CONTCAR until the volume no longer changes (normally 2–3 rounds)."
+        },
+        {
+          "text": "Finish with a static run at the final structure."
+        }
+      ],
+      "related": [
+        "encut",
+        "isif",
+        "istart"
+      ],
+      "sources": [
+        "t-pulay"
+      ]
+    },
+    {
+      "id": "slab-vacuum-collapse",
+      "title": "The vacuum layer of a slab disappeared",
+      "category": "ionic",
+      "messages": [],
+      "keywords": [
+        "slab",
+        "vacuum",
+        "isif 3",
+        "c axis shrinks"
+      ],
+      "symptoms": [
+        "My slab's vacuum layer disappeared",
+        "c lattice vector shrinks in CONTCAR"
+      ],
+      "plain": "The cell was allowed to change shape, and with nothing resisting, the empty layer was squeezed away.",
+      "causes": [
+        "ISIF = 3 relaxes the cell; the vacuum has no stress to resist compression."
+      ],
+      "fixes": [
+        {
+          "text": "Use ISIF = 2 for slabs, surfaces and molecules in a box.",
+          "incar": {
+            "ISIF": "2"
+          }
+        }
+      ],
+      "related": [
+        "isif"
+      ],
+      "sources": [
+        "t-slab"
+      ]
+    },
+    {
+      "id": "moment-collapse",
+      "title": "The magnetic moment collapses to zero",
+      "category": "magnetism",
+      "messages": [],
+      "keywords": [
+        "moment collapses",
+        "mag=0",
+        "magnetic moment zero",
+        "ispin",
+        "magmom"
+      ],
+      "symptoms": [
+        "The magnetic moment collapses to zero",
+        "OSZICAR \"mag=\" tends to 0.000",
+        "Moment collapses to 0"
+      ],
+      "plain": "The magnetic moment fell to zero, either because spin was not switched on or because the starting guess was too small.",
+      "causes": [
+        "ISPIN = 1 by mistake, an initial moment too small to reach the magnetic minimum, or a genuinely non-magnetic ground state.",
+        "Starting MAGMOM too small, or NM state really lower",
+        "Starting MAGMOM too small, or the non-magnetic state really is lower (workflow handbook)."
+      ],
+      "fixes": [
+        {
+          "text": "Check ISPIN = 2.",
+          "incar": {
+            "ISPIN": "2"
+          }
+        },
+        {
+          "text": "Set MAGMOM somewhat above the expected value."
+        },
+        {
+          "text": "Compare energies of magnetic and non-magnetic solutions to see which is lower."
+        },
+        {
+          "text": "Start at 3–5 μB"
+        },
+        {
+          "text": "Compare energies"
+        },
+        {
+          "text": "Check ISPIN = 2 is set"
+        },
+        {
+          "text": "Start at 3–5 μB and compare energies (workflow handbook)."
+        }
+      ],
+      "related": [
+        "ispin",
+        "magmom"
+      ],
+      "sources": [
+        "t-moment",
+        "w-18"
+      ]
+    },
+    {
+      "id": "afm-ends-fm",
+      "title": "An antiferromagnetic start ends ferromagnetic",
+      "category": "magnetism",
+      "messages": [],
+      "keywords": [
+        "antiferromagnetic",
+        "afm",
+        "ferromagnetic",
+        "moments equal",
+        "magmom order"
+      ],
+      "symptoms": [
+        "An antiferromagnetic start ends ferromagnetic, or moments are forced equal",
+        "OUTCAR \"magnetization (x)\" shows equal signs on all sites"
+      ],
+      "plain": "An antiferromagnetic start turned ferromagnetic, usually because the starting pattern was written in the wrong atom order.",
+      "causes": [
+        "MAGMOM does not encode the AFM pattern in POSCAR order, or the cell is too small to hold the AFM order."
+      ],
+      "fixes": [
+        {
+          "text": "Check the MAGMOM order against POSCAR."
+        },
+        {
+          "text": "Use a supercell that accommodates the ordering."
+        },
+        {
+          "text": "ISYM = 0 if you need symmetry breaking beyond the starting pattern.",
+          "incar": {
+            "ISYM": "0"
+          }
+        }
+      ],
+      "related": [
+        "magmom",
+        "isym"
+      ],
+      "sources": [
+        "t-afm"
+      ]
+    },
+    {
+      "id": "fermi-shift",
+      "title": "Bands or DOS look shifted",
+      "category": "output",
+      "messages": [],
+      "keywords": [
+        "fermi level",
+        "e-fermi",
+        "shifted bands",
+        "gap wrong place",
+        "vbm"
+      ],
+      "symptoms": [
+        "Bands or DOS seem shifted; the gap appears in the wrong place",
+        "Different E-fermi values in SCF and NSCF OUTCARs"
+      ],
+      "plain": "The zero of energy is in a different place in two runs, so the plots do not line up.",
+      "causes": [
+        "The Fermi level of an ICHARG = 11 run is less reliable than the SCF value; for insulators E_F can sit anywhere in the gap."
+      ],
+      "fixes": [
+        {
+          "text": "Shift by the E-fermi of the SCF run."
+        },
+        {
+          "text": "For semiconductors and insulators align E = 0 to the VBM."
+        }
+      ],
+      "related": [
+        "doscar",
+        "eigenval"
+      ],
+      "sources": [
+        "t-fermi"
+      ]
+    },
+    {
+      "id": "bands-wrong",
+      "title": "The band structure looks wrong or noisy",
+      "category": "output",
+      "messages": [],
+      "keywords": [
+        "band structure wrong",
+        "jagged bands",
+        "noisy bands",
+        "icharg 11",
+        "nbands"
+      ],
+      "symptoms": [
+        "The band structure looks wrong or noisy",
+        "Jagged bands, unexpected gap"
+      ],
+      "plain": "The band plot looks jagged or has the wrong gap, usually because the density was not read from the right SCF run.",
+      "causes": [
+        "ICHARG = 11 missing (density re-converged on the path), a CHGCAR from a different structure or ENCUT, or too few bands."
+      ],
+      "fixes": [
+        {
+          "text": "Copy CHGCAR from the SCF of the same structure; set ICHARG = 11.",
+          "incar": {
+            "ICHARG": "11"
+          }
+        },
+        {
+          "text": "Raise NBANDS to see the conduction bands."
+        },
+        {
+          "text": "Hybrids: use IBZKPT + zero-weight path points instead."
+        }
+      ],
+      "related": [
+        "icharg",
+        "eigenval",
+        "r-bands"
+      ],
+      "sources": [
+        "t-bands"
+      ]
+    },
+    {
+      "id": "bader-charges",
+      "title": "Bader charges change with settings",
+      "category": "output",
+      "messages": [],
+      "keywords": [
+        "bader",
+        "charges",
+        "laechg",
+        "aeccar",
+        "fft grid"
+      ],
+      "symptoms": [
+        "Bader charges change with settings or don't make sense",
+        "Sum of charges ≠ number of electrons; values change with grid size"
+      ],
+      "plain": "Bader charges depend on the density grid and on including the core density, so they move with your settings.",
+      "causes": [
+        "CHGCAR alone lacks the core density, and a coarse FFT grid makes integration inaccurate."
+      ],
+      "fixes": [
+        {
+          "text": "Set LAECHG = .TRUE.; use AECCAR0 + AECCAR2 as the reference.",
+          "incar": {
+            "LAECHG": ".TRUE."
+          }
+        },
+        {
+          "text": "Increase the fine grid (NGXF, NGYF, NGZF) until charges converge."
+        }
+      ],
+      "related": [
+        "chgcar",
+        "others"
+      ],
+      "sources": [
+        "t-bader"
+      ]
+    },
+    {
+      "id": "vasprun-xml",
+      "title": "pymatgen or ASE cannot read vasprun.xml",
+      "category": "output",
+      "messages": [],
+      "keywords": [
+        "vasprun.xml",
+        "xml parse",
+        "pymatgen",
+        "ase",
+        "unfinished"
+      ],
+      "symptoms": [
+        "pymatgen / ASE fails to read vasprun.xml",
+        "XML parse error"
+      ],
+      "plain": "The analysis tool cannot read vasprun.xml because the job stopped before the file was closed.",
+      "causes": [
+        "The job did not finish, so the XML was never closed."
+      ],
+      "fixes": [
+        {
+          "text": "Check \"Elapsed time\" in OUTCAR; rerun if the job did not finish."
+        },
+        {
+          "text": "Some parsers can read truncated files; otherwise use OUTCAR/OSZICAR."
+        }
+      ],
+      "related": [
+        "vasprunxml"
+      ],
+      "sources": [
+        "t-xml"
+      ]
+    },
+    {
+      "id": "slow-or-oom",
+      "title": "The run is slow or runs out of memory",
+      "category": "performance",
+      "messages": [],
+      "keywords": [
+        "slow",
+        "out of memory",
+        "oom",
+        "kpar",
+        "ncore",
+        "lreal"
+      ],
+      "symptoms": [
+        "The run is far slower than expected, or runs out of memory",
+        "OUTCAR \"LOOP:\" times per electronic step; scheduler memory errors"
+      ],
+      "plain": "The run is slow or runs out of memory, which is often a parallel layout that does not suit the system.",
+      "causes": [
+        "Unsuitable parallel layout, reciprocal-space projection in a large cell, or too many k-point groups for the memory."
+      ],
+      "fixes": [
+        {
+          "text": "Large cells (> ~20 atoms): LREAL = Auto.",
+          "incar": {
+            "LREAL": "Auto"
+          }
+        },
+        {
+          "text": "Many k-points: raise KPAR (watch memory)."
+        },
+        {
+          "text": "Few k-points, large cell: tune NCORE (try 4, 8, 16)."
+        },
+        {
+          "text": "Out of memory: lower KPAR, use more nodes, or use vasp_gam for Γ-only runs."
+        },
+        {
+          "text": "Set LWAVE and LCHARG to .FALSE. when the files are not needed.",
+          "incar": {
+            "LWAVE": ".FALSE.",
+            "LCHARG": ".FALSE."
+          }
+        }
+      ],
+      "related": [
+        "kpar",
+        "ncore",
+        "lreal"
+      ],
+      "sources": [
+        "t-slow"
+      ]
+    },
+    {
+      "id": "eddrmm-zhegv",
+      "title": "EDDRMM: call to ZHEGV failed",
+      "category": "electronic",
+      "messages": [
+        "EDDRMM: call to ZHEGV failed"
+      ],
+      "keywords": [
+        "eddrmm",
+        "rmm-diis",
+        "zhegv",
+        "fast",
+        "veryfast"
+      ],
+      "symptoms": [
+        "EDDRMM: call to ZHEGV failed"
+      ],
+      "plain": "The faster electron solver failed. A slower one is more robust.",
+      "causes": [
+        "RMM-DIIS failed"
+      ],
+      "fixes": [
+        {
+          "text": "ALGO = Normal instead of Fast/VeryFast",
+          "incar": {
+            "ALGO": "Normal"
+          }
+        }
+      ],
+      "related": [],
+      "sources": [
+        "w-04"
+      ]
+    },
+    {
+      "id": "zpotrf",
+      "title": "LAPACK: Routine ZPOTRF failed",
+      "category": "electronic",
+      "messages": [
+        "LAPACK: Routine ZPOTRF failed"
+      ],
+      "keywords": [
+        "zpotrf",
+        "lapack",
+        "overlap matrix",
+        "distorted structure",
+        "corrupt wavecar"
+      ],
+      "symptoms": [
+        "LAPACK: Routine ZPOTRF failed"
+      ],
+      "plain": "A matrix inside the solver was not valid, which points at a damaged structure or a damaged WAVECAR.",
+      "causes": [
+        "Overlap matrix not positive definite; distorted structure or corrupt WAVECAR"
+      ],
+      "fixes": [
+        {
+          "text": "Delete WAVECAR"
+        },
+        {
+          "text": "Lower POTIM"
+        },
+        {
+          "text": "ALGO = Normal",
+          "incar": {
+            "ALGO": "Normal"
+          }
+        },
+        {
+          "text": "Check POSCAR"
+        }
+      ],
+      "related": [],
+      "sources": [
+        "w-05"
+      ]
+    },
+    {
+      "id": "sgrcon",
+      "title": "SGRCON: symmetry detection error",
+      "category": "symmetry-kpoints",
+      "messages": [
+        "VERY BAD NEWS! internal error in subroutine SGRCON"
+      ],
+      "keywords": [
+        "sgrcon",
+        "symmetry detection",
+        "symprec",
+        "isym"
+      ],
+      "symptoms": [
+        "VERY BAD NEWS! internal error in subroutine SGRCON"
+      ],
+      "plain": "VASP found symmetry that does not agree with the coordinates you gave it.",
+      "causes": [
+        "Symmetry detection inconsistent with coordinates"
+      ],
+      "fixes": [
+        {
+          "text": "Symmetrize POSCAR"
+        },
+        {
+          "text": "Change SYMPREC (1E-4 → 1E-3)"
+        },
+        {
+          "text": "ISYM = 0",
+          "incar": {
+            "ISYM": "0"
+          }
+        }
+      ],
+      "related": [],
+      "sources": [
+        "w-07"
+      ]
+    },
+    {
+      "id": "inverse-rotation",
+      "title": "Inverse of rotation matrix was not found",
+      "category": "symmetry-kpoints",
+      "messages": [
+        "inverse of rotation matrix was not found"
+      ],
+      "keywords": [
+        "inverse of rotation matrix",
+        "symprec",
+        "off symmetric sites"
+      ],
+      "symptoms": [
+        "inverse of rotation matrix was not found (increase SYMPREC)"
+      ],
+      "plain": "Atoms sit slightly off the positions the symmetry needs, so VASP cannot close the symmetry group.",
+      "causes": [
+        "Positions slightly off symmetric sites"
+      ],
+      "fixes": [
+        {
+          "text": "SYMPREC = 1E-4 or larger",
+          "incar": {
+            "SYMPREC": "1E-4"
+          }
+        },
+        {
+          "text": "Symmetrize structure"
+        }
+      ],
+      "related": [],
+      "sources": [
+        "w-08"
+      ]
+    },
+    {
+      "id": "too-few-bands",
+      "title": "Too few bands (NBANDS too small)",
+      "category": "electronic",
+      "messages": [
+        "TOO FEW BANDS"
+      ],
+      "keywords": [
+        "too few bands",
+        "nbands",
+        "partially filled top band"
+      ],
+      "symptoms": [
+        "TOO FEW BANDS / NBANDS too small"
+      ],
+      "plain": "The calculation has too few empty bands, so the top band is still partly filled.",
+      "causes": [
+        "Partially filled top band"
+      ],
+      "fixes": [
+        {
+          "text": "Increase NBANDS by 20–30%"
+        }
+      ],
+      "related": [],
+      "sources": [
+        "w-10"
+      ]
+    },
+    {
+      "id": "magmom-count",
+      "title": "Error reading item MAGMOM",
+      "category": "magnetism",
+      "messages": [
+        "Error reading item 'MAGMOM'",
+        "Error reading item MAGMOM"
+      ],
+      "keywords": [
+        "magmom count",
+        "nions",
+        "error reading item"
+      ],
+      "symptoms": [
+        "Error reading item 'MAGMOM'"
+      ],
+      "plain": "The number of MAGMOM values does not equal the number of atoms.",
+      "causes": [
+        "Count does not match NIONS"
+      ],
+      "fixes": [
+        {
+          "text": "One value per atom (3 per atom for ncl)"
+        }
+      ],
+      "related": [],
+      "sources": [
+        "w-12"
+      ]
+    },
+    {
+      "id": "real-optlay",
+      "title": "REAL_OPTLAY: internal error",
+      "category": "performance",
+      "messages": [
+        "REAL_OPTLAY: internal error",
+        "RSPHER"
+      ],
+      "keywords": [
+        "real_optlay",
+        "rspher",
+        "real space projection",
+        "lreal"
+      ],
+      "symptoms": [
+        "REAL_OPTLAY: internal error / RSPHER"
+      ],
+      "plain": "The real-space projection step failed. Switching it off is the standard remedy.",
+      "causes": [
+        "Real-space projection problem"
+      ],
+      "fixes": [
+        {
+          "text": "LREAL = .FALSE.",
+          "incar": {
+            "LREAL": ".FALSE."
+          }
+        }
+      ],
+      "related": [],
+      "sources": [
+        "w-14"
+      ]
+    },
+    {
+      "id": "cnormn",
+      "title": "CNORMN: search vector ill defined",
+      "category": "ionic",
+      "messages": [
+        "WARNING: CNORMN: search vector ill defined"
+      ],
+      "keywords": [
+        "cnormn",
+        "search vector",
+        "ill defined"
+      ],
+      "symptoms": [
+        "WARNING: CNORMN: search vector ill defined"
+      ],
+      "plain": "The relaxation step was too large, or the electrons were not converged well enough.",
+      "causes": [
+        "Ionic step too large or poor SCF"
+      ],
+      "fixes": [
+        {
+          "text": "Lower POTIM"
+        },
+        {
+          "text": "Tighten EDIFF"
+        },
+        {
+          "text": "Switch IBRION"
+        }
+      ],
+      "related": [],
+      "sources": [
+        "w-15"
+      ]
+    },
+    {
+      "id": "dfpt-ncore",
+      "title": "LEPSILON or IBRION = 7, 8 with NCORE or NPAR",
+      "category": "performance",
+      "messages": [],
+      "keywords": [
+        "lepsilon",
+        "ibrion 7",
+        "ibrion 8",
+        "ncore npar",
+        "dfpt",
+        "band parallelization"
+      ],
+      "symptoms": [
+        "LEPSILON / IBRION=7,8 not supported with NCORE/NPAR"
+      ],
+      "plain": "Perturbation-theory runs cannot use band parallelization, so NCORE and NPAR must be removed.",
+      "causes": [
+        "Band parallelization in DFPT"
+      ],
+      "fixes": [
+        {
+          "text": "Remove NCORE and NPAR"
+        }
+      ],
+      "related": [],
+      "sources": [
+        "w-17"
+      ]
+    },
+    {
+      "id": "imaginary-phonons",
+      "title": "Imaginary phonon modes",
+      "category": "advanced",
+      "messages": [],
+      "keywords": [
+        "imaginary phonon",
+        "negative frequency",
+        "phonon instability"
+      ],
+      "symptoms": [
+        "Imaginary phonon modes"
+      ],
+      "plain": "Phonon modes with imaginary frequency can mean a loose calculation or a real structural instability.",
+      "causes": [
+        "Loose relax/EDIFF, small supercell, or genuine instability"
+      ],
+      "fixes": [
+        {
+          "text": "EDIFF 1E-8, EDIFFG −0.001, ADDGRID, larger DIM",
+          "incar": {
+            "EDIFF": "1E-8",
+            "EDIFFG": "-0.001",
+            "ADDGRID": ".TRUE."
+          }
+        },
+        {
+          "text": "Follow eigenvector if persistent"
+        }
+      ],
+      "related": [],
+      "sources": [
+        "w-19"
+      ]
+    },
+    {
+      "id": "elastic-negative",
+      "title": "Negative or odd elastic constants",
+      "category": "advanced",
+      "messages": [],
+      "keywords": [
+        "negative elastic constants",
+        "odd elastic constants",
+        "voigt",
+        "residual stress"
+      ],
+      "symptoms": [
+        "Negative or odd elastic constants"
+      ],
+      "plain": "Elastic constants came out negative or odd, which usually points to leftover stress or too coarse settings.",
+      "causes": [
+        "Residual stress, low ENCUT, coarse k-mesh, wrong Voigt mapping"
+      ],
+      "fixes": [
+        {
+          "text": "Re-relax at elastic ENCUT"
+        },
+        {
+          "text": "Denser k"
+        },
+        {
+          "text": "EDIFF 1E-8"
+        },
+        {
+          "text": "Use VASPkit 203 conversion"
+        }
+      ],
+      "related": [],
+      "sources": [
+        "w-20"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+---
+id: vdw-corrections
+title: van der Waals corrections
+module: 5
+order: 8
+summary: Why common functionals miss the weak attraction between layers and molecules, what a dispersion correction adds, and the IVDW values to use.
+concepts: [van-der-waals]
+requires: [functionals]
+vaspTags: [IVDW]
+sources: [S-019, S-028, S-041, S-042]
+noLab: true
+status: draft
+updated: 2026-11-19
+---
+
+<Why>
+
+Two neutral layers of graphite, or two molecules in a crystal, attract each other even though neither has a net charge. That weak attraction (van der Waals or dispersion) comes from correlated fluctuations of the electrons, and common semilocal functionals such as PBE barely describe it. Without a correction, layered and molecular crystals and molecules on surfaces come out too loosely bound, with the layers too far apart <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+A dispersion correction is a patch added to the energy afterwards. For every pair of atoms it adds a small attractive term that falls off with distance, switched off at short range where the functional already handles the interaction. It is cheap, because it does not change the electrons at all; it adds to the energy and forces <Cite id="S-028" />.
+
+When to use it: whenever weak, non-bonded contacts matter, such as layered materials (the stacking direction), molecular crystals and adsorption. For a dense ionic or metallic solid, bonding is dominated by other terms and the correction is usually a small change; the handbook marks it essential for layered (c-axis) and molecular crystals <Cite id="S-042" />.
+
+A practical point: the value of the correction depends on its damping scheme, and the choice of functional and correction go together, so report both. You cannot judge it from the energy of a single run: compare structures (interlayer distance) before and after.
+
+</Intuition>
+
+<TheMath>
+
+The pairwise form of the correction is a sum over atom pairs of an attractive term proportional to $-C_6^{ij}/r_{ij}^6$ times a damping function that removes it at short distance. D3 computes the coefficients from the local environment of each atom, and the Becke-Johnson damping variant (D3(BJ)) uses a different short-range form <Cite id="S-028" />. This page gives the structure only: the coefficients and damping parameters are tabulated in the cited papers and are not reproduced or invented here.
+
+</TheMath>
+
+<InVasp>
+
+- `IVDW = 11` is DFT-D3 (zero damping), `IVDW = 12` is D3 with Becke-Johnson damping, `IVDW = 20` is Tkatchenko-Scheffler <Cite id="S-042" />.
+- Use it in the relaxation, not only in a final single-point run, because the correction changes the forces and so the structure. VASPkit task 101 with the code `D3` adds it (zero damping) to the template INCAR <Cite id="S-042" />.
+- The default of `IVDW` is not stated in the handbooks: see the VASP wiki page IVDW <Cite id="S-019" />.
+- Keep the setting the same for every calculation you compare <Cite id="S-041" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...                   | ...in the structure and energy                     | ...in VASP                                                  |
+| ---------------------------------- | -------------------------------------------------- | ----------------------------------------------------------- |
+| Add a correction                   | Layers or molecules come closer, binding increases | `IVDW = 11` or `12` in the relaxation                       |
+| D3 to D3(BJ)                       | Different short-range damping, similar trend       | `IVDW = 12` instead of `11`                                 |
+| Leave it off for a layered crystal | Layers too far apart                               | The handbook marks it essential for c-axis layered crystals |
+
+Why: weak contacts are missing otherwise. Why this value: 11 or 12 are the common choices; say which. What happens if you get it wrong: a layer spacing and binding energy that depend on a setting you did not choose.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Adding the correction only at the end">
+
+Apply it in the relaxation, so the structure sees it.
+
+</Callout>
+
+<Callout variant="mistake" title="Mixing results with and without the correction">
+
+Compare only runs with the same `IVDW`.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-vdw-1', 'q-vdw-2', 'q-vdw-3', 'q-vdw-4']} />
+
+<GoDeeper>
+
+- Grimme and co-workers on DFT-D3 and the Becke-Johnson damping <Cite id="S-028" />.
+- VASP wiki page IVDW (by page name) <Cite id="S-019" />.
+
+</GoDeeper>

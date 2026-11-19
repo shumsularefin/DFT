@@ -1,0 +1,36 @@
+{
+ "id": "reciprocal-fcc",
+ "badge": "illustrative",
+ "alt": "Primitive fcc cell with its three real-space lattice vectors a, b, c and the three reciprocal vectors a*, b*, c*.",
+ "caption": "Real and reciprocal lattice vectors of fcc. The reciprocal vectors are scaled to fit the picture; only directions and relative lengths are meaningful.",
+ "structure": {
+  "ref": "fcc-primitive"
+ },
+ "camera": "iso",
+ "vectors": [
+  {
+   "space": "real",
+   "index": 0
+  },
+  {
+   "space": "real",
+   "index": 1
+  },
+  {
+   "space": "real",
+   "index": 2
+  },
+  {
+   "space": "reciprocal",
+   "index": 0
+  },
+  {
+   "space": "reciprocal",
+   "index": 1
+  },
+  {
+   "space": "reciprocal",
+   "index": 2
+  }
+ ]
+}

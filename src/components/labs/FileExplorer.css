@@ -100,3 +100,9 @@ button.fx-row:focus-visible {
 .fx-potcar dt {
   font-family: var(--font-mono, monospace);
 }
+
+.fx-row[data-atom-line='true'] {
+  background: var(--surface-2, rgba(128, 128, 128, 0.15));
+  outline: 2px solid var(--accent, currentColor);
+  outline-offset: -2px;
+}

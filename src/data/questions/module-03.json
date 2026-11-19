@@ -31,7 +31,28 @@
     "level": "beginner",
     "sources": [
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "One electron",
+            "note": "3 coordinates"
+          },
+          {
+            "label": "Two electrons",
+            "note": "6 coordinates"
+          },
+          {
+            "label": "N electrons",
+            "note": "3N coordinates"
+          }
+        ]
+      },
+      "caption": "Coordinates against the number of electrons. Illustrative.",
+      "alt": "A three-box list: one electron has 3 coordinates, two have 6, N electrons have 3N."
+    }
   },
   {
     "id": "q-many-2",
@@ -65,7 +86,16 @@
     "level": "beginner",
     "sources": [
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "grid-wall",
+      "params": {
+        "points": 10,
+        "maxN": 6
+      },
+      "caption": "Values to store on a grid of 10 points per axis, against electrons.",
+      "alt": "A straight line on a logarithmic vertical axis, rising with the number of electrons, with dots for 1 to 6 electrons."
+    }
   },
   {
     "id": "q-many-3",
@@ -85,7 +115,16 @@
     "level": "intermediate",
     "sources": [
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "grid-wall",
+      "params": {
+        "points": 10,
+        "maxN": 6
+      },
+      "caption": "Values to store on a grid of 10 points per axis.",
+      "alt": "A straight line on a logarithmic vertical axis rising with the number of electrons."
+    }
   },
   {
     "id": "q-many-4",
@@ -119,7 +158,12 @@
     "level": "intermediate",
     "sources": [
       "S-048"
-    ]
+    ],
+    "visual": {
+      "scene": "diamond",
+      "caption": "Nuclei at fixed positions in a crystal cell. Illustrative.",
+      "alt": "A diamond cubic cell with atoms at fixed positions joined by bonds."
+    }
   },
   {
     "id": "q-many-5",
@@ -153,7 +197,19 @@
     "level": "pro",
     "sources": [
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-trace",
+      "params": {
+        "Z": 2,
+        "alpha": 0.3,
+        "tol": 1e-08,
+        "nonInteracting": true,
+        "show": 10
+      },
+      "caption": "The toy loop with the electron repulsion term off.",
+      "alt": "Curve of the change in density per iteration in the toy lab with the repulsion switched off."
+    }
   },
   {
     "id": "q-wall-1",
@@ -187,7 +243,16 @@
     "level": "beginner",
     "sources": [
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "exp-wall",
+      "params": {
+        "perElectron": 4,
+        "maxN": 20
+      },
+      "caption": "Determinants against electrons for 4 spin orbitals per electron, log scale.",
+      "alt": "Curve climbing steeply against the number of electrons on a logarithmic vertical axis."
+    }
   },
   {
     "id": "q-wall-2",
@@ -207,7 +272,16 @@
     "level": "intermediate",
     "sources": [
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "exp-wall",
+      "params": {
+        "perElectron": 2,
+        "maxN": 20
+      },
+      "caption": "Determinants against electrons for 2 spin orbitals per electron.",
+      "alt": "Curve of the number of determinants against electrons on a logarithmic axis for 2 spin orbitals per electron."
+    }
   },
   {
     "id": "q-wall-3",
@@ -227,7 +301,16 @@
     "level": "intermediate",
     "sources": [
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "exp-wall",
+      "params": {
+        "perElectron": 2,
+        "maxN": 20
+      },
+      "caption": "Determinants against electrons for 2 spin orbitals per electron.",
+      "alt": "Curve of the number of determinants against electrons on a logarithmic axis for 2 spin orbitals per electron."
+    }
   },
   {
     "id": "q-wall-4",
@@ -261,7 +344,16 @@
     "level": "beginner",
     "sources": [
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "exp-wall",
+      "params": {
+        "perElectron": 4,
+        "maxN": 20
+      },
+      "caption": "Adding electrons multiplies the count. A faster computer moves you along, not off, the curve.",
+      "alt": "Curve climbing steeply on a logarithmic vertical axis against the number of electrons."
+    }
   },
   {
     "id": "q-wall-5",
@@ -295,7 +387,16 @@
     "level": "intermediate",
     "sources": [
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "exp-wall",
+      "params": {
+        "perElectron": 6,
+        "maxN": 20
+      },
+      "caption": "The lab counts determinants for chosen numbers of electrons and orbitals.",
+      "alt": "Curve of the number of determinants against electrons on a logarithmic vertical axis."
+    }
   },
   {
     "id": "q-dens-1",
@@ -329,7 +430,16 @@
     "level": "beginner",
     "sources": [
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "density-box",
+      "params": {
+        "L": 5,
+        "electrons": 2
+      },
+      "caption": "A density is one function of position, whatever the number of electrons.",
+      "alt": "Filled curve of the electron density of two electrons in a box, one hump over the box."
+    }
   },
   {
     "id": "q-dens-2",
@@ -363,7 +473,16 @@
     "level": "beginner",
     "sources": [
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "density-box",
+      "params": {
+        "L": 5,
+        "electrons": 4
+      },
+      "caption": "The density of four electrons in a box.",
+      "alt": "Filled curve of the electron density of four electrons in a 5 angstrom box with two humps."
+    }
   },
   {
     "id": "q-dens-3",
@@ -397,7 +516,17 @@
     "level": "intermediate",
     "sources": [
       "S-011"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-density",
+      "params": {
+        "Zs": [
+          2
+        ]
+      },
+      "caption": "Density and potential of the toy system.",
+      "alt": "Curve of density as a hump, with a dashed curve of the potential well, against position."
+    }
   },
   {
     "id": "q-dens-4",
@@ -431,7 +560,16 @@
     "level": "intermediate",
     "sources": [
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "density-box",
+      "params": {
+        "L": 5,
+        "electrons": 4
+      },
+      "caption": "The density of four electrons, built from two filled levels.",
+      "alt": "Filled curve of the electron density of four electrons in a box with two humps."
+    }
   },
   {
     "id": "q-dens-5",
@@ -451,7 +589,16 @@
     "level": "beginner",
     "sources": [
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "density-box",
+      "params": {
+        "L": 5,
+        "electrons": 6
+      },
+      "caption": "The density of six electrons in a box.",
+      "alt": "Filled curve of the electron density of six electrons in a 5 angstrom box with three humps."
+    }
   },
   {
     "id": "q-hk-1",
@@ -485,7 +632,17 @@
     "level": "intermediate",
     "sources": [
       "S-011"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-density",
+      "params": {
+        "Zs": [
+          2
+        ]
+      },
+      "caption": "The density of the toy system and the potential that produced it.",
+      "alt": "Curve of electron density as a hump, with a dashed curve of the potential well that produced it."
+    }
   },
   {
     "id": "q-hk-2",
@@ -519,7 +676,16 @@
     "level": "beginner",
     "sources": [
       "S-011"
-    ]
+    ],
+    "visual": {
+      "plot": "density-box",
+      "params": {
+        "L": 5,
+        "electrons": 2
+      },
+      "caption": "The density depends on one position only.",
+      "alt": "Filled curve of the electron density of two electrons in a box."
+    }
   },
   {
     "id": "q-hk-3",
@@ -553,7 +719,17 @@
     "level": "intermediate",
     "sources": [
       "S-011"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-density",
+      "params": {
+        "Zs": [
+          2
+        ]
+      },
+      "caption": "Density and potential of the toy system.",
+      "alt": "Curve of electron density as a hump and a dashed curve of the potential well."
+    }
   },
   {
     "id": "q-hk-4",
@@ -587,7 +763,17 @@
     "level": "intermediate",
     "sources": [
       "S-011"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-density",
+      "params": {
+        "Zs": [
+          2
+        ]
+      },
+      "caption": "A density, and the potential well it came from.",
+      "alt": "Curve of electron density and a dashed curve of the potential well, against position."
+    }
   },
   {
     "id": "q-hk-5",
@@ -621,7 +807,17 @@
     "level": "pro",
     "sources": [
       "S-011"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-density",
+      "params": {
+        "Zs": [
+          2
+        ]
+      },
+      "caption": "A density and the potential well of the toy system.",
+      "alt": "Curve of electron density as a hump and a dashed curve of the potential well."
+    }
   },
   {
     "id": "q-approx-1",
@@ -656,7 +852,28 @@
     "sources": [
       "S-012",
       "S-049"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Kinetic energy of the non-interacting electrons"
+          },
+          {
+            "label": "Energy in the external potential"
+          },
+          {
+            "label": "Classical Coulomb (Hartree) energy"
+          },
+          {
+            "label": "Exchange-correlation energy"
+          }
+        ]
+      },
+      "caption": "The four parts of the Kohn-Sham energy. Illustrative.",
+      "alt": "A four-box list: kinetic energy of the non-interacting electrons, energy in the external potential, the classical Coulomb energy, the exchange-correlation energy."
+    }
   },
   {
     "id": "q-approx-2",
@@ -691,7 +908,28 @@
     "sources": [
       "S-012",
       "S-049"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Kinetic energy of the non-interacting electrons"
+          },
+          {
+            "label": "Energy in the external potential"
+          },
+          {
+            "label": "Classical Coulomb (Hartree) energy"
+          },
+          {
+            "label": "Exchange-correlation energy"
+          }
+        ]
+      },
+      "caption": "The four parts of the Kohn-Sham energy. Illustrative.",
+      "alt": "A four-box list: kinetic energy of the non-interacting electrons, energy in the external potential, the classical Coulomb energy, the exchange-correlation energy."
+    }
   },
   {
     "id": "q-approx-3",
@@ -726,7 +964,28 @@
     "sources": [
       "S-012",
       "S-049"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Kinetic energy of the non-interacting electrons"
+          },
+          {
+            "label": "Energy in the external potential"
+          },
+          {
+            "label": "Classical Coulomb (Hartree) energy"
+          },
+          {
+            "label": "Exchange-correlation energy"
+          }
+        ]
+      },
+      "caption": "The four parts of the Kohn-Sham energy. Illustrative.",
+      "alt": "A four-box list: kinetic energy of the non-interacting electrons, energy in the external potential, the classical Coulomb energy, the exchange-correlation energy."
+    }
   },
   {
     "id": "q-approx-4",
@@ -761,6 +1020,28 @@
     "sources": [
       "S-012",
       "S-049"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Functional A",
+            "note": "result A"
+          },
+          {
+            "label": "Functional B",
+            "note": "result B"
+          },
+          {
+            "label": "Compare",
+            "note": "agree: more confidence. Differ: investigate"
+          }
+        ],
+        "active": 2
+      },
+      "caption": "A check with a second functional. Illustrative.",
+      "alt": "A three-box flow: run with functional A, run with functional B, compare."
+    }
   }
 ]

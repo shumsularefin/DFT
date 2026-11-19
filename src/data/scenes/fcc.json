@@ -1,0 +1,13 @@
+{
+ "id": "fcc",
+ "badge": "illustrative",
+ "alt": "Face-centred cubic cell: an atom at each corner and in the middle of each face of a cube.",
+ "caption": "Face-centred cubic: the conventional cell holds 4 atoms, the picture shows 14 because boundary atoms are drawn on every face.",
+ "structure": {
+  "ref": "fcc"
+ },
+ "camera": "iso",
+ "show": {
+  "bonds": true
+ }
+}

@@ -31,7 +31,16 @@
     "level": "beginner",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "box-wave",
+      "params": {
+        "L": 5,
+        "n": 2
+      },
+      "caption": "A standing wave: a bound electron behaves like a wave.",
+      "alt": "Curve of the n = 2 wavefunction in a box, one full wave with a node at the middle."
+    }
   },
   {
     "id": "q-wave-2",
@@ -65,7 +74,13 @@
     "level": "intermediate",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "de-broglie",
+      "params": {},
+      "caption": "Wavelength against kinetic energy of an electron.",
+      "alt": "Curve of the de Broglie wavelength of an electron against its kinetic energy, falling as the energy rises."
+    }
   },
   {
     "id": "q-wave-3",
@@ -99,7 +114,15 @@
     "level": "intermediate",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "de-broglie",
+      "params": {
+        "emax": 60
+      },
+      "caption": "Wavelength against kinetic energy of an electron.",
+      "alt": "Curve of the de Broglie wavelength of an electron against its kinetic energy, falling as the energy rises."
+    }
   },
   {
     "id": "q-wave-4",
@@ -133,7 +156,16 @@
     "level": "beginner",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "hydrogen-radial",
+      "params": {
+        "n": 1,
+        "l": 0
+      },
+      "caption": "Where the electron of hydrogen is found: a cloud, not an orbit.",
+      "alt": "Curve of radial probability for the 1s electron of hydrogen against distance from the nucleus."
+    }
   },
   {
     "id": "q-wave-5",
@@ -154,7 +186,15 @@
     "sources": [
       "S-047",
       "S-031"
-    ]
+    ],
+    "visual": {
+      "plot": "de-broglie",
+      "params": {
+        "emax": 300
+      },
+      "caption": "Wavelength against kinetic energy of an electron.",
+      "alt": "Curve of the de Broglie wavelength of an electron against its kinetic energy, falling as the energy rises."
+    }
   },
   {
     "id": "q-wavefn-1",
@@ -188,7 +228,17 @@
     "level": "beginner",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "box-wave",
+      "params": {
+        "L": 5,
+        "n": 1,
+        "density": true
+      },
+      "caption": "Wavefunction (solid) and its square (dashed) for the n = 1 state in a box.",
+      "alt": "Two curves for the lowest state in a box of length 5 angstrom: the wavefunction as a solid hump and its square as a narrower dashed hump."
+    }
   },
   {
     "id": "q-wavefn-2",
@@ -222,7 +272,18 @@
     "level": "beginner",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "box-wave",
+      "params": {
+        "L": 5,
+        "n": 1,
+        "density": true,
+        "both": false
+      },
+      "caption": "The probability density of one state, over the whole box.",
+      "alt": "Filled curve of the probability density of the n = 1 state in a box, a single smooth hump over the whole box."
+    }
   },
   {
     "id": "q-wavefn-3",
@@ -256,7 +317,18 @@
     "level": "intermediate",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "box-wave",
+      "params": {
+        "L": 5,
+        "n": 1,
+        "both": true,
+        "density": true
+      },
+      "caption": "The wavefunction (solid) and minus the wavefunction (dashed), with the probability density.",
+      "alt": "Two mirror-image curves for the n = 1 state, a hump above the axis and its mirror below, with the probability density drawn as a dotted curve."
+    }
   },
   {
     "id": "q-wavefn-4",
@@ -290,7 +362,22 @@
     "level": "beginner",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "box-mix",
+      "params": {
+        "L": 5,
+        "n": 1,
+        "m": 2,
+        "w": 0.5,
+        "phases": [
+          0,
+          0.5
+        ]
+      },
+      "caption": "Density of a mix of n = 1 and n = 2 at two times.",
+      "alt": "Two curves of the probability density for an equal mix of the n = 1 and n = 2 states, at the start and a half beat later."
+    }
   },
   {
     "id": "q-wavefn-5",
@@ -324,7 +411,22 @@
     "level": "pro",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "box-mix",
+      "params": {
+        "L": 5,
+        "n": 1,
+        "m": 2,
+        "w": 0.5,
+        "phases": [
+          0,
+          0.5
+        ]
+      },
+      "caption": "Density of a mix at two times.",
+      "alt": "Two curves of the probability density for an equal mix of the n = 1 and n = 2 states at two times."
+    }
   },
   {
     "id": "q-box-1",
@@ -358,7 +460,18 @@
     "level": "beginner",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "box-levels",
+      "params": {
+        "Ls": [
+          5
+        ],
+        "nMax": 5
+      },
+      "caption": "Only these levels exist for an electron in a 5 angstrom box.",
+      "alt": "Horizontal energy levels n = 1 to 5 of an electron in a box, spaced further apart going up."
+    }
   },
   {
     "id": "q-box-2",
@@ -392,7 +505,18 @@
     "level": "beginner",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "box-levels",
+      "params": {
+        "Ls": [
+          5
+        ],
+        "nMax": 4
+      },
+      "caption": "The levels of a 5 angstrom box.",
+      "alt": "Energy levels n = 1 to 4 of a box of length 5 angstrom."
+    }
   },
   {
     "id": "q-box-3",
@@ -426,7 +550,17 @@
     "level": "beginner",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "box-wave",
+      "params": {
+        "L": 5,
+        "n": 4,
+        "nodes": false
+      },
+      "caption": "The n = 4 wavefunction in a 5 angstrom box.",
+      "alt": "Curve of the n = 4 wavefunction in a box, two humps above and two below the axis."
+    }
   },
   {
     "id": "q-box-4",
@@ -446,7 +580,16 @@
     "level": "intermediate",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "box-wave",
+      "params": {
+        "L": 5,
+        "n": 1
+      },
+      "caption": "The lowest state in a 5 angstrom box.",
+      "alt": "Curve of the n = 1 wavefunction in a box of length 5 angstrom, one hump with no node inside."
+    }
   },
   {
     "id": "q-box-5",
@@ -466,7 +609,16 @@
     "level": "intermediate",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "box-wave",
+      "params": {
+        "L": 5,
+        "n": 3
+      },
+      "caption": "The n = 3 state in a 5 angstrom box.",
+      "alt": "Curve of the n = 3 wavefunction in a box of length 5 angstrom, with two nodes inside."
+    }
   },
   {
     "id": "q-box-6",
@@ -500,7 +652,22 @@
     "level": "pro",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "box-mix",
+      "params": {
+        "L": 5,
+        "n": 1,
+        "m": 3,
+        "w": 0.5,
+        "phases": [
+          0,
+          0.5
+        ]
+      },
+      "caption": "A mix of n = 1 and n = 3 at two times.",
+      "alt": "Two curves of the probability density for a mix of the n = 1 and n = 3 states at two times."
+    }
   },
   {
     "id": "q-orb-1",
@@ -534,7 +701,33 @@
     "level": "beginner",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "orbital-slice",
+      "params": {
+        "orbitals": [
+          {
+            "l": 0,
+            "m": 0,
+            "label": "s"
+          },
+          {
+            "l": 1,
+            "m": 0,
+            "plane": "xz",
+            "label": "p"
+          },
+          {
+            "l": 2,
+            "m": 0,
+            "plane": "xz",
+            "label": "d"
+          }
+        ]
+      },
+      "caption": "Cross-sections of an s, a p and a d orbital.",
+      "alt": "Three cross-sections of orbital shapes: a circle, two lobes, and a dumbbell with a ring."
+    }
   },
   {
     "id": "q-orb-2",
@@ -568,7 +761,22 @@
     "level": "beginner",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "orbital-slice",
+      "params": {
+        "orbitals": [
+          {
+            "l": 1,
+            "m": 0,
+            "plane": "xz",
+            "label": "one p orbital"
+          }
+        ]
+      },
+      "caption": "One p orbital, cut in the x-z plane.",
+      "alt": "Two lobes of a p orbital, one filled and one hatched."
+    }
   },
   {
     "id": "q-orb-3",
@@ -602,7 +810,16 @@
     "level": "intermediate",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "hydrogen-radial",
+      "params": {
+        "n": 3,
+        "l": 2
+      },
+      "caption": "Radial probability of the 3d electron of hydrogen.",
+      "alt": "Curve of radial probability for the hydrogen 3d electron, a single smooth hump far from the nucleus."
+    }
   },
   {
     "id": "q-orb-4",
@@ -622,7 +839,16 @@
     "level": "intermediate",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "hydrogen-levels",
+      "params": {
+        "nMax": 4,
+        "mark": 2
+      },
+      "caption": "Hydrogen levels, with the n = 2 level drawn thicker.",
+      "alt": "Horizontal energy levels of hydrogen for n = 1 to 4, closer together higher up, with n = 2 thicker."
+    }
   },
   {
     "id": "q-orb-5",
@@ -656,7 +882,16 @@
     "level": "intermediate",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "hydrogen-radial",
+      "params": {
+        "n": 1,
+        "l": 0
+      },
+      "caption": "Radial probability for the 1s electron, with its highest point marked.",
+      "alt": "Curve of radial probability for the hydrogen 1s electron against distance, with a dashed line at its highest point."
+    }
   },
   {
     "id": "q-orb-6",
@@ -690,7 +925,22 @@
     "level": "beginner",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "orbital-slice",
+      "params": {
+        "orbitals": [
+          {
+            "l": 1,
+            "m": 0,
+            "plane": "xz",
+            "label": "p orbital"
+          }
+        ]
+      },
+      "caption": "A p orbital in cross-section, with two kinds of lobe: filled and hatched.",
+      "alt": "Two lobes of a p orbital, one filled and one hatched."
+    }
   },
   {
     "id": "q-spin-1",
@@ -724,7 +974,22 @@
     "level": "beginner",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "occupation",
+      "params": {
+        "orbitals": 1,
+        "filled": [
+          0
+        ],
+        "labels": [
+          "one orbital"
+        ],
+        "title": "One box is one orbital"
+      },
+      "caption": "One orbital drawn as a box with a place for an up and a down arrow.",
+      "alt": "One empty box representing one orbital."
+    }
   },
   {
     "id": "q-spin-2",
@@ -758,7 +1023,21 @@
     "level": "beginner",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "occupation",
+      "params": {
+        "filled": [
+          1
+        ],
+        "labels": [
+          "one orbital"
+        ],
+        "title": "One box is one orbital"
+      },
+      "caption": "One orbital drawn as a box.",
+      "alt": "One box representing one orbital, holding an up arrow."
+    }
   },
   {
     "id": "q-spin-3",
@@ -778,7 +1057,37 @@
     "level": "intermediate",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "occupation",
+      "params": {
+        "filled": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "labels": [
+          "3s",
+          "3p",
+          "3p",
+          "3p",
+          "3d",
+          "3d",
+          "3d",
+          "3d",
+          "3d"
+        ],
+        "title": "Orbitals of the n = 3 shell"
+      },
+      "caption": "The orbitals of the n = 3 shell, empty: one s, three p, five d.",
+      "alt": "Nine empty boxes: one labelled 3s, three labelled 3p and five labelled 3d."
+    }
   },
   {
     "id": "q-spin-4",
@@ -812,7 +1121,29 @@
     "level": "beginner",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "occupation",
+      "params": {
+        "filled": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "labels": [
+          "d",
+          "d",
+          "d",
+          "d",
+          "d"
+        ],
+        "title": "The five d orbitals"
+      },
+      "caption": "The five d orbitals, empty.",
+      "alt": "Five empty boxes, one per d orbital."
+    }
   },
   {
     "id": "q-spin-5",
@@ -847,7 +1178,25 @@
     "sources": [
       "S-047",
       "S-010"
-    ]
+    ],
+    "visual": {
+      "plot": "spin-ladders",
+      "params": {
+        "levels": 3,
+        "up": [
+          1,
+          1,
+          1
+        ],
+        "down": [
+          1,
+          0,
+          0
+        ]
+      },
+      "caption": "Separate ladders for up and down electrons. Illustrative.",
+      "alt": "Two ladders of energy levels, one for spin up and one for spin down, with different numbers of arrows."
+    }
   },
   {
     "id": "q-levels-1",
@@ -881,7 +1230,20 @@
     "level": "beginner",
     "sources": [
       "S-050"
-    ]
+    ],
+    "visual": {
+      "plot": "band-chain",
+      "params": {
+        "sizes": [
+          2,
+          4,
+          8,
+          16
+        ]
+      },
+      "caption": "Levels of chains of 2, 4, 8 and 16 sites. Toy model.",
+      "alt": "Four rows for chains of 2, 4, 8 and 16 sites, each with tick marks for the energy levels."
+    }
   },
   {
     "id": "q-levels-2",
@@ -915,7 +1277,15 @@
     "level": "beginner",
     "sources": [
       "S-050"
-    ]
+    ],
+    "visual": {
+      "plot": "band-gap",
+      "params": {
+        "labels": false
+      },
+      "caption": "Energy blocks of a toy material. Toy model.",
+      "alt": "Two blocks of energy, a lower one drawn full and an upper one empty, with a space between them."
+    }
   },
   {
     "id": "q-levels-3",
@@ -950,7 +1320,15 @@
     "sources": [
       "S-050",
       "S-036"
-    ]
+    ],
+    "visual": {
+      "plot": "band-gap",
+      "params": {
+        "labels": false
+      },
+      "caption": "Energy blocks of a toy material. Toy model.",
+      "alt": "A lower filled block and an upper empty block of energy with a space between them."
+    }
   },
   {
     "id": "q-levels-4",
@@ -984,6 +1362,14 @@
     "level": "beginner",
     "sources": [
       "S-050"
-    ]
+    ],
+    "visual": {
+      "plot": "band-gap",
+      "params": {
+        "dos": true
+      },
+      "caption": "How many levels sit at each energy. Toy model.",
+      "alt": "A histogram of the number of levels at each energy for a 48 site chain, rising toward both ends of the band."
+    }
   }
 ]

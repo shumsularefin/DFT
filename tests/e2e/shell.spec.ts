@@ -181,6 +181,10 @@ test.describe('navigation', () => {
     } else {
       await page.keyboard.press('Tab');
       await expect(
+        page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Learn' }),
+      ).toBeFocused();
+      await page.keyboard.press('Tab');
+      await expect(
         page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Handbook' }),
       ).toBeFocused();
     }
@@ -219,7 +223,7 @@ test.describe('navigation', () => {
 
   test('tools page has no links to unbuilt tools, and nav anchors resolve', async ({ page }) => {
     await page.goto('/tools/');
-    await expect(page.getByText('Coming soon')).toHaveCount(4);
+    await expect(page.getByText('Coming soon')).toHaveCount(3);
     for (const id of ['studio', 'builder', 'practice']) await expect(page.locator(`#${id}`)).toBeAttached();
   });
 
@@ -239,7 +243,17 @@ test('a visited page reloads offline', async ({ page, context }) => {
   await context.setOffline(false);
 });
 
-const PAGES = ['/', '/handbook/', TOPIC, '/about/', '/privacy/', '/references/', '/tools/', '/changelog/'];
+const PAGES = [
+  '/',
+  '/handbook/',
+  TOPIC,
+  '/about/',
+  '/privacy/',
+  '/references/',
+  '/tools/',
+  '/errors/',
+  '/changelog/',
+];
 for (const theme of ['light', 'dark'] as const) {
   test.describe(`axe, ${theme} theme`, () => {
     for (const path of PAGES) {

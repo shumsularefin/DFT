@@ -1,7 +1,8 @@
 // Tool hand-off through sessionStorage (ARCHITECTURE section 5). Payloads are validated on receipt.
 import type { Mat3, Structure, Vec3 } from './crystal/types';
 
-export type ToolId = 'tolerance-factor' | 'input-builder' | 'convergence' | 'kpath' | 'studio' | 'builder';
+export type ToolId =
+  'tolerance-factor' | 'input-builder' | 'convergence' | 'kpath' | 'studio' | 'builder' | 'magnetic';
 export const TOOL_IDS: readonly ToolId[] = [
   'tolerance-factor',
   'input-builder',
@@ -9,6 +10,7 @@ export const TOOL_IDS: readonly ToolId[] = [
   'kpath',
   'studio',
   'builder',
+  'magnetic',
 ];
 
 export interface SiteSpec {
@@ -22,7 +24,7 @@ export interface SiteSpec {
 }
 
 export type Handoff =
-  | { v: 1; kind: 'structure'; from: ToolId; structure: Structure; label?: string }
+  | { v: 1; kind: 'structure'; from: ToolId; structure: Structure; label?: string; magmom?: string }
   | { v: 1; kind: 'composition'; from: ToolId; a: SiteSpec; b: SiteSpec; x: SiteSpec; label?: string }
   | { v: 1; kind: 'molecule'; from: ToolId; xyz: string; smiles?: string };
 
@@ -88,7 +90,9 @@ export function validateHandoff(x: unknown): Handoff | null {
   if (x.label !== undefined && !isStr(x.label)) return null;
   switch (x.kind) {
     case 'structure':
-      return isStructure(x.structure) ? (x as unknown as Handoff) : null;
+      return isStructure(x.structure) && (x.magmom === undefined || isStr(x.magmom))
+        ? (x as unknown as Handoff)
+        : null;
     case 'composition':
       return isSite(x.a) && isSite(x.b) && isSite(x.x) ? (x as unknown as Handoff) : null;
     case 'molecule':

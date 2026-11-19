@@ -88,6 +88,18 @@ Authored in `src/data/questions/module-NN.json`. M6.1 formalizes the schema with
 
 `type` is `single`, `multi`, `numeric` (with `answer` and `tolerance` instead of `options`) or `order`. `difficulty` is a logit prior (0 is average; -2 easy; +2 hard). Four or more questions per concept. Every option has a `why`; a wrong option's `why` says why it is tempting. No trick questions, no timers that punish.
 
+### Every question has a picture (M12.3)
+
+Every question needs a `visual` (exactly one of `scene`, `plot`, `none`). The picture gives context, never the answer: write a neutral caption ("The n = 4 wavefunction in a 5 angstrom box", not "with its three nodes marked"), and do not draw the thing the question asks you to count or compare. Examples:
+
+```json
+"visual": { "plot": "box-wave", "params": { "L": 5, "n": 4, "nodes": false },
+  "caption": "The n = 4 wavefunction in a 5 angstrom box.",
+  "alt": "Curve of the n = 4 wavefunction in a box, two humps above and two below the axis." }
+```
+
+`scene` takes a preset id from `src/data/scenes` (with optional `overrides`). `none` needs a `reason` of at least 20 characters and is only for questions about using the site, where a picture would restate the answer. The linter lists every exemption and the build fails on an unknown preset or plot id. Plot ids are in `PLOT_IDS` in `scripts/lint-questions.mjs`.
+
 ## 8. Citing
 
 `<Cite id="S-010" />` renders a numbered reference and links to `/references/#S-010`. Cite the specific page or section where possible. Add new sources to `docs/SCIENCE_SOURCES.md` with an honest status.

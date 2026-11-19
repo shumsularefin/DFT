@@ -1,0 +1,53 @@
+{
+ "id": "perovskite-octahedra",
+ "badge": "illustrative",
+ "alt": "Cubic perovskite SrTiO3: a titanium atom at the cell centre inside an octahedron of six oxygen atoms, strontium at the corners.",
+ "caption": "Cubic perovskite SrTiO3: the TiO6 octahedron is the building block that tilts and distorts in real perovskites.",
+ "structure": {
+  "ref": "perovskite"
+ },
+ "camera": "iso",
+ "show": {
+  "bonds": false
+ },
+ "steps": [
+  {
+   "title": "The cell",
+   "text": "One strontium, one titanium and three oxygen atoms in a cubic cell."
+  },
+  {
+   "title": "Six oxygens around titanium",
+   "text": "Join the six nearest oxygen atoms and a cage appears.",
+   "show": {
+    "polyhedra": {
+     "centre": [
+      "Ti"
+     ],
+     "ligand": [
+      "O"
+     ],
+     "cutoffA": 2.3
+    }
+   },
+   "highlight": [
+    1
+   ]
+  },
+  {
+   "title": "Look down the c axis",
+   "text": "From above the octahedron is a square; tilts in real perovskites show up here.",
+   "show": {
+    "polyhedra": {
+     "centre": [
+      "Ti"
+     ],
+     "ligand": [
+      "O"
+     ],
+     "cutoffA": 2.3
+    }
+   },
+   "camera": "c"
+  }
+ ]
+}

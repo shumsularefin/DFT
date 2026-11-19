@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import MagneticTool from '../../components/tools/magnetic/MagneticTool';
+---
+
+<BaseLayout
+  title="Magnetic configuration tool"
+  description="Build ferromagnetic and antiferromagnetic orderings (A, C, G, rock-salt II, custom) for your cell and download POSCAR, MAGMOM and INCAR files for VASP. Runs in your browser."
+  pageClass="tool"
+>
+  <div class="container">
+    <h1>Magnetic configuration tool</h1>
+    <p>
+      Give a cell, pick an ordering, and get the supercell, the up and down arrows, and the POSCAR, MAGMOM and
+      INCAR lines for each configuration. Collinear orderings only. Nothing leaves your browser.
+    </p>
+    <MagneticTool client:load />
+  </div>
+</BaseLayout>

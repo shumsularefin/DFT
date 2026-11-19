@@ -6,6 +6,7 @@ import Why from '../../../components/handbook/Why.astro';
 import Intuition from '../../../components/handbook/Intuition.astro';
 import Lab from '../../../components/handbook/Lab.astro';
 import TheMath from '../../../components/handbook/TheMath.astro';
+import TagVisual from '../../../components/handbook/TagVisual.astro';
 import InVasp from '../../../components/handbook/InVasp.astro';
 import WhatChanges from '../../../components/handbook/WhatChanges.astro';
 import Mistakes from '../../../components/handbook/Mistakes.astro';
@@ -18,6 +19,8 @@ import VaspFile from '../../../components/handbook/VaspFile.astro';
 import VaspFileExplorer from '../../../components/handbook/VaspFileExplorer.astro';
 import PseudopotentialHeader from '../../../components/handbook/PseudopotentialHeader.astro';
 import Callout from '../../../components/ui/Callout.astro';
+import ErrorFinder from '../../../components/handbook/ErrorFinder.astro';
+import Scene from '../../../components/scene/Scene.astro';
 import { citeOrder, levelNotes, presentSections, splitId, topicPageClass } from '../../../lib/topic';
 import { moduleName } from '../../../lib/site';
 
@@ -33,6 +36,7 @@ const { entry } = Astro.props;
 const { Content } = await render(entry);
 const body = entry.body ?? '';
 Astro.locals.cites = citeOrder(body);
+Astro.locals.topic = { id: entry.id, concepts: entry.data.concepts };
 const sections = presentSections(body);
 const components = {
   Why,
@@ -51,6 +55,9 @@ const components = {
   VaspFileExplorer,
   PseudopotentialHeader,
   Callout,
+  Scene,
+  TagVisual,
+  ErrorFinder,
 };
 const statusLabel = { draft: 'Draft', review: 'Awaiting verification', verified: 'Verified' }[
   entry.data.status
@@ -127,6 +134,19 @@ const statusLabel = { draft: 'Draft', review: 'Awaiting verification', verified:
   }
   .prose math[display='block'] {
     margin-block: var(--space-4);
+  }
+  /* Tables of facts must wrap, not scroll sideways, at 360 px (M7.3). */
+  .prose table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .prose th,
+  .prose td {
+    overflow-wrap: anywhere;
+    text-align: left;
+    vertical-align: top;
+    padding: var(--space-1) var(--space-2);
+    border-bottom: 1px solid var(--border);
   }
   .cite-list {
     padding-left: var(--space-5);

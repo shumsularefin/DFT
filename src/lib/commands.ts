@@ -48,6 +48,8 @@ export const SLASH_ROUTES: Record<string, string> = {
   kpath: '/tools/kpath/',
   converge: '/tools/convergence/',
   magnetic: '/tools/magnetic/',
+  practice: '/practice/',
+  progress: '/progress/',
 };
 
 const norm = (s: string) => s.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '');

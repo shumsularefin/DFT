@@ -1,0 +1,129 @@
+---
+id: why-converge
+title: Why you must test convergence
+module: 8
+order: 1
+summary: What a convergence test is, what converges and what does not, the 1 meV per atom rule of thumb, and why you report both settings with a result.
+concepts: [convergence-testing]
+requires: [cutoff-energy, k-points, output-files]
+vaspTags: [ENCUT, KPOINTS]
+sources: [S-019, S-041, S-042]
+noLab: true
+status: draft
+updated: 2026-11-19
+---
+
+<Why>
+
+A DFT calculation has settings that are not physics: the number of plane waves (`ENCUT`), the number of <Term id="k-point">k-points</Term>, how tightly the electrons must settle (`EDIFF`). Each one is an approximation you chose. If you pick them too loosely, the answer is wrong and the output does not warn you. If you pick them too tightly, you waste hours. A <Term id="convergence">convergence</Term> test is how you find the cheapest setting that is still good enough <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+Think of measuring a table with a ruler. A ruler marked in metres is too coarse; one marked in millimetres is fine; one marked in micrometres gives you digits that do not matter for a table. A convergence test is the step of finding which ruler is enough.
+
+You run the same calculation several times, changing **one** setting each time, and watch the quantity you care about. At first it moves a lot. Then it settles. The place where it stops moving by more than you can accept is the setting to use <Cite id="S-041" />.
+
+<Callout variant="note" title="Rule of thumb">
+
+The author's rule: pick the smallest setting where the energy per atom changes by less than about **1 meV** from the next setting up <Cite id="S-042" />. This is a rule of thumb, not a law. Tighter work (for example small energy differences between structures) can need a stricter one.
+
+</Callout>
+
+**What converges and what does not.**
+
+- The total energy with respect to `ENCUT` and the k-mesh **does** converge as you raise them.
+- Stress and pressure converge more slowly than energy, so a cell relaxation needs a higher `ENCUT` than a fixed-cell energy <Cite id="S-040" />.
+- A **difference** between two energies (two structures, two magnetic orders) often converges sooner than either total energy, because errors partly cancel. Test the quantity you will report.
+- Your **physical model** (the functional, `U`, the pseudopotential) does not converge. Raising `ENCUT` will never turn PBE into a better functional. Convergence removes numerical error only.
+
+</Intuition>
+
+<TheMath>
+
+<Level min="intermediate">
+
+For a plane-wave basis the total energy is variational at fixed volume: adding plane waves can only lower it, so the energy approaches its limit from above as `ENCUT` rises <Cite id="S-040" />. For the k-mesh there is no such guarantee. The energy can move up and down as the mesh changes, especially for a metal where the Fermi surface cuts through the mesh, so one smooth step is not proof of convergence. Look at two or three steps in a row.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+The recipe is the same for every setting <Cite id="S-042" />:
+
+1. Start from the unrelaxed structure (the one you built), with the real `POTCAR` and the settings you plan to use.
+2. Change only one thing: `ENCUT` while the k-mesh stays fixed, then the k-mesh while `ENCUT` stays fixed.
+3. Run static calculations (`NSW = 0`). The site's input builder writes one folder per value with the **convergence** preset.
+4. Read the energy from `OSZICAR` or `OUTCAR` and divide by the number of atoms.
+5. Plot it, or paste it into the convergence plotter.
+
+<VaspFile
+  name="INCAR"
+  code={`PREC   = Accurate
+ENCUT  = 520
+EDIFF  = 1E-6
+ALGO   = Normal
+NELM   = 200
+ISMEAR = 0
+SIGMA  = 0.05
+LREAL  = .FALSE.
+NSW    = 0`}
+  annotations={{
+    2: 'the value being tested; change only this line from run to run',
+    3: 'tight enough that electronic noise does not hide the trend',
+    9: 'a single static run per value',
+  }}
+/>
+
+Always **report both settings** with a result, for example "ENCUT 520 eV, 8x8x8 Gamma-centred mesh". A reader cannot judge a number without them.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                                  | ...the energy per atom...           | ...and the cost...       |
+| ------------------------------------------ | ----------------------------------- | ------------------------ |
+| Raise `ENCUT`                              | Falls toward a limit                | Grows quickly            |
+| Refine the k-mesh                          | Settles, sometimes with wiggles     | Grows with the mesh size |
+| Change both at once                        | Cannot tell which one mattered      | Wasted runs              |
+| Test on a relaxed structure at one setting | May hide that the settings disagree | Hard to repeat           |
+
+Why test on the unrelaxed structure: so the same input can be rerun. Why change one thing: so the cause is clear. What happens if you skip the test: you cannot tell numerical error from physics.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Changing ENCUT and the k-mesh together">
+
+If the energy moves you do not know which setting moved it. Keep one fixed while you scan the other <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Comparing total energies from different ENCUT values">
+
+Total energies are only comparable at the same `ENCUT`, the same pseudopotentials and the same mesh. Use one setting for every run you compare.
+
+</Callout>
+
+<Callout variant="mistake" title="Converging once and never again">
+
+A new structure, a new element or a new quantity (stress, band gap) can need a new test. Re-check when the system changes.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-cv-1', 'q-cv-2', 'q-cv-3', 'q-cv-4']} />
+
+<GoDeeper>
+
+- The Workflow Handbook convergence step and its 1 meV per atom rule <Cite id="S-042" />.
+- The Field Handbook k-mesh and entropy notes <Cite id="S-041" />.
+- VASP wiki pages ENCUT and KPOINTS <Cite id="S-019" />.
+- Francis and Payne on finite basis set corrections <Cite id="S-040" />.
+
+</GoDeeper>

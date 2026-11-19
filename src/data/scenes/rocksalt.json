@@ -1,0 +1,21 @@
+{
+ "id": "rocksalt",
+ "badge": "illustrative",
+ "alt": "Rock-salt structure: sodium and chlorine atoms alternate on a cubic grid, each with six neighbours of the other kind.",
+ "caption": "Rock salt (NaCl): every atom has six neighbours of the other element, drawn as an octahedron around Na.",
+ "structure": {
+  "ref": "rocksalt"
+ },
+ "camera": "iso",
+ "show": {
+  "polyhedra": {
+   "centre": [
+    "Na"
+   ],
+   "ligand": [
+    "Cl"
+   ],
+   "cutoffA": 3.0
+  }
+ }
+}

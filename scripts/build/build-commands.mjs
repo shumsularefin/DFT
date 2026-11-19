@@ -31,11 +31,19 @@ export const PAGES = [
     ['kpath', 'bands', 'bandstructure', 'hpkot', 'zone'],
   ],
   [
+    '/tools/magnetic/',
+    'Magnetic configuration tool',
+    'Tools',
+    ['magnetic', 'magmom', 'antiferromagnetic', 'ferromagnetic', 'spin', 'ordering'],
+  ],
+  [
     '/tools/eos/',
     'Equation of state fit',
     'Tools',
     ['eos', 'birch', 'murnaghan', 'bulk', 'modulus', 'lattice', 'volume'],
   ],
+  ['/practice/', 'Practice', 'Pages', ['quiz', 'questions', 'review', 'flashcards', 'spaced']],
+  ['/progress/', 'Your progress', 'Pages', ['mastery', 'map', 'streak', 'export', 'reset', 'data']],
 ];
 
 /** Reads `key: value` lines from the front matter block of an MDX file. Enough for id, title, module. */

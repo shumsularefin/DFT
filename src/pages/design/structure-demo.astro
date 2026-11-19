@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FileExplorer from '../../components/labs/FileExplorer';
+const nacl = `Rock salt NaCl (illustrative cell for the demo)
+1.0
+5.64 0 0
+0 5.64 0
+0 0 5.64
+Na Cl
+4 4
+Direct
+0 0 0
+0.5 0.5 0
+0.5 0 0.5
+0 0.5 0.5
+0.5 0 0
+0 0.5 0
+0 0 0.5
+0.5 0.5 0.5
+`;
+const cu = `Cu
+1.0
+3.61 0 0
+0 3.61 0
+0 0 3.61
+Cu
+1
+Direct
+0 0 0
+`;
+---
+
+<BaseLayout
+  title="Structure view demo"
+  description="Demo of the structure view beside a POSCAR. Not indexed."
+  pageClass="island"
+>
+  <div class="container">
+    <h1>Structure view demo</h1>
+    <p>Two POSCAR files, each with its own structure view. It is not indexed.</p>
+    <h2>Rock salt</h2>
+    <FileExplorer client:load kind="POSCAR" text={nacl} view />
+    <h2>Copper</h2>
+    <FileExplorer client:load kind="POSCAR" text={cu} view />
+  </div>
+</BaseLayout>

@@ -1,0 +1,109 @@
+---
+id: pseudopotentials-and-paw
+title: Pseudopotentials and PAW
+module: 5
+order: 3
+summary: Why the core electrons are replaced by a smooth stand-in, what the PAW method adds back, and what that means for the POTCAR files you choose.
+concepts: [pseudopotentials, paw-method]
+requires: [plane-waves]
+vaspTags: [ENCUT, LASPH]
+sources: [S-008, S-009, S-019, S-041, S-042, S-049]
+status: draft
+updated: 2026-11-19
+---
+
+<Why>
+
+Near a nucleus a valence wavefunction wiggles fast, because it has to stay different from the tightly bound core orbitals. A plane-wave basis would need a huge number of short waves to follow those wiggles, and the core electrons themselves hardly take part in bonding. So the calculation keeps only the valence electrons and replaces the nucleus plus core by a smoother stand-in. This is the single biggest saving in a plane-wave code, and the choice of stand-in (the `POTCAR` file) is one you make in every run <Cite id="S-049" />.
+
+</Why>
+
+<Intuition>
+
+Two ideas, one after the other.
+
+**Pseudopotential.** Outside a small sphere around each atom (radius $r_c$), the valence wavefunction is the real one. Inside the sphere it is replaced by a smooth function with no nodes that joins on at $r_c$. Smooth means few plane waves, so the cutoff can be lower and the run is cheaper.
+
+**PAW (projector augmented wave).** A plain pseudopotential throws the true wiggles away. PAW keeps track of them: the plane-wave part is the smooth function, and inside each sphere the difference between the true function and the smooth one is added back as a correction <Cite id="S-008" /> <Cite id="S-009" />. VASP uses PAW datasets, which is why its files are called `POTCAR` datasets <Cite id="S-042" />.
+
+The lab draws both curves. They are invented shapes, not data for any atom. Move $r_c$: the all-electron-like curve always matches the smooth one outside the sphere and wiggles (has nodes) inside, while the smooth curve never does.
+
+<Level min="intermediate">
+
+A larger $r_c$ gives a smoother function and a lower cutoff, but two atoms whose spheres overlap are then described less well. A smaller $r_c$ is harder (needs more plane waves) and can be more transferable. The `POTCAR` recommends a minimum cutoff, `ENMAX`, which sets the default `ENCUT` (previous page). Which dataset to pick for an element is a transferability and cost choice: the author's workflow takes the recommended sets from VASPkit task 103 and warns against using `_GW` or `_h` sets without a reason <Cite id="S-042" />.
+
+</Level>
+
+</Intuition>
+
+<Lab id="paw-picture" title="The PAW picture" />
+
+<TheMath>
+
+The lab plots a smooth function $\tilde\phi(r) = r\,e^{-r/1.2}$ and an all-electron-like function $\phi(r) = \tilde\phi(r)\,[1 + A\,w(r)\cos(2\pi\,n_w\,r/r_c)]$, with a window $w(r) = (1 - (r/r_c)^2)^2$ inside $r_c$ and $0$ outside. Both are invented for the picture: they show the idea (equal outside $r_c$, nodes inside) and nothing quantitative. The code checks exactly these properties: the two agree at and beyond $r_c$, the smooth one has no nodes, the all-electron-like one has nodes only inside $r_c$.
+
+In PAW the all-electron wavefunction is written as the smooth one plus a sum over atoms of one-centre terms, $|\psi\rangle = |\tilde\psi\rangle + \sum_{a,i}\big(|\phi_i^a\rangle - |\tilde\phi_i^a\rangle\big)\langle \tilde p_i^a|\tilde\psi\rangle$, with projectors $\tilde p_i^a$ that pick out the part of $\tilde\psi$ inside sphere $a$ <Cite id="S-008" />. The lab's "augmentation" curve is the schematic version of the bracket.
+
+<Level min="pro">
+
+Because the correction is made inside the spheres with spherical expansions, non-spherical terms of the density and potential inside the spheres are optional. That is what `LASPH` switches on: the card for it says it is recommended for d and f elements, for +U and for hybrids, and required for meta-GGA <Cite id="S-042" />.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+- `POTCAR` holds the dataset for each species. Concatenate them in the same order as the species in `POSCAR`. Never mix LDA and PBE files: the file records the functional it was made for (PE for PBE) <Cite id="S-042" />.
+- Read what a `POTCAR` says without opening it for sharing: `grep TITEL POTCAR` (which datasets, in which order), `grep ENMAX POTCAR` (recommended cutoff per species; take the largest, times 1.3 for runs that change the cell), `grep ZVAL POTCAR` (valence electrons) <Cite id="S-042" />.
+- Never commit or share `POTCAR` content: it is licensed. This site never shows or generates it.
+- `ZVAL` is the number of valence electrons the dataset carries. The total number of electrons in a run is the sum over atoms, and `NBANDS` follows from it.
+- `LASPH = .TRUE.` for d and f elements, +U, hybrids and meta-GGA <Cite id="S-042" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...                   | ...in the picture                             | ...in VASP                                                            |
+| ---------------------------------- | --------------------------------------------- | --------------------------------------------------------------------- |
+| A larger r_c                       | Smoother curve, nodes cover more of the range | Softer dataset: lower `ENMAX`, but less accurate when atoms are close |
+| A smaller r_c                      | Wiggles squeezed near the nucleus             | Harder dataset: higher `ENMAX`, more plane waves                      |
+| A different dataset for an element | Not shown                                     | Different `ENMAX`, `ZVAL`, accuracy and cost; re-test the cutoff      |
+| Mixing LDA and PBE files           | Not shown                                     | A calculation that is neither functional                              |
+
+Why replace the core: the true wiggles are expensive and the core hardly bonds. Why this dataset: the recommended one, unless you have a reason. What happens if you get it wrong: wrong electron count, wrong order of species, or a functional mismatch.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Wrong order of POTCAR files">
+
+The files must follow the species order in `POSCAR`. A swapped order puts the wrong dataset on each atom without an error. Check with `grep TITEL POTCAR`.
+
+</Callout>
+
+<Callout variant="mistake" title="Thinking the pseudo function is the true wavefunction">
+
+Inside the sphere it is not. Only outside $r_c$ is it the real thing. PAW exists to recover what is inside.
+
+</Callout>
+
+<Callout variant="mistake" title="Taking the lab curves as real data">
+
+They are schematic shapes with made-up units.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-pp-1', 'q-pp-2', 'q-pp-3', 'q-paw-1', 'q-paw-2', 'q-paw-3']} />
+
+<GoDeeper>
+
+- Blochl, the original PAW paper <Cite id="S-008" />.
+- Kresse and Joubert, PAW as implemented in VASP <Cite id="S-009" />.
+- Martin, chapter on pseudopotentials <Cite id="S-049" />.
+- VASP wiki pages POTCAR, ENCUT and LASPH (by page name) <Cite id="S-019" />.
+
+</GoDeeper>

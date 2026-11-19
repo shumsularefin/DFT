@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Lazy3D, { type SceneModule } from '../../labs/Lazy3D';
 import SolidFallback, { type FlatPoint } from '../../labs/SolidFallback';
 import { analyzeResultToPath } from '../../labs/bzPath';
+import StructureView from '../../structure/StructureView';
 import Slider from '../../ui/Slider';
 import Toggle from '../../ui/Toggle';
 import {
@@ -439,6 +440,14 @@ export default function KPathTool() {
             Space group {sym.hmSymbol} (number {sym.number}), Pearson symbol {sym.pearson}. The k-path below
             is for the standardized primitive cell, so use that cell as your POSCAR for the band run.
           </p>
+        </section>
+      )}
+
+      {std && sym && (
+        <section aria-labelledby="kp-real" className="kp-card">
+          <h2 id="kp-real">Your cell in real space</h2>
+          <p>The standardized primitive cell the path below belongs to, drawn from the atoms.</p>
+          <StructureView structure={sym.primStdCell} label="the standardized primitive cell" id="kp-sv" />
         </section>
       )}
 

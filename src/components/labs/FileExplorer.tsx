@@ -1,5 +1,9 @@
 import { useId, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { annotate, mergeAnnotations, type Annotation, type FileKind } from '../../lib/vasp/annotate';
+import StructureView from '../structure/StructureView';
+import { parsePoscar } from '../../lib/crystal/poscar';
+import { poscarAtomLines } from '../../lib/vasp/poscarLines';
+import { parseIncar } from '../../lib/vasp/incar';
 import TagCard from '../tools/input-builder/TagCard';
 import { useLevel } from '../tools/input-builder/hooks';
 import '../tools/input-builder/input-builder.css';
@@ -10,10 +14,12 @@ interface Props {
   text: string;
   /** Extra or replacement annotations; they win over the defaults on the same line. */
   annotations?: Annotation[];
+  /** POSCAR only: also show the structure; focusing an atom line highlights the atom and the reverse. */
+  view?: boolean;
 }
 
 /** Shows a VASP file; each annotated line is a button that opens an explanation at the reader's level. */
-export default function FileExplorer({ kind, text, annotations }: Props) {
+export default function FileExplorer({ kind, text, annotations, view = false }: Props) {
   const level = useLevel();
   const panelId = useId();
   const [open, setOpen] = useState<number | null>(null);
@@ -27,6 +33,28 @@ export default function FileExplorer({ kind, text, annotations }: Props) {
     return m;
   }, [notes]);
   const order = useMemo(() => [...byLine.keys()].sort((a, b) => a - b), [byLine]);
+
+  const incar = useMemo(() => {
+    if (kind !== 'INCAR') return undefined;
+    try {
+      return Object.fromEntries(parseIncar(text).entries.map((e) => [e.name, e.value]));
+    } catch {
+      return undefined;
+    }
+  }, [kind, text]);
+
+  const [atom, setAtom] = useState<number | null>(null);
+  const structure = useMemo(() => {
+    if (!view || kind !== 'POSCAR') return null;
+    try {
+      return parsePoscar(text).structure;
+    } catch {
+      return null;
+    }
+  }, [view, kind, text]);
+  const atomLines = useMemo(() => (structure ? poscarAtomLines(text) : []), [structure, text]);
+  const atomOfLine = useMemo(() => new Map(atomLines.map((l, i) => [l, i])), [atomLines]);
+  const showView = structure !== null && atomLines.length === structure.species.length;
 
   const move = (to: number) => {
     const target = order[Math.max(0, Math.min(order.length - 1, to))];
@@ -61,6 +89,21 @@ export default function FileExplorer({ kind, text, annotations }: Props) {
 
   return (
     <div className="fx">
+      {showView && structure && (
+        <StructureView
+          structure={structure}
+          label="this POSCAR"
+          id={`fx-sv-${panelId.replace(/[^a-zA-Z0-9]/g, '')}`}
+          selected={atom}
+          onSelect={(i) => {
+            setAtom(i);
+            if (i !== null) {
+              const line = atomLines[i];
+              if (line !== undefined) refs.current.get(line)?.scrollIntoView?.({ block: 'nearest' });
+            }
+          }}
+        />
+      )}
       <figure className="fx-file" style={{ margin: 0 }}>
         <figcaption className="fx-name">{kind}</figcaption>
         <ol className="fx-lines" aria-label={`${kind} lines`}>
@@ -76,6 +119,10 @@ export default function FileExplorer({ kind, text, annotations }: Props) {
                     ref={(el) => {
                       if (el) refs.current.set(n, el);
                       else refs.current.delete(n);
+                    }}
+                    data-atom-line={atomOfLine.has(n) && atom === atomOfLine.get(n) ? 'true' : undefined}
+                    onFocus={() => {
+                      if (showView && atomOfLine.has(n)) setAtom(atomOfLine.get(n)!);
                     }}
                     aria-expanded={open === n}
                     aria-controls={panelId}
@@ -139,7 +186,13 @@ export default function FileExplorer({ kind, text, annotations }: Props) {
                 {a.tag && a.known && (
                   <details onToggle={() => setTag(a.tag!)}>
                     <summary>Full tag card for {a.tag}</summary>
-                    <TagCard name={tag ?? a.tag} level={level} onSelect={setTag} />
+                    <TagCard
+                      name={tag ?? a.tag}
+                      level={level}
+                      onSelect={setTag}
+                      value={incar?.[tag ?? a.tag]}
+                      incar={incar}
+                    />
                   </details>
                 )}
               </div>

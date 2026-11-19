@@ -1,0 +1,112 @@
+---
+id: functionals
+title: Choosing a functional
+module: 5
+order: 4
+summary: The ladder of exchange-correlation approximations, what each rung adds and costs, and which VASP tags switch on meta-GGA and hybrid functionals.
+concepts: [functionals, hybrid-functionals]
+requires: [exchange-correlation-term]
+vaspTags: [METAGGA, LHFCALC, HFSCREEN, AEXX, LASPH]
+sources: [S-013, S-025, S-026, S-027, S-042, S-046, S-049]
+status: draft
+updated: 2026-11-19
+---
+
+<Why>
+
+Kohn-Sham DFT is exact in principle, but the exchange-correlation functional is not known, so every calculation uses an approximation. The choice sets which properties come out well (lattice constants, band gaps, magnetic energies) and how long the run takes. A wrong match, such as a plain GGA for a band gap, is a common reason a calculation disagrees with experiment even though everything else is converged <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+Think of a ladder. Each rung uses more information about the electrons, and costs more <Cite id="S-046" />:
+
+1. **LDA** uses only the density at each point.
+2. **GGA** (PBE is the common one <Cite id="S-013" />) also uses how fast the density changes.
+3. **Meta-GGA** (SCAN, r2SCAN <Cite id="S-026" />) also uses the kinetic-energy density of the orbitals.
+4. **Hybrid** (HSE06, PBE0 <Cite id="S-025" />) mixes in a fraction of exact exchange. It often improves band gaps and is much more expensive.
+5. **Beyond** (using the empty orbitals as well) is the most expensive rung.
+
+Higher is not automatically better for every property. The lab lets you pick a rung and shows what it adds, what it costs and which tags switch it on. The only numbers on the page come from the author's handbook: compared with experiment, PBE tends to overestimate lattice constants by about 1 to 2 percent and LDA to underestimate them by about 1 to 2 percent, with PBEsol and r2SCAN closer. Deviations above about 3 percent suggest a wrong magnetic state, missing van der Waals or a wrong POTCAR <Cite id="S-042" />. These are rules of thumb.
+
+<Level min="intermediate">
+
+The author's protocol works at the PBE level and treats the rest as a change of functional followed by repeating the relevant calculation: DFT+U (`LDAU`), meta-GGA (`METAGGA`: r2SCAN, SCAN or mBJ) or HSE06 (`LHFCALC`) <Cite id="S-042" />. The modified Becke-Johnson (mBJ) potential is aimed at band gaps of semiconductors and insulators <Cite id="S-027" />.
+
+</Level>
+
+</Intuition>
+
+<Lab id="functional-ladder" title="Jacob's ladder of functionals" />
+
+<TheMath>
+
+The exchange-correlation energy is a functional of the density, $E_{xc}[n]$. The rungs differ in what it may depend on:
+
+| Rung     | Depends on                                                   |
+| -------- | ------------------------------------------------------------ |
+| LDA      | $n(\mathbf r)$                                               |
+| GGA      | $n(\mathbf r)$ and $\lvert\nabla n(\mathbf r)\rvert$         |
+| Meta-GGA | adds the kinetic-energy density $\tau(\mathbf r)$            |
+| Hybrid   | adds a fraction of exact exchange from the occupied orbitals |
+
+A hybrid replaces part of the semilocal exchange by Hartree-Fock exchange, $E_x = E_x^{\text{semilocal}} + a\,(E_x^{\text{HF}} - E_x^{\text{semilocal}})$ with a fraction $a$ (0.25 in the common hybrids). HSE06 applies the exact part only at short range <Cite id="S-025" />. This is the structure only; no numerical constants of the functionals are reproduced here <Cite id="S-049" />.
+
+</TheMath>
+
+<InVasp>
+
+- LDA and GGA are set by the `POTCAR` family: PBE files carry the PBE functional (PE).
+- Meta-GGA: `METAGGA = R2SCAN` (or `SCAN`, `MBJ`). Remove any `GGA` tag. It needs `LASPH = .TRUE.` and a `POTCAR` that supports it; `LMIXTAU = .TRUE.` can stabilise the SCF <Cite id="S-042" />.
+- Hybrid: `LHFCALC = .TRUE.`, `HFSCREEN = 0.2` with `AEXX = 0.25` is HSE06; `HFSCREEN = 0` with `AEXX = 0.25` is PBE0. `AEXX` can be tuned to reproduce a known gap; report it if you do <Cite id="S-042" />.
+- Hybrid runs are far more expensive. `PRECFOCK = Fast` and `NKRED = 2` cut the cost several-fold; check that the gap changes by less than about 0.05 eV. `ICHARG = 11` does not work with hybrids <Cite id="S-042" />.
+- Changing the functional means repeating the calculations that depend on it, with the same `ENCUT`, `ISPIN`, `MAGMOM`, `LMAXMIX` and any `LDAU` tags <Cite id="S-042" />.
+- Defaults for `LHFCALC`, `HFSCREEN` and `METAGGA` are not stated in the handbooks: check the VASP wiki <Cite id="S-019" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...   | ...in the lab                   | ...in VASP                                                        |
+| ------------------ | ------------------------------- | ----------------------------------------------------------------- |
+| Up one rung        | More ingredients, higher cost   | More expensive run; sometimes a better property, never guaranteed |
+| PBE to a hybrid    | Adds exact exchange             | `LHFCALC` on, much more time, often a larger gap                  |
+| PBE to r2SCAN      | Adds the kinetic-energy density | `METAGGA`, `LASPH`, no `GGA` tag                                  |
+| A different `AEXX` | Not shown                       | A different functional from the one you report                    |
+
+Why pick a functional on purpose: it limits the accuracy of the answer no matter how well converged the rest is. Why this value: match the functional to the property. What happens if you get it wrong: gaps and energies that disagree with experiment for a reason no convergence test will find.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Quoting a PBE band gap as if it were the real gap">
+
+Semilocal functionals tend to underestimate gaps. Use a hybrid or mBJ when the gap matters, and say which you used.
+
+</Callout>
+
+<Callout variant="mistake" title="Assuming a higher rung is always better">
+
+The ladder adds ingredients and cost. Whether the answer improves depends on the property and the material.
+
+</Callout>
+
+<Callout variant="mistake" title="Changing the functional but not the inputs that must match">
+
+An `ICHARG = 11` run inherits its physics from the `CHGCAR`: the functional, `ENCUT`, `ISPIN`, `MAGMOM`, `LMAXMIX` and `LDAU` tags must match the run that wrote it <Cite id="S-042" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-func-1', 'q-func-2', 'q-func-3', 'q-hyb-1', 'q-hyb-2', 'q-hyb-3']} />
+
+<GoDeeper>
+
+- Perdew and Schmidt, the ladder <Cite id="S-046" />.
+- PBE <Cite id="S-013" />, HSE06 <Cite id="S-025" />, SCAN and r2SCAN <Cite id="S-026" />, mBJ <Cite id="S-027" />.
+- VASP wiki pages METAGGA, LHFCALC, HFSCREEN, AEXX (by page name) <Cite id="S-019" />.
+
+</GoDeeper>

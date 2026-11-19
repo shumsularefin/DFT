@@ -1,0 +1,13 @@
+{
+ "id": "diamond",
+ "badge": "illustrative",
+ "alt": "Diamond cubic cell: each atom bonded to four neighbours at the corners of a tetrahedron.",
+ "caption": "Diamond structure (Si cell): every atom has four bonded neighbours.",
+ "structure": {
+  "ref": "diamond"
+ },
+ "camera": "iso",
+ "show": {
+  "bonds": true
+ }
+}

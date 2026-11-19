@@ -1,0 +1,123 @@
+---
+id: kpoint-convergence
+title: Convergence of the k-point mesh
+module: 8
+order: 3
+summary: How to test the k-mesh, why metals need more care than insulators, and how smearing and the mesh have to be tested as a pair.
+concepts: [kpoint-convergence]
+requires: [convergence-testing]
+vaspTags: [KPOINTS, KSPACING, ISMEAR, SIGMA]
+sources: [S-019, S-041, S-042]
+noLab: true
+status: draft
+updated: 2026-11-19
+---
+
+<Why>
+
+The k-mesh is the second setting you must test on every new system. A mesh that is too coarse gives wrong energies, a wrong density of states and, for metals, forces that do not settle <Cite id="S-042" />. A mesh that is finer than needed multiplies the cost for no benefit.
+
+</Why>
+
+<Intuition>
+
+A crystal has an endless number of electron states, grouped by their <Term id="k-point">k-point</Term>. VASP cannot add them all, so it adds a finite mesh and treats each point as a stand-in for its neighbours. That is fine when the electrons change slowly from point to point, as in an insulator. In a metal the occupation jumps sharply at the Fermi surface, so a coarse mesh either catches the jump or misses it, and the energy depends on which. That is why metals need a finer mesh and more careful testing <Cite id="S-041" /> <Cite id="S-050" />.
+
+<Term id="smearing">Smearing</Term> softens the jump so the sum settles faster, but it is a second
+approximation. It does not rescue a mesh that is too coarse, so test the mesh and the smearing as a pair
+<Cite id="S-041" />.
+
+</Intuition>
+
+<TheMath>
+
+<Level min="intermediate">
+
+For a metal the total energy depends on the smearing width `SIGMA` and the mesh together: the energy error from the mesh falls as the mesh is refined, while the error from smearing grows with `SIGMA` <Cite id="S-015" />. A converged calculation keeps both small. The entropy term `T*S` that VASP prints (`EENTRO` in `OUTCAR`) measures the effect of smearing, and the author's check is that `T*S` divided by the number of atoms stays below about 1 meV <Cite id="S-042" />.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+**The scan.** Run static calculations on a rising series of Gamma-centred meshes, for example 4x4x4, then 6x6x6, then 8x8x8, with `ENCUT` fixed, until the energy per atom changes by less than about 1 meV <Cite id="S-041" />.
+
+<VaspFile
+  name="KPOINTS"
+  code={`Gamma-centred 6x6x6 mesh
+0
+Gamma
+6 6 6
+0 0 0`}
+  annotations={{
+    3: 'Gamma: the mesh includes the point Gamma',
+    4: 'the number you raise from run to run',
+  }}
+/>
+
+**Resolution.** VASPKIT and the builder describe a mesh by its resolution in 2 pi per angstrom. The author lists 0.03 to 0.04 as usually enough, finer (0.02 to 0.01) for metals or accurate densities of states, and Gamma-only for large cells <Cite id="S-042" />. These are rules of thumb: the test decides.
+
+**Metals versus insulators.**
+
+| System                   | Smearing the author uses              | Mesh                            |
+| ------------------------ | ------------------------------------- | ------------------------------- |
+| Insulator, semiconductor | `ISMEAR = 0`, `SIGMA` 0.01 to 0.05 eV | Coarser usually passes the test |
+| Metal                    | `ISMEAR = 1`, `SIGMA` 0.1 to 0.2 eV   | Finer; test more carefully      |
+
+`ISMEAR = 0` with a small `SIGMA` such as 0.05 is the safe choice for anything <Cite id="S-041" /> <Cite id="S-042" />. Never use `ISMEAR = 1` for a semiconductor <Cite id="S-042" />.
+
+**Smearing test.** After the mesh looks converged, check the entropy term:
+
+<VaspFile name="shell" code={`grep EENTRO OUTCAR | tail -1`} />
+
+Divide by the number of atoms. If it is above about 1 meV, reduce `SIGMA` and test the mesh again <Cite id="S-042" />.
+
+**Tetrahedron method.** `ISMEAR = -5` needs at least four irreducible k-points; a large cell or a Gamma-only run has fewer, and VASP stops with "Tetrahedron method fails". Use `ISMEAR = 0` there <Cite id="S-041" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                        | ...then...                                          | Cost                      |
+| -------------------------------- | --------------------------------------------------- | ------------------------- |
+| Use a coarser mesh               | Energies and DOS shift, metals most of all          | Cheaper, risky            |
+| Refine the mesh                  | The energy settles; it may wiggle on the way        | Grows with the mesh size  |
+| Raise `SIGMA`                    | Energy converges faster but moves from the true one | Cheaper, biased           |
+| Use `ISMEAR = -5` on a tiny mesh | VASP stops with an error                            | None, but the run is lost |
+
+Why test on a mesh series: the right mesh depends on the cell size and on whether the material is a metal. What happens if you skip it: a result that depends on an arbitrary choice.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Treating one smooth step as proof">
+
+For a metal the energy can move up and down as the mesh changes. Check two or three steps in a row before you stop.
+
+</Callout>
+
+<Callout variant="mistake" title="Using the same mesh for a cell and its supercell">
+
+A larger real-space cell has a smaller Brillouin zone, so it needs a coarser mesh. Compare mesh density (resolution), not the numbers 4x4x4 <Cite id="S-050" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Hiding a poor mesh behind a large SIGMA">
+
+Smearing makes the energy look settled while moving it from the answer you wanted. Keep `SIGMA` small and keep the entropy term below the threshold.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-kc-1', 'q-kc-2', 'q-kc-3', 'q-kc-4']} />
+
+<GoDeeper>
+
+- The k-point topic and the smearing topic in module 5 <Cite id="S-019" />.
+- The Field Handbook k-mesh notes and the Workflow Handbook resolution table <Cite id="S-041" /> <Cite id="S-042" />.
+- VASP wiki pages KPOINTS, KSPACING, ISMEAR and SIGMA <Cite id="S-019" />.
+
+</GoDeeper>

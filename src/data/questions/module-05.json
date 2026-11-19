@@ -1,0 +1,2444 @@
+[
+  {
+    "id": "q-pw-1",
+    "concepts": [
+      "plane-waves"
+    ],
+    "type": "single",
+    "prompt": "Why do plane-wave codes like VASP describe orbitals as a sum of waves?",
+    "options": [
+      {
+        "text": "Waves of fixed wavelength form a simple, systematic basis: more waves give a better answer, and nothing depends on where the atoms are",
+        "correct": true,
+        "why": "That is the key advantage: one number, the cutoff, controls the quality for every atom type."
+      },
+      {
+        "text": "Because electrons in crystals really are free plane waves",
+        "correct": false,
+        "why": "Tempting, but the orbitals are not free waves. The waves are only a convenient set of building blocks."
+      },
+      {
+        "text": "Because plane waves need no pseudopotential",
+        "correct": false,
+        "why": "The reverse: plane waves need a smooth potential, which is why pseudopotentials are used."
+      }
+    ],
+    "hints": [
+      "Think about what is easy to improve step by step.",
+      "Ask what you change to get a more accurate answer."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-049",
+      "S-041"
+    ],
+    "visual": {
+      "plot": "pw-parabola",
+      "params": {
+        "showCutoff": false
+      },
+      "caption": "Kinetic energy of a plane wave against its wave vector.",
+      "alt": "Curve of the kinetic energy of a plane wave against its wave vector, rising as a parabola that is lowest at zero."
+    }
+  },
+  {
+    "id": "q-pw-2",
+    "concepts": [
+      "plane-waves"
+    ],
+    "type": "single",
+    "prompt": "In a plane-wave calculation, which waves are kept in the basis?",
+    "options": [
+      {
+        "text": "Those whose kinetic energy is at most the cutoff",
+        "correct": true,
+        "why": "The cutoff sets a maximum kinetic energy; every wave below it is included."
+      },
+      {
+        "text": "Those whose wavelength is exactly the cell length",
+        "correct": false,
+        "why": "Only a few waves would fit that rule, and the basis would be far too small."
+      },
+      {
+        "text": "Those that overlap an atom",
+        "correct": false,
+        "why": "The basis does not depend on atom positions; all waves under the cutoff are kept."
+      }
+    ],
+    "hints": [
+      "The cutoff is an energy.",
+      "Waves with larger wave vector have more kinetic energy."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-049",
+      "S-041"
+    ],
+    "visual": {
+      "plot": "pw-parabola",
+      "params": {
+        "cutoff": 30
+      },
+      "caption": "Kinetic energy of a plane wave against its wave vector, with a cutoff drawn as a horizontal line.",
+      "alt": "Curve of the kinetic energy of a plane wave against its wave vector, rising as a parabola that is lowest at zero. A horizontal dashed line marks a cutoff energy with vertical lines down to the wave vectors that reach it."
+    }
+  },
+  {
+    "id": "q-pw-3",
+    "concepts": [
+      "plane-waves"
+    ],
+    "type": "single",
+    "prompt": "The kinetic energy of a plane wave with wave vector k is hbar^2 k^2 / 2m. What happens to the energy if the wavelength is halved?",
+    "options": [
+      {
+        "text": "It becomes four times larger",
+        "correct": true,
+        "why": "Halving the wavelength doubles k, and the energy goes as k squared."
+      },
+      {
+        "text": "It becomes twice as large",
+        "correct": false,
+        "why": "Energy is proportional to k squared, not k."
+      },
+      {
+        "text": "It stays the same",
+        "correct": false,
+        "why": "Shorter waves are more strongly curved, so they carry more kinetic energy."
+      }
+    ],
+    "hints": [
+      "Wavelength and k are inversely related: k = 2 pi / wavelength.",
+      "Energy depends on k squared."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-049",
+      "S-047"
+    ],
+    "visual": {
+      "plot": "pw-parabola",
+      "params": {
+        "showCutoff": false
+      },
+      "caption": "Kinetic energy of a plane wave against its wave vector.",
+      "alt": "Curve of the kinetic energy of a plane wave against its wave vector, rising as a parabola that is lowest at zero."
+    }
+  },
+  {
+    "id": "q-pw-4",
+    "concepts": [
+      "plane-waves"
+    ],
+    "type": "numeric",
+    "prompt": "Using hbar^2/2m = 3.80998 eV A^2, what is the kinetic energy, in eV, of a plane wave with |k| = 4 per angstrom?",
+    "answer": 60.96,
+    "tolerance": 0.05,
+    "unit": "eV",
+    "hints": [
+      "Use E = 3.80998 times k squared.",
+      "k squared is 16."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-031",
+      "S-049"
+    ],
+    "visual": {
+      "plot": "pw-parabola",
+      "params": {
+        "showCutoff": false
+      },
+      "caption": "Kinetic energy of a plane wave against its wave vector, no values marked.",
+      "alt": "Curve of the kinetic energy of a plane wave against its wave vector, rising as a parabola that is lowest at zero."
+    }
+  },
+  {
+    "id": "q-encut-1",
+    "concepts": [
+      "cutoff-energy"
+    ],
+    "type": "single",
+    "prompt": "What does a higher ENCUT do to a calculation?",
+    "options": [
+      {
+        "text": "Includes more plane waves: the result gets more accurate and the run gets slower",
+        "correct": true,
+        "why": "It is a straight trade of cost for accuracy, until the result stops changing."
+      },
+      {
+        "text": "Makes the SCF loop converge faster",
+        "correct": false,
+        "why": "The cutoff changes the basis, not the mixing, so convergence speed is not what it controls."
+      },
+      {
+        "text": "Moves the Fermi level",
+        "correct": false,
+        "why": "The Fermi level is set by the electrons and bands, not by the size of the basis."
+      }
+    ],
+    "hints": [
+      "ENCUT is the largest kinetic energy included.",
+      "Larger set of waves means more work."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-019",
+      "S-041"
+    ],
+    "visual": {
+      "plot": "pw-count",
+      "params": {},
+      "caption": "Relative number of plane waves against cutoff energy.",
+      "alt": "Curve of the number of plane waves in the basis against the cutoff energy, rising faster than a straight line."
+    }
+  },
+  {
+    "id": "q-encut-2",
+    "concepts": [
+      "cutoff-energy"
+    ],
+    "type": "single",
+    "prompt": "If ENCUT is not set, what does VASP use?",
+    "options": [
+      {
+        "text": "The largest ENMAX among the POTCAR files",
+        "correct": true,
+        "why": "VASP reads a recommended minimum from each POTCAR and takes the largest."
+      },
+      {
+        "text": "A fixed 500 eV",
+        "correct": false,
+        "why": "There is no single universal default; it depends on the elements."
+      },
+      {
+        "text": "Zero, which means no basis",
+        "correct": false,
+        "why": "VASP always needs a cutoff; it chooses one from the POTCAR files."
+      }
+    ],
+    "hints": [
+      "The POTCAR file carries a recommendation.",
+      "With several elements, which recommendation wins?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-041"
+    ],
+    "visual": {
+      "none": "Which POTCAR sets the default is a fact about files, so a picture would only restate the answer text."
+    }
+  },
+  {
+    "id": "q-encut-3",
+    "concepts": [
+      "cutoff-energy"
+    ],
+    "type": "single",
+    "prompt": "Doubling the cutoff energy multiplies the number of plane waves by roughly how much?",
+    "options": [
+      {
+        "text": "2^(3/2), about 2.8",
+        "correct": true,
+        "why": "The number of waves grows like the volume of a sphere of radius k, so as ENCUT to the 3/2."
+      },
+      {
+        "text": "2",
+        "correct": false,
+        "why": "That would be true if the count grew in proportion to the energy; it grows faster."
+      },
+      {
+        "text": "8",
+        "correct": false,
+        "why": "That would apply to doubling the wave vector, not the energy."
+      }
+    ],
+    "hints": [
+      "Number of waves is the volume of a sphere in k space.",
+      "Radius goes as the square root of the energy."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-049"
+    ],
+    "visual": {
+      "plot": "pw-count",
+      "params": {},
+      "caption": "Relative number of plane waves against cutoff energy, no values marked.",
+      "alt": "Curve of the number of plane waves in the basis against the cutoff energy, rising faster than a straight line."
+    }
+  },
+  {
+    "id": "q-encut-4",
+    "concepts": [
+      "cutoff-energy"
+    ],
+    "type": "single",
+    "prompt": "For a run that changes the cell shape or volume, what does the author's rule recommend for ENCUT?",
+    "options": [
+      {
+        "text": "About 1.3 times the largest ENMAX",
+        "correct": true,
+        "why": "Changing the cell changes the basis, which causes Pulay stress; a higher cutoff reduces it."
+      },
+      {
+        "text": "Exactly the largest ENMAX",
+        "correct": false,
+        "why": "That is fine for fixed-cell runs, but a cell relaxation needs more."
+      },
+      {
+        "text": "Half of the largest ENMAX",
+        "correct": false,
+        "why": "Too low a cutoff makes the stress wrong, not just the energy."
+      }
+    ],
+    "hints": [
+      "A higher cutoff reduces the Pulay error.",
+      "The factor is bigger than 1."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-040",
+      "S-041",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "pw-parabola",
+      "params": {
+        "cutoff": 30
+      },
+      "caption": "Plane waves kept below a cutoff energy.",
+      "alt": "Curve of the kinetic energy of a plane wave against its wave vector, rising as a parabola that is lowest at zero. A dashed horizontal line marks the cutoff."
+    }
+  },
+  {
+    "id": "q-kp-1",
+    "concepts": [
+      "k-points",
+      "bloch-theorem"
+    ],
+    "type": "single",
+    "prompt": "What does Bloch's theorem say about an electron orbital in a perfect crystal?",
+    "options": [
+      {
+        "text": "It is a plane wave multiplied by a function that repeats with the lattice",
+        "correct": true,
+        "why": "That is why each orbital is labelled by a wave vector k plus a band number."
+      },
+      {
+        "text": "It is the same on every atom, with no variation",
+        "correct": false,
+        "why": "The repeating part can vary a lot within the cell; only its repetition is fixed."
+      },
+      {
+        "text": "It is localized on a single atom",
+        "correct": false,
+        "why": "Bloch states spread over the whole crystal."
+      }
+    ],
+    "hints": [
+      "Think about a wave modulated by the crystal's pattern.",
+      "The label k comes from the wave part."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-036",
+      "S-049"
+    ],
+    "visual": {
+      "plot": "bz-1d",
+      "params": {},
+      "caption": "A row of atoms and the reciprocal axis that goes with it.",
+      "alt": "One-dimensional row of atoms with spacing a above a reciprocal axis marked with 0, plus and minus pi over a, and plus and minus 2 pi over a, the middle stretch shaded."
+    }
+  },
+  {
+    "id": "q-kp-2",
+    "concepts": [
+      "k-points",
+      "bloch-theorem"
+    ],
+    "type": "single",
+    "prompt": "Why does a VASP run need a set of k-points, rather than one calculation?",
+    "options": [
+      {
+        "text": "Quantities such as the density are averages over all k in the Brillouin zone, and the average is approximated by a finite sample",
+        "correct": true,
+        "why": "The sum over an infinite crystal becomes a sum over a few chosen k."
+      },
+      {
+        "text": "Each k-point is a different atom",
+        "correct": false,
+        "why": "k labels waves in reciprocal space, not atoms."
+      },
+      {
+        "text": "Each k-point is a separate ionic step",
+        "correct": false,
+        "why": "k-points are sampled within one SCF step, not across the relaxation."
+      }
+    ],
+    "hints": [
+      "The crystal is effectively infinite.",
+      "The density is an integral over k."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-036",
+      "S-041"
+    ],
+    "visual": {
+      "plot": "kmesh-grid",
+      "params": {
+        "n": 4,
+        "gamma": true,
+        "angle": 90,
+        "ratio": 1
+      },
+      "caption": "A mesh of k-points in a reciprocal cell.",
+      "alt": "Square or oblique reciprocal cell with a grid of dots for the k-points and a circle marking the Gamma point at the centre."
+    }
+  },
+  {
+    "id": "q-kp-3",
+    "concepts": [
+      "k-points",
+      "bloch-theorem"
+    ],
+    "type": "single",
+    "prompt": "You double the k-mesh density and the energy changes by 5 meV per atom. What should you conclude?",
+    "options": [
+      {
+        "text": "The first mesh was not converged; test a denser one until the change is below your tolerance",
+        "correct": true,
+        "why": "Convergence means the answer stops changing, about 1 meV per atom is a common target."
+      },
+      {
+        "text": "The first mesh was fine, since the change is small",
+        "correct": false,
+        "why": "5 meV per atom is above the usual 1 meV target, so the first mesh is not yet converged."
+      },
+      {
+        "text": "The second mesh must be wrong",
+        "correct": false,
+        "why": "A denser mesh is not wrong; it is closer to the limit."
+      }
+    ],
+    "hints": [
+      "Compare to a target such as 1 meV per atom.",
+      "Keep refining until the changes are small."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-041",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "kmesh-grid",
+      "params": {
+        "n": 6,
+        "gamma": true,
+        "angle": 90,
+        "ratio": 1
+      },
+      "caption": "A mesh of k-points in a reciprocal cell.",
+      "alt": "Square or oblique reciprocal cell with a grid of dots for the k-points and a circle marking the Gamma point at the centre."
+    }
+  },
+  {
+    "id": "q-kp-4",
+    "concepts": [
+      "k-points",
+      "bloch-theorem"
+    ],
+    "type": "single",
+    "prompt": "A cell is long in one direction. Which k-mesh is sensible along that direction?",
+    "options": [
+      {
+        "text": "Fewer k-points, because the reciprocal cell is short in that direction",
+        "correct": true,
+        "why": "Real-space length and reciprocal length are inverse, so long cells need fewer points."
+      },
+      {
+        "text": "More k-points, since the cell is big",
+        "correct": false,
+        "why": "The reverse: a long direction means a short reciprocal direction."
+      },
+      {
+        "text": "The same number as the short directions",
+        "correct": false,
+        "why": "That wastes work; spacing in k, not the count, should be similar."
+      }
+    ],
+    "hints": [
+      "Real length and reciprocal length are inversely related.",
+      "Aim for similar spacing in k."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-036",
+      "S-041"
+    ],
+    "visual": {
+      "plot": "kmesh-grid",
+      "params": {
+        "n": 6,
+        "gamma": true,
+        "angle": 90,
+        "ratio": 1
+      },
+      "caption": "A mesh of k-points in a reciprocal cell.",
+      "alt": "Square or oblique reciprocal cell with a grid of dots for the k-points and a circle marking the Gamma point at the centre."
+    }
+  },
+  {
+    "id": "q-bz-1",
+    "concepts": [
+      "brillouin-zone",
+      "reciprocal-space"
+    ],
+    "type": "single",
+    "prompt": "What is the first Brillouin zone?",
+    "options": [
+      {
+        "text": "The Wigner-Seitz cell of the reciprocal lattice: the region closer to the origin than to any other reciprocal lattice point",
+        "correct": true,
+        "why": "It is the standard unit cell of reciprocal space."
+      },
+      {
+        "text": "The Wigner-Seitz cell of the real-space lattice",
+        "correct": false,
+        "why": "That is the real-space version; the Brillouin zone lives in reciprocal space."
+      },
+      {
+        "text": "The set of all occupied states",
+        "correct": false,
+        "why": "Occupation is a separate idea; the zone is a region of wave vectors."
+      }
+    ],
+    "hints": [
+      "It is built like a Wigner-Seitz cell.",
+      "It lives in reciprocal space."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-036"
+    ],
+    "visual": {
+      "plot": "kmesh-grid",
+      "params": {
+        "n": 1,
+        "gamma": true,
+        "angle": 120,
+        "ratio": 1
+      },
+      "caption": "An oblique reciprocal cell with its centre, the Gamma point, marked.",
+      "alt": "Square or oblique reciprocal cell with a grid of dots for the k-points and a circle marking the Gamma point at the centre."
+    }
+  },
+  {
+    "id": "q-bz-2",
+    "concepts": [
+      "brillouin-zone",
+      "reciprocal-space"
+    ],
+    "type": "single",
+    "prompt": "If you make the real-space cell larger, what happens to the Brillouin zone?",
+    "options": [
+      {
+        "text": "It becomes smaller",
+        "correct": true,
+        "why": "Reciprocal lengths go as the inverse of real lengths."
+      },
+      {
+        "text": "It becomes larger",
+        "correct": false,
+        "why": "The relation is inverse, so a bigger cell gives a smaller zone."
+      },
+      {
+        "text": "It does not change",
+        "correct": false,
+        "why": "The zone depends on the lattice; scaling the lattice scales the zone."
+      }
+    ],
+    "hints": [
+      "A reciprocal lattice vector has length 2 pi over a real-space spacing.",
+      "Big in real space means small in reciprocal space."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-036"
+    ],
+    "visual": {
+      "plot": "bz-1d",
+      "params": {
+        "atoms": 5
+      },
+      "caption": "A row of atoms and the reciprocal axis that goes with it.",
+      "alt": "One-dimensional row of atoms with spacing a above a reciprocal axis marked with 0, plus and minus pi over a, and plus and minus 2 pi over a, the middle stretch shaded."
+    }
+  },
+  {
+    "id": "q-bz-3",
+    "concepts": [
+      "brillouin-zone",
+      "reciprocal-space"
+    ],
+    "type": "numeric",
+    "prompt": "A one-dimensional lattice has spacing a = 2.5 A. What is the length of the shortest reciprocal lattice vector, in 1/A?",
+    "answer": 2.5133,
+    "tolerance": 0.005,
+    "unit": "1/A",
+    "hints": [
+      "Use G = 2 pi / a.",
+      "2 pi is 6.2832."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-036"
+    ],
+    "visual": {
+      "plot": "bz-1d",
+      "params": {},
+      "caption": "A row of atoms with spacing a and the reciprocal axis, marked with symbols only.",
+      "alt": "One-dimensional row of atoms with spacing a above a reciprocal axis marked with 0, plus and minus pi over a, and plus and minus 2 pi over a, the middle stretch shaded."
+    }
+  },
+  {
+    "id": "q-bz-4",
+    "concepts": [
+      "brillouin-zone",
+      "reciprocal-space"
+    ],
+    "type": "single",
+    "prompt": "Why can we restrict the wave vector k to the first Brillouin zone?",
+    "options": [
+      {
+        "text": "Any k outside it differs from one inside by a reciprocal lattice vector, and describes the same Bloch state",
+        "correct": true,
+        "why": "The zone contains one copy of every distinct state."
+      },
+      {
+        "text": "Wave vectors outside it are unphysical",
+        "correct": false,
+        "why": "They are not wrong; they are equivalent copies of states already inside."
+      },
+      {
+        "text": "The electrons cannot move outside it",
+        "correct": false,
+        "why": "The zone is about wave vectors, not positions."
+      }
+    ],
+    "hints": [
+      "Shifting k by a reciprocal lattice vector changes nothing.",
+      "The zone holds one representative of each."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-036",
+      "S-049"
+    ],
+    "visual": {
+      "plot": "bz-1d",
+      "params": {},
+      "caption": "The reciprocal axis with the shaded stretch between minus and plus pi over a.",
+      "alt": "One-dimensional row of atoms with spacing a above a reciprocal axis marked with 0, plus and minus pi over a, and plus and minus 2 pi over a, the middle stretch shaded."
+    }
+  },
+  {
+    "id": "q-kmesh-1",
+    "concepts": [
+      "kpoint-mesh"
+    ],
+    "type": "single",
+    "prompt": "How does a Gamma-centred mesh differ from a Monkhorst-Pack mesh?",
+    "options": [
+      {
+        "text": "A Gamma-centred mesh always includes the Gamma point; Monkhorst-Pack with an even number of divisions does not",
+        "correct": true,
+        "why": "For odd divisions the two coincide, for even ones the Monkhorst-Pack mesh is shifted off Gamma."
+      },
+      {
+        "text": "Gamma-centred meshes have fewer points in total",
+        "correct": false,
+        "why": "The point counts are the same for the same divisions."
+      },
+      {
+        "text": "They sample different physical quantities",
+        "correct": false,
+        "why": "Both sample the same integral; they only differ in where the points sit."
+      }
+    ],
+    "hints": [
+      "Look at the even-division case.",
+      "The question is whether Gamma is on the mesh."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-007",
+      "S-041"
+    ],
+    "visual": {
+      "plot": "kmesh-grid",
+      "params": {
+        "n": 4,
+        "gamma": true,
+        "angle": 90,
+        "ratio": 1
+      },
+      "caption": "A four by four mesh of k-points in a reciprocal cell with the Gamma point marked.",
+      "alt": "Square or oblique reciprocal cell with a grid of dots for the k-points and a circle marking the Gamma point at the centre."
+    }
+  },
+  {
+    "id": "q-kmesh-2",
+    "concepts": [
+      "kpoint-mesh"
+    ],
+    "type": "single",
+    "prompt": "Which mesh is the safer default for a hexagonal cell?",
+    "options": [
+      {
+        "text": "Gamma-centred",
+        "correct": true,
+        "why": "A Monkhorst-Pack even mesh breaks the hexagonal symmetry, so Gamma-centred is the safe choice."
+      },
+      {
+        "text": "Monkhorst-Pack with even divisions",
+        "correct": false,
+        "why": "That can lose the hexagonal symmetry of the mesh."
+      },
+      {
+        "text": "A single k-point",
+        "correct": false,
+        "why": "One point is rarely converged for a crystal."
+      }
+    ],
+    "hints": [
+      "Think about which mesh keeps the cell symmetry.",
+      "The mesh must have the symmetry of the lattice."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-007",
+      "S-041",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "kmesh-grid",
+      "params": {
+        "n": 4,
+        "gamma": true,
+        "angle": 120,
+        "ratio": 1
+      },
+      "caption": "A mesh of k-points in a hexagonal reciprocal cell with the Gamma point marked.",
+      "alt": "Square or oblique reciprocal cell with a grid of dots for the k-points and a circle marking the Gamma point at the centre."
+    }
+  },
+  {
+    "id": "q-kmesh-3",
+    "concepts": [
+      "kpoint-mesh"
+    ],
+    "type": "single",
+    "prompt": "In VASP, which tag sets the k-point density with a single spacing number?",
+    "options": [
+      {
+        "text": "KSPACING",
+        "correct": true,
+        "why": "It gives a maximum spacing in reciprocal space, from which VASP builds the mesh."
+      },
+      {
+        "text": "ENCUT",
+        "correct": false,
+        "why": "That is the plane-wave cutoff, not the k-mesh."
+      },
+      {
+        "text": "SIGMA",
+        "correct": false,
+        "why": "That is the smearing width, not the mesh."
+      }
+    ],
+    "hints": [
+      "The tag name hints at spacing.",
+      "It is an alternative to writing a KPOINTS file."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-019",
+      "S-041"
+    ],
+    "visual": {
+      "plot": "kmesh-grid",
+      "params": {
+        "n": 5,
+        "gamma": true,
+        "angle": 90,
+        "ratio": 1
+      },
+      "caption": "A mesh of k-points in a reciprocal cell.",
+      "alt": "Square reciprocal cell with a grid of dots for the k-points and a circle marking the Gamma point at the centre."
+    }
+  },
+  {
+    "id": "q-kmesh-4",
+    "concepts": [
+      "kpoint-mesh"
+    ],
+    "type": "single",
+    "prompt": "Why test k-mesh and cutoff convergence separately?",
+    "options": [
+      {
+        "text": "They control different approximations: the basis size and the sampling of the zone",
+        "correct": true,
+        "why": "Each can limit accuracy independently, so each needs its own convergence test."
+      },
+      {
+        "text": "They are the same tag under two names",
+        "correct": false,
+        "why": "They are different settings: ENCUT and the k-mesh."
+      },
+      {
+        "text": "One of them has no effect on energy",
+        "correct": false,
+        "why": "Both change the energy; both must be converged."
+      }
+    ],
+    "hints": [
+      "One is about waves in the basis, the other about sampling.",
+      "Either can be the weak link."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-041",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "kmesh-grid",
+      "params": {
+        "n": 4,
+        "gamma": true,
+        "angle": 90,
+        "ratio": 1
+      },
+      "caption": "A mesh of k-points in a reciprocal cell.",
+      "alt": "Square or oblique reciprocal cell with a grid of dots for the k-points and a circle marking the Gamma point at the centre."
+    }
+  },
+  {
+    "id": "q-smear-1",
+    "concepts": [
+      "smearing"
+    ],
+    "type": "single",
+    "prompt": "What is the purpose of smearing in a metal calculation?",
+    "options": [
+      {
+        "text": "To replace the sharp step in occupation at the Fermi level with a smooth one, which helps the k-sum and the SCF loop converge",
+        "correct": true,
+        "why": "A smooth step is easier to integrate with a limited number of k-points."
+      },
+      {
+        "text": "To make the metal hotter in a physically exact way",
+        "correct": false,
+        "why": "Only Fermi-Dirac smearing corresponds to a physical temperature, and the others are numerical aids."
+      },
+      {
+        "text": "To remove the Fermi level",
+        "correct": false,
+        "why": "The Fermi level remains; only the step at it is blurred."
+      }
+    ],
+    "hints": [
+      "Think about what is hard about a sharp step.",
+      "It is mostly a numerical aid."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042",
+      "S-015"
+    ],
+    "visual": {
+      "plot": "smearing-curves",
+      "params": {
+        "series": "occupation",
+        "schemes": [
+          "gaussian"
+        ]
+      },
+      "caption": "Occupation of a level against its energy for Gaussian smearing.",
+      "alt": "Curve of the occupation of a level against its energy from the Fermi level, falling from one to zero. One curve per smearing scheme named in the legend."
+    }
+  },
+  {
+    "id": "q-smear-2",
+    "concepts": [
+      "smearing"
+    ],
+    "type": "single",
+    "prompt": "Which ISMEAR choice does the author's handbook say is wrong for semiconductors?",
+    "options": [
+      {
+        "text": "ISMEAR = 1 (Methfessel-Paxton)",
+        "correct": true,
+        "why": "It gives wrong energies for semiconductors; use ISMEAR = 0 with a small SIGMA."
+      },
+      {
+        "text": "ISMEAR = 0 (Gaussian)",
+        "correct": false,
+        "why": "That is the safe choice for anything, including semiconductors."
+      },
+      {
+        "text": "ISMEAR = -5 (tetrahedron)",
+        "correct": false,
+        "why": "That is accurate for bulk cells with enough k-points, not the one the handbook warns against."
+      }
+    ],
+    "hints": [
+      "The VASP default is the one to be careful with.",
+      "Semiconductors have no states at the Fermi level to smooth."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-041"
+    ],
+    "visual": {
+      "plot": "smearing-curves",
+      "params": {
+        "series": "occupation",
+        "schemes": [
+          "gaussian",
+          "mp1"
+        ]
+      },
+      "caption": "Occupation against energy for two smearing schemes.",
+      "alt": "Curve of the occupation of a level against its energy from the Fermi level, falling from one to zero. One curve per smearing scheme named in the legend."
+    }
+  },
+  {
+    "id": "q-smear-3",
+    "concepts": [
+      "smearing"
+    ],
+    "type": "single",
+    "prompt": "What should the entropy term EENTRO per atom stay below, according to the author's check?",
+    "options": [
+      {
+        "text": "About 1 meV",
+        "correct": true,
+        "why": "If it is larger, reduce SIGMA."
+      },
+      {
+        "text": "About 1 eV",
+        "correct": false,
+        "why": "That is far too large; it would spoil the energy."
+      },
+      {
+        "text": "It does not matter",
+        "correct": false,
+        "why": "It matters: a large EENTRO means the smearing error is not negligible."
+      }
+    ],
+    "hints": [
+      "The target is a small fraction of an eV.",
+      "It is the same scale as the convergence target."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "smearing-curves",
+      "params": {
+        "series": "delta",
+        "schemes": [
+          "gaussian"
+        ]
+      },
+      "caption": "Broadened delta function for Gaussian smearing.",
+      "alt": "Curve of the broadened delta function against energy from the Fermi level, a bump centred near the Fermi level. One curve per smearing scheme named in the legend."
+    }
+  },
+  {
+    "id": "q-smear-4",
+    "concepts": [
+      "smearing"
+    ],
+    "type": "single",
+    "prompt": "In the lab, you raise SIGMA with Gaussian smearing. What happens to the entropy term?",
+    "options": [
+      {
+        "text": "Its size grows",
+        "correct": true,
+        "why": "A wider smear brings more levels into fractional occupation, so the entropy term grows."
+      },
+      {
+        "text": "It shrinks to zero",
+        "correct": false,
+        "why": "It would shrink as SIGMA falls, not rises."
+      },
+      {
+        "text": "It stays the same",
+        "correct": false,
+        "why": "It depends on SIGMA."
+      }
+    ],
+    "hints": [
+      "More partly filled levels means more entropy.",
+      "Look at the SIGMA slider and the readout."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042",
+      "S-015"
+    ],
+    "visual": {
+      "plot": "smearing-curves",
+      "params": {
+        "series": "delta",
+        "schemes": [
+          "gaussian"
+        ]
+      },
+      "caption": "Broadened delta function for Gaussian smearing, drawn for a width of one.",
+      "alt": "Curve of the broadened delta function against energy from the Fermi level, a bump centred near the Fermi level. One curve per smearing scheme named in the legend."
+    }
+  },
+  {
+    "id": "q-smear-5",
+    "concepts": [
+      "smearing"
+    ],
+    "type": "single",
+    "prompt": "Which statement about Methfessel-Paxton smearing is correct?",
+    "options": [
+      {
+        "text": "Its occupation can dip below 0 or rise above 1 a little, which is expected",
+        "correct": true,
+        "why": "That is the price for a smaller error in the energy."
+      },
+      {
+        "text": "Its occupation is always between 0 and 1",
+        "correct": false,
+        "why": "That is true of Gaussian and Fermi-Dirac, not of Methfessel-Paxton."
+      },
+      {
+        "text": "It is the only scheme with a physical temperature",
+        "correct": false,
+        "why": "The physical electronic temperature belongs to Fermi-Dirac."
+      }
+    ],
+    "hints": [
+      "The schemes differ in tail behaviour.",
+      "Higher order means a bumpier shape."
+    ],
+    "difficulty": 2,
+    "level": "pro",
+    "sources": [
+      "S-015"
+    ],
+    "visual": {
+      "plot": "smearing-curves",
+      "params": {
+        "series": "delta",
+        "schemes": [
+          "gaussian",
+          "mp1"
+        ]
+      },
+      "caption": "Broadened delta function for two smearing schemes.",
+      "alt": "Curve of the broadened delta function against energy from the Fermi level, a bump centred near the Fermi level. One curve per smearing scheme named in the legend."
+    }
+  },
+  {
+    "id": "q-ef-1",
+    "concepts": [
+      "fermi-level"
+    ],
+    "type": "single",
+    "prompt": "What is the Fermi level at zero temperature?",
+    "options": [
+      {
+        "text": "The energy up to which the levels are filled",
+        "correct": true,
+        "why": "Below it every level holds an electron; above it, none."
+      },
+      {
+        "text": "The lowest energy level",
+        "correct": false,
+        "why": "That is the bottom of the band."
+      },
+      {
+        "text": "The energy of the highest atom",
+        "correct": false,
+        "why": "Atoms have positions, not a Fermi level."
+      }
+    ],
+    "hints": [
+      "It marks the edge of the filled levels.",
+      "It is where the occupation drops."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-049"
+    ],
+    "visual": {
+      "plot": "smearing-curves",
+      "params": {
+        "series": "occupation",
+        "schemes": [
+          "fermi"
+        ]
+      },
+      "caption": "Occupation against energy for Fermi-Dirac smearing.",
+      "alt": "Curve of the occupation of a level against its energy from the Fermi level, falling from one to zero. One curve per smearing scheme named in the legend."
+    }
+  },
+  {
+    "id": "q-ef-2",
+    "concepts": [
+      "fermi-level"
+    ],
+    "type": "single",
+    "prompt": "Why is the Fermi level easy to define for a metal and tricky for an insulator?",
+    "options": [
+      {
+        "text": "In a metal it lies inside a band, while in an insulator it can sit anywhere in the gap",
+        "correct": true,
+        "why": "The gap gives a range of valid values, so the exact position is not fixed by the electron count."
+      },
+      {
+        "text": "Metals have no electrons",
+        "correct": false,
+        "why": "Metals have many electrons at the Fermi level."
+      },
+      {
+        "text": "Insulators have no bands",
+        "correct": false,
+        "why": "Insulators have bands with a gap between them."
+      }
+    ],
+    "hints": [
+      "Look at where it falls in the band picture.",
+      "A gap leaves a range."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-049"
+    ],
+    "visual": {
+      "plot": "band-gap",
+      "params": {
+        "labels": false
+      },
+      "caption": "One full band and one empty band, with the space between them.",
+      "alt": "Two bands drawn as boxes, the lower one marked full and the upper one marked empty, with empty space between them."
+    }
+  },
+  {
+    "id": "q-ef-3",
+    "concepts": [
+      "fermi-level"
+    ],
+    "type": "single",
+    "prompt": "With smearing, how is the Fermi level set in the lab?",
+    "options": [
+      {
+        "text": "It is chosen so the total number of electrons is the right fixed value",
+        "correct": true,
+        "why": "The Fermi level is whatever value makes the occupations add up to the electron count."
+      },
+      {
+        "text": "It is chosen to be zero",
+        "correct": false,
+        "why": "The zero of energy is arbitrary; the Fermi level is found from the count."
+      },
+      {
+        "text": "It is chosen to maximise the energy",
+        "correct": false,
+        "why": "Nothing maximises the energy; the count fixes it."
+      }
+    ],
+    "hints": [
+      "The number of electrons is fixed.",
+      "Find the level that fills exactly that many."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-049",
+      "S-015"
+    ],
+    "visual": {
+      "plot": "smearing-curves",
+      "params": {
+        "series": "occupation",
+        "schemes": [
+          "fermi"
+        ]
+      },
+      "caption": "Occupation against energy for Fermi-Dirac smearing.",
+      "alt": "Curve of the occupation of a level against its energy from the Fermi level, falling from one to zero. One curve per smearing scheme named in the legend."
+    }
+  },
+  {
+    "id": "q-ef-4",
+    "concepts": [
+      "fermi-level"
+    ],
+    "type": "single",
+    "prompt": "What is the smeared occupation of a level exactly at the Fermi level, for Gaussian smearing?",
+    "options": [
+      {
+        "text": "1/2",
+        "correct": true,
+        "why": "The Gaussian step passes through one half at the Fermi level."
+      },
+      {
+        "text": "1",
+        "correct": false,
+        "why": "It would be fully filled only well below the Fermi level."
+      },
+      {
+        "text": "0",
+        "correct": false,
+        "why": "It would be empty only well above the Fermi level."
+      }
+    ],
+    "hints": [
+      "The step is symmetric around the Fermi level.",
+      "Gaussian is the half error function of x."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-015"
+    ],
+    "visual": {
+      "plot": "smearing-curves",
+      "params": {
+        "series": "delta",
+        "schemes": [
+          "gaussian"
+        ]
+      },
+      "caption": "Broadened delta function for Gaussian smearing.",
+      "alt": "Curve of the broadened delta function against energy from the Fermi level, a bump centred near the Fermi level. One curve per smearing scheme named in the legend."
+    }
+  },
+  {
+    "id": "q-dftu-1",
+    "concepts": [
+      "dft-plus-u"
+    ],
+    "type": "single",
+    "prompt": "What problem does DFT+U address?",
+    "options": [
+      {
+        "text": "Simple functionals spread out localized d and f electrons too much because of self-interaction error",
+        "correct": true,
+        "why": "U adds a penalty that favours integer occupation of those orbitals."
+      },
+      {
+        "text": "Plane waves are too slow",
+        "correct": false,
+        "why": "DFT+U does not change the basis."
+      },
+      {
+        "text": "The Fermi level is wrong in every metal",
+        "correct": false,
+        "why": "The correction targets localized orbitals, not every metal."
+      }
+    ],
+    "hints": [
+      "Think of d and f orbitals, which are compact.",
+      "Electrons in them partly repel themselves."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-014",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "dftu-penalty",
+      "params": {
+        "U": 4
+      },
+      "caption": "Penalty energy of one orbital against its occupation.",
+      "alt": "Arch-shaped curve of the penalty energy against orbital occupation, zero at both ends of the range."
+    }
+  },
+  {
+    "id": "q-dftu-2",
+    "concepts": [
+      "dft-plus-u"
+    ],
+    "type": "numeric",
+    "prompt": "In the Dudarev form E_U = (U_eff/2) n (1 - n), what is the penalty, in eV, at half filling n = 0.5 with U_eff = 4 eV?",
+    "answer": 0.5,
+    "tolerance": 0.001,
+    "unit": "eV",
+    "hints": [
+      "Insert n = 0.5: n(1 - n) = 0.25.",
+      "Multiply by U_eff / 2 = 2 eV."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-014"
+    ],
+    "visual": {
+      "plot": "dftu-penalty",
+      "params": {
+        "U": 4
+      },
+      "caption": "Penalty energy of one orbital against its occupation.",
+      "alt": "Arch-shaped curve of the penalty energy against orbital occupation, zero at both ends of the range."
+    }
+  },
+  {
+    "id": "q-dftu-3",
+    "concepts": [
+      "dft-plus-u"
+    ],
+    "type": "single",
+    "prompt": "In the lab, what does the correction do to a nearly full orbital?",
+    "options": [
+      {
+        "text": "It pushes the orbital level down, making it more strongly filled",
+        "correct": true,
+        "why": "The potential U_eff (1/2 - n) is negative for n above one half."
+      },
+      {
+        "text": "It pushes the level up",
+        "correct": false,
+        "why": "That happens for a nearly empty orbital."
+      },
+      {
+        "text": "It does nothing",
+        "correct": false,
+        "why": "The push is zero only at half filling."
+      }
+    ],
+    "hints": [
+      "Look at the sign of 1/2 - n.",
+      "Full orbitals are pushed towards fuller."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-014"
+    ],
+    "visual": {
+      "plot": "dftu-penalty",
+      "params": {
+        "U": 4
+      },
+      "caption": "Penalty energy of one orbital against its occupation.",
+      "alt": "Arch-shaped curve of the penalty energy against orbital occupation, zero at both ends of the range."
+    }
+  },
+  {
+    "id": "q-dftu-4",
+    "concepts": [
+      "dft-plus-u"
+    ],
+    "type": "single",
+    "prompt": "In VASP with LDAUTYPE = 2, which combination of U and J matters?",
+    "options": [
+      {
+        "text": "U minus J",
+        "correct": true,
+        "why": "In the Dudarev form only the difference U_eff = U - J enters."
+      },
+      {
+        "text": "U plus J",
+        "correct": false,
+        "why": "The sum is not the quantity used."
+      },
+      {
+        "text": "J alone",
+        "correct": false,
+        "why": "J alone is not the controlling number."
+      }
+    ],
+    "hints": [
+      "The name is U_eff.",
+      "It is a difference."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-014",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "dftu-penalty",
+      "params": {
+        "U": 4
+      },
+      "caption": "Penalty energy of one orbital against its occupation.",
+      "alt": "Arch-shaped curve of the penalty energy against orbital occupation, zero at both ends of the range."
+    }
+  },
+  {
+    "id": "q-dftu-5",
+    "concepts": [
+      "dft-plus-u"
+    ],
+    "type": "single",
+    "prompt": "A paper reports a band gap computed with DFT+U. What must you know to compare it with your own?",
+    "options": [
+      {
+        "text": "The U value, the orbital it acts on and the functional used",
+        "correct": true,
+        "why": "The gap depends on these choices, so a bare number is not comparable."
+      },
+      {
+        "text": "Nothing: all DFT+U gaps agree",
+        "correct": false,
+        "why": "They do not; the gap changes with U."
+      },
+      {
+        "text": "Only the cutoff energy",
+        "correct": false,
+        "why": "The cutoff matters little compared with the U choice."
+      }
+    ],
+    "hints": [
+      "The method has a free parameter.",
+      "Reproducibility needs the setup."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-014",
+      "S-042"
+    ],
+    "visual": {
+      "none": "The question is about reporting a method choice, so any picture would restate the answer."
+    }
+  },
+  {
+    "id": "q-pp-1",
+    "concepts": [
+      "pseudopotentials"
+    ],
+    "type": "single",
+    "prompt": "Why does a plane-wave calculation replace the nucleus and core electrons by a pseudopotential?",
+    "options": [
+      {
+        "text": "The true valence wavefunction wiggles fast near the nucleus, which would need very many plane waves; a smooth stand-in needs far fewer",
+        "correct": true,
+        "why": "The core hardly takes part in bonding, so replacing it by a smooth effective potential saves a great deal of work."
+      },
+      {
+        "text": "Because core electrons do not exist",
+        "correct": false,
+        "why": "They do exist; they are just not treated explicitly in the calculation."
+      },
+      {
+        "text": "Because it makes the nucleus lighter",
+        "correct": false,
+        "why": "The nuclear mass plays no part; the point is a smoother potential."
+      }
+    ],
+    "hints": [
+      "Think about what many short waves would cost.",
+      "Which electrons take part in bonding?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-049",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "paw-radial",
+      "params": {
+        "rc": 2
+      },
+      "caption": "Curves near a nucleus.",
+      "alt": "Two curves of amplitude against distance from the nucleus: a smooth one without nodes and one that oscillates inside a marked radius, the two joined beyond it. Invented shapes."
+    }
+  },
+  {
+    "id": "q-pp-2",
+    "concepts": [
+      "pseudopotentials"
+    ],
+    "type": "single",
+    "prompt": "Which valence function is the real one: the smooth stand-in, or the true function with nodes?",
+    "options": [
+      {
+        "text": "Outside the cutoff radius they are the same; inside it only the one with nodes is real",
+        "correct": true,
+        "why": "The stand-in is built to match outside r_c and to differ inside."
+      },
+      {
+        "text": "The smooth one everywhere",
+        "correct": false,
+        "why": "Inside the sphere it is a stand-in, not the true function."
+      },
+      {
+        "text": "Neither: they are both artefacts",
+        "correct": false,
+        "why": "Outside r_c the true function and the stand-in coincide."
+      }
+    ],
+    "hints": [
+      "Look at where the two curves agree.",
+      "The matching radius is r_c."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-008",
+      "S-049"
+    ],
+    "visual": {
+      "plot": "paw-radial",
+      "params": {
+        "rc": 2
+      },
+      "caption": "Two curves with a marked radius.",
+      "alt": "Two curves of amplitude against distance from the nucleus: a smooth one without nodes and one that oscillates inside a marked radius, the two joined beyond it. Invented shapes."
+    }
+  },
+  {
+    "id": "q-pp-3",
+    "concepts": [
+      "pseudopotentials"
+    ],
+    "type": "single",
+    "prompt": "A calculation has Fe and O in POSCAR in that order. In what order should the POTCAR files be joined?",
+    "options": [
+      {
+        "text": "Fe first, then O: the same order as the species in POSCAR",
+        "correct": true,
+        "why": "The datasets are assigned to species by position, so the order must match."
+      },
+      {
+        "text": "Alphabetical, always",
+        "correct": false,
+        "why": "Alphabetical order only works when POSCAR happens to follow it."
+      },
+      {
+        "text": "Any order; VASP sorts them",
+        "correct": false,
+        "why": "VASP does not reorder them; a swapped order puts the wrong dataset on each species."
+      }
+    ],
+    "hints": [
+      "VASP matches datasets to species by position.",
+      "The check is grep TITEL POTCAR."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "none": "The question is about file order, so a picture would only restate the answer text."
+    }
+  },
+  {
+    "id": "q-pp-4",
+    "concepts": [
+      "pseudopotentials"
+    ],
+    "type": "single",
+    "prompt": "What does the line ENMAX in a POTCAR give you?",
+    "options": [
+      {
+        "text": "The recommended minimum plane-wave cutoff for that dataset",
+        "correct": true,
+        "why": "VASP uses the largest ENMAX among the files as the default ENCUT."
+      },
+      {
+        "text": "The maximum number of electrons",
+        "correct": false,
+        "why": "The valence electron count is ZVAL."
+      },
+      {
+        "text": "The largest allowed k-mesh",
+        "correct": false,
+        "why": "ENMAX is an energy, not a mesh."
+      }
+    ],
+    "hints": [
+      "It is an energy.",
+      "Which tag does it set by default?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "paw-radial",
+      "params": {
+        "rc": 2
+      },
+      "caption": "Curves near a nucleus.",
+      "alt": "Two curves of amplitude against distance from the nucleus: a smooth one without nodes and one that oscillates inside a marked radius, the two joined beyond it. Invented shapes."
+    }
+  },
+  {
+    "id": "q-paw-1",
+    "concepts": [
+      "paw-method"
+    ],
+    "type": "single",
+    "prompt": "What does the PAW method add to a plain pseudopotential?",
+    "options": [
+      {
+        "text": "It keeps the smooth function for the plane waves and adds back, inside each sphere, the difference from the true function",
+        "correct": true,
+        "why": "That is how the true wiggles near the nucleus remain accounted for."
+      },
+      {
+        "text": "It removes the sphere altogether",
+        "correct": false,
+        "why": "The spheres are central to PAW."
+      },
+      {
+        "text": "It uses only core electrons",
+        "correct": false,
+        "why": "PAW treats the valence electrons explicitly and the core in a frozen form."
+      }
+    ],
+    "hints": [
+      "The name is projector augmented wave.",
+      "Augmented means something is added back."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-008",
+      "S-009"
+    ],
+    "visual": {
+      "plot": "paw-radial",
+      "params": {
+        "rc": 2
+      },
+      "caption": "Smooth and true curves; the difference lies inside the radius.",
+      "alt": "Two curves of amplitude against distance from the nucleus: a smooth one without nodes and one that oscillates inside a marked radius, the two joined beyond it. Invented shapes."
+    }
+  },
+  {
+    "id": "q-paw-2",
+    "concepts": [
+      "paw-method"
+    ],
+    "type": "single",
+    "prompt": "The cutoff radius r_c of a dataset is made larger. What is the usual trade-off?",
+    "options": [
+      {
+        "text": "A smoother function and a lower cutoff, but a poorer description when atoms come close and spheres overlap",
+        "correct": true,
+        "why": "A softer dataset is cheaper but can be less accurate in compressed structures."
+      },
+      {
+        "text": "A harder function and a higher cutoff, with better accuracy always",
+        "correct": false,
+        "why": "The reverse: a larger radius makes the function smoother, not harder."
+      },
+      {
+        "text": "No change at all",
+        "correct": false,
+        "why": "The radius sets how much is replaced, so it changes both the cutoff and the accuracy."
+      }
+    ],
+    "hints": [
+      "Smoother means fewer plane waves.",
+      "What happens when two spheres overlap?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-008",
+      "S-049"
+    ],
+    "visual": {
+      "plot": "paw-radial",
+      "params": {
+        "rc": 3
+      },
+      "caption": "The same curves with a larger radius.",
+      "alt": "Two curves of amplitude against distance from the nucleus: a smooth one without nodes and one that oscillates inside a marked radius, the two joined beyond it. Invented shapes."
+    }
+  },
+  {
+    "id": "q-paw-3",
+    "concepts": [
+      "paw-method"
+    ],
+    "type": "single",
+    "prompt": "In the lab the smooth stand-in has no nodes. Why does the all-electron-like curve have nodes inside r_c?",
+    "options": [
+      {
+        "text": "The true valence function must stay orthogonal to the core states, which makes it oscillate near the nucleus",
+        "correct": true,
+        "why": "This is exactly the wiggling a smooth stand-in avoids."
+      },
+      {
+        "text": "Because the lab has a bug",
+        "correct": false,
+        "why": "The nodes are the point of the picture."
+      },
+      {
+        "text": "Because outside r_c the electron has less energy",
+        "correct": false,
+        "why": "The nodes have to do with the core region, not with energy outside the radius."
+      }
+    ],
+    "hints": [
+      "Think about the core states.",
+      "Orthogonality forces oscillation."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-049",
+      "S-008"
+    ],
+    "visual": {
+      "plot": "paw-radial",
+      "params": {
+        "rc": 2
+      },
+      "caption": "Curves with a node region marked.",
+      "alt": "Two curves of amplitude against distance from the nucleus: a smooth one without nodes and one that oscillates inside a marked radius, the two joined beyond it. Invented shapes."
+    }
+  },
+  {
+    "id": "q-paw-4",
+    "concepts": [
+      "paw-method"
+    ],
+    "type": "single",
+    "prompt": "Which INCAR tag does the author recommend switching on for d and f elements, because the PAW spheres otherwise treat the density as spherical?",
+    "options": [
+      {
+        "text": "LASPH = .TRUE.",
+        "correct": true,
+        "why": "It includes the non-spherical contributions inside the PAW spheres; also recommended for +U and hybrids, and required for meta-GGA."
+      },
+      {
+        "text": "ISPIN = 2",
+        "correct": false,
+        "why": "ISPIN turns on spin polarization, which is unrelated to the shape of the density inside the spheres."
+      },
+      {
+        "text": "PREC = Low",
+        "correct": false,
+        "why": "That lowers accuracy; it is not about the spheres."
+      }
+    ],
+    "hints": [
+      "The name suggests aspherical.",
+      "It is in the accuracy group."
+    ],
+    "difficulty": 2,
+    "level": "pro",
+    "sources": [
+      "S-042",
+      "S-019"
+    ],
+    "visual": {
+      "plot": "paw-radial",
+      "params": {
+        "rc": 2
+      },
+      "caption": "Curves with a sphere radius marked.",
+      "alt": "Two curves of amplitude against distance from the nucleus: a smooth one without nodes and one that oscillates inside a marked radius, the two joined beyond it. Invented shapes."
+    }
+  },
+  {
+    "id": "q-func-1",
+    "concepts": [
+      "functionals"
+    ],
+    "type": "single",
+    "prompt": "What distinguishes a GGA such as PBE from LDA?",
+    "options": [
+      {
+        "text": "A GGA also depends on how quickly the density changes, not only on its value",
+        "correct": true,
+        "why": "The gradient of the density is the added ingredient."
+      },
+      {
+        "text": "It uses exact exchange",
+        "correct": false,
+        "why": "That is the hybrid rung."
+      },
+      {
+        "text": "It uses empty orbitals",
+        "correct": false,
+        "why": "That is a higher rung than hybrids."
+      }
+    ],
+    "hints": [
+      "Rung 1 uses the density only.",
+      "What new quantity appears on rung 2?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-046",
+      "S-013"
+    ],
+    "visual": {
+      "plot": "ladder-rungs",
+      "params": {
+        "highlight": 1
+      },
+      "caption": "The five rungs of the functional ladder, cheaper at the bottom.",
+      "alt": "Five stacked boxes named LDA, GGA, Meta-GGA, Hybrid and Beyond from bottom to top, with one box shaded."
+    }
+  },
+  {
+    "id": "q-func-2",
+    "concepts": [
+      "functionals"
+    ],
+    "type": "single",
+    "prompt": "According to the author's rule of thumb, how do PBE and LDA lattice constants compare with experiment?",
+    "options": [
+      {
+        "text": "PBE tends to overestimate them by about 1 to 2 percent and LDA to underestimate them by about 1 to 2 percent",
+        "correct": true,
+        "why": "This is the usual pattern, and a rule of thumb, not a law."
+      },
+      {
+        "text": "Both are exact",
+        "correct": false,
+        "why": "Neither is exact."
+      },
+      {
+        "text": "Both overestimate by 10 percent",
+        "correct": false,
+        "why": "The usual deviations are around one to two percent."
+      }
+    ],
+    "hints": [
+      "The two errors have opposite signs.",
+      "The size is a few percent at most."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "ladder-rungs",
+      "params": {
+        "highlight": 0
+      },
+      "caption": "The five rungs of the functional ladder, cheaper at the bottom.",
+      "alt": "Five stacked boxes named LDA, GGA, Meta-GGA, Hybrid and Beyond from bottom to top, with one box shaded."
+    }
+  },
+  {
+    "id": "q-func-3",
+    "concepts": [
+      "functionals"
+    ],
+    "type": "single",
+    "prompt": "Which statement about climbing the functional ladder is correct?",
+    "options": [
+      {
+        "text": "Each rung adds ingredients and cost, but the result is not guaranteed to be better for every property",
+        "correct": true,
+        "why": "The ladder orders the ingredients, not the quality of every answer."
+      },
+      {
+        "text": "A higher rung is always more accurate for every property",
+        "correct": false,
+        "why": "That is not guaranteed."
+      },
+      {
+        "text": "All rungs cost the same",
+        "correct": false,
+        "why": "Higher rungs cost more."
+      }
+    ],
+    "hints": [
+      "Think about what the ladder describes.",
+      "Cost grows."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-046",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "ladder-rungs",
+      "params": {
+        "highlight": 2
+      },
+      "caption": "The five rungs of the functional ladder, cheaper at the bottom.",
+      "alt": "Five stacked boxes named LDA, GGA, Meta-GGA, Hybrid and Beyond from bottom to top, with one box shaded."
+    }
+  },
+  {
+    "id": "q-func-4",
+    "concepts": [
+      "functionals"
+    ],
+    "type": "single",
+    "prompt": "Which INCAR line selects the r2SCAN meta-GGA?",
+    "options": [
+      {
+        "text": "METAGGA = R2SCAN, with any GGA tag removed and LASPH = .TRUE.",
+        "correct": true,
+        "why": "Meta-GGA runs need LASPH and compatible POTCARs."
+      },
+      {
+        "text": "LHFCALC = .TRUE.",
+        "correct": false,
+        "why": "That switches on exact exchange (a hybrid)."
+      },
+      {
+        "text": "IVDW = 12",
+        "correct": false,
+        "why": "That is a dispersion correction."
+      }
+    ],
+    "hints": [
+      "The tag name contains META.",
+      "It needs LASPH."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-026"
+    ],
+    "visual": {
+      "plot": "ladder-rungs",
+      "params": {
+        "highlight": 2
+      },
+      "caption": "The five rungs of the functional ladder, cheaper at the bottom.",
+      "alt": "Five stacked boxes named LDA, GGA, Meta-GGA, Hybrid and Beyond from bottom to top, with one box shaded."
+    }
+  },
+  {
+    "id": "q-hyb-1",
+    "concepts": [
+      "hybrid-functionals"
+    ],
+    "type": "single",
+    "prompt": "What does a hybrid functional add to a semilocal one?",
+    "options": [
+      {
+        "text": "A fraction of exact (Hartree-Fock) exchange",
+        "correct": true,
+        "why": "That is what makes it a hybrid, and what makes it expensive."
+      },
+      {
+        "text": "A van der Waals correction",
+        "correct": false,
+        "why": "That is a separate patch."
+      },
+      {
+        "text": "A spin-orbit term",
+        "correct": false,
+        "why": "That is controlled by LSORBIT, not by the functional."
+      }
+    ],
+    "hints": [
+      "The ingredient has the name of a method from module 3.",
+      "It is rung 4."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-025",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "ladder-rungs",
+      "params": {
+        "highlight": 3
+      },
+      "caption": "The five rungs of the functional ladder, cheaper at the bottom.",
+      "alt": "Five stacked boxes named LDA, GGA, Meta-GGA, Hybrid and Beyond from bottom to top, with one box shaded."
+    }
+  },
+  {
+    "id": "q-hyb-2",
+    "concepts": [
+      "hybrid-functionals"
+    ],
+    "type": "single",
+    "prompt": "Which pair of tags gives HSE06 in VASP, according to the author's tag cards?",
+    "options": [
+      {
+        "text": "LHFCALC = .TRUE. with HFSCREEN = 0.2 and AEXX = 0.25",
+        "correct": true,
+        "why": "HFSCREEN = 0 with AEXX = 0.25 would be PBE0."
+      },
+      {
+        "text": "HFSCREEN = 0 and AEXX = 0.25 only",
+        "correct": false,
+        "why": "That is PBE0, and LHFCALC is still needed."
+      },
+      {
+        "text": "METAGGA = HSE06",
+        "correct": false,
+        "why": "HSE06 is not a METAGGA value."
+      }
+    ],
+    "hints": [
+      "The screening length is 0.2.",
+      "LHFCALC must be on."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-025"
+    ],
+    "visual": {
+      "plot": "ladder-rungs",
+      "params": {
+        "highlight": 3
+      },
+      "caption": "The five rungs of the functional ladder, cheaper at the bottom.",
+      "alt": "Five stacked boxes named LDA, GGA, Meta-GGA, Hybrid and Beyond from bottom to top, with one box shaded."
+    }
+  },
+  {
+    "id": "q-hyb-3",
+    "concepts": [
+      "hybrid-functionals"
+    ],
+    "type": "single",
+    "prompt": "Why are hybrid runs much slower?",
+    "options": [
+      {
+        "text": "The exact exchange couples every pair of orbitals, which is far more work than a semilocal functional",
+        "correct": true,
+        "why": "That is why settings such as PRECFOCK and NKRED exist to cut the cost."
+      },
+      {
+        "text": "Because they use more electrons",
+        "correct": false,
+        "why": "The electron count is the same."
+      },
+      {
+        "text": "Because they need a bigger cell",
+        "correct": false,
+        "why": "The cell is the same."
+      }
+    ],
+    "hints": [
+      "Exact exchange is non-local.",
+      "Think of the cost of Hartree-Fock."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-025"
+    ],
+    "visual": {
+      "plot": "ladder-rungs",
+      "params": {
+        "highlight": 3
+      },
+      "caption": "The five rungs of the functional ladder, cheaper at the bottom.",
+      "alt": "Five stacked boxes named LDA, GGA, Meta-GGA, Hybrid and Beyond from bottom to top, with one box shaded."
+    }
+  },
+  {
+    "id": "q-hyb-4",
+    "concepts": [
+      "hybrid-functionals"
+    ],
+    "type": "single",
+    "prompt": "You change AEXX to reproduce a known band gap. What does the author's card say to do?",
+    "options": [
+      {
+        "text": "Report it, because it is a different functional from the one you named",
+        "correct": true,
+        "why": "A tuned AEXX is no longer the standard HSE06."
+      },
+      {
+        "text": "Nothing: it is still HSE06",
+        "correct": false,
+        "why": "The standard HSE06 uses AEXX = 0.25."
+      },
+      {
+        "text": "Reset it before submitting",
+        "correct": false,
+        "why": "Tuning is allowed if you say so."
+      }
+    ],
+    "hints": [
+      "The functional you report must be the one you ran.",
+      "Transparency is the rule."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "ladder-rungs",
+      "params": {
+        "highlight": 3
+      },
+      "caption": "The five rungs of the functional ladder, cheaper at the bottom.",
+      "alt": "Five stacked boxes named LDA, GGA, Meta-GGA, Hybrid and Beyond from bottom to top, with one box shaded."
+    }
+  },
+  {
+    "id": "q-mag-1",
+    "concepts": [
+      "spin-polarization"
+    ],
+    "type": "single",
+    "prompt": "When is ISPIN = 2 needed?",
+    "options": [
+      {
+        "text": "For ferromagnets, antiferromagnets, radicals and many open-shell d or f systems",
+        "correct": true,
+        "why": "In these systems the up and down electrons differ."
+      },
+      {
+        "text": "For every calculation",
+        "correct": false,
+        "why": "It doubles the cost, so it is used when the physics needs it."
+      },
+      {
+        "text": "Only for metals",
+        "correct": false,
+        "why": "Metals can be non-magnetic; spin is about magnetism, not about being a metal."
+      }
+    ],
+    "hints": [
+      "Think about when up and down differ.",
+      "The cost roughly doubles."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042",
+      "S-041"
+    ],
+    "visual": {
+      "scene": "fm-cubic",
+      "caption": "A ferromagnetic arrangement. Toy model.",
+      "alt": "Eight atoms in a cubic cell, all moments pointing the same way."
+    }
+  },
+  {
+    "id": "q-mag-2",
+    "concepts": [
+      "spin-polarization"
+    ],
+    "type": "single",
+    "prompt": "An antiferromagnetic cell has 4 atoms. How many values does MAGMOM need?",
+    "options": [
+      {
+        "text": "4, one per atom in POSCAR order",
+        "correct": true,
+        "why": "The count must equal the number of atoms."
+      },
+      {
+        "text": "2, one per spin direction",
+        "correct": false,
+        "why": "There is one value per atom, not per direction."
+      },
+      {
+        "text": "1, a single number for the cell",
+        "correct": false,
+        "why": "A single number cannot describe different atoms."
+      }
+    ],
+    "hints": [
+      "The rule is one value per atom.",
+      "The order is POSCAR order."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "scene": "afm-g",
+      "caption": "An antiferromagnetic arrangement. Toy model.",
+      "alt": "Eight atoms in a cubic cell with every neighbour pointing the opposite way."
+    }
+  },
+  {
+    "id": "q-mag-3",
+    "concepts": [
+      "spin-polarization"
+    ],
+    "type": "single",
+    "prompt": "Why do you compare ferromagnetic and antiferromagnetic energies only in the same cell?",
+    "options": [
+      {
+        "text": "Different cells use different k-meshes, cutoffs and atom counts, so their energies are not comparable",
+        "correct": true,
+        "why": "The comparison must change only the spin arrangement."
+      },
+      {
+        "text": "Because energies of magnetic states are identical in any cell",
+        "correct": false,
+        "why": "They differ, and the cell must be the same to see the difference."
+      },
+      {
+        "text": "Because the cell has no effect on energy",
+        "correct": false,
+        "why": "The cell affects the energy through the basis and the sampling."
+      }
+    ],
+    "hints": [
+      "What else would change besides the spins?",
+      "Same settings for each."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "scene": "afm-a",
+      "caption": "An arrangement that needs a cell larger than one atom. Toy model.",
+      "alt": "Eight atoms in a cubic cell with layers pointing alternately up and down."
+    }
+  },
+  {
+    "id": "q-mag-4",
+    "concepts": [
+      "spin-polarization"
+    ],
+    "type": "single",
+    "prompt": "A run with a starting moment of 0.1 on a known magnet ends with zero moment. What does the author's guidance suggest?",
+    "options": [
+      {
+        "text": "The starting moment may be too small; start at 3 to 5 muB for 3d magnetic ions and compare energies",
+        "correct": true,
+        "why": "A moment can collapse to zero if the start is too small."
+      },
+      {
+        "text": "The material must be non-magnetic",
+        "correct": false,
+        "why": "Not necessarily: the start may have been too small."
+      },
+      {
+        "text": "Increase ENCUT",
+        "correct": false,
+        "why": "The cutoff is unrelated to the starting moment."
+      }
+    ],
+    "hints": [
+      "Starting values matter.",
+      "The collapse is a known symptom."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "scene": "afm-c",
+      "caption": "An arrangement with alternating columns. Toy model.",
+      "alt": "Eight atoms in a cubic cell with chains of atoms alternating up and down."
+    }
+  },
+  {
+    "id": "q-vdw-1",
+    "concepts": [
+      "van-der-waals"
+    ],
+    "type": "single",
+    "prompt": "Why does a plain PBE calculation of graphite bind its layers too weakly?",
+    "options": [
+      {
+        "text": "Semilocal functionals barely describe the weak dispersion attraction between neutral layers",
+        "correct": true,
+        "why": "A dispersion correction adds it back."
+      },
+      {
+        "text": "Because graphite has no electrons between layers",
+        "correct": false,
+        "why": "The attraction comes from correlated fluctuations, not from a charge between layers."
+      },
+      {
+        "text": "Because the cutoff was too high",
+        "correct": false,
+        "why": "A high cutoff does not change the physics of the missing term."
+      }
+    ],
+    "hints": [
+      "Which attraction acts between neutral layers?",
+      "It is long-ranged and weak."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042",
+      "S-028"
+    ],
+    "visual": {
+      "scene": "graphite",
+      "caption": "Layers of graphite. Illustrative.",
+      "alt": "Graphite: hexagonal layers of carbon atoms stacked along one axis."
+    }
+  },
+  {
+    "id": "q-vdw-2",
+    "concepts": [
+      "van-der-waals"
+    ],
+    "type": "single",
+    "prompt": "Which IVDW values does the author's dictionary list?",
+    "options": [
+      {
+        "text": "11 (D3), 12 (D3-BJ) and 20 (TS)",
+        "correct": true,
+        "why": "Use one consistently for every run you compare."
+      },
+      {
+        "text": "0, 1 and 2",
+        "correct": false,
+        "why": "Those are not the listed values."
+      },
+      {
+        "text": "1 for PBE and 2 for LDA",
+        "correct": false,
+        "why": "IVDW is about dispersion corrections, not about the functional."
+      }
+    ],
+    "hints": [
+      "D3 and D3-BJ are consecutive.",
+      "TS is 20."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042",
+      "S-028"
+    ],
+    "visual": {
+      "scene": "graphite",
+      "caption": "Layers of graphite. Illustrative.",
+      "alt": "Graphite: hexagonal layers of carbon atoms stacked along one axis."
+    }
+  },
+  {
+    "id": "q-vdw-3",
+    "concepts": [
+      "van-der-waals"
+    ],
+    "type": "single",
+    "prompt": "In which calculation should IVDW be applied for a layered crystal?",
+    "options": [
+      {
+        "text": "In the relaxation, so the structure sees it",
+        "correct": true,
+        "why": "The correction changes forces and therefore the structure."
+      },
+      {
+        "text": "Only in a final single point",
+        "correct": false,
+        "why": "Then the structure would not have been relaxed with it."
+      },
+      {
+        "text": "Never: it only changes the printed energy",
+        "correct": false,
+        "why": "It changes forces too."
+      }
+    ],
+    "hints": [
+      "Forces determine the structure.",
+      "Which run moves atoms?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "none": "The question is about when to switch a tag on, so a picture would only restate the answer text."
+    }
+  },
+  {
+    "id": "q-vdw-4",
+    "concepts": [
+      "van-der-waals"
+    ],
+    "type": "single",
+    "prompt": "What does a pairwise dispersion correction add for each pair of atoms?",
+    "options": [
+      {
+        "text": "A small attractive term that falls off with distance and is damped at short range",
+        "correct": true,
+        "why": "D3 and D3(BJ) differ in the damping."
+      },
+      {
+        "text": "A repulsive term that grows with distance",
+        "correct": false,
+        "why": "The dispersion term is attractive and decays."
+      },
+      {
+        "text": "A new electron",
+        "correct": false,
+        "why": "It adds energy and forces, not electrons."
+      }
+    ],
+    "hints": [
+      "It is a patch on the energy.",
+      "Attractive and fading with distance."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-028"
+    ],
+    "visual": {
+      "scene": "graphite",
+      "caption": "Layers of graphite. Illustrative.",
+      "alt": "Graphite: hexagonal layers of carbon atoms stacked along one axis."
+    }
+  }
+]

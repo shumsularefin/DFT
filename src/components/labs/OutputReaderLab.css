@@ -1,0 +1,86 @@
+.or-controls {
+  display: grid;
+  gap: var(--space-3);
+}
+.or-row {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+}
+.or-field {
+  display: grid;
+  gap: var(--space-1);
+  font-size: var(--step--1);
+  min-width: 0;
+}
+.or-field > span {
+  color: var(--text-muted);
+}
+.or-field select,
+.or-field input:not([type='file']),
+.or-field textarea {
+  min-height: var(--target);
+  font: inherit;
+  padding: var(--space-1) var(--space-3);
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  max-width: 100%;
+  min-width: 0;
+}
+.or-field textarea {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  resize: vertical;
+}
+.or-note {
+  margin: 0;
+  font-size: var(--step--1);
+  color: var(--text-muted);
+}
+.or-view {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.or-banner {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  font-size: var(--step--1);
+}
+.or-warn {
+  margin: 0;
+  padding-left: var(--space-4);
+  font-size: var(--step--1);
+}
+.or-checks {
+  display: grid;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.or-check {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-left-width: 4px;
+  border-radius: var(--radius);
+  font-size: var(--step--1);
+}
+.or-ok {
+  border-left-color: var(--ok);
+}
+.or-watch {
+  border-left-color: var(--warn);
+}
+.or-problem {
+  border-left-color: var(--danger);
+}
+.or-unknown {
+  border-left-style: dashed;
+}

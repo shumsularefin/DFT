@@ -49,6 +49,10 @@ describe('queries', () => {
   it('orders prerequisites first, deterministically', () => {
     expect(topologicalOrder(diamond())).toEqual(['a', 'b', 'c', 'd']);
   });
+  it('orders a subset whose prerequisites are not all in it (published concepts)', () => {
+    const subset = diamond().filter((c) => c.id !== 'a');
+    expect(topologicalOrder(subset)).toHaveLength(subset.length);
+  });
   it('finds ancestors and descendants', () => {
     const g = diamond();
     expect(ancestors(g, 'd')).toEqual(['a', 'b', 'c']);
@@ -86,8 +90,27 @@ describe('shipped concept graph', () => {
       for (const k of q.concepts) expect(ids.has(k), k).toBe(true);
     }
   });
-  it('publishes module 4 (M7.1) and marks every module 5 to 11 concept as planned', () => {
+  it('publishes module 4 (M7.1), the module 5 concepts of M7.2 the file and running concepts of M7.3 and the module 8 concepts of M7.4, and keeps the rest planned', () => {
     expect(g.filter((x) => x.module === 4).every((x) => x.status === 'published')).toBe(true);
-    expect(g.filter((x) => x.module >= 5).every((x) => x.status === 'planned')).toBe(true);
+    const m73 = new Set([
+      'poscar-file',
+      'kpoints-file',
+      'incar-file',
+      'potcar-file',
+      'output-file-reference',
+      'five-step-protocol',
+      'job-scripts',
+      'restart-files',
+      'output-files',
+      'vaspkit',
+      'convergence-testing',
+      'cutoff-convergence',
+      'kpoint-convergence',
+      'scf-troubleshooting',
+      'relaxation-troubleshooting',
+      'common-errors',
+    ]);
+    for (const x of g.filter((y) => y.module >= 6))
+      expect(x.status, x.id).toBe(m73.has(x.id) ? 'published' : 'planned');
   });
 });

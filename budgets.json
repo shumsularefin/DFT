@@ -23,6 +23,10 @@
       "contains": "analyze_cell",
       "maxKB": 300
     },
+    "firebase": {
+      "contains": "popup-closed-by-user",
+      "maxKB": 80
+    },
     "rdkit": {
       "contains": "set_new_coords",
       "maxKB": 2500

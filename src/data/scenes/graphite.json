@@ -1,0 +1,21 @@
+{
+ "id": "graphite",
+ "badge": "illustrative",
+ "alt": "Graphite: hexagonal layers of carbon atoms stacked along c, bonded within a layer.",
+ "caption": "Graphite: strong bonds inside each layer, weak stacking between layers. Bonds shown are the in-cell ones only.",
+ "structure": {
+  "ref": "graphite"
+ },
+ "camera": {
+  "azimuth": 15,
+  "elevation": 30
+ },
+ "repeat": [
+  2,
+  2,
+  1
+ ],
+ "show": {
+  "bonds": true
+ }
+}

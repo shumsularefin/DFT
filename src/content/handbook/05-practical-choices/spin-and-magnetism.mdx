@@ -1,0 +1,102 @@
+---
+id: spin-and-magnetism
+title: Spin and magnetism
+module: 5
+order: 6
+summary: When to turn on spin polarization, how MAGMOM works, and why ferromagnetic and antiferromagnetic arrangements have to be compared in the same cell.
+concepts: [spin-polarization]
+requires: [spin-pauli, scf-loop]
+vaspTags: [ISPIN, MAGMOM, LORBIT]
+sources: [S-019, S-041, S-042]
+status: draft
+updated: 2026-11-19
+---
+
+<Why>
+
+Electrons carry spin. In many materials the up and down electrons are equally numerous everywhere, and a calculation that treats them together is fine and half the cost. In magnetic materials (iron, many oxides with d or f electrons) and in radicals the two spins differ, and forcing them to be equal gives the wrong energy and the wrong structure. Turning spin on is a decision you make in every run, and the starting guess for each atom matters because the calculation can settle in the wrong magnetic state <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+With spin polarization off, each orbital holds two electrons, one up and one down. With it on, VASP keeps separate up and down orbitals, so the two spin densities can differ. The difference is the magnetization.
+
+A moment on each atom is a starting guess you provide, in `MAGMOM`, one value per atom in the same order as the atoms in `POSCAR`. The run then adjusts the moments. If you start them too small, they can collapse to zero even in a material that is magnetic. If you start from a pattern (up on one atom, down on its neighbour), you can find an antiferromagnetic state, which a ferromagnetic start will not reach by itself.
+
+The lab shows arrangements on a small square lattice and the `MAGMOM` line that describes each. It is a cartoon: the signs are set by hand and the moments are starting guesses. Try the toggle that leaves one atom out: the count no longer matches, and the count must match.
+
+**Comparing states.** The way to learn which arrangement is lowest in energy is to run each one and compare the energies. That only means something if every arrangement uses the same cell, the same cutoff and the same k-mesh. A larger cell than the chemical one is often needed to fit an antiferromagnetic pattern <Cite id="S-042" />.
+
+<Level min="intermediate">
+
+VASP includes the `MAGMOM` pattern in its symmetry analysis, so an antiferromagnetic arrangement lowers the symmetry automatically; no separate `POTCAR` species is needed for the up and down sites (VASP wiki page MAGMOM, recorded as Q-040). The detailed magnetism pages (generating orderings, the Heisenberg picture) are planned in a later stage; the tool at `/tools/magnetic/` already builds the files for several orderings in one common cell.
+
+</Level>
+
+</Intuition>
+
+<Lab id="spin-cartoon" title="Spins and MAGMOM" />
+
+<TheMath>
+
+Write the up and down densities as $n_\uparrow(\mathbf r)$ and $n_\downarrow(\mathbf r)$. The total density is $n = n_\uparrow + n_\downarrow$ and the magnetization density is $m = n_\uparrow - n_\downarrow$ (in units of the Bohr magneton, $\mu_B$, when each electron counts as one). The total moment is the integral of $m$, and for a cell it is the net difference between the number of up and down electrons. In an antiferromagnet the site moments cancel in the sum, so the net moment is about zero while each site's moment is not. In the lab, the "net starting moment" is the sum of the values you would write in `MAGMOM`; it is not a result.
+
+</TheMath>
+
+<InVasp>
+
+<TagVisual tag="ISPIN" />
+
+- `ISPIN = 2` turns on collinear spin polarization (default 1). It roughly doubles the time and memory <Cite id="S-042" />.
+- `MAGMOM` takes one value per atom, in `POSCAR` order, in $\mu_B$. The shorthand `4*3.0` means four atoms at 3.0. The count must equal the number of atoms; a count mismatch is a common mistake <Cite id="S-042" />. An antiferromagnetic example from the tag card: `5 -5 4*0`.
+- The author's rule for the starting moment of 3d magnetic ions is 3 to 5 $\mu_B$; if it is too small, the moment can collapse to zero. Compare energies and check that `ISPIN = 2` is set <Cite id="S-042" />.
+- `LORBIT = 11` writes projected densities and the site-resolved moments in `OUTCAR`. `OSZICAR` shows the total moment as `mag` <Cite id="S-041" />.
+- Keep `ISPIN`, `MAGMOM` and `LMAXMIX` identical between an SCF run and any `ICHARG = 11` run that follows it <Cite id="S-042" />.
+- Final moments usually differ from the starting ones; VASP relaxes them.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...          | ...in the lab                          | ...in VASP                                                          |
+| ------------------------- | -------------------------------------- | ------------------------------------------------------------------- |
+| FM to AFM arrangement     | Arrows alternate, net moment goes to 0 | A different state, with its own energy; compare in the same cell    |
+| A smaller starting moment | Shorter list values                    | Risk of a collapse to zero moment                                   |
+| Leave out one value       | Count no longer matches                | The `MAGMOM` count must equal the number of atoms                   |
+| `ISPIN = 1`               | Not shown                              | Up and down forced equal: wrong for magnetic systems, half the cost |
+
+Why turn spin on: magnetic systems need it. Why this starting moment: high enough not to collapse. What happens if you get it wrong: a non-magnetic state reported for a magnetic material.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Starting from zero or from the wrong arrangement">
+
+A run started with no moment can stay non-magnetic, and a ferromagnetic start will not find an antiferromagnetic state. Try the arrangements you care about.
+
+</Callout>
+
+<Callout variant="mistake" title="Comparing energies from different cells">
+
+Energies of different magnetic orderings are comparable only in the same cell with the same settings.
+
+</Callout>
+
+<Callout variant="mistake" title="Taking the lab moments as predictions">
+
+They are starting guesses you choose, not computed values.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-mag-1', 'q-mag-2', 'q-mag-3', 'q-mag-4']} />
+
+<GoDeeper>
+
+- VASP wiki pages ISPIN, MAGMOM and LORBIT (by page name) <Cite id="S-019" />.
+- The author's handbooks on charge and spin <Cite id="S-041" /> <Cite id="S-042" />.
+
+</GoDeeper>

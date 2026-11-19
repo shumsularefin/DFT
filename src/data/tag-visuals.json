@@ -1,0 +1,406 @@
+{
+ "_meta": {
+  "sources": [
+   "S-019",
+   "S-041",
+   "S-042"
+  ],
+  "note": "One entry per tag. Captions say no more than src/data/vasp-tags.json; {braces} are filled in by src/lib/vasp/tagVisual.ts."
+ },
+ "tags": [
+  {
+   "tag": "ISPIN",
+   "plot": "ispin-ladders",
+   "badge": "illustrative",
+   "sources": [
+    "S-041",
+    "S-042"
+   ],
+   "example": "2",
+   "cases": [
+    {
+     "value": "1",
+     "params": {
+      "spin": 1
+     },
+     "captions": {
+      "beginner": "ISPIN = 1: one set of orbitals, and each orbital holds two electrons, one up and one down. It is faster and uses half the memory.",
+      "intermediate": "ISPIN = 1: non-spin-polarized. Each orbital holds two electrons.",
+      "pro": "ISPIN = 1: non-spin-polarized, each orbital holds two electrons. Faster, half the memory."
+     },
+     "alt": "One column of three energy levels. The two lower levels each show an up arrow and a down arrow; the top level is empty. The filling is invented, to show one shared set of orbitals."
+    },
+    {
+     "value": "2",
+     "params": {
+      "spin": 2
+     },
+     "captions": {
+      "beginner": "ISPIN = 2: spin-up and spin-down electrons get their own sets of orbitals, so the two sets can differ. Time and memory roughly double.",
+      "intermediate": "ISPIN = 2: collinear spin-polarized, with separate up and down wavefunctions.",
+      "pro": "ISPIN = 2: separate spin-up and spin-down wavefunctions; CPU time and memory roughly double."
+     },
+     "alt": "Two columns of three energy levels, labelled spin up and spin down. The up column has three arrows and the down column two. The filling is invented, to show two separate sets of orbitals."
+    }
+   ]
+  },
+  {
+   "tag": "MAGMOM",
+   "scene": "afm-g",
+   "badge": "computed",
+   "sources": [
+    "S-041",
+    "S-042"
+   ],
+   "example": "",
+   "captions": {
+    "beginner": "MAGMOM gives one starting moment per atom, in POSCAR order. Here {n} value(s) for {atoms} atom(s): {match}.",
+    "intermediate": "MAGMOM: initial moment per atom (muB), POSCAR order. {n} value(s) for {atoms} atom(s): {match}.",
+    "pro": "MAGMOM: one value per atom in POSCAR order ({n} given, {atoms} atoms: {match}). Arrows point up for a positive and down for a negative value."
+   }
+  },
+  {
+   "tag": "ENCUT",
+   "plot": "pw-parabola",
+   "badge": "computed",
+   "sources": [
+    "S-019",
+    "S-042",
+    "S-049"
+   ],
+   "example": "400",
+   "captions": {
+    "beginner": "ENCUT = {value} eV keeps every plane wave whose kinetic energy is below the horizontal line. A bigger cutoff keeps more of them.",
+    "intermediate": "Plane waves with kinetic energy up to ENCUT = {value} eV are in the basis.",
+    "pro": "ENCUT = {value} eV: higher ENCUT means more plane waves, a more complete basis, more memory and CPU time."
+   },
+   "alt": "Free-electron kinetic energy against wave vector, a parabola. A horizontal line at the cutoff of {value} eV and two vertical lines mark the plane waves that lie below it."
+  },
+  {
+   "tag": "KSPACING",
+   "plot": "kmesh-grid",
+   "badge": "computed",
+   "sources": [
+    "S-019",
+    "S-041"
+   ],
+   "example": "0.2",
+   "captions": {
+    "beginner": "KSPACING = {value} per angstrom gives a {mesh} mesh for {cell}. A smaller spacing gives more k-points.",
+    "intermediate": "KSPACING = {value} (1/angstrom, includes 2 pi): a {mesh} mesh for {cell}.",
+    "pro": "KSPACING = {value}: a {mesh} mesh for {cell}; a smaller spacing gives more k-points."
+   },
+   "alt": "The reciprocal cell as a square with {mesh} points drawn inside it, and the gamma point circled. The mesh comes from KSPACING = {value} for {cell}."
+  },
+  {
+   "tag": "ISMEAR",
+   "plot": "sigma-width",
+   "badge": "computed",
+   "sources": [
+    "S-016",
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "example": "0",
+   "cases": [
+    {
+     "value": "-1",
+     "params": {
+      "scheme": "fermi"
+     },
+     "captions": {
+      "beginner": "ISMEAR = -1: Fermi-Dirac smearing, the step is spread by a physical electronic temperature.",
+      "intermediate": "ISMEAR = -1: Fermi-Dirac smearing.",
+      "pro": "ISMEAR = -1: Fermi-Dirac, a physical electronic temperature (finite-temperature DFT)."
+     },
+     "alt": "Occupation against energy from the Fermi level for Fermi-Dirac smearing: a step smoothed over a width of SIGMA = {sigma} eV."
+    },
+    {
+     "value": "0",
+     "params": {
+      "scheme": "gaussian"
+     },
+     "captions": {
+      "beginner": "ISMEAR = 0: Gaussian smearing spreads the sharp step into a smooth one. 0 with a small SIGMA is the safe default for this handbook.",
+      "intermediate": "ISMEAR = 0: Gaussian smearing, safe for any system and for few k-points.",
+      "pro": "ISMEAR = 0: Gaussian, safe for any system and for few k-points; SIGMA about 0.03 to 0.05 for semiconductors and insulators."
+     },
+     "alt": "Occupation against energy from the Fermi level for Gaussian smearing: a step smoothed over a width of SIGMA = {sigma} eV."
+    },
+    {
+     "value": "1",
+     "params": {
+      "scheme": "mp1"
+     },
+     "captions": {
+      "beginner": "ISMEAR = 1: Methfessel-Paxton smearing, good for metals.",
+      "intermediate": "ISMEAR = 1: Methfessel-Paxton, good for metals.",
+      "pro": "ISMEAR = 1: Methfessel-Paxton, good for metals with SIGMA about 0.1 to 0.2. Never for semiconductors."
+     },
+     "alt": "Occupation against energy from the Fermi level for Methfessel-Paxton smearing: a step smoothed over a width of SIGMA = {sigma} eV."
+    },
+    {
+     "value": "2",
+     "params": {
+      "scheme": "mp2"
+     },
+     "captions": {
+      "beginner": "ISMEAR = 2: Methfessel-Paxton smearing, good for metals.",
+      "intermediate": "ISMEAR = 2: Methfessel-Paxton, good for metals.",
+      "pro": "ISMEAR = 2: Methfessel-Paxton, good for metals with SIGMA about 0.1 to 0.2."
+     },
+     "alt": "Occupation against energy from the Fermi level for Methfessel-Paxton smearing: a step smoothed over a width of SIGMA = {sigma} eV."
+    }
+   ]
+  },
+  {
+   "tag": "SIGMA",
+   "plot": "sigma-width",
+   "badge": "computed",
+   "sources": [
+    "S-016",
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "example": "0.05",
+   "captions": {
+    "beginner": "SIGMA = {value} eV is the width of the spreading of the electron occupations. Small for insulators, larger for metals.",
+    "intermediate": "SIGMA = {value} eV: smearing width.",
+    "pro": "SIGMA = {value} eV: smearing width. Check that the entropy term T*S per atom stays below about 1 meV."
+   },
+   "alt": "Occupation against energy from the Fermi level, a step smoothed over a width of SIGMA = {value} eV."
+  },
+  {
+   "tag": "LDAUU",
+   "plot": "dftu-penalty",
+   "badge": "computed",
+   "sources": [
+    "S-014",
+    "S-019",
+    "S-041"
+   ],
+   "example": "5.3",
+   "captions": {
+    "beginner": "U - J = {ueff} eV here. The penalty is zero for an empty or a full orbital and largest in between, so it pushes occupations towards 0 or 1.",
+    "intermediate": "DFT+U in the Dudarev form (LDAUTYPE = 2): penalty (U - J)/2 n (1 - n) with U - J = {ueff} eV.",
+    "pro": "Dudarev form (LDAUTYPE = 2), U - J = {ueff} eV, from {source}. One value per species in POSCAR order."
+   },
+   "alt": "Penalty energy against the occupation n of one orbital, an arch that is zero at n = 0 and n = 1 and largest at n = 0.5. Effective U minus J is {ueff} eV."
+  },
+  {
+   "tag": "LDAUJ",
+   "plot": "dftu-penalty",
+   "badge": "computed",
+   "sources": [
+    "S-014",
+    "S-019",
+    "S-041"
+   ],
+   "example": "0.0",
+   "captions": {
+    "beginner": "U - J = {ueff} eV here. The penalty is zero for an empty or a full orbital and largest in between, so it pushes occupations towards 0 or 1.",
+    "intermediate": "DFT+U in the Dudarev form (LDAUTYPE = 2): penalty (U - J)/2 n (1 - n) with U - J = {ueff} eV.",
+    "pro": "Dudarev form (LDAUTYPE = 2), U - J = {ueff} eV, from {source}. One value per species in POSCAR order."
+   },
+   "alt": "Penalty energy against the occupation n of one orbital, an arch that is zero at n = 0 and n = 1 and largest at n = 0.5. Effective U minus J is {ueff} eV."
+  },
+  {
+   "tag": "ISIF",
+   "plot": "dof-cell",
+   "badge": "illustrative",
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "example": "3",
+   "cases": [
+    {
+     "value": "2",
+     "params": {
+      "atoms": true,
+      "shape": false,
+      "volume": false
+     },
+     "captions": {
+      "beginner": "ISIF = 2: only the ions move; the cell stays as it is. Slabs and defects use this.",
+      "intermediate": "ISIF = 2: relax the ions only.",
+      "pro": "ISIF = 2: relax the ions only. Needs IBRION above 0 and NSW above 0 to move anything."
+     },
+     "alt": "A small cell with two atoms. Arrows on the atoms show they may move."
+    },
+    {
+     "value": "3",
+     "params": {
+      "atoms": true,
+      "shape": true,
+      "volume": true
+     },
+     "captions": {
+      "beginner": "ISIF = 3: the ions, the cell shape and the cell volume may all change.",
+      "intermediate": "ISIF = 3: ions, cell shape and volume relax.",
+      "pro": "ISIF = 3: ions, cell shape and volume relax. Needs IBRION above 0 and NSW above 0 to move anything."
+     },
+     "alt": "A small cell with two atoms. Arrows on the atoms show they may move. A dashed, larger cell shows the volume may change."
+    },
+    {
+     "value": "4",
+     "params": {
+      "atoms": true,
+      "shape": true,
+      "volume": false
+     },
+     "captions": {
+      "beginner": "ISIF = 4: the ions and the cell shape may change, at a fixed volume.",
+      "intermediate": "ISIF = 4: ions and cell shape at fixed volume.",
+      "pro": "ISIF = 4: ions and cell shape at fixed volume. Needs IBRION above 0 and NSW above 0 to move anything."
+     },
+     "alt": "A small cell with two atoms. Arrows on the atoms show they may move. A dashed cell of a different shape is drawn next to it."
+    }
+   ]
+  },
+  {
+   "tag": "IBRION",
+   "plot": "dof-cell",
+   "badge": "illustrative",
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "example": "2",
+   "cases": [
+    {
+     "value": "-1",
+     "params": {
+      "atoms": false
+     },
+     "captions": {
+      "beginner": "IBRION = -1: no ionic movement; a static calculation.",
+      "intermediate": "IBRION = -1: no ionic movement; a static calculation.",
+      "pro": "IBRION = -1: no ionic movement; a static calculation. Nothing moves unless NSW is above 0."
+     },
+     "alt": "A small cell with two atoms and no arrows: nothing moves."
+    },
+    {
+     "value": "0",
+     "params": {
+      "atoms": true
+     },
+     "captions": {
+      "beginner": "IBRION = 0: ab initio molecular dynamics; the ions move step by step.",
+      "intermediate": "IBRION = 0: ab initio molecular dynamics; the ions move step by step.",
+      "pro": "IBRION = 0: ab initio molecular dynamics; the ions move step by step. Nothing moves unless NSW is above 0."
+     },
+     "alt": "A small cell with two atoms and arrows on them: the ions may move."
+    },
+    {
+     "value": "1",
+     "params": {
+      "atoms": true
+     },
+     "captions": {
+      "beginner": "IBRION = 1: a quasi-Newton relaxation (RMM-DIIS), efficient close to the minimum.",
+      "intermediate": "IBRION = 1: a quasi-Newton relaxation (RMM-DIIS), efficient close to the minimum.",
+      "pro": "IBRION = 1: a quasi-Newton relaxation (RMM-DIIS), efficient close to the minimum. Nothing moves unless NSW is above 0."
+     },
+     "alt": "A small cell with two atoms and arrows on them: the ions may move."
+    },
+    {
+     "value": "2",
+     "params": {
+      "atoms": true
+     },
+     "captions": {
+      "beginner": "IBRION = 2: a conjugate-gradient relaxation, the robust standard for rough starting structures.",
+      "intermediate": "IBRION = 2: a conjugate-gradient relaxation, the robust standard for rough starting structures.",
+      "pro": "IBRION = 2: a conjugate-gradient relaxation, the robust standard for rough starting structures. Nothing moves unless NSW is above 0."
+     },
+     "alt": "A small cell with two atoms and arrows on them: the ions may move."
+    },
+    {
+     "value": "3",
+     "params": {
+      "atoms": true
+     },
+     "captions": {
+      "beginner": "IBRION = 3: a damped molecular-dynamics relaxation, useful for poor starting geometries.",
+      "intermediate": "IBRION = 3: a damped molecular-dynamics relaxation, useful for poor starting geometries.",
+      "pro": "IBRION = 3: a damped molecular-dynamics relaxation, useful for poor starting geometries. Nothing moves unless NSW is above 0."
+     },
+     "alt": "A small cell with two atoms and arrows on them: the ions may move."
+    }
+   ]
+  },
+  {
+   "tag": "NSW",
+   "plot": "ionic-steps",
+   "badge": "illustrative",
+   "sources": [
+    "S-041",
+    "S-042"
+   ],
+   "example": "100",
+   "captions": {
+    "beginner": "NSW = {value}: the most ionic steps allowed. 0 means a single calculation with no ion movement.",
+    "intermediate": "NSW = {value}: maximum number of ionic steps.",
+    "pro": "NSW = {value}: upper limit on ionic steps. Reaching it is not convergence."
+   },
+   "alt": "A row of numbered boxes, one for each ionic step allowed (at most NSW = {value})."
+  },
+  {
+   "tag": "EDIFF",
+   "plot": "ediff-trace",
+   "badge": "toy-model",
+   "sources": [
+    "S-011",
+    "S-031",
+    "S-041",
+    "S-042"
+   ],
+   "example": "1e-5",
+   "captions": {
+    "beginner": "The electronic loop stops when the energy changes by less than EDIFF = {value} eV between steps. This drawing uses the module 4 toy, not VASP, so only the idea carries over.",
+    "intermediate": "EDIFF = {value} eV: the SCF stops when the energy change falls below it. Toy two-electron SCF of module 4 (Hartree-Fock, not VASP).",
+    "pro": "EDIFF = {value} eV: stop when the energy change falls below it. Drawn with the toy two-electron SCF of module 4, so the step count is not VASP's."
+   },
+   "alt": "Energy change between electronic steps against step number, on a log scale, falling. A horizontal line marks EDIFF = {value} eV; the first step below it is circled."
+  },
+  {
+   "tag": "EDIFFG",
+   "plot": "force-band",
+   "badge": "illustrative",
+   "sources": [
+    "S-041",
+    "S-042"
+   ],
+   "example": "-0.01",
+   "captions": {
+    "beginner": "EDIFFG = {value}: a negative number means stop when every force is smaller than that many eV per angstrom.",
+    "intermediate": "EDIFFG = {value}: stop when the largest force falls below {abs} eV/A. The decay drawn is invented.",
+    "pro": "EDIFFG = {value}: stop when the force on every atom is below {abs} eV/A. The force criterion ignores stress. The decay drawn is invented."
+   },
+   "alt": "Largest force on any ion against ionic step, on a log scale, falling. A horizontal line marks the threshold {abs} eV per angstrom; the first step below it is circled. The decay is invented."
+  },
+  {
+   "tag": "NELM",
+   "plot": "scf-trace",
+   "badge": "toy-model",
+   "sources": [
+    "S-011",
+    "S-019",
+    "S-041",
+    "S-042"
+   ],
+   "example": "5",
+   "captions": {
+    "beginner": "NELM = {value}: the most electronic steps allowed. If the density has not settled by then, the step ends anyway.",
+    "intermediate": "NELM = {value}: maximum electronic steps per ionic step. Reaching it means the step is unconverged.",
+    "pro": "NELM = {value}: hard limit on electronic steps. Reaching it means the step is unconverged, but VASP proceeds to the next ionic step. Drawn with the toy SCF of module 4."
+   },
+   "alt": "Change in density against iteration for the module 4 toy, stopped after NELM = {value} iterations."
+  }
+ ]
+}

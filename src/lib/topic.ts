@@ -62,10 +62,17 @@ export const REGISTERED_LABS = [
   'exponential-wall',
   'density-as-a-map',
   'scf-loop',
+  'smearing',
+  'dft-plus-u',
+  'paw-picture',
+  'functional-ladder',
+  'spin-cartoon',
+  'output-reader',
 ] as const;
 
-/** Page class for a topic: "island" if its body embeds a registered lab, else "content". */
+/** Page class for a topic: "island" if its body embeds a registered lab, a `<Scene>` or the `<Check>` questions (React islands), else "content". */
 export function topicPageClass(body: string): 'content' | 'island' {
   const ids = [...body.matchAll(/<Lab\s[^>]*\bid=["']([^"']+)["']/g)].map((m) => m[1]);
+  if (/<Scene\s[^>]*\bid=["'][^"']+["']/.test(body) || /<Check\s/.test(body)) return 'island';
   return ids.some((i) => (REGISTERED_LABS as readonly string[]).includes(i!)) ? 'island' : 'content';
 }

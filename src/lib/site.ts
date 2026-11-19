@@ -29,11 +29,12 @@ export const moduleName = (n: number): string => MODULES[n - 1] ?? `Module ${n}`
 
 /** Top navigation. Tools that do not exist yet point at their "coming soon" card on /tools/. */
 export const NAV = [
+  { label: 'Learn', href: '/learn/' },
   { label: 'Handbook', href: '/handbook/' },
   { label: 'Tools', href: '/tools/' },
   { label: 'Studio', href: '/tools/#studio' },
   { label: 'Builder', href: '/tools/#builder' },
-  { label: 'Practice', href: '/tools/#practice' },
+  { label: 'Practice', href: '/practice/' },
 ] as const;
 
 export const FOOTER_LINKS = [

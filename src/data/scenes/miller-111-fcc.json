@@ -1,0 +1,33 @@
+{
+ "id": "miller-111-fcc",
+ "badge": "illustrative",
+ "alt": "Face-centred cubic cell with the (111) plane drawn as a triangle through the three cube corners next to the origin.",
+ "caption": "The (111) plane of fcc: the most densely packed plane.",
+ "structure": {
+  "ref": "fcc"
+ },
+ "camera": "iso",
+ "planes": [
+  {
+   "hkl": [
+    1,
+    1,
+    1
+   ]
+  }
+ ],
+ "vectors": [
+  {
+   "space": "real",
+   "index": 0
+  },
+  {
+   "space": "real",
+   "index": 1
+  },
+  {
+   "space": "real",
+   "index": 2
+  }
+ ]
+}

@@ -1,0 +1,134 @@
+---
+id: job-scripts
+title: Job scripts and parallel settings
+module: 7
+order: 2
+summary: How a SLURM or PBS job script launches VASP, what the lines mean, and how NCORE and KPAR split the work across MPI ranks.
+concepts: [job-scripts]
+requires: [vasp-workflow]
+vaspTags: [NCORE, KPAR]
+sources: [S-019, S-041, S-042]
+noLab: true
+status: draft
+updated: 2026-11-19
+---
+
+<Why>
+
+On a cluster you do not run VASP by typing its name. You write a short script that asks the scheduler for cores and time, then starts VASP on them. The same script can also decide how fast the run is, because VASP splits the work over its cores in ways you set with `NCORE` and `KPAR` <Cite id="S-041" />.
+
+</Why>
+
+<Intuition>
+
+A job script has three parts: **requests** (nodes, cores per node, time), **setup** (go to the folder, load the VASP module) and **launch** (the line that runs VASP and writes the screen output to a file).
+
+The scripts below are the templates this site's job-script tool writes. The module name and queue are placeholders: your cluster's values go there <Cite id="S-042" />.
+
+SLURM:
+
+<VaspFile
+  name="shell"
+  code={`#!/bin/bash
+#SBATCH --job-name=vasp
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=32
+#SBATCH --time=24:00:00
+#SBATCH --output=%x-%j.out
+
+cd "$SLURM_SUBMIT_DIR"
+module load vasp/6.4.2
+
+srun vasp_std > vasp.out 2>&1`}
+/>
+
+PBS:
+
+<VaspFile
+  name="shell"
+  code={`#!/bin/bash
+#PBS -N vasp
+#PBS -l select=1:ncpus=32:mpiprocs=32
+#PBS -l walltime=24:00:00
+#PBS -j oe
+
+cd "$PBS_O_WORKDIR"
+module load vasp/6.4.2
+
+mpirun -np 32 vasp_std > vasp.out 2>&1`}
+/>
+
+Submit with `sbatch job.sh` or `qsub job.sh`. Use `vasp_std` for general runs, `vasp_gam` for Gamma-only runs and `vasp_ncl` for spin-orbit coupling.
+
+</Intuition>
+
+<TheMath>
+
+<Level min="intermediate">
+
+VASP runs one MPI process per rank. Two tags divide the work <Cite id="S-041" />:
+
+- `KPAR` splits the k-points into groups. The number of ranks must be divisible by `KPAR`.
+- `NCORE` is the number of ranks that share one band. VASP then sets `NPAR` = ranks divided by `NCORE`. A common choice is 4 up to the number of cores per socket.
+
+With 32 ranks, `KPAR = 4` makes four groups of 8 ranks, and `NCORE = 4` inside each group makes two band groups of 4. The plot in the questions of this topic shows that split.
+
+`IBRION = 6` runs without band parallelisation, so `NCORE` must be left out for elastic runs (the workflow topic) <Cite id="S-042" />.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+- **Job-script tool.** This site's tool fills in the template and suggests `KPAR` and `NCORE` values that divide your core count. It never contains cluster defaults.
+- **Building POTCAR in the script.** `cat "$POTCAR_LIBRARY/Ti_pv/POTCAR" ... > POTCAR`, in the order of `POSCAR` line 6, on your own machine and with your own licence.
+- **Watching the run.** `tail -f OSZICAR` shows each step; the next topic explains the columns.
+- **Parallel tags.** The author's relaxation INCAR sets `NCORE = 4`. More cores are not always faster, so test two or three settings on a short run <Cite id="S-041" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...                        | ...in the run           | ...what to expect                              |
+| --------------------------------------- | ----------------------- | ---------------------------------------------- |
+| `KPAR` from 1 to 4                      | Four k-point groups     | Faster for many k-points; more memory per rank |
+| `NCORE` from 1 to 4                     | Bands shared by 4 ranks | Often faster on a node with many cores         |
+| A `KPAR` that does not divide the ranks | Groups of unequal size  | VASP stops with an error                       |
+| A longer walltime                       | A bigger request        | A longer queue wait                            |
+
+Why these settings: they decide how the cores share the work. What happens if you skip them: VASP still runs, with defaults that may be slow on many cores.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="KPAR not dividing the number of ranks">
+
+Choose `KPAR` from the divisors of your total core count <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="NCORE left in an IBRION = 6 run">
+
+Comment it out for finite-difference elastic runs <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Copying another cluster's module names">
+
+The templates use placeholders. Take the module and queue names from your own cluster's documentation.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-js-1', 'q-js-2', 'q-js-3', 'q-js-4']} />
+
+<GoDeeper>
+
+- The job-script tool on this site, and your cluster's documentation.
+- VASP wiki pages NCORE and KPAR <Cite id="S-019" />.
+- The Field Handbook `KPAR` and `NCORE` entries <Cite id="S-041" />.
+
+</GoDeeper>

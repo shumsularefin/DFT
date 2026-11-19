@@ -1,0 +1,156 @@
+---
+id: incar
+title: INCAR, the instruction file
+module: 6
+order: 3
+summary: How an INCAR is read, why defaults matter, how to confirm what VASP actually used, and the author's relaxation, SCF and band INCARs as worked examples.
+concepts: [incar-file]
+requires: [vasp-workflow]
+vaspTags: [ENCUT, EDIFF, ISPIN, MAGMOM]
+sources: [S-019, S-041, S-042]
+noLab: true
+status: draft
+updated: 2026-11-19
+---
+
+<Why>
+
+The `INCAR` file tells VASP what to calculate and how carefully. It is the file you will edit most. It is also the one where silence is dangerous: any tag you leave out takes a default, and many defaults depend on other tags <Cite id="S-041" />. Knowing how the file is read, and how to confirm what VASP really used, saves hours of debugging.
+
+</Why>
+
+<Intuition>
+
+Think of the `INCAR` as a list of settings with one setting per line, written as `TAG = value`. A `!` or `#` starts a comment, and a `;` lets you put two tags on one line <Cite id="S-041" />.
+
+Three habits make it safe:
+
+1. **Read it like a recipe.** Every tag you write should answer a question: what am I computing, how accurately, and how should it run?
+2. **Remember that omitted tags are not empty.** `IBRION`, for example, depends on `NSW` (the number of ionic steps), so leaving both out gives a single-point calculation.
+3. **Check the echo.** A misspelled tag may be ignored. The parameter echo at the top of `OUTCAR` shows what VASP used <Cite id="S-041" />.
+
+Click a line in the author's relaxation INCAR to see why that value is there.
+
+<VaspFileExplorer
+  kind="INCAR"
+  code={`SYSTEM  = Compound-relax
+PREC    = Accurate
+ENCUT   = 520          # 1.3 x largest ENMAX (grep ENMAX POTCAR)
+EDIFF   = 1E-6
+ALGO    = Normal
+NELM    = 120
+ISMEAR  = 0
+SIGMA   = 0.05
+ISPIN   = 2
+MAGMOM  = 2*5.0 4*0.6  # one entry per atom, POSCAR order
+IBRION  = 2
+ISIF    = 3
+NSW     = 200
+EDIFFG  = -0.005
+POTIM   = 0.3
+LWAVE   = .TRUE.
+LCHARG  = .TRUE.
+NCORE   = 4`}
+/>
+
+</Intuition>
+
+<TheMath>
+
+<Level min="intermediate">
+
+Two tags set stopping rules, and they mean different things.
+
+- `EDIFF` stops the **electronic** loop when the change in total energy between steps falls below it, in eV.
+- `EDIFFG` stops the **ionic** loop. A **negative** value means "stop when every force is below $\lvert\text{EDIFFG}\rvert$ in eV per angstrom". A positive value means "stop when the energy change between ionic steps is below it" <Cite id="S-042" />.
+
+The handbook's `ENCUT = 520` is 1.3 times a largest `ENMAX` of 400 eV. That factor is the author's rule for variable-cell relaxations, where the stress tensor needs a higher cutoff than the energy <Cite id="S-042" />.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+- **Where it comes from.** VASPkit task 101 writes a template for the job type you choose, which you then edit <Cite id="S-042" />. The input builder on this site writes one too.
+- **Check it before you run.** The INCAR checker on this site flags missing spin tags, a `MAGMOM` list of the wrong length, and tags that conflict (for example `NCORE` with `IBRION = 6`).
+- **Know your defaults.** Look up a tag in the tag table or the VASP wiki rather than guessing <Cite id="S-019" />.
+
+The author's SCF INCAR differs from the relaxation in four ways, each with a reason:
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM  = Compound-scf
+ISTART  = 1
+PREC    = Accurate
+ENCUT   = 520
+EDIFF   = 1E-6
+ALGO    = Normal
+NELM    = 200
+ISMEAR  = 0
+SIGMA   = 0.05
+ISPIN   = 2
+MAGMOM  = 2*5.0 4*0.6
+NSW     = 0
+LORBIT  = 11
+NEDOS   = 3001
+LWAVE   = .TRUE.
+LCHARG  = .TRUE.
+NCORE   = 4`}
+  annotations={{
+    2: 'read the WAVECAR the relaxation left in this folder',
+    4: 'same cutoff as the relaxation, so the physics matches',
+    12: 'a single point: no ionic steps',
+    13: 'write projected DOS and PROCAR',
+    16: 'the CHGCAR is needed for the band step',
+  }}
+/>
+
+This file is the author's SCF template as printed in the Workflow Handbook <Cite id="S-042" />. It has no `LMAXMIX` tag; for d elements the author's own band INCAR sets `LMAXMIX = 4`, so the missing tag here is an open question (Q-019).
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...               | ...in the run         | ...what to expect                                      |
+| ------------------------------ | --------------------- | ------------------------------------------------------ |
+| `ENCUT` higher                 | More plane waves      | Lower stress error, longer run, more memory            |
+| `EDIFF` tighter (1E-6 to 1E-8) | More electronic steps | Cleaner forces; needed before optics or phonons        |
+| `NSW = 0`                      | No ionic steps        | A single-point energy; `IBRION` is then -1             |
+| Remove `ISPIN` and `MAGMOM`    | A non-magnetic run    | A magnetic material may land on the wrong ground state |
+
+Why each line: it either says what to calculate or how accurately. Why this value: the handbook ties it to the species (`ENCUT`) or the atoms (`MAGMOM`). What happens if you skip it: you get the default, which may not be what you meant.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="A MAGMOM list with the wrong number of entries">
+
+`MAGMOM` takes one value per atom in `POSCAR` order. A short list is padded by VASP, so the run starts with the wrong moments <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Trusting what you typed instead of the echo">
+
+A misspelled tag may be ignored without an error. Compare the echo at the top of `OUTCAR` with your file <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Changing ENCUT between linked runs">
+
+An `ICHARG = 11` run inherits its physics from the `CHGCAR`, so `ENCUT`, `ISPIN` and `MAGMOM` must match the run that wrote it <Cite id="S-042" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-inc-1', 'q-inc-2', 'q-inc-3', 'q-inc-4']} />
+
+<GoDeeper>
+
+- The tag table on this site, and the VASP wiki page for each tag <Cite id="S-019" />.
+- The Field Handbook `INCAR` entry <Cite id="S-041" />.
+- The Workflow Handbook INCARs for each job type <Cite id="S-042" />.
+
+</GoDeeper>

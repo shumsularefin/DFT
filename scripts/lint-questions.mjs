@@ -9,6 +9,46 @@ import { parseFrontMatter } from './lint-content.mjs';
 const EM_DASH = '—';
 export const MIN_PER_CONCEPT = 4;
 export const MIN_HINTS = 2;
+/** Plot ids drawn by src/lib/visual/plots.ts (a unit test keeps this list equal to the registry). */
+export const PLOT_IDS = [
+  'box-levels',
+  'box-wave',
+  'box-mix',
+  'hydrogen-radial',
+  'hydrogen-levels',
+  'orbital-slice',
+  'occupation',
+  'spin-ladders',
+  'de-broglie',
+  'band-chain',
+  'band-gap',
+  'exp-wall',
+  'grid-wall',
+  'cost-scaling',
+  'scf-trace',
+  'scf-density',
+  'density-box',
+  'steps',
+  'pw-parabola',
+  'pw-count',
+  'smearing-curves',
+  'dftu-penalty',
+  'kmesh-grid',
+  'bz-1d',
+  'paw-radial',
+  'ladder-rungs',
+  'ispin-ladders',
+  'dof-cell',
+  'ionic-steps',
+  'ediff-trace',
+  'force-band',
+  'sigma-width',
+  'file-flow',
+  'restart-chain',
+  'oszicar-trace',
+  'parallel-split',
+  'conv-series',
+];
 
 function walk(dir) {
   if (!fs.existsSync(dir)) return [];
@@ -16,6 +56,29 @@ function walk(dir) {
     const p = path.join(dir, e.name);
     return e.isDirectory() ? walk(p) : e.name.endsWith('.mdx') ? [p] : [];
   });
+}
+
+/** M12.3: every question carries a picture (a scene preset, a computed plot) or a listed, reasoned exemption. */
+function lintVisual(q, at, problems, sceneIds, exempt) {
+  const v = q.visual;
+  if (!v || typeof v !== 'object')
+    return void problems.push(`${at}: no "visual" (add a scene, a plot, or { none: "reason" })`);
+  const kinds = ['scene', 'plot', 'none'].filter((k) => k in v);
+  if (kinds.length !== 1) return void problems.push(`${at}: visual needs exactly one of scene, plot, none`);
+  if ('none' in v) {
+    if (typeof v.none !== 'string' || v.none.trim().length < 20)
+      problems.push(`${at}: visual "none" needs a reason of at least 20 characters`);
+    else exempt.push(`${q.id}: ${v.none}`);
+    return;
+  }
+  for (const k of ['caption', 'alt'])
+    if (typeof v[k] !== 'string' || v[k].trim().length < 10) problems.push(`${at}: visual needs a ${k}`);
+  if ('scene' in v && !sceneIds.has(v.scene))
+    problems.push(
+      `${at}: visual scene "${v.scene}" is not a preset (known: ${[...sceneIds].sort().join(', ')})`,
+    );
+  if ('plot' in v && !PLOT_IDS.includes(v.plot))
+    problems.push(`${at}: visual plot "${v.plot}" is unknown (known: ${PLOT_IDS.join(', ')})`);
 }
 
 /** Returns { problems, coverage } where coverage maps module -> [{ id, count }] for published concepts. */
@@ -38,6 +101,14 @@ export function lintQuestions(root) {
   for (const c of concepts)
     for (const p of c.prerequisites ?? [])
       if (!conceptById.has(p)) problems.push(`concepts.json: "${c.id}" has unknown prerequisite "${p}"`);
+
+  const sceneIds = new Set(
+    fs
+      .readdirSync(path.join(root, 'src', 'data', 'scenes'))
+      .filter((n) => n.endsWith('.json'))
+      .map((n) => n.replace(/\.json$/, '')),
+  );
+  const exempt = [];
 
   // Questions.
   const qdir = path.join(root, 'src', 'data', 'questions');
@@ -66,6 +137,7 @@ export function lintQuestions(root) {
       for (const s of q.sources ?? [])
         if (!sourceIds.has(s)) problems.push(`${at}: source ${s} is not in docs/SCIENCE_SOURCES.md`);
       if ((q.hints?.length ?? 0) < MIN_HINTS) problems.push(`${at}: needs at least ${MIN_HINTS} hints`);
+      lintVisual(q, at, problems, sceneIds, exempt);
       if (q.timeLimitSec !== undefined) problems.push(`${at}: timeLimitSec is not allowed (no timers)`);
       if (q.type === 'single' || q.type === 'multi') {
         for (const [i, o] of (q.options ?? []).entries())
@@ -111,7 +183,7 @@ export function lintQuestions(root) {
         `concept "${c.id}" (module ${c.module}) has ${count} question(s), needs ${MIN_PER_CONCEPT}`,
       );
   }
-  return { problems, coverage, questions: questions.size, concepts: concepts.length };
+  return { problems, coverage, exempt, questions: questions.size, concepts: concepts.length };
 }
 
 export function coverageTable(coverage) {
@@ -124,7 +196,7 @@ export function coverageTable(coverage) {
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   const args = process.argv.slice(2);
   const root = path.resolve(args.find((a) => !a.startsWith('--')) ?? '.');
-  const { problems, coverage, questions, concepts } = lintQuestions(root);
+  const { problems, coverage, exempt, questions, concepts } = lintQuestions(root);
   if (args.includes('--report')) {
     for (const [m, list] of Object.entries(coverage)) {
       const total = list.reduce((s, x) => s + x.count, 0);
@@ -132,6 +204,10 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
         `module ${m}: ${list.length} concept(s), ${total} question(s), min ${Math.min(...list.map((x) => x.count))}`,
       );
     }
+  }
+  if (args.includes('--report')) {
+    console.log(`visual exemptions: ${exempt.length} of ${questions}`);
+    for (const e of exempt) console.log(`  ${e}`);
   }
   if (problems.length) {
     console.error(problems.join('\n'));

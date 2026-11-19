@@ -1,0 +1,145 @@
+---
+id: output-files
+title: The output files, a field guide
+module: 6
+order: 5
+summary: What each of the sixteen files VASP can write contains, which ones you restart from, which ones you read, and which ones you can safely delete.
+concepts: [output-file-reference]
+requires: [vasp-workflow]
+vaspTags: [LWAVE, LCHARG, LORBIT]
+sources: [S-019, S-041]
+noLab: true
+status: draft
+updated: 2026-11-19
+---
+
+<Why>
+
+A finished run leaves a folder full of files. Some are logs you read, some are the starting point of your next run, and some are large files you can delete. Knowing which is which tells you what to keep, what to copy to the next folder, and where to look when something goes wrong <Cite id="S-041" />.
+
+</Why>
+
+<Intuition>
+
+Sort the files by what you do with them.
+
+- **Restart from them:** `CONTCAR` (the latest geometry), `WAVECAR` (wavefunctions) and `CHGCAR` (charge density).
+- **Read them to judge the run:** `OSZICAR` (a short log) and `OUTCAR` (the full log). The next topic shows how to read both.
+- **Plot or analyse from them:** `DOSCAR`, `EIGENVAL`, `PROCAR`, `vasprun.xml`, `XDATCAR`.
+- **Everything else** is for special jobs: molecular dynamics, Bader analysis, work functions and so on.
+
+Click a line below to see what a real log line means.
+
+<VaspFileExplorer
+  kind="OSZICAR"
+  code={`       N       E                     dE             d eps       ncg     rms          rms(c)
+DAV:   1     0.425437171850E+02    0.42544E+02   -0.15040E+03   992   0.267E+02
+RMM:   9    -0.108706468020E+02   -0.11384E-04   -0.13017E-05  1021   0.309E-02
+   1 F= -.10870647E+02 E0= -.10870647E+02  d E =-.108706E+02`}
+  annotations={[
+    {
+      line: 1,
+      label: 'column names',
+      beginner: 'The header of the electronic-step table.',
+      intermediate:
+        'N is the step, E the energy and dE its change; the other columns are solver bookkeeping.',
+    },
+    {
+      line: 3,
+      label: 'last electronic step',
+      beginner: 'The energy changed by about 1e-5 eV, so this loop has settled.',
+      intermediate: 'dE is compared with EDIFF to decide whether the loop converged.',
+    },
+    {
+      line: 4,
+      label: 'ionic step',
+      beginner: 'One line per geometry step: the energy of that geometry.',
+      intermediate:
+        'F is the free energy, E0 the energy extrapolated to zero smearing, d E the change since the previous ionic step.',
+    },
+  ]}
+/>
+
+</Intuition>
+
+<TheMath>
+
+<Level min="intermediate">
+
+`F` in `OSZICAR` is the free energy that includes the smearing term, and `E0` is the energy extrapolated to zero smearing. The two differ by roughly the entropy term, which is why a large gap between them (more than about 1 meV per atom) points to a smearing width that is too large for the system <Cite id="S-019" />. The checks in the output reader on this site mark that rule as a heuristic.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+The sixteen entries of the Field Handbook, shortened <Cite id="S-041" />:
+
+| File          | What it holds                                                                           | Use it for                                    |
+| ------------- | --------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `CHG`         | Charge density in a compact format                                                      | Visualisation only                            |
+| `CHGCAR`      | The full, restart-quality charge density of the last electronic step                    | `ICHARG = 1` or `11` restarts, Bader, plots   |
+| `CONTCAR`     | The latest geometry in `POSCAR` format                                                  | The structure you restart from                |
+| `DOSCAR`      | Total DOS, plus projected DOS when `LORBIT` is set                                      | Density-of-states plots                       |
+| `EIGENVAL`    | Band energies and occupations at every k-point                                          | Band structures                               |
+| `IBZKPT`      | The symmetry-reduced k-point list VASP computed                                         | Hybrid band-structure `KPOINTS`               |
+| `OSZICAR`     | A compact log of electronic and ionic convergence                                       | Watching a run live                           |
+| `OUTCAR`      | The complete log: setup, every step, forces, stress, timing                             | Judging and debugging a run                   |
+| `PCDAT`       | Pair-correlation function averaged over an MD run                                       | MD analysis                                   |
+| `PROCAR`      | Band and orbital projections at every k-point (`LORBIT` of 10 or more)                  | Projected (fat) bands                         |
+| `REPORT`      | Log of advanced MD and machine-learned force-field runs                                 | MD and MLFF runs                              |
+| `vaspout.h5`  | All results in one HDF5 file (only if VASP was built with HDF5)                         | Reading with py4vasp                          |
+| `vasprun.xml` | Machine-readable record of inputs, structures, energies, forces and DOS                 | Parsers that must not break on format changes |
+| `WAVECAR`     | The wavefunctions: the most valuable restart file (binary)                              | `ISTART = 1`, GW, BSE, band-decomposed work   |
+| `XDATCAR`     | The trajectory: positions at every ionic step                                           | Relaxation paths and MD                       |
+| Other outputs | `AECCAR0` and `AECCAR2` (Bader), `LOCPOT`, `ELFCAR`, `PARCHG`, `WAVEDER`, screen output | Special analyses                              |
+
+Three of the large files are controlled by tags: `LWAVE` and `LCHARG` decide whether `WAVECAR` and `CHGCAR` are written, and `LORBIT` decides whether `PROCAR` and the projected `DOSCAR` are <Cite id="S-041" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...       | ...in the output                          | ...what to expect                                              |
+| ---------------------- | ----------------------------------------- | -------------------------------------------------------------- |
+| `LWAVE = .FALSE.`      | No `WAVECAR`                              | Smaller folder; the next run cannot restart from wavefunctions |
+| `LCHARG = .FALSE.`     | No `CHGCAR`                               | A later `ICHARG = 11` band run has nothing to read             |
+| `LORBIT = 11`          | `PROCAR` and a projected `DOSCAR`         | Orbital-resolved plots become possible                         |
+| A run that stops early | `CONTCAR` still holds the latest geometry | You can restart from it                                        |
+
+Why keep the right files: the next run reads them. Why delete the others: `WAVECAR` can be many gigabytes. What happens if you delete the wrong one: you recompute it.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Restarting from POSCAR instead of CONTCAR">
+
+After a relaxation, copy `CONTCAR` to `POSCAR` before the next stage, or you repeat the work <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Turning off LCHARG before a band calculation">
+
+The band step reads the charge density the SCF wrote. Keep `LCHARG = .TRUE.` in the SCF run (the workflow topic explains why).
+
+</Callout>
+
+<Callout variant="mistake" title="Reading numbers from a different file than you think">
+
+`OSZICAR` shows `F` and `E0`, and `OUTCAR` has several energy lines (`TOTEN`, without entropy, sigma to 0). Name the line you are quoting.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-of-1', 'q-of-2', 'q-of-3', 'q-of-4']} />
+
+<GoDeeper>
+
+- The Field Handbook file reference <Cite id="S-041" />.
+- VASP wiki pages for each file name, for example OUTCAR and WAVECAR <Cite id="S-019" />.
+- `vasprun.xml` and `vaspout.h5` for scripted analysis (pymatgen, py4vasp) <Cite id="S-041" />.
+
+</GoDeeper>

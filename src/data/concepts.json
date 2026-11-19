@@ -319,7 +319,7 @@
       "kohn-sham-equations"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "bloch-theorem",
@@ -330,7 +330,7 @@
       "plane-waves"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "reciprocal-space",
@@ -341,7 +341,7 @@
       "bloch-theorem"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "cutoff-energy",
@@ -352,7 +352,7 @@
       "plane-waves"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "brillouin-zone",
@@ -363,7 +363,7 @@
       "reciprocal-space"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "k-points",
@@ -374,7 +374,7 @@
       "brillouin-zone"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "kpoint-mesh",
@@ -385,7 +385,7 @@
       "k-points"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "pseudopotentials",
@@ -396,7 +396,7 @@
       "plane-waves"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "paw-method",
@@ -407,7 +407,7 @@
       "pseudopotentials"
     ],
     "level": "pro",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "functionals",
@@ -418,7 +418,7 @@
       "exchange-correlation-term"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "hybrid-functionals",
@@ -429,7 +429,7 @@
       "functionals"
     ],
     "level": "pro",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "van-der-waals",
@@ -440,7 +440,7 @@
       "functionals"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "smearing",
@@ -451,7 +451,7 @@
       "k-points"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "spin-polarization",
@@ -463,7 +463,7 @@
       "scf-loop"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "dft-plus-u",
@@ -475,7 +475,7 @@
       "spin-polarization"
     ],
     "level": "pro",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "lattice-vectors",
@@ -498,7 +498,7 @@
       "vasp-workflow"
     ],
     "level": "beginner",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "kpoints-file",
@@ -510,7 +510,7 @@
       "vasp-workflow"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "incar-file",
@@ -521,7 +521,7 @@
       "vasp-workflow"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "potcar-file",
@@ -533,7 +533,7 @@
       "vasp-workflow"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "job-scripts",
@@ -544,7 +544,7 @@
       "vasp-workflow"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "output-files",
@@ -556,7 +556,7 @@
       "scf-loop"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "restart-files",
@@ -567,7 +567,7 @@
       "output-files"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "convergence-testing",
@@ -580,7 +580,7 @@
       "output-files"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "cutoff-convergence",
@@ -591,7 +591,7 @@
       "convergence-testing"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "kpoint-convergence",
@@ -602,7 +602,7 @@
       "convergence-testing"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "common-errors",
@@ -610,10 +610,11 @@
     "module": 8,
     "summary": "Typical failures, what they mean, and how to correct them.",
     "prerequisites": [
-      "output-files"
+      "output-files",
+      "convergence-testing"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "total-energy",
@@ -775,7 +776,7 @@
       "kohn-sham-idea"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "space-group-symmetry",
@@ -809,5 +810,63 @@
     ],
     "level": "intermediate",
     "status": "planned"
+  },
+  {
+    "id": "output-file-reference",
+    "label": "The output files, a field guide",
+    "module": 6,
+    "summary": "What each file VASP can write holds, and which ones you restart from or read.",
+    "prerequisites": [
+      "vasp-workflow"
+    ],
+    "level": "beginner",
+    "status": "published"
+  },
+  {
+    "id": "five-step-protocol",
+    "label": "The five-step protocol",
+    "module": 7,
+    "summary": "Relax, SCF, bands, elastic and optics in order, with the settings that must stay the same between steps.",
+    "prerequisites": [
+      "vasp-workflow"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "vaspkit",
+    "label": "VASPKIT",
+    "module": 7,
+    "summary": "A command-line helper that writes VASP inputs and processes outputs, and why its menu codes must be checked.",
+    "prerequisites": [
+      "vasp-workflow"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "scf-troubleshooting",
+    "label": "SCF troubleshooting",
+    "module": 8,
+    "summary": "Finding out why the electronic loop stalls and the order in which to change settings.",
+    "prerequisites": [
+      "scf-loop",
+      "scf-mixing",
+      "output-files"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "relaxation-troubleshooting",
+    "label": "Relaxation troubleshooting",
+    "module": 8,
+    "summary": "Fixing ZBRENT errors, relaxations that do not finish, Pulay stress and collapsed slabs.",
+    "prerequisites": [
+      "forces-and-relaxation",
+      "output-files"
+    ],
+    "level": "intermediate",
+    "status": "published"
   }
 ]

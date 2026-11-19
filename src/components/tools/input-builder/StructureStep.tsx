@@ -2,16 +2,25 @@ import { useRef } from 'react';
 import { latticeParameters, cellVolume, guessCellType } from '../../../lib/crystal/lattice';
 import { reducedFormula, speciesCounts } from '../../../lib/crystal/structure';
 import { takeHandoff } from '../../../lib/handoff';
+import StructureView from '../../structure/StructureView';
 import { MAX_POSCAR_BYTES, useBuilder } from './store';
 import { useEffect } from 'react';
 
 export default function StructureStep() {
   const { poscarText, structure, parseError, parseWarnings, loadPoscar, setStructure } = useBuilder();
   const fileRef = useRef<HTMLInputElement>(null);
+  const magmom = useBuilder((st) => st.entries.find((e) => e.name === 'MAGMOM')?.value);
 
   useEffect(() => {
     const h = takeHandoff(['structure']);
-    if (h && h.kind === 'structure') setStructure(h.structure, h.label);
+    if (h && h.kind === 'structure') {
+      setStructure(h.structure, h.label);
+      if (h.magmom) {
+        // from the magnetic tool: MAGMOM refers to this POSCAR's atom order
+        useBuilder.getState().setEntry('ISPIN', '2');
+        useBuilder.getState().setEntry('MAGMOM', h.magmom);
+      }
+    }
   }, [setStructure]);
 
   const onFile = async (f: File | undefined) => {
@@ -94,6 +103,12 @@ export default function StructureStep() {
               .join(', ')}
             .
           </p>
+        </div>
+      )}
+      {structure && (
+        <div className="ib-view">
+          <h3>See it</h3>
+          <StructureView structure={structure} label="your POSCAR" magmom={magmom} id="ib-sv" />
         </div>
       )}
     </section>

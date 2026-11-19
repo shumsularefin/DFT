@@ -1,0 +1,111 @@
+---
+id: dft-plus-u
+title: DFT+U for localized electrons
+module: 5
+order: 7
+summary: What the Hubbard U correction does, why it is needed for some d and f electrons, and how to use it without fooling yourself.
+concepts: [dft-plus-u]
+requires: [functionals, spin-polarization]
+vaspTags: [LDAU, LDAUTYPE, LDAUL, LDAUU, LDAUJ]
+sources: [S-014, S-019, S-041, S-042]
+status: draft
+updated: 2026-11-19
+---
+
+<Why>
+
+Simple functionals have a flaw: each electron partly repels itself. For spread-out electrons the error is small. For tightly held d or f electrons, as in many oxides, it is large, and the calculation tends to smear those electrons out and treat an insulator as a metal. DFT+U adds a small correction on those orbitals that pushes them towards being either full or empty. It is a fix with a free number in it, so using it well means knowing what that number does <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+Imagine one orbital on one atom that can hold an electron. A plain functional is happy with half an electron there, because spreading charge costs it little. Real electrons in a tight orbital do not behave that way: an orbital is either occupied or it is not, and putting an extra electron on a small orbital costs energy because of repulsion.
+
+DFT+U adds an energy penalty that is zero when the orbital is empty or full and largest at half filling. It also adds a push on the level: a nearly full orbital is pushed down, a nearly empty one is pushed up. The result is a larger gap between occupied and empty states and electrons that stay on their atoms.
+
+The lab shows the penalty and the push for one orbital. The strength is `U_eff`, written $U - J$ in the Dudarev form that VASP uses with `LDAUTYPE = 2`. Larger `U_eff` means a stronger push towards integers.
+
+Three cautions:
+
+- **The U value is not predicted by the method.** It is a parameter chosen for the atom and the orbital, often fitted to match a known property. Different values give different energies, gaps and magnetic moments, so a result is only meaningful with its `U` stated.
+- **Energies with different U are not comparable.** Compare only runs with the same `U` on the same atoms <Cite id="S-042" />.
+- **It is a correction, not a better functional.** Use it on the d or f orbitals where the self-interaction problem is known to matter, and report it.
+
+This site does not list recommended `U` values for specific elements: none of the sources registered here gives a verified table, and a value copied from a paper may not transfer.
+
+</Intuition>
+
+<Lab id="dft-plus-u" title="The Dudarev penalty" />
+
+<TheMath>
+
+For one orbital with occupation $n$ ($0 \le n \le 1$) the Dudarev penalty and the potential it adds are
+
+$$E_U = \frac{U_{\text{eff}}}{2}\,n\,(1-n), \qquad V = \frac{dE_U}{dn} = U_{\text{eff}}\Big(\frac12 - n\Big), \qquad U_{\text{eff}} = U - J.$$
+
+The penalty is 0 at $n = 0$ and $n = 1$ and equals $U_{\text{eff}}/8$ at $n = \tfrac12$; with $U_{\text{eff}} = 4$ eV that is 0.5 eV. The potential is $+U_{\text{eff}}/2$ for an empty orbital and $-U_{\text{eff}}/2$ for a full one <Cite id="S-014" />. The site's test checks these values and that $V$ is the derivative of $E_U$.
+
+<Level min="pro">
+
+In the full method the penalty is a trace over the occupation matrix of the correlated shell, $E_U = \frac{U_{\text{eff}}}{2}\sum_\sigma \mathrm{Tr}\big[\mathbf{n}^\sigma(1-\mathbf{n}^\sigma)\big]$, evaluated for each marked atom and each spin <Cite id="S-014" />. The lab is the one-orbital, one-spin special case with a plain number for $n$, so it shows the shape of the correction but not the matrix structure.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+<TagVisual tag="LDAUU" />
+
+- `LDAU = .TRUE.` switches the correction on, `LDAUTYPE = 2` selects the Dudarev form in which only `U - J` matters <Cite id="S-042" />.
+- `LDAUL` gives, for each species in `POSCAR` order, the orbital channel: `-1` for none, `2` for d, `3` for f. `LDAUU` and `LDAUJ` give `U` and `J` per species in the same order, in eV. One entry per species is required <Cite id="S-042" />.
+- Set `LMAXMIX = 4` for d elements and `6` for f elements: the handbook calls this vital for +U runs. Keep it the same in every run in a chain, such as an SCF run followed by a band run <Cite id="S-042" />. Where the handbook's own example INCARs are inconsistent about this is recorded as Q-019.
+- DFT+U is a spin-polarized tool in practice: magnetic systems need `ISPIN = 2` and a `MAGMOM` with one entry per atom (see the spin topic in this module).
+- Defaults for the `LDAU` tags are not stated in the handbooks. Check the VASP wiki pages `LDAU`, `LDAUTYPE`, `LDAUL`, `LDAUU` and `LDAUJ` for your version <Cite id="S-019" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...                 | ...in the lab                          | ...in VASP                                                          |
+| -------------------------------- | -------------------------------------- | ------------------------------------------------------------------- |
+| `U_eff` larger                   | Taller penalty arch, steeper potential | Stronger push to integer occupation, larger gaps, more localization |
+| The occupation moves towards 1/2 | Penalty and pushing both rise          | The correction fights half-filled d or f orbitals                   |
+| `U` differs between two runs     | Not shown                              | Energies are not comparable                                         |
+| Switch +U off                    | `U_eff = 0`: no penalty, no push       | Plain functional: d or f electrons may be over-delocalized          |
+
+Why use it: to treat self-interaction on localized d or f orbitals. Why this value: it is a choice you must justify and state. What happens if you get it wrong: gaps and magnetic moments that depend on an arbitrary number.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Quoting a result without its U">
+
+A band gap or a moment from DFT+U is a function of `U`. Always report `LDAUTYPE`, `LDAUL`, `LDAUU` and `LDAUJ`.
+
+</Callout>
+
+<Callout variant="mistake" title="Copying U from a paper for a different setup">
+
+A value fitted with one functional, one pseudopotential and one structure may not carry over. Treat it as a starting point and say where it came from.
+
+</Callout>
+
+<Callout variant="mistake" title="Giving LDAUU in the wrong order">
+
+The lists follow the species order in `POSCAR`, not the periodic table. A swapped list puts `U` on the wrong atom without an error.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-dftu-1', 'q-dftu-2', 'q-dftu-3', 'q-dftu-4', 'q-dftu-5']} />
+
+<GoDeeper>
+
+- Dudarev and co-workers on the LSDA+U method in the form VASP uses <Cite id="S-014" />.
+- VASP wiki pages LDAU, LDAUTYPE, LDAUL, LDAUU, LDAUJ and LMAXMIX (by page name) <Cite id="S-019" />.
+
+</GoDeeper>

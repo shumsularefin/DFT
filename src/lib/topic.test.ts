@@ -64,5 +64,7 @@ describe('topicPageClass', () => {
     expect(topicPageClass('<Lab id="cost-of-exactness" title="x" />')).toBe('island');
     expect(topicPageClass('<Lab id="how-to-use-this-site-demo" />')).toBe('content');
     expect(topicPageClass('no lab here')).toBe('content');
+    expect(topicPageClass('<Scene id="fcc" />')).toBe('island');
+    expect(topicPageClass("<Check ids={['q-a-1']} />")).toBe('island');
   });
 });

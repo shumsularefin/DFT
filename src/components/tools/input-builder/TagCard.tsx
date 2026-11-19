@@ -1,5 +1,7 @@
 import tagsFile from '../../../data/vasp-tags.json';
 import type { Level } from '../../../lib/levels';
+import type { Structure } from '../../../lib/crystal/types';
+import TagVisual from './TagVisual';
 
 export interface TagInfo {
   name: string;
@@ -31,10 +33,17 @@ export default function TagCard({
   name,
   level,
   onSelect,
+  value,
+  structure,
+  incar,
 }: {
   name: string | null;
   level: Level;
   onSelect: (n: string) => void;
+  /** The value of this tag in the file being edited, so the picture follows it. */
+  value?: string | undefined;
+  structure?: Structure | null | undefined;
+  incar?: Readonly<Record<string, string>> | undefined;
 }) {
   const t = name ? tagByName(name) : undefined;
   if (!name)
@@ -59,6 +68,7 @@ export default function TagCard({
     <aside className="ib-card" aria-label={`Explanation of ${t.name}`}>
       <h3>{t.name}</h3>
       <p>{summaryAt(t, level)}</p>
+      <TagVisual tag={t.name} value={value ?? ''} level={level} structure={structure} incar={incar} />
       <dl>
         <dt>Why this value</dt>
         <dd>{t.why}</dd>

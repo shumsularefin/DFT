@@ -542,5 +542,13 @@
     "access": "book",
     "status": "cited-from-memory",
     "notes": "Added in plan v3; results are checked against scipy and pymatgen fits, not against the book"
+  },
+  {
+    "id": "S-069",
+    "citation": "Firebase documentation and JS SDK reference (v13): Authentication (Google sign-in with a popup), Cloud Firestore lite web SDK, Cloud Firestore security rules language and the Firestore usage quotas page",
+    "usedFor": "Optional progress sync: SDK calls, document rules, rules tests (M6.5)",
+    "access": "open web",
+    "status": "cited-from-memory",
+    "notes": "The SDK exports used were checked against the installed firebase@13.1.0 package; firebase.google.com was not reachable, so the quota figures stay open in Q-006"
   }
 ]

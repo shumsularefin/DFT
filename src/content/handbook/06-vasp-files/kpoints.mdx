@@ -1,0 +1,127 @@
+---
+id: kpoints
+title: KPOINTS, the sampling file
+module: 6
+order: 2
+summary: The four layouts of a KPOINTS file (automatic mesh, line mode for bands, explicit list, no file), when to use Gamma-centred or Monkhorst-Pack, and the checks that go with it.
+concepts: [kpoints-file]
+requires: [k-points, vasp-workflow]
+vaspTags: [KSPACING]
+sources: [S-019, S-041, S-042]
+noLab: true
+status: draft
+updated: 2026-11-19
+---
+
+<Why>
+
+The previous module explained why a crystal needs a set of k-points. The `KPOINTS` file is where you choose them. A mesh that is too coarse gives noisy energies, especially for metals, and a mesh that does not respect the symmetry of the lattice makes VASP refuse to run or quietly lowers the symmetry. A mesh that is much too fine costs time for nothing. This file is small, but it is the second most common source of "why does this number move" questions <Cite id="S-041" />.
+
+</Why>
+
+<Intuition>
+
+The `KPOINTS` file has one job: say how the Brillouin zone is sampled. It comes in four layouts.
+
+1. **Automatic mesh.** You give the number of subdivisions along each reciprocal vector, and VASP builds the grid. This is the layout for self-consistent runs.
+2. **Line mode.** You give the start and end of each straight segment of a band path, and VASP fills in the points between. This is the layout for a band structure.
+3. **Explicit list.** You write every point and its weight. Hybrid-functional band structures use this, with the weighted mesh first and the path points at weight zero <Cite id="S-041" />.
+4. **No file.** Without a `KPOINTS` file, VASP can build a mesh from the `KSPACING` tag in the `INCAR` <Cite id="S-041" />.
+
+Two centrings are common. **Gamma-centred** meshes always contain the point at the centre of the zone. **Monkhorst-Pack** meshes with an even number of subdivisions are shifted away from it.
+
+<VaspFileExplorer
+  kind="KPOINTS"
+  code={`Gamma-centred 8x8x8 mesh
+0
+Gamma
+8 8 8
+0 0 0`}
+/>
+
+</Intuition>
+
+<TheMath>
+
+For a mesh of $N_1 \times N_2 \times N_3$ points, the subdivisions follow the cell: a longer real-space cell means a shorter reciprocal vector, so fewer points are needed along it. The author's rule of thumb is $N_i\, a_i \approx \text{constant}$ <Cite id="S-041" />.
+
+<Level min="intermediate">
+
+For a Monkhorst-Pack mesh, VASP uses $k_r = (2r - N - 1)/(2N)$ for $r = 1,\dots,N$. For odd $N$ this includes the zone centre and is symmetric. For even $N$ the mesh is shifted off the centre, and on hexagonal and face-centred cubic lattices it breaks the point-group symmetry. The Workflow Handbook says "odd" meshes are the problem for hexagonal cells, which the numerical test on this site contradicts: the advice to use Gamma-centred meshes is right, and the word "odd" looks like a slip for "even" (open question Q-017) <Cite id="S-042" />.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+- **Mesh file** (as in the explorer above): line 1 a comment, line 2 `0` for automatic, line 3 `Gamma` or `Monkhorst-Pack`, line 4 the subdivisions, line 5 an optional shift <Cite id="S-041" />.
+- **Choosing the centring.** Gamma-centred is required for hexagonal cells and is a safe default for any lattice. Monkhorst-Pack suits cubic and orthorhombic cells, but with an even mesh it can break the symmetry of fcc, bcc or hexagonal lattices, so many groups use Gamma-centred meshes everywhere <Cite id="S-041" />.
+- **Resolution.** VASPkit task 102 writes the file for a chosen resolution in 2 pi per angstrom. The author lists 0.03 to 0.04 as usually enough, finer (0.02 to 0.01) for metals or accurate densities of states, and Gamma-only for large cells <Cite id="S-042" />.
+- **Convergence.** Test 4x4x4, 6x6x6, 8x8x8 and so on until the energy changes by less than about 1 meV per atom. Metals need more than insulators <Cite id="S-041" />.
+- **Band paths.** Line mode is not suitable for a self-consistent run. The Workflow Handbook uses either a second run that reads the SCF charge density (`ICHARG = 11`), or, from VASP 6.3, a `KPOINTS_OPT` file next to a uniform `KPOINTS` <Cite id="S-042" />. The k-path tool on this site writes these files.
+
+<VaspFile
+  name="KPOINTS"
+  code={`Line mode, 20 points per segment
+20
+Line-mode
+Reciprocal
+0.0 0.0 0.0 ! GAMMA
+0.5 0.0 0.5 ! X
+
+0.5 0.0 0.5 ! X
+0.625 0.25 0.625 ! U`}
+annotations={{
+    2: 'points per segment between the two ends',
+    3: 'line mode: pairs of lines are the start and end of a segment',
+    4: 'coordinates are fractions of the reciprocal vectors',
+  }}
+/>
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...                     | ...in the sampling                         | ...in VASP                                           |
+| ------------------------------------ | ------------------------------------------ | ---------------------------------------------------- |
+| A denser mesh                        | More points and more irreducible points    | Run time grows with the number of irreducible points |
+| A coarser mesh for a metal           | The Fermi surface is poorly resolved       | Noisy energies and forces                            |
+| Gamma-centred to even Monkhorst-Pack | The mesh moves off the zone centre         | Possible loss of symmetry on hexagonal and fcc cells |
+| A supercell twice as long            | Half the subdivisions along that direction | About the same sampling density for less work        |
+
+Why this file: it sets the sampling. Why Gamma-centred: it always respects the lattice symmetry. What happens if you get it wrong: a mesh VASP rejects ("reciprocal lattice and k-lattice belong to different class of lattices") or energies that have not converged <Cite id="S-041" />.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="An even Monkhorst-Pack mesh on a hexagonal cell">
+
+The shifted mesh breaks the symmetry and VASP may stop. Use a Gamma-centred mesh <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Using the SCF mesh to plot bands">
+
+A uniform mesh gives energies at scattered points, not along a path. Run the path as a separate step (see the workflow topic).
+
+</Callout>
+
+<Callout variant="mistake" title="Never testing the mesh">
+
+One mesh gives one number. Compare at least three before you trust an energy difference <Cite id="S-041" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-kpf-1', 'q-kpf-2', 'q-kpf-3', 'q-kpf-4']} />
+
+<GoDeeper>
+
+- VASP wiki pages KPOINTS and KSPACING (by page name) <Cite id="S-019" />.
+- The author's Field Handbook `KPOINTS` and `IBZKPT` entries <Cite id="S-041" />.
+- The Workflow Handbook, "Input and output files" and "Band structure" <Cite id="S-042" />.
+
+</GoDeeper>

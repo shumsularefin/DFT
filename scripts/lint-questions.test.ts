@@ -15,6 +15,7 @@ const good = (id: string) => ({
   difficulty: 0,
   level: 'beginner',
   sources: ['S-001'],
+  visual: { plot: 'box-levels', params: {}, caption: 'A caption for the picture', alt: 'A text description' },
 });
 
 /** Builds a throwaway repo root with one published concept and the given questions and topic text. */
@@ -48,6 +49,7 @@ function fixture(questions: unknown[], topic = "<Check ids={['q-1']} />") {
       },
     ]),
   );
+  w('src/data/scenes/fcc.json', '{}');
   w('src/data/questions/module-01.json', JSON.stringify(questions));
   w('src/content/handbook/01-x/t.mdx', `---\nconcepts: [alpha]\n---\n${topic}\n`);
   return root;
@@ -80,6 +82,25 @@ describe('lintQuestions', () => {
     expect(run([good('q-1'), good('q-1'), ...four().slice(2)])).toMatch(/duplicate question id/);
     expect(run(four(), "<Check ids={['q-1', 'q-zzz']} />")).toMatch(/id "q-zzz" has no question/);
     expect(run([{ ...good('q-1'), timeLimitSec: 30 }, ...four().slice(1)])).toMatch(/no timers/);
+  });
+  it('requires a visual on every question (M12.3)', () => {
+    const rest = four().slice(1);
+    const bare: Record<string, unknown> = { ...good('q-1') };
+    delete bare.visual;
+    expect(run([bare, ...rest])).toMatch(/q-1: no "visual"/);
+    const v = good('q-1').visual;
+    expect(run([{ ...good('q-1'), visual: { none: 'too short' } }, ...rest])).toMatch(/needs a reason/);
+    expect(
+      run([{ ...good('q-1'), visual: { none: 'A reason that is long enough to be a real one.' } }, ...rest]),
+    ).toBe('');
+    expect(run([{ ...good('q-1'), visual: { ...v, scene: 'fcc', plot: undefined } }, ...rest])).toBe('');
+    expect(
+      run([{ ...good('q-1'), visual: { scene: 'nope', caption: v.caption, alt: v.alt } }, ...rest]),
+    ).toMatch(/scene "nope" is not a preset/);
+    expect(run([{ ...good('q-1'), visual: { ...v, plot: 'nope' } }, ...rest])).toMatch(
+      /plot "nope" is unknown/,
+    );
+    expect(run([{ ...good('q-1'), visual: { ...v, alt: '' } }, ...rest])).toMatch(/needs a alt/);
   });
   it('requires four questions per published concept but not per planned one', () => {
     const r = lintQuestions(fixture(four().slice(0, 3)));

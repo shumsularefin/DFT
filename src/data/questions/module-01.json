@@ -31,7 +31,29 @@
     "level": "beginner",
     "sources": [
       "S-018"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Build a model of the material"
+          },
+          {
+            "label": "Run the calculation on a computer"
+          },
+          {
+            "label": "Read the result"
+          },
+          {
+            "label": "Make the real sample (or not)"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "A simulation sits before the experiment. Illustrative.",
+      "alt": "A four-step flow from building a model, to running the calculation, to reading the result, to making the real sample."
+    }
   },
   {
     "id": "q-why-sim-2",
@@ -66,7 +88,15 @@
     "sources": [
       "S-018",
       "S-047"
-    ]
+    ],
+    "visual": {
+      "scene": "rocksalt",
+      "caption": "Two kinds of atom in a crystal. Illustrative.",
+      "alt": "A rock-salt crystal with two kinds of atom alternating on a cubic grid.",
+      "overrides": {
+        "camera": "iso"
+      }
+    }
   },
   {
     "id": "q-why-sim-3",
@@ -100,7 +130,16 @@
     "level": "beginner",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "hydrogen-radial",
+      "params": {
+        "n": 1,
+        "l": 0
+      },
+      "caption": "The electron in hydrogen is a probability cloud, not a path.",
+      "alt": "Curve of radial probability for the hydrogen 1s electron against distance from the nucleus, rising to a peak and falling away."
+    }
   },
   {
     "id": "q-why-sim-4",
@@ -134,7 +173,25 @@
     "level": "beginner",
     "sources": [
       "S-018"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Atoms and their positions (the model)"
+          },
+          {
+            "label": "Solve for the electrons"
+          },
+          {
+            "label": "Energy, forces and a relaxed structure"
+          }
+        ]
+      },
+      "caption": "The model comes first, then the calculation. Illustrative.",
+      "alt": "A three-step flow: the model of atoms and positions, then solving for the electrons, then the energy, forces and a relaxed structure."
+    }
   },
   {
     "id": "q-ladder-1",
@@ -169,7 +226,17 @@
     "sources": [
       "S-048",
       "S-049"
-    ]
+    ],
+    "visual": {
+      "plot": "cost-scaling",
+      "params": {
+        "methods": [
+          "dft"
+        ]
+      },
+      "caption": "Cost against system size for a method that grows as size to the power 3. Both axes logarithmic.",
+      "alt": "Straight line on logarithmic axes for DFT, cost rising with system size."
+    }
   },
   {
     "id": "q-ladder-2",
@@ -203,7 +270,18 @@
     "level": "beginner",
     "sources": [
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "cost-scaling",
+      "params": {
+        "methods": [
+          "force-field",
+          "dft"
+        ]
+      },
+      "caption": "A force field against DFT. Both axes logarithmic.",
+      "alt": "Two straight lines on logarithmic axes, a force field rising slowly and DFT rising faster."
+    }
   },
   {
     "id": "q-ladder-3",
@@ -237,7 +315,19 @@
     "level": "intermediate",
     "sources": [
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "cost-scaling",
+      "params": {
+        "methods": [
+          "force-field",
+          "dft",
+          "mp2"
+        ]
+      },
+      "caption": "Slopes on a log-log chart. Steeper means a bigger power.",
+      "alt": "Three straight lines on logarithmic axes with different slopes: force field, DFT and MP2."
+    }
   },
   {
     "id": "q-ladder-4",
@@ -272,7 +362,18 @@
     "sources": [
       "S-011",
       "S-012"
-    ]
+    ],
+    "visual": {
+      "plot": "cost-scaling",
+      "params": {
+        "methods": [
+          "hf",
+          "dft"
+        ]
+      },
+      "caption": "Two practical methods on one chart.",
+      "alt": "Two straight lines on logarithmic axes: Hartree-Fock and DFT."
+    }
   },
   {
     "id": "q-ladder-5",
@@ -306,7 +407,20 @@
     "level": "intermediate",
     "sources": [
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "cost-scaling",
+      "params": {
+        "methods": [
+          "force-field",
+          "dft",
+          "hf",
+          "mp2"
+        ]
+      },
+      "caption": "Every curve starts at cost 1 for the smallest system.",
+      "alt": "Four curves on logarithmic axes that all start from the same point at the smallest size and fan out."
+    }
   },
   {
     "id": "q-scope-1",
@@ -340,7 +454,18 @@
     "level": "beginner",
     "sources": [
       "S-011"
-    ]
+    ],
+    "visual": {
+      "plot": "box-levels",
+      "params": {
+        "Ls": [
+          5
+        ],
+        "nMax": 4
+      },
+      "caption": "Energy levels of an electron in a 5 angstrom box.",
+      "alt": "Horizontal energy levels n = 1 to 4 of an electron in a box of length 5 angstrom."
+    }
   },
   {
     "id": "q-scope-2",
@@ -375,7 +500,24 @@
     "sources": [
       "S-027",
       "S-025"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Experiment",
+            "note": "measured gap"
+          },
+          {
+            "label": "Calculation",
+            "note": "gap from one functional"
+          }
+        ]
+      },
+      "caption": "A computed number next to a measured one. Illustrative.",
+      "alt": "A two-box comparison: the measured gap from an experiment and the gap from a calculation with one functional."
+    }
   },
   {
     "id": "q-scope-3",
@@ -409,7 +551,28 @@
     "level": "intermediate",
     "sources": [
       "S-011"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Atoms and positions",
+            "note": "input"
+          },
+          {
+            "label": "DFT calculation",
+            "note": ""
+          },
+          {
+            "label": "Energy, forces, density",
+            "note": "output"
+          }
+        ]
+      },
+      "caption": "What goes into a DFT calculation and what comes out. Illustrative.",
+      "alt": "A three-box flow: atoms and positions go in, a DFT calculation runs, energy, forces and density come out."
+    }
   },
   {
     "id": "q-scope-4",
@@ -443,7 +606,24 @@
     "level": "beginner",
     "sources": [
       "S-012"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Experiment",
+            "note": "measured gap"
+          },
+          {
+            "label": "Calculation",
+            "note": "gap from one functional"
+          }
+        ]
+      },
+      "caption": "A computed number next to a measured one. Illustrative.",
+      "alt": "A two-box comparison: the measured gap from an experiment and the gap from a calculation with one functional."
+    }
   },
   {
     "id": "q-roadmap-1",
@@ -477,7 +657,10 @@
     "level": "beginner",
     "sources": [
       "S-042"
-    ]
+    ],
+    "visual": {
+      "none": "A picture would only restate the answer: the question is about how to use the site, not about a physical idea."
+    }
   },
   {
     "id": "q-roadmap-2",
@@ -511,7 +694,25 @@
     "level": "beginner",
     "sources": [
       "S-042"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Input files"
+          },
+          {
+            "label": "VASP"
+          },
+          {
+            "label": "Output files"
+          }
+        ]
+      },
+      "caption": "A VASP calculation reads files and writes files. Illustrative.",
+      "alt": "A three-box flow: input files, VASP, output files."
+    }
   },
   {
     "id": "q-roadmap-3",
@@ -545,7 +746,25 @@
     "level": "beginner",
     "sources": [
       "S-010"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Input files on your computer"
+          },
+          {
+            "label": "VASP"
+          },
+          {
+            "label": "Output files on your computer"
+          }
+        ]
+      },
+      "caption": "A VASP calculation reads files and writes files. Illustrative.",
+      "alt": "A three-box flow: input files, VASP, output files."
+    }
   },
   {
     "id": "q-roadmap-4",
@@ -579,7 +798,10 @@
     "level": "beginner",
     "sources": [
       "S-042"
-    ]
+    ],
+    "visual": {
+      "none": "A picture would only restate the answer: the question is about how to use the site, not about a physical idea."
+    }
   },
   {
     "id": "q-how-to-use-1",
@@ -611,7 +833,10 @@
     ],
     "difficulty": -2,
     "level": "beginner",
-    "sources": []
+    "sources": [],
+    "visual": {
+      "none": "A picture would only restate the answer: the question is about how to use the site, not about a physical idea."
+    }
   },
   {
     "id": "q-how-to-use-2",
@@ -643,7 +868,10 @@
     ],
     "difficulty": -1.5,
     "level": "beginner",
-    "sources": []
+    "sources": [],
+    "visual": {
+      "none": "A picture would only restate the answer: the question is about how to use the site, not about a physical idea."
+    }
   },
   {
     "id": "q-how-to-use-3",
@@ -675,7 +903,10 @@
     ],
     "difficulty": -1.5,
     "level": "beginner",
-    "sources": []
+    "sources": [],
+    "visual": {
+      "none": "A picture would only restate the answer: the question is about how to use the site, not about a physical idea."
+    }
   },
   {
     "id": "q-how-to-use-4",
@@ -707,7 +938,10 @@
     ],
     "difficulty": -1,
     "level": "beginner",
-    "sources": []
+    "sources": [],
+    "visual": {
+      "none": "A picture would only restate the answer: the question is about how to use the site, not about a physical idea."
+    }
   },
   {
     "id": "q-why-sim-5",
@@ -741,7 +975,29 @@
     "level": "beginner",
     "sources": [
       "S-018"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "The real material",
+            "note": "atoms, defects, surfaces, temperature"
+          },
+          {
+            "label": "The model",
+            "note": "the part you choose to describe"
+          },
+          {
+            "label": "The calculation",
+            "note": "what the computer solves"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "The model is a choice about what to include. Illustrative.",
+      "alt": "A three-box flow: the real material, the model you choose, and the calculation that solves the model."
+    }
   },
   {
     "id": "q-why-sim-6",
@@ -775,7 +1031,19 @@
     "level": "beginner",
     "sources": [
       "S-018"
-    ]
+    ],
+    "visual": {
+      "scene": "fcc",
+      "caption": "A model cell repeats in every direction, so it has no surface unless you add one. Illustrative.",
+      "alt": "A face-centred cubic cell drawn as a flat view; the cell is the repeating unit of the model.",
+      "overrides": {
+        "repeat": [
+          2,
+          2,
+          2
+        ]
+      }
+    }
   },
   {
     "id": "q-why-sim-7",
@@ -809,7 +1077,12 @@
     "level": "beginner",
     "sources": [
       "S-018"
-    ]
+    ],
+    "visual": {
+      "scene": "diamond",
+      "caption": "Atoms drawn as spheres: each centre is a nucleus, the electrons are not drawn. Illustrative.",
+      "alt": "A diamond cubic cell with atoms drawn as spheres joined by bonds; the electrons are not shown."
+    }
   },
   {
     "id": "q-why-sim-8",
@@ -844,7 +1117,12 @@
     "sources": [
       "S-018",
       "S-047"
-    ]
+    ],
+    "visual": {
+      "scene": "graphite",
+      "caption": "A layered carbon crystal. Illustrative.",
+      "alt": "Graphite, hexagonal layers of carbon atoms stacked along the c direction."
+    }
   },
   {
     "id": "q-why-sim-9",
@@ -878,7 +1156,12 @@
     "level": "beginner",
     "sources": [
       "S-018"
-    ]
+    ],
+    "visual": {
+      "scene": "rocksalt",
+      "caption": "Two kinds of atom, drawn in two colours. Illustrative.",
+      "alt": "A rock-salt crystal with sodium and chlorine atoms in two colours, alternating on a cubic grid."
+    }
   },
   {
     "id": "q-why-sim-10",
@@ -912,7 +1195,18 @@
     "level": "intermediate",
     "sources": [
       "S-047"
-    ]
+    ],
+    "visual": {
+      "plot": "box-levels",
+      "params": {
+        "Ls": [
+          5
+        ],
+        "nMax": 5
+      },
+      "caption": "Energy levels of an electron in a box. The equation gives these.",
+      "alt": "Horizontal lines for the first five energy levels of an electron in a box of length 5 angstrom, spreading apart higher up."
+    }
   },
   {
     "id": "q-why-sim-11",
@@ -947,7 +1241,16 @@
     "sources": [
       "S-047",
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "exp-wall",
+      "params": {
+        "perElectron": 4,
+        "maxN": 20
+      },
+      "caption": "The number of determinants for 4 spin orbitals per electron, on a log scale.",
+      "alt": "Curve of the number of Slater determinants against the number of electrons on a logarithmic vertical axis, climbing steeply."
+    }
   },
   {
     "id": "q-why-sim-12",
@@ -981,7 +1284,12 @@
     "level": "intermediate",
     "sources": [
       "S-048"
-    ]
+    ],
+    "visual": {
+      "scene": "diamond",
+      "caption": "Nuclei at fixed positions in a crystal cell. Illustrative.",
+      "alt": "A diamond cubic cell with atoms at fixed positions joined by bonds."
+    }
   },
   {
     "id": "q-ladder-6",
@@ -1015,7 +1323,22 @@
     "level": "beginner",
     "sources": [
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "cost-scaling",
+      "params": {
+        "methods": [
+          "force-field",
+          "dft",
+          "hf",
+          "mp2",
+          "ccsd",
+          "ccsdt"
+        ]
+      },
+      "caption": "The ladder of methods by how cost grows with size.",
+      "alt": "Six curves on logarithmic axes: force field, DFT, Hartree-Fock, MP2, CCSD and CCSD(T), steeper for the more accurate methods."
+    }
   },
   {
     "id": "q-ladder-7",
@@ -1035,7 +1358,18 @@
     "level": "beginner",
     "sources": [
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "cost-scaling",
+      "params": {
+        "methods": [
+          "mp2",
+          "dft"
+        ]
+      },
+      "caption": "MP2 against DFT on log-log axes.",
+      "alt": "Two straight lines on logarithmic axes: MP2 steeper than DFT."
+    }
   },
   {
     "id": "q-ladder-8",
@@ -1069,7 +1403,19 @@
     "level": "beginner",
     "sources": [
       "S-048"
-    ]
+    ],
+    "visual": {
+      "plot": "cost-scaling",
+      "params": {
+        "methods": [
+          "dft",
+          "ccsd",
+          "ccsdt"
+        ]
+      },
+      "caption": "Steeper curves leave small systems behind quickly.",
+      "alt": "Three straight lines on logarithmic axes, DFT, CCSD and CCSD(T), with different slopes."
+    }
   },
   {
     "id": "q-scope-5",
@@ -1103,7 +1449,28 @@
     "level": "intermediate",
     "sources": [
       "S-011"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Atoms and positions",
+            "note": "input"
+          },
+          {
+            "label": "DFT calculation",
+            "note": ""
+          },
+          {
+            "label": "Energy, forces, density",
+            "note": "output"
+          }
+        ]
+      },
+      "caption": "What goes into a DFT calculation and what comes out. Illustrative.",
+      "alt": "A three-box flow: atoms and positions go in, a DFT calculation runs, energy, forces and density come out."
+    }
   },
   {
     "id": "q-scope-6",
@@ -1137,7 +1504,18 @@
     "level": "beginner",
     "sources": [
       "S-011"
-    ]
+    ],
+    "visual": {
+      "plot": "box-levels",
+      "params": {
+        "Ls": [
+          5
+        ],
+        "nMax": 4
+      },
+      "caption": "Energy levels of an electron in a 5 angstrom box.",
+      "alt": "Horizontal energy levels n = 1 to 4 of an electron in a box of length 5 angstrom."
+    }
   },
   {
     "id": "q-scope-7",
@@ -1171,7 +1549,18 @@
     "level": "beginner",
     "sources": [
       "S-011"
-    ]
+    ],
+    "visual": {
+      "plot": "box-levels",
+      "params": {
+        "Ls": [
+          5
+        ],
+        "nMax": 4
+      },
+      "caption": "Energy levels of an electron in a 5 angstrom box.",
+      "alt": "Horizontal energy levels n = 1 to 4 of an electron in a box of length 5 angstrom."
+    }
   },
   {
     "id": "q-scope-8",
@@ -1205,7 +1594,17 @@
     "level": "intermediate",
     "sources": [
       "S-011"
-    ]
+    ],
+    "visual": {
+      "plot": "scf-density",
+      "params": {
+        "Zs": [
+          2
+        ]
+      },
+      "caption": "The density of the toy two-electron system and the potential well it sits in.",
+      "alt": "Curve of electron density, a single hump, and a dashed curve of the potential well it sits in, both against position."
+    }
   },
   {
     "id": "q-roadmap-5",
@@ -1239,7 +1638,25 @@
     "level": "intermediate",
     "sources": [
       "S-042"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Input files"
+          },
+          {
+            "label": "VASP"
+          },
+          {
+            "label": "Output files"
+          }
+        ]
+      },
+      "caption": "A VASP calculation reads files and writes files. Illustrative.",
+      "alt": "A three-box flow: input files, VASP, output files."
+    }
   },
   {
     "id": "q-roadmap-6",
@@ -1274,7 +1691,31 @@
     "sources": [
       "S-042",
       "S-041"
-    ]
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Relaxation"
+          },
+          {
+            "label": "SCF in the same folder"
+          },
+          {
+            "label": "Band structure"
+          },
+          {
+            "label": "Elastic properties"
+          },
+          {
+            "label": "Optical properties"
+          }
+        ]
+      },
+      "caption": "A path for a first project, not a recipe for every system. Illustrative.",
+      "alt": "The five protocol steps in a flow: relaxation, SCF, band structure, elastic properties, optical properties."
+    }
   },
   {
     "id": "q-roadmap-7",
@@ -1308,7 +1749,12 @@
     "level": "beginner",
     "sources": [
       "S-042"
-    ]
+    ],
+    "visual": {
+      "scene": "fcc",
+      "caption": "A structure is atoms in a repeating cell. Illustrative.",
+      "alt": "A face-centred cubic cell: an atom at each corner and in the middle of each face of a cube."
+    }
   },
   {
     "id": "q-roadmap-8",
@@ -1343,6 +1789,9 @@
     "sources": [
       "S-010",
       "S-042"
-    ]
+    ],
+    "visual": {
+      "none": "A picture would only restate the answer: the question is about how to use the site, not about a physical idea."
+    }
   }
 ]
