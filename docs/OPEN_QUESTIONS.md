@@ -12,7 +12,7 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-006 | open | author |
 | Q-007 | open | author |
 | Q-008 | open | author |
-| Q-009 | open | author + builder (M9.1) |
+| Q-009 | open | author (licence text; M9.1 did the rest) |
 | Q-010 | open | builder (M9.3, needs vasp.at) |
 | Q-011 | open | author |
 | Q-012 | open | builder (M8.2, M10.1) |
@@ -80,6 +80,16 @@ The worked example (module 10) and parser validation need real files from the au
 
 ## Q-009. Materials Project terms and scope
 Confirm the current licence for redistributing derived data (believed CC BY 4.0 with attribution), API rate limits, and which subset to ship so the sharded data stays "a few MB gzipped". `mp-api 0.47.0` supports `db_version` snapshots; record the version and date used. Needs the author's API key (never committed). **Close:** M9.1 documents the terms and the chosen query in the data README.
+
+**M9.1 update (2026-11-19):**
+- **Done in M9.1:**
+  - The query is documented in `scripts/mp/config.yaml` and `scripts/mp/README.md`, and every manifest records it under `source.query`.
+  - The database version and fetch date are recorded in the manifest, and `db_version` is pinned in the config after the first run (D-072).
+  - mp-api's own retries apply, plus four outer retries with backoff. The rate limits themselves are not documented here.
+- **Still open, for the author:** the licence and attribution text.
+  - `config.yaml` ships "CC BY 4.0 (to be confirmed by the author, Q-009)" and an attribution that cites S-024.
+  - I could not read the terms: the Materials Project terms page answered 403 to an automated fetch, and the documentation site renders its pages with JavaScript.
+  - Confirm both, edit `config.yaml` if needed, and record the confirmed text here (README step 8).
 
 ## Q-010. PAW availability table
 Which elements have recommended VASP PAW potentials in the PBE set (and their recommended names such as Ti_pv). Source is the VASP wiki "Available PAW potentials" page. Needed by the feasibility check. **Close:** M9.3 builds the table from the wiki with the page cited, or the author supplies the list.

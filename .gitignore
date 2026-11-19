@@ -11,6 +11,8 @@ test-results/
 
 # python
 .venv/
+# Materials Project raw responses and mock output (scripts/mp/fetch.py)
+scripts/mp/.cache/
 __pycache__/
 *.pyc
 

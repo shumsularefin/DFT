@@ -1,0 +1,46 @@
+# Screening Studio data pipeline settings (M9.1). Read by fetch.py, build_shards.py and make_sample.py.
+# Edit this file, not the scripts. Filter names are the arguments of mp-api's
+# mpr.materials.summary.search(...) (S-044); a [min, max] pair is an inclusive range.
+
+# Pin the Materials Project database version you want. The REST API always serves its current
+# version, so fetch.py stops if the served version differs from this pin. Leave it empty ("")
+# for the first run: fetch.py then records whatever version is served. Example: "2026.04.13".
+db_version: ""
+
+# Licence and attribution written into manifest.json and shown by the Studio.
+# The licence is believed to be CC BY 4.0 (Q-009); confirm it on the Materials Project
+# terms page before you publish, and edit these two lines if it differs.
+licence: "CC BY 4.0 (Materials Project data; to be confirmed by the author, Q-009)"
+attribution: >-
+  Data from the Materials Project (https://materialsproject.org), database version {db_version}.
+  A. Jain et al., APL Materials 1, 011002 (2013). Derived and filtered by the DFT Handbook
+  pipeline (scripts/mp); see the Materials Project page of each material for the full record.
+
+# Elements left out of both queries. Two editorial choices, each matching a pymatgen element set
+# (S-034); scripts/mp/tests/test_config.py checks the lists against pymatgen.
+exclude_elements:
+  # Noble gases (pymatgen Element.is_noble_gas): few solid compounds, rarely a first project.
+  noble_gases: [He, Ne, Ar, Kr, Xe, Rn, Og]
+  # No stable isotope (pymatgen Element.is_radioactive: Tc, Pm and Z >= 84). Bi (Z = 83) stays.
+  radioactive: [Tc, Pm, Po, At, Fr, Ra, Ac, Th, Pa, U, Np, Pu, Am, Cm, Bk, Cf, Es, Fm, Md, "No", Lr,
+    Rf, Db, Sg, Bh, Hs, Mt, Ds, Rg, Cn, Nh, Fl, Mc, Lv, Ts]
+
+# The filter index: every material here gets one row (no structure) in index.json.
+# Budget: index.json at most 1.5 MB gzipped. If validate.py reports "over-budget" for
+# index.json, lower energy_above_hull's maximum or num_sites's maximum and run again.
+index:
+  energy_above_hull: [0, 0.05] # eV/atom
+  num_sites: [1, 60]
+  num_elements: [1, 4]
+
+# The starter subset: these materials also ship their structure, in shards of about 100 KB gzipped.
+# The API has no "stable OR near the hull" filter; stable materials have energy_above_hull = 0,
+# so the range below includes them.
+starter:
+  energy_above_hull: [0, 0.025] # eV/atom
+  num_sites: [1, 20]
+  num_elements: [1, 4]
+
+# Retries around each query (the client also retries single HTTP requests).
+retries: 4
+backoff_seconds: 5

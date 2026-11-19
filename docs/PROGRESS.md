@@ -6,7 +6,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 
 ## How to read this table
 
-- **Next stage to build: M12.2 (Scene library: one data format for every 3D picture, with a flat fallback), Tier B, size L.** Start it with `STAGE: NEXT`, `BASE: main`. The next Tier A stage is M9.1 (Data pipeline, schema, validation and sample data), size L: start it with `STAGE: NEXT`, `TIER: A`. Each builder session rewrites this line for the stage that follows.
+- **Next stage to build: M12.2 (Scene library: one data format for every 3D picture, with a flat fallback), Tier B, size L.** Start it with `STAGE: NEXT`, `BASE: main`. No Tier A stage is eligible now: M13.3 waits on M13.2, M7.5 on M7.4, M14.1 on M7.4 and M13.3, M14.2 on M14.1 and M9.3, M14.3 on M7.5, M11.3 on M11.2. Build Tier B stages first (M9.2 needs M8.3). Each builder session rewrites this line for the stage that follows.
 - **Tier** says which model to open the session with. **A** = the strongest model (Opus class): stages where a subtle mistake would put a wrong number in front of a researcher. **B** = the fast model (Sonnet class): UI, content and wiring on top of tested libraries. `-` = already done.
 - **Size** says how much work it is: **S** short session, **M** one normal session, **L** a long session that may stop as `partial` and need a second one.
 - A session started on the wrong tier does not build. It names the model to switch to and stops (`docs/WORKFLOW.md` section 2, step 0).
@@ -70,7 +70,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M14.3 | Charge-density difference, spin density and planar averages | todo | M7.5, M13.5 | M | A | | | | [work order](milestones/M14-research-guidance.md) |
 | M14.1 | Calculation review: pre-flight and post-flight checks | todo | M7.4, M13.3 | L | A | | | | [work order](milestones/M14-research-guidance.md) |
 | M8.4 | Maps, family trend and hand-offs | todo | M8.3, M4.3 | M | B | | | | [work order](milestones/M8-tolerance-factor.md) |
-| M9.1 | Data pipeline, schema, validation and sample data | todo | M5.1 | L | A | | | | [work order](milestones/M9-screening-studio.md) |
+| M9.1 | Data pipeline, schema, validation and sample data | done | M5.1 | L | A | main | none (pushed to main) | 2026-11-19 | [work order](milestones/M9-screening-studio.md) |
 | M9.2 | Explorer UI | todo | M9.1, M8.3 | L | B | | | | [work order](milestones/M9-screening-studio.md) |
 | M9.3 | Feasibility check and first-project builder | todo | M9.2, M3.5, M4.2 | L | B | | | | [work order](milestones/M9-screening-studio.md) |
 | M9.4 | Hooks, attribution, offline and integration | todo | M9.3 | S | B | | | | [work order](milestones/M9-screening-studio.md) |
@@ -86,6 +86,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 
 Newest first. One line per session: date, stage, outcome, branch.
 
+- 2026-11-19, M9.1: Materials Project pipeline in `scripts/mp/` (config, pinned requirements, `fetch.py` with retries, a db_version guard and `--mock`, `build_shards.py`, `validate.py`, `make_sample.py`, 19 unittest tests with a mocked client and no network), the shared `schema.json`, `src/lib/mp/{schema,jsonSchema,validate}.ts`, the synthetic sample in `public/data/mp/sample/`, and a deploy gate that scans every manifest (tested). D-072, Q-009 updated. The author must run the pipeline. main.
 - 2026-11-19, M13.6: `physics/eos.ts` (Birch-Murnaghan and Murnaghan, Levenberg-Marquardt from the parabola start, standard errors, sampling and residual warnings) against `eos_reference.json` (pymatgen EOS and scipy curve_fit); OUTCAR volume, `eosInput.ts`, `volumeSeries` and the EOS project in `series.ts` (ISIF 4, or 2 for cubic), EOS mode in the Input Builder series step, `/tools/eos/` with residual plot and SVG/PNG/CSV export. D-071. main.
 - 2026-11-19, M10.3: `chem/molgraph.ts` (graph, SMILES and MOL through RDKit, B012 sanitization issues, CoordGen layout, SVG), `geom3d.ts` (rough 3D, L-BFGS, planarity terms; methane, CO2, ethene, benzene, water within the work-order tolerances, each under 8 ms), `molexport.ts` (XYZ, MOL, molecule in a box), RDKit worker and client, `/design/molecule-check/`, `lazy.rdkit` 2391/2500 KB; D-070, Q-045. `TIER: A`, so M12.2 (Tier B) is still next. Pushed directly to `main`.
 - 2026-11-18, M13.5: `crystal/slab.ts` and `defects.ts` (terminations, polarity, orbits, defect pairs, supercell suggestion, neutral formation energy) against `structure_tools_reference.json` (pymatgen, spglib); D-069, Q-044 closed. `TIER: A`. Pushed directly to `main`.

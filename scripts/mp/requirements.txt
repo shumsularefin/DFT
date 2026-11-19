@@ -1,0 +1,8 @@
+# Screening Studio pipeline (scripts/mp). Python 3.12 or newer. Install in a virtualenv:
+#   pip install -r scripts/mp/requirements.txt
+mp-api==0.47.0
+emmet-core==0.88.3
+pymatgen==2026.10.24
+pymatgen-core==2026.10.31
+PyYAML==6.0.3
+jsonschema==4.26.0
