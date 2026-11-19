@@ -1,0 +1,104 @@
+.ef {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+.ef-input {
+  display: grid;
+  gap: var(--space-2);
+}
+.ef-input label {
+  font-weight: 600;
+}
+.ef-input textarea {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  padding: var(--space-2) var(--space-3);
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  max-width: 100%;
+  min-width: 0;
+  resize: vertical;
+}
+.ef-note,
+.ef-count,
+.ef-kind,
+.ef-src {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--step--1);
+}
+.ef-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.ef-chip,
+.ef-link {
+  min-height: var(--target);
+  padding: 0 var(--space-3);
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  cursor: pointer;
+  max-width: 100%;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.ef-link {
+  background: none;
+  border: 0;
+  color: var(--accent);
+  text-decoration: underline;
+  padding: 0;
+}
+.ef-card {
+  border: 1px solid var(--border);
+  border-left: 6px solid var(--accent);
+  border-radius: var(--radius);
+  padding: var(--space-3) var(--space-4);
+  margin-top: var(--space-3);
+  background: var(--surface);
+  min-width: 0;
+}
+.ef-title {
+  margin: 0 0 var(--space-1);
+  overflow-wrap: anywhere;
+}
+.ef-sub {
+  margin: var(--space-3) 0 var(--space-1);
+  font-size: var(--step-0);
+}
+.ef-card ol,
+.ef-card ul {
+  margin: 0;
+  padding-left: var(--space-5);
+}
+.ef-card code,
+.ef-none code {
+  overflow-wrap: anywhere;
+}
+.ef-incar {
+  background: var(--surface-2);
+  padding: 0 var(--space-1);
+  border-radius: var(--radius);
+}
+.ef-browse summary {
+  cursor: pointer;
+  font-weight: 600;
+  min-height: var(--target);
+  display: flex;
+  align-items: center;
+}
+.ef-browse ul {
+  padding-left: var(--space-5);
+}
+.ef-browse li {
+  min-height: var(--target);
+  display: flex;
+  align-items: center;
+}

@@ -64,6 +64,7 @@ export const PLOT_IDS = [
   'restart-chain',
   'oszicar-trace',
   'parallel-split',
+  'conv-series',
 ] as const;
 export type PlotId = (typeof PLOT_IDS)[number];
 
@@ -1152,6 +1153,36 @@ function oszicarTrace(p: P): string {
   return wrap(p.alt as string, c.h, body);
 }
 
+/**
+ * A convergence series: how much the energy per atom still changes from one setting to the next, on a log axis,
+ * with the accepted threshold as a dashed line. `diff` lists |E(n) - E(n+1)| (any unit, same unit as `threshold`).
+ * No numbers are printed, so a question can ask for the value.
+ */
+function convSeries(p: P): string {
+  const diff = arr<number>(p, 'diff', [20, 6, 2, 0.6, 0.2]).map((d) => Math.max(Math.abs(d), 1e-9));
+  const thr = Math.max(1e-9, num(p, 'threshold', 1));
+  const xlabel = typeof p.xlabel === 'string' ? p.xlabel : 'setting (rising)';
+  const ys = diff.map((d) => Math.log10(d));
+  const t = Math.log10(thr);
+  const lo = Math.floor(Math.min(...ys, t)) - 1;
+  const hi = Math.ceil(Math.max(...ys, t)) + 1;
+  const c = chart(
+    1,
+    Math.max(diff.length, 2),
+    lo,
+    hi,
+    xlabel,
+    'change from the next setting (powers of ten)',
+  );
+  const pts = ys.map((y, i) => [c.sx(i + 1), c.sy(y)] as [number, number]);
+  let body = c.axes + line(c.x0, c.sy(t), c.x1, c.sy(t), 'vp-guide') + path(pts, 'vp-curve');
+  body += text(c.x1 - 4, c.sy(t) - 5, 'threshold', 'vp-t', 'end');
+  body += pts
+    .map(([x, y]) => `<circle class="vp-node vp-solid" cx="${r1(x)}" cy="${r1(y)}" r="3"/>`)
+    .join('');
+  return wrap(p.alt as string, c.h, body);
+}
+
 /** How the MPI ranks are split by KPAR (k-point groups) and NCORE (cores per band). Pure arithmetic. */
 function parallelSplit(p: P): string {
   const ranks = Math.min(64, Math.max(1, Math.round(num(p, 'ranks', 16))));
@@ -1226,6 +1257,7 @@ const RENDER: Record<PlotId, { fn: (p: P) => string; badge: PlotBadge }> = {
   'restart-chain': { fn: restartChain, badge: 'illustrative' },
   'oszicar-trace': { fn: oszicarTrace, badge: 'illustrative' },
   'parallel-split': { fn: parallelSplit, badge: 'computed' },
+  'conv-series': { fn: convSeries, badge: 'illustrative' },
 };
 
 export function isPlotId(id: string): id is PlotId {

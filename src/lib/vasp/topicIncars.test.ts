@@ -6,7 +6,11 @@ import { parseIncar } from './incar';
 import { formatIssue, validate } from './validate';
 import type { Structure, Vec3 } from '../crystal/types';
 
-const DIRS = ['src/content/handbook/06-vasp-files', 'src/content/handbook/07-running'];
+const DIRS = [
+  'src/content/handbook/06-vasp-files',
+  'src/content/handbook/07-running',
+  'src/content/handbook/08-convergence-and-errors',
+];
 const BLOCK = /<(?:VaspFileExplorer|VaspFile)\s+(?:kind|name)="INCAR"[^]*?code=\{`([^`]*)`\}/g;
 
 interface Shown {

@@ -20,6 +20,11 @@ const tools = [
     text: 'Paste results from a series of runs and see whether the energy has settled.',
   },
   {
+    id: 'errors',
+    title: 'Error finder',
+    text: 'Paste a VASP error message or describe a symptom and see likely causes and fixes, in order.',
+  },
+  {
     id: 'kpath',
     title: 'Brillouin zone and k-path viewer',
     text: 'See the Brillouin zone of your structure in 3D and export a k-path for a band-structure run.',
@@ -51,14 +56,14 @@ const more = [
 
 <BaseLayout
   title="Tools"
-  description="Research tools for the DFT Handbook. The input builder, convergence plotter, k-path tool, magnetic configuration tool and practice are available; the others are planned."
+  description="Research tools for the DFT Handbook. The input builder, convergence plotter, error finder, k-path tool, magnetic configuration tool and practice are available; the others are planned."
 >
   <div class="container">
     <h1>Tools</h1>
     <p>
-      These tools run entirely in your browser. The input builder, the convergence plotter, the k-path tool
-      and the magnetic configuration tool are available now, and so is practice. The others are not built yet,
-      so they have no link. Each card says what it will do.
+      These tools run entirely in your browser. The input builder, the convergence plotter, the error finder,
+      the k-path tool and the magnetic configuration tool are available now, and so is practice. The others
+      are not built yet, so they have no link. Each card says what it will do.
     </p>
     <h2>Research tools</h2>
     <div class="tool-grid">
@@ -75,6 +80,10 @@ const more = [
           ) : t.id === 'convergence' ? (
             <p>
               <a href="/tools/convergence/">Open the convergence plotter</a>
+            </p>
+          ) : t.id === 'errors' ? (
+            <p>
+              <a href="/errors/">Open the error finder</a>
             </p>
           ) : t.id === 'kpath' ? (
             <p>

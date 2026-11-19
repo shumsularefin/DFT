@@ -1,0 +1,1058 @@
+[
+  {
+    "id": "q-cv-1",
+    "concepts": [
+      "convergence-testing"
+    ],
+    "type": "single",
+    "prompt": "You are testing ENCUT. Which settings should stay the same from run to run?",
+    "options": [
+      {
+        "text": "The structure, the k-mesh, the pseudopotentials and every other INCAR tag",
+        "correct": true,
+        "why": "Only the setting under test may change, or you cannot tell which change moved the energy."
+      },
+      {
+        "text": "Only the structure; the k-mesh can change too",
+        "correct": false,
+        "why": "A changing mesh would move the energy for a second reason."
+      },
+      {
+        "text": "Nothing; each run should use its own best settings",
+        "correct": false,
+        "why": "Then the runs are not comparable."
+      }
+    ],
+    "hints": [
+      "How many things should differ between two runs in a test?",
+      "What would you conclude if two settings changed and the energy moved?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Choose the setting to test"
+          },
+          {
+            "label": "Run a static calculation"
+          },
+          {
+            "label": "Read the energy per atom"
+          },
+          {
+            "label": "Plot it"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "One run in a convergence series.",
+      "alt": "A four-step flow from choosing the setting to test, to running a static calculation, to reading the energy per atom, to plotting it."
+    }
+  },
+  {
+    "id": "q-cv-2",
+    "concepts": [
+      "convergence-testing"
+    ],
+    "type": "single",
+    "prompt": "The curve shows how much the energy changes from one setting to the next. Which setting does the author's rule pick?",
+    "options": [
+      {
+        "text": "The first one where the change falls below the dashed threshold",
+        "correct": true,
+        "why": "The rule picks the smallest setting whose change to the next one is under the threshold."
+      },
+      {
+        "text": "The very last one, because it is the most accurate",
+        "correct": false,
+        "why": "The last one is the most expensive and the gain after convergence is nothing."
+      },
+      {
+        "text": "The first one, because it is the cheapest",
+        "correct": false,
+        "why": "The change there is far above the threshold."
+      }
+    ],
+    "hints": [
+      "Look for where the curve crosses the dashed line.",
+      "Cheapest that is still good enough."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "conv-series",
+      "params": {
+        "diff": [
+          20,
+          6,
+          2,
+          0.6,
+          0.2
+        ],
+        "threshold": 1,
+        "xlabel": "ENCUT (rising)"
+      },
+      "caption": "The change in energy per atom from each setting to the next, with the threshold as a dashed line.",
+      "alt": "Curve of the change in energy from one setting to the next on a logarithmic axis, falling step by step, with a dashed horizontal line marking the threshold."
+    }
+  },
+  {
+    "id": "q-cv-3",
+    "concepts": [
+      "convergence-testing"
+    ],
+    "type": "numeric",
+    "prompt": "The energy per atom is -4.9512 eV at ENCUT 500 and -4.9518 eV at ENCUT 550. By how many meV per atom did it change? Give a positive number.",
+    "answer": 0.6,
+    "tolerance": 0.05,
+    "unit": "meV/atom",
+    "hints": [
+      "Subtract the two energies.",
+      "1 eV is 1000 meV, so 0.0006 eV is how many meV?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "none": "The numbers are in the question, so a picture would only repeat them."
+    }
+  },
+  {
+    "id": "q-cv-4",
+    "concepts": [
+      "convergence-testing"
+    ],
+    "type": "single",
+    "prompt": "Which of these does a convergence test NOT improve?",
+    "options": [
+      {
+        "text": "The choice of exchange-correlation functional",
+        "correct": true,
+        "why": "Convergence removes numerical error. The model itself, such as PBE, is a separate approximation."
+      },
+      {
+        "text": "The completeness of the plane-wave basis",
+        "correct": false,
+        "why": "Raising ENCUT is exactly this."
+      },
+      {
+        "text": "The sampling of the Brillouin zone",
+        "correct": false,
+        "why": "Refining the k-mesh is exactly this."
+      }
+    ],
+    "hints": [
+      "Which choice is a physical model and not a numerical setting?",
+      "Convergence tests raise a numerical setting."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "ladder-rungs",
+      "params": {},
+      "caption": "Functionals on a ladder: a model choice, not a numerical setting.",
+      "alt": "A ladder of exchange-correlation functional rungs from simple to complex."
+    }
+  },
+  {
+    "id": "q-ec-1",
+    "concepts": [
+      "cutoff-convergence"
+    ],
+    "type": "single",
+    "prompt": "The curve shows the change in energy per atom from one ENCUT to the next. What does it tell you about going to a much higher ENCUT than the converged one?",
+    "options": [
+      {
+        "text": "It costs more and changes the energy by less than the threshold",
+        "correct": true,
+        "why": "Past convergence the curve stays below the dashed line, so the extra cost buys nothing."
+      },
+      {
+        "text": "It keeps lowering the energy by a large amount",
+        "correct": false,
+        "why": "The changes shown are already below the threshold."
+      },
+      {
+        "text": "It makes the structure relax further",
+        "correct": false,
+        "why": "ENCUT does not move the atoms by itself."
+      }
+    ],
+    "hints": [
+      "Where is the curve relative to the dashed line at high ENCUT?",
+      "What do you gain beyond the threshold?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "conv-series",
+      "params": {
+        "diff": [
+          30,
+          9,
+          2.5,
+          0.7,
+          0.25,
+          0.1
+        ],
+        "threshold": 1,
+        "xlabel": "ENCUT (rising)"
+      },
+      "caption": "Change in energy per atom between neighbouring ENCUT values.",
+      "alt": "Curve of the change in energy between neighbouring cutoffs on a logarithmic axis, falling below a dashed threshold line."
+    }
+  },
+  {
+    "id": "q-ec-2",
+    "concepts": [
+      "cutoff-convergence"
+    ],
+    "type": "single",
+    "prompt": "You will relax the cell with ISIF = 3. What ENCUT does the author's rule give?",
+    "options": [
+      {
+        "text": "1.3 times the largest ENMAX",
+        "correct": true,
+        "why": "The 30 percent margin keeps Pulay stress small while the volume changes."
+      },
+      {
+        "text": "Exactly the largest ENMAX",
+        "correct": false,
+        "why": "That is the minimum for fixed-cell runs."
+      },
+      {
+        "text": "Half the largest ENMAX",
+        "correct": false,
+        "why": "This is below the recommended minimum."
+      }
+    ],
+    "hints": [
+      "Does the cell size change in the run?",
+      "Which runs need extra margin?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-041",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "pw-count",
+      "params": {},
+      "caption": "Relative number of plane waves against cutoff energy.",
+      "alt": "Curve of the number of plane waves in the basis against the cutoff energy, rising faster than a straight line."
+    }
+  },
+  {
+    "id": "q-ec-3",
+    "concepts": [
+      "cutoff-convergence"
+    ],
+    "type": "single",
+    "prompt": "How do you read ENMAX without exposing the POTCAR contents?",
+    "options": [
+      {
+        "text": "grep ENMAX POTCAR, which prints one number per element",
+        "correct": true,
+        "why": "This prints only the lines with ENMAX, not the file."
+      },
+      {
+        "text": "Open the POTCAR and copy the header into the report",
+        "correct": false,
+        "why": "The POTCAR is licensed; do not copy its contents."
+      },
+      {
+        "text": "Ask the site to look it up",
+        "correct": false,
+        "why": "The site never sees your files."
+      }
+    ],
+    "hints": [
+      "Which command prints only the lines that contain a word?",
+      "What should never be copied from a POTCAR?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {},
+      "caption": "The files VASP reads and writes.",
+      "alt": "Boxes showing the input files VASP reads and the output files it writes."
+    }
+  },
+  {
+    "id": "q-kc-1",
+    "concepts": [
+      "kpoint-convergence"
+    ],
+    "type": "single",
+    "prompt": "Why does a metal need a finer k-mesh than an insulator?",
+    "options": [
+      {
+        "text": "The occupation changes sharply at the Fermi surface, so a coarse mesh can catch or miss it",
+        "correct": true,
+        "why": "A coarse mesh makes the energy depend on where the mesh points fall."
+      },
+      {
+        "text": "Metals have more atoms",
+        "correct": false,
+        "why": "The number of atoms is not the reason."
+      },
+      {
+        "text": "Insulators have no electrons to sample",
+        "correct": false,
+        "why": "Insulators have filled bands that vary smoothly."
+      }
+    ],
+    "hints": [
+      "Where does the occupation of electron states jump?",
+      "Smooth changes need fewer samples."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-041",
+      "S-050"
+    ],
+    "visual": {
+      "plot": "smearing-curves",
+      "params": {
+        "series": "occupation",
+        "schemes": [
+          "gaussian"
+        ]
+      },
+      "caption": "Occupation against energy from the Fermi level.",
+      "alt": "Curve of the occupation of a level falling from one to zero around the Fermi level."
+    }
+  },
+  {
+    "id": "q-kc-2",
+    "concepts": [
+      "kpoint-convergence"
+    ],
+    "type": "single",
+    "prompt": "You tested 4x4x4, 6x6x6 and 8x8x8. The energy per atom changed by 12 meV, then 0.4 meV. What is a careful next step for a metal?",
+    "options": [
+      {
+        "text": "Run one more, finer mesh to see that it stays settled",
+        "correct": true,
+        "why": "For a metal one smooth step is not proof; check another."
+      },
+      {
+        "text": "Stop; 6x6x6 is converged for good",
+        "correct": false,
+        "why": "The last change is small but a single step can mislead a metal."
+      },
+      {
+        "text": "Raise SIGMA until the numbers agree",
+        "correct": false,
+        "why": "That hides a poor mesh behind smearing."
+      }
+    ],
+    "hints": [
+      "Can the energy wiggle for a metal?",
+      "What does a larger SIGMA do to the energy?"
+    ],
+    "difficulty": 2,
+    "level": "intermediate",
+    "sources": [
+      "S-041",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "conv-series",
+      "params": {
+        "diff": [
+          12,
+          0.4
+        ],
+        "threshold": 1,
+        "xlabel": "mesh (rising)"
+      },
+      "caption": "Change in energy per atom between meshes.",
+      "alt": "Curve of the change in energy between neighbouring meshes on a logarithmic axis, falling below a dashed threshold line."
+    }
+  },
+  {
+    "id": "q-kc-3",
+    "concepts": [
+      "kpoint-convergence"
+    ],
+    "type": "single",
+    "prompt": "A cell is doubled along one axis to make a supercell. What happens to the k-mesh you need along that axis?",
+    "options": [
+      {
+        "text": "A coarser mesh gives the same density, because the Brillouin zone is smaller",
+        "correct": true,
+        "why": "Compare the mesh density (resolution), not the numbers of divisions."
+      },
+      {
+        "text": "The same mesh, because the atoms are the same",
+        "correct": false,
+        "why": "The reciprocal cell shrinks as the real cell grows."
+      },
+      {
+        "text": "A finer mesh, because there are more atoms",
+        "correct": false,
+        "why": "More atoms do not mean more k-points along that axis."
+      }
+    ],
+    "hints": [
+      "What happens to the reciprocal lattice when the real cell doubles?",
+      "What does resolution describe?"
+    ],
+    "difficulty": 2,
+    "level": "pro",
+    "sources": [
+      "S-050"
+    ],
+    "visual": {
+      "plot": "kmesh-grid",
+      "params": {
+        "n": 4,
+        "gamma": true,
+        "angle": 90,
+        "ratio": 1
+      },
+      "caption": "A mesh of k-points in a reciprocal cell.",
+      "alt": "Square reciprocal cell with a grid of dots for the k-points and a circle marking the Gamma point at the centre."
+    }
+  },
+  {
+    "id": "q-kc-4",
+    "concepts": [
+      "kpoint-convergence"
+    ],
+    "type": "single",
+    "prompt": "What does it tell you if T*S divided by the number of atoms is above about 1 meV?",
+    "options": [
+      {
+        "text": "SIGMA is too large; reduce it and test again",
+        "correct": true,
+        "why": "The smeared energy is far from the zero-smearing energy."
+      },
+      {
+        "text": "The k-mesh is perfect",
+        "correct": false,
+        "why": "The entropy term measures smearing, not the mesh."
+      },
+      {
+        "text": "The run has not finished",
+        "correct": false,
+        "why": "It is printed at every electronic step regardless."
+      }
+    ],
+    "hints": [
+      "Which tag sets the smearing width?",
+      "What does a large entropy term mean?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "sigma-width",
+      "params": {},
+      "caption": "Effect of the smearing width.",
+      "alt": "Curves showing how a wider smearing changes the occupation of levels near the Fermi level."
+    }
+  },
+  {
+    "id": "q-st-1",
+    "concepts": [
+      "scf-troubleshooting"
+    ],
+    "type": "single",
+    "prompt": "An SCF loop reaches NELM with dE jumping between 1E-2 and 1E-1. What do you check first?",
+    "options": [
+      {
+        "text": "The structure: overlapping atoms or a broken geometry",
+        "correct": true,
+        "why": "Most unconvergeable runs are caused by the structure."
+      },
+      {
+        "text": "Raise NELM to 1000",
+        "correct": false,
+        "why": "A loop that jumps does not converge with more steps."
+      },
+      {
+        "text": "Delete OUTCAR",
+        "correct": false,
+        "why": "OUTCAR is output, not input."
+      }
+    ],
+    "hints": [
+      "What is the cheapest thing to check?",
+      "Does more time fix a loop that oscillates?"
+    ],
+    "difficulty": 1,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "oszicar-trace",
+      "params": {
+        "dE": [
+          1,
+          0.3,
+          0.1,
+          0.3,
+          0.1,
+          0.3,
+          0.1
+        ],
+        "ediff": 0.0001
+      },
+      "caption": "A loop whose change in energy does not fall.",
+      "alt": "Curve of the change in energy per electronic step on a logarithmic axis, jumping up and down above a dashed horizontal line at the convergence threshold."
+    }
+  },
+  {
+    "id": "q-st-2",
+    "concepts": [
+      "scf-troubleshooting"
+    ],
+    "type": "single",
+    "prompt": "What does reducing AMIX do?",
+    "options": [
+      {
+        "text": "Takes smaller, calmer steps in the density mixing",
+        "correct": true,
+        "why": "A smaller fraction of the new density is mixed in each step, which damps oscillation."
+      },
+      {
+        "text": "Makes the electrons heavier",
+        "correct": false,
+        "why": "It is a numerical mixing parameter, not a physical one."
+      },
+      {
+        "text": "Switches spin on",
+        "correct": false,
+        "why": "Spin is set by ISPIN."
+      }
+    ],
+    "hints": [
+      "What does the mixer do each step?",
+      "Does a smaller mixing fraction make bigger or smaller moves?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-041"
+    ],
+    "visual": {
+      "plot": "scf-trace",
+      "params": {
+        "Z": 2,
+        "alpha": 0.1,
+        "tol": 1e-08,
+        "show": 40
+      },
+      "caption": "The toy loop with a smaller mixing fraction.",
+      "alt": "Curve of the change in density per iteration in the toy lab with a small mixing fraction, falling slowly and steadily."
+    }
+  },
+  {
+    "id": "q-st-3",
+    "concepts": [
+      "scf-troubleshooting"
+    ],
+    "type": "single",
+    "prompt": "A hard metal slab converges with SIGMA = 0.2 and heavy damping. What is the right way to use that result?",
+    "options": [
+      {
+        "text": "Use it as a starting WAVECAR, then rerun with the normal settings",
+        "correct": true,
+        "why": "Recovery settings can bias the result; they get you started."
+      },
+      {
+        "text": "Report it as the final result",
+        "correct": false,
+        "why": "A larger SIGMA moves the energy."
+      },
+      {
+        "text": "Delete it and start again",
+        "correct": false,
+        "why": "The converged WAVECAR is exactly what the next run needs."
+      }
+    ],
+    "hints": [
+      "What do the recovery settings do to the energy?",
+      "How do restarts help?"
+    ],
+    "difficulty": 2,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "restart-chain",
+      "params": {
+        "focus": ""
+      },
+      "caption": "One run writes the files the next run reads.",
+      "alt": "Boxes showing a run that writes a WAVECAR and a following run that reads it."
+    }
+  },
+  {
+    "id": "q-rt-1",
+    "concepts": [
+      "relaxation-troubleshooting"
+    ],
+    "type": "single",
+    "prompt": "You set NSW = 50 and no IBRION. OSZICAR shows T= and EK=. What happened?",
+    "options": [
+      {
+        "text": "IBRION defaulted to 0, molecular dynamics; set IBRION = 2 explicitly",
+        "correct": true,
+        "why": "With more than one ionic step and no IBRION, VASP runs MD."
+      },
+      {
+        "text": "The run is a perfect relaxation",
+        "correct": false,
+        "why": "A relaxation does not print a temperature."
+      },
+      {
+        "text": "ISPIN was wrong",
+        "correct": false,
+        "why": "Spin does not change the type of ionic motion."
+      }
+    ],
+    "hints": [
+      "Which tag chooses how the ions move?",
+      "What does a temperature in OSZICAR mean?"
+    ],
+    "difficulty": 1,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "ionic-steps",
+      "params": {
+        "nsw": 50
+      },
+      "caption": "Fifty ionic steps.",
+      "alt": "A row of boxes for ionic steps."
+    }
+  },
+  {
+    "id": "q-rt-2",
+    "concepts": [
+      "relaxation-troubleshooting"
+    ],
+    "type": "single",
+    "prompt": "A relaxation stops with ZBRENT: fatal error in bracketing. What is the first thing to try?",
+    "options": [
+      {
+        "text": "Copy CONTCAR to POSCAR and restart",
+        "correct": true,
+        "why": "The run continues from the last good geometry."
+      },
+      {
+        "text": "Delete the INCAR",
+        "correct": false,
+        "why": "The INCAR holds your settings."
+      },
+      {
+        "text": "Increase NSW to 1000",
+        "correct": false,
+        "why": "The search failed; more steps do not help."
+      }
+    ],
+    "hints": [
+      "Which file holds the last geometry?",
+      "Does a failed line search recover by itself?"
+    ],
+    "difficulty": 1,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "force-band",
+      "params": {
+        "tol": 0.005
+      },
+      "caption": "Forces fall step by step toward the tolerance band.",
+      "alt": "Curve of the largest force falling over ionic steps on a logarithmic axis, with a horizontal band at the force tolerance."
+    }
+  },
+  {
+    "id": "q-rt-3",
+    "concepts": [
+      "relaxation-troubleshooting"
+    ],
+    "type": "single",
+    "prompt": "Your slab's vacuum shrank in an ISIF = 3 run. What should the setting be for a slab?",
+    "options": [
+      {
+        "text": "ISIF = 2, which relaxes the ions but keeps the cell",
+        "correct": true,
+        "why": "Vacuum has no stress to resist compression, so the cell must be held."
+      },
+      {
+        "text": "ISIF = 3 with a smaller POTIM",
+        "correct": false,
+        "why": "POTIM does not stop the cell from changing."
+      },
+      {
+        "text": "ISIF = 4",
+        "correct": false,
+        "why": "This still lets the cell shape change."
+      }
+    ],
+    "hints": [
+      "Which tag decides what is relaxed?",
+      "What would hold the vacuum thickness?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "dof-cell",
+      "params": {
+        "atoms": true,
+        "shape": true,
+        "volume": true
+      },
+      "caption": "What ISIF = 3 lets move.",
+      "alt": "Diagram of a cell with arrows showing atom positions, cell shape and volume all free to change."
+    }
+  },
+  {
+    "id": "q-ce-1",
+    "concepts": [
+      "common-errors"
+    ],
+    "type": "single",
+    "prompt": "You have a VASP error. In which file is the error message most likely to appear?",
+    "options": [
+      {
+        "text": "In standard output, such as vasp.out or the scheduler log",
+        "correct": true,
+        "why": "VASP prints errors to standard output, not to OUTCAR."
+      },
+      {
+        "text": "In OUTCAR",
+        "correct": false,
+        "why": "OUTCAR records progress, not the error text."
+      },
+      {
+        "text": "In POSCAR",
+        "correct": false,
+        "why": "POSCAR is an input file."
+      }
+    ],
+    "hints": [
+      "Where does a program normally print errors?",
+      "Which file is an input?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {},
+      "caption": "Files VASP reads and writes.",
+      "alt": "Boxes showing the input files VASP reads and the output files it writes."
+    }
+  },
+  {
+    "id": "q-ce-2",
+    "concepts": [
+      "common-errors"
+    ],
+    "type": "single",
+    "prompt": "A message names IBZKPT and different classes of lattices. What is the usual remedy?",
+    "options": [
+      {
+        "text": "Use a Gamma-centred mesh with equal divisions on equivalent axes",
+        "correct": true,
+        "why": "The mesh must share the lattice symmetry."
+      },
+      {
+        "text": "Delete WAVECAR",
+        "correct": false,
+        "why": "The error appears at k-point setup, before the wavefunctions matter."
+      },
+      {
+        "text": "Raise ENCUT",
+        "correct": false,
+        "why": "ENCUT does not change the k-point symmetry."
+      }
+    ],
+    "hints": [
+      "Which setup step failed?",
+      "What must the mesh share with the lattice?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "kmesh-grid",
+      "params": {
+        "n": 4,
+        "gamma": true,
+        "angle": 120,
+        "ratio": 1
+      },
+      "caption": "A Gamma-centred mesh in a hexagonal reciprocal cell.",
+      "alt": "Oblique reciprocal cell with a grid of dots and a circle marking Gamma."
+    }
+  },
+  {
+    "id": "q-ce-3",
+    "concepts": [
+      "common-errors"
+    ],
+    "type": "single",
+    "prompt": "Why is ISYM = 0 a last resort for symmetry errors?",
+    "options": [
+      {
+        "text": "It removes the symptom but slows the run and can change magnetic results",
+        "correct": true,
+        "why": "Turning symmetry off is a blunt fix; first fix the structure or the mesh."
+      },
+      {
+        "text": "It speeds the run up",
+        "correct": false,
+        "why": "Symmetry reduces the work; turning it off adds work."
+      },
+      {
+        "text": "It always fixes the problem",
+        "correct": false,
+        "why": "It removes some errors, not all."
+      }
+    ],
+    "hints": [
+      "What does symmetry save?",
+      "Does removing it change the physics?"
+    ],
+    "difficulty": 2,
+    "level": "pro",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "none": "The answer explains a trade-off in words, so a picture would only restate it."
+    }
+  },
+  {
+    "id": "q-ec-4",
+    "concepts": [
+      "cutoff-convergence"
+    ],
+    "type": "single",
+    "prompt": "Your ENCUT scan ends at the first value where the change to the next is below 1 meV per atom. What should you do before you use the number?",
+    "options": [
+      {
+        "text": "Write it down with the k-mesh, and use it for every run you compare",
+        "correct": true,
+        "why": "Energies are only comparable at the same ENCUT and mesh."
+      },
+      {
+        "text": "Use a different ENCUT for each structure you compare",
+        "correct": false,
+        "why": "Then the total energies are not comparable."
+      },
+      {
+        "text": "Forget it; the default will do",
+        "correct": false,
+        "why": "The default may be too low for cell relaxations."
+      }
+    ],
+    "hints": [
+      "Which runs can be compared?",
+      "What must a reader know to judge your number?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "conv-series",
+      "params": {
+        "diff": [
+          25,
+          7,
+          2,
+          0.5,
+          0.2
+        ],
+        "threshold": 1,
+        "xlabel": "ENCUT (rising)"
+      },
+      "caption": "The scan ends below the threshold.",
+      "alt": "Curve of the change in energy between neighbouring cutoffs on a logarithmic axis, ending below a dashed threshold line."
+    }
+  },
+  {
+    "id": "q-st-4",
+    "concepts": [
+      "scf-troubleshooting"
+    ],
+    "type": "single",
+    "prompt": "Where do you look to see whether an SCF loop actually converged?",
+    "options": [
+      {
+        "text": "OSZICAR: the last change in energy should be below EDIFF",
+        "correct": true,
+        "why": "OSZICAR lists the change in energy at each electronic step."
+      },
+      {
+        "text": "The file size of OUTCAR",
+        "correct": false,
+        "why": "Size says nothing about convergence."
+      },
+      {
+        "text": "The job script",
+        "correct": false,
+        "why": "The script only launches VASP."
+      }
+    ],
+    "hints": [
+      "Which file lists each electronic step?",
+      "What threshold does the change have to pass?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-041",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "oszicar-trace",
+      "params": {
+        "dE": [
+          10,
+          0.1,
+          0.001,
+          1e-05,
+          1e-07
+        ],
+        "ediff": 0.0001
+      },
+      "caption": "A converged loop falls below EDIFF.",
+      "alt": "Curve of the change in energy per electronic step on a logarithmic axis, falling below a dashed horizontal line at the convergence threshold."
+    }
+  },
+  {
+    "id": "q-rt-4",
+    "concepts": [
+      "relaxation-troubleshooting"
+    ],
+    "type": "single",
+    "prompt": "Why do you rerun an ISIF = 3 relaxation from its own CONTCAR until the volume stops changing?",
+    "options": [
+      {
+        "text": "The basis set is fixed to the starting cell, so Pulay stress biases a single round",
+        "correct": true,
+        "why": "Each round rebuilds the basis for the new cell."
+      },
+      {
+        "text": "Because VASP always stops after one ionic step",
+        "correct": false,
+        "why": "A relaxation continues until it meets its criterion or reaches NSW."
+      },
+      {
+        "text": "To change the functional",
+        "correct": false,
+        "why": "The functional is set in the POTCAR and INCAR, not by restarting."
+      }
+    ],
+    "hints": [
+      "What is fixed while the volume changes?",
+      "What does a new POSCAR rebuild?"
+    ],
+    "difficulty": 2,
+    "level": "pro",
+    "sources": [
+      "S-040",
+      "S-041"
+    ],
+    "visual": {
+      "plot": "pw-parabola",
+      "params": {
+        "showCutoff": true
+      },
+      "caption": "Plane waves below a cutoff are kept.",
+      "alt": "Curve of the kinetic energy of a plane wave against its wave vector with a line marking the cutoff."
+    }
+  },
+  {
+    "id": "q-ce-4",
+    "concepts": [
+      "common-errors"
+    ],
+    "type": "single",
+    "prompt": "A job ends with no error message at all. What is the most likely reason?",
+    "options": [
+      {
+        "text": "It hit the wall-time limit or ran out of memory, so check the scheduler log",
+        "correct": true,
+        "why": "The scheduler stops the job; VASP does not get to print."
+      },
+      {
+        "text": "The INCAR is perfect",
+        "correct": false,
+        "why": "A good INCAR does not stop a job."
+      },
+      {
+        "text": "OUTCAR is missing",
+        "correct": false,
+        "why": "OUTCAR would exist if VASP had started."
+      }
+    ],
+    "hints": [
+      "Who can stop a job without VASP saying anything?",
+      "Where would that be recorded?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "parallel-split",
+      "params": {
+        "ranks": 16,
+        "kpar": 2,
+        "ncore": 4
+      },
+      "caption": "Ranks split into k-point groups.",
+      "alt": "Boxes showing sixteen MPI ranks split into two k-point groups."
+    }
+  }
+]

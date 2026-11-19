@@ -580,7 +580,7 @@
       "output-files"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "cutoff-convergence",
@@ -591,7 +591,7 @@
       "convergence-testing"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "kpoint-convergence",
@@ -602,7 +602,7 @@
       "convergence-testing"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "common-errors",
@@ -610,10 +610,11 @@
     "module": 8,
     "summary": "Typical failures, what they mean, and how to correct them.",
     "prerequisites": [
-      "output-files"
+      "output-files",
+      "convergence-testing"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "total-energy",
@@ -839,6 +840,31 @@
     "summary": "A command-line helper that writes VASP inputs and processes outputs, and why its menu codes must be checked.",
     "prerequisites": [
       "vasp-workflow"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "scf-troubleshooting",
+    "label": "SCF troubleshooting",
+    "module": 8,
+    "summary": "Finding out why the electronic loop stalls and the order in which to change settings.",
+    "prerequisites": [
+      "scf-loop",
+      "scf-mixing",
+      "output-files"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "relaxation-troubleshooting",
+    "label": "Relaxation troubleshooting",
+    "module": 8,
+    "summary": "Fixing ZBRENT errors, relaxations that do not finish, Pulay stress and collapsed slabs.",
+    "prerequisites": [
+      "forces-and-relaxation",
+      "output-files"
     ],
     "level": "intermediate",
     "status": "published"

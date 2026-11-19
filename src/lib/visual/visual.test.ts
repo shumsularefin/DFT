@@ -6,12 +6,13 @@ import m4 from '../../data/questions/module-04.json';
 import m5 from '../../data/questions/module-05.json';
 import m6 from '../../data/questions/module-06.json';
 import m7 from '../../data/questions/module-07.json';
+import m8 from '../../data/questions/module-08.json';
 import { boxEnergyEV } from '../physics/box';
 import { loadQuestionBank } from '../learning/questions';
 import { PLOT_IDS, renderPlot } from './plots';
 import { resolveVisual } from './resolve';
 
-const bank = loadQuestionBank({ m1, m2, m3, m4, m5, m6, m7 });
+const bank = loadQuestionBank({ m1, m2, m3, m4, m5, m6, m7, m8 });
 
 describe('question visuals (M12.3)', () => {
   it('every question has a visual or a reasoned exemption', () => {

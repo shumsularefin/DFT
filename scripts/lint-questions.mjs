@@ -47,6 +47,7 @@ export const PLOT_IDS = [
   'restart-chain',
   'oszicar-trace',
   'parallel-split',
+  'conv-series',
 ];
 
 function walk(dir) {

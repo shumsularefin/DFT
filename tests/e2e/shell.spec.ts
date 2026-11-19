@@ -239,7 +239,17 @@ test('a visited page reloads offline', async ({ page, context }) => {
   await context.setOffline(false);
 });
 
-const PAGES = ['/', '/handbook/', TOPIC, '/about/', '/privacy/', '/references/', '/tools/', '/changelog/'];
+const PAGES = [
+  '/',
+  '/handbook/',
+  TOPIC,
+  '/about/',
+  '/privacy/',
+  '/references/',
+  '/tools/',
+  '/errors/',
+  '/changelog/',
+];
 for (const theme of ['light', 'dark'] as const) {
   test.describe(`axe, ${theme} theme`, () => {
     for (const path of PAGES) {

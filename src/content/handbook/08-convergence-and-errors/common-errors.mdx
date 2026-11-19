@@ -1,0 +1,126 @@
+---
+id: common-errors
+title: Common errors and how to read them
+module: 8
+order: 6
+summary: A method for reading a VASP failure, the families of errors with their usual causes, and the error finder that turns a pasted message into causes and fixes.
+concepts: [common-errors]
+requires: [output-files, convergence-testing]
+vaspTags: [ISYM, SYMPREC, ALGO, ISTART]
+sources: [S-019, S-041, S-042]
+noLab: true
+status: draft
+updated: 2026-11-19
+---
+
+<Why>
+
+Every VASP user meets error messages that look like a wall of capital letters. The messages are short, they name a part of the code and not the cause, and the same message can have several causes. A method for reading them saves hours. The site's <a href="/errors/">error finder</a> keeps the author's two handbooks' troubleshooting entries together so you can search them <Cite id="S-041" /> <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+Treat an error like a doctor treats a symptom. The message tells you **where it hurts**, for example ZBRENT (the relaxation search), BRMIX (the density mixer) or IBZKPT (the k-point setup). It does not say why. The usual causes are, in order of how often they are the answer:
+
+1. **The input is wrong**: overlapping atoms, a wrong scale, coordinates in the wrong mode, a `MAGMOM` list of the wrong length.
+2. **The files are from a different run**: an old `WAVECAR` or `CHGCAR` that does not match.
+3. **A numerical setting is too aggressive**: a fast algorithm, a large step, a loose convergence.
+4. **The system is genuinely hard**: a metal, a slab, a magnetic state that flips.
+
+Check them in that order <Cite id="S-041" />.
+
+</Intuition>
+
+<TheMath>
+
+<Level min="intermediate">
+
+Many of the "internal error" messages come from the symmetry code. VASP finds the symmetry of the structure from the positions to a tolerance (`SYMPREC`) and builds the k-point set from it. Positions that are slightly off, or a k-mesh that does not share the lattice symmetry, can make the two steps disagree. That is the origin of SGRCON and IBZKPT errors and of "inverse of rotation matrix was not found" <Cite id="S-042" />.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+**Where to look.** VASP prints errors to standard output (the screen log, usually `vasp.out` or the scheduler log), not to `OUTCAR`. `OSZICAR` tells you whether the run stopped in an electronic loop or between ionic steps <Cite id="S-041" />.
+
+<VaspFile
+  name="shell"
+  code={`tail -30 vasp.out
+tail -5  OSZICAR
+tail -40 OUTCAR`}
+/>
+
+No message at all usually means the wall-time limit was reached or the node ran out of memory, so check the scheduler log. Before you restart, check that `CONTCAR` and `WAVECAR` are not empty <Cite id="S-041" />.
+
+**The error finder.** Paste the message below, or describe what you see in words.
+
+<ErrorFinder />
+
+**Families.** The finder has entries in these groups; each page of this module covers one of them in depth.
+
+| Family                     | Typical messages or symptoms                                | Where to read more              |
+| -------------------------- | ----------------------------------------------------------- | ------------------------------- |
+| Starting a run             | Error reading WAVECAR, distance between ions very small     | Restarts, POSCAR                |
+| Electronic convergence     | BRMIX, Sub-Space-Matrix not hermitian, ZPOTRF, NELM reached | When the loop will not converge |
+| Ionic relaxation           | ZBRENT, CNORMN, relaxation never finishes                   | When a relaxation misbehaves    |
+| Symmetry and k-points      | IBZKPT, SGRCON, PRICEL, tetrahedron method fails            | Convergence of the k-point mesh |
+| Magnetism                  | Error reading item MAGMOM, moment collapses to zero         | Spin and magnetism              |
+| Output and post-processing | Shifted bands, wrong band structure, vasprun.xml unreadable | Output files                    |
+| Performance                | Slow or out of memory, REAL_OPTLAY                          | Job scripts                     |
+
+<Callout variant="note" title="About the message text">
+
+The message strings in the finder come from the author's handbooks. They have not been checked against a printed log from every VASP version, so a message in your log can differ slightly. If nothing matches, describe the symptom in words or browse by category.
+
+</Callout>
+
+</InVasp>
+
+<WhatChanges>
+
+| You see...          | Try first...                                    | Then...                            |
+| ------------------- | ----------------------------------------------- | ---------------------------------- |
+| ZBRENT              | Copy `CONTCAR` to `POSCAR`, restart             | Tighten `EDIFF`, `IBRION = 1`      |
+| BRMIX               | Remove old `CHGCAR` and `WAVECAR`               | `ISYM = 0` if symmetry changed     |
+| IBZKPT              | A Gamma-centred mesh                            | Equal divisions on equivalent axes |
+| Distance very small | Check scale and Direct or Cartesian in `POSCAR` | Look at the structure in a viewer  |
+| Nothing printed     | Scheduler log, memory and wall time             | Reduce `KPAR`, add nodes           |
+
+Why start with the cheap fix: most failures are input or file problems. What happens if you change many things at once: you do not learn which one fixed it <Cite id="S-041" />.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Looking for the error in OUTCAR">
+
+The message is in standard output. `OUTCAR` is where VASP records what it was doing, which helps after you have the message.
+
+</Callout>
+
+<Callout variant="mistake" title="Restarting from a WAVECAR you have not checked">
+
+A killed job can leave an empty or truncated `WAVECAR`. Delete it or set `ISTART = 0` <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Turning off symmetry as the first fix">
+
+`ISYM = 0` removes the symptom and makes the run slower and, for magnets, can change the answer. It is a last resort in most entries <Cite id="S-041" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-ce-1', 'q-ce-2', 'q-ce-3', 'q-ce-4']} />
+
+<GoDeeper>
+
+- The Field Handbook troubleshooting section and the Workflow Handbook error index <Cite id="S-041" /> <Cite id="S-042" />.
+- The VASP wiki, searching by the name of the subroutine in the message <Cite id="S-019" />.
+- The VASP forum, where the same messages are discussed with the code authors. Cite the thread when you use a fix from there.
+
+</GoDeeper>

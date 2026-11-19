@@ -90,7 +90,7 @@ describe('shipped concept graph', () => {
       for (const k of q.concepts) expect(ids.has(k), k).toBe(true);
     }
   });
-  it('publishes module 4 (M7.1), the module 5 concepts of M7.2 and the file and running concepts of M7.3, and keeps the rest planned', () => {
+  it('publishes module 4 (M7.1), the module 5 concepts of M7.2 the file and running concepts of M7.3 and the module 8 concepts of M7.4, and keeps the rest planned', () => {
     expect(g.filter((x) => x.module === 4).every((x) => x.status === 'published')).toBe(true);
     const m73 = new Set([
       'poscar-file',
@@ -103,6 +103,12 @@ describe('shipped concept graph', () => {
       'restart-files',
       'output-files',
       'vaspkit',
+      'convergence-testing',
+      'cutoff-convergence',
+      'kpoint-convergence',
+      'scf-troubleshooting',
+      'relaxation-troubleshooting',
+      'common-errors',
     ]);
     for (const x of g.filter((y) => y.module >= 6))
       expect(x.status, x.id).toBe(m73.has(x.id) ? 'published' : 'planned');

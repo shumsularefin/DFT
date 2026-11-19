@@ -935,5 +935,41 @@
     "sources": [
       "S-020"
     ]
+  },
+  {
+    "id": "convergence",
+    "label": "Convergence",
+    "short": "A result has converged when making a setting more demanding no longer changes it by more than you can accept.",
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "pulay-stress",
+    "label": "Pulay stress",
+    "short": "An artificial pressure that appears when the cell volume changes while the number of plane waves is set for the starting cell. A higher cutoff reduces it.",
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "smearing",
+    "label": "Smearing",
+    "short": "Spreading the occupation of electron levels over a small energy width (SIGMA) so a sum over k-points settles faster, mainly for metals.",
+    "level": "beginner",
+    "sources": [
+      "S-019"
+    ]
+  },
+  {
+    "id": "nbands",
+    "label": "NBANDS",
+    "short": "The number of electron states VASP calculates at each k-point. Too few leaves the top state half filled.",
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ]
   }
 ]
