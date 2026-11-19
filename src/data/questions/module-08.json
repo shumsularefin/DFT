@@ -125,7 +125,23 @@
       "S-042"
     ],
     "visual": {
-      "none": "The numbers are in the question, so a picture would only repeat them."
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Subtract the two energies"
+          },
+          {
+            "label": "Convert eV to meV"
+          },
+          {
+            "label": "Compare with the threshold"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "Working out the change between two runs.",
+      "alt": "A three-step flow: subtract the two energies, convert electronvolts to millielectronvolts, then compare with the threshold."
     }
   },
   {
@@ -865,7 +881,26 @@
       "S-041"
     ],
     "visual": {
-      "none": "The answer explains a trade-off in words, so a picture would only restate it."
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Check the structure"
+          },
+          {
+            "label": "Check the k-mesh"
+          },
+          {
+            "label": "Try a symmetry tolerance"
+          },
+          {
+            "label": "ISYM = 0 as a last resort"
+          }
+        ],
+        "active": 3
+      },
+      "caption": "Order of fixes for a symmetry error.",
+      "alt": "A four-step order of fixes for a symmetry error, ending with ISYM equals 0 as the last resort."
     }
   },
   {
