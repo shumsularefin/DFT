@@ -28,7 +28,7 @@ export default function SmearingLab() {
   const outside = fMin < -1e-3 || fMax > 1 + 1e-3;
   const tag =
     scheme.ismear === null
-      ? 'No ISMEAR value is claimed for this scheme on this page (open question Q-045).'
+      ? 'No ISMEAR value is claimed for this scheme on this page (open question Q-046).'
       : `In VASP this is ISMEAR = ${scheme.ismear === -1 ? '-1' : scheme.ismear}, with SIGMA set to the width.`;
   return (
     <LabShell

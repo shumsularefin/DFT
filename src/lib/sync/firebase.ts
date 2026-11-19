@@ -2,7 +2,7 @@
  * The real backend: Firebase Auth (Google popup) and Firestore lite. Loaded only after the user chooses
  * to sync, through a dynamic import from controller.ts. Document: users/{uid}/state/main with exactly
  * { version, learner (JSON text), updatedAt (server timestamp) }, checked by firestore.rules.
- * @source Firebase JS SDK documentation (S-069); the document shape is an engineering choice (D-071).
+ * @source Firebase JS SDK documentation (S-069); the document shape is an engineering choice (D-083).
  */
 import { initializeApp, getApps } from 'firebase/app';
 import { GoogleAuthProvider, getAuth, onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';

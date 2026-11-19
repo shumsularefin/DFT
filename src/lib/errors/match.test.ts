@@ -107,7 +107,7 @@ describe('fuzzy matching', () => {
 });
 
 describe('open questions', () => {
-  it.todo('Q-047: check each message string against a real vasp.out from the author');
+  it.todo('Q-048: check each message string against a real vasp.out from the author');
 });
 
 describe('browse by category', () => {

@@ -6,7 +6,7 @@
  * only if the cloud copy differs. While active, at most one write is made per WRITE_INTERVAL_MS, plus one
  * when the page is hidden. Errors back off exponentially. An empty state is never written automatically,
  * so erasing on this device cannot silently wipe the cloud copy (only "Delete my synced data" does that).
- * @source engineering choices (D-071); the quota arithmetic is in docs/reports/M6.5.md (Q-006).
+ * @source engineering choices (D-083); the quota arithmetic is in docs/reports/M6.5.md (Q-006).
  */
 import { deserialize, mergeStates, serialize, type LearnerState } from '../learning/state';
 

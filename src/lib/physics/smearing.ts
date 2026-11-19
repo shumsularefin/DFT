@@ -2,7 +2,7 @@
 // generalised entropy S(x) = integral from x to infinity of t delta(t) dt, with x = (epsilon - mu) / sigma.
 // x > 0 is above the Fermi level, so f -> 1 for x -> -infinity and f -> 0 for x -> +infinity. Pure.
 // @source S-015 (Methfessel-Paxton: delta_N = sum A_n H_2n(x) exp(-x^2), A_n = (-1)^n / (n! 4^n sqrt(pi)))
-// @source S-016 (cold smearing; the sign convention of x is Q-045), S-019 (VASP wiki ISMEAR, SIGMA), S-049 (Martin)
+// @source S-016 (cold smearing; the sign convention of x is Q-046), S-019 (VASP wiki ISMEAR, SIGMA), S-049 (Martin)
 // The occupation of MP and cold smearing follows by integrating delta; closed forms are checked against quadrature
 // in smearing.test.ts. S(x) is the per-level entropy such that the free energy is E_band - sigma * sum S.
 
@@ -11,7 +11,7 @@ export const SMEARINGS = [
   { id: 'gaussian', label: 'Gaussian', ismear: 0 },
   { id: 'mp1', label: 'Methfessel-Paxton, order 1', ismear: 1 },
   { id: 'mp2', label: 'Methfessel-Paxton, order 2', ismear: 2 },
-  // the author's handbooks do not give an ISMEAR value for cold smearing, so none is claimed (Q-045)
+  // the author's handbooks do not give an ISMEAR value for cold smearing, so none is claimed (Q-046)
   { id: 'cold', label: 'Marzari-Vanderbilt (cold)', ismear: null },
 ] as const;
 export type SmearingId = (typeof SMEARINGS)[number]['id'];

@@ -86,7 +86,7 @@ describe('specific schemes', () => {
     expect(moment('cold', 0)).toBeCloseTo(1, 10);
     expect(moment('cold', 1)).toBeCloseTo(0, 10);
   });
-  it('cold smearing: delta is negative above x = sqrt(2) (the stated sign convention, Q-045)', () => {
+  it('cold smearing: delta is negative above x = sqrt(2) (the stated sign convention, Q-046)', () => {
     expect(delta('cold', 1.6)).toBeLessThan(0);
     expect(delta('cold', 1.0)).toBeGreaterThan(0);
   });

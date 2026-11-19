@@ -3,7 +3,7 @@
  * context, and read mastery. Pure functions, no storage, no DOM.
  * @source S-037 (BKT, Rasch), S-038 (SM-2), S-039 (Thompson sampling). How they are combined
  * here (one event updates every concept the question lists; "I am not sure" counts as a
- * wrong answer with quality 1) is an engineering choice, D-064.
+ * wrong answer with quality 1) is an engineering choice, D-076.
  */
 import { DEFAULT_BKT, MASTERY_PL, update as bktUpdate } from './bkt';
 import { readyToLearn, type Concept } from './graph';

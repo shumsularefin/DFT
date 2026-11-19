@@ -1,7 +1,7 @@
 /**
  * Gentle motivation: a streak that forgives rest days, and milestones. No timers, no
  * leaderboards, and nothing is ever shown as "lost". A streak chain may miss one day in
- * any 7 (one free rest day per 7). These are design conventions, not science (D-064).
+ * any 7 (one free rest day per 7). These are design conventions, not science (D-076).
  */
 export const ACTIVITY_VERSION = 1;
 export const MAX_ACTIVE_DAYS = 400;
