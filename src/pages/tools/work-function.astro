@@ -1,0 +1,21 @@
+---
+// @source S-019, S-030, S-043, S-065, S-066
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import WorkFunctionTool from '../../components/tools/work-function/WorkFunctionTool';
+---
+
+<BaseLayout
+  title="Work function and charge-density difference"
+  description="Compute planar and macroscopic averages of LOCPOT, extract slab work functions Phi = V_vacuum - E_F, and compute CHGCAR charge-density differences locally in your browser."
+  pageClass="tool"
+>
+  <div class="container">
+    <h1>Work function and charge-density difference</h1>
+    <p>
+      Analyse your own <code>LOCPOT</code> and <code>CHGCAR</code> files locally in the browser: compute
+      planar and macroscopic averages, check for a flat vacuum plateau, obtain the work function{' '}
+      <code>Phi = V_vacuum - E_F</code>, and compute charge-density differences on matched grids.
+    </p>
+    <WorkFunctionTool client:load />
+  </div>
+</BaseLayout>

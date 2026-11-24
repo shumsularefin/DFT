@@ -67,7 +67,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M7.4 | Module 8: Convergence testing and common errors (with error finder) | done | M7.3, M4.3 | M | B | claude/m7-4-convergence-errors | PR pending (stacked on M7.3) | 2026-11-19 | [report](reports/M7.4.md), [work order](milestones/M7-remaining-modules.md) |
 | M13.6 | Equation of state and lattice-constant tool | done | M4.1, M4.2 | M | A | main | none (pushed to main) | 2026-11-19 | [report](reports/M13.6.md), [work order](milestones/M13-magnetism-and-structures.md) |
 | M7.5 | Module 9: Analysis (with relaxation, DOS/band and charge-density tools) | done | M7.4, M5.6, M2.1 | L | A | main | none (pushed to main) | 2026-11-24 | [report](reports/M7.5.md), [work order](milestones/M7-remaining-modules.md) |
-| M14.3 | Charge-density difference, spin density and planar averages | todo | M7.5, M13.5 | M | A | | | | [work order](milestones/M14-research-guidance.md) |
+| M14.3 | Charge-density difference, spin density and planar averages | done | M7.5, M13.5 | M | A | main | none (pushed to main) | 2026-11-24 | [report](reports/M14.3.md), [work order](milestones/M14-research-guidance.md) |
 | M14.1 | Calculation review: pre-flight and post-flight checks | done | M7.4, M13.3 | L | A | main | none (pushed to main) | 2026-11-24 | [report](reports/M14.1.md), [work order](milestones/M14-research-guidance.md) |
 | M8.4 | Maps, family trend and hand-offs | done | M8.3, M4.3 | M | B | main | none (pushed to main) | 2026-11-24 | [report](reports/M8.4.md), [work order](milestones/M8-tolerance-factor.md) |
 | M9.1 | Data pipeline, schema, validation and sample data | done | M5.1 | L | A | main | none (pushed to main) | 2026-11-19 | [work order](milestones/M9-screening-studio.md) |
