@@ -44,6 +44,11 @@ const tools = [
     title: 'Calculation review',
     text: 'Drop VASP inputs and outputs (or a zip) for sourced pre-flight and post-flight checks.',
   },
+  {
+    id: 'work-function',
+    title: 'Work function and charge difference',
+    text: 'Planar and macroscopic averages of LOCPOT, work function Phi = V_vac - E_F, and CHGCAR differences.',
+  },
 ];
 const more = [
   {
@@ -114,6 +119,10 @@ const more = [
           ) : t.id === 'review' ? (
             <p>
               <a href="/tools/review/">Open the calculation review</a>
+            </p>
+          ) : t.id === 'work-function' ? (
+            <p>
+              <a href="/tools/work-function/">Open the work-function tool</a>
             </p>
           ) : (
             <p>
