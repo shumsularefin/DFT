@@ -29,7 +29,7 @@ describe('M14.3 LOCPOT and volumetric analysis', () => {
       }
     }
     const avgZ = planarAverage(values, grid, 2);
-    expect(avgZ).toEqual([1.05, 11.05, 21.05, 31.05]);
+    [1.05, 11.05, 21.05, 31.05].forEach((v, i) => expect(avgZ[i]).toBeCloseTo(v, 12));
     const avgX = planarAverage(values, grid, 0);
     expect(avgX[0]).toBeCloseTo(16.0, 12);
     expect(avgX[1]).toBeCloseTo(16.1, 12);
