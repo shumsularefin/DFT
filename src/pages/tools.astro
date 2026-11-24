@@ -78,7 +78,11 @@ const more = [
             {t.title}
           </h3>
           <p>{t.text}</p>
-          {t.id === 'input-builder' ? (
+          {t.id === 'tolerance' ? (
+            <p>
+              <a href="/tools/tolerance-factor/">Open the tolerance-factor explorer</a>
+            </p>
+          ) : t.id === 'input-builder' ? (
             <p>
               <a href="/tools/input-builder/">Open the input builder</a>
             </p>

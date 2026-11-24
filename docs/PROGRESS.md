@@ -56,7 +56,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M13.4 | Handbook: spin-polarized DFT and magnetism, visually | done | M7.2, M13.3, M12.2 | L | B | main | none (pushed to main) | 2026-11-24 | [report](reports/M13.4.md), [work order](milestones/M13-magnetism-and-structures.md) |
 | M8.1 | Shannon radii dataset and lookup | done | M0.2 | M | A | main | none (pushed to main) | 2026-11-18 | [report](reports/M8.1.md), [work order](milestones/M8-tolerance-factor.md) |
 | M8.2 | Factors, checks and mixed sites | done | M8.1 | M | A | main | none (pushed to main) | 2026-11-18 | [report](reports/M8.2.md), [work order](milestones/M8-tolerance-factor.md) |
-| M8.3 | Explorer UI and the shared periodic table | todo | M8.2, M1.3 | M | B | | | | [work order](milestones/M8-tolerance-factor.md) |
+| M8.3 | Explorer UI and the shared periodic table | done | M8.2, M1.3 | M | B | main | none (pushed to main) | 2026-11-24 | [report](reports/M8.3.md), [work order](milestones/M8-tolerance-factor.md) |
 | M10.1 | Chemistry data and validity engine | done | M8.2, M5.1 | L | A | main | none (pushed to main) | 2026-11-18 | [report](reports/M10.1.md), [work order](milestones/M10-material-builder.md) |
 | M10.2 | Crystal operations and exports | done | M10.1, M13.1 | M | A | main | none (pushed to main) | 2026-11-18 | [report](reports/M10.2.md), [work order](milestones/M10-material-builder.md) |
 | M13.5 | Structure toolkit: slabs, vacancies, substitutions and doping (library) | done | M13.1, M5.1 | L | A | main | none (pushed to main) | 2026-11-18 | [report](reports/M13.5.md), [work order](milestones/M13-magnetism-and-structures.md) |
