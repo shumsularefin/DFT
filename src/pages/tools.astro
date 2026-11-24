@@ -140,7 +140,11 @@ const more = [
             {t.title}
           </h3>
           <p>{t.text}</p>
-          {t.id === 'practice' ? (
+          {t.id === 'studio' ? (
+            <p>
+              <a href="/studio/">Open Screening Studio</a>
+            </p>
+          ) : t.id === 'practice' ? (
             <p>
               <a href="/practice/">Open practice</a> or see <a href="/progress/">your progress</a>
             </p>
