@@ -39,6 +39,11 @@ const tools = [
     title: 'Equation of state fit',
     text: 'Fit energy-volume points to Birch-Murnaghan or Murnaghan and read V0, the bulk modulus and the lattice constant.',
   },
+  {
+    id: 'review',
+    title: 'Calculation review',
+    text: 'Drop VASP inputs and outputs (or a zip) for sourced pre-flight and post-flight checks.',
+  },
 ];
 const more = [
   {
@@ -105,6 +110,10 @@ const more = [
           ) : t.id === 'eos' ? (
             <p>
               <a href="/tools/eos/">Open the equation-of-state fit</a>
+            </p>
+          ) : t.id === 'review' ? (
+            <p>
+              <a href="/tools/review/">Open the calculation review</a>
             </p>
           ) : (
             <p>
