@@ -1,0 +1,81 @@
+---
+id: band-structures
+title: Reading a band structure
+module: 9
+order: 4
+summary: How to run band structures via both the standard ICHARG = 11 route and VASP 6.3+ KPOINTS_OPT, read EIGENVAL, and identify direct versus indirect band gaps.
+concepts: [band-structure-analysis]
+requires: [dos-analysis, k-points]
+vaspTags: [ICHARG, LORBIT, LMAXMIX]
+sources: [S-019, S-042]
+status: draft
+updated: 2026-11-24
+---
+
+<Why>
+
+While the DOS averages over the whole Brillouin zone, a **band structure** plots the Kohn-Sham eigenvalues $\varepsilon_{n\mathbf k}$ along high-symmetry lines of the Brillouin zone. It reveals whether a band gap is direct or indirect and shows band curvature (effective masses) <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+In the author's workflow there are two clean routes to a band structure <Cite id="S-042" />:
+
+1. **Standard two-step route (`ICHARG = 11`):** Run a self-consistent calculation on a uniform k-mesh to produce `CHGCAR`, then run a non-self-consistent calculation (`ICHARG = 11`, `LWAVE = .FALSE.`, `LCHARG = .FALSE.`) using a line-mode `KPOINTS` path from the [k-path tool](/tools/kpath/).
+2. **Single-step `KPOINTS_OPT` route (VASP 6.3 and newer):** Keep your uniform mesh in `KPOINTS` and supply the high-symmetry path in `KPOINTS_OPT`; VASP converges the density on `KPOINTS` and then evaluates the bands along `KPOINTS_OPT` automatically (and this route also works for hybrid functionals) <Cite id="S-019" />.
+
+If the valence-band maximum (VBM) and conduction-band minimum (CBM) sit at the same $\mathbf k$-point, the gap is **direct**; if they sit at different $\mathbf k$-points, it is **indirect**.
+
+</Intuition>
+
+<Lab id="band-viewer" title="Band-structure viewer (EIGENVAL)" />
+
+<TheMath>
+
+The fundamental Kohn-Sham band gap is:
+
+$$E_g = \min_{\mathbf k,\;n \in \text{unocc}} \varepsilon_{n\mathbf k} - \max_{\mathbf k,\;m \in \text{occ}} \varepsilon_{m\mathbf k}$$
+
+Standard semilocal functionals (such as PBE) systematically underestimate experimental band gaps due to the derivative discontinuity and self-interaction error <Cite id="S-042" />.
+
+</TheMath>
+
+<InVasp>
+
+- Keep `ISPIN`, `MAGMOM`, `LMAXMIX`, and `LDAU*` identical between the SCF run and the `ICHARG = 11` band run <Cite id="S-042" />.
+- Do not use `ISMEAR = -5` on a line-mode `KPOINTS` path; use `ISMEAR = 0` with small `SIGMA` <Cite id="S-019" />.
+- Generate standardized primitive cells and HPKOT high-symmetry paths in the [k-path tool](/tools/kpath/).
+
+</InVasp>
+
+<WhatChanges>
+
+| Choice in band run          | Effect                                                               |
+| --------------------------- | -------------------------------------------------------------------- |
+| Standard cell vs primitive  | Non-standard cells scramble high-symmetry labels                     |
+| `ISMEAR = -5` on line-mode  | Fails: tetrahedron method requires a 3D k-mesh                       |
+| `KPOINTS_OPT` (VASP >= 6.3) | Works in one run and supports hybrid functionals <Cite id="S-019" /> |
+
+Why standardize the cell first: high-symmetry labels ($\Gamma, X, L, K, \dots$) only match the textbook path on the standardized primitive cell.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Changing ISPIN or omitting LMAXMIX between SCF and ICHARG = 11">
+
+Mismatched spin or `LMAXMIX` settings between the SCF `CHGCAR` and the `ICHARG = 11` band run corrupt the eigenvalues <Cite id="S-042" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m9-13', 'q-m9-14', 'q-m9-15', 'q-m9-16']} />
+
+<GoDeeper>
+
+- VASP wiki pages `EIGENVAL`, `ICHARG`, and `KPOINTS_OPT` <Cite id="S-019" />.
+- [Brillouin zone and k-path viewer](/tools/kpath/).
+
+</GoDeeper>

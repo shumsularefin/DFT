@@ -1,0 +1,802 @@
+[
+  {
+    "id": "q-m9-1",
+    "concepts": [
+      "dft-energies-forces"
+    ],
+    "type": "single",
+    "prompt": "Which energy in OUTCAR should you report for ground-state energy differences when using finite-temperature smearing?",
+    "options": [
+      {
+        "text": "energy(sigma->0) (printed as E0 in OSZICAR)",
+        "correct": true,
+        "why": "Matches the VASP output conventions and Field Handbook."
+      },
+      {
+        "text": "Only the first electronic step energy",
+        "correct": false,
+        "why": "Check the exact VASP definition."
+      },
+      {
+        "text": "The raw kinetic energy alone",
+        "correct": false,
+        "why": "This confuses two different quantities."
+      }
+    ],
+    "hints": [
+      "Check how VASP defines this quantity in OUTCAR or the output file.",
+      "Review the summary table on the topic page."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "fcc",
+      "caption": "Illustrative crystal scene for dft-energies-forces.",
+      "alt": "Crystal structure scene fcc."
+    }
+  },
+  {
+    "id": "q-m9-2",
+    "concepts": [
+      "dft-energies-forces"
+    ],
+    "type": "single",
+    "prompt": "Why are raw DFT total energies only meaningful as differences between matched calculations?",
+    "options": [
+      {
+        "text": "Absolute energies depend on POTCAR choice, ENCUT, and functional offsets",
+        "correct": true,
+        "why": "Matches the VASP output conventions and Field Handbook."
+      },
+      {
+        "text": "Because VASP adds a random constant to every run",
+        "correct": false,
+        "why": "Check the exact VASP definition."
+      },
+      {
+        "text": "Because forces are measured in Kelvin",
+        "correct": false,
+        "why": "This confuses two different quantities."
+      }
+    ],
+    "hints": [
+      "Check how VASP defines this quantity in OUTCAR or the output file.",
+      "Review the summary table on the topic page."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "fcc",
+      "caption": "Illustrative crystal scene for dft-energies-forces.",
+      "alt": "Crystal structure scene fcc."
+    }
+  },
+  {
+    "id": "q-m9-3",
+    "concepts": [
+      "dft-energies-forces"
+    ],
+    "type": "single",
+    "prompt": "What is the handbook rule of thumb for the electronic smearing entropy term |T*S| per atom?",
+    "options": [
+      {
+        "text": "Keep |T*S| / atom below 1 meV/atom",
+        "correct": true,
+        "why": "Matches the VASP output conventions and Field Handbook."
+      },
+      {
+        "text": "Keep |T*S| / atom above 100 meV/atom",
+        "correct": false,
+        "why": "Check the exact VASP definition."
+      },
+      {
+        "text": "Entropy per atom does not depend on SIGMA",
+        "correct": false,
+        "why": "This confuses two different quantities."
+      }
+    ],
+    "hints": [
+      "Check how VASP defines this quantity in OUTCAR or the output file.",
+      "Review the summary table on the topic page."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "fcc",
+      "caption": "Illustrative crystal scene for dft-energies-forces.",
+      "alt": "Crystal structure scene fcc."
+    }
+  },
+  {
+    "id": "q-m9-4",
+    "concepts": [
+      "dft-energies-forces"
+    ],
+    "type": "single",
+    "prompt": "What unit does VASP use for atomic forces in OUTCAR TOTAL-FORCE?",
+    "options": [
+      {
+        "text": "eV / Angstrom",
+        "correct": true,
+        "why": "Matches the VASP output conventions and Field Handbook."
+      },
+      {
+        "text": "Joule / meter",
+        "correct": false,
+        "why": "Check the exact VASP definition."
+      },
+      {
+        "text": "Rydberg / second",
+        "correct": false,
+        "why": "This confuses two different quantities."
+      }
+    ],
+    "hints": [
+      "Check how VASP defines this quantity in OUTCAR or the output file.",
+      "Review the summary table on the topic page."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "fcc",
+      "caption": "Illustrative crystal scene for dft-energies-forces.",
+      "alt": "Crystal structure scene fcc."
+    }
+  },
+  {
+    "id": "q-m9-5",
+    "concepts": [
+      "relaxation-analysis"
+    ],
+    "type": "single",
+    "prompt": "What does a negative EDIFFG (for example EDIFFG = -0.02) tell VASP to check?",
+    "options": [
+      {
+        "text": "Stop ionic relaxation when the maximum force norm on any atom is below 0.02 eV/A",
+        "correct": true,
+        "why": "Matches the VASP output conventions and Field Handbook."
+      },
+      {
+        "text": "Stop after 2 ionic steps regardless of forces",
+        "correct": false,
+        "why": "Check the exact VASP definition."
+      },
+      {
+        "text": "Allow forces to grow up to 0.02 eV/A",
+        "correct": false,
+        "why": "This confuses two different quantities."
+      }
+    ],
+    "hints": [
+      "Check how VASP defines this quantity in OUTCAR or the output file.",
+      "Review the summary table on the topic page."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "diamond",
+      "caption": "Illustrative crystal scene for relaxation-analysis.",
+      "alt": "Crystal structure scene diamond."
+    }
+  },
+  {
+    "id": "q-m9-6",
+    "concepts": [
+      "relaxation-analysis"
+    ],
+    "type": "single",
+    "prompt": "If an ISIF = 3 relaxation changes the cell volume by more than 10 %, what should you do?",
+    "options": [
+      {
+        "text": "Copy CONTCAR to POSCAR and re-run relaxation so VASP rebuilds the plane-wave basis",
+        "correct": true,
+        "why": "Matches the VASP output conventions and Field Handbook."
+      },
+      {
+        "text": "Keep the first run without restarting because the basis updates every step",
+        "correct": false,
+        "why": "Check the exact VASP definition."
+      },
+      {
+        "text": "Switch to ISIF = 0",
+        "correct": false,
+        "why": "This confuses two different quantities."
+      }
+    ],
+    "hints": [
+      "Check how VASP defines this quantity in OUTCAR or the output file.",
+      "Review the summary table on the topic page."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "diamond",
+      "caption": "Illustrative crystal scene for relaxation-analysis.",
+      "alt": "Crystal structure scene diamond."
+    }
+  },
+  {
+    "id": "q-m9-7",
+    "concepts": [
+      "relaxation-analysis"
+    ],
+    "type": "single",
+    "prompt": "Which output line in OUTCAR confirms that ionic relaxation met your EDIFFG criterion?",
+    "options": [
+      {
+        "text": "reached required accuracy",
+        "correct": true,
+        "why": "Matches the VASP output conventions and Field Handbook."
+      },
+      {
+        "text": "aborting loop because EDIFF is reached",
+        "correct": false,
+        "why": "Check the exact VASP definition."
+      },
+      {
+        "text": "POTCAR read successfully",
+        "correct": false,
+        "why": "This confuses two different quantities."
+      }
+    ],
+    "hints": [
+      "Check how VASP defines this quantity in OUTCAR or the output file.",
+      "Review the summary table on the topic page."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "diamond",
+      "caption": "Illustrative crystal scene for relaxation-analysis.",
+      "alt": "Crystal structure scene diamond."
+    }
+  },
+  {
+    "id": "q-m9-8",
+    "concepts": [
+      "relaxation-analysis"
+    ],
+    "type": "single",
+    "prompt": "Which file stores the relaxed structure at the end of a VASP relaxation?",
+    "options": [
+      {
+        "text": "CONTCAR",
+        "correct": true,
+        "why": "Matches the VASP output conventions and Field Handbook."
+      },
+      {
+        "text": "OSZICAR",
+        "correct": false,
+        "why": "Check the exact VASP definition."
+      },
+      {
+        "text": "DOSCAR",
+        "correct": false,
+        "why": "This confuses two different quantities."
+      }
+    ],
+    "hints": [
+      "Check how VASP defines this quantity in OUTCAR or the output file.",
+      "Review the summary table on the topic page."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "diamond",
+      "caption": "Illustrative crystal scene for relaxation-analysis.",
+      "alt": "Crystal structure scene diamond."
+    }
+  },
+  {
+    "id": "q-m9-9",
+    "concepts": [
+      "dos-analysis"
+    ],
+    "type": "single",
+    "prompt": "Before reading a DOS plot from DOSCAR, how should you shift the energy axis?",
+    "options": [
+      {
+        "text": "Subtract the Fermi energy so E - E_F = 0 sits at the Fermi level",
+        "correct": true,
+        "why": "Matches the VASP output conventions and Field Handbook."
+      },
+      {
+        "text": "Multiply all energies by cell volume",
+        "correct": false,
+        "why": "Check the exact VASP definition."
+      },
+      {
+        "text": "Shift the highest unoccupied band to zero",
+        "correct": false,
+        "why": "This confuses two different quantities."
+      }
+    ],
+    "hints": [
+      "Check how VASP defines this quantity in OUTCAR or the output file.",
+      "Review the summary table on the topic page."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "bcc",
+      "caption": "Illustrative crystal scene for dos-analysis.",
+      "alt": "Crystal structure scene bcc."
+    }
+  },
+  {
+    "id": "q-m9-10",
+    "concepts": [
+      "dos-analysis"
+    ],
+    "type": "single",
+    "prompt": "Why should Gaussian post-smoothing be off by default when reading band edges in a DOS viewer?",
+    "options": [
+      {
+        "text": "Artificial broadening can smear states into the band gap and hide a narrow gap",
+        "correct": true,
+        "why": "Matches the VASP output conventions and Field Handbook."
+      },
+      {
+        "text": "Smoothing removes the spin-down channel",
+        "correct": false,
+        "why": "Check the exact VASP definition."
+      },
+      {
+        "text": "Smoothing changes the Fermi energy to 10 eV",
+        "correct": false,
+        "why": "This confuses two different quantities."
+      }
+    ],
+    "hints": [
+      "Check how VASP defines this quantity in OUTCAR or the output file.",
+      "Review the summary table on the topic page."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "bcc",
+      "caption": "Illustrative crystal scene for dos-analysis.",
+      "alt": "Crystal structure scene bcc."
+    }
+  },
+  {
+    "id": "q-m9-11",
+    "concepts": [
+      "dos-analysis"
+    ],
+    "type": "single",
+    "prompt": "Which VASP tag writes lm-decomposed projected DOS columns (s, py, pz, px, dxy, ...) into DOSCAR?",
+    "options": [
+      {
+        "text": "LORBIT = 11",
+        "correct": true,
+        "why": "Matches the VASP output conventions and Field Handbook."
+      },
+      {
+        "text": "ISIF = 3",
+        "correct": false,
+        "why": "Check the exact VASP definition."
+      },
+      {
+        "text": "LWAVE = .FALSE.",
+        "correct": false,
+        "why": "This confuses two different quantities."
+      }
+    ],
+    "hints": [
+      "Check how VASP defines this quantity in OUTCAR or the output file.",
+      "Review the summary table on the topic page."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "bcc",
+      "caption": "Illustrative crystal scene for dos-analysis.",
+      "alt": "Crystal structure scene bcc."
+    }
+  },
+  {
+    "id": "q-m9-12",
+    "concepts": [
+      "dos-analysis"
+    ],
+    "type": "single",
+    "prompt": "What is the standard smearing method for a sharp DOS calculation on an insulator with a dense k-mesh?",
+    "options": [
+      {
+        "text": "ISMEAR = -5 (tetrahedron method with Bloechl corrections)",
+        "correct": true,
+        "why": "Matches the VASP output conventions and Field Handbook."
+      },
+      {
+        "text": "ISMEAR = 2 with SIGMA = 0.5",
+        "correct": false,
+        "why": "Check the exact VASP definition."
+      },
+      {
+        "text": "ISMEAR = -1 with SIGMA = 1.0",
+        "correct": false,
+        "why": "This confuses two different quantities."
+      }
+    ],
+    "hints": [
+      "Check how VASP defines this quantity in OUTCAR or the output file.",
+      "Review the summary table on the topic page."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "bcc",
+      "caption": "Illustrative crystal scene for dos-analysis.",
+      "alt": "Crystal structure scene bcc."
+    }
+  },
+  {
+    "id": "q-m9-13",
+    "concepts": [
+      "band-structure-analysis"
+    ],
+    "type": "single",
+    "prompt": "When is a band gap classified as indirect?",
+    "options": [
+      {
+        "text": "When the valence-band maximum (VBM) and conduction-band minimum (CBM) occur at different k-points",
+        "correct": true,
+        "why": "Matches the VASP output conventions and Field Handbook."
+      },
+      {
+        "text": "When the VBM and CBM occur at the exact same k-point",
+        "correct": false,
+        "why": "Check the exact VASP definition."
+      },
+      {
+        "text": "Whenever ISPIN = 2 is enabled",
+        "correct": false,
+        "why": "This confuses two different quantities."
+      }
+    ],
+    "hints": [
+      "Check how VASP defines this quantity in OUTCAR or the output file.",
+      "Review the summary table on the topic page."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "reciprocal-fcc",
+      "caption": "Illustrative crystal scene for band-structure-analysis.",
+      "alt": "Crystal structure scene reciprocal-fcc."
+    }
+  },
+  {
+    "id": "q-m9-14",
+    "concepts": [
+      "band-structure-analysis"
+    ],
+    "type": "single",
+    "prompt": "Why must you avoid ISMEAR = -5 on a line-mode KPOINTS band-structure run?",
+    "options": [
+      {
+        "text": "The tetrahedron method requires a 3D k-point mesh and fails on a 1D k-path",
+        "correct": true,
+        "why": "Matches the VASP output conventions and Field Handbook."
+      },
+      {
+        "text": "ISMEAR = -5 only works for molecules",
+        "correct": false,
+        "why": "Check the exact VASP definition."
+      },
+      {
+        "text": "ISMEAR = -5 deletes EIGENVAL",
+        "correct": false,
+        "why": "This confuses two different quantities."
+      }
+    ],
+    "hints": [
+      "Check how VASP defines this quantity in OUTCAR or the output file.",
+      "Review the summary table on the topic page."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "reciprocal-fcc",
+      "caption": "Illustrative crystal scene for band-structure-analysis.",
+      "alt": "Crystal structure scene reciprocal-fcc."
+    }
+  },
+  {
+    "id": "q-m9-15",
+    "concepts": [
+      "band-structure-analysis"
+    ],
+    "type": "single",
+    "prompt": "What advantage does KPOINTS_OPT (VASP 6.3+) offer for band structures?",
+    "options": [
+      {
+        "text": "It evaluates the band path in a single run after SCF and works with hybrid functionals",
+        "correct": true,
+        "why": "Matches the VASP output conventions and Field Handbook."
+      },
+      {
+        "text": "It eliminates the need for a POSCAR file",
+        "correct": false,
+        "why": "Check the exact VASP definition."
+      },
+      {
+        "text": "It forces all gaps to be direct",
+        "correct": false,
+        "why": "This confuses two different quantities."
+      }
+    ],
+    "hints": [
+      "Check how VASP defines this quantity in OUTCAR or the output file.",
+      "Review the summary table on the topic page."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "reciprocal-fcc",
+      "caption": "Illustrative crystal scene for band-structure-analysis.",
+      "alt": "Crystal structure scene reciprocal-fcc."
+    }
+  },
+  {
+    "id": "q-m9-16",
+    "concepts": [
+      "band-structure-analysis"
+    ],
+    "type": "single",
+    "prompt": "In the two-step ICHARG = 11 band workflow, which tags must match the preceding SCF calculation?",
+    "options": [
+      {
+        "text": "ISPIN, MAGMOM, LMAXMIX, and LDAU*",
+        "correct": true,
+        "why": "Matches the VASP output conventions and Field Handbook."
+      },
+      {
+        "text": "NSW and POTIM",
+        "correct": false,
+        "why": "Check the exact VASP definition."
+      },
+      {
+        "text": "Only the job name",
+        "correct": false,
+        "why": "This confuses two different quantities."
+      }
+    ],
+    "hints": [
+      "Check how VASP defines this quantity in OUTCAR or the output file.",
+      "Review the summary table on the topic page."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "reciprocal-fcc",
+      "caption": "Illustrative crystal scene for band-structure-analysis.",
+      "alt": "Crystal structure scene reciprocal-fcc."
+    }
+  },
+  {
+    "id": "q-m9-17",
+    "concepts": [
+      "charge-density-analysis"
+    ],
+    "type": "single",
+    "prompt": "How do you convert raw CHGCAR grid values into physical electron density in e/A^3?",
+    "options": [
+      {
+        "text": "Divide each grid value by the unit-cell volume V_cell",
+        "correct": true,
+        "why": "Matches the VASP output conventions and Field Handbook."
+      },
+      {
+        "text": "Multiply each grid value by the unit-cell volume V_cell",
+        "correct": false,
+        "why": "Check the exact VASP definition."
+      },
+      {
+        "text": "Divide by the number of k-points",
+        "correct": false,
+        "why": "This confuses two different quantities."
+      }
+    ],
+    "hints": [
+      "Check how VASP defines this quantity in OUTCAR or the output file.",
+      "Review the summary table on the topic page."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "rocksalt",
+      "caption": "Illustrative crystal scene for charge-density-analysis.",
+      "alt": "Crystal structure scene rocksalt."
+    }
+  },
+  {
+    "id": "q-m9-18",
+    "concepts": [
+      "charge-density-analysis"
+    ],
+    "type": "single",
+    "prompt": "In what axis order does VASP write the 3D volumetric grid in CHGCAR?",
+    "options": [
+      {
+        "text": "x varies fastest, then y, then z (Fortran order)",
+        "correct": true,
+        "why": "Matches the VASP output conventions and Field Handbook."
+      },
+      {
+        "text": "z varies fastest, then y, then x (C order)",
+        "correct": false,
+        "why": "Check the exact VASP definition."
+      },
+      {
+        "text": "Random order indexed by energy",
+        "correct": false,
+        "why": "This confuses two different quantities."
+      }
+    ],
+    "hints": [
+      "Check how VASP defines this quantity in OUTCAR or the output file.",
+      "Review the summary table on the topic page."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "rocksalt",
+      "caption": "Illustrative crystal scene for charge-density-analysis.",
+      "alt": "Crystal structure scene rocksalt."
+    }
+  },
+  {
+    "id": "q-m9-19",
+    "concepts": [
+      "charge-density-analysis"
+    ],
+    "type": "single",
+    "prompt": "What does the second volumetric grid block in a spin-polarized (ISPIN = 2) CHGCAR store?",
+    "options": [
+      {
+        "text": "The magnetization density (rho_up - rho_down) * V_cell",
+        "correct": true,
+        "why": "Matches the VASP output conventions and Field Handbook."
+      },
+      {
+        "text": "The electrostatic potential in eV",
+        "correct": false,
+        "why": "Check the exact VASP definition."
+      },
+      {
+        "text": "Only the core electrons",
+        "correct": false,
+        "why": "This confuses two different quantities."
+      }
+    ],
+    "hints": [
+      "Check how VASP defines this quantity in OUTCAR or the output file.",
+      "Review the summary table on the topic page."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "rocksalt",
+      "caption": "Illustrative crystal scene for charge-density-analysis.",
+      "alt": "Crystal structure scene rocksalt."
+    }
+  },
+  {
+    "id": "q-m9-20",
+    "concepts": [
+      "charge-density-analysis"
+    ],
+    "type": "single",
+    "prompt": "How does LOCPOT differ from CHGCAR in scaling?",
+    "options": [
+      {
+        "text": "LOCPOT values are electrostatic potential in eV and are NOT multiplied by V_cell",
+        "correct": true,
+        "why": "Matches the VASP output conventions and Field Handbook."
+      },
+      {
+        "text": "LOCPOT values are multiplied by V_cell^2",
+        "correct": false,
+        "why": "Check the exact VASP definition."
+      },
+      {
+        "text": "LOCPOT has no POSCAR header",
+        "correct": false,
+        "why": "This confuses two different quantities."
+      }
+    ],
+    "hints": [
+      "Check how VASP defines this quantity in OUTCAR or the output file.",
+      "Review the summary table on the topic page."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "rocksalt",
+      "caption": "Illustrative crystal scene for charge-density-analysis.",
+      "alt": "Crystal structure scene rocksalt."
+    }
+  }
+]

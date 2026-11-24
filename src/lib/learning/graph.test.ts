@@ -109,6 +109,11 @@ describe('shipped concept graph', () => {
       'scf-troubleshooting',
       'relaxation-troubleshooting',
       'common-errors',
+      'dft-energies-forces',
+      'relaxation-analysis',
+      'dos-analysis',
+      'band-structure-analysis',
+      'charge-density-analysis',
     ]);
     for (const x of g.filter((y) => y.module >= 6))
       expect(x.status, x.id).toBe(m73.has(x.id) ? 'published' : 'planned');

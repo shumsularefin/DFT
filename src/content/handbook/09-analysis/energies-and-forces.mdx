@@ -1,0 +1,79 @@
+---
+id: energies-and-forces
+title: Reading energies and forces
+module: 9
+order: 1
+summary: Which total energy in OUTCAR and OSZICAR to report (energy sigma->0 vs TOTEN), how forces and stress are checked, and why raw DFT energies only have meaning as differences.
+concepts: [dft-energies-forces]
+requires: [output-files]
+vaspTags: [EDIFFG, ISMEAR, SIGMA]
+sources: [S-019, S-042]
+noLab: true
+status: draft
+updated: 2026-11-24
+---
+
+<Why>
+
+A finished VASP calculation prints three different energies at every step (`TOTEN`, `energy without entropy`, and `energy(sigma->0)`). Picking the wrong one or comparing raw energies computed with different `POTCAR` files or `ENCUT` values produces meaningless numbers <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+Total energies in plane-wave DFT are only meaningful as **differences** between calculations that share the same functional, `POTCAR` files, `ENCUT`, and compatible k-point sampling. For finite-temperature smearing (such as Gaussian or Methfessel-Paxton), `energy(sigma->0)` extrapolates out the artificial electronic entropy term and is the standard energy to report for ground-state comparisons <Cite id="S-042" />.
+
+<Scene id="fcc" />
+
+Forces on each atom (printed in `OUTCAR` under `TOTAL-FORCE (eV/Angst)`) tell you whether atoms are at equilibrium. For a converged geometry relaxation, the largest force magnitude should fall below `|EDIFFG|` (typically `0.01` to `0.02` eV/A).
+
+</Intuition>
+
+<TheMath>
+
+With electronic smearing, the free energy $F = E - T S$ (`TOTEN`) differs from the zero-temperature energy $E$. The extrapolated energy `energy(sigma->0)` is:
+
+$$E(\sigma \to 0) = \frac{1}{2}\bigl(F + E_{\text{without entropy}}\bigr)$$
+
+Always check that $|T S| / N_{\text{atoms}} < 1\text{ meV/atom}$ <Cite id="S-042" />.
+
+</TheMath>
+
+<InVasp>
+
+- Read `E0` from `OSZICAR` (which equals `energy(sigma->0)` in `OUTCAR`) for energy comparisons <Cite id="S-042" />.
+- Check the final `TOTAL-FORCE (eV/Angst)` block in `OUTCAR` to confirm every force component is below `|EDIFFG|` <Cite id="S-019" />.
+- Normalize energies per atom or per formula unit before comparing cells of different sizes.
+
+</InVasp>
+
+<WhatChanges>
+
+| Quantity in `OUTCAR`     | Meaning                                  | When to use                                                    |
+| ------------------------ | ---------------------------------------- | -------------------------------------------------------------- | --- | ---------- |
+| `free energy TOTEN`      | Free energy $F = E - T S$                | Variational quantity used to compute Hellmann-Feynman forces   |
+| `energy without entropy` | $E$ before $\sigma \to 0$ extrapolation  | Compare with `TOTEN` to check $                                | T S | $ per atom |
+| `energy(sigma->0)`       | Extrapolated zero-smearing energy (`E0`) | Report for ground-state energy differences <Cite id="S-042" /> |
+
+Why report `energy(sigma->0)`: removes the artificial smearing entropy offset while keeping forces consistent with `TOTEN`.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Comparing raw energies across different ENCUT or POTCARs">
+
+Plane-wave total energies shift by tens of eV if you change `ENCUT`, `POTCAR` variants (for example `Ti` vs `Ti_pv`), or functionals. Only differences with matched settings are physical.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m9-1', 'q-m9-2', 'q-m9-3', 'q-m9-4']} />
+
+<GoDeeper>
+
+- VASP wiki pages `OUTCAR`, `OSZICAR`, and `ISMEAR` <Cite id="S-019" />.
+- The author's VASP Field Handbook on energies and forces <Cite id="S-042" />.
+
+</GoDeeper>
