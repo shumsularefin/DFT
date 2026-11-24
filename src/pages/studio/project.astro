@@ -1,0 +1,20 @@
+---
+// @source S-024, S-042, S-044
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCardTool from '../../components/tools/studio/ProjectCardTool';
+---
+
+<BaseLayout
+  title="Starter project & feasibility card"
+  description="Transparent Green/Yellow/Red DFT feasibility verdict, order-of-magnitude compute estimate, PBE sanity-check caveats, and validator-clean starter INCARs."
+  pageClass="tool"
+>
+  <div class="container">
+    <h1>Feasibility check and starter VASP project</h1>
+    <p>
+      Inspect transparent heuristic feasibility rules, an order-of-magnitude runtime bucket, and a three-step
+      VASP starter protocol for the selected candidate material.
+    </p>
+    <ProjectCardTool client:load />
+  </div>
+</BaseLayout>
