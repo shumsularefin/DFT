@@ -69,7 +69,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M7.5 | Module 9: Analysis (with relaxation, DOS/band and charge-density tools) | todo | M7.4, M5.6, M2.1 | L | A | | | | [work order](milestones/M7-remaining-modules.md) |
 | M14.3 | Charge-density difference, spin density and planar averages | todo | M7.5, M13.5 | M | A | | | | [work order](milestones/M14-research-guidance.md) |
 | M14.1 | Calculation review: pre-flight and post-flight checks | todo | M7.4, M13.3 | L | A | | | | [work order](milestones/M14-research-guidance.md) |
-| M8.4 | Maps, family trend and hand-offs | todo | M8.3, M4.3 | M | B | | | | [work order](milestones/M8-tolerance-factor.md) |
+| M8.4 | Maps, family trend and hand-offs | done | M8.3, M4.3 | M | B | main | none (pushed to main) | 2026-11-24 | [report](reports/M8.4.md), [work order](milestones/M8-tolerance-factor.md) |
 | M9.1 | Data pipeline, schema, validation and sample data | done | M5.1 | L | A | main | none (pushed to main) | 2026-11-19 | [work order](milestones/M9-screening-studio.md) |
 | M9.2 | Explorer UI | todo | M9.1, M8.3 | L | B | | | | [work order](milestones/M9-screening-studio.md) |
 | M9.3 | Feasibility check and first-project builder | todo | M9.2, M3.5, M4.2 | L | B | | | | [work order](milestones/M9-screening-studio.md) |
