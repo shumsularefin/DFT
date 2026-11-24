@@ -26,6 +26,7 @@ import {
   type CompositionState,
   type LnCnPolicy,
 } from '../../../lib/perovskite/urlState';
+import ToleranceMaps from './ToleranceMaps';
 import './tolerance-factor.css';
 
 const SHANNON_ELEMENTS = new Set(SHANNON_ENTRIES.map((e) => e.el));
@@ -493,6 +494,15 @@ export default function ToleranceFactorTool() {
           </button>
         )}
       </div>
+
+      <ToleranceMaps
+        A={state.A}
+        B={state.B}
+        X={state.X}
+        kind={state.kind}
+        lnPolicy={state.lnPolicy}
+        evalRes={evalRes}
+      />
 
       {evalRes.checks.length > 0 && (
         <section aria-label="Checks and warnings">
