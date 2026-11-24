@@ -1,0 +1,80 @@
+---
+id: relaxations
+title: Judging a geometry relaxation
+module: 9
+order: 2
+summary: How to inspect XDATCAR trajectories, confirm ionic convergence in OSZICAR and OUTCAR, and know when a large volume change requires a restart from CONTCAR.
+concepts: [relaxation-analysis]
+requires: [dft-energies-forces]
+vaspTags: [IBRION, ISIF, EDIFFG, NSW]
+sources: [S-019, S-042]
+status: draft
+updated: 2026-11-24
+---
+
+<Why>
+
+A relaxation job that exits cleanly without an error message has not necessarily converged: it may simply have hit `NSW` steps while forces are still large, or relaxed into a much larger volume where the fixed plane-wave basis is no longer accurate <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+Before accepting `CONTCAR` as your relaxed structure, check four items:
+
+1. `OUTCAR` contains `reached required accuracy` (meaning every ionic force fell below `|EDIFFG|`).
+2. Every electronic loop along the way converged before hitting `NELM`.
+3. The trajectory in `XDATCAR` settled smoothly rather than oscillating back and forth.
+4. If `ISIF = 3` changed the cell volume by more than a few percent, copy `CONTCAR` to `POSCAR` and run a second relaxation so VASP rebuilds the plane-wave basis at the new cell volume <Cite id="S-042" />.
+
+</Intuition>
+
+<Lab id="relaxation-viewer" title="Relaxation trajectory viewer" />
+
+<TheMath>
+
+The maximum ionic force is the largest Euclidean norm across all $N$ atoms:
+
+$$F_{\max} = \max_{1 \le i \le N} \|\mathbf F_i\|_2$$
+
+Setting a negative `EDIFFG` (for example `EDIFFG = -0.02`) stops ionic relaxation only when $F_{\max} < |\text{EDIFFG}|$ in eV/A <Cite id="S-019" />.
+
+</TheMath>
+
+<InVasp>
+
+- Always inspect `CONTCAR` (not `POSCAR`) for the final relaxed coordinates <Cite id="S-042" />.
+- After an `ISIF = 3` relaxation, run a final static calculation (`NSW = 0`, `IBRION = -1`) on `CONTCAR` to get a clean total energy without Pulay stress drift.
+
+</InVasp>
+
+<WhatChanges>
+
+| Observation in output       | Likely meaning            | Action                                               |
+| --------------------------- | ------------------------- | ---------------------------------------------------- | --- | ----------------------------------------------------- |
+| `reached required accuracy` | Forces converged below `  | EDIFFG                                               | `   | Check volume change, then run static SCF on `CONTCAR` |
+| Stopped at step `NSW`       | Relaxation unfinished     | Copy `CONTCAR` to `POSCAR` and continue              |
+| Volume changed by > 10 %    | Plane-wave basis is stale | Re-run relaxation from `CONTCAR` <Cite id="S-042" /> |
+
+Why restart after a large volume change: VASP fixes the set of plane waves at the initial cell volume.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Using a positive EDIFFG without realising it stops on energy, not force">
+
+A positive `EDIFFG` (e.g. `1E-4`) stops when the energy difference between ionic steps drops below that value, even if individual atomic forces are still large. Use negative `EDIFFG` for force convergence <Cite id="S-019" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m9-5', 'q-m9-6', 'q-m9-7', 'q-m9-8']} />
+
+<GoDeeper>
+
+- VASP wiki pages `XDATCAR`, `CONTCAR`, `EDIFFG`, and `ISIF` <Cite id="S-019" />.
+- The author's VASP Field Handbook on relaxation checks <Cite id="S-042" />.
+
+</GoDeeper>

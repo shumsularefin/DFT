@@ -18,6 +18,7 @@ import LadderLab from '../labs/LadderLab';
 import SpinLab from '../labs/SpinLab';
 import StonerLab from '../labs/StonerLab';
 import OutputReaderLab from '../labs/OutputReaderLab';
+import { RelaxationViewer, DosViewer, BandViewer, DensityViewer } from '../labs/AnalysisViewers';
 // Labs are registered by id. An id with no component yet shows the placeholder, so topics can be written ahead of their labs.
 interface Props {
   id: string;
@@ -90,6 +91,22 @@ const { id, title } = Astro.props;
   ) : id === 'output-reader' ? (
     <div data-lab-id={id}>
       <OutputReaderLab client:visible />
+    </div>
+  ) : id === 'relaxation-viewer' ? (
+    <div data-lab-id={id}>
+      <RelaxationViewer client:visible />
+    </div>
+  ) : id === 'dos-viewer' ? (
+    <div data-lab-id={id}>
+      <DosViewer client:visible />
+    </div>
+  ) : id === 'band-viewer' ? (
+    <div data-lab-id={id}>
+      <BandViewer client:visible />
+    </div>
+  ) : id === 'density-viewer' ? (
+    <div data-lab-id={id}>
+      <DensityViewer client:visible />
     </div>
   ) : id === 'unit-cell' ? (
     <div data-lab-id={id}>

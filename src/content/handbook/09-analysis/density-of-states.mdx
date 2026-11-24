@@ -1,0 +1,78 @@
+---
+id: density-of-states
+title: Reading a density of states (DOS)
+module: 9
+order: 3
+summary: How to interpret total and site-projected DOS from DOSCAR, shift energies to E - E_F, read mirrored spin channels, and avoid smoothing artefacts.
+concepts: [dos-analysis]
+requires: [dft-energies-forces, smearing]
+vaspTags: [LORBIT, NEDOS, ISMEAR, ISPIN]
+sources: [S-019, S-042]
+status: draft
+updated: 2026-11-24
+---
+
+<Why>
+
+The density of states (DOS) counts how many electronic states exist at each energy. It tells you at a glance whether a material is a metal or an insulator, which elements and orbitals (`s`, `p`, `d`, `f`) form the valence and conduction edges, and whether up-spin and down-spin bands are split <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+Always shift the energy axis so the Fermi level sits at zero ($E - E_F = 0$). States below zero are occupied; states above zero are empty. If there is a clean zero-DOS gap around $E - E_F = 0$, the material is a semiconductor or insulator; if the DOS is non-zero at zero, it is metallic.
+
+With `LORBIT = 11`, `DOSCAR` also provides site- and orbital-projected DOS (PDOS) in the order `s, py, pz, px, dxy, dyz, dz2, dxz, dx2` <Cite id="S-019" />. Keep Gaussian smoothing off when reading band edges, because artificial broadening can smear states into the gap and make an insulator look metallic.
+
+</Intuition>
+
+<Lab id="dos-viewer" title="DOSCAR viewer" />
+
+<TheMath>
+
+The total density of states is the Brillouin-zone sum over bands $n$ and wavevectors $\mathbf k$:
+
+$$D(E) = \sum_{n,\mathbf k} w_{\mathbf k}\,\delta\bigl(E - \varepsilon_{n\mathbf k}\bigr)$$
+
+Integrating $D(E)$ up to $E_F$ recovers the number of valence electrons in the cell <Cite id="S-019" />.
+
+</TheMath>
+
+<InVasp>
+
+- Run a dense k-point mesh with `ISMEAR = -5` (tetrahedron method with Bloechl corrections) for clean, sharp DOS features in insulators and semiconductors <Cite id="S-042" />.
+- Set `LORBIT = 11` for $lm$-decomposed PDOS and raise `NEDOS` (e.g. `2000`) for fine energy resolution <Cite id="S-042" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| Setting in DOS run           | Effect on `DOSCAR`                                     |
+| ---------------------------- | ------------------------------------------------------ |
+| Dense k-mesh + `ISMEAR = -5` | Sharp van Hove singularities and clean band edges      |
+| Coarse k-mesh                | Spiky, noisy DOS peaks                                 |
+| Heavy post-smoothing         | Can fill in narrow band gaps artificially              |
+| `ISPIN = 2`                  | Separate spin-up and spin-down columns (plot mirrored) |
+
+Why use a denser k-mesh for DOS than for relaxation: DOS resolves sharp energy features across the whole Brillouin zone.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Forgetting to subtract E_F before reading the plot">
+
+Raw `DOSCAR` energies have an arbitrary offset that depends on the cell and potential. Always plot against $E - E_F$.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m9-9', 'q-m9-10', 'q-m9-11', 'q-m9-12']} />
+
+<GoDeeper>
+
+- VASP wiki pages `DOSCAR`, `LORBIT`, and `NEDOS` <Cite id="S-019" />.
+- The author's VASP Field Handbook on DOS workflows <Cite id="S-042" />.
+
+</GoDeeper>

@@ -1,0 +1,78 @@
+---
+id: charge-density
+title: Charge density and volumetric files
+module: 9
+order: 5
+summary: How VASP stores electron density in CHGCAR (rho times cell volume in x-fastest order), how to inspect isosurfaces and 2D slices, and how spin magnetization is stored.
+concepts: [charge-density-analysis]
+requires: [dft-energies-forces]
+vaspTags: [LCHARG, ISPIN]
+sources: [S-019, S-030, S-042, S-043]
+status: draft
+updated: 2026-11-24
+---
+
+<Why>
+
+Real-space charge density `CHGCAR` shows where electrons actually sit in the crystal: covalent bonds between atoms, lone pairs, charge transfer across an interface, and (for `ISPIN = 2`) where the spin magnetization is localized <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+`CHGCAR` starts with the `POSCAR` crystal structure, followed by a blank line, the 3D FFT grid dimensions `NGXF NGYF NGZF`, and the volumetric values written with `x` varying fastest (Fortran order).
+
+One crucial VASP convention: the numbers in `CHGCAR` are stored as $\rho(\mathbf r) \times V_{\text{cell}}$, not $\rho(\mathbf r)$ directly. That means averaging all grid numbers gives the total number of valence electrons in the cell, and dividing each grid value by $V_{\text{cell}}$ gives the physical electron density in $e/\text{\AA}^3$ <Cite id="S-042" />. When `ISPIN = 2`, `CHGCAR` writes a second grid block for the magnetization density $m(\mathbf r) \times V_{\text{cell}}$.
+
+</Intuition>
+
+<Lab id="density-viewer" title="Charge-density viewer (CHGCAR)" />
+
+<TheMath>
+
+For a grid of $N_{\text{grid}} = N_x N_y N_z$ points storing $g_{ijk} = \rho(\mathbf r_{ijk})\,V_{\text{cell}}$:
+
+$$N_{\text{electrons}} = \frac{1}{N_{\text{grid}}}\sum_{i,j,k} g_{ijk}, \qquad \rho(\mathbf r_{ijk}) = \frac{g_{ijk}}{V_{\text{cell}}}$$
+
+Isosurfaces at a chosen threshold $\rho_0$ are extracted on the 3D grid using marching-cubes / tetrahedral triangulation <Cite id="S-030" />.
+
+</TheMath>
+
+<InVasp>
+
+- Set `LCHARG = .TRUE.` to write `CHGCAR` (default is `.TRUE.`, though many relaxations set `LCHARG = .FALSE.` to save disk space) <Cite id="S-019" />.
+- `LOCPOT` uses the exact same 3D grid layout as `CHGCAR`, except its values are electrostatic potential in eV and are **not** multiplied by $V_{\text{cell}}$ <Cite id="S-043" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| File / block                 | Quantity stored                                      | Divide by $V_{\text{cell}}$?     |
+| ---------------------------- | ---------------------------------------------------- | -------------------------------- |
+| `CHGCAR` block 1             | $(\rho_\uparrow + \rho_\downarrow)\,V_{\text{cell}}$ | Yes, to get $e/\text{\AA}^3$     |
+| `CHGCAR` block 2 (`ISPIN=2`) | $(\rho_\uparrow - \rho_\downarrow)\,V_{\text{cell}}$ | Yes, to get $\mu_B/\text{\AA}^3$ |
+| `LOCPOT`                     | Local electrostatic potential (eV)                   | No <Cite id="S-043" />           |
+
+Why remember the $V_{\text{cell}}$ factor: forgetting to divide by volume makes densities look 100 times too large on typical cells.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Reading CHGCAR in C order (z fastest) instead of Fortran order (x fastest)">
+
+Swapping axis order distorts every non-cubic cell and shifts atoms away from their density peaks. Always index as `ix + nx * (iy + ny * iz)` <Cite id="S-019" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m9-17', 'q-m9-18', 'q-m9-19', 'q-m9-20']} />
+
+<GoDeeper>
+
+- VASP wiki pages `CHGCAR` and `LOCPOT` <Cite id="S-019" />.
+- Lorensen and Cline, Marching Cubes <Cite id="S-030" />.
+- The author's VASP Field Handbook on volumetric files <Cite id="S-042" />.
+
+</GoDeeper>

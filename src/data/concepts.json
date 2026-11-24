@@ -672,7 +672,7 @@
       "total-energy"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "elastic-constants",
@@ -933,6 +933,50 @@
       "magnetic-ground-state"
     ],
     "level": "pro",
+    "status": "published"
+  },
+  {
+    "id": "dft-energies-forces",
+    "label": "DFT energies and forces",
+    "module": 9,
+    "summary": "Choosing energy(sigma->0) for comparisons and verifying forces against |EDIFFG|.",
+    "prerequisites": [
+      "output-files"
+    ],
+    "level": "beginner",
+    "status": "published"
+  },
+  {
+    "id": "relaxation-analysis",
+    "label": "Judging a relaxation",
+    "module": 9,
+    "summary": "Checking reached required accuracy, XDATCAR trajectories, and restarts after large volume changes.",
+    "prerequisites": [
+      "dft-energies-forces"
+    ],
+    "level": "beginner",
+    "status": "published"
+  },
+  {
+    "id": "dos-analysis",
+    "label": "Density of states analysis",
+    "module": 9,
+    "summary": "Reading total and projected DOS shifted to E - E_F with mirrored spin channels.",
+    "prerequisites": [
+      "dft-energies-forces"
+    ],
+    "level": "beginner",
+    "status": "published"
+  },
+  {
+    "id": "band-structure-analysis",
+    "label": "Band structure analysis",
+    "module": 9,
+    "summary": "Running ICHARG = 11 or KPOINTS_OPT band calculations and identifying direct vs indirect gaps.",
+    "prerequisites": [
+      "dos-analysis"
+    ],
+    "level": "intermediate",
     "status": "published"
   }
 ]
