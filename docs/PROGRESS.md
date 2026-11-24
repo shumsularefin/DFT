@@ -73,7 +73,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M9.1 | Data pipeline, schema, validation and sample data | done | M5.1 | L | A | main | none (pushed to main) | 2026-11-19 | [work order](milestones/M9-screening-studio.md) |
 | M9.2 | Explorer UI | done | M9.1, M8.3 | L | B | main | none (pushed to main) | 2026-11-24 | [report](reports/M9.2.md), [work order](milestones/M9-screening-studio.md) |
 | M9.3 | Feasibility check and first-project builder | done | M9.2, M3.5, M4.2 | L | B | main | none (pushed to main) | 2026-11-24 | [report](reports/M9.3.md), [work order](milestones/M9-screening-studio.md) |
-| M9.4 | Hooks, attribution, offline and integration | todo | M9.3 | S | B | | | | [work order](milestones/M9-screening-studio.md) |
+| M9.4 | Hooks, attribution, offline and integration | done | M9.3 | S | B | main | none (pushed to main) | 2026-11-24 | [report](reports/M9.4.md), [work order](milestones/M9-screening-studio.md) |
 | M14.2 | Research planner: goal to a sourced, step-by-step workflow | todo | M14.1, M13.5, M13.6, M9.3 | L | A | | | | [work order](milestones/M14-research-guidance.md) |
 | M6.5 | Optional progress sync with Firebase (Spark) | done | M6.4, M0.2 | M | B | claude/m6-5-progress-sync | PR pending (stacked on M7.4, PR #40) | 2026-11-19 | [report](reports/M6.5.md), [work order](milestones/M6-adaptive-engine.md) |
 | M12.4 | Guided path: learn DFT step by step in 3D | done | M12.2, M7.2, M13.2 | L | B | claude/m12-4-guided-path | PR pending (stacked on M6.5, PR #41) | 2026-11-19 | [report](reports/M12.4.md), [work order](milestones/M12-visual-layer.md) |

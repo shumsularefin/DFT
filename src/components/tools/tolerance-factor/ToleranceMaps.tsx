@@ -384,6 +384,9 @@ export default function ToleranceMaps({ A, B, X, kind, lnPolicy, evalRes }: Tole
         >
           Prepare VASP inputs
         </button>
+        <a className="tf-preset-btn" href="/studio/" style={{ display: 'inline-flex', alignItems: 'center' }}>
+          Explore in Screening Studio
+        </a>
       </div>
     </section>
   );

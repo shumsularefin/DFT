@@ -325,6 +325,15 @@ export default function StudioTool() {
         </section>
       )}
 
+      <details>
+        <summary>Why there is no ML column yet</summary>
+        <p style={{ fontSize: 'var(--step--1)', color: 'var(--text-muted)' }}>
+          The index schema reserves an optional <code>ml_e_above_hull</code> field (currently null and
+          hidden). No machine-learning model is trained or served on Spark hosting, and showing an unvalidated
+          ML prediction would break this site's honesty rules.
+        </p>
+      </details>
+
       {manifest && (
         <footer className="st-footer">
           <strong>Data attribution (S-024):</strong> {manifest.attribution} | Dataset version:{' '}
