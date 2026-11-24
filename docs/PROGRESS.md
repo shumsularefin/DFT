@@ -53,7 +53,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M7.2 | Module 5: Practical choices | done | M7.1, M4.4, M4.5, M5.5, M12.2 | L | B | claude/m7-2-practical-choices | see PR | 2026-11-19 | [report](reports/M7.2.md), [work order](milestones/M7-remaining-modules.md) |
 | M12.5 | See what a tag does | done | M12.3, M7.2, M3.5 | M | B | claude/m12-5-tag-visuals | PR pending (stacked on M7.2) | 2026-11-19 | [report](reports/M12.5.md), [work order](milestones/M12-visual-layer.md) |
 | M13.3 | Magnetic ground state and exchange analysis | done | M13.2, M4.1 | L | A | main | none (pushed to main) | 2026-11-19 | [work order](milestones/M13-magnetism-and-structures.md); [report](reports/M13.3.md). Q-042 default convention still open |
-| M13.4 | Handbook: spin-polarized DFT and magnetism, visually | todo | M7.2, M13.3, M12.2 | L | B | | | | [work order](milestones/M13-magnetism-and-structures.md) |
+| M13.4 | Handbook: spin-polarized DFT and magnetism, visually | done | M7.2, M13.3, M12.2 | L | B | main | none (pushed to main) | 2026-11-24 | [report](reports/M13.4.md), [work order](milestones/M13-magnetism-and-structures.md) |
 | M8.1 | Shannon radii dataset and lookup | done | M0.2 | M | A | main | none (pushed to main) | 2026-11-18 | [report](reports/M8.1.md), [work order](milestones/M8-tolerance-factor.md) |
 | M8.2 | Factors, checks and mixed sites | done | M8.1 | M | A | main | none (pushed to main) | 2026-11-18 | [report](reports/M8.2.md), [work order](milestones/M8-tolerance-factor.md) |
 | M8.3 | Explorer UI and the shared periodic table | todo | M8.2, M1.3 | M | B | | | | [work order](milestones/M8-tolerance-factor.md) |

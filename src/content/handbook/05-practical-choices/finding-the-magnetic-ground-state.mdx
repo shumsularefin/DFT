@@ -1,0 +1,104 @@
+---
+id: finding-the-magnetic-ground-state
+title: Finding the magnetic ground state
+module: 5
+order: 9
+summary: How to compare candidate magnetic orderings fairly in one common cell, normalize energies per magnetic ion, and avoid common pitfalls like moment collapse or DFT+U shifts.
+concepts: [magnetic-ground-state]
+requires: [magnetic-orderings]
+vaspTags: [ISPIN, MAGMOM, LDAU, LORBIT]
+sources: [S-014, S-042, S-059, S-060, S-065]
+noLab: true
+status: draft
+updated: 2026-11-24
+---
+
+<Why>
+
+Magnetic energy differences between FM, A-, C- and G-type states are often only a few to a few tens of meV per magnetic ion <Cite id="S-060" />. That is smaller than the k-point sampling error between two differently shaped cells, and small enough that a collapsed moment or an inconsistent `ENCUT` can flip the ranking completely. A reliable ground-state search needs strict apples-to-apples comparisons.
+
+</Why>
+
+<Intuition>
+
+The standard recipe has four steps:
+
+1. **Use one common supercell** that hosts every ordering you plan to compare, with the exact same atom order, `ENCUT`, functional, smearing and k-point mesh.
+2. **Run each ordering** from its own `MAGMOM` line (all other tags identical) with `LORBIT = 11`.
+3. **Verify that every run kept its intended pattern** by checking the final per-site moments in `OUTCAR`. If an AFM run collapsed to non-magnetic or flipped into FM, its energy does not represent the intended state.
+4. **Compare total energies per magnetic ion** (typically in meV per magnetic ion relative to FM or the lowest state).
+
+<Scene id="afm-g" />
+
+Once you have verified energies for enough distinct orderings, you can also map them onto a Heisenberg spin model to extract nearest-neighbour exchange constants $J_1, J_2$ in the Analyse tab of the [Magnetic configuration tool](/tools/magnetic/) <Cite id="S-060" />.
+
+</Intuition>
+
+<TheMath>
+
+For a cell containing $N_{\text{mag}}$ magnetic ions, the energy difference relative to the ferromagnetic state is:
+
+$$\Delta E_{\text{mag}} = \frac{E_{\text{ordering}} - E_{\text{FM}}}{N_{\text{mag}}}$$
+
+When fitting a classical Heisenberg Hamiltonian, the energy of each configuration is linear in the exchange constants $J_n$:
+
+$$E_{\text{config}} = E_0 + \sum_n c_n(\text{config})\,J_n$$
+
+where $c_n$ is determined by the parallel and antiparallel neighbour counts in shell $n$ <Cite id="S-060" />. Because different papers use different sign conventions, pair-counting factors (once vs twice) and spin normalization (unit vectors vs $|S|$), always write out the exact Hamiltonian convention alongside every reported $J_n$.
+
+</TheMath>
+
+<InVasp>
+
+```incar
+ISPIN = 2
+MAGMOM = 2*4.0 2*-4.0 16*0.0
+LORBIT = 11
+LMAXMIX = 4
+```
+
+- Keep `ENCUT`, `KPOINTS`, `ISMEAR`, `SIGMA`, `PREC`, `LASPH` and `LDAU*` identical across every ordering in the comparison <Cite id="S-042" />.
+- Set `LMAXMIX = 4` for 3d transition metals (and `6` for f-electrons) so charge-density mixing handles localized orbitals properly <Cite id="S-042" />.
+- Remember that `DFT+U` (`LDAUU`) often changes both the magnitude of the moments and the preferred magnetic ordering; report the $U_{\text{eff}}$ used <Cite id="S-014" />.
+- Do not mix relaxed cells from one ordering with unrelaxed cells from another unless you are deliberately comparing fully relaxed energies at matched convergence <Cite id="S-065" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| Pitfall                      | Symptom in output                        | Fix                                                                          |
+| ---------------------------- | ---------------------------------------- | ---------------------------------------------------------------------------- |
+| Different cells per ordering | Spurious meV shifts from k-mesh mismatch | Run all orderings in one `commonSupercell`                                   |
+| Moment collapse              | `OUTCAR` site moments near $0\,\mu_B$    | Increase initial `MAGMOM` (e.g. 4 to 5 $\mu_B$) or check `LDAU`              |
+| Symmetry trap                | SCF stays in a higher-symmetry state     | Check that `MAGMOM` actually breaks symmetry; verify final signs             |
+| Changing $U_{\text{eff}}$    | Ordering preference flips (e.g. FM to G) | Test sensitivity to $U_{\text{eff}}$ and cite the choice <Cite id="S-014" /> |
+
+Why compare in one cell: cancels k-point and basis-set differences down to the sub-meV level. What happens if you skip it: numerical noise can masquerade as a magnetic phase transition.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Ranking energies without checking final site moments">
+
+A calculation seeded as G-type AFM can converge to FM or non-magnetic. Always inspect the `magnetization (x)` table in `OUTCAR` before accepting an energy into the ranking.
+
+</Callout>
+
+<Callout variant="mistake" title="Reporting a Heisenberg J without its Hamiltonian">
+
+Two papers on the same crystal can report $J$ values that differ in sign and by a factor of 2 or $S^2$. Always state the Hamiltonian form explicitly.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-mag-11', 'q-mag-12', 'q-mag-13']} />
+
+<GoDeeper>
+
+- Xiang, Lee, Koo, Gong and Whangbo, Magnetic properties and energy-mapping analysis <Cite id="S-060" />.
+- Dudarev et al., Electron-energy-loss spectra and the structural stability of nickel oxide (DFT+U) <Cite id="S-014" />.
+- Analyse tab of the [Magnetic configuration tool](/tools/magnetic/).
+
+</GoDeeper>

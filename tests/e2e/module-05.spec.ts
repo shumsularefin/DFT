@@ -3,12 +3,23 @@ import AxeBuilder from '@axe-core/playwright';
 
 const BASE = '/handbook/05-practical-choices/';
 const TOPICS = ['plane-waves-and-encut', 'kpoints-and-the-brillouin-zone', 'smearing', 'dft-plus-u'];
-const TOPICS2 = ['pseudopotentials-and-paw', 'functionals', 'spin-and-magnetism', 'vdw-corrections'];
+const TOPICS2 = [
+  'pseudopotentials-and-paw',
+  'functionals',
+  'spin-and-magnetism',
+  'spin-polarized-calculations',
+  'magnetic-orderings',
+  'finding-the-magnetic-ground-state',
+  'reading-magnetic-output',
+  'noncollinear-and-spin-orbit',
+  'vdw-corrections',
+];
 
 async function ready(page: Page, url: string) {
   await page.goto(url);
-  const lab = page.locator('[data-lab-id]');
-  if (await lab.count()) await lab.first().scrollIntoViewIfNeeded();
+  const islands = page.locator('astro-island[ssr]');
+  const n = await islands.count();
+  for (let i = 0; i < n; i++) await islands.nth(i).scrollIntoViewIfNeeded();
   await page.waitForFunction(() => document.querySelectorAll('astro-island[ssr]').length === 0);
 }
 const noOverflow = (page: Page) =>
@@ -51,12 +62,12 @@ test.describe('module 5', () => {
     expect(await lab.locator('.lab-readout').allInnerTexts()).not.toEqual(before);
   });
 
-  for (const id of ['paw-picture', 'spin-cartoon']) {
+  for (const [id, slug] of [
+    ['paw-picture', 'pseudopotentials-and-paw'],
+    ['stoner-toy', 'spin-polarized-calculations'],
+  ] as const) {
     test(`${id} lab: keyboard slider changes the readouts, reset restores`, async ({ page }) => {
-      await ready(
-        page,
-        `${BASE}${id === 'paw-picture' ? 'pseudopotentials-and-paw' : 'spin-and-magnetism'}/`,
-      );
+      await ready(page, `${BASE}${slug}/`);
       const lab = page.locator(`[data-lab-id="${id}"]`);
       const before = await lab.locator('.lab-readout').allInnerTexts();
       const slider = lab.getByRole('slider').first();

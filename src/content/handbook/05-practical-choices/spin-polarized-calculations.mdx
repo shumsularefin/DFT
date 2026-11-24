@@ -1,0 +1,103 @@
+---
+id: spin-polarized-calculations
+title: Spin-polarized calculations
+module: 5
+order: 7
+summary: How ISPIN = 2 splits the density into up and down channels, why the Stoner criterion favours spin splitting, and how MAGMOM and NUPDOWN seed or constrain a run.
+concepts: [spin-polarized-dft, stoner-criterion]
+requires: [spin-polarization]
+vaspTags: [ISPIN, MAGMOM, NUPDOWN]
+sources: [S-019, S-041, S-042, S-059, S-065]
+status: draft
+updated: 2026-11-24
+---
+
+<Why>
+
+In a non-magnetic calculation (`ISPIN = 1`), up and down electrons share one set of orbitals, so any spontaneous magnetic moment is forbidden by construction. Switching to `ISPIN = 2` lets the two spin channels relax independently so the Kohn-Sham solver can lower the total energy whenever exchange stabilization beats the kinetic energy cost of moving electrons into one spin channel <Cite id="S-059" />.
+
+</Why>
+
+<Intuition>
+
+Picture the electron cloud of a magnetic crystal as two overlapping clouds: an up-spin density $n_\uparrow(\mathbf r)$ and a down-spin density $n_\downarrow(\mathbf r)$. Wherever the two clouds match, the local magnetization is zero. Wherever one cloud is denser, that atom carries a net magnetic moment pointing up or down.
+
+Why does a material split its spins at all? Moving electrons from down-spin to up-spin forces them into higher-energy states (a kinetic energy penalty), but electrons of the same spin stay further apart by the Pauli exclusion principle, lowering their exchange energy. In a metal, the competition is captured by the **Stoner criterion**: when the exchange parameter $I$ times the density of states at the Fermi level $N(E_F)$ exceeds $1$, the spin-split state sits lower in energy than the non-magnetic state <Cite id="S-059" />.
+
+The 3D scene below shows a ferromagnetic cubic cell where every magnetic site carries an excess of up-spin density, represented by parallel arrows.
+
+<Scene id="fm-cubic" />
+
+In VASP, `MAGMOM` supplies the initial guess for each atom's moment at step 0, and the SCF loop is free to change both the magnitude and the sign. If you need to test a specific fixed total moment (for example, to map energy versus total spin), `NUPDOWN` constrains the difference between total up and down electrons <Cite id="S-065" />.
+
+</Intuition>
+
+<Lab id="stoner-toy" title="Stoner criterion toy model" />
+
+<TheMath>
+
+In collinear spin-polarized DFT, the Kohn-Sham equations are solved separately for $\sigma \in \{\uparrow, \downarrow\}$ with spin-dependent effective potentials $v_{\text{eff}}^\sigma(\mathbf r)$. The total density and magnetization density are:
+
+$$n(\mathbf r) = n_\uparrow(\mathbf r) + n_\downarrow(\mathbf r), \qquad m(\mathbf r) = n_\uparrow(\mathbf r) - n_\downarrow(\mathbf r)$$
+
+In the constant-DOS Stoner toy model <Cite id="S-059" />, transferring $m/2$ electrons from down-spin to up-spin across a flat band with density of states $N$ per spin changes the energy by:
+
+$$\Delta E(m) = \frac{1}{4N}\bigl(1 - I\,N\bigr) m^2$$
+
+When $I\,N \le 1$, the coefficient is positive and $m = 0$ is the unique minimum. When $I\,N > 1$, the quadratic term turns negative and a spin-split solution with $m \ne 0$ lowers the energy <Cite id="S-059" />.
+
+</TheMath>
+
+<InVasp>
+
+```incar
+ISPIN = 2
+MAGMOM = 4*4.0 4*0.0
+LORBIT = 11
+```
+
+- `ISPIN = 2` enables collinear spin polarization (VASP wiki page ISPIN <Cite id="S-019" />).
+- `MAGMOM` lists one initial moment per atom in `POSCAR` order. Above, `4*4.0 4*0.0` seeds four magnetic atoms at $4.0\,\mu_B$ and four non-magnetic atoms at $0.0\,\mu_B$ <Cite id="S-042" />.
+- `NUPDOWN` fixes the integer difference $N_\uparrow - N_\downarrow$ for the whole cell; leave it unset (default `-1`) for normal unconstrained runs <Cite id="S-065" />.
+- Always include `LORBIT = 11` when `ISPIN = 2` so VASP writes per-site moments to `OUTCAR` <Cite id="S-041" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...                   | ...in the Stoner toy                    | ...in VASP                                                         |
+| ---------------------------------- | --------------------------------------- | ------------------------------------------------------------------ |
+| Increase $I \cdot N(E_F)$ past $1$ | Minimum moves from $m = 0$ to $m^* > 0$ | Spin-polarized state drops below the non-magnetic energy           |
+| `MAGMOM` too small (e.g. `0.1`)    | Not in toy                              | SCF can collapse to $m = 0$ even for a magnetic oxide              |
+| Set `NUPDOWN = 0`                  | Forces net $m = 0$                      | Constrains total cell spin (useful for AFM checks, not general FM) |
+| Set `ISPIN = 1`                    | Locks $n_\uparrow = n_\downarrow$       | Non-magnetic run; misses spin splitting completely                 |
+
+Why set `ISPIN = 2` with realistic `MAGMOM`: gives SCF a clear symmetry-breaking push toward the physical spin state. What happens if you skip it: magnetic ions converge to a high-energy non-magnetic solution.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Forgetting that MAGMOM is only an initial guess">
+
+Setting `MAGMOM = 4*4.0` does not force the final moment to stay at $4.0\,\mu_B$. VASP relaxes the moments during SCF; check `OSZICAR` and `OUTCAR` afterwards.
+
+</Callout>
+
+<Callout variant="mistake" title="Leaving NUPDOWN fixed during a ground-state search">
+
+`NUPDOWN` locks the global spin difference of the cell. Use it only when you deliberately want a constrained-moment energy curve, and remove it for unconstrained relaxations.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-mag-5', 'q-mag-6', 'q-mag-7']} />
+
+<GoDeeper>
+
+- Blundell, Magnetism in Condensed Matter (Stoner criterion derivation) <Cite id="S-059" />.
+- VASP wiki pages ISPIN, MAGMOM and NUPDOWN <Cite id="S-019" /> <Cite id="S-065" />.
+- The author's VASP Field Handbook on spin-polarized setups <Cite id="S-042" />.
+
+</GoDeeper>

@@ -1,0 +1,98 @@
+---
+id: reading-magnetic-output
+title: Reading magnetic output
+module: 5
+order: 10
+summary: How to read total moments in OSZICAR, per-site moments in OUTCAR, and mirrored spin-polarized densities of states.
+concepts: [magnetic-output]
+requires: [spin-polarized-dft]
+vaspTags: [ISPIN, LORBIT, MAGMOM]
+sources: [S-019, S-041, S-042, S-059, S-065]
+noLab: true
+status: draft
+updated: 2026-11-24
+---
+
+<Why>
+
+After a spin-polarized VASP job finishes, the total energy alone does not tell you what magnetic state the calculation actually found. You have to read three pieces of output: the total cell moment in `OSZICAR`, the atom-by-atom moment table in `OUTCAR`, and (for electronic structure) the up-spin and down-spin densities of states in `DOSCAR` <Cite id="S-041" />.
+
+</Why>
+
+<Intuition>
+
+1. **`OSZICAR` (`mag=`):** At the end of each ionic step, `OSZICAR` prints `mag=` followed by the net magnetic moment of the whole simulation cell in $\mu_B$. For a ferromagnet, `mag` is roughly the sum of the site moments. For a clean antiferromagnet, `mag` is close to `0.000`, which by itself cannot distinguish an antiferromagnet from a collapsed non-magnetic state!
+2. **`OUTCAR` (`magnetization (x)`):** When `LORBIT = 11` is set, `OUTCAR` prints a table listing the $s, p, d, f$ and total local magnetic moment inside each atom's PAW projection sphere <Cite id="S-041" />. Always read the **last** occurrence of this table (the converged ionic step). Here an antiferromagnet shows large opposite-sign moments on its magnetic sites (for example, `+3.8` and `-3.8`), whereas a collapsed non-magnetic run shows zeros everywhere.
+3. **Spin-polarized DOS (`DOSCAR`):** With `ISPIN = 2`, the density of states is split into up-spin and down-spin channels. Plotting up-spin positive and down-spin negative (mirrored across zero) makes spin splitting visible at a glance: symmetric mirrors mean zero net polarization, while shifted peaks reveal exchange splitting <Cite id="S-059" />.
+
+<Scene id="fm-cubic" />
+
+Note that the sum of atomic moments in `OUTCAR` rarely equals `OSZICAR` `mag=` exactly: the `OUTCAR` numbers only integrate inside atomic projection spheres, leaving out the interstitial space between atoms <Cite id="S-065" />.
+
+</Intuition>
+
+<TheMath>
+
+The total cell moment reported in `OSZICAR` is the exact integral over the entire unit cell $\Omega$:
+
+$$M_{\text{tot}} = \int_\Omega \bigl(n_\uparrow(\mathbf r) - n_\downarrow(\mathbf r)\bigr)\,d^3r$$
+
+Each atomic moment $m_i$ in the `OUTCAR` `magnetization (x)` table is the projection inside a sphere of radius $R_i$ centred on ion $i$:
+
+$$m_i = \int_{|\mathbf r - \mathbf R_i| \le R_i} \bigl(n_\uparrow(\mathbf r) - n_\downarrow(\mathbf r)\bigr)\,d^3r$$
+
+Because the spheres do not fill all of $\Omega$, $M_{\text{tot}} - \sum_i m_i = M_{\text{interstitial}}$ is generally non-zero <Cite id="S-065" />.
+
+</TheMath>
+
+<InVasp>
+
+```incar
+ISPIN = 2
+MAGMOM = 2*4.0 2*-4.0 16*0.0
+LORBIT = 11
+```
+
+- Check `OSZICAR` first to confirm electronic convergence and inspect the net `mag=` value <Cite id="S-041" />.
+- Search `OUTCAR` for the final `magnetization (x)` block to verify every magnetic site's sign and magnitude <Cite id="S-041" />.
+- Drop your `OUTCAR` and `OSZICAR` files into the Analyse tab of the [Magnetic configuration tool](/tools/magnetic/) to parse the table and check automatically whether each run kept its intended pattern.
+
+</InVasp>
+
+<WhatChanges>
+
+| Output check          | Healthy FM run                  | Healthy AFM run                      | Collapsed non-magnetic run |
+| --------------------- | ------------------------------- | ------------------------------------ | -------------------------- |
+| `OSZICAR` `mag=`      | Large non-zero total            | Near `0.000`                         | `0.000`                    |
+| `OUTCAR` site moments | All magnetic sites same sign    | Equal and opposite signs on sites    | All sites near `0.000`     |
+| Mirrored DOS          | Up and down shifted differently | Total DOS symmetric, site PDOS split | Up and down identical      |
+
+Why check `OUTCAR` and not just `OSZICAR`: `OSZICAR` `mag = 0` looks identical for an antiferromagnet and a collapsed non-magnetic state.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Reading the first magnetization table in OUTCAR">
+
+During a geometry relaxation, `OUTCAR` prints a `magnetization (x)` block at every ionic step. Always inspect the last block in the file.
+
+</Callout>
+
+<Callout variant="mistake" title="Forgetting LORBIT = 11">
+
+Without `LORBIT = 11` (or `10`), VASP does not write the per-site magnetization table to `OUTCAR`, leaving you unable to confirm an antiferromagnetic pattern.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-mag-14', 'q-mag-15', 'q-mag-18']} />
+
+<GoDeeper>
+
+- VASP wiki pages LORBIT and OUTCAR <Cite id="S-019" /> <Cite id="S-065" />.
+- The author's VASP Workflow Handbook on reading `OSZICAR` and `OUTCAR` <Cite id="S-041" />.
+- Analyse tab of the [Magnetic configuration tool](/tools/magnetic/).
+
+</GoDeeper>

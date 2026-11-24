@@ -1,0 +1,116 @@
+---
+id: magnetic-orderings
+title: Magnetic orderings
+module: 5
+order: 8
+summary: Visualizing FM, A-type, C-type, G-type and rock-salt type-II orderings in 3D, and why antiferromagnetic patterns require larger supercells.
+concepts: [magnetic-orderings]
+requires: [spin-polarized-dft]
+vaspTags: [ISPIN, MAGMOM]
+sources: [S-042, S-058, S-059, S-065]
+noLab: true
+status: draft
+updated: 2026-11-24
+---
+
+<Why>
+
+Knowing that an atom carries a local magnetic moment is only half the story. Neighbouring moments can align parallel (ferromagnetic, FM) or antiparallel (antiferromagnetic, AFM) in several distinct geometric patterns. A single primitive cell with one magnetic atom can only represent FM, because periodic boundary conditions copy that one arrow into every neighbouring cell. To test antiferromagnetic states, you must build a commensurate supercell that fits the repeating spin pattern <Cite id="S-058" />.
+
+</Why>
+
+<Intuition>
+
+On a simple cubic or pseudocubic perovskite B-site sublattice, each magnetic ion has 6 nearest magnetic neighbours. Wollan and Koehler <Cite id="S-058" /> named the four classic collinear orderings by how the signs alternate along the three lattice axes:
+
+- **FM (ferromagnetic):** all 6 nearest neighbours are parallel. Net cell moment is non-zero.
+- **A-type AFM:** ferromagnetic planes stacked antiferromagnetically along one axis (4 parallel, 2 antiparallel nearest neighbours).
+- **C-type AFM:** antiferromagnetic in the plane, ferromagnetic chains along the axis (2 parallel, 4 antiparallel nearest neighbours).
+- **G-type AFM:** every nearest neighbour is antiparallel in all three directions (0 parallel, 6 antiparallel nearest neighbours).
+
+Inspect the generated 3D scenes below (built from the same structure engine as the [Magnetic configuration tool](/tools/magnetic/)).
+
+<Scene id="fm-cubic" />
+
+<Scene id="afm-a" />
+
+<Scene id="afm-c" />
+
+<Scene id="afm-g" />
+
+For rock-salt transition-metal oxides like MnO and NiO (face-centred cubic magnetic sublattice, 12 nearest cation neighbours), the common antiferromagnetic ground state is **rock-salt type-II**, where ferromagnetic $(111)$ planes stack antiferromagnetically (6 parallel and 6 antiparallel nearest cation neighbours) <Cite id="S-059" />.
+
+<Scene id="rocksalt" />
+
+</Intuition>
+
+<TheMath>
+
+A collinear ordering with propagation vector $\mathbf k$ assigns each magnetic site at lattice translation $\mathbf R_j$ the sign:
+
+$$s_j = \cos(2\pi\,\mathbf k \cdot \mathbf R_j) \in \{+1, -1\}$$
+
+For a simple cubic magnetic sublattice (one site per primitive cell):
+
+- FM: $\mathbf k = (0, 0, 0)$ (determinant 1).
+- A-type: $\mathbf k = (0, 0, \tfrac{1}{2})$ (minimal supercell determinant 2).
+- C-type: $\mathbf k = (\tfrac{1}{2}, \tfrac{1}{2}, 0)$ (minimal supercell determinant 2).
+- G-type: $\mathbf k = (\tfrac{1}{2}, \tfrac{1}{2}, \tfrac{1}{2})$ (minimal supercell determinant 2).
+
+To host FM, A, C and G together inside **one common supercell** (so all four runs share one lattice and one k-point mesh), the minimal common supercell for the cubic perovskite has determinant 4 (four formula units) <Cite id="S-058" />.
+
+</TheMath>
+
+<InVasp>
+
+```incar
+ISPIN = 2
+MAGMOM = 4.0 -4.0 4*0.0
+LORBIT = 11
+```
+
+- Every atom in the supercell `POSCAR` needs an entry in `MAGMOM`, in the exact order atoms appear in `POSCAR` <Cite id="S-042" />.
+- You do not need to split `Mn` into `Mn1` and `Mn2` species in `POSCAR` just to give them opposite signs; `MAGMOM` already distinguishes up and down sites <Cite id="S-065" />.
+- Use the [Magnetic configuration tool](/tools/magnetic/) to generate the common supercell `POSCAR`, `MAGMOM` lines and zipped project folders for FM, A, C, G and rock-salt type-II automatically.
+
+</InVasp>
+
+<WhatChanges>
+
+| Ordering        | Parallel / antiparallel NN (cubic B-site) | Net moment | Minimal cell size (perovskite) |
+| --------------- | ----------------------------------------- | ---------- | ------------------------------ |
+| FM              | 6 parallel, 0 antiparallel                | Non-zero   | 1 formula unit                 |
+| A-type AFM      | 4 parallel, 2 antiparallel                | Zero       | 2 formula units                |
+| C-type AFM      | 2 parallel, 4 antiparallel                | Zero       | 2 formula units                |
+| G-type AFM      | 0 parallel, 6 antiparallel                | Zero       | 2 formula units                |
+| Common cell all | All four patterns fit in one cell         | Depends    | 4 formula units                |
+
+Why build a supercell: a 1-atom magnetic cell cannot represent an AFM pattern. What happens if you skip it: you only ever test FM and can miss a lower-energy AFM ground state.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Putting opposite signs in a cell that is too small">
+
+If a cell has only one magnetic atom, you cannot write an antiferromagnetic `MAGMOM`. Build a commensurate supercell first, or check whether an orthorhombic cell (like _Pnma_ with 4 B-sites) already fits A, C and G without enlargement.
+
+</Callout>
+
+<Callout variant="mistake" title="Forgetting POSCAR species ordering in MAGMOM">
+
+VASP groups atoms by species in `POSCAR`. If your `POSCAR` lists 4 Sr, 4 Mn, 12 O, the 4 magnetic entries must sit in positions 5 to 8, not positions 1 to 4.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-mag-8', 'q-mag-9', 'q-mag-10']} />
+
+<GoDeeper>
+
+- Wollan and Koehler, Neutron Diffraction Study of the Magnetic Properties of Perovskite-Type Compounds <Cite id="S-058" />.
+- Blundell, Magnetism in Condensed Matter <Cite id="S-059" />.
+- [Magnetic configuration tool](/tools/magnetic/) to build and inspect FM, A, C, G and rock-salt type-II inputs in 3D.
+
+</GoDeeper>

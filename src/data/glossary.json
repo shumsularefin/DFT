@@ -971,5 +971,90 @@
     "sources": [
       "S-042"
     ]
+  },
+  {
+    "id": "spin-polarization",
+    "label": "Spin polarization",
+    "short": "Allowing up-spin and down-spin electron densities to differ in a calculation (ISPIN = 2 in VASP).",
+    "level": "beginner",
+    "sources": [
+      "S-059"
+    ]
+  },
+  {
+    "id": "magnetization-density",
+    "label": "Magnetization density",
+    "short": "The difference between up-spin and down-spin electron densities at each point in space, m(r) = n_up(r) - n_down(r).",
+    "level": "beginner",
+    "sources": [
+      "S-059"
+    ]
+  },
+  {
+    "id": "collinear-magnetism",
+    "label": "Collinear magnetism",
+    "short": "A magnetic arrangement in which every atomic moment points either parallel or antiparallel to a single axis.",
+    "level": "beginner",
+    "sources": [
+      "S-059"
+    ]
+  },
+  {
+    "id": "noncollinear-magnetism",
+    "label": "Non-collinear magnetism",
+    "short": "A magnetic arrangement in which atomic moments point along arbitrary 3D directions rather than a single axis.",
+    "level": "intermediate",
+    "sources": [
+      "S-059",
+      "S-065"
+    ]
+  },
+  {
+    "id": "antiferromagnet",
+    "label": "Antiferromagnet",
+    "short": "A magnetic crystal whose local atomic moments cancel to zero net magnetization over the unit cell.",
+    "level": "beginner",
+    "sources": [
+      "S-058",
+      "S-059"
+    ]
+  },
+  {
+    "id": "ferrimagnet",
+    "label": "Ferrimagnet",
+    "short": "A magnetic crystal with opposing sublattice moments of unequal magnitude, leaving a non-zero net moment.",
+    "level": "intermediate",
+    "sources": [
+      "S-059"
+    ]
+  },
+  {
+    "id": "propagation-vector",
+    "label": "Propagation vector",
+    "short": "A reciprocal-space vector k that describes how magnetic moments repeat or alternate from one cell to the next.",
+    "level": "intermediate",
+    "sources": [
+      "S-058",
+      "S-059"
+    ]
+  },
+  {
+    "id": "exchange-constant",
+    "label": "Exchange constant",
+    "short": "The coupling parameter J in a spin Hamiltonian that measures the energy preference for parallel versus antiparallel neighbour spins.",
+    "level": "intermediate",
+    "sources": [
+      "S-059",
+      "S-060"
+    ]
+  },
+  {
+    "id": "stoner-criterion",
+    "label": "Stoner criterion",
+    "short": "The condition I * N(E_F) > 1 under which spontaneous spin splitting lowers the energy of an itinerant metal.",
+    "level": "intermediate",
+    "sources": [
+      "S-059"
+    ]
   }
 ]

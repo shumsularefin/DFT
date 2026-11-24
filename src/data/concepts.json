@@ -868,5 +868,71 @@
     ],
     "level": "intermediate",
     "status": "published"
+  },
+  {
+    "id": "spin-polarized-dft",
+    "label": "Spin-polarized DFT",
+    "module": 5,
+    "summary": "Solving separate Kohn-Sham equations for up-spin and down-spin densities with ISPIN = 2.",
+    "prerequisites": [
+      "spin-polarization"
+    ],
+    "level": "beginner",
+    "status": "published"
+  },
+  {
+    "id": "stoner-criterion",
+    "label": "Stoner criterion",
+    "module": 5,
+    "summary": "Spin splitting lowers the energy of a metal when I times N(E_F) exceeds 1.",
+    "prerequisites": [
+      "spin-polarized-dft"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "magnetic-orderings",
+    "label": "Magnetic orderings",
+    "module": 5,
+    "summary": "Collinear arrangements of atomic moments (FM, A-, C-, G-type and rock-salt type-II) and their supercells.",
+    "prerequisites": [
+      "spin-polarized-dft"
+    ],
+    "level": "beginner",
+    "status": "published"
+  },
+  {
+    "id": "magnetic-ground-state",
+    "label": "Finding the magnetic ground state",
+    "module": 5,
+    "summary": "Comparing candidate magnetic orderings in one common supercell and checking final site moments.",
+    "prerequisites": [
+      "magnetic-orderings"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "magnetic-output",
+    "label": "Reading magnetic output",
+    "module": 5,
+    "summary": "Checking total moment in OSZICAR, per-site moments in OUTCAR, and mirrored spin-polarized DOS.",
+    "prerequisites": [
+      "spin-polarized-dft"
+    ],
+    "level": "beginner",
+    "status": "published"
+  },
+  {
+    "id": "noncollinear-magnetism",
+    "label": "Non-collinear magnetism and SOC",
+    "module": 5,
+    "summary": "Vector magnetization, spin-orbit coupling, 3N MAGMOM entries and the vasp_ncl binary.",
+    "prerequisites": [
+      "magnetic-ground-state"
+    ],
+    "level": "pro",
+    "status": "published"
   }
 ]

@@ -1,0 +1,102 @@
+---
+id: noncollinear-and-spin-orbit
+title: Non-collinear magnetism and spin-orbit coupling
+module: 5
+order: 11
+summary: Overview of when spins tilt away from a single axis, how spin-orbit coupling links spin to the crystal lattice, and which VASP tags and binary are required.
+concepts: [noncollinear-magnetism]
+requires: [magnetic-ground-state]
+vaspTags: [LNONCOLLINEAR, LSORBIT, SAXIS, MAGMOM]
+sources: [S-019, S-042, S-059, S-065]
+noLab: true
+status: draft
+updated: 2026-11-24
+---
+
+<Why>
+
+Collinear `ISPIN = 2` assumes every atomic spin points strictly along one shared axis (either $+z$ or $-z$). That works for most simple ferromagnets and collinear antiferromagnets, but fails when spins cant at an angle (weak ferromagnetism, triangular frustrated lattices, spin spirals) or when heavy elements introduce strong **spin-orbit coupling (SOC)** that locks the spin direction to specific crystal axes <Cite id="S-059" />.
+
+</Why>
+
+<Intuition>
+
+In a non-collinear calculation, the magnetization density becomes a 3D vector field $\mathbf m(\mathbf r) = (m_x, m_y, m_z)$ instead of a single scalar. Each atom's moment can point in any direction in space.
+
+Without spin-orbit coupling, rotating all spins together costs zero energy because spin space is decoupled from the crystal lattice. Turning on **spin-orbit coupling** (`LSORBIT = .TRUE.`) couples electron spin to orbital motion, which couples it to the crystal axes. That is what produces magnetocrystalline anisotropy energy (MAE), band splittings in heavy-element semiconductors (such as Bi, Pb, or 5d oxides), and canted spins in distorted perovskites <Cite id="S-059" />.
+
+<Scene id="perovskite-octahedra" />
+
+Non-collinear and SOC calculations are substantially more expensive than collinear runs and require the dedicated `vasp_ncl` executable rather than `vasp_std` <Cite id="S-065" />. Treat this page as a map of the tags so you recognize them when a project genuinely requires them.
+
+</Intuition>
+
+<TheMath>
+
+Instead of two decoupled scalar orbitals $\psi_\uparrow, \psi_\downarrow$, each Kohn-Sham state becomes a two-component spinor:
+
+$$\Psi_i(\mathbf r) = \begin{pmatrix} \psi_{i,\uparrow}(\mathbf r) \\ \psi_{i,\downarrow}(\mathbf r) \end{pmatrix}$$
+
+The magnetization density is the expectation value of the Pauli vector $\boldsymbol\sigma = (\sigma_x, \sigma_y, \sigma_z)$:
+
+$$\mathbf m(\mathbf r) = \sum_i f_i\,\Psi_i^\dagger(\mathbf r)\,\boldsymbol\sigma\,\Psi_i(\mathbf r)$$
+
+In `MAGMOM`, every atom therefore requires **three** numbers $(m_x, m_y, m_z)$ in Cartesian coordinates, so an $N$-atom cell needs $3N$ entries <Cite id="S-065" />.
+
+</TheMath>
+
+<InVasp>
+
+```incar
+LNONCOLLINEAR = .TRUE.
+LSORBIT = .TRUE.
+SAXIS = 0 0 1
+MAGMOM = 0 0 3.0 0 0 -3.0 12*0.0
+LORBIT = 11
+```
+
+- `LNONCOLLINEAR = .TRUE.` switches to two-component spinors and vector magnetization (requires the `vasp_ncl` binary) <Cite id="S-065" />.
+- `LSORBIT = .TRUE.` turns on spin-orbit coupling (automatically sets `LNONCOLLINEAR = .TRUE.`) <Cite id="S-065" />.
+- `SAXIS` sets the spin quantization axis (default `0 0 1`); changing `SAXIS` lets you compare energies for spins aligned along different crystal directions <Cite id="S-065" />.
+- `MAGMOM` must supply **3 values per atom** ($3N$ total entries). Do not set `ISPIN = 2` alongside `LNONCOLLINEAR = .TRUE.`; VASP uses the spinor formalism instead <Cite id="S-042" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| Setting               | Collinear (`ISPIN = 2`) | Non-collinear / SOC (`LNONCOLLINEAR` / `LSORBIT`) |
+| --------------------- | ----------------------- | ------------------------------------------------- |
+| VASP binary           | `vasp_std`              | `vasp_ncl`                                        |
+| `MAGMOM` entries      | $1$ per atom ($N$)      | $3$ per atom ($3N$)                               |
+| Spin direction        | Single axis (up / down) | Arbitrary 3D vector $(m_x, m_y, m_z)$             |
+| Crystal-axis coupling | None                    | Present when `LSORBIT = .TRUE.`                   |
+
+Why stay collinear when you can: non-collinear and SOC runs cost several times more and lose symmetry operations. Turn them on only when heavy-element SOC or non-collinear spin texture is part of the physics you are studying.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Running LNONCOLLINEAR with vasp_std">
+
+`vasp_std` cannot run non-collinear or spin-orbit jobs. Your job script must call `vasp_ncl` <Cite id="S-065" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Giving only N values in MAGMOM instead of 3N">
+
+In non-collinear mode every atom needs three components `(mx my mz)`. Passing a collinear $N$-entry `MAGMOM` causes a count error or misassigned spins.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-mag-16', 'q-mag-17', 'q-mag-19']} />
+
+<GoDeeper>
+
+- VASP wiki pages LNONCOLLINEAR, LSORBIT and SAXIS <Cite id="S-019" /> <Cite id="S-065" />.
+- Blundell, Magnetism in Condensed Matter (spin-orbit coupling and anisotropy) <Cite id="S-059" />.
+- The author's VASP Field Handbook <Cite id="S-042" />.
+
+</GoDeeper>
