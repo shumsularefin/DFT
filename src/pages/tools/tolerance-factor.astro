@@ -1,0 +1,21 @@
+---
+// @source S-001 (Shannon 1976), S-002 (Goldschmidt), S-003 (Bartel tau), S-022 (radius-ratio rule), S-051 (SMACT)
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ToleranceFactorTool from '../../components/tools/tolerance-factor/ToleranceFactorTool';
+---
+
+<BaseLayout
+  title="Perovskite tolerance-factor explorer"
+  description="Pick A, B and X ions from the periodic table, inspect Shannon 1976 radii with source entries, and compute Goldschmidt t, octahedral mu and Bartel tau."
+  pageClass="tool"
+>
+  <div class="container">
+    <h1>Perovskite tolerance-factor explorer</h1>
+    <p>
+      Choose A, B and X ions (including mixed sites) to inspect their exact Shannon 1976 radii and compute the
+      Goldschmidt tolerance factor t, octahedral factor mu and Bartel tolerance factor tau. Missing radii are
+      reported honestly rather than guessed.
+    </p>
+    <ToleranceFactorTool client:load />
+  </div>
+</BaseLayout>
