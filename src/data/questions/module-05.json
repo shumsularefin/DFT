@@ -2440,5 +2440,873 @@
       "caption": "Layers of graphite. Illustrative.",
       "alt": "Graphite: hexagonal layers of carbon atoms stacked along one axis."
     }
+  },
+  {
+    "id": "q-mag-5",
+    "concepts": [
+      "spin-polarized-dft"
+    ],
+    "type": "single",
+    "prompt": "What does setting ISPIN = 2 allow VASP to do during SCF?",
+    "options": [
+      {
+        "text": "Solve separate Kohn-Sham orbitals and densities for up and down spins",
+        "correct": true,
+        "why": "ISPIN = 2 lets n_up(r) and n_down(r) differ."
+      },
+      {
+        "text": "Lock every atom permanently to its initial MAGMOM value",
+        "correct": false,
+        "why": "MAGMOM is only a starting guess."
+      },
+      {
+        "text": "Turn on spin-orbit coupling automatically",
+        "correct": false,
+        "why": "Spin-orbit coupling requires LSORBIT = .TRUE. and vasp_ncl."
+      }
+    ],
+    "hints": [
+      "Think about the two spin channels.",
+      "Up and down densities can relax independently."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "fm-cubic",
+      "caption": "Ferromagnetic spin arrangement on a cubic sublattice.",
+      "alt": "Cubic lattice with parallel up-pointing spin arrows."
+    }
+  },
+  {
+    "id": "q-mag-6",
+    "concepts": [
+      "stoner-criterion"
+    ],
+    "type": "single",
+    "prompt": "In the constant-DOS Stoner model, when does a spin-split state have lower energy than the non-magnetic state?",
+    "options": [
+      {
+        "text": "When I * N(E_F) > 1",
+        "correct": true,
+        "why": "Then the exchange gain beats the kinetic energy cost of moving electrons into one spin channel."
+      },
+      {
+        "text": "When I * N(E_F) < 1",
+        "correct": false,
+        "why": "Below 1, kinetic energy wins and m = 0 is the minimum."
+      },
+      {
+        "text": "Whenever N(E_F) = 0",
+        "correct": false,
+        "why": "If N(E_F) = 0, I * N(E_F) = 0 < 1."
+      }
+    ],
+    "hints": [
+      "Check the sign of (1 - I * N) in Delta E(m).",
+      "Exchange gain must beat the kinetic energy cost."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-059"
+    ],
+    "visual": {
+      "scene": "fm-cubic",
+      "caption": "Spontaneous ferromagnetic polarization above the Stoner threshold.",
+      "alt": "Ferromagnetic cubic lattice with aligned spin arrows."
+    }
+  },
+  {
+    "id": "q-mag-7",
+    "concepts": [
+      "spin-polarized-dft"
+    ],
+    "type": "single",
+    "prompt": "What does NUPDOWN control in a collinear VASP calculation?",
+    "options": [
+      {
+        "text": "It fixes the total difference N_up - N_down of electrons in the cell",
+        "correct": true,
+        "why": "NUPDOWN constrains the global cell moment; leave it unset for unconstrained runs."
+      },
+      {
+        "text": "It chooses the number of k-points along z",
+        "correct": false,
+        "why": "k-points are set in KPOINTS or KSPACING."
+      },
+      {
+        "text": "It prints per-atom magnetization in OUTCAR",
+        "correct": false,
+        "why": "LORBIT = 11 writes the per-atom table."
+      }
+    ],
+    "hints": [
+      "Look at the name: N-UP-DOWN.",
+      "It constrains total spin in the cell."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-065"
+    ],
+    "visual": {
+      "scene": "fm-cubic",
+      "caption": "Total spin imbalance in a ferromagnetic cell.",
+      "alt": "Cubic lattice with parallel spin arrows."
+    }
+  },
+  {
+    "id": "q-mag-8",
+    "concepts": [
+      "magnetic-orderings"
+    ],
+    "type": "single",
+    "prompt": "In a G-type antiferromagnetic cubic perovskite, how do the 6 nearest magnetic neighbours of a B-site ion align?",
+    "options": [
+      {
+        "text": "All 6 nearest neighbours point antiparallel",
+        "correct": true,
+        "why": "G-type alternates sign along all three pseudocubic axes."
+      },
+      {
+        "text": "4 parallel in-plane and 2 antiparallel out-of-plane",
+        "correct": false,
+        "why": "That describes A-type AFM."
+      },
+      {
+        "text": "2 parallel along chains and 4 antiparallel in-plane",
+        "correct": false,
+        "why": "That describes C-type AFM."
+      }
+    ],
+    "hints": [
+      "G-type is the 3D checkerboard pattern.",
+      "Every nearest neighbour has the opposite sign."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-058"
+    ],
+    "visual": {
+      "scene": "afm-g",
+      "caption": "G-type antiferromagnetic ordering.",
+      "alt": "Cubic perovskite sublattice with alternating up and down spin arrows in all three directions."
+    }
+  },
+  {
+    "id": "q-mag-9",
+    "concepts": [
+      "magnetic-orderings"
+    ],
+    "type": "single",
+    "prompt": "Which ordering has ferromagnetic planes stacked antiferromagnetically along one axis (4 parallel, 2 antiparallel nearest neighbours)?",
+    "options": [
+      {
+        "text": "A-type antiferromagnetic",
+        "correct": true,
+        "why": "A-type has parallel spins within each plane and opposite spins between adjacent planes."
+      },
+      {
+        "text": "C-type antiferromagnetic",
+        "correct": false,
+        "why": "C-type has 2 parallel and 4 antiparallel nearest neighbours."
+      },
+      {
+        "text": "G-type antiferromagnetic",
+        "correct": false,
+        "why": "G-type has 0 parallel and 6 antiparallel nearest neighbours."
+      }
+    ],
+    "hints": [
+      "Think of stacked sheets of parallel spins.",
+      "4 in-plane neighbours match; 2 out-of-plane oppose."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-058"
+    ],
+    "visual": {
+      "scene": "afm-a",
+      "caption": "A-type antiferromagnetic ordering.",
+      "alt": "Layers of parallel spin arrows alternating up and down along one axis."
+    }
+  },
+  {
+    "id": "q-mag-10",
+    "concepts": [
+      "magnetic-orderings"
+    ],
+    "type": "single",
+    "prompt": "Why can a primitive cubic perovskite cell (1 B-site atom) not represent an antiferromagnetic ordering?",
+    "options": [
+      {
+        "text": "Periodic images copy the single B-site moment identically into every neighbouring cell",
+        "correct": true,
+        "why": "At least two magnetic sites are needed to have both up and down spins."
+      },
+      {
+        "text": "VASP forbids ISPIN = 2 on cells with fewer than 10 atoms",
+        "correct": false,
+        "why": "VASP allows ISPIN = 2 on any cell size."
+      },
+      {
+        "text": "Antiferromagnets cannot have cubic symmetry",
+        "correct": false,
+        "why": "The limitation is having only one magnetic atom per cell."
+      }
+    ],
+    "hints": [
+      "Periodic boundary conditions repeat the cell.",
+      "You need at least one up and one down site inside the cell."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-058",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "afm-c",
+      "caption": "C-type antiferromagnetic ordering requiring a supercell.",
+      "alt": "Supercell showing chains of parallel spins alternating in the perpendicular plane."
+    }
+  },
+  {
+    "id": "q-mag-11",
+    "concepts": [
+      "magnetic-ground-state"
+    ],
+    "type": "single",
+    "prompt": "Why should FM, A-, C- and G-type orderings be run in one common supercell when comparing their energies?",
+    "options": [
+      {
+        "text": "To cancel k-point mesh and cell-shape sampling differences that can rival magnetic energy differences",
+        "correct": true,
+        "why": "Magnetic energy differences are often only a few meV per magnetic ion."
+      },
+      {
+        "text": "Because VASP cannot compute total energy in a 1-formula-unit cell",
+        "correct": false,
+        "why": "VASP can, but comparing across different cells introduces k-mesh mismatch."
+      },
+      {
+        "text": "Because MAGMOM only works in cells with determinant 4",
+        "correct": false,
+        "why": "MAGMOM works in any cell; the common cell is for fair energy comparison."
+      }
+    ],
+    "hints": [
+      "Magnetic energy splittings are tiny (meV scale).",
+      "Matched cells give matched k-point sampling."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-060",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "afm-g",
+      "caption": "Comparing candidate orderings in a shared supercell.",
+      "alt": "G-type antiferromagnetic supercell with up and down arrows."
+    }
+  },
+  {
+    "id": "q-mag-12",
+    "concepts": [
+      "magnetic-ground-state"
+    ],
+    "type": "single",
+    "prompt": "Before ranking a finished AFM calculation against FM, what must you check in OUTCAR?",
+    "options": [
+      {
+        "text": "That the final per-site moments kept the intended up/down pattern and did not collapse to zero",
+        "correct": true,
+        "why": "An AFM seed can relax into FM or non-magnetic during SCF."
+      },
+      {
+        "text": "That the final moments are numerically identical to the initial MAGMOM values",
+        "correct": false,
+        "why": "Final moments normally relax away from the starting guess."
+      },
+      {
+        "text": "That OSZICAR mag is larger than 10",
+        "correct": false,
+        "why": "An antiferromagnet has net mag near zero."
+      }
+    ],
+    "hints": [
+      "SCF is free to flip or collapse moments.",
+      "Check the last magnetization (x) table in OUTCAR."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-041",
+      "S-060"
+    ],
+    "visual": {
+      "scene": "afm-a",
+      "caption": "Verifying that final site moments match the intended pattern.",
+      "alt": "A-type antiferromagnetic ordering with alternating spin layers."
+    }
+  },
+  {
+    "id": "q-mag-13",
+    "concepts": [
+      "magnetic-ground-state"
+    ],
+    "type": "single",
+    "prompt": "Why must a reported Heisenberg exchange constant J always be accompanied by its Hamiltonian convention?",
+    "options": [
+      {
+        "text": "Sign, single- vs double-counting of pairs, and spin normalization change J by a sign or factor of 2 or S^2",
+        "correct": true,
+        "why": "Without the Hamiltonian form, the number J is ambiguous."
+      },
+      {
+        "text": "Because J depends on the filename of POSCAR",
+        "correct": false,
+        "why": "Filenames have no effect on physics."
+      },
+      {
+        "text": "Because J is always positive in every convention",
+        "correct": false,
+        "why": "The sign of J depends on whether H has +J or -J."
+      }
+    ],
+    "hints": [
+      "Different papers write H = -sum J S_i.S_j or +sum J S_i.S_j.",
+      "Counting each pair once vs twice changes J by a factor of 2."
+    ],
+    "difficulty": 2,
+    "level": "pro",
+    "sources": [
+      "S-060"
+    ],
+    "visual": {
+      "scene": "rocksalt",
+      "caption": "Exchange paths between neighbouring magnetic ions.",
+      "alt": "Rock-salt crystal lattice showing magnetic cation neighbours."
+    }
+  },
+  {
+    "id": "q-mag-14",
+    "concepts": [
+      "magnetic-output"
+    ],
+    "type": "single",
+    "prompt": "Your antiferromagnetic run finishes with OSZICAR mag = 0.000. Does that prove it converged to an antiferromagnetic state?",
+    "options": [
+      {
+        "text": "No: a collapsed non-magnetic solution also has mag = 0.000; check per-site moments in OUTCAR",
+        "correct": true,
+        "why": "Only the per-site magnetization (x) table distinguishes AFM from non-magnetic."
+      },
+      {
+        "text": "Yes: mag = 0.000 can only come from opposite atomic spins",
+        "correct": false,
+        "why": "Zero moment on every atom also sums to zero."
+      },
+      {
+        "text": "No: an antiferromagnet always has mag > 4",
+        "correct": false,
+        "why": "An antiferromagnet has zero net moment."
+      }
+    ],
+    "hints": [
+      "What is the sum of all zeros?",
+      "You need atom-resolved moments from LORBIT = 11."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-041",
+      "S-065"
+    ],
+    "visual": {
+      "scene": "afm-g",
+      "caption": "Zero net moment with non-zero local moments.",
+      "alt": "G-type antiferromagnetic cell with equal numbers of up and down arrows."
+    }
+  },
+  {
+    "id": "q-mag-15",
+    "concepts": [
+      "magnetic-output"
+    ],
+    "type": "single",
+    "prompt": "Why does the sum of atomic moments in the OUTCAR magnetization (x) table usually differ slightly from OSZICAR mag?",
+    "options": [
+      {
+        "text": "OUTCAR integrates inside PAW spheres around atoms and omits the interstitial region",
+        "correct": true,
+        "why": "OSZICAR mag integrates over the entire unit cell."
+      },
+      {
+        "text": "OUTCAR uses different units from OSZICAR",
+        "correct": false,
+        "why": "Both report moments in Bohr magnetons."
+      },
+      {
+        "text": "OUTCAR only prints moments for oxygen atoms",
+        "correct": false,
+        "why": "OUTCAR prints every ion in POSCAR order."
+      }
+    ],
+    "hints": [
+      "Atomic spheres do not fill 100% of the unit cell.",
+      "Think about the space between atoms."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-065"
+    ],
+    "visual": {
+      "scene": "fm-cubic",
+      "caption": "Local atomic spheres inside the full unit cell.",
+      "alt": "Cubic crystal cell with magnetic sites and arrows."
+    }
+  },
+  {
+    "id": "q-mag-16",
+    "concepts": [
+      "noncollinear-magnetism"
+    ],
+    "type": "single",
+    "prompt": "How many numbers per atom must MAGMOM contain when LNONCOLLINEAR = .TRUE.?",
+    "options": [
+      {
+        "text": "Three numbers per atom (mx, my, mz), so 3N entries for N atoms",
+        "correct": true,
+        "why": "Each atomic moment is a 3D vector in non-collinear mode."
+      },
+      {
+        "text": "One number per atom, the same as ISPIN = 2",
+        "correct": false,
+        "why": "One number per atom is only for collinear ISPIN = 2."
+      },
+      {
+        "text": "Two numbers per atom (up and down)",
+        "correct": false,
+        "why": "A 3D vector needs three Cartesian components."
+      }
+    ],
+    "hints": [
+      "In non-collinear mode, magnetization is a 3D vector.",
+      "Count the Cartesian components x, y, z."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-065"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "Tilted octahedra where spin canting can occur.",
+      "alt": "Perovskite structure with coordination octahedra."
+    }
+  },
+  {
+    "id": "q-mag-17",
+    "concepts": [
+      "noncollinear-magnetism"
+    ],
+    "type": "single",
+    "prompt": "Which VASP executable is required when running LSORBIT = .TRUE. or LNONCOLLINEAR = .TRUE.?",
+    "options": [
+      {
+        "text": "vasp_ncl",
+        "correct": true,
+        "why": "vasp_ncl is compiled for two-component spinors and non-collinear magnetism."
+      },
+      {
+        "text": "vasp_std",
+        "correct": false,
+        "why": "vasp_std handles standard collinear calculations only."
+      },
+      {
+        "text": "vasp_gam",
+        "correct": false,
+        "why": "vasp_gam is the Gamma-point-only collinear binary."
+      }
+    ],
+    "hints": [
+      "Look at the suffix for non-collinear.",
+      "ncl stands for non-collinear."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-065"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "Spin-orbit coupling links spin to crystal axes.",
+      "alt": "Perovskite crystal structure with octahedra."
+    }
+  },
+  {
+    "id": "q-mag-18",
+    "concepts": [
+      "magnetic-output"
+    ],
+    "type": "single",
+    "prompt": "Which occurrence of the magnetization (x) table in OUTCAR should you read after a geometry relaxation?",
+    "options": [
+      {
+        "text": "The last occurrence, corresponding to the final converged ionic step",
+        "correct": true,
+        "why": "Earlier tables belong to intermediate unrelaxed steps."
+      },
+      {
+        "text": "The first occurrence at step 1",
+        "correct": false,
+        "why": "Step 1 is before ionic relaxation finishes."
+      },
+      {
+        "text": "The average of all occurrences in the file",
+        "correct": false,
+        "why": "You want the converged final structure, not an average over unrelaxed geometries."
+      }
+    ],
+    "hints": [
+      "OUTCAR appends a table after each ionic step.",
+      "You want the converged end state."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "scene": "fm-cubic",
+      "caption": "Converged magnetic moments on the final relaxed structure.",
+      "alt": "Cubic lattice with aligned spin arrows."
+    }
+  },
+  {
+    "id": "q-mag-19",
+    "concepts": [
+      "noncollinear-magnetism"
+    ],
+    "type": "single",
+    "prompt": "What does SAXIS control in a VASP calculation with LSORBIT = .TRUE.?",
+    "options": [
+      {
+        "text": "The global spin quantization axis relative to the crystal axes",
+        "correct": true,
+        "why": "Changing SAXIS lets you compare energies for spins pointing along different crystal directions."
+      },
+      {
+        "text": "The supercell expansion matrix along the z axis",
+        "correct": false,
+        "why": "Supercells are built in POSCAR."
+      },
+      {
+        "text": "The smearing width in eV",
+        "correct": false,
+        "why": "Smearing width is set by SIGMA."
+      }
+    ],
+    "hints": [
+      "S-AXIS stands for spin axis.",
+      "Used to probe magnetocrystalline anisotropy."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-065"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "Quantization axis relative to crystal directions.",
+      "alt": "Perovskite structure with octahedra."
+    }
+  },
+  {
+    "id": "q-mag-20",
+    "concepts": [
+      "spin-polarized-dft",
+      "stoner-criterion"
+    ],
+    "type": "single",
+    "prompt": "Why does moving electrons from down-spin to up-spin cost kinetic energy in the Stoner model?",
+    "options": [
+      {
+        "text": "Pauli exclusion forces transferred electrons into higher empty energy states",
+        "correct": true,
+        "why": "Filled states below E_F cannot accept extra same-spin electrons."
+      },
+      {
+        "text": "Up-spin electrons have a larger mass than down-spin electrons",
+        "correct": false,
+        "why": "Both spins have the same electron mass."
+      },
+      {
+        "text": "The unit cell expands automatically when ISPIN = 2",
+        "correct": false,
+        "why": "The kinetic energy cost comes from Pauli exclusion in a fixed band."
+      }
+    ],
+    "hints": [
+      "Think about the Pauli exclusion principle.",
+      "Transferred electrons must occupy empty states above the Fermi level."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-059"
+    ],
+    "visual": {
+      "scene": "fm-cubic",
+      "caption": "Kinetic vs exchange competition in spin splitting.",
+      "alt": "Cubic lattice with aligned spin arrows."
+    }
+  },
+  {
+    "id": "q-mag-21",
+    "concepts": [
+      "spin-polarized-dft",
+      "stoner-criterion"
+    ],
+    "type": "single",
+    "prompt": "What happens in the Stoner model when the density of states at the Fermi level N(E_F) is very large?",
+    "options": [
+      {
+        "text": "The kinetic energy cost of flipping spins is smaller, making I * N(E_F) > 1 easier to satisfy",
+        "correct": true,
+        "why": "Narrow d bands with high N(E_F) favour spontaneous ferromagnetism."
+      },
+      {
+        "text": "Magnetism becomes impossible because the band is too narrow",
+        "correct": false,
+        "why": "High N(E_F) actually favours spin splitting."
+      },
+      {
+        "text": "ISPIN = 1 and ISPIN = 2 give identical energies",
+        "correct": false,
+        "why": "When I * N(E_F) > 1, ISPIN = 2 sits lower in energy."
+      }
+    ],
+    "hints": [
+      "Look at the product I * N(E_F).",
+      "High DOS at E_F means small energy spacing between states."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-059"
+    ],
+    "visual": {
+      "scene": "fm-cubic",
+      "caption": "High Fermi-level DOS promotes spin splitting.",
+      "alt": "Ferromagnetic cubic lattice with aligned spin arrows."
+    }
+  },
+  {
+    "id": "q-mag-22",
+    "concepts": [
+      "stoner-criterion"
+    ],
+    "type": "single",
+    "prompt": "If a metal has I = 0.8 eV and N(E_F) = 1.0 states/eV per spin in the Stoner toy model, what is its equilibrium moment?",
+    "options": [
+      {
+        "text": "Zero (non-magnetic), because I * N(E_F) = 0.8 <= 1",
+        "correct": true,
+        "why": "Spontaneous spin splitting requires I * N(E_F) > 1."
+      },
+      {
+        "text": "0.8 mu_B",
+        "correct": false,
+        "why": "I * N is dimensionless and below the threshold 1."
+      },
+      {
+        "text": "1.8 mu_B",
+        "correct": false,
+        "why": "Below threshold the energy minimum sits at m = 0."
+      }
+    ],
+    "hints": [
+      "Multiply I and N(E_F).",
+      "Compare the product to 1."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-059"
+    ],
+    "visual": {
+      "scene": "fm-cubic",
+      "caption": "Below the Stoner threshold, spin splitting raises the energy.",
+      "alt": "Cubic lattice scene illustrating magnetic states."
+    }
+  },
+  {
+    "id": "q-mag-23",
+    "concepts": [
+      "magnetic-orderings"
+    ],
+    "type": "single",
+    "prompt": "In rock-salt type-II antiferromagnets such as MnO and NiO, how are the ferromagnetic sheets oriented?",
+    "options": [
+      {
+        "text": "Ferromagnetic (111) planes stacked antiferromagnetically",
+        "correct": true,
+        "why": "Each cation has 6 parallel in-plane and 6 antiparallel out-of-plane nearest cation neighbours."
+      },
+      {
+        "text": "Ferromagnetic (100) planes stacked antiferromagnetically",
+        "correct": false,
+        "why": "That is type-I, not rock-salt type-II."
+      },
+      {
+        "text": "All spins parallel in every plane",
+        "correct": false,
+        "why": "That is ferromagnetic."
+      }
+    ],
+    "hints": [
+      "Think of the close-packed planes of the fcc cation sublattice.",
+      "They are the (111) planes."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-059"
+    ],
+    "visual": {
+      "scene": "rocksalt",
+      "caption": "Rock-salt structure hosting type-II antiferromagnetic ordering.",
+      "alt": "Rock-salt crystal lattice."
+    }
+  },
+  {
+    "id": "q-mag-24",
+    "concepts": [
+      "magnetic-ground-state"
+    ],
+    "type": "single",
+    "prompt": "How should total energies of different magnetic orderings be normalized before comparing them?",
+    "options": [
+      {
+        "text": "Per magnetic ion (or per formula unit), using matched cells and settings",
+        "correct": true,
+        "why": "Normalization per magnetic ion makes energy differences independent of supercell size."
+      },
+      {
+        "text": "Divided by the initial MAGMOM value",
+        "correct": false,
+        "why": "Initial MAGMOM is only a seed, not a normalization factor."
+      },
+      {
+        "text": "Raw total energy regardless of how many atoms are in the cell",
+        "correct": false,
+        "why": "Doubling the cell doubles the total energy."
+      }
+    ],
+    "hints": [
+      "Supercells can contain different numbers of formula units.",
+      "Divide by the number of magnetic ions."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-060",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "afm-c",
+      "caption": "Normalizing total energy per magnetic ion across orderings.",
+      "alt": "C-type antiferromagnetic supercell with up and down arrows."
+    }
+  },
+  {
+    "id": "q-mag-25",
+    "concepts": [
+      "magnetic-output"
+    ],
+    "type": "single",
+    "prompt": "In a mirrored spin-polarized DOS plot (up-spin positive, down-spin negative), what does a shifted up-spin peak relative to down-spin indicate?",
+    "options": [
+      {
+        "text": "Exchange splitting between the two spin channels",
+        "correct": true,
+        "why": "Unequal effective potentials shift up-spin and down-spin bands apart."
+      },
+      {
+        "text": "A numerical bug in DOSCAR",
+        "correct": false,
+        "why": "Spin splitting is the expected signature of magnetism."
+      },
+      {
+        "text": "That ISPIN = 1 was used",
+        "correct": false,
+        "why": "ISPIN = 1 forces identical up and down channels."
+      }
+    ],
+    "hints": [
+      "Compare the positive and negative halves of the mirrored plot.",
+      "Shifted peaks mean spin-up and spin-down states sit at different energies."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-059",
+      "S-041"
+    ],
+    "visual": {
+      "scene": "fm-cubic",
+      "caption": "Exchange splitting in a ferromagnetic crystal.",
+      "alt": "Ferromagnetic cubic lattice with aligned spin arrows."
+    }
+  },
+  {
+    "id": "q-mag-26",
+    "concepts": [
+      "noncollinear-magnetism"
+    ],
+    "type": "single",
+    "prompt": "Why does turning on spin-orbit coupling (LSORBIT = .TRUE.) make the total energy depend on the spin direction relative to the crystal axes?",
+    "options": [
+      {
+        "text": "Spin-orbit coupling links electron spin to orbital motion, which feels the crystal lattice",
+        "correct": true,
+        "why": "Without SOC, global spin rotations cost zero energy."
+      },
+      {
+        "text": "Because LSORBIT changes the lattice constants in POSCAR automatically",
+        "correct": false,
+        "why": "LSORBIT adds the relativistic spin-orbit term to the Hamiltonian."
+      },
+      {
+        "text": "Because MAGMOM is ignored when LSORBIT = .TRUE.",
+        "correct": false,
+        "why": "MAGMOM still seeds the 3N spin components."
+      }
+    ],
+    "hints": [
+      "What does \"spin-orbit\" couple together?",
+      "Orbitals are oriented along crystal bonds."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-059",
+      "S-065"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "Crystal environment coupled to spin via spin-orbit interaction.",
+      "alt": "Perovskite crystal with tilted octahedra."
+    }
   }
 ]

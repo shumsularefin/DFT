@@ -3,44 +3,51 @@ id: spin-and-magnetism
 title: Spin and magnetism
 module: 5
 order: 6
-summary: When to turn on spin polarization, how MAGMOM works, and why ferromagnetic and antiferromagnetic arrangements have to be compared in the same cell.
+summary: Overview of spin polarization in DFT, when to turn ISPIN on, and how the five visual magnetism topics fit together.
 concepts: [spin-polarization]
 requires: [spin-pauli, scf-loop]
 vaspTags: [ISPIN, MAGMOM, LORBIT]
-sources: [S-019, S-041, S-042]
+sources: [S-019, S-041, S-042, S-058, S-059]
+noLab: true
 status: draft
-updated: 2026-11-19
+updated: 2026-11-24
 ---
 
 <Why>
 
-Electrons carry spin. In many materials the up and down electrons are equally numerous everywhere, and a calculation that treats them together is fine and half the cost. In magnetic materials (iron, many oxides with d or f electrons) and in radicals the two spins differ, and forcing them to be equal gives the wrong energy and the wrong structure. Turning spin on is a decision you make in every run, and the starting guess for each atom matters because the calculation can settle in the wrong magnetic state <Cite id="S-042" />.
+Electrons carry spin. In many closed-shell materials the up and down electrons are equally numerous everywhere, so treating both spins together is accurate and half the cost. In magnetic materials (iron, transition-metal oxides, rare-earth compounds) and in radicals the two spin densities differ, and forcing them to be equal gives the wrong energy and the wrong structure. Turning spin on is a decision you make in every run, and the starting guess for each atom matters because the calculation can settle in the wrong magnetic state <Cite id="S-042" />.
 
 </Why>
 
 <Intuition>
 
-With spin polarization off, each orbital holds two electrons, one up and one down. With it on, VASP keeps separate up and down orbitals, so the two spin densities can differ. The difference is the magnetization.
+With spin polarization off (`ISPIN = 1`), every orbital holds two electrons, one up and one down. With it on (`ISPIN = 2`), VASP keeps separate up and down orbitals, so the two spin densities can differ. The difference is the magnetization density <Cite id="S-059" />.
 
-A moment on each atom is a starting guess you provide, in `MAGMOM`, one value per atom in the same order as the atoms in `POSCAR`. The run then adjusts the moments. If you start them too small, they can collapse to zero even in a material that is magnetic. If you start from a pattern (up on one atom, down on its neighbour), you can find an antiferromagnetic state, which a ferromagnetic start will not reach by itself.
+This page is the overview. The five topics that follow walk through the pieces in order:
 
-The lab shows arrangements on a small square lattice and the `MAGMOM` line that describes each. It is a cartoon: the signs are set by hand and the moments are starting guesses. Try the toggle that leaves one atom out: the count no longer matches, and the count must match.
+1. [Spin-polarized calculations](/handbook/05-practical-choices/spin-polarized-calculations/): two densities, the Stoner toy model, `ISPIN`, `MAGMOM` and `NUPDOWN`.
+2. [Magnetic orderings](/handbook/05-practical-choices/magnetic-orderings/): FM, A-type, C-type, G-type and rock-salt type-II patterns in 3D, and why larger supercells are needed <Cite id="S-058" />.
+3. [Finding the magnetic ground state](/handbook/05-practical-choices/finding-the-magnetic-ground-state/): comparing orderings in one common cell, and spotting moment collapse or symmetry traps.
+4. [Reading magnetic output](/handbook/05-practical-choices/reading-magnetic-output/): checking `OSZICAR`, `OUTCAR` per-site moments and mirrored spin-polarized DOS.
+5. [Non-collinear magnetism and spin-orbit coupling](/handbook/05-practical-choices/noncollinear-and-spin-orbit/): when spins tilt away from a single axis and how `LNONCOLLINEAR`, `LSORBIT` and `vasp_ncl` enter.
 
-**Comparing states.** The way to learn which arrangement is lowest in energy is to run each one and compare the energies. That only means something if every arrangement uses the same cell, the same cutoff and the same k-mesh. A larger cell than the chemical one is often needed to fit an antiferromagnetic pattern <Cite id="S-042" />.
+The two generated scenes below show the contrast between a ferromagnetic (FM) arrangement, where all magnetic sites point the same way, and a G-type antiferromagnetic arrangement, where every nearest neighbour points opposite <Cite id="S-058" />.
+
+<Scene id="fm-cubic" />
+
+<Scene id="afm-g" />
 
 <Level min="intermediate">
 
-VASP includes the `MAGMOM` pattern in its symmetry analysis, so an antiferromagnetic arrangement lowers the symmetry automatically; no separate `POTCAR` species is needed for the up and down sites (VASP wiki page MAGMOM, recorded as Q-040). The detailed magnetism pages (generating orderings, the Heisenberg picture) are planned in a later stage; the tool at `/tools/magnetic/` already builds the files for several orderings in one common cell.
+VASP includes the `MAGMOM` pattern in its symmetry analysis, so an antiferromagnetic arrangement lowers the symmetry automatically; no separate `POTCAR` species is needed for the up and down sites (VASP wiki page MAGMOM, recorded as Q-040). You can build ready-to-run inputs for all standard orderings in one common supercell with the [Magnetic configuration tool](/tools/magnetic/).
 
 </Level>
 
 </Intuition>
 
-<Lab id="spin-cartoon" title="Spins and MAGMOM" />
-
 <TheMath>
 
-Write the up and down densities as $n_\uparrow(\mathbf r)$ and $n_\downarrow(\mathbf r)$. The total density is $n = n_\uparrow + n_\downarrow$ and the magnetization density is $m = n_\uparrow - n_\downarrow$ (in units of the Bohr magneton, $\mu_B$, when each electron counts as one). The total moment is the integral of $m$, and for a cell it is the net difference between the number of up and down electrons. In an antiferromagnet the site moments cancel in the sum, so the net moment is about zero while each site's moment is not. In the lab, the "net starting moment" is the sum of the values you would write in `MAGMOM`; it is not a result.
+Write the up and down densities as $n_\uparrow(\mathbf r)$ and $n_\downarrow(\mathbf r)$. The total density is $n(\mathbf r) = n_\uparrow(\mathbf r) + n_\downarrow(\mathbf r)$ and the magnetization density is $m(\mathbf r) = n_\uparrow(\mathbf r) - n_\downarrow(\mathbf r)$ (in units of the Bohr magneton, $\mu_B$, when each electron counts as one) <Cite id="S-059" />. The total moment of a cell is the integral of $m(\mathbf r)$ over the cell volume. In an antiferromagnet the site moments cancel in the sum, so the net moment is zero while each magnetic site still carries a local moment.
 
 </TheMath>
 
@@ -49,24 +56,23 @@ Write the up and down densities as $n_\uparrow(\mathbf r)$ and $n_\downarrow(\ma
 <TagVisual tag="ISPIN" />
 
 - `ISPIN = 2` turns on collinear spin polarization (default 1). It roughly doubles the time and memory <Cite id="S-042" />.
-- `MAGMOM` takes one value per atom, in `POSCAR` order, in $\mu_B$. The shorthand `4*3.0` means four atoms at 3.0. The count must equal the number of atoms; a count mismatch is a common mistake <Cite id="S-042" />. An antiferromagnetic example from the tag card: `5 -5 4*0`.
-- The author's rule for the starting moment of 3d magnetic ions is 3 to 5 $\mu_B$; if it is too small, the moment can collapse to zero. Compare energies and check that `ISPIN = 2` is set <Cite id="S-042" />.
+- `MAGMOM` takes one value per atom, in `POSCAR` order, in $\mu_B$. The shorthand `4*3.0` means four atoms at 3.0. The count must equal the number of atoms <Cite id="S-042" />.
+- The author's rule for the starting moment of 3d magnetic ions is 3 to 5 $\mu_B$; if it is too small, the moment can collapse to zero <Cite id="S-042" />.
 - `LORBIT = 11` writes projected densities and the site-resolved moments in `OUTCAR`. `OSZICAR` shows the total moment as `mag` <Cite id="S-041" />.
 - Keep `ISPIN`, `MAGMOM` and `LMAXMIX` identical between an SCF run and any `ICHARG = 11` run that follows it <Cite id="S-042" />.
-- Final moments usually differ from the starting ones; VASP relaxes them.
 
 </InVasp>
 
 <WhatChanges>
 
-| If you change...          | ...in the lab                          | ...in VASP                                                          |
-| ------------------------- | -------------------------------------- | ------------------------------------------------------------------- |
-| FM to AFM arrangement     | Arrows alternate, net moment goes to 0 | A different state, with its own energy; compare in the same cell    |
-| A smaller starting moment | Shorter list values                    | Risk of a collapse to zero moment                                   |
-| Leave out one value       | Count no longer matches                | The `MAGMOM` count must equal the number of atoms                   |
-| `ISPIN = 1`               | Not shown                              | Up and down forced equal: wrong for magnetic systems, half the cost |
+| If you change...           | ...in the physical picture       | ...in VASP                                                         |
+| -------------------------- | -------------------------------- | ------------------------------------------------------------------ |
+| `ISPIN = 1` to `ISPIN = 2` | Up and down densities can differ | Separate spin channels; roughly double the memory and run time     |
+| FM to AFM arrangement      | Neighbour arrows point opposite  | Different state with its own energy; compare in the same supercell |
+| A smaller starting moment  | Weak initial spin imbalance      | Risk of collapsing to a non-magnetic solution                      |
+| Leave out one `MAGMOM`     | Missing site assignment          | Count mismatch error against the atom count in `POSCAR`            |
 
-Why turn spin on: magnetic systems need it. Why this starting moment: high enough not to collapse. What happens if you get it wrong: a non-magnetic state reported for a magnetic material.
+Why turn spin on: magnetic systems need separate up and down densities. Why this starting moment: large enough not to collapse. What happens if you get it wrong: a non-magnetic state reported for a magnetic material.
 
 </WhatChanges>
 
@@ -74,19 +80,19 @@ Why turn spin on: magnetic systems need it. Why this starting moment: high enoug
 
 <Callout variant="mistake" title="Starting from zero or from the wrong arrangement">
 
-A run started with no moment can stay non-magnetic, and a ferromagnetic start will not find an antiferromagnetic state. Try the arrangements you care about.
+A run started with zero moment can stay non-magnetic, and a ferromagnetic start will not find an antiferromagnetic state. Test the arrangements you care about.
 
 </Callout>
 
 <Callout variant="mistake" title="Comparing energies from different cells">
 
-Energies of different magnetic orderings are comparable only in the same cell with the same settings.
+Energies of different magnetic orderings are comparable only in the same cell with the same settings and k-point mesh.
 
 </Callout>
 
-<Callout variant="mistake" title="Taking the lab moments as predictions">
+<Callout variant="mistake" title="Treating MAGMOM as a fixed result">
 
-They are starting guesses you choose, not computed values.
+`MAGMOM` only seeds the initial density. Always inspect the final moments in `OSZICAR` and `OUTCAR`.
 
 </Callout>
 
@@ -97,6 +103,8 @@ They are starting guesses you choose, not computed values.
 <GoDeeper>
 
 - VASP wiki pages ISPIN, MAGMOM and LORBIT (by page name) <Cite id="S-019" />.
+- Wollan and Koehler, Neutron Diffraction Study of the Magnetic Properties of Perovskite-Type Compounds <Cite id="S-058" />.
+- Blundell, Magnetism in Condensed Matter <Cite id="S-059" />.
 - The author's handbooks on charge and spin <Cite id="S-041" /> <Cite id="S-042" />.
 
 </GoDeeper>
