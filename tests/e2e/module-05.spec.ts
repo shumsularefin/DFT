@@ -17,9 +17,16 @@ const TOPICS2 = [
 
 async function ready(page: Page, url: string) {
   await page.goto(url);
-  const islands = page.locator('astro-island[ssr]');
-  const n = await islands.count();
-  for (let i = 0; i < n; i++) await islands.nth(i).scrollIntoViewIfNeeded();
+  for (let pass = 0; pass < 40; pass++) {
+    const remaining = await page.locator('astro-island[ssr]').count();
+    if (remaining === 0) break;
+    await page
+      .locator('astro-island[ssr]')
+      .first()
+      .scrollIntoViewIfNeeded()
+      .catch(() => {});
+    await page.waitForTimeout(50);
+  }
   await page.waitForFunction(() => document.querySelectorAll('astro-island[ssr]').length === 0);
 }
 const noOverflow = (page: Page) =>

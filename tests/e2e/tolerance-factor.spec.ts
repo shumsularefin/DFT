@@ -12,7 +12,7 @@ test.describe('tolerance-factor explorer', () => {
     // Switch to NdCuO3 (Cu3+ LS)
     await page.getByRole('button', { name: 'NdCuO3 (Cu3+ LS)' }).click();
     await expect(page.getByText(/uncommon oxidation state/i)).toBeVisible();
-    const policy = page.getByLabel('A-site coordination policy');
+    const policy = page.getByLabel('A-site coordination policy', { exact: true });
     await expect(policy).toBeVisible();
 
     // Switch policy to CN 9 -> t = 0.9342

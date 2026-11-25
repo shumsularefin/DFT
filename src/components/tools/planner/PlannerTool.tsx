@@ -87,7 +87,10 @@ export default function PlannerTool() {
   }
 
   return (
-    <div style={{ display: 'grid', gap: 'var(--space-5)' }} data-tool-id="research-planner">
+    <div
+      style={{ display: 'grid', gap: 'var(--space-5)', minWidth: 0, maxWidth: '100%' }}
+      data-tool-id="research-planner"
+    >
       <div
         role="note"
         style={{
@@ -109,6 +112,9 @@ export default function PlannerTool() {
           display: 'grid',
           gap: 'var(--space-3)',
           padding: 'var(--space-4)',
+          minWidth: 0,
+          maxWidth: '100%',
+          overflowX: 'auto',
           border: '1px solid var(--border-strong)',
           borderRadius: 'var(--radius)',
           background: 'var(--surface)',
@@ -118,6 +124,7 @@ export default function PlannerTool() {
           <label style={{ display: 'grid', gap: '0.25rem' }}>
             <span>Research goal</span>
             <select
+              style={{ maxWidth: '100%' }}
               value={goalId}
               onChange={(e) => setGoalId(e.target.value)}
               style={{
@@ -280,6 +287,9 @@ export default function PlannerTool() {
           display: 'grid',
           gap: 'var(--space-3)',
           padding: 'var(--space-4)',
+          minWidth: 0,
+          maxWidth: '100%',
+          overflowX: 'auto',
           border: '1px solid var(--border-strong)',
           borderRadius: 'var(--radius)',
           background: 'var(--surface)',

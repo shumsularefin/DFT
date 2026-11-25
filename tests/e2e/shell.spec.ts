@@ -221,10 +221,12 @@ test.describe('navigation', () => {
     await expect(page.getByRole('link', { name: 'How to use this site' })).toBeVisible();
   });
 
-  test('tools page has no links to unbuilt tools, and nav anchors resolve', async ({ page }) => {
+  test('tools page has no unbuilt tools, and top-level tool routes resolve', async ({ page }) => {
     await page.goto('/tools/');
-    await expect(page.getByText('Coming soon')).toHaveCount(3);
-    for (const id of ['studio', 'builder', 'practice']) await expect(page.locator(`#${id}`)).toBeAttached();
+    await expect(page.getByText('Coming soon')).toHaveCount(0);
+    for (const href of ['/studio/', '/builder/', '/practice/']) {
+      await expect(page.locator(`header a[href="${href}"]`).first()).toBeAttached();
+    }
   });
 
   test('changelog renders the markdown', async ({ page }) => {
