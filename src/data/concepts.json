@@ -705,7 +705,7 @@
       "lattice-vectors"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "tolerance-factor",
@@ -716,7 +716,7 @@
       "perovskite-structure"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "worked-example-workflow",
@@ -729,7 +729,7 @@
       "band-structure"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "material-builder",
@@ -741,7 +741,7 @@
       "perovskite-structure"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "screening",
@@ -753,7 +753,7 @@
       "worked-example-workflow"
     ],
     "level": "pro",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "born-oppenheimer-approximation",
@@ -809,7 +809,7 @@
       "perovskite-structure"
     ],
     "level": "intermediate",
-    "status": "planned"
+    "status": "published"
   },
   {
     "id": "output-file-reference",

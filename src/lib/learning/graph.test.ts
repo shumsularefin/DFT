@@ -114,6 +114,12 @@ describe('shipped concept graph', () => {
       'dos-analysis',
       'band-structure-analysis',
       'charge-density-analysis',
+      'perovskite-structure',
+      'tolerance-factor',
+      'worked-example-workflow',
+      'material-builder',
+      'screening',
+      'ionic-radii',
     ]);
     for (const x of g.filter((y) => y.module >= 6))
       expect(x.status, x.id).toBe(m73.has(x.id) ? 'published' : 'planned');

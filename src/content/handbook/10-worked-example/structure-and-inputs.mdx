@@ -1,0 +1,85 @@
+---
+id: structure-and-inputs
+title: Structure and starting inputs
+module: 10
+order: 2
+summary: Preparing the RCuO3 POSCAR, choosing matching PAW POTCARs, and assembling a validator-clean starting INCAR and KPOINTS.
+concepts: [worked-example-workflow]
+requires: [perovskite-structure, poscar-file, incar-file]
+vaspTags: [ENCUT, PREC, ISPIN, MAGMOM]
+sources: [S-019, S-042]
+noLab: true
+status: draft
+updated: 2026-11-24
+---
+
+<Why>
+
+Every downstream comparison in a perovskite study depends on starting from a clean, symmetry-checked `POSCAR` and consistent `POTCAR` and `INCAR` settings <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+<Callout variant="note" title="Results pending: author data not yet supplied">
+
+This page presents the input-preparation protocol for `RCuO3`. Author-computed lattice constants and energies will be populated once files are added to `data/author/`.
+
+</Callout>
+
+Start by loading or building the candidate perovskite cell in the <a href="/builder/">Material Builder</a> so that bond lengths, minimum interatomic distances, and space-group symmetry are verified before exporting `POSCAR`. Next, concatenate the licensed PAW `POTCAR` files on your cluster in the exact species order printed on line 6 of `POSCAR` <Cite id="S-019" />.
+
+<Scene id="perovskite-octahedra" />
+
+Because copper oxides can carry unpaired $d$ electrons, keep `ISPIN = 2` ready and check whether rare-earth $4f$ electrons are treated in the core (using the VASP `_3` PAW potentials for trivalent lanthanides) or explicitly in valence <Cite id="S-042" />.
+
+</Intuition>
+
+<TheMath>
+
+When combining multiple elements in one `POTCAR`, the starting plane-wave cutoff for variable-cell relaxations follows the maximum `ENMAX` across all species <Cite id="S-042" />:
+
+$$E_{\mathrm{cut}} \ge 1.3 \times \max_{s} \mathrm{ENMAX}_s$$
+
+Holding this same `ENCUT` fixed across every stage of the project ensures clean energy differences.
+
+</TheMath>
+
+<InVasp>
+
+- Verify species order in `POSCAR` matches `grep TITEL POTCAR` on your cluster <Cite id="S-019" />.
+- Build the initial `INCAR` and Gamma-centered `KPOINTS` using the <a href="/tools/input-builder/">Input Builder</a>.
+- Run the pre-flight check in <a href="/tools/review/">Calculation Review</a> before submitting the first job <Cite id="S-042" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| Input file | Key check before submission                            | Tool on this site                                 |
+| ---------- | ------------------------------------------------------ | ------------------------------------------------- |
+| `POSCAR`   | No overlapping atoms; expected symmetry                | <a href="/builder/">Material Builder</a>          |
+| `INCAR`    | No conflicting tags; `ENCUT >= 1.3 x ENMAX`            | <a href="/tools/input-builder/">Input Builder</a> |
+| `KPOINTS`  | Gamma-centered mesh proportional to reciprocal lengths | <a href="/tools/kpath/">k-path and mesh tool</a>  |
+
+Why check inputs first: catching a species-order mismatch or missing tag locally saves hours of wasted queue time.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Switching POTCAR variants mid-project">
+
+Never compare total energies between a standard `Cu` potential and `Cu_pv`, or between different lanthanide `f`-in-core potentials. Keep the exact same `POTCAR` set for every calculation you compare.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m10-5', 'q-m10-6', 'q-m10-7', 'q-m10-8']} />
+
+<GoDeeper>
+
+- VASP wiki on PAW potentials and `POTCAR` selection <Cite id="S-019" />.
+- The author's VASP Workflow Handbook <Cite id="S-042" />.
+
+</GoDeeper>

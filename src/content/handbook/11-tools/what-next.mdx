@@ -1,0 +1,75 @@
+---
+id: what-next
+title: Where to go next
+module: 11
+order: 4
+summary: Moving from this handbook into independent DFT research, open-source Python ecosystems, and reproducible publication practices.
+concepts: [screening]
+requires: [material-builder, screening]
+vaspTags: []
+sources: [S-019, S-024, S-042]
+noLab: true
+status: draft
+updated: 2026-11-24
+---
+
+<Why>
+
+Finishing the handbook gives you the core mental models and browser tools to run trustworthy VASP workflows; the next step is scaling up to automated scripts and literature-grade verification <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+Once you are comfortable running single calculations and checking `OUTCAR` by hand, Python libraries such as `pymatgen`, `ASE`, and `phonopy` let you automate high-throughput workflows, phase diagrams, and full phonon dispersions across the entire Brillouin zone <Cite id="S-024" />. Keep returning to the <a href="/tools/review/">Calculation Review</a> and <a href="/errors/">Error Finder</a> whenever an automated job behaves unexpectedly.
+
+<Scene id="fcc" />
+
+For every calculation you plan to publish, verify your primary sources on <a href="/references/">References</a> and record every numerical parameter and convergence check in your supporting information <Cite id="S-019" />.
+
+</Intuition>
+
+<TheMath>
+
+Reproducibility in computational materials science rests on three pillars: exact input provenance (`POSCAR`, `INCAR`, `KPOINTS`, `POTCAR` titles), explicit convergence criteria, and honest reporting of functional limitations <Cite id="S-042" />.
+
+</TheMath>
+
+<InVasp>
+
+- Use <a href="/practice/">Practice</a> periodically so spaced repetition keeps key VASP rules and physics fresh.
+- Check <a href="/progress/">Progress</a> to see your mastery map across all modules.
+- Consult the official VASP wiki for newly released tags and version-specific defaults <Cite id="S-019" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| Next step                    | Best resource                                                                             | When to use                                 |
+| ---------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------- |
+| Start a new VASP calculation | <a href="/tools/planner/">Research Planner</a>                                            | Setting up a clean multi-step folder tree   |
+| Automate 50+ runs            | `pymatgen` / `ASE` / `atomate2`                                                           | High-throughput screening or phase diagrams |
+| Debug a failed job           | <a href="/errors/">Error Finder</a> &amp; <a href="/tools/review/">Calculation Review</a> | Diagnosing convergence or force errors      |
+
+Why combine interactive tools with scripting: visual inspection catches subtle geometric and physical mistakes that batch scripts silently overlook.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Running high-throughput scripts without spot-checking individual OUTCARs">
+
+Automated pipelines can silently accept unconverged electronic steps or collapsed magnetic moments if exit codes are the only check. Always audit representative runs manually.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m11-2', 'q-m11-4', 'q-m11-6', 'q-m11-8']} />
+
+<GoDeeper>
+
+- Official VASP Wiki <Cite id="S-019" /> and Materials Project documentation <Cite id="S-024" />.
+- Check all cited works on <a href="/references/">References</a>.
+
+</GoDeeper>

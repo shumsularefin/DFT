@@ -1,0 +1,78 @@
+---
+id: material-builder
+title: Tour of the Material Builder
+module: 11
+order: 2
+summary: Building and editing crystals, supercells, slabs, defects, and molecules in the browser with live validity checks and POSCAR/CIF export.
+concepts: [material-builder]
+requires: [poscar-file, perovskite-structure]
+vaspTags: [ISIF]
+sources: [S-021, S-041]
+noLab: true
+status: draft
+updated: 2026-11-24
+---
+
+<Why>
+
+Bad starting geometries such as overlapping atoms, polar uncompensated slabs, or tiny vacuum boxes are one of the fastest ways to waste VASP jobs <Cite id="S-041" />.
+
+</Why>
+
+<Intuition>
+
+The <a href="/builder/">Material Builder</a> combines two browser-only workspaces: **Crystal mode** for periodic solids (templates, supercells, Miller-index slabs, vacancies, substitutions, and strain) and **Molecule mode** for 2D sketching, 3D valence clean-up, and molecule-in-a-box `POSCAR` export.
+
+<Scene id="fcc" />
+
+In Crystal mode, a live chemistry-and-geometry validity panel runs rules `B001` through `B012` on every edit, flagging overlapping atoms, unrelaxed cell collapses, or thin vacuum before you export `POSCAR` or `CIF` <Cite id="S-021" />. Every edit supports undo/redo and one-click hand-off straight into the Input Builder, k-path tool, or Magnetic Configuration tool.
+
+</Intuition>
+
+<TheMath>
+
+Overlap checks compare every pair distance $d_{ij}$ (under periodic minimum-image convention) against the sum of Cordero single-bond covalent radii <Cite id="S-021" />:
+
+$$d_{ij} < f_{\mathrm{min}}\,(r_{\mathrm{cov}, i} + r_{\mathrm{cov}, j})$$
+
+Flagging severe overlaps before exporting prevents immediate VASP `ZHEGV` or ionic-step blow-ups.
+
+</TheMath>
+
+<InVasp>
+
+- Build or drop a `POSCAR`/`CIF` in <a href="/builder/">Material Builder</a> and resolve all error-level validity warnings before exporting.
+- For slabs and molecules in a box, keep vacuum padding $\ge 10$ to $15\text{ \AA}$ and use `ISIF = 2` (fixed cell) in VASP <Cite id="S-041" />.
+- Click **Send to Input Builder** or **Send to k-path** to keep the exact structure across tools without re-uploading.
+
+</InVasp>
+
+<WhatChanges>
+
+| Builder mode  | Core operations                                           | Export formats                |
+| ------------- | --------------------------------------------------------- | ----------------------------- |
+| Crystal mode  | Supercell, slab, vacancy, substitute, strain, standardize | `POSCAR`, `CIF`, hand-off     |
+| Molecule mode | 2D sketch, bond order, formal charge, 3D valence clean-up | `XYZ`, `MOL`, `POSCAR` in box |
+
+Why validate in the browser: geometric bugs are caught in milliseconds before touching an HPC queue.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Treating the 3D molecule clean-up as a DFT-optimized geometry">
+
+Molecule mode's 3D clean-up uses a fast valence-geometry heuristic to produce a clean starting geometry; always relax the molecule in VASP (or a quantum-chemistry code) before computing properties.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m11-5', 'q-m11-6', 'q-m11-7', 'q-m11-8']} />
+
+<GoDeeper>
+
+- Open the <a href="/builder/">Material Builder</a> to try both Crystal and Molecule modes.
+- Cordero et al. (2008) covalent radii used in the overlap checks <Cite id="S-021" />.
+
+</GoDeeper>

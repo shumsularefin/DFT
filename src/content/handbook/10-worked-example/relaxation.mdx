@@ -1,0 +1,84 @@
+---
+id: relaxation
+title: Structural relaxation of RCuO3
+module: 10
+order: 4
+summary: Relaxing cell parameters and octahedral tilts cleanly with ISIF = 3, followed by a static confirmation run on CONTCAR.
+concepts: [worked-example-workflow]
+requires: [relaxation-analysis]
+vaspTags: [IBRION, ISIF, EDIFFG]
+sources: [S-019, S-042]
+noLab: true
+status: draft
+updated: 2026-11-24
+---
+
+<Why>
+
+Perovskite stability and electronic structure depend sensitively on octahedral tilting and Cu-O bond lengths, so the crystal must be relaxed to tight force and stress tolerances before computing DOS or bands <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+<Callout variant="note" title="Results pending: author data not yet supplied">
+
+This page documents the structural relaxation protocol for `RCuO3`. Relaxed lattice parameters, bond lengths, and final energies will be added once the author's VASP files are supplied in `data/author/`.
+
+</Callout>
+
+Run a variable-cell ionic relaxation (`ISIF = 3`, `IBRION = 2`) at the converged `ENCUT` ($\ge 1.3 \times \mathrm{ENMAX}$) until `OUTCAR` reports `reached required accuracy` and every residual force falls below `|EDIFFG|` <Cite id="S-019" />. Afterward, copy `CONTCAR` to `POSCAR` and run one clean static calculation (`IBRION = -1`, `NSW = 0`) so the plane-wave basis is built directly for the relaxed cell <Cite id="S-042" />.
+
+<Scene id="perovskite-octahedra" />
+
+Drop the finished `OUTCAR`, `OSZICAR`, `POSCAR`, and `CONTCAR` into <a href="/tools/review/">Calculation Review</a> to verify force convergence, electronic convergence, volume change, and whether the space group changed during relaxation.
+
+</Intuition>
+
+<TheMath>
+
+At equilibrium, both the atomic forces and the stress tensor vanish within numerical tolerances:
+
+$$\max_{I} \|\mathbf{F}_I\| < |\mathrm{EDIFFG}|, \qquad \sigma_{\alpha\beta} \approx 0$$
+
+For high-precision lattice constants without Pulay-stress bias, fit a fixed-volume energy-volume curve using the <a href="/tools/eos/">Equation of state fit</a> tool <Cite id="S-042" />.
+
+</TheMath>
+
+<InVasp>
+
+- Use `ISIF = 3` for bulk relaxation and check that `ENCUT >= 1.3 x ENMAX` <Cite id="S-042" />.
+- Always follow a variable-cell relaxation with a static run on `CONTCAR` <Cite id="S-019" />.
+- Inspect the trajectory and final forces in <a href="/tools/review/">Calculation Review</a>.
+
+</InVasp>
+
+<WhatChanges>
+
+| Stage               | `IBRION` / `ISIF`        | Purpose                                      |
+| ------------------- | ------------------------ | -------------------------------------------- |
+| Bulk relaxation     | `IBRION = 2`, `ISIF = 3` | Relax cell shape, volume, and internal tilts |
+| Static confirmation | `IBRION = -1`, `NSW = 0` | Rebuild plane-wave basis on final `CONTCAR`  |
+
+Why run a static step after `ISIF = 3`: the FFT grid and plane-wave sphere stay tied to the starting cell during a single `ISIF = 3` run.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Using the energy from the last step of a large-volume-change ISIF = 3 run">
+
+If the cell volume changes significantly during relaxation, the final step's plane-wave basis no longer matches `ENCUT`. Always copy `CONTCAR` to `POSCAR` and run a fresh static step.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m10-13', 'q-m10-14', 'q-m10-15', 'q-m10-16']} />
+
+<GoDeeper>
+
+- VASP wiki on `ISIF`, `IBRION`, and `EDIFFG` <Cite id="S-019" />.
+- The author's VASP Workflow Handbook on relaxation and static follow-up <Cite id="S-042" />.
+
+</GoDeeper>

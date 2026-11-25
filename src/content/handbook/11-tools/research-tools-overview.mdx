@@ -1,0 +1,74 @@
+---
+id: research-tools-overview
+title: Research tools overview
+module: 11
+order: 3
+summary: A map of every browser tool on this site and how they connect across a real VASP research workflow.
+concepts: [material-builder, screening]
+requires: [material-builder, screening]
+vaspTags: []
+sources: [S-041, S-042]
+noLab: true
+status: draft
+updated: 2026-11-24
+---
+
+<Why>
+
+Real DFT projects move back and forth between structure building, input preparation, convergence checks, diagnostics, and post-processing; knowing which tool handles each stage keeps your workflow fast and consistent <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+Every tool on the <a href="/tools/">Tools</a> page runs 100% locally in your browser with zero file uploads to any server. They share a common structure hand-off format so you can move a crystal from screening to building, input generation, k-path selection, magnetic ordering, and calculation review without re-typing coordinates <Cite id="S-041" />.
+
+<Scene id="reciprocal-fcc" />
+
+Use the <a href="/tools/planner/">Research Planner</a> whenever you start a new calculation goal: it connects the right presets, checks, pitfalls, and calculators into a downloadable starter zip.
+
+</Intuition>
+
+<TheMath>
+
+Every quantitative tool on this site separates **exact/computed** results (evaluated directly from your uploaded files or exact constants) from **heuristics** (such as tolerance factors or runtime buckets) and **toy models** (educational 1D/2D labs), marked with explicit badges.
+
+</TheMath>
+
+<InVasp>
+
+- Pre-run: <a href="/tools/tolerance-factor/">Tolerance-factor explorer</a>, <a href="/builder/">Material Builder</a>, <a href="/tools/planner/">Research Planner</a>, <a href="/tools/input-builder/">Input Builder</a>, <a href="/tools/kpath/">k-path tool</a>, and <a href="/tools/magnetic/">Magnetic tool</a>.
+- During/post-run: <a href="/tools/convergence/">Convergence plotter</a>, <a href="/tools/eos/">Equation of state fit</a>, <a href="/tools/review/">Calculation review</a>, <a href="/tools/work-function/">Work function &amp; charge difference</a>, and <a href="/errors/">Error finder</a>.
+
+</InVasp>
+
+<WhatChanges>
+
+| Stage             | Primary tool                                                                                            | Output                                               |
+| ----------------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| Plan & inputs     | <a href="/tools/planner/">Research Planner</a> &amp; <a href="/tools/input-builder/">Input Builder</a>  | Validated `INCAR`, `KPOINTS`, `POSCAR`, `PLAN.md`    |
+| Convergence & EOS | <a href="/tools/convergence/">Convergence</a> &amp; <a href="/tools/eos/">EOS fit</a>                   | Settling curves, $V_0$, $B_0$                        |
+| Audit & analysis  | <a href="/tools/review/">Calculation Review</a> &amp; <a href="/tools/work-function/">Work Function</a> | Markdown lab report, $\Phi = V_{\mathrm{vac}} - E_F$ |
+
+Why use local browser tools: your unpublished research structures and outputs never leave your machine.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Skipping post-flight checks because VASP exited without crashing">
+
+A VASP run can finish with exit code 0 while still hitting `NELM`, having large smearing entropy, or collapsing an antiferromagnetic state to ferromagnetic. Always inspect `OUTCAR` and `OSZICAR` in Calculation Review.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m11-1', 'q-m11-3', 'q-m11-5', 'q-m11-7']} />
+
+<GoDeeper>
+
+- Browse the full directory on the <a href="/tools/">Tools</a> page.
+- Practice key concepts anytime on <a href="/practice/">Practice</a>.
+
+</GoDeeper>

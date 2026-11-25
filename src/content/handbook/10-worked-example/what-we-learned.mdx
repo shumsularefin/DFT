@@ -1,0 +1,82 @@
+---
+id: what-we-learned
+title: What the worked example teaches
+module: 10
+order: 6
+summary: Reviewing the full decision chain from geometric screening to verified electronic structure, and what to record in a methods section.
+concepts: [worked-example-workflow]
+requires: [worked-example-workflow]
+vaspTags: []
+sources: [S-001, S-002, S-042]
+noLab: true
+status: draft
+updated: 2026-11-24
+---
+
+<Why>
+
+A trustworthy DFT study is defined by its reproducible decision chain: every choice from starting geometry to convergence threshold and post-flight check must be documented <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+<Callout variant="note" title="Results pending: author data not yet supplied">
+
+This summary closes the `RCuO3` worked-example protocol. Quantitative takeaways from the author's VASP outputs will be added once files are placed in `data/author/`.
+
+</Callout>
+
+Across the five stages of this worked example, each step fed directly into the next: tolerance-factor screening prioritized candidate compositions <Cite id="S-001" /> <Cite id="S-002" />, structure checks verified the starting cell, convergence testing locked in `ENCUT` and k-mesh spacing, variable-cell relaxation plus static confirmation established the equilibrium geometry, and fixed-potential non-SCF runs produced the DOS and band structure <Cite id="S-042" />.
+
+<Scene id="perovskite-octahedra" />
+
+You can generate this entire multi-step folder hierarchy and methods checklist automatically for your own material using the <a href="/tools/planner/">Research Planner</a>.
+
+</Intuition>
+
+<TheMath>
+
+Every methods section should report the exact inputs that fix the numerical energy surface: functional, `POTCAR` titles, `ENCUT`, k-mesh spacing, `EDIFF`, `EDIFFG`, smearing (`ISMEAR`, `SIGMA`), and any spin (`ISPIN`, `MAGMOM`) or $+U$ parameters <Cite id="S-042" />.
+
+</TheMath>
+
+<InVasp>
+
+- Archive `INCAR`, `POSCAR`, `KPOINTS`, `CONTCAR`, `OSZICAR`, and key `OUTCAR` metrics for every production run.
+- Export the Markdown report from <a href="/tools/review/">Calculation Review</a> straight into your lab notebook.
+- Never share licensed `POTCAR` files in public repositories; record their `TITEL` lines instead.
+
+</InVasp>
+
+<WhatChanges>
+
+| Workflow stage       | Output carried forward  | Verification check                           |
+| -------------------- | ----------------------- | -------------------------------------------- | ------ | ------------------------- |
+| Screening            | Candidate stoichiometry | Tolerance factor & oxidation states recorded |
+| Convergence          | Locked `ENCUT` & k-mesh | Energy/atom plateau verified                 |
+| Relaxation + Static  | `CONTCAR` & `CHGCAR`    | Max force `<                                 | EDIFFG | `, entropy `< 1 meV/atom` |
+| Electronic structure | `DOSCAR` & `EIGENVAL`   | Fermi alignment and path labels checked      |
+
+Why document every link in the chain: another researcher (or your future self) can reproduce every number without guessing hidden defaults.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Publishing results without recording POTCAR titles and smearing">
+
+Saying only "we used PBE in VASP" leaves out the PAW variant, `ENCUT`, k-mesh, and smearing width, making the calculation impossible to reproduce reliably.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m10-1', 'q-m10-5', 'q-m10-12', 'q-m10-16']} />
+
+<GoDeeper>
+
+- Open the <a href="/tools/planner/">Research Planner</a> to build a downloadable zip for your own project.
+- Continue to Module 11 for a guided tour of all browser tools on this site.
+
+</GoDeeper>

@@ -1,0 +1,316 @@
+[
+  {
+    "id": "q-m11-1",
+    "concepts": [
+      "screening"
+    ],
+    "type": "single",
+    "prompt": "What does an energy above the convex hull (E_hull) equal to 0 eV/atom indicate in a materials database?",
+    "options": [
+      {
+        "text": "The phase is predicted to be thermodynamically stable against competing phases in that database at 0 K",
+        "correct": true,
+        "why": "On-hull phases have E_hull = 0 relative to the competing entries in the same functional set."
+      },
+      {
+        "text": "The material has a zero band gap and must be a metal",
+        "correct": false,
+        "why": "E_hull measures thermodynamic stability, not electronic band gap."
+      },
+      {
+        "text": "The calculation failed to converge",
+        "correct": false,
+        "why": "E_hull = 0 means the entry sits on the lower convex hull."
+      }
+    ],
+    "hints": [
+      "Distinguish thermodynamic phase stability from electronic band structure.",
+      "Review the summary table and callouts on the topic page."
+    ],
+    "difficulty": -0.3,
+    "level": "beginner",
+    "sources": [
+      "S-024"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "Candidate screening by thermodynamic stability.",
+      "alt": "Perovskite screening candidate."
+    }
+  },
+  {
+    "id": "q-m11-2",
+    "concepts": [
+      "screening"
+    ],
+    "type": "single",
+    "prompt": "Why should you treat band gaps listed in a high-throughput GGA/GGA+U database with caution?",
+    "options": [
+      {
+        "text": "Semi-local GGA functionals systematically underestimate semiconductor and insulator band gaps",
+        "correct": true,
+        "why": "Derivative discontinuity errors in semi-local DFT lead to underestimated gaps."
+      },
+      {
+        "text": "Databases only store optical absorption coefficients, not band gaps",
+        "correct": false,
+        "why": "Materials Project stores Kohn-Sham band gaps, which reflect the chosen functional."
+      },
+      {
+        "text": "GGA always overestimates band gaps by a factor of three",
+        "correct": false,
+        "why": "Semi-local GGA underestimates rather than overestimates band gaps."
+      }
+    ],
+    "hints": [
+      "Recall the functional ladder and band-gap problem from Module 5.",
+      "Review the summary table and callouts on the topic page."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-024",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "reciprocal-fcc",
+      "caption": "Band-gap screening caveats in semi-local DFT catalogs.",
+      "alt": "Reciprocal-space Brillouin zone."
+    }
+  },
+  {
+    "id": "q-m11-3",
+    "concepts": [
+      "screening"
+    ],
+    "type": "single",
+    "prompt": "Why does the Screening Studio display a prominent synthetic-data banner when running on sample fixtures?",
+    "options": [
+      {
+        "text": "So demonstration rows are never mistaken for real Materials Project entries before an author data pull",
+        "correct": true,
+        "why": "Honest provenance prevents users from citing synthetic test rows as real materials data."
+      },
+      {
+        "text": "Because browser JavaScript cannot read real JSON files",
+        "correct": false,
+        "why": "The same query engine reads both the sample fixture and the real snapshot."
+      },
+      {
+        "text": "Because CSV export only works on synthetic data",
+        "correct": false,
+        "why": "CSV export works on any loaded snapshot."
+      }
+    ],
+    "hints": [
+      "Think about scientific honesty and data provenance.",
+      "Review the summary table and callouts on the topic page."
+    ],
+    "difficulty": -0.4,
+    "level": "beginner",
+    "sources": [
+      "S-024"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "Provenance transparency in the Screening Studio.",
+      "alt": "Perovskite candidate visual."
+    }
+  },
+  {
+    "id": "q-m11-4",
+    "concepts": [
+      "screening"
+    ],
+    "type": "single",
+    "prompt": "Why is filtering by site count (nsites) useful before launching a first VASP project from a screening shortlist?",
+    "options": [
+      {
+        "text": "Plane-wave DFT scales steeply with atom count and volume, so smaller cells give faster starter runs",
+        "correct": true,
+        "why": "Keeping starter cells compact makes convergence testing and debugging practical."
+      },
+      {
+        "text": "VASP rejects any POSCAR with more than 10 atoms",
+        "correct": false,
+        "why": "VASP supports large supercells, but compute cost grows rapidly with atom count."
+      },
+      {
+        "text": "Larger cells never require k-points",
+        "correct": false,
+        "why": "k-mesh density depends on reciprocal lattice lengths, not just atom count."
+      }
+    ],
+    "hints": [
+      "Think about computational scaling with electron count.",
+      "Review the summary table and callouts on the topic page."
+    ],
+    "difficulty": -0.2,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "scene": "fcc",
+      "caption": "Cell size directly impacts DFT runtime.",
+      "alt": "Unit cell illustration."
+    }
+  },
+  {
+    "id": "q-m11-5",
+    "concepts": [
+      "material-builder"
+    ],
+    "type": "single",
+    "prompt": "What does the live validity panel in the Material Builder check before you export a POSCAR?",
+    "options": [
+      {
+        "text": "Geometric and chemical issues such as overlapping atoms, collapsed cells, or thin vacuum",
+        "correct": true,
+        "why": "Catching severe overlaps and cell issues locally prevents immediate VASP failures."
+      },
+      {
+        "text": "Whether your HPC cluster queue is currently empty",
+        "correct": false,
+        "why": "The Material Builder runs offline in the browser with no cluster connection."
+      },
+      {
+        "text": "The exact experimental melting point of the crystal",
+        "correct": false,
+        "why": "Validity rules check structure geometry and chemistry, not melting points."
+      }
+    ],
+    "hints": [
+      "Recall rules B001 through B012 in the Material Builder.",
+      "Review the summary table and callouts on the topic page."
+    ],
+    "difficulty": -0.4,
+    "level": "beginner",
+    "sources": [
+      "S-021",
+      "S-041"
+    ],
+    "visual": {
+      "scene": "fcc",
+      "caption": "Structure validation prior to POSCAR export.",
+      "alt": "Crystal unit cell."
+    }
+  },
+  {
+    "id": "q-m11-6",
+    "concepts": [
+      "material-builder"
+    ],
+    "type": "single",
+    "prompt": "Which ISIF setting should you use in VASP when relaxing a slab or a molecule placed in a vacuum box?",
+    "options": [
+      {
+        "text": "ISIF = 2 (relax atomic positions while keeping cell shape and volume fixed)",
+        "correct": true,
+        "why": "ISIF = 3 would collapse the vacuum gap."
+      },
+      {
+        "text": "ISIF = 3 (relax cell volume and shape freely)",
+        "correct": false,
+        "why": "ISIF = 3 shrinks the vacuum region around a slab or molecule."
+      },
+      {
+        "text": "ISIF = 7 (change volume only)",
+        "correct": false,
+        "why": "Volume relaxation collapses the vacuum gap."
+      }
+    ],
+    "hints": [
+      "Think about what happens to empty vacuum space if VASP optimizes the cell volume.",
+      "Review the summary table and callouts on the topic page."
+    ],
+    "difficulty": -0.2,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "scene": "miller-111-fcc",
+      "caption": "Surface slab with fixed vacuum padding.",
+      "alt": "FCC 111 surface slab."
+    }
+  },
+  {
+    "id": "q-m11-7",
+    "concepts": [
+      "material-builder"
+    ],
+    "type": "single",
+    "prompt": "How does the Material Builder detect severely overlapping atoms in a periodic crystal?",
+    "options": [
+      {
+        "text": "By comparing periodic minimum-image pair distances against Cordero covalent radii",
+        "correct": true,
+        "why": "Periodic minimum-image checks catch overlaps both inside the cell and across cell boundaries."
+      },
+      {
+        "text": "By running a full VASP SCF calculation in the browser",
+        "correct": false,
+        "why": "The overlap check is a fast geometric distance check."
+      },
+      {
+        "text": "By checking only the file size in bytes",
+        "correct": false,
+        "why": "File size says nothing about interatomic distances."
+      }
+    ],
+    "hints": [
+      "Check the source cited in the Material Builder tour.",
+      "Review the summary table and callouts on the topic page."
+    ],
+    "difficulty": 0.1,
+    "level": "intermediate",
+    "sources": [
+      "S-021"
+    ],
+    "visual": {
+      "scene": "fcc",
+      "caption": "Minimum-image distance check in a periodic cell.",
+      "alt": "FCC crystal lattice."
+    }
+  },
+  {
+    "id": "q-m11-8",
+    "concepts": [
+      "material-builder"
+    ],
+    "type": "single",
+    "prompt": "What is the purpose of Molecule mode's 'Clean up in 3D' button?",
+    "options": [
+      {
+        "text": "It generates a rough starting 3D geometry for DFT using a valence-geometry heuristic, not a final quantum-chemical optimization",
+        "correct": true,
+        "why": "The 3D clean-up gives a reasonable starting POSCAR/XYZ that still needs DFT relaxation."
+      },
+      {
+        "text": "It runs CCSD(T) in the browser to compute exact bond lengths",
+        "correct": false,
+        "why": "It uses a lightweight local valence-geometry heuristic labelled with a Heuristic badge."
+      },
+      {
+        "text": "It deletes all hydrogen atoms before export",
+        "correct": false,
+        "why": "It expands explicit hydrogens so every atom has 3D coordinates."
+      }
+    ],
+    "hints": [
+      "Remember the Heuristic badge shown on Molecule mode's 3D clean-up panel.",
+      "Review the summary table and callouts on the topic page."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-021"
+    ],
+    "visual": {
+      "scene": "diamond",
+      "caption": "Tetrahedral 3D starting geometry.",
+      "alt": "3D tetrahedral molecular/crystal geometry."
+    }
+  }
+]
