@@ -2,7 +2,7 @@
 
 An interactive site that takes a complete beginner to a first sensible VASP project, with research tools for working scientists: a Perovskite Tolerance Factor Explorer, a VASP Input Builder with convergence helper, a Brillouin zone and k-path viewer, a Screening Studio on Materials Project data, and a Material Builder. Everything runs in the browser on Firebase Hosting's free Spark plan.
 
-**Status:** planning complete, no application code yet. This repository is a build environment: rules, a verified specification, 53 stage work orders, golden reference data and automated guards, so that a model can build the site one stage at a time and an independent reviewer can check it afterwards.
+**Status:** all 11 handbook modules, browser tools, guards, and release-prep checks are built and verified (`M11.3` complete; `M7.6` Module 10 results await author VASP outputs in `data/author/`). Search indexing stays off on `main` (`INDEXING_ENABLED = false`) until the author merges `chore/enable-indexing` after independent review using [`docs/AUDIT_PACKAGE.md`](docs/AUDIT_PACKAGE.md).
 
 ## How the work is organised
 

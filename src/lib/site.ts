@@ -5,8 +5,9 @@ export const SITE = {
 } as const;
 
 /**
- * Pages stay out of search engines until the release stage (D-027). M11.3 flips this one constant;
- * it drives the robots meta tag, robots.txt and the sitemap.
+ * Pages stay out of search engines until the release stage (D-027). The unmerged
+ * `chore/enable-indexing` branch flips this one constant; it drives the robots meta tag,
+ * robots.txt and the sitemap.
  */
 export const INDEXING_ENABLED = false;
 
@@ -27,13 +28,13 @@ export const MODULES = [
 
 export const moduleName = (n: number): string => MODULES[n - 1] ?? `Module ${n}`;
 
-/** Top navigation. Tools that do not exist yet point at their "coming soon" card on /tools/. */
+/** Top navigation. */
 export const NAV = [
   { label: 'Learn', href: '/learn/' },
   { label: 'Handbook', href: '/handbook/' },
   { label: 'Tools', href: '/tools/' },
-  { label: 'Studio', href: '/tools/#studio' },
-  { label: 'Builder', href: '/tools/#builder' },
+  { label: 'Studio', href: '/studio/' },
+  { label: 'Builder', href: '/builder/' },
   { label: 'Practice', href: '/practice/' },
 ] as const;
 
