@@ -72,6 +72,8 @@ The t-mu map needs region boundaries from the literature. Derivable without a ci
 ## Q-006. Firebase Spark plan limits
 v1 of the SPEC says hosting transfer is 10 GB per month in current sources but 360 MB per day in older ones. firebase.google.com was unreachable when checked, so neither is confirmed, nor the Firestore figures (1 GiB storage, 50K reads, 20K writes, 20K deletes per day) or whether Cloud Storage for Firebase is unavailable on Spark. **Design rule until closed:** assume the stricter 360 MB/day. **Close:** author opens the pricing page and records the current numbers here; M0.2 and M11.1 re-compute the page-weight budget against them.
 
+**M11.1 update (2026-11-24):** Transfer estimates against the 360 MB/day conservative floor are recorded in `docs/reports/M11.1.md` (~26,000 cold landing visits/day, ~2,700 cold handbook visits/day, ~140 cold Molecule-mode RDKit visits/day; repeat visits served from Service Worker cache).
+
 ## Q-007. Network access for builder sessions
 Builders cannot verify against papers or the VASP wiki if the cloud environment blocks them. Suggested allowed domains: `vasp.at`, `www.vasp.at`, `arxiv.org`, `export.arxiv.org`, `doi.org`, `pmc.ncbi.nlm.nih.gov`, `firebase.google.com`, `docs.astro.build`, `github.com`, `raw.githubusercontent.com`, `spglib.readthedocs.io`, `pymatgen.org`, `docs.materialsproject.org`, `abulafia.mt.ic.ac.uk`. See `docs/SETUP_FIREBASE.md` section 5 for where to set it. Without it, stages still run but record "could not verify against source" items here. **Owner: author.** **Update 2026-11-18 (M13.1, M7.1):** `vasp.at` was reachable from these builder sessions; the VASP wiki pages MAGMOM, GGA, IMIX, AMIX, BMIX, NELM and NBANDS were read. Other domains were not tested.
 
