@@ -1,10 +1,13 @@
-/* Design language v3 (D-054): terminal-minimal. Interface text is JetBrains Mono, prose stays IBM Plex Sans.
-   One accent (clay), 1 px borders, no gradients, no deep shadows. Colour values live in tokens.css. */
+/* macOS scientific desktop UI theme:
+   Cool aluminum window canvas (#eef1f6), crisp white rounded panels (#ffffff),
+   segmented control navigation with vivid macOS cobalt blue active state (#1463d1),
+   clean system sans-serif UI with tabular monospace for numbers and readouts. */
 
 body {
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
 }
 main {
   flex: 1 0 auto;
@@ -13,10 +16,11 @@ h1,
 h2,
 h3,
 h4 {
-  font-weight: 500;
+  font-weight: 700;
+  letter-spacing: -0.015em;
 }
 
-/* Interface face: nav, sidebar, buttons, badges, readouts, tables of numbers, breadcrumbs, status line, palette. */
+/* Clean sans-serif for interface chrome; tabular monospace for numbers and code. */
 .site-header,
 .site-footer,
 .breadcrumbs,
@@ -24,7 +28,6 @@ h4 {
 .prevnext,
 .btn,
 .badge,
-.readout,
 .level-switch button,
 .progress-btn,
 .progress-pop,
@@ -35,45 +38,163 @@ h4 {
 .stepper,
 .skip-link,
 .card-title,
-td.num,
-table.numeric,
 button,
 summary {
+  font-family: var(--font-sans);
+}
+
+.readout,
+td.num,
+table.numeric,
+.slider-value,
+.status-line {
   font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
+
+/* Top macOS desktop toolbar header */
+.site-header {
+  background: var(--chrome-bg);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.65) inset;
+}
+:root[data-theme='dark'] .site-header {
+  box-shadow: none;
+}
+
 .brand {
-  font-weight: 500;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
-.brand::before {
-  content: '> ';
-  color: var(--accent);
-}
+
 .site-footer {
   border-top: 1px solid var(--border);
+  background: var(--chrome-bg);
 }
 
-/* Navigation: the active item is the accent. */
+/* Segmented control navigation (desktop) */
 .nav-list a {
   font-size: var(--step--1);
-}
-.nav-list a[aria-current='page'] {
-  color: var(--accent);
   font-weight: 500;
-  border-bottom-width: 2px;
+}
+@media (min-width: 64rem) {
+  .nav-list {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-1);
+  }
+  .nav-list li + li a {
+    border-inline-start: 1px solid var(--border);
+  }
+  .nav-list a {
+    min-height: 2.35rem;
+    padding: 0 0.9rem;
+    border-bottom: 0;
+    transition:
+      background-color var(--dur-fast),
+      color var(--dur-fast);
+  }
+  .nav-list a:hover {
+    background: var(--surface-2);
+  }
+  .nav-list a[aria-current='page'] {
+    background: var(--accent);
+    color: var(--accent-contrast);
+    font-weight: 600;
+    border-bottom: 0;
+  }
+  .nav-list a[aria-current='page']:hover {
+    background: var(--accent);
+    filter: brightness(0.95);
+  }
 }
 
-/* Panels: 1 px bordered blocks, no shadow. */
+/* Mobile nav active pill */
+@media (max-width: 63.99rem) {
+  .nav-list a[aria-current='page'] {
+    background: var(--accent);
+    color: var(--accent-contrast);
+    border-radius: var(--radius);
+    border-bottom: 0;
+    font-weight: 600;
+  }
+}
+
+/* Crisp macOS toolbar buttons */
+.progress-btn,
+.theme-toggle,
+.menu-btn,
+.search-form input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-1);
+}
+.progress-btn:hover,
+.theme-toggle:hover,
+.menu-btn:hover {
+  background: var(--surface-2);
+}
+
+/* Crisp white rounded panels with subtle elevation */
 .card,
 .callout,
 .readout,
 .search-results,
 .progress-pop,
-.help-dialog {
-  box-shadow: none;
+.help-dialog,
+.lab-shell {
+  background: var(--surface);
   border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
 }
 
-/* Step lists: filled circle for a step, corner connector for a nested result. Text equivalents live in the markup. */
+/* Form controls: crisp macOS rounded inputs and selects */
+input[type='text'],
+input[type='number'],
+input[type='search'],
+select,
+textarea {
+  font-family: var(--font-sans);
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: inset 0 1px 1px rgb(15 23 42 / 0.04);
+}
+input[type='number'] {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Clean scientific data tables */
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  font-variant-numeric: tabular-nums;
+}
+thead th {
+  background: var(--surface-2);
+  color: var(--text);
+  font-weight: 600;
+  font-size: var(--step--1);
+  border-bottom: 1px solid var(--border);
+}
+tbody td {
+  border-bottom: 1px solid var(--border);
+}
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* Step lists */
 .step-list {
   list-style: none;
   padding: 0;
@@ -94,9 +215,9 @@ summary {
   content: '\23BF\00a0';
 }
 
-/* Busy indicator: a short monospace label with a slow pulse; static under reduced motion. */
+/* Busy indicator */
 .busy {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--step--1);
   color: var(--text-muted);
 }
@@ -115,7 +236,7 @@ summary {
   }
 }
 
-/* Landing: a session prompt and a short list of starting points. */
+/* Landing workspace: macOS search bar + crisp white card grid */
 .session {
   padding-block: var(--space-6);
 }
@@ -124,71 +245,93 @@ summary {
   align-items: center;
   gap: var(--space-3);
   width: 100%;
-  min-height: 3.5rem;
+  min-height: 3.25rem;
   padding: 0 var(--space-4);
   font: inherit;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--step-0);
   color: var(--text-muted);
   text-align: start;
   background: var(--surface);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
   cursor: pointer;
+  transition:
+    border-color var(--dur-fast),
+    box-shadow var(--dur-fast);
 }
 .session-prompt:hover {
   border-color: var(--accent);
+  box-shadow: var(--shadow-2);
 }
 .session-prompt .prompt-mark {
   color: var(--accent);
+  font-weight: 700;
 }
 .session-prompt kbd {
   margin-inline-start: auto;
+  padding: 0.15rem 0.45rem;
   font-size: var(--step--1);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
 }
 .starts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: var(--space-3);
   list-style: none;
   padding: 0;
   margin: var(--space-5) 0;
   max-width: none;
-  font-family: var(--font-mono);
 }
 .starts li {
   margin: 0;
-  border-bottom: 1px solid var(--border);
 }
 .starts a {
   display: flex;
-  gap: var(--space-3);
-  align-items: baseline;
-  min-height: var(--target);
-  padding: var(--space-2) var(--space-1);
+  flex-direction: column;
+  gap: var(--space-1);
+  min-height: 100%;
+  padding: var(--space-3) var(--space-4);
   color: var(--text);
   text-decoration: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+  transition:
+    border-color var(--dur-fast),
+    box-shadow var(--dur-fast);
 }
 .starts a:hover {
-  background: var(--surface);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-2);
 }
-.starts a::before {
-  content: '>';
-  color: var(--accent);
+.starts a span {
+  font-weight: 600;
+  color: var(--text);
 }
 .starts small {
   color: var(--text-muted);
   font-family: var(--font-sans);
+  font-size: var(--step--1);
 }
 
-/* Command palette (created on first open by chrome/palette.ts). */
+/* Command palette (macOS Spotlight style) */
 .palette {
   width: min(40rem, 100vw - 1.5rem);
   max-height: 80dvh;
   margin: 10dvh auto auto;
   padding: 0;
   color: var(--text);
-  background: var(--bg);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius);
-  font-family: var(--font-mono);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-2);
+  font-family: var(--font-sans);
   overflow: hidden;
 }
 .palette[open] {
@@ -196,7 +339,8 @@ summary {
   flex-direction: column;
 }
 .palette::backdrop {
-  background: rgb(0 0 0 / 0.45);
+  background: rgb(15 23 42 / 0.35);
+  backdrop-filter: blur(2px);
 }
 .palette-row {
   display: flex;
@@ -207,6 +351,7 @@ summary {
 }
 .palette-prompt {
   color: var(--accent);
+  font-weight: 700;
 }
 .palette-input {
   flex: 1;
@@ -215,6 +360,7 @@ summary {
   color: var(--text);
   background: transparent;
   border: 0;
+  box-shadow: none;
 }
 .palette-input:focus-visible {
   outline: none;
@@ -242,8 +388,12 @@ summary {
   font-size: var(--step--1);
 }
 .palette-opt[aria-selected='true'] {
-  background: var(--surface-2);
-  box-shadow: inset 2px 0 0 var(--accent);
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+.palette-opt[aria-selected='true'] .palette-group {
+  color: var(--accent-contrast);
+  opacity: 0.85;
 }
 .palette-group {
   color: var(--text-muted);
@@ -255,5 +405,6 @@ summary {
   max-width: none;
   color: var(--text-muted);
   font-size: var(--step--1);
+  background: var(--chrome-bg);
   border-top: 1px solid var(--border);
 }

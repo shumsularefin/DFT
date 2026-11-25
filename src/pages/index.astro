@@ -3,32 +3,78 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Callout from '../components/ui/Callout.astro';
 import { SITE } from '../lib/site';
 
-// Starting points. Magnetic orderings has no tool yet (M13.2), so it is listed as "coming" rather than linked.
 const starts = [
-  { href: '/handbook/', label: 'Start learning', note: 'short topics, three reading levels' },
-  { href: '/tools/input-builder/', label: 'Build a structure', note: 'POSCAR from lattice and atoms' },
+  {
+    href: '/learn/',
+    label: 'Guided path',
+    note: '14 interactive stations from one atom to your first VASP run',
+  },
+  { href: '/handbook/', label: 'Handbook', note: '11 modules, 65 topics, three reading levels' },
   {
     href: '/tools/input-builder/',
-    label: 'Prepare VASP inputs',
-    note: 'INCAR, KPOINTS and job script with checks',
+    label: 'VASP Input Builder',
+    note: 'INCAR, KPOINTS, POSCAR, convergence series and job scripts',
   },
-  { href: '/tools/kpath/', label: 'k-path', note: 'Brillouin zone and band-structure path' },
-  { href: '/tools/convergence/', label: 'Convergence', note: 'plot ENCUT and k-point tests' },
+  {
+    href: '/builder/',
+    label: 'Material Builder',
+    note: 'Crystal editor, slabs, defects and RDKit molecule builder',
+  },
+  {
+    href: '/studio/',
+    label: 'Screening Studio',
+    note: 'Filter Materials Project structures and check DFT feasibility',
+  },
+  {
+    href: '/tools/planner/',
+    label: 'Research Planner',
+    note: 'Goal-to-workflow protocols with downloadable project zips',
+  },
+  {
+    href: '/tools/magnetic/',
+    label: 'Magnetic orderings',
+    note: 'Collinear FM/AFM supercells, MAGMOM and Heisenberg J fit',
+  },
+  {
+    href: '/tools/kpath/',
+    label: 'k-path & Brillouin zone',
+    note: 'HPKOT and Setyawan-Curtarolo band paths in 3D',
+  },
+  {
+    href: '/tools/convergence/',
+    label: 'Convergence & EOS',
+    note: 'Plot ENCUT/k-mesh tests and Birch-Murnaghan fits',
+  },
+  {
+    href: '/tools/tolerance-factor/',
+    label: 'Tolerance factors',
+    note: 'Goldschmidt t, octahedral mu, Bartel tau and family maps',
+  },
+  {
+    href: '/tools/review/',
+    label: 'Calculation review',
+    note: 'Pre-flight and post-flight VASP sanity checks',
+  },
+  { href: '/practice/', label: 'Adaptive practice', note: '316 visual questions with spaced repetition' },
 ];
 ---
 
 <BaseLayout>
   <div class="container session">
     <h1 class="sr-only">{SITE.name}</h1>
-    <p class="session-name">{SITE.name}</p>
+    <div class="session-head">
+      <p class="session-name">{SITE.name}</p>
+      <p class="session-tagline">{SITE.tagline}</p>
+    </div>
     <button type="button" class="session-prompt js-only" data-palette-open>
       <span class="prompt-mark" aria-hidden="true">
-        &gt;
+        &#8981;
       </span>
-      <span>what do you want to learn or build?</span>
+      <span>Search topics, INCAR tags, glossary, or jump to a tool...</span>
       <kbd aria-hidden="true">Ctrl K</kbd>
       <span class="sr-only">Open the command palette</span>
     </button>
+    <p class="section-kicker">WORKSPACE MODULES &amp; TOOLS</p>
     <ul class="starts" aria-label="Starting points">
       {starts.map((x) => (
         <li>
@@ -38,33 +84,36 @@ const starts = [
           </a>
         </li>
       ))}
-      <li class="starts-soon">
-        <span>Magnetic orderings</span>
-        <small>coming: not built yet</small>
-      </li>
     </ul>
-    <Callout variant="note" title="Under construction">
-      Only some topics are written so far and drafts are marked <code>[draft]</code>: they have not yet been
-      checked against their sources. Everything runs in your browser and nothing is uploaded.
+    <Callout variant="note" title="Runs locally in your browser">
+      All eleven handbook modules and interactive tools run client-side with zero uploads. Pages marked
+      <code>draft</code> await independent source verification.
     </Callout>
   </div>
 </BaseLayout>
 
 <style is:global>
+  .session-head {
+    margin-bottom: var(--space-4);
+  }
   .session-name {
-    margin: 0 0 var(--space-3);
-    font-family: var(--font-mono);
-    color: var(--text-muted);
+    margin: 0;
+    font-size: var(--step-3);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
   }
-  .starts-soon {
-    display: flex;
-    gap: var(--space-3);
-    align-items: baseline;
-    min-height: var(--target);
-    padding: var(--space-2) var(--space-1);
+  .session-tagline {
+    margin: var(--space-1) 0 0;
     color: var(--text-muted);
+    font-size: var(--step-0);
   }
-  .starts-soon::before {
-    content: '-';
+  .section-kicker {
+    margin: var(--space-5) 0 var(--space-2);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
   }
 </style>
