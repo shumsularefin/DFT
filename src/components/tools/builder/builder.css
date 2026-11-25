@@ -1,5 +1,7 @@
 .mb-root {
   display: flex;
+  max-width: 100%;
+  min-width: 0;
   flex-direction: column;
   gap: var(--space-4);
   margin-top: var(--space-4);
@@ -52,6 +54,9 @@
 
 .mb-panel {
   display: flex;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
   flex-direction: column;
   gap: var(--space-3);
   padding: var(--space-4);
