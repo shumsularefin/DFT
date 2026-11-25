@@ -10,32 +10,32 @@
     "assert": {
       "assertions": {
         "categories:performance": [
-          "warn",
+          "error",
           {
             "minScore": 0.95
           }
         ],
         "categories:accessibility": [
-          "warn",
+          "error",
           {
             "minScore": 0.95
           }
         ],
         "categories:best-practices": [
-          "warn",
+          "error",
           {
             "minScore": 0.95
           }
         ],
         "categories:seo": "off",
-        "document-title": "warn",
-        "meta-description": "warn",
-        "http-status-code": "warn",
-        "link-text": "warn",
-        "crawlable-anchors": "warn",
-        "canonical": "warn",
-        "robots-txt": "warn",
-        "image-alt": "warn",
+        "document-title": "error",
+        "meta-description": "error",
+        "http-status-code": "error",
+        "link-text": "error",
+        "crawlable-anchors": "error",
+        "canonical": "error",
+        "robots-txt": "error",
+        "image-alt": "error",
         "is-crawlable": "off"
       }
     }
