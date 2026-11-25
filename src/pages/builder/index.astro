@@ -1,21 +1,21 @@
 ---
-// @source S-034, S-042, S-067
+// @source S-021, S-034, S-042, S-067
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import CrystalBuilder from '../../components/tools/builder/CrystalBuilder';
+import MaterialBuilder from '../../components/tools/builder/MaterialBuilder';
 ---
 
 <BaseLayout
   title="Material Builder"
-  description="Build, edit, validate and export crystal structures (POSCAR, CIF) with live B001-B012 validity checks, supercells, vacancies, substitutions, and tool hand-offs."
+  description="Build, edit, validate and export crystals (POSCAR, CIF) and molecules (2D canvas, rough 3D clean-up, XYZ, MOL, POSCAR in a box) locally in your browser."
   pageClass="tool"
 >
   <div class="container">
     <h1>Material Builder</h1>
     <p>
-      Start from a template or import a POSCAR/CIF, edit sites and supercells, inspect live chemical and
-      geometric validity checks, and export or hand off to the Input Builder, k-path tool, or Magnetic
+      Switch between Crystal mode and Molecule mode (loaded lazily). Validate structures live against B001 to
+      B012, export POSCAR/CIF/XYZ/MOL, or hand off directly to the Input Builder, k-path tool, or Magnetic
       configuration tool.
     </p>
-    <CrystalBuilder client:load />
+    <MaterialBuilder client:load />
   </div>
 </BaseLayout>
