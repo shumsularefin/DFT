@@ -3,7 +3,7 @@
   align-items: center;
   gap: var(--space-3);
   min-height: var(--target);
-  padding: 0 var(--space-3);
+  padding: 0 var(--space-2);
   font: inherit;
   color: var(--text);
   background: transparent;
@@ -14,21 +14,24 @@
 .toggle-track {
   position: relative;
   width: 2.75rem;
-  height: 1.5rem;
+  height: 1.55rem;
   border-radius: 999px;
-  border: 2px solid var(--border-strong);
+  border: 1px solid var(--border-strong);
   background: var(--surface-2);
-  transition: background-color var(--dur-fast);
+  transition:
+    background-color var(--dur-fast),
+    border-color var(--dur-fast);
   flex: none;
 }
 .toggle-thumb {
   position: absolute;
   top: 2px;
   left: 2px;
-  width: 1rem;
-  height: 1rem;
+  width: 1.15rem;
+  height: 1.15rem;
   border-radius: 50%;
-  background: var(--text);
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgb(15 23 42 / 0.28);
   transition: transform var(--dur-fast);
 }
 .toggle[aria-checked='true'] .toggle-track {
@@ -36,11 +39,12 @@
   border-color: var(--accent);
 }
 .toggle[aria-checked='true'] .toggle-thumb {
-  transform: translateX(1.25rem);
-  background: var(--accent-contrast);
+  transform: translateX(1.2rem);
+  background: #ffffff;
 }
 .toggle-label {
   font-weight: 600;
+  font-size: var(--step--1);
 }
 .toggle-state {
   color: var(--text-muted);

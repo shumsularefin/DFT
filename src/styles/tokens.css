@@ -1,73 +1,83 @@
-/* Design tokens. Light is the default; dark applies via data-theme="dark" or, without a stored choice,
-   prefers-color-scheme. scripts/build/contrast.mjs reads the three colour blocks below, so keep their
-   selectors exactly as written and keep the media block identical to the data-theme="dark" block. */
+/* Design tokens: macOS scientific desktop theme. Light is the default; dark applies via
+   data-theme="dark" or, without a stored choice, prefers-color-scheme.
+   scripts/build/contrast.mjs reads the three colour blocks below, so keep their selectors
+   exactly as written and keep the media block identical to the data-theme="dark" block. */
 :root {
   color-scheme: light;
-  --bg: #faf9f6;
-  --surface: #f2f0ea;
-  --surface-2: #e7e4db;
-  --text: #1f1d1a;
-  --text-muted: #58534b;
-  --border: #dcd8cd;
-  --border-strong: #7d776b;
-  --accent: #a2431f;
+  --bg: #eef1f6;
+  --surface: #ffffff;
+  --surface-2: #e3e8f0;
+  --text: #111827;
+  --text-muted: #4b5563;
+  --border: #d0d7e2;
+  --border-strong: #6b788c;
+  --accent: #1463d1;
   --accent-contrast: #ffffff;
-  --danger: #b0123f;
-  --warn: #8a4b00;
-  --ok: #17653a;
-  --focus: #a2431f;
+  --danger: #b91c1c;
+  --warn: #92400e;
+  --ok: #157347;
+  --focus: #1463d1;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
-    --bg: #1c1b19;
-    --surface: #262421;
-    --surface-2: #312e2a;
-    --text: #ece8e0;
-    --text-muted: #b3ac9f;
-    --border: #3b3832;
-    --border-strong: #857e71;
-    --accent: #e58a62;
-    --accent-contrast: #1c1b19;
-    --danger: #ff8fa6;
+    --bg: #1c1f26;
+    --surface: #252932;
+    --surface-2: #2f3440;
+    --text: #f1f4f9;
+    --text-muted: #adb8c9;
+    --border: #3a4150;
+    --border-strong: #8492a6;
+    --accent: #6cb4ff;
+    --accent-contrast: #111827;
+    --danger: #ff8a9b;
     --warn: #f5b942;
-    --ok: #62d58f;
-    --focus: #e58a62;
+    --ok: #5cd68d;
+    --focus: #6cb4ff;
   }
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --bg: #1c1b19;
-  --surface: #262421;
-  --surface-2: #312e2a;
-  --text: #ece8e0;
-  --text-muted: #b3ac9f;
-  --border: #3b3832;
-  --border-strong: #857e71;
-  --accent: #e58a62;
-  --accent-contrast: #1c1b19;
-  --danger: #ff8fa6;
+  --bg: #1c1f26;
+  --surface: #252932;
+  --surface-2: #2f3440;
+  --text: #f1f4f9;
+  --text-muted: #adb8c9;
+  --border: #3a4150;
+  --border-strong: #8492a6;
+  --accent: #6cb4ff;
+  --accent-contrast: #111827;
+  --danger: #ff8a9b;
   --warn: #f5b942;
-  --ok: #62d58f;
-  --focus: #e58a62;
+  --ok: #5cd68d;
+  --focus: #6cb4ff;
 }
 
 :root {
-  --font-sans: 'IBM Plex Sans', 'IBM Plex Sans Fallback', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', 'JetBrains Mono Fallback', ui-monospace, monospace;
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'IBM Plex Sans', 'IBM Plex Sans Fallback', system-ui,
+    sans-serif;
+  --font-mono: 'SF Mono', 'JetBrains Mono', 'JetBrains Mono Fallback', ui-monospace, monospace;
+
+  /* Soft macOS pill fills (derived cleanly for both light and dark). */
+  --ok-soft: color-mix(in srgb, var(--ok) 15%, var(--surface));
+  --warn-soft: color-mix(in srgb, var(--warn) 16%, var(--surface));
+  --danger-soft: color-mix(in srgb, var(--danger) 14%, var(--surface));
+  --accent-soft: color-mix(in srgb, var(--accent) 13%, var(--surface));
+  --chrome-bg: color-mix(in srgb, var(--surface) 45%, var(--bg));
 
   /* Fluid type scale, steps -1 to 5 (viewport 360px to 1200px). */
-  --step--1: clamp(0.8rem, 0.77rem + 0.15vw, 0.875rem);
-  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
-  --step-1: clamp(1.2rem, 1.12rem + 0.4vw, 1.4rem);
-  --step-2: clamp(1.44rem, 1.3rem + 0.7vw, 1.75rem);
-  --step-3: clamp(1.73rem, 1.5rem + 1.15vw, 2.2rem);
-  --step-4: clamp(2.07rem, 1.7rem + 1.85vw, 2.8rem);
-  --step-5: clamp(2.49rem, 1.9rem + 2.95vw, 3.6rem);
-  --leading-tight: 1.2;
-  --leading-body: 1.6;
+  --step--1: clamp(0.8rem, 0.77rem + 0.12vw, 0.875rem);
+  --step-0: clamp(0.95rem, 0.93rem + 0.14vw, 1.05rem);
+  --step-1: clamp(1.15rem, 1.1rem + 0.3vw, 1.32rem);
+  --step-2: clamp(1.38rem, 1.28rem + 0.55vw, 1.65rem);
+  --step-3: clamp(1.65rem, 1.48rem + 0.9vw, 2.05rem);
+  --step-4: clamp(1.95rem, 1.68rem + 1.4vw, 2.55rem);
+  --step-5: clamp(2.35rem, 1.9rem + 2.2vw, 3.2rem);
+  --leading-tight: 1.22;
+  --leading-body: 1.58;
   --measure: 68ch;
 
   /* Spacing, 4px base. */
@@ -80,11 +90,11 @@
   --space-7: 3rem;
   --space-8: 4rem;
 
-  --radius-sm: 4px;
-  --radius: 6px;
-  --radius-lg: 8px;
-  --shadow-1: 0 1px 0 rgb(0 0 0 / 0.06);
-  --shadow-2: 0 1px 0 rgb(0 0 0 / 0.12);
+  --radius-sm: 5px;
+  --radius: 7px;
+  --radius-lg: 10px;
+  --shadow-1: 0 1px 2px rgb(15 23 42 / 0.06), 0 0 0 1px rgb(15 23 42 / 0.03);
+  --shadow-2: 0 3px 10px rgb(15 23 42 / 0.1);
   --target: 2.75rem; /* 44px touch target */
 
   /* Motion is off unless the user allows it. */
