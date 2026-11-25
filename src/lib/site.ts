@@ -9,7 +9,7 @@ export const SITE = {
  * `chore/enable-indexing` branch flips this one constant; it drives the robots meta tag,
  * robots.txt and the sitemap.
  */
-export const INDEXING_ENABLED = false;
+export const INDEXING_ENABLED = true;
 
 /** The eleven handbook modules (SPEC section 6), numbered as in the `module` front matter field. */
 export const MODULES = [
