@@ -45,6 +45,11 @@ const tools = [
     text: 'Drop VASP inputs and outputs (or a zip) for sourced pre-flight and post-flight checks.',
   },
   {
+    id: 'planner',
+    title: 'Research planner',
+    text: 'Pick a calculation goal to generate a sourced, step-by-step VASP workflow, starter INCARs, methods checklist, and zip.',
+  },
+  {
     id: 'work-function',
     title: 'Work function and charge difference',
     text: 'Planar and macroscopic averages of LOCPOT, work function Phi = V_vac - E_F, and CHGCAR differences.',
@@ -78,7 +83,8 @@ const more = [
     <p>
       These tools run entirely in your browser. The input builder, the convergence plotter, the error finder,
       the k-path tool, the magnetic configuration tool and the equation-of-state fit are available now, and so
-      is practice. The others are not built yet, so they have no link. Each card says what it will do.
+      is practice. All research tools, Screening Studio, Material Builder, and Practice are available locally
+      in your browser.
     </p>
     <h2>Research tools</h2>
     <div class="tool-grid">
@@ -115,6 +121,10 @@ const more = [
           ) : t.id === 'eos' ? (
             <p>
               <a href="/tools/eos/">Open the equation-of-state fit</a>
+            </p>
+          ) : t.id === 'planner' ? (
+            <p>
+              <a href="/tools/planner/">Open the research planner</a>
             </p>
           ) : t.id === 'review' ? (
             <p>

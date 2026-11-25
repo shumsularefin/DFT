@@ -1,0 +1,406 @@
+{
+  "version": 1,
+  "recipes": [
+    {
+      "id": "lattice-constant",
+      "title": "Equilibrium lattice constant (EOS)",
+      "summary": "Compute the equilibrium volume and bulk modulus from a fixed-volume energy-volume curve to avoid Pulay stress bias.",
+      "calculator": "formula-unit",
+      "sources": ["S-041", "S-042", "S-067"],
+      "steps": [
+        {
+          "id": "01-convergence",
+          "title": "Converge ENCUT and k-mesh",
+          "preset": "convergence",
+          "prerequisites": ["Structure file (POSCAR) and PAW POTCARs ready"],
+          "carries": [],
+          "checks": ["Total energy difference < 1 meV/atom between successive cutoffs and k-meshes"],
+          "whyStep": "An unconverged cutoff introduces Pulay stress that shifts the fitted lattice parameter.",
+          "whyValues": "Set ENCUT at least 1.3 x ENMAX and use a Gamma-centered mesh across all volumes.",
+          "ifSkipped": "Volume curves show noisy kinks and biased bulk moduli.",
+          "report": ["Converged ENCUT (eV)", "Converged k-mesh density", "PAW POTCAR titles and functional"],
+          "pitfalls": ["pulay-stress", "scf-not-converging"],
+          "sources": ["S-041", "S-042"]
+        },
+        {
+          "id": "02-eos-volumes",
+          "title": "Fixed-volume static runs across 7 to 11 volumes",
+          "preset": "static",
+          "prerequisites": ["Converged ENCUT and k-mesh from step 1"],
+          "carries": [],
+          "checks": ["Every volume reaches electronic convergence", "Same ENCUT and k-mesh across all volumes"],
+          "whyStep": "Fixed-volume static runs (or ISIF=2 ionic relaxation at fixed cell) eliminate variable-basis Pulay artifacts.",
+          "whyValues": "Use IBRION = -1, NSW = 0, EDIFF = 1E-6, and identical ENCUT across +/-5% volume strains.",
+          "ifSkipped": "A single ISIF=3 run at low ENCUT can mispredict volume by 1-2%.",
+          "report": ["Volume range tested", "EOS form (Birch-Murnaghan 3rd order)", "V0, a0, and B0 (GPa)"],
+          "pitfalls": ["pulay-stress", "large-entropy"],
+          "sources": ["S-042", "S-067"]
+        }
+      ]
+    },
+    {
+      "id": "relaxed-structure",
+      "title": "Relaxed crystal structure",
+      "summary": "Relax cell shape, volume, and atomic positions cleanly, followed by a final static energy run.",
+      "calculator": "formula-unit",
+      "sources": ["S-041", "S-042"],
+      "steps": [
+        {
+          "id": "01-relax",
+          "title": "Cell and ionic relaxation",
+          "preset": "relax",
+          "prerequisites": ["Initial POSCAR with reasonable starting geometry"],
+          "carries": ["CONTCAR"],
+          "checks": ["OUTCAR contains 'reached required accuracy'", "Max force < |EDIFFG|"],
+          "whyStep": "Finds the zero-force, zero-stress equilibrium geometry for the chosen functional.",
+          "whyValues": "ENCUT >= 1.3 x ENMAX, ISIF = 3 for bulk cell + ions, EDIFFG = -0.01 eV/A.",
+          "ifSkipped": "Electronic properties and total energies will reflect residual strain.",
+          "report": ["EDIFF and EDIFFG thresholds", "ISIF value", "Final lattice parameters and space group"],
+          "pitfalls": ["relax-not-finishing", "pulay-stress", "zbrent"],
+          "sources": ["S-041", "S-042"]
+        },
+        {
+          "id": "02-static",
+          "title": "Final static energy run on CONTCAR",
+          "preset": "static",
+          "prerequisites": ["Converged CONTCAR copied to POSCAR"],
+          "carries": ["CHGCAR", "WAVECAR"],
+          "checks": ["Single ionic step converges below EDIFF", "Entropy term < 1 meV/atom"],
+          "whyStep": "Rebuilds the plane-wave basis cleanly for the final relaxed cell.",
+          "whyValues": "IBRION = -1, NSW = 0, LCHARG = .TRUE. to save CHGCAR for downstream analysis.",
+          "ifSkipped": "Final energy may carry basis-set mismatch from the initial cell volume.",
+          "report": ["Final static total energy (eV/f.u.)", "Smearing method and SIGMA"],
+          "pitfalls": ["large-entropy", "scf-not-converging"],
+          "sources": ["S-041", "S-042"]
+        }
+      ]
+    },
+    {
+      "id": "band-structure",
+      "title": "Electronic band structure (both routes)",
+      "summary": "Compute k-resolved eigenvalues along a standardized high-symmetry k-path using either the fixed-CHGCAR non-SCF route (PBE/meta-GGA) or zero-weight k-points (hybrids).",
+      "sources": ["S-041", "S-042", "S-019"],
+      "steps": [
+        {
+          "id": "01-scf",
+          "title": "Self-consistent charge density on standardized primitive cell",
+          "preset": "static",
+          "prerequisites": ["Relaxed primitive cell standardized to HPKOT/Setyawan convention"],
+          "carries": ["CHGCAR"],
+          "checks": ["SCF converged", "CHGCAR written and non-empty"],
+          "whyStep": "Provides the converged self-consistent potential for the non-SCF path evaluation.",
+          "whyValues": "LCHARG = .TRUE., uniform Gamma-centered k-mesh.",
+          "ifSkipped": "Band path eigenvalues cannot be evaluated without a converged charge density.",
+          "report": ["Standardization convention used", "SCF k-mesh", "Fermi energy E_F"],
+          "pitfalls": ["primitive-cell", "bands-wrong"],
+          "sources": ["S-041", "S-042"]
+        },
+        {
+          "id": "02-bands",
+          "title": "Non-SCF band path run (ICHARG = 11)",
+          "preset": "band",
+          "prerequisites": ["CHGCAR from step 1", "Line-mode KPOINTS from k-path tool"],
+          "carries": [],
+          "checks": ["ICHARG = 11 set for PBE/r2SCAN", "Band path labels match the standardized cell"],
+          "whyStep": "Evaluates Kohn-Sham eigenvalues along high-symmetry lines at fixed potential (for hybrids, use zero-weight k-points in a single SCF instead).",
+          "whyValues": "ICHARG = 11, LORBIT = 11 for orbital-projected bands, ISMEAR = 0.",
+          "ifSkipped": "You only have eigenvalues on the uniform grid, missing direct/indirect gap extrema.",
+          "report": ["k-path segments and point density", "Band gap (direct vs indirect) and functional caveat"],
+          "pitfalls": ["bands-wrong", "fermi-shift"],
+          "sources": ["S-041", "S-042", "S-019"]
+        }
+      ]
+    },
+    {
+      "id": "dos-pdos",
+      "title": "Density of states (DOS and PDOS)",
+      "summary": "Compute accurate total and orbital-projected density of states on a dense k-mesh using the tetrahedron method with Bloechl corrections.",
+      "sources": ["S-041", "S-042"],
+      "steps": [
+        {
+          "id": "01-scf",
+          "title": "Converged static SCF run",
+          "preset": "static",
+          "prerequisites": ["Relaxed POSCAR"],
+          "carries": ["CHGCAR"],
+          "checks": ["SCF converged cleanly", "CHGCAR written"],
+          "whyStep": "Generates a clean converged charge density before evaluating a dense k-mesh.",
+          "whyValues": "LCHARG = .TRUE., EDIFF = 1E-6.",
+          "ifSkipped": "Running a very dense mesh from scratch takes more SCF steps.",
+          "report": ["SCF k-mesh", "ENCUT"],
+          "pitfalls": ["scf-not-converging"],
+          "sources": ["S-041", "S-042"]
+        },
+        {
+          "id": "02-dos",
+          "title": "Dense-mesh DOS/PDOS run",
+          "preset": "dos",
+          "prerequisites": ["CHGCAR from step 1", "Dense Gamma-centered k-mesh (typically 2x per axis)"],
+          "carries": [],
+          "checks": ["ISMEAR = -5 used when >= 4 irreducible k-points exist", "NEDOS >= 2000 for smooth curves"],
+          "whyStep": "Tetrahedron integration removes artificial Gaussian broadening of band edges and van Hove singularities.",
+          "whyValues": "ISMEAR = -5, LORBIT = 11, NEDOS = 2001, ICHARG = 11.",
+          "ifSkipped": "DOS peaks appear overly smeared or noisy.",
+          "report": ["Dense k-mesh", "ISMEAR = -5 and NEDOS", "Energy window EMIN/EMAX"],
+          "pitfalls": ["tetrahedron-few-kpoints", "fermi-shift"],
+          "sources": ["S-041", "S-042"]
+        }
+      ]
+    },
+    {
+      "id": "magnetic-ground-state",
+      "title": "Magnetic ground state (FM vs AFM)",
+      "summary": "Enumerate candidate collinear spin orderings, relax or run static energy comparisons at identical settings, and verify final site moments.",
+      "sources": ["S-041", "S-042", "S-058"],
+      "steps": [
+        {
+          "id": "01-spin-candidates",
+          "title": "Run FM and candidate AFM orderings",
+          "preset": "spin",
+          "prerequisites": ["Supercell large enough for target AFM patterns", "MAGMOM strings from Magnetic Tool"],
+          "carries": ["CONTCAR"],
+          "checks": ["Same supercell, ENCUT, and k-mesh for all orderings", "Final OUTCAR moments preserve intended sign pattern"],
+          "whyStep": "Energy differences between magnetic orderings are often a few meV/f.u. and require strict numerical cancellation.",
+          "whyValues": "ISPIN = 2, explicit MAGMOM per ion (typically 1.2-1.5x expected moment), LORBIT = 11.",
+          "ifSkipped": "Assuming FM can miss an AFM insulating ground state.",
+          "report": ["Orderings tested", "Energy per magnetic ion relative to ground state", "Final site moments (mu_B)"],
+          "pitfalls": ["moment-collapse", "afm-ends-fm", "magmom-count"],
+          "sources": ["S-041", "S-042", "S-058"]
+        },
+        {
+          "id": "02-dftu-check",
+          "title": "Optional DFT+U sensitivity check for 3d/4f oxides",
+          "preset": "dftu",
+          "prerequisites": ["Converged spin orderings from step 1"],
+          "carries": [],
+          "checks": ["LDAU/LDAUL/LDAUU/LDAUJ match POSCAR species order", "LMAXMIX = 4 (d) or 6 (f)"],
+          "whyStep": "Semi-local PBE can over-delocalize d/f states and distort exchange couplings; always report U choice transparently.",
+          "whyValues": "LDAUTYPE = 2 (Dudarev), LASPH = .TRUE., LMAXMIX = 4 or 6.",
+          "ifSkipped": "Correlated transition-metal oxides may collapse to metallic or wrong-spin states.",
+          "report": ["U_eff values and literature/linear-response justification", "LMAXMIX and LASPH settings"],
+          "pitfalls": ["moment-collapse", "scf-not-converging"],
+          "sources": ["S-041", "S-042"]
+        }
+      ]
+    },
+    {
+      "id": "surface-energy",
+      "title": "Surface energy (symmetric slab)",
+      "summary": "Compute the surface formation energy gamma = (E_slab - N E_bulk) / (2 A) using a symmetric stoichiometric slab with converged slab thickness and vacuum.",
+      "calculator": "surface",
+      "sources": ["S-041", "S-042", "S-065"],
+      "steps": [
+        {
+          "id": "01-bulk-ref",
+          "title": "Bulk reference energy with matched settings",
+          "preset": "static",
+          "prerequisites": ["Relaxed bulk primitive/oriented cell"],
+          "carries": [],
+          "checks": ["Same ENCUT, functional, and in-plane k-point density as slab"],
+          "whyStep": "Consistent bulk reference minimizes systematic cancellation errors in (E_slab - N E_bulk).",
+          "whyValues": "Match ENCUT, PREC, and smearing to the slab calculation.",
+          "ifSkipped": "Mismatched bulk and slab settings cause linear drift in gamma with slab thickness.",
+          "report": ["Bulk energy per formula unit E_bulk", "Lattice constants"],
+          "pitfalls": ["pulay-stress"],
+          "sources": ["S-042", "S-065"]
+        },
+        {
+          "id": "02-slab-relax",
+          "title": "Relax symmetric slab at fixed cell (ISIF = 2)",
+          "preset": "relax",
+          "prerequisites": ["Symmetric slab POSCAR with >= 12-15 A vacuum", "k-mesh with 1 k-point along surface normal"],
+          "carries": ["CONTCAR"],
+          "checks": ["ISIF = 2 (never ISIF = 3 for slabs)", "Vacuum plateau flat in LOCPOT"],
+          "whyStep": "Relaxes surface layers while keeping the bulk lateral lattice constant and vacuum fixed.",
+          "whyValues": "ISIF = 2, single k-point along vacuum direction, optional dipole correction if asymmetric.",
+          "ifSkipped": "Unrelaxed slabs overestimate surface energy.",
+          "report": ["Miller index (hkl) and termination", "Number of layers and vacuum thickness (A)", "Surface energy gamma in J/m^2 and eV/A^2"],
+          "pitfalls": ["slab-vacuum-collapse", "relax-not-finishing"],
+          "sources": ["S-041", "S-042", "S-065"]
+        }
+      ]
+    },
+    {
+      "id": "vacancy-formation",
+      "title": "Neutral vacancy formation energy",
+      "summary": "Compute neutral vacancy formation energy in a supercell large enough to suppress periodic image interactions.",
+      "calculator": "formation",
+      "sources": ["S-041", "S-042", "S-065"],
+      "steps": [
+        {
+          "id": "01-pristine-supercell",
+          "title": "Pristine supercell reference",
+          "preset": "static",
+          "prerequisites": ["Supercell with >= 10 A minimum image separation"],
+          "carries": [],
+          "checks": ["Identical supercell, ENCUT, and k-mesh to the defective cell"],
+          "whyStep": "Provides E_pristine on the exact same FFT grid and k-mesh as the defect calculation.",
+          "whyValues": "IBRION = -1, NSW = 0, matching ENCUT and k-mesh.",
+          "ifSkipped": "Grid differences add artificial noise to defect formation energies.",
+          "report": ["Supercell dimensions and atom count", "E_pristine"],
+          "pitfalls": ["scf-not-converging"],
+          "sources": ["S-042", "S-065"]
+        },
+        {
+          "id": "02-defect-relax",
+          "title": "Defective supercell ionic relaxation (ISIF = 2)",
+          "preset": "relax",
+          "prerequisites": ["Supercell with one atom removed", "Chemical potential reference energy mu_X"],
+          "carries": ["CONTCAR"],
+          "checks": ["ISIF = 2 so the host lattice stays fixed", "Spin polarization checked if defect has unpaired electrons"],
+          "whyStep": "Relaxes neighboring atoms around the vacancy at constant volume.",
+          "whyValues": "ISIF = 2, EDIFFG = -0.02 eV/A, ISPIN = 2 if open-shell.",
+          "ifSkipped": "Unrelaxed vacancies miss strong local lattice relaxation.",
+          "report": ["Supercell size", "Chemical potential reference state", "E_f = E_defect - E_pristine + mu_X"],
+          "pitfalls": ["relax-not-finishing", "moment-collapse"],
+          "sources": ["S-041", "S-042", "S-065"]
+        }
+      ]
+    },
+    {
+      "id": "formation-energy",
+      "title": "Compound formation energy",
+      "summary": "Compute the formation energy of a compound relative to user-supplied elemental reference phases under identical VASP settings.",
+      "calculator": "formation",
+      "sources": ["S-041", "S-042"],
+      "steps": [
+        {
+          "id": "01-compound-static",
+          "title": "Relaxed static energy of the compound",
+          "preset": "static",
+          "prerequisites": ["Relaxed compound POSCAR"],
+          "carries": [],
+          "checks": ["Converged ENCUT and k-mesh", "Correct magnetic ground state if magnetic"],
+          "whyStep": "Gives the total energy of the target phase.",
+          "whyValues": "Use the exact same ENCUT, functional, and POTCARs as the elemental references.",
+          "ifSkipped": "No target energy to compare against references.",
+          "report": ["Compound total energy per formula unit"],
+          "pitfalls": ["pulay-stress", "large-entropy"],
+          "sources": ["S-041", "S-042"]
+        },
+        {
+          "id": "02-element-refs",
+          "title": "Elemental reference energies (same functional and ENCUT)",
+          "preset": "static",
+          "prerequisites": ["Standard elemental ground states (e.g. O2 in box, bulk metals)"],
+          "carries": [],
+          "checks": ["Identical ENCUT and POTCARs for every element", "Spin-polarized triplet state for O2"],
+          "whyStep": "Formation energy is only meaningful when compound and references share the exact same computational setup.",
+          "whyValues": "Keep ENCUT fixed at the highest 1.3 x ENMAX across the whole chemical system.",
+          "ifSkipped": "Mixing different ENCUTs or POTCARs invalidates formation energies.",
+          "report": ["Reference phases and chemical potentials", "Formation energy per atom and per formula unit"],
+          "pitfalls": ["moment-collapse", "scf-not-converging"],
+          "sources": ["S-041", "S-042"]
+        }
+      ]
+    },
+    {
+      "id": "elastic-constants",
+      "title": "Elastic stiffness tensor (C_ij)",
+      "summary": "Compute the 6x6 elastic tensor using stress-strain finite differences (IBRION = 6, ISIF = 3) with tight electronic convergence.",
+      "sources": ["S-041", "S-042", "S-061"],
+      "steps": [
+        {
+          "id": "01-tight-relax",
+          "title": "Tight pre-relaxation of the crystal",
+          "preset": "relax",
+          "prerequisites": ["Conventional or primitive cell"],
+          "carries": ["CONTCAR"],
+          "checks": ["Residual stress < 0.1 kbar", "Forces < 0.005 eV/A"],
+          "whyStep": "Elastic moduli are second derivatives of energy and are sensitive to residual stress.",
+          "whyValues": "ENCUT >= 1.3 x ENMAX, EDIFF = 1E-7, EDIFFG = -0.005.",
+          "ifSkipped": "Residual stress can produce spurious or even negative elastic constants.",
+          "report": ["Pre-relaxation force and stress tolerance"],
+          "pitfalls": ["pulay-stress", "elastic-negative"],
+          "sources": ["S-041", "S-042"]
+        },
+        {
+          "id": "02-elastic",
+          "title": "Finite-difference elastic tensor run",
+          "preset": "elastic",
+          "prerequisites": ["Tightly relaxed CONTCAR copied to POSCAR"],
+          "carries": [],
+          "checks": ["Born mechanical stability criteria satisfied", "Stress tensor converged with ENCUT and k-mesh"],
+          "whyStep": "Applies symmetry-inequivalent strains and evaluates the stress response.",
+          "whyValues": "IBRION = 6, ISIF = 3, NFREE = 2, POTIM = 0.015, EDIFF = 1E-7.",
+          "ifSkipped": "No elastic stiffness tensor C_ij is computed.",
+          "report": ["C_ij components (GPa)", "Voigt/Reuss/Hill bulk and shear moduli", "Born stability check"],
+          "pitfalls": ["elastic-negative", "pulay-stress"],
+          "sources": ["S-041", "S-042", "S-061"]
+        }
+      ]
+    },
+    {
+      "id": "phonons-at-gamma",
+      "title": "Phonons at Gamma (finite displacements)",
+      "summary": "Compute Gamma-point vibrational frequencies using finite displacements with strict force and electronic convergence.",
+      "sources": ["S-041", "S-042", "S-063"],
+      "steps": [
+        {
+          "id": "01-tight-relax",
+          "title": "Tight ionic relaxation",
+          "preset": "relax",
+          "prerequisites": ["Converged POSCAR"],
+          "carries": ["CONTCAR"],
+          "checks": ["Max force < 0.001 eV/A", "EDIFF <= 1E-8"],
+          "whyStep": "Residual forces contaminate finite-difference force constants.",
+          "whyValues": "EDIFF = 1E-8, EDIFFG = -0.001, ADDGRID = .TRUE.",
+          "ifSkipped": "Spurious imaginary modes appear even for dynamically stable crystals.",
+          "report": ["Pre-relaxation EDIFF and EDIFFG"],
+          "pitfalls": ["imaginary-phonons", "relax-not-finishing"],
+          "sources": ["S-041", "S-042", "S-063"]
+        },
+        {
+          "id": "02-phonon-gamma",
+          "title": "Finite-displacement Hessian at Gamma",
+          "preset": "phonon-finite-displacement",
+          "prerequisites": ["Tightly relaxed CONTCAR copied to POSCAR"],
+          "carries": [],
+          "checks": ["Three acoustic modes near 0 THz", "Check for imaginary modes before claiming stability"],
+          "whyStep": "Evaluates the dynamical matrix at q = 0 via central finite differences.",
+          "whyValues": "IBRION = 5, NFREE = 2, POTIM = 0.015, EDIFF = 1E-8, NCORE = 1 if using DFPT (IBRION = 8).",
+          "ifSkipped": "Dynamical stability is unverified.",
+          "report": ["Displacement amplitude POTIM", "Gamma-point frequencies (THz or cm^-1)", "Acoustic sum rule residual"],
+          "pitfalls": ["imaginary-phonons", "dfpt-ncore"],
+          "sources": ["S-041", "S-042", "S-063"]
+        }
+      ]
+    },
+    {
+      "id": "optics",
+      "title": "Linear optical response (IPA dielectric function)",
+      "summary": "Compute the frequency-dependent dielectric function in the independent-particle approximation (LOPTICS = .TRUE.) with extra empty bands.",
+      "sources": ["S-041", "S-042"],
+      "steps": [
+        {
+          "id": "01-ground-state",
+          "title": "Converged ground-state WAVECAR",
+          "preset": "static",
+          "prerequisites": ["Relaxed POSCAR"],
+          "carries": ["WAVECAR", "CHGCAR"],
+          "checks": ["SCF converged", "WAVECAR saved"],
+          "whyStep": "Provides occupied orbitals and self-consistent potential for the optical matrix elements.",
+          "whyValues": "LWAVE = .TRUE., LCHARG = .TRUE., dense k-mesh.",
+          "ifSkipped": "Optical transitions require accurate ground-state wavefunctions.",
+          "report": ["Functional (note PBE band-gap underestimation)", "k-mesh"],
+          "pitfalls": ["scf-not-converging"],
+          "sources": ["S-041", "S-042"]
+        },
+        {
+          "id": "02-optics",
+          "title": "LOPTICS frequency-dependent dielectric function",
+          "preset": "optics",
+          "prerequisites": ["WAVECAR and CHGCAR from step 1", "Dense k-mesh"],
+          "carries": [],
+          "checks": ["NBANDS increased to 2-3x default empty bands", "CSHIFT broadening documented"],
+          "whyStep": "Evaluates interband dipole transitions across a wide energy window.",
+          "whyValues": "LOPTICS = .TRUE., ALGO = Exact (or Normal), NEDOS = 2000, increased NBANDS.",
+          "ifSkipped": "No dielectric function or absorption spectrum is computed.",
+          "report": ["NBANDS used", "CSHIFT and NEDOS", "Note that IPA omits excitonic effects"],
+          "pitfalls": ["too-few-bands", "slow-or-oom"],
+          "sources": ["S-041", "S-042"]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PlannerTool from '../../components/tools/planner/PlannerTool';
+---
+
+<BaseLayout
+  title="Research Planner"
+  pageClass="tool"
+  description="Pick a DFT calculation goal to get a sourced, step-by-step VASP workflow, starter INCARs, methods checklist, and calculators."
+>
+  <div class="container">
+    <h1>Research Planner</h1>
+    <p>
+      Choose a calculation goal to generate a sourced, step-by-step VASP workflow with starter INCAR files,
+      carried-file instructions, a methods checklist, and a downloadable zip archive.
+    </p>
+    <PlannerTool client:load />
+  </div>
+</BaseLayout>
