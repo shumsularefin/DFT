@@ -74,13 +74,13 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M9.2 | Explorer UI | done | M9.1, M8.3 | L | B | main | none (pushed to main) | 2026-11-24 | [report](reports/M9.2.md), [work order](milestones/M9-screening-studio.md) |
 | M9.3 | Feasibility check and first-project builder | done | M9.2, M3.5, M4.2 | L | B | main | none (pushed to main) | 2026-11-24 | [report](reports/M9.3.md), [work order](milestones/M9-screening-studio.md) |
 | M9.4 | Hooks, attribution, offline and integration | done | M9.3 | S | B | main | none (pushed to main) | 2026-11-24 | [report](reports/M9.4.md), [work order](milestones/M9-screening-studio.md) |
-| M14.2 | Research planner: goal to a sourced, step-by-step workflow | done | M14.1, M13.5, M13.6, M9.3 | L | A | | | | [work order](milestones/M14-research-guidance.md) |
+| M14.2 | Research planner: goal to a sourced, step-by-step workflow | done | M14.1, M13.5, M13.6, M9.3 | L | A | main | PR #56 | 2026-11-24 | [work order](milestones/M14-research-guidance.md) |
 | M6.5 | Optional progress sync with Firebase (Spark) | done | M6.4, M0.2 | M | B | claude/m6-5-progress-sync | PR pending (stacked on M7.4, PR #40) | 2026-11-19 | [report](reports/M6.5.md), [work order](milestones/M6-adaptive-engine.md) |
 | M12.4 | Guided path: learn DFT step by step in 3D | done | M12.2, M7.2, M13.2 | L | B | claude/m12-4-guided-path | PR pending (stacked on M6.5, PR #41) | 2026-11-19 | [report](reports/M12.4.md), [work order](milestones/M12-visual-layer.md) |
-| M7.6 | Modules 10 and 11: Worked example and tool tour | partial | M7.5, M8.4, M9.3, M10.5 | L | B | | | | [work order](milestones/M7-remaining-modules.md) |
-| M11.1 | Performance and offline audit | done | M10.5, M9.4, M7.6, M6.5, M12.3, M12.4, M12.5, M12.6, M13.4, M14.2, M14.3 | M | B | | | | [work order](milestones/M11-polish.md) |
-| M11.2 | Accessibility and security audit | done | M11.1 | M | B | | | | [work order](milestones/M11-polish.md) |
-| M11.3 | Content integrity and release preparation | todo | M11.2 | M | A | | | | [work order](milestones/M11-polish.md) |
+| M7.6 | Modules 10 and 11: Worked example and tool tour | partial | M7.5, M8.4, M9.3, M10.5 | L | B | main | PR #57 | 2026-11-24 | [work order](milestones/M7-remaining-modules.md) (Module 10 awaits `data/author/`, Q-008) |
+| M11.1 | Performance and offline audit | done | M10.5, M9.4, M7.6, M6.5, M12.3, M12.4, M12.5, M12.6, M13.4, M14.2, M14.3 | M | B | main | PR #58 | 2026-11-24 | [report](reports/M11.1.md), [work order](milestones/M11-polish.md) |
+| M11.2 | Accessibility and security audit | done | M11.1 | M | B | main | PR #59 | 2026-11-24 | [report](reports/M11.2.md), [work order](milestones/M11-polish.md) |
+| M11.3 | Content integrity and release preparation | done | M11.2 | M | A | main | PR #60 | 2026-11-24 | [report](reports/M11.3.md), [audit package](AUDIT_PACKAGE.md), [work order](milestones/M11-polish.md) |
 
 ## Session log
 

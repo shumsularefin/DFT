@@ -49,6 +49,18 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-043 | open | author |
 | Q-044 | closed | builder (M13.5) |
 
+## Release triage (M11.3)
+
+Every open question below has been reviewed for user-visible impact. Nothing open silently alters a displayed number: every unverified or heuristic figure carries an explicit caveat, badge, or pending notice in the UI.
+
+| Category | Open IDs | User-visible effect | Release status |
+| --- | --- | --- | --- |
+| Licensing & legal | Q-001, Q-002, Q-009, Q-012 | Missing repo `LICENSE`; Materials Project & ICSD attribution wording awaits author confirmation | **Blocking public indexing** (confirm before merging `chore/enable-indexing`) |
+| Author calculation & MP data | Q-008, Q-009 | Module 10 shows `"Results pending: author data not yet supplied"`; live deploy excludes synthetic Studio sample until real MP pull is committed | **Blocking public indexing** (author supplies `data/author/` and runs `scripts/mp/`) |
+| Draft prose & glossary verification | Q-020, Q-022, Q-023, Q-024, Q-026 | Topics and glossary show explicit `[draft]` badges until human review against primary books/wiki | **Blocking `verified` badge** (non-blocking for preview; clearly labelled) |
+| VASP / VASPKIT calibrations & handbook errata | Q-004, Q-013, Q-017, Q-018, Q-019, Q-027, Q-028, Q-029, Q-030, Q-031, Q-032, Q-033, Q-034, Q-035, Q-036, Q-037, Q-038, Q-039, Q-042, Q-046, Q-047, Q-048 | Tools display explicit heuristic/convention notices and let users choose conventions (e.g. Heisenberg `J`, Pulay threshold) | **Non-blocking** (close incrementally with author 5-min runs) |
+| UI, fonts, hosting quotas & optional data | Q-005, Q-006, Q-007, Q-010, Q-011, Q-014, Q-015, Q-021, Q-043, Q-045, Q-049 | Conservative 360 MB/day Spark floor documented; optional cost/toxicity filters and Firebase sync clearly gated | **Non-blocking** |
+
 ## Q-001. Repository licence
 Which licence for the code and which for the written content and data (a common split: MIT for code, CC BY 4.0 for original text)? Affects `LICENSE`, the footer and the references page. Until decided: no LICENSE file; `THIRD_PARTY_NOTICES.md` lists upstream licences. **Update 2026-11-04:** the secrets `FIREBASE_SERVICE_ACCOUNT` and `FIREBASE_PROJECT_ID` are set (screenshot from the author) and the deploy workflow has succeeded on every merge to main since; the live site URL was not opened from the builder environment, so please confirm it shows the latest stage. **Owner: author.**
 

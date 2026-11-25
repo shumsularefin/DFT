@@ -7,6 +7,17 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- Release preparation (`M11.3`): updated top navigation so Studio (`/studio/`) and Builder (`/builder/`) point directly to live routes, updated `/about/` limits and `README.md`, added a Release Triage section to `docs/OPEN_QUESTIONS.md`, wrote `docs/AUDIT_PACKAGE.md`, and prepared the unmerged `chore/enable-indexing` branch for post-audit launch.
+- Accessibility and security audit (`M11.2`): added Content Security Policy headers in `firebase.json` (with `'wasm-unsafe-eval'` and `worker-src 'self' blob:`), switched `lighthouserc.json` assertions to `"error"`, and added `tests/e2e/a11y-csp.spec.ts` covering axe checks, 360 px overflow, and zero CSP violations.
+- Performance and offline audit (`M11.1`): documented all 102 routes against `budgets.json` and lazy-chunk limits in `docs/reports/M11.1.md`, with conservative 360 MB/day Spark transfer estimates recorded in `Q-006`.
+- Modules 10 and 11 (`M7.6`): six worked-example topics for `RCuO3` perovskites (explicitly flagged "Results pending: author data not yet supplied" until `data/author/` is populated per `Q-008`), four Screening Studio and Material Builder tour topics, 6 published concepts, and 24 visual practice questions.
+- Research Planner (`/tools/planner/`, `M14.2`): goal-to-workflow generator covering all 11 DFT calculation goals with sourced recipes (`src/data/recipes.json`, guarded by `scripts/guard/check-recipes.mjs`), surface-slab helpers, and downloadable project zip archives.
+- Material Builder (`/builder/`, `M10.4` and `M10.5`): crystal editor UI (symmetrization, supercells, slabs, defects, validity checks, undo/redo, POSCAR/CIF/XYZ export) and lazy-loaded Molecule Builder (2D RDKit canvas with keyboard fallback, 3D valence clean-up, XYZ/MOL/POSCAR-in-box export).
+- Screening Studio (`/studio/`, `M9.2` to `M9.4`): Materials Project dataset explorer with periodic-table filter, feasibility checker, first-project generator, offline/attribution banners, and synthetic demo guard on live deploys.
+- Charge-density and spin-density tool (`/tools/density/`, `M14.3`): browser-side CHGCAR/PARCHG difference, spin density, and planar-average visualizer.
+- Module 9: Analysis (`M7.5`) and Calculation Review (`/tools/review/`, `M14.1`): analysis handbook topics with relaxation, DOS/band, and charge-density tools, plus pre-flight and post-flight VASP calculation checks.
+- Tolerance Factor Explorer (`/tools/tolerance/`, `M8.3` and `M8.4`): interactive Goldschmidt `t`, octahedral `mu`, and Bartel `tau` explorer with shared periodic table, 2D formability maps, lanthanide family trends, and tool hand-offs.
+- Spin-polarized DFT and magnetism handbook module (`M13.4`): visual guide to collinear magnetic orderings, `MAGMOM`, and exchange mapping.
 - Analyse tab in the magnetic configuration tool: after running the orderings, give each one its OSZICAR or OUTCAR (or type its energy) and see the orderings ranked by energy per magnetic ion relative to FM, with a bar chart, the final moment on every magnetic site next to its starting MAGMOM and a heuristic "pattern kept" check, and an optional fit of exchange constants J1 to J3. The Hamiltonian convention (sign, each pair once or twice, unit spins or spin S) is chosen by you and printed next to every J. Files are read in your browser and never uploaded; no Néel or Curie temperature is estimated.
 - Guided path at `/learn/`: fourteen short stations from one atom to your first VASP folder (electron cloud, orbitals, the exponential wall, density, the Kohn-Sham idea, the SCF loop, the unit cell, periodic images, plane waves, reciprocal space, k-points, bands, spin orderings, the four input files). Each has one picture marked computed, toy model or illustrative, three plain sentences, one thing to try and a link to the full topic. Move with the buttons or the arrow keys; 3D loads only when you press "View in 3D". There is a new Learn link in the header.
 - Optional progress sync (only on builds with Firebase configured): sign in with Google on the progress page to merge your practice progress across devices. Off by default, the sync code is not downloaded until you press the button, writes are at most one a minute, and a "Delete my synced data" button removes the cloud copy. The privacy page explains what is stored.
@@ -65,4 +76,4 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Notes
 
-- The site is under construction and hidden from search engines until its first release.
+- All stages through M11.3 are built and verified; the site remains hidden from search engines (`INDEXING_ENABLED = false`) until the author merges `chore/enable-indexing` after independent audit.
