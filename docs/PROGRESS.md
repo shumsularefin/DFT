@@ -60,7 +60,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M10.1 | Chemistry data and validity engine | done | M8.2, M5.1 | L | A | main | none (pushed to main) | 2026-11-18 | [report](reports/M10.1.md), [work order](milestones/M10-material-builder.md) |
 | M10.2 | Crystal operations and exports | done | M10.1, M13.1 | M | A | main | none (pushed to main) | 2026-11-18 | [report](reports/M10.2.md), [work order](milestones/M10-material-builder.md) |
 | M13.5 | Structure toolkit: slabs, vacancies, substitutions and doping (library) | done | M13.1, M5.1 | L | A | main | none (pushed to main) | 2026-11-18 | [report](reports/M13.5.md), [work order](milestones/M13-magnetism-and-structures.md) |
-| M10.4 | Crystal editor UI | todo | M10.2, M5.5, M8.3, M13.5, M12.2 | L | B | | | | [work order](milestones/M10-material-builder.md) |
+| M10.4 | Crystal editor UI | done | M10.2, M5.5, M8.3, M13.5, M12.2 | L | B | main | none (pushed to main) | 2026-11-24 | [report](reports/M10.4.md), [work order](milestones/M10-material-builder.md) |
 | M10.3 | Molecule engine (RDKit 2D, in-house 3D) | done | M10.1 | L | A | main | none (pushed to main) | 2026-11-19 | [report](reports/M10.3.md), [work order](milestones/M10-material-builder.md) |
 | M10.5 | Molecule editor UI | todo | M10.3, M10.4 | L | B | | | | [work order](milestones/M10-material-builder.md) |
 | M7.3 | Modules 6 and 7: VASP files and running a calculation | done | M3.6, M4.1 | L | B | claude/m7-3-vasp-files-running | PR pending (stacked on M12.5) | 2026-11-19 | [report](reports/M7.3.md), [work order](milestones/M7-remaining-modules.md) |
