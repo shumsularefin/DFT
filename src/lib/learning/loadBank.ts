@@ -9,10 +9,12 @@ import m6 from '../../data/questions/module-06.json';
 import m7 from '../../data/questions/module-07.json';
 import m8 from '../../data/questions/module-08.json';
 import m9 from '../../data/questions/module-09.json';
+import m10 from '../../data/questions/module-10.json';
+import m11 from '../../data/questions/module-11.json';
 import { loadConcepts } from './graph';
 import { loadQuestionBank } from './questions';
 
-export const questionBank = () => loadQuestionBank({ m1, m2, m3, m4, m5, m6, m7, m8, m9 });
+export const questionBank = () => loadQuestionBank({ m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11 });
 export const conceptGraph = () => loadConcepts(conceptsRaw);
 
 /** Concept id to the first topic that teaches it, from the handbook collection's front matter. */

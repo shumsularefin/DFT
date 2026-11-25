@@ -1,0 +1,74 @@
+---
+id: screening-studio
+title: Tour of the Screening Studio
+module: 11
+order: 1
+summary: How to filter candidate materials, inspect feasibility and starter INCARs, and understand the synthetic demo banner vs real Materials Project snapshots.
+concepts: [screening]
+requires: [worked-example-workflow]
+vaspTags: []
+sources: [S-024, S-042]
+noLab: true
+status: draft
+updated: 2026-11-24
+---
+
+<Why>
+
+When exploring a chemical family, filtering a structured catalog by stability, band gap, element constraints, and cell size lets you focus VASP compute on the most promising candidates <Cite id="S-024" />.
+
+</Why>
+
+<Intuition>
+
+The <a href="/studio/">Screening Studio</a> runs entirely in your browser: it loads a compact columnar dataset, filters tens of thousands of entries in milliseconds, and exports shortlists to CSV. Clicking any candidate opens its <a href="/studio/project/">Project Card</a> with a transparent Green/Yellow/Red feasibility rubric, runtime bucket, and a three-step starter `INCAR` sequence <Cite id="S-042" />.
+
+<Scene id="perovskite-octahedra" />
+
+Check the banner at the top of the Studio: until the author runs a real Materials Project data pull, the Studio clearly labels its table as synthetic demo data so demonstration numbers are never confused with real materials entries <Cite id="S-024" />.
+
+</Intuition>
+
+<TheMath>
+
+Thermodynamic stability against competing phases is tracked by the energy above the convex hull $E_{\mathrm{hull}}$ (in eV/atom). Compounds with $E_{\mathrm{hull}} = 0$ lie on the zero-temperature hull; small positive values may still be synthetically accessible depending on kinetics and temperature <Cite id="S-024" />.
+
+</TheMath>
+
+<InVasp>
+
+- Filter by elements, band-gap window, $E_{\mathrm{hull}}$, and atom count in <a href="/studio/">Screening Studio</a>.
+- Open a candidate's <a href="/studio/project/">Project Card</a> to inspect its feasibility flags and download starter `INCAR` files.
+- Always confirm magnetic ground states and PAW choices in VASP rather than relying solely on database metadata <Cite id="S-042" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| Studio filter        | What it narrows         | Practical effect                                 |
+| -------------------- | ----------------------- | ------------------------------------------------ |
+| `E_hull` max         | Thermodynamic stability | Drops highly unstable polymorphs early           |
+| Max sites (`nsites`) | Supercell cost          | Keeps starter runs within modest HPC wall-time   |
+| Band gap range       | Electronic class        | Separates metals, semiconductors, and insulators |
+
+Why screen before simulating: a two-minute filter prevents spending weeks relaxing unstable or prohibitively large cells.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Treating database band gaps as experimental values">
+
+High-throughput catalogs such as the Materials Project primarily use semi-local GGA/GGA+U functionals, which systematically underestimate band gaps relative to experiment.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m11-1', 'q-m11-2', 'q-m11-3', 'q-m11-4']} />
+
+<GoDeeper>
+
+- Open the <a href="/studio/">Screening Studio</a> and inspect the attribution and data-licence notes on <a href="/about/">About</a> <Cite id="S-024" />.
+
+</GoDeeper>

@@ -1,0 +1,632 @@
+[
+  {
+    "id": "q-m10-1",
+    "concepts": [
+      "perovskite-structure"
+    ],
+    "type": "single",
+    "prompt": "How are the BO6 octahedra connected in an ideal cubic ABO3 perovskite?",
+    "options": [
+      {
+        "text": "By sharing corners in a three-dimensional network",
+        "correct": true,
+        "why": "Corner-sharing BO6 octahedra form the 3D perovskite framework with A cations in 12-fold cavities."
+      },
+      {
+        "text": "As isolated zero-dimensional molecules with no shared oxygen atoms",
+        "correct": false,
+        "why": "Perovskite octahedra share every vertex oxygen with an adjacent octahedron."
+      },
+      {
+        "text": "By sharing faces along every axis simultaneously",
+        "correct": false,
+        "why": "Ideal cubic perovskites are corner-sharing, not all-face-sharing."
+      }
+    ],
+    "hints": [
+      "Inspect the perovskite octahedra figure.",
+      "Count how many octahedra meet at each oxygen corner."
+    ],
+    "difficulty": -0.5,
+    "level": "beginner",
+    "sources": [
+      "S-001"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "Corner-sharing BO6 octahedra in an ABO3 perovskite.",
+      "alt": "3D perovskite structure showing corner-sharing octahedra."
+    }
+  },
+  {
+    "id": "q-m10-2",
+    "concepts": [
+      "perovskite-structure"
+    ],
+    "type": "single",
+    "prompt": "What is the ideal coordination number of the A-site cation in a cubic ABO3 perovskite?",
+    "options": [
+      {
+        "text": "12",
+        "correct": true,
+        "why": "The A-site cation sits in the cuboctahedral cavity surrounded by 12 oxygen anions."
+      },
+      {
+        "text": "6",
+        "correct": false,
+        "why": "6 is the coordination number of the B-site cation inside each octahedron."
+      },
+      {
+        "text": "4",
+        "correct": false,
+        "why": "4 is tetrahedral coordination, not the perovskite A-site."
+      }
+    ],
+    "hints": [
+      "Compare the A-site cavity with the 6-fold B-site octahedron.",
+      "Check the CN policy in Module 10."
+    ],
+    "difficulty": -0.2,
+    "level": "beginner",
+    "sources": [
+      "S-001",
+      "S-003"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "A-site and B-site coordination environments in ABO3.",
+      "alt": "Perovskite octahedra with central A-site cavity."
+    }
+  },
+  {
+    "id": "q-m10-3",
+    "concepts": [
+      "perovskite-structure"
+    ],
+    "type": "single",
+    "prompt": "Why does shrinking the A-site cation across the lanthanide series in RCuO3 often require a larger supercell than the 5-atom cubic cell?",
+    "options": [
+      {
+        "text": "Smaller A-site ions drive cooperative octahedral tilting that doubles lattice vectors (for example Pnma)",
+        "correct": true,
+        "why": "Cooperative BO6 rotations break cubic symmetry and enlarge the primitive cell."
+      },
+      {
+        "text": "VASP cannot simulate cells with fewer than 20 atoms",
+        "correct": false,
+        "why": "VASP handles 5-atom cells easily; the supercell is required by the physical tilting distortion."
+      },
+      {
+        "text": "Oxygen atoms become magnetic only in larger cells",
+        "correct": false,
+        "why": "The supercell enlargement here is driven by structural octahedral tilting."
+      }
+    ],
+    "hints": [
+      "Think about what happens to BO6 octahedra when the A-site cavity is too large for a small R3+ ion.",
+      "Review the summary table and callouts on the topic page."
+    ],
+    "difficulty": 0.2,
+    "level": "intermediate",
+    "sources": [
+      "S-001",
+      "S-002"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "Octahedral framework that tilts when the A-site ion shrinks.",
+      "alt": "Perovskite octahedra framework."
+    }
+  },
+  {
+    "id": "q-m10-4",
+    "concepts": [
+      "perovskite-structure"
+    ],
+    "type": "single",
+    "prompt": "How many atoms are in the ideal cubic primitive cell of an ABO3 perovskite?",
+    "options": [
+      {
+        "text": "5 atoms (1 A, 1 B, 3 O)",
+        "correct": true,
+        "why": "One formula unit of ABO3 contains 1 + 1 + 3 = 5 atoms."
+      },
+      {
+        "text": "3 atoms",
+        "correct": false,
+        "why": "Count all three species: 1 A + 1 B + 3 O."
+      },
+      {
+        "text": "12 atoms",
+        "correct": false,
+        "why": "12 is the A-site coordination number, not the atom count per formula unit."
+      }
+    ],
+    "hints": [
+      "Sum the stoichiometric subscripts in ABO3.",
+      "Review the summary table and callouts on the topic page."
+    ],
+    "difficulty": -0.6,
+    "level": "beginner",
+    "sources": [
+      "S-001"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "Unit cell of the ideal ABO3 perovskite.",
+      "alt": "Perovskite unit cell."
+    }
+  },
+  {
+    "id": "q-m10-5",
+    "concepts": [
+      "tolerance-factor"
+    ],
+    "type": "single",
+    "prompt": "What does a Goldschmidt tolerance factor t close to 1 indicate for an ABO3 oxide?",
+    "options": [
+      {
+        "text": "Good geometric packing compatibility with an undistorted cubic perovskite",
+        "correct": true,
+        "why": "At t = 1, the A-O and B-O ideal bond lengths match the cubic perovskite geometry."
+      },
+      {
+        "text": "Guaranteed thermodynamic stability against all competing phases",
+        "correct": false,
+        "why": "Tolerance factors are geometric heuristics and do not prove thermodynamic stability."
+      },
+      {
+        "text": "That the compound must be a metal",
+        "correct": false,
+        "why": "Tolerance factors describe ionic packing geometry, not electronic conductivity."
+      }
+    ],
+    "hints": [
+      "Recall the geometric meaning of t = (r_A + r_X) / (sqrt(2) * (r_B + r_X)).",
+      "Review the summary table and callouts on the topic page."
+    ],
+    "difficulty": -0.3,
+    "level": "beginner",
+    "sources": [
+      "S-001",
+      "S-002"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "Geometric packing of A, B, and X ions in a perovskite.",
+      "alt": "Perovskite octahedra packing diagram."
+    }
+  },
+  {
+    "id": "q-m10-6",
+    "concepts": [
+      "tolerance-factor"
+    ],
+    "type": "single",
+    "prompt": "In the Goldschmidt tolerance factor formula, what happens to t as r_A decreases while r_B and r_X stay fixed?",
+    "options": [
+      {
+        "text": "t decreases",
+        "correct": true,
+        "why": "r_A appears linearly in the numerator, so decreasing r_A lowers t."
+      },
+      {
+        "text": "t increases",
+        "correct": false,
+        "why": "r_A is in the numerator, not the denominator."
+      },
+      {
+        "text": "t remains unchanged",
+        "correct": false,
+        "why": "t depends directly on r_A."
+      }
+    ],
+    "hints": [
+      "Check where r_A sits in t = (r_A + r_X) / (sqrt(2) * (r_B + r_X)).",
+      "Review the summary table and callouts on the topic page."
+    ],
+    "difficulty": -0.4,
+    "level": "beginner",
+    "sources": [
+      "S-001"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "Effect of A-site radius on perovskite geometry.",
+      "alt": "Perovskite structure with A-site ion."
+    }
+  },
+  {
+    "id": "q-m10-7",
+    "concepts": [
+      "tolerance-factor"
+    ],
+    "type": "single",
+    "prompt": "What is the octahedral factor mu = r_B / r_X used to check?",
+    "options": [
+      {
+        "text": "Whether the B-site cation is large enough to stabilize a 6-coordinated BO6 octahedron",
+        "correct": true,
+        "why": "If r_B / r_X is too small, anions touch before enclosing the B cation stably in an octahedron."
+      },
+      {
+        "text": "The plane-wave cutoff ENCUT required in VASP",
+        "correct": false,
+        "why": "ENCUT comes from POTCAR ENMAX, not ionic radii."
+      },
+      {
+        "text": "The magnetic ordering temperature",
+        "correct": false,
+        "why": "mu is purely a geometric radius ratio."
+      }
+    ],
+    "hints": [
+      "Look at which two radii appear in mu = r_B / r_X.",
+      "Review the summary table and callouts on the topic page."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-002"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "BO6 octahedron geometry governed by the ratio r_B / r_X.",
+      "alt": "Perovskite BO6 octahedra."
+    }
+  },
+  {
+    "id": "q-m10-8",
+    "concepts": [
+      "tolerance-factor"
+    ],
+    "type": "single",
+    "prompt": "Why should tolerance-factor screening always be followed by DFT total-energy checks?",
+    "options": [
+      {
+        "text": "Geometric packing heuristics do not compute electronic energies or competing-phase decomposition",
+        "correct": true,
+        "why": "A composition with favorable t or tau can still decompose into lower-energy competing phases."
+      },
+      {
+        "text": "Tolerance factors only apply to pure metals",
+        "correct": false,
+        "why": "Tolerance factors are specifically designed for ionic compounds like perovskites."
+      },
+      {
+        "text": "Shannon radii are always exact at finite temperature",
+        "correct": false,
+        "why": "Shannon radii are empirical crystal-derived averages, and stability requires energy calculations."
+      }
+    ],
+    "hints": [
+      "Compare a geometric descriptor with a full convex-hull energy calculation.",
+      "Review the summary table and callouts on the topic page."
+    ],
+    "difficulty": 0.1,
+    "level": "intermediate",
+    "sources": [
+      "S-002"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "From geometric descriptors to DFT stability verification.",
+      "alt": "Perovskite structure diagram."
+    }
+  },
+  {
+    "id": "q-m10-9",
+    "concepts": [
+      "ionic-radii"
+    ],
+    "type": "single",
+    "prompt": "Which two properties must be specified to look up a Shannon effective ionic radius unambiguously?",
+    "options": [
+      {
+        "text": "Oxidation state and coordination number (plus spin state where applicable)",
+        "correct": true,
+        "why": "Shannon radii vary strongly with both formal charge and coordination environment."
+      },
+      {
+        "text": "Atomic mass and melting point",
+        "correct": false,
+        "why": "Shannon tables are indexed by element, oxidation state, coordination number, and spin state."
+      },
+      {
+        "text": "VASP ENCUT and k-mesh",
+        "correct": false,
+        "why": "Shannon radii are empirical crystallographic radii independent of DFT settings."
+      }
+    ],
+    "hints": [
+      "Check what columns identify each entry in Shannon (1976).",
+      "Review the summary table and callouts on the topic page."
+    ],
+    "difficulty": -0.3,
+    "level": "beginner",
+    "sources": [
+      "S-003"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "Coordination-dependent ionic radii in ABO3.",
+      "alt": "Perovskite structure showing coordination polyhedra."
+    }
+  },
+  {
+    "id": "q-m10-10",
+    "concepts": [
+      "ionic-radii"
+    ],
+    "type": "single",
+    "prompt": "What is the honest way to handle an ion whose 12-coordinated Shannon radius is absent from the published table?",
+    "options": [
+      {
+        "text": "Report the gap explicitly (or state any fallback CN policy transparently) rather than silently fabricating a radius",
+        "correct": true,
+        "why": "Transparent gap reporting prevents hidden extrapolation errors in screening maps."
+      },
+      {
+        "text": "Copy the 4-coordinated radius without noting the change",
+        "correct": false,
+        "why": "Lower coordination radii are significantly smaller and would bias t without warning."
+      },
+      {
+        "text": "Set the missing radius to 1.0 Angstrom",
+        "correct": false,
+        "why": "Arbitrary placeholder values corrupt tolerance-factor comparisons."
+      }
+    ],
+    "hints": [
+      "Recall how the Tolerance-factor explorer handles missing CN=12 entries.",
+      "Review the summary table and callouts on the topic page."
+    ],
+    "difficulty": 0.1,
+    "level": "intermediate",
+    "sources": [
+      "S-003"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "Honest handling of missing Shannon radius entries.",
+      "alt": "Perovskite octahedra scene."
+    }
+  },
+  {
+    "id": "q-m10-11",
+    "concepts": [
+      "ionic-radii"
+    ],
+    "type": "single",
+    "prompt": "For a fixed element and coordination number, how does the Shannon ionic radius typically change as oxidation state increases?",
+    "options": [
+      {
+        "text": "It decreases because higher positive charge pulls remaining electrons closer",
+        "correct": true,
+        "why": "Removing valence electrons reduces electron-electron screening and contracts the ion."
+      },
+      {
+        "text": "It increases linearly with oxidation state",
+        "correct": false,
+        "why": "Higher cations are smaller, not larger."
+      },
+      {
+        "text": "It never depends on oxidation state",
+        "correct": false,
+        "why": "Oxidation state is one of the primary keys in Shannon's table."
+      }
+    ],
+    "hints": [
+      "Compare Fe2+ and Fe3+ or Cu2+ and Cu3+.",
+      "Review the summary table and callouts on the topic page."
+    ],
+    "difficulty": -0.2,
+    "level": "beginner",
+    "sources": [
+      "S-003"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "Cation size trends in oxides.",
+      "alt": "Perovskite crystal structure."
+    }
+  },
+  {
+    "id": "q-m10-12",
+    "concepts": [
+      "ionic-radii"
+    ],
+    "type": "single",
+    "prompt": "For a fixed ion and oxidation state, how does the Shannon radius change when coordination number increases (for example from 6 to 12)?",
+    "options": [
+      {
+        "text": "It increases with higher coordination number",
+        "correct": true,
+        "why": "More surrounding ligands increase anion-anion repulsion and lengthen bond distances."
+      },
+      {
+        "text": "It decreases by half",
+        "correct": false,
+        "why": "Higher coordination numbers correspond to larger effective ionic radii."
+      },
+      {
+        "text": "It is strictly identical for every coordination number",
+        "correct": false,
+        "why": "That is why Shannon tabulates separate radii per coordination number."
+      }
+    ],
+    "hints": [
+      "Think about ligand crowding around a 12-fold site versus a 6-fold site.",
+      "Review the summary table and callouts on the topic page."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-003"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "Coordination number effect on effective ionic radius.",
+      "alt": "Perovskite octahedra."
+    }
+  },
+  {
+    "id": "q-m10-13",
+    "concepts": [
+      "worked-example-workflow"
+    ],
+    "type": "single",
+    "prompt": "After completing a variable-cell ISIF = 3 relaxation in VASP, what should you run before reading the final total energy?",
+    "options": [
+      {
+        "text": "Copy CONTCAR to POSCAR and run a static calculation (IBRION = -1, NSW = 0)",
+        "correct": true,
+        "why": "A fresh static run rebuilds the plane-wave basis cleanly for the final relaxed cell."
+      },
+      {
+        "text": "Lower ENCUT to 200 eV to speed up the last step",
+        "correct": false,
+        "why": "Changing ENCUT invalidates energy comparisons."
+      },
+      {
+        "text": "Delete CHGCAR and stop without checking forces",
+        "correct": false,
+        "why": "You need to verify force convergence and keep CHGCAR for DOS/bands."
+      }
+    ],
+    "hints": [
+      "Recall why a single ISIF = 3 run keeps its initial plane-wave basis.",
+      "Review the summary table and callouts on the topic page."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "Relaxation followed by a static confirmation run.",
+      "alt": "Perovskite structure."
+    }
+  },
+  {
+    "id": "q-m10-14",
+    "concepts": [
+      "worked-example-workflow"
+    ],
+    "type": "single",
+    "prompt": "Which file carries the converged self-consistent charge density from the static run into a non-SCF DOS or band-structure run (ICHARG = 11)?",
+    "options": [
+      {
+        "text": "CHGCAR",
+        "correct": true,
+        "why": "ICHARG = 11 reads the charge density from CHGCAR and holds it fixed."
+      },
+      {
+        "text": "XDATCAR",
+        "correct": false,
+        "why": "XDATCAR stores ionic trajectory coordinates, not electron density."
+      },
+      {
+        "text": "OSZICAR",
+        "correct": false,
+        "why": "OSZICAR is a text summary log of SCF and ionic energies."
+      }
+    ],
+    "hints": [
+      "Look at the VASP file name that stores charge density.",
+      "Review the summary table and callouts on the topic page."
+    ],
+    "difficulty": -0.4,
+    "level": "beginner",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "reciprocal-fcc",
+      "caption": "Reciprocal-space sampling using a converged CHGCAR.",
+      "alt": "Reciprocal space Brillouin zone."
+    }
+  },
+  {
+    "id": "q-m10-15",
+    "concepts": [
+      "worked-example-workflow"
+    ],
+    "type": "single",
+    "prompt": "Why does a line-mode band-structure calculation use ISMEAR = 0 instead of ISMEAR = -5?",
+    "options": [
+      {
+        "text": "The tetrahedron method (ISMEAR = -5) requires a 3D k-mesh and cannot integrate along 1D band paths",
+        "correct": true,
+        "why": "Line-mode KPOINTS sample 1D segments, where tetrahedra are undefined."
+      },
+      {
+        "text": "ISMEAR = -5 is only allowed for molecules in a box",
+        "correct": false,
+        "why": "ISMEAR = -5 is for dense 3D k-meshes of solids, never for single Gamma-point molecules."
+      },
+      {
+        "text": "ISMEAR = 0 turns off spin polarization",
+        "correct": false,
+        "why": "Spin polarization is controlled by ISPIN, not ISMEAR."
+      }
+    ],
+    "hints": [
+      "Compare the geometry of a 3D k-grid with a 1D high-symmetry line path.",
+      "Review the summary table and callouts on the topic page."
+    ],
+    "difficulty": 0.1,
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "reciprocal-fcc",
+      "caption": "High-symmetry path in the Brillouin zone.",
+      "alt": "Brillouin zone reciprocal-space view."
+    }
+  },
+  {
+    "id": "q-m10-16",
+    "concepts": [
+      "worked-example-workflow"
+    ],
+    "type": "single",
+    "prompt": "What must be kept identical across every calculation whose total energies you subtract from one another?",
+    "options": [
+      {
+        "text": "Functional, POTCAR variants, ENCUT, and compatible k-point density",
+        "correct": true,
+        "why": "Mismatched POTCARs, functionals, or ENCUTs shift raw energies by large unphysical offsets."
+      },
+      {
+        "text": "Only the job wall-time limit in the Slurm script",
+        "correct": false,
+        "why": "Wall-time limits do not change the physical Hamiltonian."
+      },
+      {
+        "text": "Only the comment line on line 1 of POSCAR",
+        "correct": false,
+        "why": "The POSCAR comment line has no effect on VASP energies."
+      }
+    ],
+    "hints": [
+      "Check the reproducibility checklist in Module 10.",
+      "Review the summary table and callouts on the topic page."
+    ],
+    "difficulty": -0.2,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "scene": "fcc",
+      "caption": "Consistent settings across compared crystal calculations.",
+      "alt": "Crystal structure reference."
+    }
+  }
+]

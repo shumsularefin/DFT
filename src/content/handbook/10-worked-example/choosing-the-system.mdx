@@ -1,0 +1,84 @@
+---
+id: choosing-the-system
+title: Choosing the RCuO3 system
+module: 10
+order: 1
+summary: Why the rare-earth cuprate perovskite family RCuO3 is a clean testbed for tolerance-factor screening and DFT workflow design.
+concepts: [perovskite-structure, tolerance-factor, ionic-radii]
+requires: [lattice-vectors]
+vaspTags: []
+sources: [S-001, S-002, S-003, S-042]
+noLab: true
+status: draft
+updated: 2026-11-24
+---
+
+<Why>
+
+Before spending computer time on a family of oxides, geometric descriptors help you decide which compositions can plausibly adopt the perovskite framework and how much octahedral tilting to expect <Cite id="S-001" /> <Cite id="S-002" />.
+
+</Why>
+
+<Intuition>
+
+<Callout variant="note" title="Results pending: author data not yet supplied">
+
+This worked example documents the complete `RCuO3` workflow and input protocol. Computed DFT result numbers will be added once the author supplies the VASP calculation files in `data/author/`.
+
+</Callout>
+
+An $AB\mathrm{O}_3$ perovskite consists of a three-dimensional network of corner-sharing $B\mathrm{O}_6$ octahedra with larger $A$-site cations sitting in the 12-coordinated cavities between them <Cite id="S-001" />. In the $R\mathrm{CuO}_3$ series, stepping across the lanthanide row $R^{3+}$ systematically shrinks the $A$-site Shannon ionic radius, driving progressive octahedral tilting while keeping the formal copper oxidation state fixed <Cite id="S-003" />.
+
+<Scene id="perovskite-octahedra" />
+
+Use the <a href="/tools/tolerance-factor/">Tolerance-factor explorer</a> to compare Goldschmidt $t$, the octahedral factor $\mu$, and Bartel's $\tau$ across the $R\mathrm{CuO}_3$ series. Remember that Shannon ionic radii depend on both oxidation state and coordination number (12-fold for $A$, 6-fold for $B$ and $\mathrm{O}^{2-}$), and missing CN entries are reported honestly as gaps rather than guessed <Cite id="S-003" />.
+
+</Intuition>
+
+<TheMath>
+
+Goldschmidt's tolerance factor and the octahedral factor are defined from the Shannon radii $r_A$, $r_B$, and $r_X$ <Cite id="S-001" /> <Cite id="S-002" />:
+
+$$t = \frac{r_A + r_X}{\sqrt{2}\,(r_B + r_X)}, \qquad \mu = \frac{r_B}{r_X}$$
+
+Values of $t$ near unity favor cubic symmetry, while smaller $t$ indicates stronger tilting of the $B\mathrm{O}_6$ octahedra. Because tolerance factors are empirical heuristics, they guide candidate selection but never replace a full DFT stability check <Cite id="S-002" />.
+
+</TheMath>
+
+<InVasp>
+
+- Screen candidate $R^{3+}$ ions in the <a href="/tools/tolerance-factor/">Tolerance-factor explorer</a> before building supercells.
+- Record the exact oxidation states and coordination numbers used for every radius lookup <Cite id="S-003" />.
+- Carry the selected composition directly into the <a href="/builder/">Material Builder</a> or <a href="/tools/input-builder/">Input Builder</a>.
+
+</InVasp>
+
+<WhatChanges>
+
+| $A$-site radius trend               | Geometric effect on $B\mathrm{O}_6$ network        | Impact on DFT setup                                                      |
+| ----------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------ |
+| Smaller $R^{3+}$ across lanthanides | Lower Goldschmidt $t$, stronger octahedral tilting | Orthorhombic supercell (e.g. $Pnma$) needed instead of 5-atom cubic cell |
+| Fixed $\mathrm{Cu}^{3+}$ $B$-site   | Constant octahedral factor $\mu$                   | Same $B$-site PAW potential and $d$-orbital considerations               |
+
+Why screen first: geometric screening narrows a large rare-earth series to a prioritized shortlist before burning cluster hours.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Treating tolerance factors as proof of thermodynamic stability">
+
+A favorable Goldschmidt $t$ or Bartel $\tau$ only indicates geometric compatibility with the perovskite framework. Decomposition into competing binary oxides must still be tested with DFT total energies.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m10-1', 'q-m10-2', 'q-m10-3', 'q-m10-4']} />
+
+<GoDeeper>
+
+- Goldschmidt (1926) and Bartel et al. (2019) on perovskite stability descriptors <Cite id="S-001" /> <Cite id="S-002" />.
+- Shannon (1976) effective ionic radii tables <Cite id="S-003" />.
+
+</GoDeeper>
