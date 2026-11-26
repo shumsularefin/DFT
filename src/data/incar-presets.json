@@ -1504,6 +1504,112 @@
      ]
     }
    ]
+  },
+  {
+   "id": "aimd-nvt",
+   "title": "Ab initio molecular dynamics (NVT)",
+   "summary": "Liquids, amorphous phases, diffusion and finite-temperature behaviour, at constant temperature.",
+   "protocolStage": null,
+   "fragment": false,
+   "sources": [
+    "S-019",
+    "S-041"
+   ],
+   "notes": [
+    "Γ-only (vasp_gam) is common for large MD cells.",
+    "Discard the equilibration period before analysis.",
+    "POTIM is the time step in fs; the handbook uses 0.5 with hydrogen."
+   ],
+   "variants": [
+    {
+     "id": "default",
+     "title": "NVT run (Nose-Hoover)",
+     "requires": [
+      "POSCAR",
+      "POTCAR",
+      "KPOINTS"
+     ],
+     "entries": [
+      {
+       "name": "SYSTEM",
+       "value": "AIMD NVT"
+      },
+      {
+       "name": "IBRION",
+       "value": "0"
+      },
+      {
+       "name": "MDALGO",
+       "value": "2",
+       "comment": "Nose-Hoover thermostat"
+      },
+      {
+       "name": "SMASS",
+       "value": "1.0",
+       "comment": "Nose mass; tune for the T oscillation period"
+      },
+      {
+       "name": "TEBEG",
+       "value": "300"
+      },
+      {
+       "name": "TEEND",
+       "value": "300"
+      },
+      {
+       "name": "POTIM",
+       "value": "1.0",
+       "comment": "fs; 0.5 with H"
+      },
+      {
+       "name": "NSW",
+       "value": "5000"
+      },
+      {
+       "name": "ISIF",
+       "value": "0",
+       "comment": "no stress -> faster (ISIF = 2 to monitor pressure)"
+      },
+      {
+       "name": "ISYM",
+       "value": "0"
+      },
+      {
+       "name": "PREC",
+       "value": "Normal"
+      },
+      {
+       "name": "LREAL",
+       "value": "Auto"
+      },
+      {
+       "name": "ISMEAR",
+       "value": "0"
+      },
+      {
+       "name": "SIGMA",
+       "value": "0.05"
+      },
+      {
+       "name": "NELMIN",
+       "value": "4"
+      },
+      {
+       "name": "NBLOCK",
+       "value": "1",
+       "comment": "sampling interval for XDATCAR / PCDAT"
+      },
+      {
+       "name": "LWAVE",
+       "value": ".FALSE."
+      },
+      {
+       "name": "LCHARG",
+       "value": ".FALSE."
+      }
+     ]
+    }
+   ]
   }
  ]
 }

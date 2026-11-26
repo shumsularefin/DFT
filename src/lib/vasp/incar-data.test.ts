@@ -90,9 +90,9 @@ describe('vasp-tags.json', () => {
 });
 
 describe('incar-presets.json', () => {
-  it('has 16 presets with unique ids', () => {
-    expect(presets).toHaveLength(16);
-    expect(new Set(presets.map((p) => p.id)).size).toBe(16);
+  it('has 17 presets with unique ids', () => {
+    expect(presets).toHaveLength(17);
+    expect(new Set(presets.map((p) => p.id)).size).toBe(17);
   });
   it('uses only known tags, and each variant parses', () => {
     for (const p of presets)

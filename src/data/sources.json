@@ -654,5 +654,21 @@
     "access": "book",
     "status": "cited-from-memory",
     "notes": "Not read for this stage. The formulas used are the ones printed in S-042 (Workflow Handbook, \"Quantities derived by 711\"), which is in the repository; this entry is the textbook the work order asked for, to be checked (Q-057)"
+  },
+  {
+    "id": "S-083",
+    "citation": "A. Togo, I. Tanaka, \"First principles phonon calculations in materials science\", Scr. Mater. 108, 1 (2015)",
+    "usedFor": "Finite-displacement phonon method and the phonopy workflow (M15.7, phonons page)",
+    "access": "open access",
+    "status": "cited-from-memory",
+    "notes": "Cited as the method paper for phonopy; the commands and settings on the page come from S-042. Not read for this stage"
+  },
+  {
+    "id": "S-084",
+    "citation": "W. Tang, E. Sanville, G. Henkelman, \"A grid-based Bader analysis algorithm without lattice bias\", J. Phys.: Condens. Matter 21, 084204 (2009)",
+    "usedFor": "Bader partition on a grid and the `bader` program (M15.7, Bader page)",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": "The commands, the AECCAR reference and the checks on the page come from S-042. Not read for this stage"
   }
 ]

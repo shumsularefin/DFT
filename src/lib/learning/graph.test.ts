@@ -120,6 +120,12 @@ describe('shipped concept graph', () => {
       'material-builder',
       'screening',
       'ionic-radii',
+      'elastic-constants',
+      'equation-of-state',
+      'phonons',
+      'dielectric-response',
+      'optical-properties',
+      'bader-charges',
     ]);
     for (const x of g.filter((y) => y.module >= 6))
       expect(x.status, x.id).toBe(m73.has(x.id) ? 'published' : 'planned');

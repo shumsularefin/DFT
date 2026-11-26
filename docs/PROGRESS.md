@@ -6,7 +6,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 
 ## How to read this table
 
-- **Next Tier B stage: M15.7 (waits on M15.4 to M15.6)**; M15.9 waits on M15.6. M15.1 to M15.6 are done (all Tier A stages of M15). **Next stage to build is Tier B: M15.7** (module 12), then M15.8 and M15.9. Plan M15 (2026-11-26, D-086): repair after the process audit of main at 33414fb, and the parts of the author's handbooks (S-041, S-042) that had no page; see [work order](milestones/M15-coverage-and-repair.md). M7.6 stays `partial` until `data/author/` exists.
+- M15.1 to M15.7 are done. **Next stage to build is Tier B: M15.8** (beyond-PBE depth and the property catalogue), then M15.9 (waits on M15.6, done). Plan M15 (2026-11-26, D-086): repair after the process audit of main at 33414fb, and the parts of the author's handbooks (S-041, S-042) that had no page; see [work order](milestones/M15-coverage-and-repair.md). M7.6 stays `partial` until `data/author/` exists.
 - **Tier** says which model to open the session with. **A** = the strongest model (Opus class): stages where a subtle mistake would put a wrong number in front of a researcher. **B** = the fast model (Sonnet class): UI, content and wiring on top of tested libraries. `-` = already done.
 - **Size** says how much work it is: **S** short session, **M** one normal session, **L** a long session that may stop as `partial` and need a second one.
 - A session started on the wrong tier does not build. It names the model to switch to and stops (`docs/WORKFLOW.md` section 2, step 0).
@@ -87,7 +87,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M15.4 | Elastic tensor: reader and mechanical analysis | done | M4.1 | L | A | claude/compassionate-einstein-ls4ab4 | [#65](https://github.com/shumsularefin/DFT/pull/65) | 2026-11-26 | [report](reports/M15.4.md), [work order](milestones/M15-coverage-and-repair.md). Library only; UI in M15.7 |
 | M15.5 | Optics and dielectric response: readers and derived quantities | done | M4.1 | M | A | claude/compassionate-einstein-ls4ab4 | [#68](https://github.com/shumsularefin/DFT/pull/68) | 2026-11-26 | [report](reports/M15.5.md), [work order](milestones/M15-coverage-and-repair.md). Library only; UI in M15.7 |
 | M15.6 | Phonon output reader: Gamma modes and units | done | M4.1 | S | A | claude/compassionate-einstein-ls4ab4 | | 2026-11-26 | [report](reports/M15.6.md), [work order](milestones/M15-coverage-and-repair.md). Library and review checks; UI in M15.7 |
-| M15.7 | Handbook module 12: lattice response and properties | todo | M15.4, M15.5, M15.6 | L | B | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
+| M15.7 | Handbook module 12: lattice response and properties | done | M15.4, M15.5, M15.6 | L | B | claude/compassionate-einstein-ls4ab4 | | 2026-11-26 | [report](reports/M15.7.md), [work order](milestones/M15-coverage-and-repair.md). Six topics, AIMD preset |
 | M15.8 | Handbook: beyond-PBE depth and the property catalogue | todo | M15.7 | M | B | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
 | M15.9 | Reference pages: units, where to read it, checklist, layout, VASPKIT map | todo | M15.6 | M | B | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
 
@@ -126,6 +126,7 @@ Newest first. One line per session: date, stage, outcome, branch.
 - 2026-11-26, M15.2 session 1: pymatgen golden planar averages (M14.3); the M9.3 runtime formula replaced by a sourced relative estimate (D-092); Q-053 opened for the feasibility cut-offs.
 - 2026-11-26, M15.2 session 2: science-verifier over M7.5, M14.1 and M14.2 (no wrong formula; fixed one wrong doc comment, two unlabelled or unsourced thresholds, missing tests); band-gap golden vs pymatgen; Q-005, Q-010, Q-014 and Q-018 closed; D-093 to D-095; Q-054 to Q-056 opened.
 - 2026-11-26, M15.5: optics derived quantities and LOPTICS/LEPSILON readers, numpy and pymatgen golden data, D-096, Q-057 (Fox not read).
+- 2026-11-26, M15.7: handbook module 12 (elastic constants, EOS, phonons, dielectric tensor, optics, Bader), anisotropy section, 26 questions, 13 glossary terms, AIMD preset through the generator, S-083, S-084, D-098.
 - 2026-11-26, M15.6: units library from CODATA, Gamma-mode reader, two review checks (imaginary modes, acoustic count Heuristic), ASE read-back fixtures, D-097, Q-058.
 
 - 2026-11-24, batch (recorded late in M15.3 from `git log`): M13.4, M8.3, M8.4, M7.5, M14.1, M14.3, M9.2, M9.3 and M9.4 pushed to main (PRs #44 to #53) without session-log lines, DECISIONS entries or full reports; M15.2 re-audits the Tier A ones.

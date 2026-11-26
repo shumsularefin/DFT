@@ -1,4 +1,4 @@
-// M7.3: every INCAR shown in the module 6 and 7 topics must pass the M3.4 validator with no errors.
+// M7.3 (module 12 added in M15.7): every INCAR shown in the module 6, 7, 8 and 12 topics must pass the M3.4 validator with no errors.
 // Warnings are listed (set PRINT_FP=1). Q-019: the handbook's band INCAR has no LMAXMIX, so a V018 warning is expected there.
 import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -10,6 +10,7 @@ const DIRS = [
   'src/content/handbook/06-vasp-files',
   'src/content/handbook/07-running',
   'src/content/handbook/08-convergence-and-errors',
+  'src/content/handbook/12-properties',
 ];
 const BLOCK = /<(?:VaspFileExplorer|VaspFile)\s+(?:kind|name)="INCAR"[^]*?code=\{`([^`]*)`\}/g;
 

@@ -1,0 +1,1302 @@
+[
+  {
+    "id": "q-m12-el-1",
+    "concepts": [
+      "elastic-constants"
+    ],
+    "type": "single",
+    "prompt": "Before the IBRION = 6 run, what should the external pressure of the re-relaxed cell be?",
+    "options": [
+      {
+        "text": "Within about 1 kB of zero",
+        "correct": true,
+        "why": "Residual stress in the starting cell leaks into every elastic constant."
+      },
+      {
+        "text": "Exactly the pressure of the original relaxation, whatever it was",
+        "correct": false,
+        "why": "A cell that is not at rest gives strains measured from the wrong reference."
+      },
+      {
+        "text": "It does not matter, IBRION = 6 removes it",
+        "correct": false,
+        "why": "The finite-difference run starts from the cell you give it; it does not relax it away."
+      }
+    ],
+    "hints": [
+      "What does the run measure the strain from?",
+      "What would leftover stress add to each C_ij?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Relax at the elastic ENCUT"
+          },
+          {
+            "label": "Check external pressure"
+          },
+          {
+            "label": "IBRION = 6, ISIF = 3"
+          },
+          {
+            "label": "Read TOTAL ELASTIC MODULI"
+          }
+        ],
+        "active": 0
+      },
+      "caption": "The elastic-constant run in four steps.",
+      "alt": "A four-step flow: relax at the elastic cutoff, check the external pressure, run IBRION 6 with ISIF 3, read the elastic moduli block."
+    }
+  },
+  {
+    "id": "q-m12-el-2",
+    "concepts": [
+      "elastic-constants"
+    ],
+    "type": "single",
+    "prompt": "OUTCAR prints the elastic matrix with rows XX YY ZZ XY YZ ZX. In Voigt order (11 22 33 23 13 12), where does VASP's 4th entry (XY) belong?",
+    "options": [
+      {
+        "text": "Voigt index 6",
+        "correct": true,
+        "why": "XY is the 12 pair, which is Voigt 6; VASP's 5th and 6th entries are Voigt 4 and 5."
+      },
+      {
+        "text": "Voigt index 4",
+        "correct": false,
+        "why": "Voigt 4 is the 23 (YZ) pair, VASP's 5th entry."
+      },
+      {
+        "text": "It is already in Voigt order",
+        "correct": false,
+        "why": "That is the ordering trap: the last three entries must be reordered."
+      }
+    ],
+    "hints": [
+      "Write out which pair each Voigt index stands for.",
+      "XY means the 1-2 pair."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "scene": "fcc",
+      "caption": "A cubic crystal whose C44, C55 and C66 must be placed correctly.",
+      "alt": "Face-centred cubic crystal structure."
+    }
+  },
+  {
+    "id": "q-m12-el-3",
+    "concepts": [
+      "elastic-constants"
+    ],
+    "type": "single",
+    "prompt": "The stiffness matrix of your relaxed structure has one negative eigenvalue. What does the Born test say?",
+    "options": [
+      {
+        "text": "The structure is mechanically unstable as given",
+        "correct": true,
+        "why": "All eigenvalues of C must be positive for elastic stability."
+      },
+      {
+        "text": "It is stable, only the sum of eigenvalues matters",
+        "correct": false,
+        "why": "The criterion is on every eigenvalue, not the sum."
+      },
+      {
+        "text": "The run is fine, eigenvalues of C have no meaning",
+        "correct": false,
+        "why": "The eigenvalues are exactly what the necessary and sufficient condition tests."
+      }
+    ],
+    "hints": [
+      "What sign must every eigenvalue have?",
+      "A negative eigenvalue is a strain that lowers the energy."
+    ],
+    "difficulty": 1,
+    "level": "pro",
+    "sources": [
+      "S-072"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Relax at the elastic ENCUT"
+          },
+          {
+            "label": "Check external pressure"
+          },
+          {
+            "label": "IBRION = 6, ISIF = 3"
+          },
+          {
+            "label": "Read TOTAL ELASTIC MODULI"
+          }
+        ],
+        "active": 0
+      },
+      "caption": "The elastic-constant run in four steps.",
+      "alt": "A four-step flow: relax at the elastic cutoff, check the external pressure, run IBRION 6 with ISIF 3, read the elastic moduli block."
+    }
+  },
+  {
+    "id": "q-m12-el-4",
+    "concepts": [
+      "elastic-constants"
+    ],
+    "type": "single",
+    "prompt": "VASPKIT reports a Pugh ratio B/G of 2.1. How should the page tell you to read it?",
+    "options": [
+      {
+        "text": "As a Heuristic hint of ductility, not a measured result",
+        "correct": true,
+        "why": "Pugh's 1.75 threshold is an empirical rule of thumb."
+      },
+      {
+        "text": "As proof that the material is ductile",
+        "correct": false,
+        "why": "The ratio is an empirical indicator, not a law."
+      },
+      {
+        "text": "As an error, B/G must be below 1",
+        "correct": false,
+        "why": "Ratios above 1 are common; there is no such bound."
+      }
+    ],
+    "hints": [
+      "Is the 1.75 threshold derived or empirical?",
+      "How does the site label rules of thumb?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-073",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Relax at the elastic ENCUT"
+          },
+          {
+            "label": "Check external pressure"
+          },
+          {
+            "label": "IBRION = 6, ISIF = 3"
+          },
+          {
+            "label": "Read TOTAL ELASTIC MODULI"
+          }
+        ],
+        "active": 0
+      },
+      "caption": "The elastic-constant run in four steps.",
+      "alt": "A four-step flow: relax at the elastic cutoff, check the external pressure, run IBRION 6 with ISIF 3, read the elastic moduli block."
+    }
+  },
+  {
+    "id": "q-m12-eos-1",
+    "concepts": [
+      "equation-of-state"
+    ],
+    "type": "single",
+    "prompt": "In an E-V scan, why use ISIF = 4 rather than ISIF = 3 for each point?",
+    "options": [
+      {
+        "text": "ISIF = 4 keeps the volume you set while the ions and shape relax",
+        "correct": true,
+        "why": "Each point must stay at its own volume."
+      },
+      {
+        "text": "ISIF = 3 is not allowed with IBRION = 2",
+        "correct": false,
+        "why": "It is allowed; it would just relax the volume too."
+      },
+      {
+        "text": "ISIF = 4 is faster but gives the same curve",
+        "correct": false,
+        "why": "ISIF = 3 would send every point back to one volume and collapse the curve."
+      }
+    ],
+    "hints": [
+      "What does ISIF = 3 let change?",
+      "What would happen to seven points if the volume relaxed?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Scale the lattice 0.97 to 1.03"
+          },
+          {
+            "label": "Relax each at fixed volume"
+          },
+          {
+            "label": "Collect E and V"
+          },
+          {
+            "label": "Fit Birch-Murnaghan"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "The equation-of-state scan.",
+      "alt": "A four-step flow: scale the lattice constant, relax each point at fixed volume, collect energy and volume, fit a Birch-Murnaghan curve."
+    }
+  },
+  {
+    "id": "q-m12-eos-2",
+    "concepts": [
+      "equation-of-state"
+    ],
+    "type": "single",
+    "prompt": "Your fitted E-V curve has its lowest point at the largest volume you scanned. What should you do?",
+    "options": [
+      {
+        "text": "Extend the scan to larger volumes",
+        "correct": true,
+        "why": "The minimum must lie inside the scanned range for the fit to be trusted."
+      },
+      {
+        "text": "Report that volume as the equilibrium volume",
+        "correct": false,
+        "why": "The true minimum may lie beyond the edge."
+      },
+      {
+        "text": "Remove the largest-volume point",
+        "correct": false,
+        "why": "That hides the problem instead of fixing it."
+      }
+    ],
+    "hints": [
+      "Where must the minimum lie?",
+      "What does a minimum at the edge tell you about the range?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Scale the lattice 0.97 to 1.03"
+          },
+          {
+            "label": "Relax each at fixed volume"
+          },
+          {
+            "label": "Collect E and V"
+          },
+          {
+            "label": "Fit Birch-Murnaghan"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "The equation-of-state scan.",
+      "alt": "A four-step flow: scale the lattice constant, relax each point at fixed volume, collect energy and volume, fit a Birch-Murnaghan curve."
+    }
+  },
+  {
+    "id": "q-m12-eos-3",
+    "concepts": [
+      "equation-of-state"
+    ],
+    "type": "single",
+    "prompt": "A Birch-Murnaghan fit gives B0' = 9. What is the likely reason?",
+    "options": [
+      {
+        "text": "Too few points, too narrow a range or noisy energies",
+        "correct": true,
+        "why": "B0' is usually between 3.5 and 5; far outside points to a poor scan."
+      },
+      {
+        "text": "The material is extremely hard",
+        "correct": false,
+        "why": "Hardness shows in B0, not in an unusual pressure derivative."
+      },
+      {
+        "text": "Nothing, any B0' is fine",
+        "correct": false,
+        "why": "Values far from 3.5 to 5 are a warning sign."
+      }
+    ],
+    "hints": [
+      "What range of B0' is typical?",
+      "Which quantity is sensitive to curvature far from the minimum?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-061"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Scale the lattice 0.97 to 1.03"
+          },
+          {
+            "label": "Relax each at fixed volume"
+          },
+          {
+            "label": "Collect E and V"
+          },
+          {
+            "label": "Fit Birch-Murnaghan"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "The equation-of-state scan.",
+      "alt": "A four-step flow: scale the lattice constant, relax each point at fixed volume, collect energy and volume, fit a Birch-Murnaghan curve."
+    }
+  },
+  {
+    "id": "q-m12-eos-4",
+    "concepts": [
+      "equation-of-state"
+    ],
+    "type": "single",
+    "prompt": "B0 from your EOS fit is 30 % larger than B_Hill from the elastic constants of the same cell. What does the page suggest?",
+    "options": [
+      {
+        "text": "Check ENCUT, the k-points and residual stress",
+        "correct": true,
+        "why": "The two routes should agree within a few percent."
+      },
+      {
+        "text": "This is normal, the two never agree",
+        "correct": false,
+        "why": "They measure the same response and should agree closely."
+      },
+      {
+        "text": "Always trust B_Hill and discard the EOS",
+        "correct": false,
+        "why": "The disagreement means at least one is unconverged; find out which."
+      }
+    ],
+    "hints": [
+      "Should the two routes agree?",
+      "What settings do both depend on?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "scene": "rocksalt",
+      "caption": "A rocksalt crystal compressed uniformly in an EOS scan.",
+      "alt": "Rocksalt crystal structure."
+    }
+  },
+  {
+    "id": "q-m12-ph-1",
+    "concepts": [
+      "phonons"
+    ],
+    "type": "single",
+    "prompt": "Why re-relax to EDIFFG = -0.001 before a phonon run?",
+    "options": [
+      {
+        "text": "Leftover forces show up as spurious imaginary modes",
+        "correct": true,
+        "why": "Phonons are computed from forces around the minimum, so residual forces distort them."
+      },
+      {
+        "text": "Phonopy refuses to read a structure relaxed less tightly",
+        "correct": false,
+        "why": "Phonopy reads any POSCAR; the problem is the physics."
+      },
+      {
+        "text": "It makes the supercell smaller",
+        "correct": false,
+        "why": "The relaxation does not change the supercell size you choose."
+      }
+    ],
+    "hints": [
+      "What quantity are phonons built from?",
+      "What does a structure off the minimum do to the curvature?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "phonopy -d"
+          },
+          {
+            "label": "Run each displacement"
+          },
+          {
+            "label": "phonopy -f"
+          },
+          {
+            "label": "band.conf and mesh.conf"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "Route A with phonopy.",
+      "alt": "A four-step flow: phonopy -d makes displaced supercells, each runs in VASP, phonopy -f collects forces, then band and mesh configuration files give the results."
+    }
+  },
+  {
+    "id": "q-m12-ph-2",
+    "concepts": [
+      "phonons"
+    ],
+    "type": "single",
+    "prompt": "What does `phonopy -f disp-*/vasprun.xml` do?",
+    "options": [
+      {
+        "text": "Collects the forces of the displaced runs into FORCE_SETS",
+        "correct": true,
+        "why": "This is step 3 of route A."
+      },
+      {
+        "text": "Writes the displaced supercells",
+        "correct": false,
+        "why": "That is phonopy -d."
+      },
+      {
+        "text": "Plots the band structure",
+        "correct": false,
+        "why": "That is phonopy -p -s band.conf."
+      }
+    ],
+    "hints": [
+      "Which step comes after the VASP runs?",
+      "What does -f stand for in this context?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "phonopy -d"
+          },
+          {
+            "label": "Run each displacement"
+          },
+          {
+            "label": "phonopy -f"
+          },
+          {
+            "label": "band.conf and mesh.conf"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "Route A with phonopy.",
+      "alt": "A four-step flow: phonopy -d makes displaced supercells, each runs in VASP, phonopy -f collects forces, then band and mesh configuration files give the results."
+    }
+  },
+  {
+    "id": "q-m12-ph-3",
+    "concepts": [
+      "phonons"
+    ],
+    "type": "single",
+    "prompt": "Your dispersion shows a dip to a few cm-1 imaginary in an acoustic branch near Gamma. What is the usual reading?",
+    "options": [
+      {
+        "text": "Numerical noise: tighten EDIFF, add ADDGRID, raise ENCUT, k-mesh or supercell",
+        "correct": true,
+        "why": "Small acoustic dips near Gamma are typical noise."
+      },
+      {
+        "text": "A genuine structural instability",
+        "correct": false,
+        "why": "Large imaginary modes at zone-boundary points are the real warning sign."
+      },
+      {
+        "text": "The crystal is a metal",
+        "correct": false,
+        "why": "Imaginary modes say nothing direct about metallicity."
+      }
+    ],
+    "hints": [
+      "How large is the dip, and where?",
+      "What do the three acoustic modes do at Gamma?"
+    ],
+    "difficulty": 1,
+    "level": "pro",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "phonopy -d"
+          },
+          {
+            "label": "Run each displacement"
+          },
+          {
+            "label": "phonopy -f"
+          },
+          {
+            "label": "band.conf and mesh.conf"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "Route A with phonopy.",
+      "alt": "A four-step flow: phonopy -d makes displaced supercells, each runs in VASP, phonopy -f collects forces, then band and mesh configuration files give the results."
+    }
+  },
+  {
+    "id": "q-m12-ph-4",
+    "concepts": [
+      "phonons"
+    ],
+    "type": "single",
+    "prompt": "Why does a polar insulator need a BORN file and NAC = .TRUE. in phonopy?",
+    "options": [
+      {
+        "text": "The long-range dipole field splits LO and TO modes at Gamma",
+        "correct": true,
+        "why": "Without the correction the optical branches at Gamma are wrong."
+      },
+      {
+        "text": "BORN holds the POTCAR data phonopy needs",
+        "correct": false,
+        "why": "BORN holds the dielectric constant and Born charges."
+      },
+      {
+        "text": "NAC speeds up the supercell runs",
+        "correct": false,
+        "why": "It corrects the result; it does not change the VASP runs."
+      }
+    ],
+    "hints": [
+      "What is special about ionic insulators at Gamma?",
+      "Which tensors does the BORN file contain?"
+    ],
+    "difficulty": 1,
+    "level": "pro",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "scene": "rocksalt",
+      "caption": "A polar rocksalt crystal with LO-TO splitting.",
+      "alt": "Rocksalt crystal structure."
+    }
+  },
+  {
+    "id": "q-m12-ph-5",
+    "concepts": [
+      "phonons"
+    ],
+    "type": "single",
+    "prompt": "A magnetic phonon supercell run uses the unit cell's MAGMOM line. What is wrong?",
+    "options": [
+      {
+        "text": "MAGMOM needs one value per supercell atom",
+        "correct": true,
+        "why": "The supercell has more atoms than the unit cell."
+      },
+      {
+        "text": "Nothing, VASP repeats it automatically",
+        "correct": false,
+        "why": "VASP does not know your supercell mapping; the count must match."
+      },
+      {
+        "text": "Phonons cannot be magnetic",
+        "correct": false,
+        "why": "Magnetic phonon runs add ISPIN = 2 with a supercell MAGMOM."
+      }
+    ],
+    "hints": [
+      "How many atoms does the supercell have?",
+      "How many MAGMOM values does VASP expect?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "phonopy -d"
+          },
+          {
+            "label": "Run each displacement"
+          },
+          {
+            "label": "phonopy -f"
+          },
+          {
+            "label": "band.conf and mesh.conf"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "Route A with phonopy.",
+      "alt": "A four-step flow: phonopy -d makes displaced supercells, each runs in VASP, phonopy -f collects forces, then band and mesh configuration files give the results."
+    }
+  },
+  {
+    "id": "q-m12-di-1",
+    "concepts": [
+      "dielectric-response"
+    ],
+    "type": "single",
+    "prompt": "How is the static dielectric tensor built from the two parts OUTCAR prints?",
+    "options": [
+      {
+        "text": "epsilon_0 = epsilon_inf + epsilon_ion",
+        "correct": true,
+        "why": "The electronic part plus the ionic contribution."
+      },
+      {
+        "text": "epsilon_0 = epsilon_inf times epsilon_ion",
+        "correct": false,
+        "why": "The two screening contributions add."
+      },
+      {
+        "text": "epsilon_0 = epsilon_inf, the ions do not screen",
+        "correct": false,
+        "why": "The ions move in a static field and add screening."
+      }
+    ],
+    "hints": [
+      "Which two screening mechanisms act in a static field?",
+      "Do contributions to screening add or multiply?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Relaxed insulator cell"
+          },
+          {
+            "label": "IBRION = 8, LEPSILON"
+          },
+          {
+            "label": "grep the three blocks"
+          },
+          {
+            "label": "phonopy-vasp-born"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "The dielectric run and how its output is used.",
+      "alt": "A four-step flow: a relaxed insulator cell, a run with IBRION 8 and LEPSILON, grep the three OUTCAR blocks, write the BORN file."
+    }
+  },
+  {
+    "id": "q-m12-di-2",
+    "concepts": [
+      "dielectric-response"
+    ],
+    "type": "single",
+    "prompt": "The Born charges summed over all atoms give 0.3 in one component. What does that suggest?",
+    "options": [
+      {
+        "text": "The k-mesh or EDIFF is too loose",
+        "correct": true,
+        "why": "The acoustic sum rule says the sum should be close to zero; above about 0.1 points to loose settings."
+      },
+      {
+        "text": "The material is ferroelectric",
+        "correct": false,
+        "why": "The sum rule holds for every insulator."
+      },
+      {
+        "text": "Nothing, the sum is not meaningful",
+        "correct": false,
+        "why": "Moving the whole crystal cannot polarize it, so the sum should vanish."
+      }
+    ],
+    "hints": [
+      "What happens to polarization when the whole crystal moves rigidly?",
+      "What threshold does the page give?"
+    ],
+    "difficulty": 1,
+    "level": "pro",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Relaxed insulator cell"
+          },
+          {
+            "label": "IBRION = 8, LEPSILON"
+          },
+          {
+            "label": "grep the three blocks"
+          },
+          {
+            "label": "phonopy-vasp-born"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "The dielectric run and how its output is used.",
+      "alt": "A four-step flow: a relaxed insulator cell, a run with IBRION 8 and LEPSILON, grep the three OUTCAR blocks, write the BORN file."
+    }
+  },
+  {
+    "id": "q-m12-di-3",
+    "concepts": [
+      "dielectric-response"
+    ],
+    "type": "single",
+    "prompt": "In BaTiO3, Ti has a Born charge of about +7 against a nominal +4. What does that indicate?",
+    "options": [
+      {
+        "text": "Strong covalency (p-d hybridization) and a nearby ferroelectric instability",
+        "correct": true,
+        "why": "Anomalous Born charges are a known signature of this."
+      },
+      {
+        "text": "A wrong POTCAR for Ti",
+        "correct": false,
+        "why": "Anomalous Born charges are physical in such oxides."
+      },
+      {
+        "text": "That the run is metallic",
+        "correct": false,
+        "why": "The dielectric tensor is ill-defined in a metal; this is an insulator."
+      }
+    ],
+    "hints": [
+      "Is a Born charge the same as an ionic charge?",
+      "What bonding makes dynamical charges large?"
+    ],
+    "difficulty": 1,
+    "level": "pro",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "A perovskite with corner-sharing TiO6 octahedra.",
+      "alt": "Perovskite structure with corner-sharing octahedra."
+    }
+  },
+  {
+    "id": "q-m12-di-4",
+    "concepts": [
+      "dielectric-response"
+    ],
+    "type": "single",
+    "prompt": "Your system is metallic. Should you run LEPSILON for the dielectric tensor and Born charges?",
+    "options": [
+      {
+        "text": "No: they are ill-defined in a metal, free carriers screen a static field completely",
+        "correct": true,
+        "why": "The page warns against this run on a metallic state."
+      },
+      {
+        "text": "Yes, the result is the same as for an insulator",
+        "correct": false,
+        "why": "Free carriers make the static response ill-defined."
+      },
+      {
+        "text": "Yes, but with ISMEAR = -5",
+        "correct": false,
+        "why": "The smearing method does not fix the physics."
+      }
+    ],
+    "hints": [
+      "What do free carriers do to a static field?",
+      "Which materials is the run meant for?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Relaxed insulator cell"
+          },
+          {
+            "label": "IBRION = 8, LEPSILON"
+          },
+          {
+            "label": "grep the three blocks"
+          },
+          {
+            "label": "phonopy-vasp-born"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "The dielectric run and how its output is used.",
+      "alt": "A four-step flow: a relaxed insulator cell, a run with IBRION 8 and LEPSILON, grep the three OUTCAR blocks, write the BORN file."
+    }
+  },
+  {
+    "id": "q-m12-op-1",
+    "concepts": [
+      "optical-properties"
+    ],
+    "type": "single",
+    "prompt": "Why does the LOPTICS run need about three times the default NBANDS?",
+    "options": [
+      {
+        "text": "Every optical transition ends in an empty band, and the default has few empty bands",
+        "correct": true,
+        "why": "Too few empty bands cut the spectrum off at high energy."
+      },
+      {
+        "text": "More bands make the SCF converge faster",
+        "correct": false,
+        "why": "Extra empty bands make each step slower, not faster."
+      },
+      {
+        "text": "VASP refuses LOPTICS with the default band count",
+        "correct": false,
+        "why": "It runs, but the spectrum is incomplete."
+      }
+    ],
+    "hints": [
+      "Where does each transition end?",
+      "What happens to transitions to bands you did not compute?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Tight static SCF"
+          },
+          {
+            "label": "Read default NBANDS"
+          },
+          {
+            "label": "NBANDS about 3x, LOPTICS"
+          },
+          {
+            "label": "vaspkit 711"
+          }
+        ],
+        "active": 2
+      },
+      "caption": "The optics sequence.",
+      "alt": "A four-step flow: a tight static SCF, read the default band count, rerun with about three times the bands and LOPTICS, derive the optical quantities with VASPKIT 711."
+    }
+  },
+  {
+    "id": "q-m12-op-2",
+    "concepts": [
+      "optical-properties"
+    ],
+    "type": "single",
+    "prompt": "Your absorption onset sits at the PBE gap, which is too small. Which fix does the page give?",
+    "options": [
+      {
+        "text": "A scissor shift of eps2 by the gap correction, then Kramers-Kronig again, or optics with HSE or mBJ",
+        "correct": true,
+        "why": "Both correct the underestimated onset."
+      },
+      {
+        "text": "Increase CSHIFT",
+        "correct": false,
+        "why": "CSHIFT only broadens the spectrum; it does not move the onset."
+      },
+      {
+        "text": "Lower NEDOS",
+        "correct": false,
+        "why": "NEDOS sets the energy grid, not the gap."
+      }
+    ],
+    "hints": [
+      "What does CSHIFT actually change?",
+      "What must follow a rigid shift of eps2?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Tight static SCF"
+          },
+          {
+            "label": "Read default NBANDS"
+          },
+          {
+            "label": "NBANDS about 3x, LOPTICS"
+          },
+          {
+            "label": "vaspkit 711"
+          }
+        ],
+        "active": 2
+      },
+      "caption": "The optics sequence.",
+      "alt": "A four-step flow: a tight static SCF, read the default band count, rerun with about three times the bands and LOPTICS, derive the optical quantities with VASPKIT 711."
+    }
+  },
+  {
+    "id": "q-m12-op-3",
+    "concepts": [
+      "optical-properties"
+    ],
+    "type": "single",
+    "prompt": "Why is the low-energy LOPTICS spectrum of a metal incomplete?",
+    "options": [
+      {
+        "text": "LOPTICS has no intraband (Drude) term",
+        "correct": true,
+        "why": "Only transitions between bands are counted."
+      },
+      {
+        "text": "Metals have no empty bands",
+        "correct": false,
+        "why": "Metals have empty states right above the Fermi level."
+      },
+      {
+        "text": "The k-mesh is always too dense for metals",
+        "correct": false,
+        "why": "Metals need dense meshes; that is not the reason."
+      }
+    ],
+    "hints": [
+      "Which transitions does LOPTICS count?",
+      "What do free carriers contribute at low energy?"
+    ],
+    "difficulty": 1,
+    "level": "pro",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Tight static SCF"
+          },
+          {
+            "label": "Read default NBANDS"
+          },
+          {
+            "label": "NBANDS about 3x, LOPTICS"
+          },
+          {
+            "label": "vaspkit 711"
+          }
+        ],
+        "active": 2
+      },
+      "caption": "The optics sequence.",
+      "alt": "A four-step flow: a tight static SCF, read the default band count, rerun with about three times the bands and LOPTICS, derive the optical quantities with VASPKIT 711."
+    }
+  },
+  {
+    "id": "q-m12-op-4",
+    "concepts": [
+      "optical-properties"
+    ],
+    "type": "single",
+    "prompt": "A tetragonal crystal gives different xx and zz spectra. What should you report?",
+    "options": [
+      {
+        "text": "The components separately, or say that you averaged",
+        "correct": true,
+        "why": "Non-cubic crystals are optically anisotropic."
+      },
+      {
+        "text": "Only xx, since the components should be equal",
+        "correct": false,
+        "why": "They differ by symmetry in a non-cubic crystal."
+      },
+      {
+        "text": "The largest component",
+        "correct": false,
+        "why": "Choosing one hides the anisotropy without saying so."
+      }
+    ],
+    "hints": [
+      "Are xx and zz equivalent in a tetragonal cell?",
+      "How would a reader know you averaged?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "An oxide whose optical response can differ along its axes.",
+      "alt": "Perovskite structure with corner-sharing octahedra."
+    }
+  },
+  {
+    "id": "q-m12-ba-1",
+    "concepts": [
+      "bader-charges"
+    ],
+    "type": "single",
+    "prompt": "Why does bader need -ref CHGCAR_sum rather than CHGCAR alone?",
+    "options": [
+      {
+        "text": "The PAW CHGCAR holds only the pseudo valence density, which has no peaks at the nuclei",
+        "correct": true,
+        "why": "The regions are drawn on the all-electron reference, the sum of AECCAR0 and AECCAR2."
+      },
+      {
+        "text": "CHGCAR is too large for bader to read",
+        "correct": false,
+        "why": "Size is not the issue; the shape of the density is."
+      },
+      {
+        "text": "CHGCAR_sum holds more valence electrons",
+        "correct": false,
+        "why": "The valence charge counted still comes from CHGCAR."
+      }
+    ],
+    "hints": [
+      "What does the Bader partition need at each nucleus?",
+      "Which files does LAECHG write?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Static run, LAECHG"
+          },
+          {
+            "label": "chgsum.pl AECCAR0 AECCAR2"
+          },
+          {
+            "label": "bader CHGCAR -ref CHGCAR_sum"
+          },
+          {
+            "label": "ZVAL minus CHARGE"
+          }
+        ],
+        "active": 2
+      },
+      "caption": "The Bader workflow.",
+      "alt": "A four-step flow: a static run writing AECCAR files, sum them with chgsum.pl, run bader with the summed reference, subtract CHARGE from ZVAL."
+    }
+  },
+  {
+    "id": "q-m12-ba-2",
+    "concepts": [
+      "bader-charges"
+    ],
+    "type": "single",
+    "prompt": "ZVAL for O is 6 and ACF.dat gives CHARGE = 7.2 for an oxygen atom. What is its net Bader charge?",
+    "options": [
+      {
+        "text": "-1.2",
+        "correct": true,
+        "why": "Net charge = ZVAL - CHARGE = 6 - 7.2 = -1.2: the atom gained electrons."
+      },
+      {
+        "text": "+1.2",
+        "correct": false,
+        "why": "The sign is ZVAL minus CHARGE; gaining electrons gives a negative charge."
+      },
+      {
+        "text": "-2, the formal charge",
+        "correct": false,
+        "why": "Bader charges are smaller than formal oxidation states."
+      }
+    ],
+    "hints": [
+      "Net charge = ZVAL minus what?",
+      "Did the atom gain or lose electrons?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "scene": "rocksalt",
+      "caption": "An oxide in which oxygen gains charge.",
+      "alt": "Rocksalt crystal structure."
+    }
+  },
+  {
+    "id": "q-m12-ba-3",
+    "concepts": [
+      "bader-charges"
+    ],
+    "type": "single",
+    "prompt": "How do you check that a Bader result is converged with the grid?",
+    "options": [
+      {
+        "text": "Repeat with a finer FFT grid; charges should change by less than 0.01 e",
+        "correct": true,
+        "why": "The region borders are drawn on the grid."
+      },
+      {
+        "text": "Repeat with a larger ENCUT only",
+        "correct": false,
+        "why": "The page asks for a finer fine FFT grid (NGXF and so on)."
+      },
+      {
+        "text": "Check that the vacuum charge is large",
+        "correct": false,
+        "why": "For bulk the vacuum charge should be about zero."
+      }
+    ],
+    "hints": [
+      "Where are the borders between regions drawn?",
+      "What change size does the page accept?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Static run, LAECHG"
+          },
+          {
+            "label": "chgsum.pl AECCAR0 AECCAR2"
+          },
+          {
+            "label": "bader CHGCAR -ref CHGCAR_sum"
+          },
+          {
+            "label": "ZVAL minus CHARGE"
+          }
+        ],
+        "active": 2
+      },
+      "caption": "The Bader workflow.",
+      "alt": "A four-step flow: a static run writing AECCAR files, sum them with chgsum.pl, run bader with the summed reference, subtract CHARGE from ZVAL."
+    }
+  },
+  {
+    "id": "q-m12-ba-4",
+    "concepts": [
+      "bader-charges"
+    ],
+    "type": "single",
+    "prompt": "Two oxides give O Bader charges of -1.1 and -1.3. How should you use them?",
+    "options": [
+      {
+        "text": "Compare the trend between the structures, not the absolute values",
+        "correct": true,
+        "why": "Bader charges are always smaller than formal charges; trends are what they show."
+      },
+      {
+        "text": "Conclude the oxygen is not O2- in either",
+        "correct": false,
+        "why": "Bader charges are not oxidation states."
+      },
+      {
+        "text": "Discard them, they should be -2",
+        "correct": false,
+        "why": "Values near -1 to -1.3 are typical for oxygen in oxides."
+      }
+    ],
+    "hints": [
+      "Are Bader charges oxidation states?",
+      "What range does the page give for oxygen?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Static run, LAECHG"
+          },
+          {
+            "label": "chgsum.pl AECCAR0 AECCAR2"
+          },
+          {
+            "label": "bader CHGCAR -ref CHGCAR_sum"
+          },
+          {
+            "label": "ZVAL minus CHARGE"
+          }
+        ],
+        "active": 2
+      },
+      "caption": "The Bader workflow.",
+      "alt": "A four-step flow: a static run writing AECCAR files, sum them with chgsum.pl, run bader with the summed reference, subtract CHARGE from ZVAL."
+    }
+  }
+]

@@ -677,24 +677,68 @@
   {
     "id": "elastic-constants",
     "label": "Elastic constants",
-    "module": 9,
-    "summary": "How the energy changes when the cell is deformed.",
+    "module": 12,
+    "summary": "How the stress responds to a small strain of the cell, and what the tensor says about stability and stiffness.",
     "prerequisites": [
-      "forces-and-relaxation"
+      "relaxation-analysis"
     ],
     "level": "pro",
-    "status": "planned"
+    "status": "published"
+  },
+  {
+    "id": "equation-of-state",
+    "label": "Equation of state",
+    "module": 12,
+    "summary": "Fitting energy against volume to get the equilibrium volume, the bulk modulus and transition pressures.",
+    "prerequisites": [
+      "relaxation-analysis"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "phonons",
+    "label": "Phonons",
+    "module": 12,
+    "summary": "Lattice vibrations from finite displacements or perturbation theory, and what imaginary modes mean.",
+    "prerequisites": [
+      "relaxation-analysis"
+    ],
+    "level": "pro",
+    "status": "published"
+  },
+  {
+    "id": "dielectric-response",
+    "label": "Dielectric response",
+    "module": 12,
+    "summary": "The electronic and ionic dielectric tensors and the Born effective charges of an insulator.",
+    "prerequisites": [
+      "phonons"
+    ],
+    "level": "pro",
+    "status": "published"
   },
   {
     "id": "optical-properties",
     "label": "Optical properties",
-    "module": 9,
-    "summary": "Estimating absorption from the computed states, with known limits.",
+    "module": 12,
+    "summary": "The frequency-dependent dielectric function from LOPTICS and the optical quantities derived from it.",
     "prerequisites": [
-      "band-structure"
+      "dielectric-response"
     ],
     "level": "pro",
-    "status": "planned"
+    "status": "published"
+  },
+  {
+    "id": "bader-charges",
+    "label": "Bader charges",
+    "module": 12,
+    "summary": "Splitting the electron density into one region per atom to count a charge per atom.",
+    "prerequisites": [
+      "charge-density-analysis"
+    ],
+    "level": "intermediate",
+    "status": "published"
   },
   {
     "id": "perovskite-structure",

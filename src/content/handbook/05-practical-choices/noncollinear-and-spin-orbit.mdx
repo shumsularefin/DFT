@@ -6,11 +6,11 @@ order: 11
 summary: Overview of when spins tilt away from a single axis, how spin-orbit coupling links spin to the crystal lattice, and which VASP tags and binary are required.
 concepts: [noncollinear-magnetism]
 requires: [magnetic-ground-state]
-vaspTags: [LNONCOLLINEAR, LSORBIT, SAXIS, MAGMOM]
+vaspTags: [LNONCOLLINEAR, LSORBIT, SAXIS, MAGMOM, ICHARG, ISYM]
 sources: [S-019, S-042, S-059, S-065]
 noLab: true
 status: draft
-updated: 2026-11-24
+updated: 2026-11-26
 ---
 
 <Why>
@@ -60,6 +60,17 @@ LORBIT = 11
 - `SAXIS` sets the spin quantization axis (default `0 0 1`); changing `SAXIS` lets you compare energies for spins aligned along different crystal directions <Cite id="S-065" />.
 - `MAGMOM` must supply **3 values per atom** ($3N$ total entries). Do not set `ISPIN = 2` alongside `LNONCOLLINEAR = .TRUE.`; VASP uses the spinor formalism instead <Cite id="S-042" />.
 
+**Computing the magnetocrystalline anisotropy.** The <Term id="magnetocrystalline-anisotropy">anisotropy energy</Term> (MAE) is the energy difference between two magnetization directions, so it takes one collinear run and then one non-collinear run per direction <Cite id="S-042" />:
+
+1. A collinear SCF with `vasp_std`, `LMAXMIX = 4` (6 for f elements) and a tight `EDIFF`; keep `CHGCAR` and `WAVECAR`.
+2. For each direction, a `vasp_ncl` run with `LSORBIT = .TRUE.`, `ICHARG = 11`, `ISYM = -1`, `LORBMOM = .TRUE.` and `MAGMOM` as three components per atom, for example `0 0 4 ...` for [001] and `4 0 0 ...` for [100].
+3. $\text{MAE} = E[100] - E[001]$, typically microelectronvolts to millielectronvolts per atom.
+
+- **Why `ICHARG = 11`:** the density is held fixed from the collinear run, so the two directions differ only through spin-orbit coupling.
+- **Why `ISYM = -1`:** symmetry operations that are valid without the spin direction may not be valid with it.
+- **Why `LORBMOM`:** it prints the orbital moments, which are worth reporting with the MAE.
+- **Converge the k-mesh hard:** an energy difference this small needs very dense sampling <Cite id="S-042" />.
+
 </InVasp>
 
 <WhatChanges>
@@ -91,7 +102,7 @@ In non-collinear mode every atom needs three components `(mx my mz)`. Passing a 
 
 </Mistakes>
 
-<Check ids={['q-mag-16', 'q-mag-17', 'q-mag-19']} />
+<Check ids={['q-mag-16', 'q-mag-17', 'q-mag-19', 'q-mag-27']} />
 
 <GoDeeper>
 

@@ -1,0 +1,144 @@
+---
+id: elastic-constants
+title: Elastic constants and mechanical stability
+module: 12
+order: 1
+summary: How VASP computes the elastic tensor, the checks before you run, the OUTCAR ordering trap, the Born stability test and the Voigt, Reuss and Hill moduli.
+concepts: [elastic-constants]
+requires: [relaxation-analysis]
+vaspTags: [IBRION, ISIF, NFREE, POTIM, ENCUT, EDIFF]
+sources: [S-019, S-020, S-042, S-072, S-073, S-074, S-075, S-076, S-077, S-078, S-079]
+noLab: true
+status: draft
+updated: 2026-11-26
+---
+
+<Why>
+
+Push on a crystal and it pushes back. The <Term id="elastic-tensor">elastic tensor</Term> says how hard it pushes back for every way you can squeeze, stretch or shear it. From it come the bulk, shear and Young's moduli, the speed of sound, a Debye temperature, and the most basic stability test a structure has to pass: a crystal whose elastic tensor is not positive definite would deform by itself <Cite id="S-072" />.
+
+</Why>
+
+<Intuition>
+
+Think of the crystal as a block of jelly with a grain. Squeezing it along x, along z, or shearing the top face sideways all cost different amounts of energy. VASP measures this directly: with `IBRION = 6` and `ISIF = 3` it applies small positive and negative strains to the cell, six independent ones, lets the ions respond, and reads the stress that comes back <Cite id="S-019" />. The ratio of stress to strain is the stiffness. The total printed in OUTCAR, `TOTAL ELASTIC MODULI`, is the clamped-ion part plus the correction from the ions relaxing inside the strained cell <Cite id="S-042" />.
+
+Stress is very sensitive to how well the plane-wave basis describes the cell, so the elastic run is the most demanding of the author's five steps: a high cutoff, a tight SCF and a cell that is already relaxed with exactly those settings <Cite id="S-042" />.
+
+</Intuition>
+
+<TheMath>
+
+In <Term id="voigt-notation">Voigt notation</Term> the stress and strain each have six components (11, 22, 33, 23, 13, 12), and the elastic constants form a symmetric 6 by 6 matrix $C$ in GPa.
+
+**Stability (Born).** A crystal is mechanically stable when all six eigenvalues of $C$ are positive. This test is general, necessary and sufficient. For a cubic crystal it reduces to $C_{11} - C_{12} > 0$, $C_{11} + 2C_{12} > 0$ and $C_{44} > 0$ <Cite id="S-072" />.
+
+<Level min="intermediate">
+
+**Averages.** A polycrystal has one bulk modulus $B$ and one shear modulus $G$. Voigt's average assumes uniform strain and is an upper bound; Reuss's average uses the compliance $S = C^{-1}$, assumes uniform stress and is a lower bound; Hill's value is their mean <Cite id="S-076" />:
+
+$$B_V = \tfrac{1}{9}\left[(C_{11}+C_{22}+C_{33}) + 2(C_{12}+C_{13}+C_{23})\right], \qquad B_R = \frac{1}{(S_{11}+S_{22}+S_{33}) + 2(S_{12}+S_{13}+S_{23})}$$
+
+$$G_V = \tfrac{1}{15}\left[(C_{11}+C_{22}+C_{33}) - (C_{12}+C_{13}+C_{23}) + 3(C_{44}+C_{55}+C_{66})\right]$$
+
+$$G_R = \frac{15}{4(S_{11}+S_{22}+S_{33}) - 4(S_{12}+S_{13}+S_{23}) + 3(S_{44}+S_{55}+S_{66})}$$
+
+with $B_H = (B_V + B_R)/2$ and $G_H = (G_V + G_R)/2$. Young's modulus is $E = 9BG/(3B+G)$ and Poisson's ratio $\nu = (3B-2G)/[2(3B+G)]$ <Cite id="S-042" />.
+
+</Level>
+
+<Level min="pro">
+
+The universal anisotropy index $A^U = 5G_V/G_R + B_V/B_R - 6$ is zero for an isotropic solid <Cite id="S-077" />. Sound velocities $v_l = \sqrt{(B + 4G/3)/\rho}$ and $v_t = \sqrt{G/\rho}$ give a mean velocity $v_m$ and, through Anderson's formula, a Debye temperature <Cite id="S-078" />. The site's elastic library computes all of these from a VASP tensor and is tested against pymatgen's `ElasticTensor` on cubic, hexagonal and triclinic cases.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+The run, from the author's protocol (step 5) <Cite id="S-042" />:
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM  = Compound-elastic
+PREC    = Accurate
+ENCUT   = 620
+EDIFF   = 1E-8
+ALGO    = Normal
+ISMEAR  = 0
+SIGMA   = 0.05
+LREAL   = .FALSE.
+LASPH   = .TRUE.
+IBRION  = 6
+ISIF    = 3
+NFREE   = 4
+POTIM   = 0.015
+NSW     = 1
+LWAVE   = .FALSE.
+LCHARG  = .FALSE.`}
+/>
+
+- **Why `ENCUT = 620`:** it is at least 1.3 times the largest ENMAX in the author's system, the same value used to re-relax, because stress converges slowly with the cutoff. Use your own 1.3 x ENMAX <Cite id="S-042" />.
+- **Why `NFREE = 4`, `POTIM = 0.015`:** four displacements per direction, with a step of 0.015, are more accurate than two; 2 is cheaper <Cite id="S-042" />.
+- **Leave `NCORE` out:** VASP runs `IBRION = 6` without band parallelization, and an `NCORE` line can stop the run <Cite id="S-042" />.
+- Magnetic: add `ISPIN = 2` and one `MAGMOM` value per atom.
+
+**Before you run** <Cite id="S-042" />:
+
+1. Relax with exactly this ENCUT, PREC and k-mesh, then check `grep "external pressure" OUTCAR | tail -1`: it should be within about 1 kB of zero.
+2. Use a denser k-mesh than for the relaxation (metals especially): the C_ij converge slowly with k-points.
+3. Use the conventional cell when its axes are the crystal axes you want C_ij in (for example cubic).
+
+**Reading it.** `grep -A 9 "TOTAL ELASTIC MODULI" OUTCAR` prints the matrix in kBar (divide by 10 for GPa), and `printf "203\n" | vaspkit` analyses it <Cite id="S-020" />. VASPKIT 203 reports C_ij and S_ij, the Voigt, Reuss and Hill B, E, G and nu, the Pugh ratio, two hardness models, the Cauchy pressure, anisotropy indices, sound velocities, the Debye temperature, the six eigenvalues and the Born criteria <Cite id="S-042" />.
+
+**The energy-strain route (VASPKIT 201).** Energies are less noisy than stresses, so VASPKIT also fits C_ij to the energy of strained cells. It needs more runs (for a cubic crystal, 3 strain types times 7 strains). Write `VPKIT.in` with line 1 set to `1`, run 201 to create the strain folders, run VASP in each with `ISIF = 2` (the ions relax, the strain fixes the cell), then set line 1 to `2` and run 201 again for the fit <Cite id="S-042" />.
+
+<VaspFile
+  name="VPKIT.in"
+  code={`1                       ! 1 for pre-processing; 2 for post-processing
+3D                      ! 2D for two-dimensional, 3D for bulk
+7                       ! number of strain cases
+-0.015 -0.010 -0.005 0.000 0.005 0.010 0.015   ! strain range`}
+/>
+
+</InVasp>
+
+<WhatChanges>
+
+| If you...                                   | ...then                                         | Why                                                      |
+| ------------------------------------------- | ----------------------------------------------- | -------------------------------------------------------- |
+| Skip the re-relaxation at the elastic ENCUT | Residual stress leaks into every C_ij           | The strains are measured from a cell that is not at rest |
+| Use the relaxation k-mesh                   | C_ij drift, metals most                         | Elastic constants converge slowly with k-points          |
+| Read OUTCAR yourself in the printed order   | C44, C55 and C66 land in the wrong places       | See the ordering trap below                              |
+| Find one negative eigenvalue                | The structure is mechanically unstable as given | Born test <Cite id="S-072" />                            |
+
+Cross-check: B_H from C_ij should agree with B_0 from an equation-of-state fit within a few percent; a large gap points to unconverged ENCUT or k-points, or residual stress <Cite id="S-042" />.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="The ordering trap">
+
+OUTCAR prints rows and columns as XX YY ZZ XY YZ ZX. Voigt order is 11 22 33 23 13 12. So VASP's 4th, 5th and 6th entries are Voigt 6, 4 and 5. VASPKIT converts for you; if you parse OUTCAR yourself, reorder first <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Reading the ductility indicators as laws">
+
+Pugh's B/G above 1.75 (ductile), Poisson's ratio above 0.26, the sign of the Cauchy pressure and the Chen hardness model are empirical rules of thumb, not results <Cite id="S-073" /> <Cite id="S-075" /> <Cite id="S-079" />. The Chen model can even come out negative for soft solids, where it does not apply <Cite id="S-074" />. Treat them as Heuristic.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m12-el-1', 'q-m12-el-2', 'q-m12-el-3', 'q-m12-el-4']} />
+
+<GoDeeper>
+
+- Mouhat and Coudert on the Born stability criteria for every crystal class <Cite id="S-072" />.
+- Hill on the Voigt and Reuss bounds <Cite id="S-076" />; Ranganathan and Ostoja-Starzewski on the universal anisotropy index <Cite id="S-077" />.
+- VASP wiki pages IBRION and ISIF (by page name) <Cite id="S-019" />; the VASPKIT paper <Cite id="S-020" />.
+
+</GoDeeper>

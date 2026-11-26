@@ -1056,5 +1056,127 @@
     "sources": [
       "S-059"
     ]
+  },
+  {
+    "id": "elastic-tensor",
+    "label": "Elastic tensor",
+    "short": "The 6 by 6 table of elastic constants that links a small strain of the cell to the stress it produces.",
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-072"
+    ]
+  },
+  {
+    "id": "voigt-notation",
+    "label": "Voigt notation",
+    "short": "Writing the pairs xx, yy, zz, yz, xz, xy as the single indices 1 to 6, so a symmetric strain or stress becomes a list of six numbers.",
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "bulk-modulus",
+    "label": "Bulk modulus",
+    "short": "How hard a material resists a uniform squeeze: the pressure needed per relative change of volume, usually given in GPa.",
+    "level": "beginner",
+    "sources": [
+      "S-042",
+      "S-061"
+    ]
+  },
+  {
+    "id": "equation-of-state",
+    "label": "Equation of state",
+    "short": "A fitted curve of energy (or pressure) against volume, giving the equilibrium volume, the bulk modulus and its pressure derivative.",
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-061"
+    ]
+  },
+  {
+    "id": "phonon",
+    "label": "Phonon",
+    "short": "A quantum of lattice vibration: one normal mode of the atoms moving together at a definite frequency and wave vector.",
+    "level": "beginner",
+    "sources": [
+      "S-042",
+      "S-083"
+    ]
+  },
+  {
+    "id": "imaginary-mode",
+    "label": "Imaginary mode",
+    "short": "A vibration whose squared frequency comes out negative, printed as an imaginary frequency; the structure can lower its energy by moving along it.",
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "lo-to-splitting",
+    "label": "LO-TO splitting",
+    "short": "In a polar crystal, the long-range dipole field splits the longitudinal and transverse optical modes at the zone centre (Gamma).",
+    "level": "pro",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "dielectric-tensor",
+    "label": "Dielectric tensor",
+    "short": "The 3 by 3 tensor that says how strongly a material screens an electric field in each direction, from electrons alone or with the ions too.",
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "born-effective-charge",
+    "label": "Born effective charge",
+    "short": "The change of polarization when one atom is moved, per unit displacement: a 3 by 3 tensor per atom that can differ from the nominal ionic charge.",
+    "level": "pro",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "bader-charge",
+    "label": "Bader charge",
+    "short": "The number of electrons inside an atom's region when the density is split along surfaces where it has no slope across them.",
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-084"
+    ]
+  },
+  {
+    "id": "kramers-kronig",
+    "label": "Kramers-Kronig transform",
+    "short": "The relation that gives the real part of a response function, such as the dielectric function, from its imaginary part over all frequencies.",
+    "level": "pro",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "scissor-shift",
+    "label": "Scissor shift",
+    "short": "Rigidly moving the empty bands, or the absorption spectrum, up by a fixed energy to correct an underestimated gap.",
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "magnetocrystalline-anisotropy",
+    "label": "Magnetocrystalline anisotropy",
+    "short": "The energy difference between magnetization directions in a crystal, which comes from spin-orbit coupling.",
+    "level": "pro",
+    "sources": [
+      "S-042"
+    ]
   }
 ]

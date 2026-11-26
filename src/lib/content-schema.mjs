@@ -14,7 +14,7 @@ export const STATUSES = ['draft', 'review', 'verified'];
 export const handbookSchema = z.object({
   id: kebab,
   title: z.string().min(3),
-  module: z.number().int().min(1).max(11),
+  module: z.number().int().min(1).max(12),
   order: z.number().int().min(0),
   summary: z.string().min(10),
   concepts: z.array(kebab).default([]),

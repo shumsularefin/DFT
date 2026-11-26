@@ -3308,5 +3308,61 @@
       "caption": "Crystal environment coupled to spin via spin-orbit interaction.",
       "alt": "Perovskite crystal with tilted octahedra."
     }
+  },
+  {
+    "id": "q-mag-27",
+    "concepts": [
+      "noncollinear-magnetism"
+    ],
+    "type": "single",
+    "prompt": "For the anisotropy energy you run one vasp_ncl calculation per magnetization direction. Why use ICHARG = 11 from a collinear run?",
+    "options": [
+      {
+        "text": "The density stays fixed, so the directions differ only through spin-orbit coupling",
+        "correct": true,
+        "why": "The MAE is a tiny difference; a fixed density keeps everything else the same."
+      },
+      {
+        "text": "vasp_ncl cannot run a self-consistent calculation",
+        "correct": false,
+        "why": "It can; the fixed density is a choice for this energy difference."
+      },
+      {
+        "text": "ICHARG = 11 makes the k-mesh denser",
+        "correct": false,
+        "why": "ICHARG controls the starting density, not the k-points."
+      }
+    ],
+    "hints": [
+      "How large is the MAE compared with the total energy?",
+      "What should differ between the two runs?"
+    ],
+    "difficulty": 2,
+    "level": "pro",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Collinear SCF, keep CHGCAR"
+          },
+          {
+            "label": "vasp_ncl along [001]"
+          },
+          {
+            "label": "vasp_ncl along [100]"
+          },
+          {
+            "label": "MAE = E[100] - E[001]"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "The anisotropy sequence.",
+      "alt": "A four-step flow: a collinear SCF keeping CHGCAR, a non-collinear run along 001, another along 100, then the energy difference."
+    }
   }
 ]

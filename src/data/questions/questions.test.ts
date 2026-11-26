@@ -8,6 +8,7 @@ import q5 from './module-05.json';
 import q6 from './module-06.json';
 import q7 from './module-07.json';
 import q8 from './module-08.json';
+import q12 from './module-12.json';
 
 interface Q {
   id: string;
@@ -31,6 +32,7 @@ const MODULES = [
   { name: 'module 6', perConcept: true, dir: 'src/content/handbook/06-vasp-files', questions: q6 as Q[] },
   { name: 'module 7', perConcept: true, dir: 'src/content/handbook/07-running', questions: q7 as Q[] },
   { name: 'module 8', perConcept: true, dir: 'src/content/handbook/08-convergence-and-errors', questions: q8 as Q[] },
+  { name: 'module 12', perConcept: true, dir: 'src/content/handbook/12-properties', questions: q12 as Q[] },
 ];
 const sourceIds = new Set([...readFileSync('docs/SCIENCE_SOURCES.md', 'utf8').matchAll(/^\| (S-\d{3}) /gm)].map((m) => m[1]));
 
