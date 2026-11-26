@@ -133,6 +133,8 @@ test.describe('k-path tool', () => {
 
   test('the Input Builder hands its structure over', async ({ page }) => {
     await page.goto('/tools/input-builder/');
+    // Wait for hydration: text filled into the server-rendered textarea is reset when React hydrates.
+    await page.waitForFunction(() => document.querySelectorAll('astro-island[ssr]').length === 0);
     await page.getByLabel('POSCAR text').fill(MG);
     await page.getByRole('button', { name: /^\d K-points$/ }).click();
     await page.getByLabel(/Line mode for a band path/).check();

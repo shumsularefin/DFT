@@ -16,6 +16,7 @@ python -m venv .venv && .venv/bin/pip install -r scripts/reference/requirements.
 .venv/bin/python scripts/reference/gen_element_reference.py   # downloads the SMACT wheel for its data file
 .venv/bin/python scripts/reference/gen_magnetic_reference.py  # after gen_kpaths.py (reuses its fixtures)
 .venv/bin/python scripts/reference/gen_elastic_reference.py
+.venv/bin/python scripts/reference/gen_optics_reference.py
 ```
 
 | File | Content | Used by | Caveat |
@@ -32,5 +33,6 @@ python -m venv .venv && .venv/bin/pip install -r scripts/reference/requirements.
 | `element_reference.json` | 30 elements: Pauling electronegativity, mass, vdW radius (pymatgen), Cordero covalent radius (via ASE), ICSD 2024 oxidation-state counts and shares (SMACT) | M8.2, M10.1 | Recalled anchors asserted at generation |
 | `magnetic_reference.json` | FM, A-, C-, G-type orderings of the cubic and Pnma perovskite fixtures and rock-salt type II of the NaCl fixture: wave vector, minimal and diagonal supercell, per-site parallel and antiparallel nearest-neighbour counts (pymatgen cells and neighbours); common supercell determinants; numbers of symmetry-distinct collinear configurations (brute force with spglib operations) | M13.1 | Supercells found by brute force over matrices with entries in [-2, 2]; pseudocubic axes typed in per fixture, not detected |
 | `elastic_reference.json`, `elastic/OUTCAR_*` | Three illustrative stiffness tensors (cubic, hexagonal, triclinic with mixed signs): compliance and eigenvalues (numpy), Voigt, Reuss and Hill B and G, E, nu, A^U, sound velocities and Debye temperature (pymatgen `ElasticTensor`); two SYNTHETIC OUTCAR files whose TOTAL ELASTIC MODULI block is permuted to VASP order and read back by pymatgen `Outcar.read_elastic_tensor`, one non-symmetric with all entries distinct | M15.4 | Tensors are illustrative, not results for any material; the OUTCAR layout is from pymatgen's reader pattern, not a real file (Q-008) |
+| `optics_reference.json`, `optics/vasprun_dielectric.xml`, `optics/OUTCAR_lepsilon_*` | Synthetic Lorentz-oscillator dielectric function written as two VASP 6 `<dielectricfunction>` blocks and read back by pymatgen `Vasprun._parse_diel`; numpy |eps|, n, k, alpha (1/cm), R, L, sigma (S/m) per xx, yy, zz and for the averaged eps (S-042 formulas, CODATA 2018 constants), alpha also checked against pymatgen `optical_absorption_coeff`; two LEPSILON OUTCARs (eps with and without local fields, ionic eps, Born charges, one breaking the sum rule) read back by `read_lepsilon` and `read_lepsilon_ionic` | `scripts/reference/gen_optics_reference.py` (M15.5) |
 
 Provenance and versions are inside each file's `_meta`.

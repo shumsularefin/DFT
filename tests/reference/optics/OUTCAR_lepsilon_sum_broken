@@ -1,0 +1,43 @@
+ vasp.6.4.2 18Apr23 (build Jan 01 2024) complex
+   number of dos      NEDOS =    301   number of ions     NIONS =      2
+   k-points           NKPTS =     20   k-points in BZ     NKDIM =     20   number of bands    NBANDS=     16
+ total plane-waves  NPLWV =  32768
+   ISPIN  =      1    spin polarized calculation?
+   IBRION =      8    ionic relax: 0-MD 1-quasi-New 2-CG
+   LEPSILON =      T
+
+ MACROSCOPIC STATIC DIELECTRIC TENSOR (excluding local field effects)
+ ------------------------------------------------------
+       5.46223     0.01107    -0.00369
+       0.01107     5.68149     0.00185
+      -0.00369     0.00185     5.28958
+ ------------------------------------------------------
+
+ MACROSCOPIC STATIC DIELECTRIC TENSOR (including local field effects in DFT)
+ ------------------------------------------------------
+       6.06914     0.01230    -0.00410
+       0.01230     6.31277     0.00205
+      -0.00410     0.00205     5.87731
+ ------------------------------------------------------
+
+ BORN EFFECTIVE CHARGES (in e, cummulative output)
+ ---------------------------------------------------------------------------------
+ ion    1
+    1     2.55389     0.01200    -0.00300
+    2     0.01500     2.61022     0.00400
+    3    -0.00200     0.00300     2.48750
+ ion    2
+    1    -2.25389    -0.01200     0.00300
+    2    -0.01500    -2.61022    -0.00400
+    3     0.00200    -0.00300    -2.48750
+ ---------------------------------------------------------------------------------
+
+ MACROSCOPIC STATIC DIELECTRIC TENSOR IONIC CONTRIBUTION
+ ------------------------------------------------------
+      12.44100     0.00000     0.00000
+       0.00000    13.05250     0.00000
+       0.00000     0.00000    11.88730
+ ------------------------------------------------------
+
+ General timing and accounting informations for this job:
+
