@@ -646,5 +646,13 @@
     "access": "open access",
     "status": "cited-from-memory",
     "notes": "pymatgen MP2020Compatibility.yaml (S-034) holds the fitted corrections; it changes corrections, not the U values"
+  },
+  {
+    "id": "S-082",
+    "citation": "M. Fox, *Optical Properties of Solids*, 2nd ed., Oxford University Press (2010), chapter 1 and 2",
+    "usedFor": "Textbook form of n, k, alpha, R, L and sigma from eps1 and eps2 (M15.5)",
+    "access": "book",
+    "status": "cited-from-memory",
+    "notes": "Not read for this stage. The formulas used are the ones printed in S-042 (Workflow Handbook, \"Quantities derived by 711\"), which is in the repository; this entry is the textbook the work order asked for, to be checked (Q-057)"
   }
 ]

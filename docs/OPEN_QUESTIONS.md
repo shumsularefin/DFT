@@ -60,6 +60,7 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-054 | open | author |
 | Q-055 | open | author or builder |
 | Q-056 | open | builder |
+| Q-057 | open | builder |
 
 ## Release triage (M11.3)
 
@@ -273,3 +274,6 @@ The feasibility rules in `src/lib/mp/feasibility.ts` use three cut-offs that no 
 
 ## Q-056. Source for the marching-tetrahedra isosurface
 `src/lib/physics/marchingCubes.ts` splits each cube into six tetrahedra. S-030 (Lorensen and Cline 1987) describes marching cubes only. The method is checked by tests (closed manifold, sphere volume within 1 % on a 64^3 grid), so no number depends on it, but the register has no paper for the variant. **Close:** add a register entry for a marching-tetrahedra paper read by a builder (for example Doi and Koide 1991, not yet read), or keep S-030 with this note.
+
+## Q-057. Fox, Optical Properties of Solids, not read for M15.5
+The work order asked for a textbook source for n, k, alpha, R, L and sigma from eps1 and eps2. S-082 (Fox, 2nd ed., 2010) is registered as cited-from-memory: no copy was reachable from the builder session. The formulas in `src/lib/optics/derived.ts` are the ones printed in S-042 and are standard; the golden values (`scripts/reference/gen_optics_reference.py`) are computed by numpy from the same closed forms, and alpha also agrees with pymatgen `optical_absorption_coeff` (S-034), so no number depends on the unread book. **Close:** a builder or the author reads Fox chapters 1 and 2 and confirms the forms (in particular sigma = eps0 omega eps2 in SI and R at normal incidence), then marks S-082 as read. **Owner: builder.**

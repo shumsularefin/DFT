@@ -42,3 +42,8 @@ export const BOLTZMANN_EV_K = BOLTZMANN_J_K / ELEMENTARY_CHARGE_C;
  * kBar; the Workflow Handbook (S-042, units table) gives the same factor ("divide by 10 for GPa").
  */
 export const KBAR_IN_GPA = 0.1;
+
+/** Speed of light in vacuum in m/s (exact by the SI definition of the metre, S-031). */
+export const SPEED_OF_LIGHT_M_S = 299792458;
+/** Vacuum permittivity in F/m (CODATA 2018, S-031; relative uncertainty 1.5e-10). */
+export const VACUUM_PERMITTIVITY_F_M = 8.8541878128e-12;

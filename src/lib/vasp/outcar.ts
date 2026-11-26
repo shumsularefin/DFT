@@ -97,6 +97,61 @@ function readElastic(lines: string[], i: number): ElasticModuli | undefined {
   return { line: i + 1, vaspOrderKbar: rows, voigtGPa, asymmetryGPa };
 }
 
+/** A 3x3 tensor block such as MACROSCOPIC STATIC DIELECTRIC TENSOR; `line` is the 1-based heading line. */
+export interface Tensor3Block {
+  line: number;
+  tensor: number[][];
+}
+
+/** BORN EFFECTIVE CHARGES: one 3x3 tensor per ion (rows: field direction, as VASP prints them), in e. */
+export interface BornChargesBlock {
+  line: number;
+  charges: number[][][];
+}
+
+const NUM3 = /^\s*([-+0-9.Ee]+)\s+([-+0-9.Ee]+)\s+([-+0-9.Ee]+)\s*$/;
+
+/** Three rows of three numbers after the heading at line i (dashed lines skipped). */
+function readTensor3(lines: string[], i: number): Tensor3Block | undefined {
+  const rows: number[][] = [];
+  for (let j = i + 1; j < lines.length && rows.length < 3; j++) {
+    const t = lines[j]!;
+    if (/^\s*-+\s*$/.test(t)) continue;
+    const m = NUM3.exec(t);
+    if (!m) return undefined;
+    const v = [m[1]!, m[2]!, m[3]!].map(toNum);
+    if (!v.every(Number.isFinite)) return undefined;
+    rows.push(v);
+  }
+  return rows.length === 3 ? { line: i + 1, tensor: rows } : undefined;
+}
+
+/** "ion N" followed by rows "1 x y z", "2 ...", "3 ..." until the closing dashed line. */
+function readBorn(lines: string[], i: number): BornChargesBlock | undefined {
+  const charges: number[][][] = [];
+  let j = i + 1;
+  if (/^\s*-+\s*$/.test(lines[j] ?? '')) j++;
+  for (; j < lines.length; j++) {
+    const t = lines[j]!;
+    const ion = /^\s*ion\s+(\d+)\s*$/.exec(t);
+    if (ion) {
+      if (Number(ion[1]) !== charges.length + 1) return undefined;
+      const z: number[][] = [];
+      for (let r = 1; r <= 3; r++) {
+        const m = /^\s*([1-3])\s+([-+0-9.Ee]+)\s+([-+0-9.Ee]+)\s+([-+0-9.Ee]+)\s*$/.exec(lines[j + r] ?? '');
+        if (!m || Number(m[1]) !== r) return undefined;
+        z.push([m[2]!, m[3]!, m[4]!].map(toNum));
+      }
+      charges.push(z);
+      j += 3;
+      continue;
+    }
+    if (/^\s*-+\s*$/.test(t)) break;
+    return undefined;
+  }
+  return charges.length > 0 ? { line: i + 1, charges } : undefined;
+}
+
 export interface OutcarResult {
   /** VASP version string such as "6.3.2" when found. */
   version?: string;
@@ -123,6 +178,12 @@ export interface OutcarResult {
   volume?: Found<number>;
   /** The last TOTAL ELASTIC MODULI block (IBRION = 6, ISIF >= 3), when present. */
   elastic?: ElasticModuli;
+  /** epsilon_infinity: the last MACROSCOPIC STATIC DIELECTRIC TENSOR (including local field effects in DFT). */
+  epsilonInf?: Tensor3Block;
+  /** The last MACROSCOPIC STATIC DIELECTRIC TENSOR IONIC CONTRIBUTION (IBRION = 5 to 8 with LEPSILON). */
+  epsilonIon?: Tensor3Block;
+  /** The last BORN EFFECTIVE CHARGES block. */
+  born?: BornChargesBlock;
   /** One per electronic loop: true when EDIFF was reached. */
   electronicLoops: { line: number; reached: boolean }[];
   warnings: string[];
@@ -264,6 +325,27 @@ export function parseOutcar(text: string): OutcarResult {
         out.warnings.push(
           `Line ${ln}: a TOTAL ELASTIC MODULI block was found but its six rows could not be read.`,
         );
+    }
+    if (/^\s*MACROSCOPIC STATIC DIELECTRIC TENSOR \(including local field effects in DFT\)/.test(s)) {
+      const b = readTensor3(lines, i);
+      if (b) out.epsilonInf = b;
+      else
+        out.warnings.push(
+          `Line ${ln}: a dielectric tensor heading was found but its three rows could not be read.`,
+        );
+    }
+    if (/^\s*MACROSCOPIC STATIC DIELECTRIC TENSOR IONIC CONTRIBUTION/.test(s)) {
+      const b = readTensor3(lines, i);
+      if (b) out.epsilonIon = b;
+      else
+        out.warnings.push(
+          `Line ${ln}: an ionic dielectric tensor heading was found but its rows could not be read.`,
+        );
+    }
+    if (/^\s*BORN EFFECTIVE CHARGES/.test(s)) {
+      const b = readBorn(lines, i);
+      if (b) out.born = b;
+      else out.warnings.push(`Line ${ln}: a BORN EFFECTIVE CHARGES block was found but could not be read.`);
     }
     if ((m = R.magnet.exec(s))) out.magnetization = { value: toNum(m[2]!), line: ln };
     if (R.ediffYes.test(s)) out.electronicLoops.push({ line: ln, reached: true });
