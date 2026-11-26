@@ -15,6 +15,7 @@ import { BZ_COLORS } from '../../lib/three/bzColors';
 import type { BzScene } from '../../lib/three/BzScene';
 import type { SceneController } from '../../lib/three/SceneController';
 import type { Mat3, Structure, Vec3 } from '../../lib/crystal/types';
+import '../ui/button.css';
 
 const load = (): Promise<SceneModule> => import('../../lib/three/BzScene');
 const isBz = (c: SceneController | null): c is BzScene => !!c && typeof (c as BzScene).setZone === 'function';
@@ -135,7 +136,7 @@ export default function BrillouinLab({ headingLevel = 2 }: { headingLevel?: 2 | 
             </select>
           </div>
           <div className="cv-actions">
-            <button type="button" onClick={() => void computePath()} disabled={busy}>
+            <button type="button" className="btn" onClick={() => void computePath()} disabled={busy}>
               {busy ? 'Working...' : 'Compute k-path'}
             </button>
           </div>
@@ -144,16 +145,21 @@ export default function BrillouinLab({ headingLevel = 2 }: { headingLevel?: 2 | 
           {showMesh && <Slider label="Mesh divisions" min={1} max={12} value={mesh} onChange={setMesh} />}
           {scene && (
             <div className="cv-actions" role="group" aria-label="Preset views">
-              <button type="button" onClick={() => scene.viewAlongReciprocal(0)}>
+              <button type="button" className="btn" onClick={() => scene.viewAlongReciprocal(0)}>
                 Along b₁
               </button>
-              <button type="button" onClick={() => scene.viewAlongReciprocal(1)}>
+              <button type="button" className="btn" onClick={() => scene.viewAlongReciprocal(1)}>
                 Along b₂
               </button>
-              <button type="button" onClick={() => scene.viewAlongReciprocal(2)}>
+              <button type="button" className="btn" onClick={() => scene.viewAlongReciprocal(2)}>
                 Along b₃
               </button>
-              <button type="button" onClick={() => scene.viewAlongPathStart()} disabled={!scene.hasPath}>
+              <button
+                type="button"
+                className="btn"
+                onClick={() => scene.viewAlongPathStart()}
+                disabled={!scene.hasPath}
+              >
                 Along the path start
               </button>
             </div>

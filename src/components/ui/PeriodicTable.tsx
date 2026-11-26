@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import elementsData from '../../data/elements.json';
 import './PeriodicTable.css';
+import './button.css';
 
 export interface ElementEntry {
   readonly Z: number;

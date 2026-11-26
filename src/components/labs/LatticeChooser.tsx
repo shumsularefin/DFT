@@ -2,6 +2,7 @@ import { useId, useState } from 'react';
 import { parsePoscar } from '../../lib/crystal/poscar';
 import type { Mat3 } from '../../lib/crystal/types';
 import { CELLS } from './cells';
+import '../ui/button.css';
 
 interface Props {
   cellId: string;
@@ -50,7 +51,7 @@ export default function LatticeChooser({ cellId, custom, onChange }: Props) {
           </label>
           <textarea id={`${id}-poscar`} rows={8} value={text} onChange={(e) => setText(e.target.value)} />
         </div>
-        <button type="button" onClick={apply}>
+        <button type="button" className="btn" onClick={apply}>
           Use this cell
         </button>
         {error && (

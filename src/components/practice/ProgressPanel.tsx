@@ -4,7 +4,7 @@ import { dayNumber } from '../../lib/learning/session';
 import { modulesDone } from '../../lib/progress';
 import { exportData, importData, resetAll, setHideStreaks } from '../../stores/learner';
 import { useLearner } from '../../stores/useLearner';
-import { progressStore } from '../../stores/progress';
+import { progressServerSnapshot, progressStore } from '../../stores/progress';
 import './practice.css';
 
 interface Props {
@@ -18,7 +18,7 @@ export default function ProgressPanel({ modules }: Props) {
   const progress = useSyncExternalStore(
     progressStore.subscribe,
     progressStore.getState,
-    progressStore.getState,
+    progressServerSnapshot,
   );
   const [msg, setMsg] = useState('');
   const [confirm, setConfirm] = useState(false);

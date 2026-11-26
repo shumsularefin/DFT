@@ -20,6 +20,7 @@ import { analyzeSeries } from '../../lib/vasp/convergence';
 import { energyView } from '../../lib/vasp/convergenceView';
 import type { SceneController } from '../../lib/three/SceneController';
 import type { EncutScene } from '../../lib/three/EncutScene';
+import '../ui/button.css';
 
 const load = (): Promise<SceneModule> => import('../../lib/three/EncutScene');
 const isEncutScene = (c: SceneController | null): c is EncutScene =>
@@ -248,10 +249,10 @@ export default function EncutLab({ headingLevel = 3 }: { headingLevel?: 2 | 3 })
       {set && !set.truncated && !scene && <SliceView set={set} cell={cell} />}
       {scene && (
         <div className="cv-actions">
-          <button type="button" onClick={() => scene.rotate(-15)}>
+          <button type="button" className="btn" onClick={() => scene.rotate(-15)}>
             Turn left
           </button>
-          <button type="button" onClick={() => scene.rotate(15)}>
+          <button type="button" className="btn" onClick={() => scene.rotate(15)}>
             Turn right
           </button>
         </div>

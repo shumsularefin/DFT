@@ -209,11 +209,14 @@ const mid = ROW_H / 2;
   }
   .map-filter {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--space-2);
     align-items: center;
     margin: var(--space-3) 0;
   }
   .map-filter select {
+    min-width: 0;
+    max-width: 100%;
     min-height: var(--target);
     font: inherit;
     color: var(--text);

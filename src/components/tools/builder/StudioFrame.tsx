@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import './builder.css';
+import '../../ui/button.css';
 // Crystal mode of the Material Builder: DFT Studio (VESTA-style viewer and editor) in a frame (D-103).
 // The frame keeps Studio's own styles away from the site's; hand-offs pass through sessionStorage, which
 // the frame shares with this page, so a structure sent to /builder/ opens in Studio.
@@ -33,11 +34,19 @@ export default function StudioFrame() {
           title="DFT Studio crystal builder and 3D viewer"
         />
       ) : (
-        <div className="mb-studio-frame mb-studio-poster">
-          <p>The 3D editor loads when you start it (about 200 KB of JavaScript, WebGL).</p>
-          <button type="button" className="btn" onClick={() => setStarted(true)}>
+        <div className="mb-studio-frame mb-studio-poster" aria-labelledby="mb-studio-poster-title">
+          <h2 id="mb-studio-poster-title" className="mb-studio-poster-title">
+            DFT Studio, the 3D crystal editor
+          </h2>
+          <p className="mb-studio-poster-text">
+            Build a crystal from a template or your own POSCAR or CIF, look at it in 3D, make supercells,
+            slabs and defects, check it against B001 to B012, then export it or send it on to the VASP tools.
+            Everything runs in this browser tab.
+          </p>
+          <button type="button" className="btn btn-primary mb-studio-start" onClick={() => setStarted(true)}>
             Start the 3D crystal editor
           </button>
+          <p className="mb-studio-poster-note">Loads about 200 KB of JavaScript and needs WebGL.</p>
         </div>
       )}
     </div>

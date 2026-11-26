@@ -1,4 +1,5 @@
 ---
+import '../ui/disclosure.css';
 // Collapsible so a beginner never meets an equation first. Use <Level min="intermediate"> inside for depth.
 ---
 
@@ -11,3 +12,10 @@
     </div>
   </details>
 </section>
+
+<style>
+  /* Long equations scroll inside the box instead of pushing the page sideways on a phone. */
+  .themath .disclosure-body {
+    overflow-x: auto;
+  }
+</style>

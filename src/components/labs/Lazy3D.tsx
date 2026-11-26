@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { hasWebGL, prefersReducedMotion, shouldStart3D } from '../../lib/three/capabilities';
 import type { SceneController } from '../../lib/three/SceneController';
+import '../ui/button.css';
 
 export interface SceneModule {
   createScene(container: HTMLElement): SceneController;

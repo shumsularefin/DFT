@@ -76,6 +76,19 @@ export const learnerStore = createStore<LearnerStore>(() => ({
   persisted: canPersist(),
 }));
 
+/**
+ * The state the server renders and hydration must match: empty, storage assumed to work. Reading the
+ * browser's state here instead made the first client render differ from the HTML (React error 418) and
+ * flashed the "storage is blocked" warning to everyone before scripts ran.
+ */
+const SERVER_STATE: LearnerStore = {
+  learner: emptyState(),
+  meta: newMeta(),
+  activity: emptyActivity(),
+  persisted: true,
+};
+export const learnerServerSnapshot = (): LearnerStore => SERVER_STATE;
+
 function persist(next: LearnerStore): void {
   const ok = [
     setJSON('learner', next.learner),

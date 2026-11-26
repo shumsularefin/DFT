@@ -22,6 +22,9 @@ interface Props {
 export default function FileExplorer({ kind, text, annotations, view = false }: Props) {
   const level = useLevel();
   const panelId = useId();
+  // A POSCAR's first line names the structure: it keeps two explorers on one page apart for screen readers.
+  const comment = kind === 'POSCAR' ? (text.split('\n')[0] ?? '').trim().slice(0, 60) : '';
+  const panelLabel = comment ? `Explanation for ${kind}: ${comment}` : `Explanation for ${kind}`;
   const [open, setOpen] = useState<number | null>(null);
   const [tag, setTag] = useState<string | null>(null);
   const refs = useRef(new Map<number, HTMLButtonElement>());
@@ -150,13 +153,7 @@ export default function FileExplorer({ kind, text, annotations, view = false }: 
           })}
         </ol>
       </figure>
-      <div
-        className="fx-panel"
-        id={panelId}
-        role="region"
-        aria-label={`Explanation for ${kind}`}
-        aria-live="polite"
-      >
+      <div className="fx-panel" id={panelId} role="region" aria-label={panelLabel} aria-live="polite">
         {shown.length === 0 ? (
           <p className="fx-hint">
             {order.length === 0

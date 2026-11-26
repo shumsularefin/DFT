@@ -1,4 +1,5 @@
 @import '../../lib/visual/plots.css';
+@import '../ui/button.css';
 
 .qc,
 .pr,
@@ -174,6 +175,15 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--surface);
+}
+/* The card's padding is the top and bottom space; the first and last paragraphs' margins doubled it. */
+.pr > :first-child,
+.pr > div:first-child > :first-child {
+  margin-top: 0;
+}
+.pr > :last-child,
+.pr > div:last-child > :last-child {
+  margin-bottom: 0;
 }
 .ck-count,
 .pr-why,
