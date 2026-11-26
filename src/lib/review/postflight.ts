@@ -4,6 +4,7 @@
 import { cellVolume } from '../crystal/lattice';
 import type { ReviewIntake } from './intake';
 import { runPreflightChecks, type ReviewCheck } from './preflight';
+import { analyseGammaModes } from '../vasp/phonons';
 
 /** kB. Heuristic warning level for |Pulay stress|, no cited basis (Q-014); the EOS plotter uses its own adjustable 5 kB. */
 export const PULAY_WARN_KB = 1.0;
@@ -149,7 +150,51 @@ export function runPostflightChecks(intake: ReviewIntake): ReviewCheck[] {
     });
   }
 
-  // 7. Volume change POSCAR vs CONTCAR
+  // 7. Gamma-point phonon modes (IBRION = 5 to 8)
+  if (outcar?.phonons) {
+    const a = analyseGammaModes(outcar.phonons.modes);
+    const fmt = (m: (typeof a.modes)[number]) =>
+      `mode ${m.index}: ${m.thz.toFixed(3)}i THz (${m.cm1.toFixed(1)}i cm-1, ${m.meV.toFixed(2)}i meV)`;
+    const soft = a.imaginaryOptical.length > 0;
+    checks.push({
+      id: 'POST-PHONON-IMAG',
+      phase: 'postflight',
+      title: 'Imaginary modes at Gamma (f/i lines)',
+      status: soft ? 'warn' : 'pass',
+      kind: 'computed',
+      reason: soft
+        ? `${a.imaginaryOptical.length} imaginary mode(s) besides the three acoustic ones: ${a.imaginaryOptical.map(fmt).join('; ')}. The structure is not at a minimum (S-042).`
+        : `No imaginary modes besides the acoustic ones (${a.modes.length} modes read).${a.imaginaryAcoustic.length ? ` ${a.imaginaryAcoustic.length} acoustic mode(s) are printed as f/i; see the acoustic check.` : ''}`,
+      source: 'S-019, S-042',
+      ...(soft
+        ? {
+            fix: 'Displace the atoms along the soft mode and re-relax; if the mode is small, first tighten EDIFF, add ADDGRID or raise ENCUT and the k-mesh (S-042).',
+          }
+        : {}),
+    });
+    const ok = a.nearZeroAcoustic === 3;
+    checks.push({
+      id: 'POST-PHONON-ACOUSTIC',
+      phase: 'postflight',
+      title: 'Three near-zero acoustic modes',
+      status: ok ? 'pass' : 'warn',
+      kind: 'heuristic',
+      reason: `${a.nearZeroAcoustic} of the three lowest modes are below ${a.limitCm1} cm-1 (lowest |frequency|: ${a.modes
+        .filter((m) => m.acoustic)
+        .map((m) => `${m.signed.cm1.toFixed(2)} cm-1`)
+        .join(
+          ', ',
+        )}). Heuristic: S-042 says "a few cm-1", the ${a.limitCm1} cm-1 level is the builder's reading (Q-058).`,
+      source: 'S-042',
+      ...(ok
+        ? {}
+        : {
+            fix: 'Acoustic modes far from zero point to loose settings: tighten EDIFF (1E-7 to 1E-8 for phonons), add ADDGRID, raise ENCUT or the k-mesh (S-042).',
+          }),
+    });
+  }
+
+  // 8. Volume change POSCAR vs CONTCAR
   if (intake.poscar && intake.contcar) {
     const v0 = Math.abs(cellVolume(intake.poscar.lattice));
     const v1 = Math.abs(cellVolume(intake.contcar.lattice));

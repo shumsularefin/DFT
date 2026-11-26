@@ -152,6 +152,55 @@ function readBorn(lines: string[], i: number): BornChargesBlock | undefined {
   return charges.length > 0 ? { line: i + 1, charges } : undefined;
 }
 
+/** One normal mode at Gamma from "Eigenvectors and eigenvalues of the dynamical matrix" (IBRION = 5 to 8). */
+export interface PhononMode {
+  index: number;
+  /** True for an "f/i" line (imaginary frequency, a soft mode). */
+  imaginary: boolean;
+  /** The frequencies as printed (all positive; `imaginary` carries the sign). */
+  thz: number;
+  cm1: number;
+  meV: number;
+  line: number;
+}
+
+export interface PhononModesBlock {
+  /** 1-based line of the "Eigenvectors and eigenvalues of the dynamical matrix" heading. */
+  line: number;
+  modes: PhononMode[];
+}
+
+// @source S-019 (VASP wiki "Phonons from finite differences", oldid 36045, gives the line layout):
+//    1 f  =   14.329944 THz    90.037693 2PiTHz  477.995462 cm-1    59.263905 meV
+// The wiki names 'f/i' for imaginary modes without printing such a line; ASE (read_vib_freq) treats 'f/i=' as
+// one token, and this reader accepts any spacing around '='.
+const MN = `(${NUM_SRC})`;
+const MODE_LINE = new RegExp(
+  String.raw`^\s*(\d+)\s+(f|f\/i)\s*=\s*${MN}\s+THz\s+${MN}\s+2PiTHz\s+${MN}\s+cm-1\s+${MN}\s+meV`,
+);
+
+/** Read the mode lines after a dynamical-matrix heading at line i, up to the next heading or 3 NIONS modes. */
+function readModes(lines: string[], i: number, nions: number | undefined): PhononModesBlock | undefined {
+  const modes: PhononMode[] = [];
+  for (let j = i + 1; j < lines.length; j++) {
+    const s = lines[j]!;
+    if (/Eigenvectors/.test(s)) break;
+    const m = MODE_LINE.exec(s);
+    if (m) {
+      modes.push({
+        index: Number(m[1]),
+        imaginary: m[2] === 'f/i',
+        thz: toNum(m[3]!),
+        cm1: toNum(m[5]!),
+        meV: toNum(m[6]!),
+        line: j + 1,
+      });
+      if (nions && modes.length === 3 * nions) break;
+    }
+  }
+  return modes.length ? { line: i + 1, modes } : undefined;
+}
+
 export interface OutcarResult {
   /** VASP version string such as "6.3.2" when found. */
   version?: string;
@@ -184,6 +233,8 @@ export interface OutcarResult {
   epsilonIon?: Tensor3Block;
   /** The last BORN EFFECTIVE CHARGES block. */
   born?: BornChargesBlock;
+  /** The last block of Gamma-point normal modes (IBRION = 5 to 8). */
+  phonons?: PhononModesBlock;
   /** One per electronic loop: true when EDIFF was reached. */
   electronicLoops: { line: number; reached: boolean }[];
   warnings: string[];
@@ -346,6 +397,14 @@ export function parseOutcar(text: string): OutcarResult {
       const b = readBorn(lines, i);
       if (b) out.born = b;
       else out.warnings.push(`Line ${ln}: a BORN EFFECTIVE CHARGES block was found but could not be read.`);
+    }
+    if (/^\s*Eigenvectors and eigenvalues of the dynamical matrix/.test(s)) {
+      const b = readModes(lines, i, out.nions?.value);
+      if (b) out.phonons = b;
+      else
+        out.warnings.push(
+          `Line ${ln}: a dynamical-matrix heading was found but no mode lines could be read.`,
+        );
     }
     if ((m = R.magnet.exec(s))) out.magnetization = { value: toNum(m[2]!), line: ln };
     if (R.ediffYes.test(s)) out.electronicLoops.push({ line: ln, reached: true });

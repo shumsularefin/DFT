@@ -1,0 +1,135 @@
+{
+ "_meta": {
+  "generator": "scripts/reference/gen_phonon_reference.py",
+  "scipy": "1.18.1",
+  "ase": "3.29.0",
+  "note": "Illustrative frequencies, not a calculation. Factors from scipy.constants (CODATA)."
+ },
+ "factors": {
+  "kbar_to_gpa": 0.1,
+  "ev_per_a3_to_gpa": 160.21766339999996,
+  "thz_to_cm1": 33.3564095198152,
+  "thz_to_mev": 4.135667696923859,
+  "cm1_to_mev": 0.12398419843320026,
+  "ry_to_ev": 13.60569312299,
+  "hartree_to_ev": 27.211386245981,
+  "ev_per_atom_to_kj_mol": 96.48533212331002,
+  "ev_per_a_to_nn": 1.6021766339999997
+ },
+ "outcar_fixtures": {
+  "stable": {
+   "file": "phonon/OUTCAR_phonon_stable",
+   "modes": [
+    {
+     "index": 1,
+     "imaginary": false,
+     "thz": 15.2,
+     "cm1": 507.017425,
+     "meV": 62.862149
+    },
+    {
+     "index": 2,
+     "imaginary": false,
+     "thz": 15.2,
+     "cm1": 507.017425,
+     "meV": 62.862149
+    },
+    {
+     "index": 3,
+     "imaginary": false,
+     "thz": 11.7,
+     "cm1": 390.269991,
+     "meV": 48.387312
+    },
+    {
+     "index": 4,
+     "imaginary": false,
+     "thz": 0.021,
+     "cm1": 0.700485,
+     "meV": 0.086849
+    },
+    {
+     "index": 5,
+     "imaginary": false,
+     "thz": 0.013,
+     "cm1": 0.433633,
+     "meV": 0.053764
+    },
+    {
+     "index": 6,
+     "imaginary": true,
+     "thz": 0.034,
+     "cm1": 1.134118,
+     "meV": 0.140613
+    }
+   ],
+   "ase_real_meV": [
+    62.862149,
+    62.862149,
+    48.387312,
+    0.086849,
+    0.053764
+   ],
+   "ase_imaginary_meV": [
+    0.140613
+   ]
+  },
+  "unstable": {
+   "file": "phonon/OUTCAR_phonon_unstable",
+   "modes": [
+    {
+     "index": 1,
+     "imaginary": false,
+     "thz": 15.2,
+     "cm1": 507.017425,
+     "meV": 62.862149
+    },
+    {
+     "index": 2,
+     "imaginary": false,
+     "thz": 11.7,
+     "cm1": 390.269991,
+     "meV": 48.387312
+    },
+    {
+     "index": 3,
+     "imaginary": false,
+     "thz": 0.021,
+     "cm1": 0.700485,
+     "meV": 0.086849
+    },
+    {
+     "index": 4,
+     "imaginary": false,
+     "thz": 0.013,
+     "cm1": 0.433633,
+     "meV": 0.053764
+    },
+    {
+     "index": 5,
+     "imaginary": true,
+     "thz": 0.034,
+     "cm1": 1.134118,
+     "meV": 0.140613
+    },
+    {
+     "index": 6,
+     "imaginary": true,
+     "thz": 2.85,
+     "cm1": 95.065767,
+     "meV": 11.786653
+    }
+   ],
+   "ase_real_meV": [
+    62.862149,
+    48.387312,
+    0.086849,
+    0.053764
+   ],
+   "ase_imaginary_meV": [
+    0.140613,
+    11.786653
+   ]
+  }
+ }
+}
