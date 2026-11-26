@@ -108,6 +108,8 @@ Builders cannot verify against papers or the VASP wiki if the cloud environment 
 ## Q-008. Author example data
 The worked example (module 10) and parser validation need real files from the author's calculations, trimmed and without POTCAR content. See `data/author/README.md`. Until supplied, parsers are tested on fixtures written to the documented formats, and the worked example is built with a visible "Illustrative data" badge. **Owner: author.**
 
+**Deferred (2026-11-26, D-101):** the research is ongoing and private. Module 10 shows the method only, under a "Will be updated" notice, until the author publishes.
+
 ## Q-009. Materials Project terms and scope
 Confirm the current licence for redistributing derived data (believed CC BY 4.0 with attribution), API rate limits, and which subset to ship so the sharded data stays "a few MB gzipped". `mp-api 0.47.0` supports `db_version` snapshots; record the version and date used. Needs the author's API key (never committed). **Close:** M9.1 documents the terms and the chosen query in the data README.
 
