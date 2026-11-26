@@ -82,7 +82,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M11.2 | Accessibility and security audit | done | M11.1 | M | B | main | PR #59 | 2026-11-24 | [report](reports/M11.2.md), [work order](milestones/M11-polish.md) |
 | M11.3 | Content integrity and release preparation | done | M11.2 | M | A | main | PR #60 | 2026-11-24 | [report](reports/M11.3.md), [audit package](AUDIT_PACKAGE.md), [work order](milestones/M11-polish.md) |
 | M15.1 | Make main green and gate deploy on CI | done | none | S | B | claude/m15-1-green-main | PR pending | 2026-11-26 | [report](reports/M15.1.md), [work order](milestones/M15-coverage-and-repair.md) |
-| M15.2 | Science re-audit of the 2026-11-24 batch | todo | M15.1 | L | A | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
+| M15.2 | Science re-audit of the 2026-11-24 batch | partial | M15.1 | L | A | claude/compassionate-einstein-ls4ab4 | PR pending | 2026-11-26 | [report](reports/M15.2.md), [work order](milestones/M15-coverage-and-repair.md). Session 1 done; session 2 (M7.5, M14.1, M14.2, questions) remains |
 | M15.3 | Process repair: missing tests and records | todo | M15.1 | M | B | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
 | M15.4 | Elastic tensor: reader and mechanical analysis | done | M4.1 | L | A | claude/compassionate-einstein-ls4ab4 | [#65](https://github.com/shumsularefin/DFT/pull/65) | 2026-11-26 | [report](reports/M15.4.md), [work order](milestones/M15-coverage-and-repair.md). Library only; UI in M15.7 |
 | M15.5 | Optics and dielectric response: readers and derived quantities | todo | M4.1 | M | A | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
@@ -123,6 +123,7 @@ Newest first. One line per session: date, stage, outcome, branch.
 - 2026-11-26, process (D-088): lean execution made binding (`docs/WORKFLOW.md` 2a): budgets on every M15 stage, targeted tests while working, full runs once, no CI polling. M15.1 rewritten around the 15 diagnosed e2e failures in four groups; M15.2 and M15.7 split into two sessions.
 - 2026-11-26, M15.1: deploy now runs only after CI succeeds on a push to main (D-089); 25 e2e failures traced to 6 layout or test causes and fixed without loosening any assertion; see report.
 - 2026-11-26, M15.4: OUTCAR `TOTAL ELASTIC MODULI` reader with the XX YY ZZ XY YZ ZX to Voigt reorder, `src/lib/mechanics/elastic.ts` (compliance, eigenvalue stability, Born class forms, VRH, E, nu, A^U, sound velocities, Debye, Heuristic indicators, EOS cross-check); pymatgen golden file `elastic_reference.json` (D-090).
+- 2026-11-26, M15.2 session 1: pymatgen golden planar averages (M14.3); the M9.3 runtime formula replaced by a sourced relative estimate (D-091); Q-052 opened for the feasibility cut-offs.
 
 ## Author actions outstanding
 

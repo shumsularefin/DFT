@@ -50,6 +50,7 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-044 | closed | builder (M13.5) |
 | Q-050 | closed | author + builder (M15.4) |
 | Q-051 | closed | author + builder (M15.8) |
+| Q-052 | open | author |
 
 ## Release triage (M11.3)
 
@@ -241,3 +242,6 @@ S-042 gives Pugh ratio B/G above 1.75 as ductile, Poisson ratio above 0.26 as du
 ## Q-051. Materials Project U values in the DFT+U topic
 S-042 lists Ueff (eV) for Co 3.32, Cr 3.7, Fe 5.3, Mn 3.9, Mo 4.38, Ni 6.2, V 3.25, W 6.2 as Materials Project values for oxides and fluorides. These must be checked against the Materials Project documentation for the compatibility scheme in use (MP2020) before the site shows them, because the values have changed between schemes. **Close:** builder reads the pymatgen `MPRelaxSet` / MP2020 compatibility files from the package and records the match or the difference. **Owner: author + builder (M15.8).**
  **Closed (2026-11-26, D-087):** all eight S-042 values (Co 3.32, Cr 3.7, Fe 5.3, Mn 3.9, Mo 4.38, Ni 6.2, V 3.25, W 6.2 eV) equal `LDAUU` in pymatgen 2026.10.31 `MPRelaxSet.yaml` (S-034), with LDAUTYPE = 2 (Dudarev, Ueff = U - J, LDAUJ = 0), LDAUL = 2 (d), applied only when O or F is present. MP2020 (S-081; `MP2020Compatibility.yaml`) changed the energy corrections, not these U values. Their origin is a fit to oxide formation enthalpies (S-080), so they are database-compatibility values, not physical U for a given compound. Materials Project's r2SCAN sets (`MPSCANRelaxSet`, `MP24RelaxSet`) use no +U, so the table applies to GGA (PBE)+U only. The site may show the table with these four conditions next to it.
+
+## Q-052. Feasibility cut-offs in Screening Studio (M9.3)
+The feasibility rules in `src/lib/mp/feasibility.ts` use three cut-offs that no source states: cell size green up to 10 atoms, yellow up to 30, red above (F-SIZE), and 'heavy element' meaning Z > 54 (F-HEAVY, a hint that spin-orbit coupling may matter; S-042 says only "heavy elements"). They are labelled Heuristic and cite S-042 for the reasoning, not for the numbers. The unsourced absolute runtime formula was removed in M15.2 (D-091). **Close:** author confirms these cut-offs as house rules, or gives the values to use. **Owner: author.**
