@@ -36,3 +36,9 @@ export const EV_PER_A3_IN_GPA = (ELEMENTARY_CHARGE_C * 1e30) / 1e9;
 export const BOLTZMANN_J_K = 1.380649e-23;
 /** Boltzmann constant in eV/K: k_B / e = 8.617333262e-5. The Workflow Handbook (S-042) rounds it to 8.617e-5. */
 export const BOLTZMANN_EV_K = BOLTZMANN_J_K / ELEMENTARY_CHARGE_C;
+
+/**
+ * 1 kBar in GPa: 1 bar = 1e5 Pa exactly, so 1 kBar = 1e8 Pa = 0.1 GPa. VASP prints stress and the elastic moduli in
+ * kBar; the Workflow Handbook (S-042, units table) gives the same factor ("divide by 10 for GPa").
+ */
+export const KBAR_IN_GPA = 0.1;
