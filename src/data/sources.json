@@ -409,8 +409,8 @@
   },
   {
     "id": "S-052",
-    "citation": "ASE (Atomic Simulation Environment) 3.29.0 data module, https://wiki.fysik.dtu.dk/ase (LGPL-2.1-or-later), used only as the transcription of Cordero's covalent radii (S-021)",
-    "usedFor": "Covalent radii values (M10)",
+    "citation": "ASE (Atomic Simulation Environment) 3.29.0 data module, https://wiki.fysik.dtu.dk/ase (LGPL-2.1-or-later), used as the transcription of Cordero's covalent radii (S-021), and from M15.6 its OUTCAR reader `Vasp.read_vib_freq` as an independent read-back of the phonon fixtures",
+    "usedFor": "Covalent radii values (M10); phonon mode-line read-back (M15.6)",
     "access": "open source",
     "status": "cross-checked",
     "notes": "7 recalled Cordero values match (H 0.31, C 0.76, N 0.71, O 0.66, Si 1.11, Fe 1.32, Cu 1.32)"
