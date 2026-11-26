@@ -31,7 +31,14 @@ Because every point uses the same plane-wave basis settings and none relies on t
 
 The third-order Birch-Murnaghan form <Cite id="S-061" /> fits four numbers: the minimum energy $E_0$, the equilibrium volume $V_0$, the bulk modulus $B_0$ and its pressure derivative $B_0'$:
 
-$$E(V) = E_0 + \frac{9 V_0 B_0}{16}\left\{\left[\left(\tfrac{V_0}{V}\right)^{2/3} - 1\right]^3 B_0' + \left[\left(\tfrac{V_0}{V}\right)^{2/3} - 1\right]^2\left[6 - 4\left(\tfrac{V_0}{V}\right)^{2/3}\right]\right\}$$
+With the shorthand $x = (V_0/V)^{2/3}$ it reads
+
+$$
+\begin{aligned}
+E(V) = E_0 + \frac{9 V_0 B_0}{16}\Big\{ &(x - 1)^3 B_0' \\
+&+ (x - 1)^2 (6 - 4x) \Big\}
+\end{aligned}
+$$
 
 With $E$ in eV and $V$ in cubic angstrom, $B_0$ comes out in eV per cubic angstrom; multiply by 160.2177 for GPa <Cite id="S-042" />.
 
