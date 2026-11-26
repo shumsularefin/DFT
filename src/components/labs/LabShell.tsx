@@ -2,6 +2,7 @@ import { useId, type ReactNode } from 'react';
 import Badge from '../ui/Badge';
 import type { BadgeVariant } from '../../lib/badges';
 import './LabShell.css';
+import '../ui/button.css';
 
 export interface Readout {
   label: string;

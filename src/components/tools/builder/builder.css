@@ -140,3 +140,33 @@
   text-align: center;
   background: var(--surface-2, transparent);
 }
+.mb-studio-poster-title {
+  margin: 0;
+  font-size: var(--step-2);
+}
+.mb-studio-poster-text {
+  max-width: 34rem;
+  margin: 0;
+  color: var(--text);
+}
+.mb-studio-poster-note {
+  margin: 0;
+  font-size: var(--step--1);
+  color: var(--text-muted);
+}
+.mb-studio-start {
+  min-height: calc(var(--target) + 0.5rem);
+  padding: 0 var(--space-5);
+  font-size: var(--step-1);
+}
+
+/* Mode tabs: show which mode is on. */
+.mb-btn[role='tab'] {
+  font-family: var(--font-sans);
+  font-weight: 600;
+}
+.mb-btn[aria-selected='true'] {
+  color: var(--accent-contrast);
+  background: var(--accent);
+  border-color: var(--accent);
+}

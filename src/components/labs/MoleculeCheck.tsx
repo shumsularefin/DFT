@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { RdkitClient } from '../../lib/chem/rdkit-client';
 import type { MoleculeReport } from '../../lib/chem/molecule-service';
 import { moleculeInBox, writeXyz } from '../../lib/chem/molexport';
+import '../ui/button.css';
 
 const mono = { width: '100%', fontFamily: 'var(--font-mono, monospace)' } as const;
 
