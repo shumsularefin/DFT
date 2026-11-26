@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+  UNIT_ROWS,
+  VASPKIT_RESOLUTIONS,
+  formatValue,
+  kspacingFromVaspkitResolution,
+} from '../../lib/reference/tables';
+---
+
+<BaseLayout
+  title="Units and conversions"
+  description="The unit conversions a VASP user needs, computed from CODATA constants, and the VASPKIT resolution to KSPACING relation."
+>
+  <div class="container ref-page" data-pagefind-body data-pagefind-meta="module:Quick reference">
+    <h1>Units and conversions</h1>
+    <p>
+      VASP prints stress in kBar, energies in eV and frequencies in THz; papers want GPa, kJ/mol and cm⁻¹.
+      This table follows the units table of the author's Workflow Handbook (
+      <a href="/references/#S-042">S-042</a>). No number on this page is typed in: each one is computed from
+      the CODATA constants in the site's code (<a href="/references/#S-031">S-031</a>).
+    </p>
+    <div class="ref-scroll" role="region" aria-label="Unit conversions" tabindex="0">
+      <table data-testid="units-table">
+        <thead>
+          <tr>
+            <th scope="col">Quantity</th>
+            <th scope="col">Equals</th>
+          </tr>
+        </thead>
+        <tbody>
+          {UNIT_ROWS.map((r) => (
+            <tr>
+              <th scope="row">{r.from}</th>
+              <td>{r.to.map((t) => `${formatValue(t.value)} ${t.unit}`).join(' = ')}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2>k-mesh resolution and KSPACING</h2>
+    <p>
+      VASPKIT 102 asks for a k-mesh resolution r in units of 2π/Å. The VASP tag <code>KSPACING</code> is in
+      1/Å and already includes the 2π, so <code>KSPACING</code> ≈ 2π r (<a href="/references/#S-042">S-042</a>
+      ). Why it matters: typing a VASPKIT resolution into <code>KSPACING</code> asks for a mesh about six
+      times denser in each direction than you meant.
+    </p>
+    <div class="ref-scroll" role="region" aria-label="Resolution to KSPACING" tabindex="0">
+      <table data-testid="kspacing-table">
+        <thead>
+          <tr>
+            <th scope="col">VASPKIT resolution (2π/Å)</th>
+            <th scope="col">KSPACING (1/Å)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {VASPKIT_RESOLUTIONS.map((r) => (
+            <tr>
+              <td>{r}</td>
+              <td>{formatValue(kspacingFromVaspkitResolution(r))}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p>
+      See also <a href="/reference/where-to-read/">where to read each number</a> and the
+      <a href="/reference/checklist/">pre-submit checklist</a>.
+    </p>
+  </div>
+</BaseLayout>

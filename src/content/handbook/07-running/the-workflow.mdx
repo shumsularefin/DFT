@@ -10,7 +10,7 @@ vaspTags: [ISTART, ICHARG, EDIFF, ENCUT, LORBIT]
 sources: [S-019, S-020, S-042]
 noLab: true
 status: draft
-updated: 2026-11-19
+updated: 2026-11-26
 ---
 
 <Why>
@@ -85,19 +85,28 @@ The project folder from the Workflow Handbook, one folder per job type <Cite id=
 
 <VaspFile
   name="shell"
-  code={`project/
-  00_conv/      convergence tests (ENCUT, k-points)
-  01_relax/     relaxation, then the SCF in the same folder
-  04_band/      band structure
-  05_optics/    optical properties
-  06_elastic/   elastic constants
-  07_eos/       equation of state
-  08_phonon/    phonons
-  09_dielectric/
-  10_bader/
-  11_magnetic/
-  12_hse/       hybrid functional`}
+  code={`Compound/
+├── 00_conv/       encut_400 … encut_700/   kpt_0.05 … kpt_0.02/
+├── 01_relax/      relax → cp CONTCAR POSCAR → SCF in the same folder (ISTART=1)
+│                  → CHGCAR, WAVECAR, DOSCAR (DOS via LORBIT=11)
+├── 04_band/       SCF without ICHARG=11 + KPATH.in (303) as the band path
+├── 05_optics/     LOPTICS, NBANDS ≈ 3× default
+├── 06_elastic/    IBRION=6, ISIF=3
+├── 07_eos/        s_0.97 … s_1.03/
+├── 08_phonon/     SPOSCAR, disp-001 …   (phonopy)
+├── 09_dielectric/ LEPSILON, IBRION=8   → Born charges, ε∞, ε0
+├── 10_bader/      LAECHG → AECCAR0, AECCAR2
+├── 11_magnetic/   NM/ FM/ AFM1/ AFM2/   (same supercell)
+└── 12_hse/        or 12_dftu/, 12_r2scan/`}
 />
+
+<Callout variant="mistake" title="Back up the relaxation before the SCF">
+
+The relaxation and the SCF share `01_relax/`, so the SCF overwrites the relaxation's `OUTCAR` and `CONTCAR`. Copy them first (for example to `OUTCAR.relax` and `CONTCAR.relax`) <Cite id="S-042" />. Why: the relaxation `OUTCAR` is the record of the forces, the stress and the final energy you report; without it you cannot show that the structure converged.
+
+</Callout>
+
+Every other calculation gets its own folder with copies of the files it needs <Cite id="S-042" />.
 
 Between stages, copy `CONTCAR` to `POSCAR` and carry the files the next step reads (`WAVECAR`, `CHGCAR`) <Cite id="S-042" />. VASPkit does much of the file preparation. Its command map is in a later topic <Cite id="S-020" />.
 

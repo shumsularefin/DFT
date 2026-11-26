@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { READ_ROWS } from '../../lib/reference/tables';
+---
+
+<BaseLayout
+  title="Where to read each number"
+  description="Which VASP output file holds each result, what to grep for, and which reader on this site parses it."
+>
+  <div class="container ref-page" data-pagefind-body data-pagefind-meta="module:Quick reference">
+    <h1>Where to read each number</h1>
+    <p>
+      A finished run leaves a dozen files. This table says which one holds each number and which line to look
+      for. It merges the "Where do I find ..." table of the Field Handbook (
+      <a href="/references/#S-041">S-041</a>) with the "Where to read it" table of the Workflow Handbook (
+      <a href="/references/#S-042">S-042</a>). The last column names the reader on this site that parses the
+      file, so you can drop the file in and read the number in your browser; nothing is uploaded.
+    </p>
+    <div class="ref-scroll" role="region" aria-label="Where to read each number" tabindex="0">
+      <table data-testid="read-table">
+        <thead>
+          <tr>
+            <th scope="col">You want</th>
+            <th scope="col">Look in</th>
+            <th scope="col">Reader on this site</th>
+            <th scope="col">Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          {READ_ROWS.map((r) => (
+            <tr>
+              <th scope="row">{r.quantity}</th>
+              <td>{r.where}</td>
+              <td>
+                {r.link ? <a href={r.link.href}>{r.link.label}</a> : <span>Read it by eye</span>}
+                {r.parser && (
+                  <>
+                    <br />
+                    <code>
+                      {r.parser.fn}().{r.parser.field}
+                    </code>
+                  </>
+                )}
+              </td>
+              <td>{r.sources.join(', ')}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p>
+      Why it matters: the same name can mean different numbers. "Energy" in OSZICAR is <code>F</code> (with
+      the smearing entropy) and <code>E0</code> (extrapolated to zero smearing); use one of them consistently.
+      The Fermi level must come from the self-consistent run, not from a band run.
+    </p>
+    <p>
+      See also <a href="/reference/units/">units and conversions</a> and the
+      <a href="/reference/checklist/">pre-submit checklist</a>.
+    </p>
+  </div>
+</BaseLayout>

@@ -6,7 +6,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 
 ## How to read this table
 
-- M15.1 to M15.8 are done. **Next stage to build is Tier B: M15.9** (reference pages: units, where to read it, checklist, layout, VASPKIT map). Plan M15 (2026-11-26, D-086): repair after the process audit of main at 33414fb, and the parts of the author's handbooks (S-041, S-042) that had no page; see [work order](milestones/M15-coverage-and-repair.md). M7.6 stays `partial` until `data/author/` exists.
+- M15.1 to M15.9 are done: milestone M15 is complete. Plan M15 (2026-11-26, D-086): repair after the process audit of main at 33414fb, and the parts of the author's handbooks (S-041, S-042) that had no page; see [work order](milestones/M15-coverage-and-repair.md). M7.6 stays `partial` until `data/author/` exists.
 - **Tier** says which model to open the session with. **A** = the strongest model (Opus class): stages where a subtle mistake would put a wrong number in front of a researcher. **B** = the fast model (Sonnet class): UI, content and wiring on top of tested libraries. `-` = already done.
 - **Size** says how much work it is: **S** short session, **M** one normal session, **L** a long session that may stop as `partial` and need a second one.
 - A session started on the wrong tier does not build. It names the model to switch to and stops (`docs/WORKFLOW.md` section 2, step 0).
@@ -88,8 +88,8 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M15.5 | Optics and dielectric response: readers and derived quantities | done | M4.1 | M | A | claude/compassionate-einstein-ls4ab4 | [#68](https://github.com/shumsularefin/DFT/pull/68) | 2026-11-26 | [report](reports/M15.5.md), [work order](milestones/M15-coverage-and-repair.md). Library only; UI in M15.7 |
 | M15.6 | Phonon output reader: Gamma modes and units | done | M4.1 | S | A | claude/compassionate-einstein-ls4ab4 | [#69](https://github.com/shumsularefin/DFT/pull/69) | 2026-11-26 | [report](reports/M15.6.md), [work order](milestones/M15-coverage-and-repair.md). Library and review checks; UI in M15.7 |
 | M15.7 | Handbook module 12: lattice response and properties | done | M15.4, M15.5, M15.6 | L | B | claude/compassionate-einstein-ls4ab4 | [#70](https://github.com/shumsularefin/DFT/pull/70) | 2026-11-26 | [report](reports/M15.7.md), [work order](milestones/M15-coverage-and-repair.md). Six topics, AIMD preset |
-| M15.8 | Handbook: beyond-PBE depth and the property catalogue | done | M15.7 | M | B | claude/compassionate-einstein-ls4ab4 | | 2026-11-26 | [report](reports/M15.8.md), [work order](milestones/M15-coverage-and-repair.md) |
-| M15.9 | Reference pages: units, where to read it, checklist, layout, VASPKIT map | todo | M15.6 | M | B | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
+| M15.8 | Handbook: beyond-PBE depth and the property catalogue | done | M15.7 | M | B | claude/compassionate-einstein-ls4ab4 | [#71](https://github.com/shumsularefin/DFT/pull/71) | 2026-11-26 | [report](reports/M15.8.md), [work order](milestones/M15-coverage-and-repair.md) |
+| M15.9 | Reference pages: units, where to read it, checklist, layout, VASPKIT map | done | M15.6 | M | B | claude/compassionate-einstein-ls4ab4 | [#72](https://github.com/shumsularefin/DFT/pull/72) | 2026-11-26 | [report](reports/M15.9.md), [work order](milestones/M15-coverage-and-repair.md) |
 
 ## Session log
 
@@ -118,6 +118,7 @@ Newest first. One line per session: date, stage, outcome, branch.
 - 2026-10-28, M0.2: sw, manifest, size budgets, headers check (emulator, 18 pass), Lighthouse 100/100/100; preview pending Q-015. Same branch and PR as M0.1.
 - 2026-10-28, M0.1: scaffold done, verify and e2e green. Branch `claude/vigilant-newton-ws593b`.
 - 2026-10-27, planning: environment created (rules, SPEC v2, workflow, 53 work orders, guards, CI, hosting config, golden reference data). Branch `claude/great-dijkstra-oj0kbx`.
+- 2026-11-26, M15.9: `/reference/units/`, `/reference/where-to-read/`, `/reference/checklist/` from `src/lib/reference/tables.ts` (values computed from units.ts, rule ids checked against `ALL_RULES`), the S-042 layout tree and backup note in `the-workflow`, 18 more VASPKIT rows in `vaspkit-in-practice`, warn-only `check-handbook-coverage.mjs` (34 sections, 0 uncovered); D-100.
 - 2026-11-26, planning: process audit of main (CI e2e red on every recent merge while deploy runs regardless; 19 stages of 2026-11-24/25 without DECISIONS entries, golden files or full reports) and a coverage check of S-041 and S-042 against the site. Added milestone M15 (9 stages, Tier A: M15.2, M15.4, M15.5, M15.6; Tier B: M15.1, M15.3, M15.7, M15.8, M15.9), D-086, Q-050, Q-051, Q-042 update.
 - 2026-11-26, Q-042/Q-050/Q-051 from the literature (D-087): Heisenberg default now minus sign (J > 0 FM), Heuristic mean-field T_C for FM ground states in `/tools/magnetic/` (S-070, S-071), handbook erratum on the T_C reference state; sources S-070 to S-081; MP U values confirmed against pymatgen.
 - 2026-11-26, process (D-088): lean execution made binding (`docs/WORKFLOW.md` 2a): budgets on every M15 stage, targeted tests while working, full runs once, no CI polling. M15.1 rewritten around the 15 diagnosed e2e failures in four groups; M15.2 and M15.7 split into two sessions.

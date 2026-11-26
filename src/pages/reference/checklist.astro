@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { CHECKLIST } from '../../lib/reference/tables';
+import { ALL_RULES } from '../../lib/vasp/rules';
+
+const titles = new Map(ALL_RULES.map((r) => [r.id, r.title]));
+---
+
+<BaseLayout
+  title="Pre-submit checklist"
+  description="What each kind of VASP run must have and must not have before you submit it, linked to the Input Builder checks."
+>
+  <div class="container ref-page" data-pagefind-body data-pagefind-meta="module:Quick reference">
+    <h1>Pre-submit checklist</h1>
+    <p>
+      Read the row for your calculation before you submit. Each row follows the pre-submit checklist of the
+      author's Workflow Handbook (<a href="/references/#S-042">S-042</a>). Where the
+      <a href="/builder/">Input Builder</a> already checks a line, the rule id is shown; the builder warns you
+      when that rule fires. Lines without an id are not checked automatically.
+    </p>
+    <p class="muted">Heuristic: a checklist catches common mistakes, it does not prove a setup is right.</p>
+    {CHECKLIST.map((row) => (
+      <section class="ref-check">
+        <h2>{row.calculation}</h2>
+        <div class="ref-check-cols">
+          {(
+            [
+              ['Must have', row.must],
+              ['Must not have', row.mustNot],
+            ] as const
+          ).map(([label, items]) => (
+            <div>
+              <h3>{label}</h3>
+              <ul>
+                {items.map((it) => (
+                  <li>
+                    {it.text}
+                    {it.rules && (
+                      <span class="ref-rules">
+                        {' '}
+                        {it.rules.map((id) => (
+                          <code title={titles.get(id)} data-rule={id}>
+                            {id}
+                          </code>
+                        ))}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+    ))}
+    <p>
+      See also <a href="/reference/units/">units and conversions</a> and
+      <a href="/reference/where-to-read/">where to read each number</a>.
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .ref-check-cols {
+    display: grid;
+    gap: 0 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  }
+  .ref-rules code {
+    margin-left: 0.25rem;
+  }
+</style>
