@@ -6,7 +6,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 
 ## How to read this table
 
-- **Next stage to build: M13.4 (Handbook: spin-polarized DFT and magnetism, visually), Tier B**, size L. Start it with `STAGE: NEXT`, `TIER: B`. **Next Tier A stage: M7.5** (Module 9: Analysis), size L; M14.1 (Tier A) is also ready now that M13.3 is done. Also ready: M8.3 (Tier B). The M6 to M7, M12 and M13.2 stages that were stacked in open PRs were integrated with main on 2026-11-19; the stack's decision ids were renumbered to D-073 to D-084 and its question ids to Q-046 to Q-049 because main had used D-061 to D-072 and Q-045 for other decisions.
+- **Next stage to build: M15.1 (Make main green and gate deploy on CI), Tier B**, size S. Start it with `STAGE: NEXT`, `TIER: B`. **Next Tier A stage: M15.4** (elastic tensor), with M15.5 and M15.6 also ready; M15.2 (science re-audit) follows M15.1. Plan M15 (2026-11-26, D-086): repair after the process audit of main at 33414fb, and the parts of the author's handbooks (S-041, S-042) that had no page; see [work order](milestones/M15-coverage-and-repair.md). M7.6 stays `partial` until `data/author/` exists.
 - **Tier** says which model to open the session with. **A** = the strongest model (Opus class): stages where a subtle mistake would put a wrong number in front of a researcher. **B** = the fast model (Sonnet class): UI, content and wiring on top of tested libraries. `-` = already done.
 - **Size** says how much work it is: **S** short session, **M** one normal session, **L** a long session that may stop as `partial` and need a second one.
 - A session started on the wrong tier does not build. It names the model to switch to and stops (`docs/WORKFLOW.md` section 2, step 0).
@@ -81,6 +81,15 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M11.1 | Performance and offline audit | done | M10.5, M9.4, M7.6, M6.5, M12.3, M12.4, M12.5, M12.6, M13.4, M14.2, M14.3 | M | B | main | PR #58 | 2026-11-24 | [report](reports/M11.1.md), [work order](milestones/M11-polish.md) |
 | M11.2 | Accessibility and security audit | done | M11.1 | M | B | main | PR #59 | 2026-11-24 | [report](reports/M11.2.md), [work order](milestones/M11-polish.md) |
 | M11.3 | Content integrity and release preparation | done | M11.2 | M | A | main | PR #60 | 2026-11-24 | [report](reports/M11.3.md), [audit package](AUDIT_PACKAGE.md), [work order](milestones/M11-polish.md) |
+| M15.1 | Make main green and gate deploy on CI | todo | none | S | B | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
+| M15.2 | Science re-audit of the 2026-11-24 batch | todo | M15.1 | L | A | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
+| M15.3 | Process repair: missing tests and records | todo | M15.1 | M | B | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
+| M15.4 | Elastic tensor: reader and mechanical analysis | todo | M4.1 | L | A | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
+| M15.5 | Optics and dielectric response: readers and derived quantities | todo | M4.1 | M | A | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
+| M15.6 | Phonon output reader: Gamma modes and units | todo | M4.1 | S | A | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
+| M15.7 | Handbook module 12: lattice response and properties | todo | M15.4, M15.5, M15.6 | L | B | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
+| M15.8 | Handbook: beyond-PBE depth and the property catalogue | todo | M15.7 | M | B | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
+| M15.9 | Reference pages: units, where to read it, checklist, layout, VASPKIT map | todo | M15.6 | M | B | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
 
 ## Session log
 
@@ -109,6 +118,7 @@ Newest first. One line per session: date, stage, outcome, branch.
 - 2026-10-28, M0.2: sw, manifest, size budgets, headers check (emulator, 18 pass), Lighthouse 100/100/100; preview pending Q-015. Same branch and PR as M0.1.
 - 2026-10-28, M0.1: scaffold done, verify and e2e green. Branch `claude/vigilant-newton-ws593b`.
 - 2026-10-27, planning: environment created (rules, SPEC v2, workflow, 53 work orders, guards, CI, hosting config, golden reference data). Branch `claude/great-dijkstra-oj0kbx`.
+- 2026-11-26, planning: process audit of main (CI e2e red on every recent merge while deploy runs regardless; 19 stages of 2026-11-24/25 without DECISIONS entries, golden files or full reports) and a coverage check of S-041 and S-042 against the site. Added milestone M15 (9 stages, Tier A: M15.2, M15.4, M15.5, M15.6; Tier B: M15.1, M15.3, M15.7, M15.8, M15.9), D-086, Q-050, Q-051, Q-042 update.
 
 ## Author actions outstanding
 
