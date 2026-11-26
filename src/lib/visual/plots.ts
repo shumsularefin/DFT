@@ -128,7 +128,7 @@ function chart(
   // the y title is one rotated line, or two when it is longer than the axis; the tick labels sit between it and the
   // axis, so the plot area starts far enough right that neither ever overlaps the other
   const yLines = splitTitle(ylabel, y0 - y1);
-  const titleRight = yLines.length > 1 ? 30 : 17;
+  const titleRight = yLines.length > 1 ? 33 : 17;
   const tickW = Math.max(0, ...(opts.yticks ?? []).map(([, s]) => textWidth(s)));
   const x0 = Math.max(46, Math.ceil(titleRight + 4 + tickW + 7));
   const x1 = W - 14;
@@ -137,7 +137,7 @@ function chart(
   let axes = line(x0, y0, x1, y0, 'vp-axis') + line(x0, y0, x0, y1, 'vp-axis');
   axes += text((x0 + x1) / 2, h - 8, xlabel, 'vp-t');
   yLines.forEach((s, i) => {
-    axes += `<text class="vp-t" transform="translate(${12 + i * 13} ${r1((y0 + y1) / 2)}) rotate(-90)" text-anchor="middle">${esc(s)}</text>`;
+    axes += `<text class="vp-t" transform="translate(${11 + i * 16} ${r1((y0 + y1) / 2)}) rotate(-90)" text-anchor="middle">${esc(s)}</text>`;
   });
   for (const [v, s] of opts.xticks ?? [])
     axes += line(sx(v), y0, sx(v), y0 + 4, 'vp-axis') + tickText(sx(v), y0 + 16, s, 'middle');
