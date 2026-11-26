@@ -266,7 +266,11 @@
     ],
     "visual": {
       "kind": "scene",
-      "scene": "sc"
+      "scene": "sc",
+      "camera": {
+        "azimuth": 30,
+        "elevation": 22
+      }
     },
     "try": {
       "kind": "choice",
@@ -306,7 +310,11 @@
     ],
     "visual": {
       "kind": "scene",
-      "scene": "rocksalt"
+      "scene": "rocksalt",
+      "camera": {
+        "azimuth": 30,
+        "elevation": 22
+      }
     },
     "try": {
       "kind": "choice",

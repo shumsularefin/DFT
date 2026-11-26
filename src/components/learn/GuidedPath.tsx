@@ -8,6 +8,8 @@ import type { SceneSpec } from '../../lib/scene/spec';
 import Badge from '../ui/Badge';
 import Slider from '../ui/Slider';
 import Scene from '../scene/Scene';
+// plots.ts writes class names only; without its stylesheet every shape is filled black (the SVG default)
+import '../../lib/visual/plots.css';
 import './learn.css';
 
 interface Props {

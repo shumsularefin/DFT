@@ -60,9 +60,18 @@
   gap: var(--space-3);
 }
 .lp-plot-svg svg {
+  display: block;
   width: 100%;
   height: auto;
   max-height: 28rem;
+  margin-inline: auto;
+}
+/* a station picture shares the row with three sentences: keep a scene about as tall as the text beside it */
+.lp-visual .scene {
+  margin: 0;
+}
+.lp-visual .scene-stage {
+  max-width: 24rem;
 }
 .lp-wait {
   min-height: 12rem;
