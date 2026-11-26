@@ -157,7 +157,7 @@ export default function StructureView({
               ? ''
               : 'Select a site in the table to highlight it.'}
       </p>
-      <div className="sv-table-wrap" role="region" aria-label={`Sites of ${label}`} tabIndex={0}>
+      <div className="sv-table-wrap" role="region" aria-label={`Sites of ${label} (${formula})`} tabIndex={0}>
         <table className="sv-table">
           <caption>
             Sites ({s.species.length}).{' '}
