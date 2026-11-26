@@ -10,7 +10,7 @@ vaspTags: []
 sources: [S-019, S-020, S-042]
 noLab: true
 status: draft
-updated: 2026-11-19
+updated: 2026-11-26
 ---
 
 <Why>
@@ -63,6 +63,29 @@ The command map, from the Workflow Handbook <Cite id="S-042" />:
 | 311 to 314 | `CHGCAR` analysis                                                                                                                                                            |
 | 426        | Work function from `LOCPOT`                                                                                                                                                  |
 | 711        | Optical properties from `vasprun.xml`                                                                                                                                        |
+
+More codes the Workflow Handbook uses, with what each reads, what it writes and where this site explains it <Cite id="S-042" />:
+
+| Code       | Reads                                                                                                | Writes                                                                 | Explained in                                                      |
+| ---------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| 911        | The finished run                                                                                     | Printed: gap, VBM and CBM energies, their k-points, direct or indirect | [Functionals](/handbook/05-practical-choices/functionals/)        |
+| 912        | A fine k-grid around a band edge                                                                     | m\*/mₑ                                                                 | [Other calculations](/handbook/12-properties/other-calculations/) |
+| 252        | A hybrid run with `KPATH.in` in the folder                                                           | Same files as 211                                                      | [Functionals](/handbook/05-practical-choices/functionals/)        |
+| 253 to 255 | The same hybrid run                                                                                  | `PBAND` files: selected atoms, each element, a sum                     | [Functionals](/handbook/05-practical-choices/functionals/)        |
+| 261 / 262  | The primitive cell (261 writes a dense `KPOINTS`, resolution about 0.01); 262 reads the finished run | `FERMISURFACE.bxsf` for XCrySDen                                       | [Other calculations](/handbook/12-properties/other-calculations/) |
+| 312 / 313  | A spin-polarized `CHGCAR`                                                                            | `SPIN.vasp`; `SPIN_UP.vasp` and `SPIN_DW.vasp`                         | [Other calculations](/handbook/12-properties/other-calculations/) |
+| 314        | `CHGCAR` of AB, A and B (also `LOCPOT`, `ELFCAR`, `PARCHG`)                                          | `CHGDIFF.vasp`                                                         | [Other calculations](/handbook/12-properties/other-calculations/) |
+| 427        | `LOCPOT` of a heterostructure                                                                        | `PLANAR_AVERAGE.dat`, `MACROSCOPIC_AVERAGE.dat`                        | [Other calculations](/handbook/12-properties/other-calculations/) |
+| 501 / 502  | A frequency run: adsorbate (temperature) / gas molecule (temperature, pressure, spin multiplicity)   | ZPE, TS and G corrections                                              | [Other calculations](/handbook/12-properties/other-calculations/) |
+| 503        | A `LORBIT = 11` DOS run and an energy window                                                         | `D_BAND_CENTER`, relative to E_F                                       | [Other calculations](/handbook/12-properties/other-calculations/) |
+| 511        | `WAVECAR`, one band at one k-point                                                                   | `RWAV_*.vasp` (real part), `IWAV_*` (imaginary part)                   | [Other calculations](/handbook/12-properties/other-calculations/) |
+| 712 / 713  | `WAVECAR`: at one k-point / along a band path                                                        | `TDM.dat` (Debye²)                                                     | [Optical properties](/handbook/12-properties/optical-properties/) |
+| 721 / 722  | A molecular dynamics run                                                                             | `MSD.dat` (mean squared displacement), RDF data                        | [Other calculations](/handbook/12-properties/other-calculations/) |
+| 926        | A 2D structure (the handbook names the task only)                                                    | 2D elastic constants                                                   | Not on this site yet                                              |
+| 203        | `OUTCAR` of an `IBRION = 6` run                                                                      | Cij, Sij, moduli (Voigt, Reuss, Hill), Born criteria, `ELASTIC_TENSOR` | [Elastic constants](/handbook/12-properties/elastic-constants/)   |
+| 201        | `VPKIT.in`: step 1 makes strain folders, step 2 fits their energies                                  | Same analysis as 203                                                   | [Elastic constants](/handbook/12-properties/elastic-constants/)   |
+| 200 / 202  | 200: VASPKIT's own stress-strain workflow; 202: a tensor you supply in `ELASTIC_TENSOR.in`           | Same analysis as 203                                                   | [Elastic constants](/handbook/12-properties/elastic-constants/)   |
+| 205        | Energy-volume points                                                                                 | E0, V0, B0, B′                                                         | [Equation of state](/handbook/12-properties/equation-of-state/)   |
 
 Habits that protect you:
 

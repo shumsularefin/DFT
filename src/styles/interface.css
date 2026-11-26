@@ -408,3 +408,21 @@ tbody tr:last-child td {
   background: var(--chrome-bg);
   border-top: 1px solid var(--border);
 }
+
+/* Quick-reference pages (/reference/) */
+
+.ref-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.ref-page table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.ref-page th,
+.ref-page td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+}

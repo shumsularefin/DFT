@@ -8,6 +8,7 @@ import { definedIds } from './check-sources.mjs';
 import { parseStages } from './check-stages.mjs';
 import runAll from './check-doc-links.mjs';
 import { definedQ, definedD } from './check-refs.mjs';
+import { sourceSections, checkCoverage } from './check-handbook-coverage.mjs';
 
 const EM = '\u2014';
 
@@ -62,4 +63,11 @@ test('doc link check runs on the repository', () => {
 test('Q and D id parsers read headings and bold ids only', () => {
   assert.deepEqual([...definedQ('## Q-001. Title\ntext Q-999\n## Q-002. Other')], ['Q-001', 'Q-002']);
   assert.deepEqual([...definedD('**D-001. A.** text D-777 **D-010. B.**')], ['D-001', 'D-010']);
+});
+
+test('handbook coverage reads all 8 S-041 and 26 S-042 sections and finds every map entry in them', () => {
+  const s = sourceSections();
+  assert.equal(s.filter((x) => x.key.startsWith('S-041#')).length, 8);
+  assert.equal(s.filter((x) => x.key.startsWith('S-042#')).length, 26);
+  assert.deepEqual(checkCoverage().stale, []);
 });
