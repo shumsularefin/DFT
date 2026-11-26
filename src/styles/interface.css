@@ -1,7 +1,5 @@
-/* macOS scientific desktop UI theme:
-   Cool aluminum window canvas (#eef1f6), crisp white rounded panels (#ffffff),
-   segmented control navigation with vivid macOS cobalt blue active state (#1463d1),
-   clean system sans-serif UI with tabular monospace for numbers and readouts. */
+/* Calm workspace UI: warm paper canvas, quiet sidebar chrome, soft rounded panels,
+   one terracotta accent, system sans-serif for text and tabular monospace for numbers. */
 
 body {
   display: flex;
@@ -16,7 +14,7 @@ h1,
 h2,
 h3,
 h4 {
-  font-weight: 700;
+  font-weight: 650;
   letter-spacing: -0.015em;
 }
 
@@ -52,74 +50,9 @@ table.numeric,
   font-variant-numeric: tabular-nums;
 }
 
-/* Top macOS desktop toolbar header */
-.site-header {
-  background: var(--chrome-bg);
-  border-bottom: 1px solid var(--border);
-  box-shadow: 0 1px 0 rgb(255 255 255 / 0.65) inset;
-}
-:root[data-theme='dark'] .site-header {
-  box-shadow: none;
-}
-
-.brand {
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
 .site-footer {
   border-top: 1px solid var(--border);
-  background: var(--chrome-bg);
-}
-
-/* Segmented control navigation (desktop) */
-.nav-list a {
-  font-size: var(--step--1);
-  font-weight: 500;
-}
-@media (min-width: 64rem) {
-  .nav-list {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow-1);
-  }
-  .nav-list li + li a {
-    border-inline-start: 1px solid var(--border);
-  }
-  .nav-list a {
-    min-height: 2.35rem;
-    padding: 0 0.9rem;
-    border-bottom: 0;
-    transition:
-      background-color var(--dur-fast),
-      color var(--dur-fast);
-  }
-  .nav-list a:hover {
-    background: var(--surface-2);
-  }
-  .nav-list a[aria-current='page'] {
-    background: var(--accent);
-    color: var(--accent-contrast);
-    font-weight: 600;
-    border-bottom: 0;
-  }
-  .nav-list a[aria-current='page']:hover {
-    background: var(--accent);
-    filter: brightness(0.95);
-  }
-}
-
-/* Mobile nav active pill */
-@media (max-width: 63.99rem) {
-  .nav-list a[aria-current='page'] {
-    background: var(--accent);
-    color: var(--accent-contrast);
-    border-radius: var(--radius);
-    border-bottom: 0;
-    font-weight: 600;
-  }
+  background: var(--bg);
 }
 
 /* Crisp macOS toolbar buttons */
@@ -271,6 +204,7 @@ tbody tr:last-child td {
 }
 .session-prompt kbd {
   margin-inline-start: auto;
+  white-space: nowrap;
   padding: 0.15rem 0.45rem;
   font-size: var(--step--1);
   background: var(--surface-2);
@@ -393,7 +327,6 @@ tbody tr:last-child td {
 }
 .palette-opt[aria-selected='true'] .palette-group {
   color: var(--accent-contrast);
-  opacity: 0.85;
 }
 .palette-group {
   color: var(--text-muted);
