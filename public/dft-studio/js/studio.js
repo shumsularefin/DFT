@@ -53,7 +53,112 @@
     if (window.PP_LOCAL_LIBRARY !== true) { S.ppLibrary = false; return; }
     const t = setTimeout(() => { if (S.ppLibrary === null) S.ppLibrary = false; }, 4000);
     loadPotcarText('PAW_PBE_64', 'O').then(() => { S.ppLibrary = true; clearTimeout(t); renderStepbar(); if (S.stage === 'potcar' || S.stage === 'bundle') renderStage(); })
-      .catch(() => { S.ppLibrary = false; clearTimeout(t); });
+      .catch(() => { if (S.ppLibrary !== true) S.ppLibrary = false; clearTimeout(t); });
+  }
+
+  // POTCAR library loaded in the browser: a VASP_PP_PATH folder, a zip of it, single POTCAR files,
+  // or the data/potcars/*.js files. Kept in IndexedDB so it survives reloads on this computer.
+  const PP_DB = 'dft-studio-potcar', PP_STORE = 'potcar';
+  function ppDb() {
+    return new Promise((resolve, reject) => {
+      const r = indexedDB.open(PP_DB, 1);
+      r.onupgradeneeded = () => r.result.createObjectStore(PP_STORE);
+      r.onsuccess = () => resolve(r.result);
+      r.onerror = () => reject(r.error);
+    });
+  }
+  async function ppSave(entries) {
+    try {
+      const db = await ppDb();
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(PP_STORE, 'readwrite');
+        entries.forEach(([k, v]) => tx.objectStore(PP_STORE).put(v, k));
+        tx.oncomplete = resolve; tx.onerror = () => reject(tx.error);
+      });
+    } catch (e) { console.warn('POTCAR library not saved for next visit:', e); }
+  }
+  async function ppRestore() {
+    try {
+      const db = await ppDb();
+      const keys = await new Promise((resolve, reject) => {
+        const r = db.transaction(PP_STORE).objectStore(PP_STORE).getAllKeys();
+        r.onsuccess = () => resolve(r.result); r.onerror = () => reject(r.error);
+      });
+      if (!keys.length) return 0;
+      const vals = await new Promise((resolve, reject) => {
+        const r = db.transaction(PP_STORE).objectStore(PP_STORE).getAll();
+        r.onsuccess = () => resolve(r.result); r.onerror = () => reject(r.error);
+      });
+      keys.forEach((k, i) => { ppCache[k] = vals[i]; });
+      return keys.length;
+    } catch (e) { return 0; }
+  }
+  async function ppClear() {
+    Object.keys(ppCache).forEach((k) => delete ppCache[k]);
+    try {
+      const db = await ppDb();
+      db.transaction(PP_STORE, 'readwrite').objectStore(PP_STORE).clear();
+    } catch (e) { /* nothing stored */ }
+  }
+  function ppFuncFromDir(dir) {
+    if (!dir) return null;
+    const d = dir.toLowerCase();
+    for (const [func, lib] of Object.entries(D.PP_LIB_DIRS)) {
+      if (d === lib.toLowerCase() || d === func.toLowerCase()) return func;
+    }
+    return null;
+  }
+  function ppKeyFor(path, text) {
+    const parts = path.split(/[\\/]/).filter(Boolean);
+    const titel = (text.match(/TITEL\s*=\s*(\S+)\s+(\S+)/) || []);
+    const variant = parts.length >= 2 ? parts[parts.length - 2] : (titel[2] || null);
+    if (!variant) return null;
+    let func = null;
+    for (let i = parts.length - 3; i >= 0 && !func; i--) func = ppFuncFromDir(parts[i]);
+    if (!func) func = S.potFunc;
+    return `${func}/${variant}`;
+  }
+  function ppParseJs(text) {
+    const m = text.match(/__POTCAR_LOAD\(\s*"([^"]+)"\s*,\s*("(?:[^"\\]|\\.)*")\s*\)/s);
+    if (!m) return null;
+    try { return [m[1], JSON.parse(m[2])]; } catch (e) { return null; }
+  }
+  async function importPotcarFiles(files) {
+    const found = [];
+    const take = (path, text) => {
+      const base = path.split(/[\\/]/).pop();
+      if (/\.js$/i.test(base)) { const kv = ppParseJs(text); if (kv) found.push(kv); return; }
+      if (!/^POTCAR$/i.test(base) || !/End of Dataset/.test(text)) return;
+      const key = ppKeyFor(path, text);
+      if (key) found.push([key, text]);
+    };
+    for (const f of files) {
+      const path = f.webkitRelativePath || f.name;
+      if (/\.zip$/i.test(f.name)) {
+        if (!window.JSZip) { V().toast('Zip support is still loading. Try again in a moment.'); continue; }
+        const zip = await window.JSZip.loadAsync(f);
+        const entries = Object.values(zip.files).filter((z) => !z.dir && /(^|\/)(POTCAR|[^/]+\.js)$/i.test(z.name));
+        for (const z of entries) take(z.name, await z.async('string'));
+      } else if (/(^|[\\/])POTCAR$/i.test(path) || /\.js$/i.test(f.name) || f.size < 3e6) {
+        take(path, await f.text());
+      }
+    }
+    if (!found.length) { V().toast('No POTCAR files found. Pick your POTCAR folder (for example potpaw_PBE.64) or a zip of it.'); return; }
+    found.forEach(([k, v]) => { ppCache[k] = v; });
+    S.ppLibrary = true;
+    await ppSave(found);
+    V().toast(`POTCAR library loaded: ${found.length} POTCAR file${found.length === 1 ? '' : 's'}.`);
+    renderStepbar(); renderStage();
+  }
+  function ppMissing() {
+    return elements().map((el) => `${S.potFunc}/${S.potSel[el] || el}`).filter((k) => !ppCache[k]);
+  }
+  function pickPotcarLibrary(folder) {
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.multiple = true;
+    if (folder) inp.webkitdirectory = true; else inp.accept = '.zip,.js,*';
+    inp.onchange = () => { if (inp.files.length) importPotcarFiles(Array.from(inp.files)).catch((e) => V().toast(`Could not read the POTCAR files: ${e.message}`)); };
+    inp.click();
   }
 
   function downloadText(filename, content) {
@@ -346,7 +451,7 @@ echo "POTCAR written:"; grep TITEL POTCAR
     const lp = V().getLatticeParams();
     if (!line && S.kpt.scheme === 'Monkhorst-Pack' && Math.abs(lp.gamma - 120) < 1 && currentMesh().slice(0, 2).some((n) => n % 2 === 0)) add('warn', 'Hexagonal cell with an even Monkhorst-Pack mesh breaks the hexagonal symmetry. Use a Gamma-centred mesh.', 'kpoints');
     if (needsNoncollinear()) add('info', 'Non-collinear / SOC run: use the vasp_ncl executable.', 'bundle');
-    if (S.ppLibrary !== true) add('info', 'POTCAR is not bundled. make_potcar.sh in the bundle builds it on your cluster from VASP_PP_PATH.', 'potcar');
+    if (S.ppLibrary !== true) add('info', 'No POTCAR library loaded yet. Load it in the POTCAR step to generate POTCAR here; otherwise make_potcar.sh builds it on your cluster.', 'potcar');
     return out;
   }
 
@@ -448,7 +553,18 @@ echo "POTCAR written:"; grep TITEL POTCAR
           <div><span>Recommended ENCUT (1.3 x)</span><b class="font-mono-code text-blue-500">${recommendedEncut()} eV</b></div>
           <div><span>Valence electrons NELECT</span><b class="font-mono-code">${ne !== null ? +ne.toFixed(2) : '-'}</b></div>
         </div>
-        <div class="sp-note">${S.ppLibrary === true ? 'Local lab POTCAR library detected: the run bundle can include a real POTCAR.' : 'POTCAR files are licensed and are not shipped. The bundle includes <code>make_potcar.sh</code>, which builds POTCAR on your cluster from <code>VASP_PP_PATH</code> with exactly these variants.'}</div>
+      </div>
+      <div class="sp-card" id="pp-gen-card">
+        <div class="sp-card-title">Generate POTCAR</div>
+        <div class="sp-note">${S.ppLibrary === true
+          ? `POTCAR library ready${Object.keys(ppCache).length ? ` (${Object.keys(ppCache).length} files loaded in this browser)` : ''}. ${(() => { const m = ppMissing(); return m.length && Object.keys(ppCache).length ? `Not loaded yet: ${esc(m.join(', '))} (they are fetched from data/potcars if present).` : 'Download POTCAR, or include it in the run bundle.'; })()}`
+          : 'Load your POTCAR library once (your VASP_PP_PATH folder such as potpaw_PBE.64, a zip of it, or single POTCAR files). It stays in this browser and is reused on every visit.'}</div>
+        <div class="sp-row" style="flex-wrap:wrap;gap:6px;margin-top:6px">
+          <button class="v-btn primary py-1 px-3" id="pp-dl-real" ${S.ppLibrary === true ? '' : 'disabled'}>Download POTCAR</button>
+          <button class="v-btn py-1 px-3" id="pp-load-dir">Load POTCAR folder</button>
+          <button class="v-btn py-1 px-3" id="pp-load-zip">Load zip / files</button>
+          ${Object.keys(ppCache).length ? '<button class="v-btn py-1 px-3" id="pp-clear">Forget loaded library</button>' : ''}
+        </div>
       </div>
       ${species.map(({ el, count }) => {
         const vars = variantsFor(el);
@@ -466,7 +582,7 @@ echo "POTCAR written:"; grep TITEL POTCAR
         </div>`;
       }).join('')}
       ${checkList('potcar')}
-      ${filePreview('make_potcar.sh', makePotcarScript(), S.ppLibrary === true ? '<button class="v-btn py-0.5 px-2 text-[10.5px]" id="pp-dl-real">Download POTCAR (local library)</button>' : '')}
+      ${filePreview('make_potcar.sh', makePotcarScript(), '')}
     `;
     $('pp-func').onchange = (e) => { S.potFunc = e.target.value; ensurePotSelection(); rerenderBody(); };
     body.querySelectorAll('[data-pv]').forEach((c) => {
@@ -476,7 +592,11 @@ echo "POTCAR written:"; grep TITEL POTCAR
     });
     bindFileButtons(body, () => makePotcarScript());
     const real = $('pp-dl-real');
-    if (real) real.onclick = async () => { try { downloadText('POTCAR', await realPotcar()); } catch (e) { V().toast(e.message); } };
+    if (real) real.onclick = async () => { try { downloadText('POTCAR', await realPotcar()); } catch (e) { V().toast(`${e.message}. Load the folder that contains it.`); } };
+    $('pp-load-dir').onclick = () => pickPotcarLibrary(true);
+    $('pp-load-zip').onclick = () => pickPotcarLibrary(false);
+    const clr = $('pp-clear');
+    if (clr) clr.onclick = async () => { await ppClear(); S.ppLibrary = null; probeLocalLibrary(); rerenderBody(); };
   };
 
   // ---------------------------------------------------------------------------
@@ -710,7 +830,7 @@ ${c.length ? c.map((x) => `- [${x.level}] ${x.msg}`).join('\n') : '- none'}
         <label class="sp-inline"><input id="bn-sweep" type="checkbox" ${B.sweep ? 'checked' : ''}/> ENCUT convergence sweep:</label>
         <input id="bn-sweep-v" class="v-input font-mono-code" value="${esc(B.sweepVals)}" ${B.sweep ? '' : 'disabled'}/>
         <label class="sp-inline" style="margin-top:6px"><input id="bn-kconv" type="checkbox" ${B.kconv && kc ? 'checked' : ''} ${kc ? '' : 'disabled'}/> Include kpoint_convergence/ folder ${kc ? '' : '(set up step 5 first)'}</label>
-        <label class="sp-inline" style="margin-top:6px"><input id="bn-realpot" type="checkbox" ${B.potMode === 'real' ? 'checked' : ''} ${S.ppLibrary === true ? '' : 'disabled'}/> Include real POTCAR from the local lab library ${S.ppLibrary === true ? '' : '(library not installed: make_potcar.sh is used)'}</label>
+        <label class="sp-inline" style="margin-top:6px"><input id="bn-realpot" type="checkbox" ${B.potMode === 'real' ? 'checked' : ''} ${S.ppLibrary === true ? '' : 'disabled'}/> Include real POTCAR ${S.ppLibrary === true ? '' : '(load the POTCAR library in step 2 first; make_potcar.sh is used until then)'}</label>
         <div class="sp-row" style="margin-top:10px"><button id="bn-zip" class="v-btn v-btn-primary">Download ${esc(B.name)}.zip</button><span id="bn-st" class="text-[11px] text-mut"></span></div>
       </div>
       <div class="sp-card">
@@ -865,12 +985,15 @@ ${c.length ? c.map((x) => `- [${x.level}] ${x.msg}`).join('\n') : '- none'}
     });
     $('wasm-pill').onclick = () => window.WasmEngine.ensureReady(updateWasmPill).catch((e) => V().toast(e.message));
     $('btn-guide').onclick = () => showHelp('How DFT Studio works', { meaning: 'Work left to right along the steps at the top. 1 Structure: load a sample, the 350-crystal library, or your own POSCAR/CIF; build supercells, slabs and defects; set spins in the Magnetic tab. 2 POTCAR: pick variants, ENCUT follows. 3 INCAR: choose a preset, add magnetism, DFT+U, SOC. 4 KPOINTS: mesh or band path. 5 (optional) k-point convergence test. 6 Run bundle: checks plus a ready-to-submit .zip. 7 Analyze: plot DOS, bands, EOS, phonons and MD.', when: 'Every step reads the live 3D structure, so going back and editing the structure updates all files. Press Ctrl+K to jump to any VASPKIT function by number or name.' });
-    probeLocalLibrary();
+    ppRestore().then((n) => {
+      if (n) { S.ppLibrary = true; renderStepbar(); if (S.stage === 'potcar' || S.stage === 'bundle') renderStage(); }
+      else probeLocalLibrary();
+    });
     renderStepbar();
     V().refresh();
   }
 
   window.Studio = { getIncar, getKpoints, useBandPath: () => { S.kpt.mode = 'line'; go('kpoints'); }, go, setMesh: (m) => { S.kpt.mode = 'manual'; S.kpt.manual = m.slice(); S.visited.add('kpoints'); } };
-  window.StudioKit = { S, V, $, esc, helpBtn, filePreview, bindFileButtons, downloadText, downloadBlob, readFileText, plot, plotLayout, getIncar, getKpoints, currentMesh, go, rerenderBody, renderStepbar, stageRenderers, updateWasmPill, copyText, elements };
+  window.StudioKit = { importPotcarFiles,  S, V, $, esc, helpBtn, filePreview, bindFileButtons, downloadText, downloadBlob, readFileText, plot, plotLayout, getIncar, getKpoints, currentMesh, go, rerenderBody, renderStepbar, stageRenderers, updateWasmPill, copyText, elements };
   setTimeout(init, 0);
 })();
