@@ -6,7 +6,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 
 ## How to read this table
 
-- **Next stage to build: M15.3 (Process repair), Tier B**, size M (M15.1 is done). Start it with `STAGE: NEXT`, `TIER: B`. **Next Tier A stage: M15.5** (optics and dielectric), with M15.6 also ready (M15.4 is done) (M15.2 is done). Plan M15 (2026-11-26, D-086): repair after the process audit of main at 33414fb, and the parts of the author's handbooks (S-041, S-042) that had no page; see [work order](milestones/M15-coverage-and-repair.md). M7.6 stays `partial` until `data/author/` exists.
+- **Next Tier B stage: M15.7 (waits on M15.4 to M15.6)**; M15.9 waits on M15.6. M15.1, M15.2 and M15.3 are done. **Next stage to build is Tier A: M15.5** (optics and dielectric), with M15.6 also ready (M15.4 is done). Plan M15 (2026-11-26, D-086): repair after the process audit of main at 33414fb, and the parts of the author's handbooks (S-041, S-042) that had no page; see [work order](milestones/M15-coverage-and-repair.md). M7.6 stays `partial` until `data/author/` exists.
 - **Tier** says which model to open the session with. **A** = the strongest model (Opus class): stages where a subtle mistake would put a wrong number in front of a researcher. **B** = the fast model (Sonnet class): UI, content and wiring on top of tested libraries. `-` = already done.
 - **Size** says how much work it is: **S** short session, **M** one normal session, **L** a long session that may stop as `partial` and need a second one.
 - A session started on the wrong tier does not build. It names the model to switch to and stops (`docs/WORKFLOW.md` section 2, step 0).
@@ -83,7 +83,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M11.3 | Content integrity and release preparation | done | M11.2 | M | A | main | PR #60 | 2026-11-24 | [report](reports/M11.3.md), [audit package](AUDIT_PACKAGE.md), [work order](milestones/M11-polish.md) |
 | M15.1 | Make main green and gate deploy on CI | done | none | S | B | claude/m15-1-green-main | PR pending | 2026-11-26 | [report](reports/M15.1.md), [work order](milestones/M15-coverage-and-repair.md) |
 | M15.2 | Science re-audit of the 2026-11-24 batch | done | M15.1 | L | A | claude/compassionate-einstein-ls4ab4 | PR #67 (session 1), session 2 PR | 2026-11-26 | [report](reports/M15.2.md), [work order](milestones/M15-coverage-and-repair.md) |
-| M15.3 | Process repair: missing tests and records | todo | M15.1 | M | B | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
+| M15.3 | Process repair: missing tests and records | done | M15.1 | M | B | claude/m15-3-process-repair | PR #66 | 2026-11-26 | [report](reports/M15.3.md), [work order](milestones/M15-coverage-and-repair.md) |
 | M15.4 | Elastic tensor: reader and mechanical analysis | done | M4.1 | L | A | claude/compassionate-einstein-ls4ab4 | [#65](https://github.com/shumsularefin/DFT/pull/65) | 2026-11-26 | [report](reports/M15.4.md), [work order](milestones/M15-coverage-and-repair.md). Library only; UI in M15.7 |
 | M15.5 | Optics and dielectric response: readers and derived quantities | todo | M4.1 | M | A | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
 | M15.6 | Phonon output reader: Gamma modes and units | todo | M4.1 | S | A | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
@@ -125,6 +125,10 @@ Newest first. One line per session: date, stage, outcome, branch.
 - 2026-11-26, M15.4: OUTCAR `TOTAL ELASTIC MODULI` reader with the XX YY ZZ XY YZ ZX to Voigt reorder, `src/lib/mechanics/elastic.ts` (compliance, eigenvalue stability, Born class forms, VRH, E, nu, A^U, sound velocities, Debye, Heuristic indicators, EOS cross-check); pymatgen golden file `elastic_reference.json` (D-090).
 - 2026-11-26, M15.2 session 1: pymatgen golden planar averages (M14.3); the M9.3 runtime formula replaced by a sourced relative estimate (D-092); Q-053 opened for the feasibility cut-offs.
 - 2026-11-26, M15.2 session 2: science-verifier over M7.5, M14.1 and M14.2 (no wrong formula; fixed one wrong doc comment, two unlabelled or unsourced thresholds, missing tests); band-gap golden vs pymatgen; Q-005, Q-010, Q-014 and Q-018 closed; D-093 to D-095; Q-054 to Q-056 opened.
+
+- 2026-11-24, batch (recorded late in M15.3 from `git log`): M13.4, M8.3, M8.4, M7.5, M14.1, M14.3, M9.2, M9.3 and M9.4 pushed to main (PRs #44 to #53) without session-log lines, DECISIONS entries or full reports; M15.2 re-audits the Tier A ones.
+- 2026-11-25, batch (recorded late in M15.3): M10.4, M10.5, M14.2, M7.6, M11.1, M11.2, M11.3 (PRs #54 to #60), the 360 px e2e fix (#62) and the macOS theme (#63, D-090) pushed to main; CI end-to-end was red from here until M15.1.
+- 2026-11-26, M15.3: tests for the builder (templates, molecule export, e2e keyboard path and axe at 360 px), records repaired (D-090, Q table, M11.1 report), branch list for the author in `docs/reports/M15.3.md`.
 
 ## Author actions outstanding
 
