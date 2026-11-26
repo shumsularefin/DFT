@@ -550,5 +550,101 @@
     "access": "open web",
     "status": "cited-from-memory",
     "notes": "The SDK exports used were checked against the installed firebase@13.1.0 package; firebase.google.com was not reachable, so the quota figures stay open in Q-006"
+  },
+  {
+    "id": "S-070",
+    "citation": "K. Sato, L. Bergqvist, J. Kudrnovsky, P. H. Dederichs, O. Eriksson, I. Turek, B. Sanyal, G. Bouzerar, H. Katayama-Yoshida, V. A. Dinh, T. Fukushima, H. Kizaki, R. Zeller, \"First-principles theory of dilute magnetic semiconductors\", Rev. Mod. Phys. 82, 1633 (2010)",
+    "usedFor": "Mean-field Curie temperature k_B T_C = (2/3)(E_DLM - E_FM) per magnetic atom, referenced to the disordered (paramagnetic) state (M13.3, Q-042)",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": "The formula and its DLM reference were confirmed in later papers that apply it (2026-11-26 web search); the review text was not read. The same result follows from classical mean-field theory of the Heisenberg model, k_B T_C = (1/3) sum_j J_0j with unit spins and H = -sum_(i<j) J_ij e_i.e_j, which the unit test checks"
+  },
+  {
+    "id": "S-071",
+    "citation": "P. Peczak, A. M. Ferrenberg, D. P. Landau, \"High-accuracy Monte Carlo study of the three-dimensional classical Heisenberg ferromagnet\", Phys. Rev. B 43, 6087 (1991)",
+    "usedFor": "Exact (Monte Carlo) J/(k_B T_C) = 0.6929(1) for the nearest-neighbour simple-cubic classical Heisenberg model, the size of the mean-field overestimate (M13.3)",
+    "access": "paywalled",
+    "status": "cross-checked",
+    "notes": "Value from the abstract (2026-11-26 web search); Holm and Janke (1993) agree. Mean field gives k_B T_C = 2J on the same lattice, 1.386 times the Monte Carlo 1.4432J"
+  },
+  {
+    "id": "S-072",
+    "citation": "F. Mouhat, F.-X. Coudert, \"Necessary and sufficient elastic stability conditions in various crystal systems\", Phys. Rev. B 90, 224104 (2014); arXiv:1410.0065",
+    "usedFor": "Born elastic stability: all eigenvalues of C positive; per-class closed forms (M15.4)",
+    "access": "open access (arXiv)",
+    "status": "cross-checked",
+    "notes": "Hexagonal and tetragonal (I) conditions in S-042 match the paper. A 2025 J. Elasticity paper (10.1007/s10659-025-10112-0) finds the paper correct for nine of the eleven Laue classes, so the eigenvalue test is the authority and per-class forms are explanation only"
+  },
+  {
+    "id": "S-073",
+    "citation": "S. F. Pugh, \"Relations between the elastic moduli and the plastic properties of polycrystalline pure metals\", Phil. Mag. 45, 823 (1954)",
+    "usedFor": "Pugh ratio G/B (k) as a ductility indicator (M15.4)",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": "The critical value B/G = 1.75 (G/B = 0.57) used in S-042 is the conventional reading of Pugh's data in later literature; it is an empirical rule, shown only as Heuristic"
+  },
+  {
+    "id": "S-074",
+    "citation": "X.-Q. Chen, H. Niu, D. Li, Y. Li, \"Modeling hardness of polycrystalline materials and bulk metallic glasses\", Intermetallics 19, 1275 (2011), doi:10.1016/j.intermet.2011.03.026; arXiv:1102.4063",
+    "usedFor": "Vickers hardness H_V = 2(k^2 G)^0.585 - 3, k = G/B, G in GPa (M15.4)",
+    "access": "open access (arXiv)",
+    "status": "cross-checked",
+    "notes": "Formula confirmed against the journal listing and arXiv (2026-11-26). Gives unphysical negative values for soft materials (the -3 intercept); calibrated on brittle, high-k solids. Heuristic"
+  },
+  {
+    "id": "S-075",
+    "citation": "I. N. Frantsevich, F. F. Voronov, S. A. Bakuta, \"Elastic constants and elastic moduli of metals and insulators\", Naukova Dumka, Kiev (1983)",
+    "usedFor": "Poisson-ratio ductility rule nu = 0.26 (M15.4)",
+    "access": "book",
+    "status": "cited-from-memory",
+    "notes": "The 0.26 value is not stated explicitly in the book; it was inferred later from its tables and became an empirical rule (noted in arXiv:1704.01752). Heuristic"
+  },
+  {
+    "id": "S-076",
+    "citation": "R. Hill, \"The elastic behaviour of a crystalline aggregate\", Proc. Phys. Soc. A 65, 349 (1952)",
+    "usedFor": "Voigt, Reuss and Hill averages of B and G (M15.4)",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": "Golden values come from pymatgen ElasticTensor (S-034)"
+  },
+  {
+    "id": "S-077",
+    "citation": "S. I. Ranganathan, M. Ostoja-Starzewski, \"Universal elastic anisotropy index\", Phys. Rev. Lett. 101, 055504 (2008)",
+    "usedFor": "A^U = 5 G_V/G_R + B_V/B_R - 6 (M15.4)",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": "pymatgen ElasticTensor.universal_anisotropy is the golden reference"
+  },
+  {
+    "id": "S-078",
+    "citation": "O. L. Anderson, \"A simplified method for calculating the Debye temperature from elastic constants\", J. Phys. Chem. Solids 24, 909 (1963)",
+    "usedFor": "Sound velocities and Debye temperature from B, G and density (M15.4)",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": ""
+  },
+  {
+    "id": "S-079",
+    "citation": "D. G. Pettifor, \"Theoretical predictions of structure and related properties of intermetallics\", Mater. Sci. Technol. 8, 345 (1992)",
+    "usedFor": "Cauchy pressure C12 - C44 as a bonding indicator (M15.4)",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": "Heuristic"
+  },
+  {
+    "id": "S-080",
+    "citation": "A. Jain, G. Hautier, S. P. Ong, C. J. Moore, C. C. Fischer, K. A. Persson, G. Ceder, \"Formation enthalpies by mixing GGA and GGA+U calculations\", Phys. Rev. B 84, 045115 (2011); L. Wang, T. Maxisch, G. Ceder, Phys. Rev. B 73, 195107 (2006)",
+    "usedFor": "Origin of the Materials Project U values (fit to oxide formation enthalpies) (M15.8, Q-051)",
+    "access": "paywalled",
+    "status": "cited-from-memory",
+    "notes": "The values themselves are checked against pymatgen's MPRelaxSet.yaml (S-034)"
+  },
+  {
+    "id": "S-081",
+    "citation": "A. Wang, R. Kingsbury, M. McDermott, M. Horton, A. Jain, S. P. Ong, S. Dwaraknath, K. A. Persson, \"A framework for quantifying uncertainty in DFT energy corrections\", Sci. Rep. 11, 15496 (2021)",
+    "usedFor": "MP2020 energy-correction scheme (M15.8, Q-051)",
+    "access": "open access",
+    "status": "cited-from-memory",
+    "notes": "pymatgen MP2020Compatibility.yaml (S-034) holds the fitted corrections; it changes corrections, not the U values"
   }
 ]

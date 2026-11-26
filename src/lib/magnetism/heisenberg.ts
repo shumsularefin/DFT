@@ -2,8 +2,11 @@
 // The coefficients c_n come from the M13.1 bond statistics per neighbour shell; nothing here assumes a lattice.
 // The Hamiltonian convention is a parameter and is written out with every result, because J changes by a factor
 // of 2 (pairs counted once or twice), by S^2 (unit spins or spins of length S) and by sign between conventions.
-// No transition temperature is estimated here (Q-042).
-// @source S-059 (Heisenberg Hamiltonian, conventions), S-060 (energy-mapping analysis)
+// The only transition temperature offered is the classical mean-field estimate for a ferromagnetic ground state
+// (meanFieldCurie), labelled Heuristic, with its known overestimate (Q-042, closed 2026-11-26).
+// @source S-059 (Heisenberg Hamiltonian, conventions), S-060 (energy-mapping analysis), S-070 (mean-field T_C),
+// S-071 (Monte Carlo T_C, size of the mean-field error), S-031 (k_B)
+import { BOLTZMANN_EV_K } from '../physics/constants';
 import { bondStatistics, type MagneticConfiguration } from './orderings';
 
 export interface HeisenbergConvention {
@@ -15,9 +18,16 @@ export interface HeisenbergConvention {
   spin: { kind: 'unit' } | { kind: 'S'; s: number };
 }
 
-/** Pending Q-042: the author has not chosen a default; this one is only a starting point and is always printed. */
+/**
+ * Default (Q-042, closed 2026-11-26): H = E0 - sum_(i<j) J_ij S_i.S_j with unit spins, so J > 0 is ferromagnetic.
+ * The literature has no single standard: textbooks (S-059) and the mean-field T_C literature (S-070) use the minus
+ * sign, the Whangbo energy-mapping papers (S-060) use the plus sign. The minus sign is the default because it is the
+ * one in the author's Workflow Handbook (S-042) and in S-059 and S-070; pairs are counted once, as in both S-042 and
+ * S-060; unit spins because collinear DFT energies determine only the products J S^2, not J and S separately.
+ * The convention is printed with every result and can be switched.
+ */
 export const DEFAULT_CONVENTION: HeisenbergConvention = {
-  sign: 'plus',
+  sign: 'minus',
   pairs: 'once',
   spin: { kind: 'unit' },
 };
@@ -193,4 +203,42 @@ export function fitExchange(points: readonly FitPoint[], conv: HeisenbergConvent
 /** Shell distances of two configurations agree (they come from the same parent structure). */
 export function sameShells(a: readonly number[], b: readonly number[], tolA = 1e-3): boolean {
   return a.length === b.length && a.every((d, i) => Math.abs(d - b[i]!) <= tolA);
+}
+
+export interface MeanFieldCurie {
+  /** Classical mean-field Curie temperature, kelvin. */
+  kelvin: number;
+  /** E0 - E_FM of the fitted model, eV per magnetic ion (the paramagnetic-to-FM energy, S-070's E_DLM - E_FM). */
+  deltaE: number;
+  warnings: string[];
+}
+
+/** Mean field over Monte Carlo T_C for the nearest-neighbour simple-cubic classical Heisenberg model (S-071). */
+export const MEAN_FIELD_OVER_MC_SC = 0.6929 / 0.5;
+
+/**
+ * Classical mean-field Curie temperature from a fit, k_B T_C = (2/3) (E0 - E_FM) per magnetic ion (S-070).
+ * E0 is the fitted constant: the energy of uncorrelated (paramagnetic, DLM-like) spins, where every S_i.S_j averages
+ * to zero. E_FM is the model energy of the FM configuration, E0 + sum c_n^FM J_n. The result does not depend on the
+ * convention, because it uses model energies only. Equivalent to k_B T_C = (1/3) sum_n z_n J_n in the default
+ * convention with unit spins. Only for a ferromagnetic ground state: returns undefined when there is no fit or when
+ * E_FM is not below E0. The caller must also check that FM is the lowest computed configuration.
+ * Using E_AFM - E_FM in place of E0 - E_FM (as S-042 writes it) doubles the estimate when the AFM state reverses every
+ * coupled bond, because then E_AFM - E_FM = 2 (E0 - E_FM).
+ */
+export function meanFieldCurie(
+  fit: FitResult,
+  fmCoefficients: readonly number[],
+): MeanFieldCurie | undefined {
+  if (!fit.j || fit.e0 === undefined || fmCoefficients.length !== fit.j.length) return undefined;
+  const eFm = fit.e0 + fmCoefficients.reduce((a, c, n) => a + c * fit.j![n]!, 0);
+  const deltaE = fit.e0 - eFm;
+  if (!(deltaE > 0)) return undefined;
+  const warnings = [
+    `Mean field neglects spin fluctuations and overestimates T_C: for the nearest-neighbour simple-cubic model it gives ${MEAN_FIELD_OVER_MC_SC.toFixed(3)} times the Monte Carlo value. Use Monte Carlo on the fitted J for a number to compare with experiment.`,
+    'Classical spins: the fit gives J S^2, so no S(S+1) quantum factor is applied.',
+  ];
+  if (fit.determination !== 'over')
+    warnings.push('The fit is exactly determined, so nothing checks the model behind this estimate.');
+  return { kelvin: ((2 / 3) * deltaE) / BOLTZMANN_EV_K, deltaE, warnings };
 }

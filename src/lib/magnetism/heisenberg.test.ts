@@ -6,10 +6,13 @@ import {
   DEFAULT_CONVENTION,
   describeConvention,
   fitExchange,
+  meanFieldCurie,
+  MEAN_FIELD_OVER_MC_SC,
   shellCoefficients,
   type FitPoint,
   type HeisenbergConvention,
 } from './heisenberg';
+import { BOLTZMANN_EV_K } from '../physics/constants';
 import { namedOrdering, type NamedKind } from './orderings';
 
 type Input = { lattice_rows: number[][]; frac_coords: number[][]; atomic_numbers: number[] };
@@ -110,11 +113,51 @@ describe('fitExchange round trip (mathematical, J chosen in the test)', () => {
     const r = fitExchange(energies(DEFAULT_CONVENTION, [0.004]), DEFAULT_CONVENTION);
     expect(r.conventionText).toBe(describeConvention(DEFAULT_CONVENTION));
     expect(r.conventionText).toMatch(/each bond|bonds i<j/);
-    expect(r.conventionText).toMatch(/antiferromagnetic/);
+    expect(r.conventionText).toMatch(/J > 0 is ferromagnetic/);
+    expect(describeConvention({ ...DEFAULT_CONVENTION, sign: 'plus' })).toMatch(/J > 0 is antiferromagnetic/);
     expect(describeConvention({ sign: 'minus', pairs: 'twice', spin: { kind: 'S', s: 2.5 } })).toMatch(
       /S = 2\.5.*J > 0 is ferromagnetic/,
     );
   });
 
-  it.todo('Q-042: the default convention the author chooses, checked against the worked example in S-060');
+  it('Q-042 default: H = E0 - sum_(i<j) J S_i.S_j, unit spins, J > 0 ferromagnetic (S-042, S-059, S-070)', () => {
+    expect(DEFAULT_CONVENTION).toEqual({ sign: 'minus', pairs: 'once', spin: { kind: 'unit' } });
+    expect(describeConvention(DEFAULT_CONVENTION)).toMatch(/H = E0 - .*J > 0 is ferromagnetic/);
+    // FM on the simple-cubic Ti sublattice: 6 parallel neighbours, each bond once, minus sign: c_1 = -3.
+    expect(shellCoefficients(configs[0]!, 1, DEFAULT_CONVENTION).perIon[0]).toBe(-3);
+  });
+});
+
+describe('meanFieldCurie (S-070, S-071)', () => {
+  const fmC = (conv: HeisenbergConvention) => shellCoefficients(configs[0]!, 1, conv).perIon;
+  it('nearest-neighbour simple cubic: k_B T_C = (2/3)(E0 - E_FM) = z J / 3 = 2 J (classical mean field)', () => {
+    const j = 0.01; // eV, ferromagnetic in the default convention
+    const fit = fitExchange(energies(DEFAULT_CONVENTION, [j], -9.5, false), DEFAULT_CONVENTION);
+    const tc = meanFieldCurie(fit, fmC(DEFAULT_CONVENTION))!;
+    expect(tc.deltaE).toBeCloseTo(3 * j, 12);
+    expect(tc.kelvin).toBeCloseTo((2 * j) / BOLTZMANN_EV_K, 6);
+    expect(tc.kelvin).toBeCloseTo(232.0904, 3); // 0.02 eV / 8.617333262e-5 eV/K
+  });
+  it('does not depend on the convention: same energies, other sign and pair counting, same T_C', () => {
+    const pts = energies(DEFAULT_CONVENTION, [0.01], -9.5, false);
+    const other: HeisenbergConvention = { sign: 'plus', pairs: 'twice', spin: { kind: 'S', s: 2.5 } };
+    const refit = fitExchange(
+      pts.map((p, i) => ({ ...p, coefficients: shellCoefficients(configs[i]!, 1, other).perIon })),
+      other,
+    );
+    const a = meanFieldCurie(fitExchange(pts, DEFAULT_CONVENTION), fmC(DEFAULT_CONVENTION))!;
+    const b = meanFieldCurie(refit, fmC(other))!;
+    expect(b.kelvin).toBeCloseTo(a.kelvin, 6);
+  });
+  it('gives no estimate for an antiferromagnetic model or without a fit', () => {
+    const afm = fitExchange(energies(DEFAULT_CONVENTION, [-0.01], -9.5, false), DEFAULT_CONVENTION);
+    expect(meanFieldCurie(afm, fmC(DEFAULT_CONVENTION))).toBeUndefined();
+    const under = fitExchange(energies(DEFAULT_CONVENTION, [0.01]).slice(0, 1), DEFAULT_CONVENTION);
+    expect(meanFieldCurie(under, fmC(DEFAULT_CONVENTION))).toBeUndefined();
+  });
+  it('states the known overestimate: mean field / Monte Carlo = 2 x 0.6929 on simple cubic (S-071)', () => {
+    expect(MEAN_FIELD_OVER_MC_SC).toBeCloseTo(1.3858, 4);
+    const fit = fitExchange(energies(DEFAULT_CONVENTION, [0.01], -9.5, false), DEFAULT_CONVENTION);
+    expect(meanFieldCurie(fit, fmC(DEFAULT_CONVENTION))!.warnings[0]).toMatch(/overestimates/);
+  });
 });

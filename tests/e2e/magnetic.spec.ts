@@ -182,6 +182,9 @@ test.describe('magnetic tool', () => {
     await page.getByRole('tab', { name: 'Analyse' }).click();
     const nMag = mag.common_supercell[STO]!.det;
     // Energies from J1 = 3 meV, H = +J sum over bonds once, unit spins: per ion c1 = (parallel - antiparallel) / 2.
+    // The default is the minus sign (Q-042), so the test switches to plus first.
+    await expect(page.getByTestId('mg-convention')).toContainText('J > 0 is ferromagnetic');
+    await page.getByLabel('Sign').selectOption('plus');
     const c1: Record<string, number> = { FM: 3, A: 1, C: -1, G: -3 };
     for (const [k, c] of Object.entries(c1))
       await page.getByLabel(`Total energy of ${k}, eV per cell`).fill(String((-10 + c * 0.003) * nMag));
@@ -194,7 +197,15 @@ test.describe('magnetic tool', () => {
     await expect(fit).toContainText('J1');
     await expect(fit).toContainText('3.00');
     await expect(fit).toContainText('Convention: H = E0 +');
-    await expect(page.getByText(/No Néel or Curie temperature/)).toBeVisible();
+    await expect(page.getByTestId('mg-curie')).toContainText('FM is not the lowest');
+    await page.getByLabel('Sign').selectOption('minus');
+    await expect(fit).toContainText('-3.00');
+    // The same physics with FM lowest (J1 = -3 meV in the plus sign): a Heuristic mean-field T_C appears.
+    for (const [k, c] of Object.entries(c1))
+      await page.getByLabel(`Total energy of ${k}, eV per cell`).fill(String((-10 - c * 0.003) * nMag));
+    await expect(page.getByTestId('mg-curie')).toContainText(/heuristic/i);
+    await expect(page.getByTestId('mg-curie')).toContainText('70 K');
+    await page.getByLabel('Sign').selectOption('plus');
     await page.getByLabel('Pairs').selectOption('twice');
     await expect(fit).toContainText('1.50');
 

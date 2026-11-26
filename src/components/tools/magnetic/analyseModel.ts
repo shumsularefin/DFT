@@ -11,10 +11,12 @@ import {
 } from '../../../lib/magnetism/analysis';
 import {
   fitExchange,
+  meanFieldCurie,
   sameShells,
   shellCoefficients,
   type FitResult,
   type HeisenbergConvention,
+  type MeanFieldCurie,
 } from '../../../lib/magnetism/heisenberg';
 import type { ConfigOutput } from '../../../lib/magnetism/export';
 import { parseOszicar } from '../../../lib/vasp/oszicar';
@@ -133,6 +135,10 @@ export interface AnalyseResult {
   fit?: FitResult;
   shells?: number[];
   fitWarnings: string[];
+  /** Classical mean-field T_C (Heuristic), only when FM is the lowest configuration and the fit is ferromagnetic. */
+  curie?: MeanFieldCurie;
+  /** Why no T_C is given, when a fit exists. */
+  curieNote?: string;
 }
 
 /** Rank, and fit J for nShells shells when at least one energy is present. The ranking uses config labels. */
@@ -164,5 +170,17 @@ export function analyseAll(
   const out: AnalyseResult = { runs, ranking, fitWarnings };
   if (shells) out.shells = shells;
   if (pts.length && !fitWarnings.length) out.fit = fitExchange(pts, conv);
+  if (out.fit?.j) {
+    const fm = outs.find((o, i) => o.config.kind === 'FM' && runs[i]!.energy);
+    if (!fm) out.curieNote = 'No T_C estimate: it needs an FM configuration with an energy.';
+    else if (ranking.rows[0]?.label !== fm.folder)
+      out.curieNote =
+        'No T_C estimate: FM is not the lowest configuration, and the mean-field Curie formula applies to a ferromagnetic ground state only.';
+    else {
+      const tc = meanFieldCurie(out.fit, shellCoefficients(fm.config, nShells, conv).perIon);
+      if (tc) out.curie = tc;
+      else out.curieNote = 'No T_C estimate: in the fitted model FM is not below the paramagnetic energy E0.';
+    }
+  }
   return out;
 }

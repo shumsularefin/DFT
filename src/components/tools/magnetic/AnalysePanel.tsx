@@ -315,8 +315,10 @@ export default function AnalysePanel({ outputs }: { outputs: ConfigOutput[] }) {
           {convError ?? describeConvention(conv)}
         </p>
         <p className="mg-note">
-          No default has been agreed yet (open question Q-042): check which convention the paper you compare
-          with uses. Published J values differ by factors of 2 and S^2 for this reason alone.
+          Default: H = E0 - sum J S_i.S_j over bonds counted once, unit spins (J &gt; 0 ferromagnetic), as in
+          the author&apos;s Workflow Handbook and the textbook convention. Papers differ in sign, pair
+          counting and spin length, so published J values can differ by factors of 2 and S^2 for that reason
+          alone: match the paper you compare with before comparing numbers.
         </p>
       </fieldset>
       {res?.fitWarnings.map((w) => (
@@ -365,9 +367,30 @@ export default function AnalysePanel({ outputs }: { outputs: ConfigOutput[] }) {
           )}
         </div>
       )}
+      {(res?.curie || res?.curieNote) && (
+        <div data-testid="mg-curie">
+          {res.curie ? (
+            <>
+              <p>
+                <Badge variant="heuristic" /> Mean-field Curie temperature: about{' '}
+                <strong>{String(Number(res.curie.kelvin.toPrecision(2)))} K</strong>, from k_B T_C = (2/3)(E0
+                - E_FM) per magnetic ion with E0 - E_FM = {meV(res.curie.deltaE)} meV from the fit.
+              </p>
+              {res.curie.warnings.map((w) => (
+                <p key={w} className="mg-note">
+                  {w}
+                </p>
+              ))}
+            </>
+          ) : (
+            <p className="mg-note">{res.curieNote}</p>
+          )}
+        </div>
+      )}
       <p className="mg-note">
-        No Néel or Curie temperature is estimated here: mean-field estimates need a cited formula and have
-        large known errors (Q-042).
+        No Néel temperature is estimated. The mean-field Curie estimate uses the paramagnetic energy E0 of the
+        fit, not E_AFM - E_FM: with an antiferromagnetic reference that reverses every bond the same formula
+        would double the estimate.
       </p>
     </div>
   );

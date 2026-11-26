@@ -5,8 +5,13 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- Heisenberg fit default convention is now H = E0 - sum J S_i.S_j, pairs once, unit spins (J > 0 ferromagnetic), as in the Workflow Handbook and the textbooks (Q-042 closed, D-087). The plus sign is still available.
+
 ### Added
 
+- Magnetic tool, Analyse tab: Heuristic classical mean-field Curie temperature for a ferromagnetic ground state, k_B T_C = (2/3)(E0 - E_FM) per magnetic ion (S-070), with its known overestimate (S-071); D-087.
 - Release preparation (`M11.3`): updated top navigation so Studio (`/studio/`) and Builder (`/builder/`) point directly to live routes, updated `/about/` limits and `README.md`, added a Release Triage section to `docs/OPEN_QUESTIONS.md`, wrote `docs/AUDIT_PACKAGE.md`, and prepared the unmerged `chore/enable-indexing` branch for post-audit launch.
 - Accessibility and security audit (`M11.2`): added Content Security Policy headers in `firebase.json` (with `'wasm-unsafe-eval'` and `worker-src 'self' blob:`), switched `lighthouserc.json` assertions to `"error"`, and added `tests/e2e/a11y-csp.spec.ts` covering axe checks, 360 px overflow, and zero CSP violations.
 - Performance and offline audit (`M11.1`): documented all 102 routes against `budgets.json` and lazy-chunk limits in `docs/reports/M11.1.md`, with conservative 360 MB/day Spark transfer estimates recorded in `Q-006`.

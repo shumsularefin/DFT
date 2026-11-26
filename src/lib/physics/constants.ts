@@ -31,3 +31,8 @@ export const RYDBERG_ENERGY_EV = 13.605693122994;
  * (S-042) rounds it to 160.2177; the golden file takes it from scipy.constants.
  */
 export const EV_PER_A3_IN_GPA = (ELEMENTARY_CHARGE_C * 1e30) / 1e9;
+
+/** Boltzmann constant in J/K (exact by the 2019 SI definition). */
+export const BOLTZMANN_J_K = 1.380649e-23;
+/** Boltzmann constant in eV/K: k_B / e = 8.617333262e-5. The Workflow Handbook (S-042) rounds it to 8.617e-5. */
+export const BOLTZMANN_EV_K = BOLTZMANN_J_K / ELEMENTARY_CHARGE_C;
