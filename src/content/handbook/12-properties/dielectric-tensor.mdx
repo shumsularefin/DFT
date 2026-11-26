@@ -1,0 +1,111 @@
+---
+id: dielectric-tensor
+title: Dielectric tensor and Born effective charges
+module: 12
+order: 4
+summary: Compute the electronic and ionic dielectric tensors and the Born effective charges with LEPSILON, read them from OUTCAR, and check the acoustic sum rule.
+concepts: [dielectric-response]
+requires: [phonons]
+vaspTags: [LEPSILON, LCALCEPS, LRPA, IBRION, EDIFF]
+sources: [S-019, S-034, S-042]
+noLab: true
+status: draft
+updated: 2026-11-26
+---
+
+<Why>
+
+Put an insulator in an electric field and two things screen the field. The electron clouds shift a little (fast, electronic screening) and the ions move a little (slow, ionic screening). The <Term id="dielectric-tensor">dielectric tensor</Term> measures both. Along the way VASP computes the <Term id="born-effective-charge">Born effective charges</Term>, which phonopy needs to fix the optical modes of polar crystals and which flag materials close to a ferroelectric instability <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+The Born effective charge of an atom answers: if I move this atom a little along y, how much does the crystal's polarization change along x? It is a 3 by 3 tensor per atom, a dynamical charge, and it can be far larger than the nominal ionic charge when bonding is strongly covalent. In BaTiO<sub>3</sub>, titanium's Born charge is about +7 against a nominal +4, a sign of strong p-d hybridization and of the ferroelectric instability nearby <Cite id="S-042" />.
+
+The high-frequency tensor, written $\varepsilon_\infty$, is the electronic part alone. Adding the ionic contribution gives the static tensor $\varepsilon_0$ <Cite id="S-042" />.
+
+</Intuition>
+
+<TheMath>
+
+$$\varepsilon_0 = \varepsilon_\infty + \varepsilon_\text{ion}$$
+
+The Born charges obey the acoustic sum rule: moving the whole crystal rigidly cannot polarize it, so for each tensor component the sum over all atoms $\kappa$ is zero, $\sum_\kappa Z^*_{\kappa,\alpha\beta} = 0$. In a real calculation it is only approximately zero <Cite id="S-042" />.
+
+</TheMath>
+
+<InVasp>
+
+The run, on a relaxed unit cell of an insulator or semiconductor <Cite id="S-042" />:
+
+<VaspFile
+  name="INCAR"
+  code={`PREC     = Accurate
+ENCUT    = 520
+EDIFF    = 1E-8
+ISMEAR   = 0
+SIGMA    = 0.01
+LREAL    = .FALSE.
+LASPH    = .TRUE.
+IBRION   = 8
+LEPSILON = .TRUE.
+LRPA     = .FALSE.
+NSW      = 1
+LWAVE    = .FALSE.
+LCHARG   = .FALSE.`}
+/>
+
+- **Why `IBRION = 8` with `LEPSILON`:** density-functional perturbation theory gives the electronic tensor, the ionic contribution and the Gamma phonons in one run <Cite id="S-042" />.
+- **Why `LRPA = .FALSE.`:** it includes local-field effects in DFT, which is the tensor you want to report <Cite id="S-042" />.
+- **No `NCORE`:** DFPT needs `NCORE = 1`, the default <Cite id="S-042" />.
+- **Hybrid or meta-GGA:** replace `IBRION = 8` and `LEPSILON` by `IBRION = 6` and `LCALCEPS = .TRUE.` <Cite id="S-042" />.
+
+**Reading it** <Cite id="S-042" />:
+
+<VaspFile
+  name="shell"
+  code={`grep -A 5 "MACROSCOPIC STATIC DIELECTRIC TENSOR (including local field effects in DFT)" OUTCAR | tail -4
+grep -A 5 "MACROSCOPIC STATIC DIELECTRIC TENSOR IONIC CONTRIBUTION" OUTCAR
+grep -A 40 "BORN EFFECTIVE CHARGES" OUTCAR | head -45
+phonopy-vasp-born vasprun.xml > BORN`}
+/>
+
+The first line is $\varepsilon_\infty$, the second the ionic part, the third the Born charges per ion; the last writes the `BORN` file for phonopy's non-analytical correction. The site's OUTCAR reader takes the same three blocks and checks the sum rule; it is tested on files that pymatgen reads back.
+
+</InVasp>
+
+<WhatChanges>
+
+| Check                                                        | Good sign                                | If not                                                                      |
+| ------------------------------------------------------------ | ---------------------------------------- | --------------------------------------------------------------------------- |
+| Sum of Z\* over all atoms, per component                     | Below about 0.1                          | The k-mesh or EDIFF is too loose (Heuristic level) <Cite id="S-042" />      |
+| Z\* compared with the nominal charge                         | Similar                                  | Much larger: strong covalency, possibly near a ferroelectric instability    |
+| $\varepsilon_\infty$ against $\varepsilon_1(0)$ from LOPTICS | Close; LEPSILON usually slightly smaller | LEPSILON includes local-field effects, LOPTICS does not <Cite id="S-042" /> |
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Running it on a metal">
+
+The dielectric tensor, the Born charges and the polarization are ill-defined in a metal: free carriers screen any static field completely. Do not run this on a metallic state <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Reading the block without local fields">
+
+OUTCAR prints more than one dielectric tensor. The one to report is the block "including local field effects in DFT".
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m12-di-1', 'q-m12-di-2', 'q-m12-di-3', 'q-m12-di-4']} />
+
+<GoDeeper>
+
+- VASP wiki pages LEPSILON, LCALCEPS and LRPA (by page name) <Cite id="S-019" />.
+- pymatgen's `Outcar.read_lepsilon` for reading the same blocks in Python <Cite id="S-034" />.
+
+</GoDeeper>

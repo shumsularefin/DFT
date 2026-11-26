@@ -69,6 +69,14 @@ describe('presets', () => {
         expect(e.length).toBeGreaterThan(0);
       }
   });
+  it('the AIMD (NVT) preset from S-041 passes the M3.4 validator with no errors (M15.7)', () => {
+    const e = entriesFromPreset(byId('aimd-nvt'), 'default');
+    expect(e.map((x) => x.name)).toEqual(
+      expect.arrayContaining(['IBRION', 'MDALGO', 'SMASS', 'TEBEG', 'TEEND', 'POTIM']),
+    );
+    const incar = parseIncar(e.map((x) => `${x.name} = ${x.value}`).join('\n')).entries;
+    expect(validate({ incar }).filter((i) => i.severity === 'error')).toEqual([]);
+  });
   it('unknown variant falls back to the first', () => {
     expect(entriesFromPreset(byId('band'), 'nope').length).toBeGreaterThan(0);
   });

@@ -12,7 +12,7 @@ const kebab = z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'concept id must be k
 export const conceptSchema = z.object({
   id: kebab,
   label: z.string().min(1),
-  module: z.number().int().min(0).max(11),
+  module: z.number().int().min(0).max(12),
   summary: z.string().min(1),
   prerequisites: z.array(kebab),
   level: z.enum(['beginner', 'intermediate', 'pro']),

@@ -1,0 +1,127 @@
+---
+id: optical-properties
+title: Optical properties
+module: 12
+order: 5
+summary: Compute the frequency-dependent dielectric function with LOPTICS, derive the refractive index, absorption and reflectivity from it, and avoid the scissor, metal and NBANDS traps.
+concepts: [optical-properties]
+requires: [dielectric-response]
+vaspTags: [LOPTICS, NBANDS, CSHIFT, NEDOS, EDIFF]
+sources: [S-019, S-020, S-042, S-082]
+noLab: true
+status: draft
+updated: 2026-11-26
+---
+
+<Why>
+
+Absorption, colour, reflectivity and the refractive index all follow from one function: the frequency-dependent dielectric function. VASP computes it from the band structure you already have, so a single extra run turns a converged ground state into an optical spectrum. The trap is that the run looks easy and silently gives wrong answers when empty bands, the gap or the metal case are not handled <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+Light of energy $\hbar\omega$ can lift an electron from a filled state to an empty one that lies $\hbar\omega$ higher. Count all such transitions and you get the imaginary part $\varepsilon_2(\omega)$: it says how strongly the material absorbs at each energy. The real part $\varepsilon_1(\omega)$ follows from $\varepsilon_2$ by a Kramers-Kronig transform. Because the transitions end in empty states, the run needs many more empty bands than a normal calculation <Cite id="S-042" />.
+
+This is the independent-particle picture: no excitons and no local-field effects <Cite id="S-042" />.
+
+</Intuition>
+
+<TheMath>
+
+From $\varepsilon_1$ and $\varepsilon_2$, with $|\varepsilon| = \sqrt{\varepsilon_1^2 + \varepsilon_2^2}$, the derived quantities are <Cite id="S-042" /> <Cite id="S-082" />:
+
+$$n = \sqrt{\tfrac{|\varepsilon| + \varepsilon_1}{2}}, \qquad k = \sqrt{\tfrac{|\varepsilon| - \varepsilon_1}{2}}, \qquad \alpha = \frac{2\omega k}{c}$$
+
+$$R = \frac{(n-1)^2 + k^2}{(n+1)^2 + k^2}, \qquad L = \frac{\varepsilon_2}{\varepsilon_1^2 + \varepsilon_2^2}, \qquad \sigma = \omega\,\varepsilon_0\,\varepsilon_2$$
+
+Here $n$ is the refractive index, $k$ the extinction coefficient, $\alpha$ the absorption coefficient, $R$ the normal-incidence reflectivity, $L$ the energy-loss function (plasmon peaks) and $\sigma$ the real part of the optical conductivity. The site's optics library computes exactly these and is tested against reference values from pymatgen.
+
+At zero frequency, $\varepsilon_1(0)$ is the electronic dielectric constant $\varepsilon_\infty$ and $n(0) = \sqrt{\varepsilon_1(0)}$ <Cite id="S-042" />.
+
+</TheMath>
+
+<InVasp>
+
+**The sequence** <Cite id="S-042" />:
+
+1. A static SCF with tight convergence (`EDIFF = 1E-8` gives smooth spectra).
+2. Read the default band count: `grep NBANDS OUTCAR`.
+3. Set `NBANDS` to about three times that, rounded up to a multiple of the MPI ranks.
+4. Make the optics INCAR (VASPKIT 101, code OP, then edit it) and use a denser k-mesh than the SCF.
+5. Run, then `printf "711\n1\n" | vaspkit` (1 for eV, 2 for nm, 3 for THz). It reads the dielectric function from `vasprun.xml` <Cite id="S-020" />.
+
+<VaspFile
+  name="shell"
+  code={`nb=\$(grep -m1 "NBANDS=" OUTCAR | awk '{print \$NF}')
+np=32                                    # MPI ranks of the optics run
+echo \$(( ( (3*nb + np - 1) / np ) * np ))   # e.g. nb=48 gives 144; nb=50 gives 160`}
+/>
+
+<VaspFile
+  name="INCAR"
+  code={`ISTART  = 1            # optional: start from the SCF WAVECAR
+PREC    = Accurate
+ENCUT   = 520
+EDIFF   = 1E-8
+ALGO    = Normal
+NELM    = 200
+ISMEAR  = 0
+SIGMA   = 0.05
+NBANDS  = 144          # about 3 x default, a multiple of the ranks
+LOPTICS = .TRUE.
+CSHIFT  = 0.100
+NEDOS   = 2001
+NSW     = 0
+LWAVE   = .FALSE.
+LCHARG  = .FALSE.`}
+/>
+
+- **Why so many bands:** every transition ends in an empty band; with too few, the spectrum is cut off at high energy <Cite id="S-042" />.
+- **Why `NEDOS = 2001`:** the spectrum is printed on this energy grid; more points give a smoother curve.
+- **Why `CSHIFT`:** it is the broadening of the spectrum, nothing more <Cite id="S-042" />.
+- Magnetic: add `ISPIN = 2` and `MAGMOM` as in the SCF.
+
+VASPKIT warns that task 711 is not suitable for low-dimensional materials, where the vacuum dilutes the dielectric function <Cite id="S-042" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| Check                               | Do this                                                                                               |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Absorption onset at the PBE gap     | It is underestimated: apply a scissor shift, or run the optics with HSE or mBJ <Cite id="S-042" />    |
+| Non-cubic crystal                   | Report xx, yy and zz separately, or say that you averaged <Cite id="S-042" />                         |
+| Raise `NBANDS`                      | Until the spectrum up to your plotted energy stops changing <Cite id="S-042" />                       |
+| $\varepsilon_1(0)$ against LEPSILON | Close; LEPSILON includes local-field effects and is usually slightly smaller <Cite id="S-042" />      |
+| Peaks in $\varepsilon_2$            | Assign them to transitions using the projected DOS (for example O 2p to metal 3d) <Cite id="S-042" /> |
+
+A direct gap can still absorb weakly if the band-edge transition is dipole-forbidden. VASPKIT 713 computes the transition dipole moment between two bands along the band path; run the band calculation with `LWAVE = .TRUE.` <Cite id="S-042" />.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Using CSHIFT as a scissor">
+
+`CSHIFT` only broadens the spectrum. A scissor shift rigidly moves $\varepsilon_2$ up by $\Delta = E_g(\text{HSE or experiment}) - E_g(\text{PBE})$, and $\varepsilon_1$ must then be recomputed by Kramers-Kronig <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Trusting the low-energy spectrum of a metal">
+
+LOPTICS has no intraband (Drude) term, so the low-energy part of a metal's spectrum is incomplete <Cite id="S-042" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m12-op-1', 'q-m12-op-2', 'q-m12-op-3', 'q-m12-op-4']} />
+
+<GoDeeper>
+
+- VASP wiki pages LOPTICS, CSHIFT and NBANDS (by page name) <Cite id="S-019" />.
+- A textbook treatment of n, k, absorption and reflectivity <Cite id="S-082" />.
+- The [dielectric tensor topic](/handbook/12-properties/dielectric-tensor/) for the static, local-field tensor.
+
+</GoDeeper>

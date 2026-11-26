@@ -19,6 +19,8 @@ const URL = '/tools/eos/';
 
 async function paste(page: import('@playwright/test').Page, text: string) {
   await page.goto(URL);
+  // Wait for hydration: text filled into the server-rendered textarea is reset when React hydrates (Q-052).
+  await page.waitForFunction(() => document.querySelectorAll('astro-island[ssr]').length === 0);
   await page.getByLabel(/Or paste a table/).fill(text);
   await page.getByRole('button', { name: 'Add pasted table' }).click();
 }
@@ -111,6 +113,7 @@ test.describe('Input Builder EOS mode', () => {
     page,
   }) => {
     await page.goto('/tools/input-builder/');
+    await page.waitForFunction(() => document.querySelectorAll('astro-island[ssr]').length === 0);
     await page.getByRole('button', { name: 'Convergence series' }).click();
     await page
       .getByLabel('POSCAR text')

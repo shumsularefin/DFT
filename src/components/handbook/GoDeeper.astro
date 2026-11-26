@@ -39,3 +39,10 @@ const others = extra.filter((id) => !cites.includes(id));
     </>
   )}
 </Section>
+
+<style>
+  /* Long URLs in a citation (for example the pymatgen one) must wrap at 360 px instead of widening the page. */
+  li {
+    overflow-wrap: anywhere;
+  }
+</style>

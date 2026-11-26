@@ -1,0 +1,127 @@
+---
+id: phonons
+title: Phonons and vibrational properties
+module: 12
+order: 3
+summary: Two routes to phonons (phonopy finite displacements and DFPT), LO-TO splitting in polar crystals, Gamma-only modes, and how to read imaginary modes and thermal properties.
+concepts: [phonons]
+requires: [relaxation-analysis]
+vaspTags: [IBRION, EDIFF, EDIFFG, ADDGRID, NSW]
+sources: [S-019, S-042, S-083]
+noLab: true
+status: draft
+updated: 2026-11-26
+---
+
+<Why>
+
+Atoms in a crystal are never still: they vibrate about their positions, and the collective vibrations are <Term id="phonon">phonons</Term>. Phonons answer two questions a single relaxation cannot. Is the structure a real minimum, or a saddle point that would fall into a lower-symmetry phase? And what are the heat capacity, the vibrational entropy and the free energy at a given temperature <Cite id="S-042" />?
+
+</Why>
+
+<Intuition>
+
+Picture balls joined by springs. Pull one ball a little and every neighbour feels a force; the forces per unit displacement are the force constants, and from them come the vibration frequencies. VASP supplies the forces. If every frequency is real the structure is stable at 0 K. An <Term id="imaginary-mode">imaginary mode</Term> means that moving the atoms along that pattern lowers the energy: the structure is not at a minimum <Cite id="S-042" />.
+
+To get vibrations with different wavelengths you need a <Term id="supercell">supercell</Term>, so that a displaced atom does not push on its own periodic copies.
+
+</Intuition>
+
+<TheMath>
+
+The site keeps the phonon mathematics to what you need to read the output. Frequencies come in several units; the conversions are computed from CODATA constants: 1 THz = 33.356 cm<sup>-1</sup> = 4.1357 meV, and 1 cm<sup>-1</sup> = 0.12398 meV <Cite id="S-042" />.
+
+<Level min="intermediate">
+
+At high temperature the heat capacity $C_V$ approaches $3Nk_B$ per cell (Dulong and Petit), and the vibrational free energy $F_\text{vib}(T)$ adds to the DFT energy when comparing phases at finite temperature. The quasi-harmonic approximation (phonopy-qha) adds thermal expansion <Cite id="S-042" />.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+**First, re-relax tightly:** `EDIFF = 1E-8`, `EDIFFG = -0.001`. Leftover forces show up as spurious imaginary modes <Cite id="S-042" />.
+
+**Route A: phonopy with finite displacements (recommended)** <Cite id="S-042" />
+
+1. `phonopy -d --dim 2 2 2 -c POSCAR` writes the perfect supercell (`SPOSCAR`), one `POSCAR-001`, `POSCAR-002`, ... per displacement, and `phonopy_disp.yaml`. Choose DIM so each supercell edge is at least about 10 angstrom.
+2. Run one static VASP job per displacement, with a k-mesh reduced in proportion to the supercell.
+3. `phonopy -f disp-*/vasprun.xml` collects the forces into `FORCE_SETS`.
+4. `phonopy -p -s band.conf` gives the dispersion, `phonopy -t -p -s mesh.conf` the DOS and thermal properties.
+
+<VaspFile
+  name="INCAR"
+  code={`PREC    = Accurate
+ENCUT   = 520
+EDIFF   = 1E-8
+ISMEAR  = 0
+SIGMA   = 0.02
+LREAL   = .FALSE.
+ADDGRID = .TRUE.
+LASPH   = .TRUE.
+NSW     = 0
+LWAVE   = .FALSE.
+LCHARG  = .FALSE.`}
+/>
+
+Why these values: forces are derivatives, so they need a far tighter SCF (`EDIFF = 1E-8`) than the energy does, and `ADDGRID` reduces the force noise. For a magnetic system add `ISPIN = 2` with `MAGMOM` for the supercell, not the unit cell <Cite id="S-042" />.
+
+<VaspFile
+  name="mesh.conf"
+  code={`DIM = 2 2 2
+PRIMITIVE_AXES = AUTO
+MP = 24 24 24
+TPROP = .TRUE.
+TMIN = 0
+TMAX = 1000
+TSTEP = 10`}
+/>
+
+`band.conf` uses the same `DIM` and `PRIMITIVE_AXES` and adds `BAND` (the path, or `BAND = AUTO` when seekpath is installed), `BAND_LABELS` and `BAND_POINTS` <Cite id="S-042" />.
+
+**Route B: DFPT (`IBRION = 8`).** One VASP job on the perfect supercell (`cp SPOSCAR POSCAR`) with `IBRION = 8`, `EDIFF = 1E-8` and no `NCORE`. Then `phonopy --fc vasprun.xml` writes `FORCE_CONSTANTS`; add `FORCE_CONSTANTS = READ` to both conf files. One job instead of many, but DFPT does not support every functional (no hybrids, limited +U) and scales poorly for large supercells <Cite id="S-042" />.
+
+**Polar crystals: LO-TO splitting.** In ionic insulators the long-range dipole field splits the longitudinal and transverse optical modes at Gamma (<Term id="lo-to-splitting">LO-TO splitting</Term>); without a correction the optical branches at Gamma are wrong. Compute the high-frequency dielectric constant and the Born charges in the unit cell ([next topic](/handbook/12-properties/dielectric-tensor/)), write `phonopy-vasp-born vasprun.xml > BORN` and set `NAC = .TRUE.` <Cite id="S-042" />.
+
+**Gamma modes only.** For IR or Raman assignment, run `IBRION` = 5 to 8 on the unit cell. OUTCAR lists each mode as `f` (real) or `f/i` (imaginary) in THz, 2 pi THz, cm<sup>-1</sup> and meV <Cite id="S-019" />. The [calculation review tool](/tools/review/) reads these lines and flags imaginary modes.
+
+</InVasp>
+
+<WhatChanges>
+
+| What you see                                                      | What it usually means                  | What to do                                                                                    |
+| ----------------------------------------------------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------- |
+| No imaginary branches                                             | Dynamically stable at 0 K              | Go on to thermal properties                                                                   |
+| A small imaginary acoustic dip near Gamma (a few cm<sup>-1</sup>) | Numerical noise                        | Tighten EDIFF, add ADDGRID, raise ENCUT, the k-mesh or the supercell, re-relax tighter        |
+| Large imaginary modes at a zone-boundary point                    | A genuine instability                  | Displace the atoms along that mode in the matching supercell and re-relax <Cite id="S-042" /> |
+| Three near-zero modes at Gamma                                    | The acoustic translations, as expected | Nothing                                                                                       |
+
+A gap between acoustic and optical branches follows from the mass contrast; flat, low-lying optical modes (rattlers) suppress thermal conductivity <Cite id="S-042" />.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Phonons on a loosely relaxed structure">
+
+With the relaxation's `EDIFFG = -0.01` the leftover forces alone can give imaginary modes. Re-relax to `EDIFFG = -0.001` first.
+
+</Callout>
+
+<Callout variant="mistake" title="MAGMOM for the unit cell in a supercell run">
+
+The supercell has more atoms; `MAGMOM` needs one value per supercell atom.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m12-ph-1', 'q-m12-ph-2', 'q-m12-ph-3', 'q-m12-ph-4', 'q-m12-ph-5']} />
+
+<GoDeeper>
+
+- Togo and Tanaka on phonon calculations with phonopy <Cite id="S-083" />.
+- VASP wiki pages "Phonons from finite differences" and IBRION (by page name) <Cite id="S-019" />.
+
+</GoDeeper>

@@ -71,6 +71,10 @@ const mbj = entriesOf(byCaption('mBJ').text);
 const hse = entriesOf(byCaption('HSE06').text);
 const dftu = entriesOf(frag('+U').text);
 const magF = frag('MAGMOM').text.split('\n');
+// The AIMD (NVT) recipe is in the Field Handbook only (S-041), not in the Workflow Handbook.
+const mdRecipe = field.RECIPES.find((r) => r.id === 'r-md');
+if (!mdRecipe) throw new Error('Field Handbook recipe r-md not found');
+const md = entriesOf(mdRecipe.incar);
 
 const H = ['S-019', 'S-041', 'S-042'];
 const v = (id, title, entries, extra = {}) => ({ id, title, requires: [], ...extra, entries });
@@ -395,7 +399,23 @@ const presets = [
       }),
     ],
   },
+  {
+    id: 'aimd-nvt',
+    title: 'Ab initio molecular dynamics (NVT)',
+    summary:
+      'Liquids, amorphous phases, diffusion and finite-temperature behaviour, at constant temperature.',
+    protocolStage: null,
+    fragment: false,
+    sources: ['S-019', 'S-041'],
+    notes: [
+      ...mdRecipe.notes.map(strip),
+      'POTIM is the time step in fs; the handbook uses 0.5 with hydrogen.',
+    ],
+    variants: [v('default', 'NVT run (Nose-Hoover)', md, { requires: ['POSCAR', 'POTCAR', 'KPOINTS'] })],
+  },
 ];
+/** Presets taken from the Field Handbook alone: their tags count as field-handbook content, not workflow. */
+const FIELD_PRESETS = new Set(['aimd-nvt']);
 
 // ---------------------------------------------------------------------------------------------------------------
 // Tags
@@ -997,6 +1017,51 @@ const T = [
     'LDIPOL/IDIPOL',
   ],
   [
+    'MDALGO',
+    'md',
+    'int',
+    'Chooses the molecular dynamics algorithm and thermostat. The handbook uses 2, the Nose-Hoover thermostat, for NVT runs.',
+    'The handbooks show only MDALGO = 2; for other thermostats see the VASP wiki page.',
+    ['IBRION', 'SMASS', 'TEBEG'],
+    null,
+  ],
+  [
+    'SMASS',
+    'md',
+    'real',
+    'The Nose mass of the thermostat. The handbook says to tune it for the period of the temperature oscillation.',
+    'A badly chosen value couples the thermostat poorly, so the temperature is not held well.',
+    ['MDALGO', 'TEBEG'],
+    null,
+  ],
+  [
+    'TEBEG',
+    'md',
+    'real',
+    'The temperature at the start of a molecular dynamics run, in kelvin.',
+    'For a constant-temperature run TEEND must match it; the handbook sets both to 300.',
+    ['TEEND', 'MDALGO', 'POTIM'],
+    null,
+  ],
+  [
+    'TEEND',
+    'md',
+    'real',
+    'The temperature at the end of a molecular dynamics run, in kelvin.',
+    'A value different from TEBEG makes the target temperature change during the run.',
+    ['TEBEG', 'MDALGO'],
+    null,
+  ],
+  [
+    'NBLOCK',
+    'md',
+    'int',
+    'The sampling interval, in ionic steps, for XDATCAR and PCDAT in molecular dynamics.',
+    'A large value samples the trajectory coarsely.',
+    ['NSW', 'IBRION'],
+    null,
+  ],
+  [
     'SYSTEM',
     'output',
     'string',
@@ -1055,6 +1120,8 @@ for (const p of presets)
       if (!usage.has(e.name)) usage.set(e.name, new Set());
       usage.get(e.name).add(p.id);
     }
+const usedByWorkflowPreset = (n) => [...(usage.get(n) ?? [])].some((id) => !FIELD_PRESETS.has(id));
+const usedByFieldPreset = (n) => [...(usage.get(n) ?? [])].some((id) => FIELD_PRESETS.has(id));
 for (const [n] of usage) if (!nameSet.has(n)) throw new Error(`preset uses tag ${n} that has no tag entry`);
 
 const clip = (s, n) => (s.length <= n ? s : s.slice(0, s.lastIndexOf(' ', n - 1)) + ' ...');
@@ -1067,8 +1134,10 @@ const tags = T.map(([name, group, type, beginner, breaks, related, key]) => {
   if (key && !row) throw new Error(`${name}: dictionary row ${key} not found`);
   const f = fieldBy(name);
   const fromHandbook = [
-    ...(f ? ['field'] : []),
-    ...(row || usage.has(name) || ['LUSE_VDW', 'BPARAM', 'CMBJ'].includes(name) ? ['workflow'] : []),
+    ...(f || usedByFieldPreset(name) ? ['field'] : []),
+    ...(row || usedByWorkflowPreset(name) || ['LUSE_VDW', 'BPARAM', 'CMBJ'].includes(name)
+      ? ['workflow']
+      : []),
   ];
   let def = UNSTATED(name);
   if (f) {
@@ -1114,7 +1183,13 @@ const tags = T.map(([name, group, type, beginner, breaks, related, key]) => {
     handbook: null,
     sources: [
       ...new Set([
-        ...H.filter((s) => (s === 'S-041' ? fromHandbook.includes('field') : true)),
+        ...H.filter((s) =>
+          s === 'S-041'
+            ? fromHandbook.includes('field')
+            : s === 'S-042'
+              ? fromHandbook.includes('workflow')
+              : true,
+        ),
         ...(name === 'KSPACING' ? ['S-020'] : []),
       ]),
     ],

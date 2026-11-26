@@ -1,0 +1,110 @@
+---
+id: bader-charges
+title: Bader charges
+module: 12
+order: 6
+summary: Assign the electron density to atoms with the Bader method, from the AECCAR files to the net charge per atom, and check the result.
+concepts: [bader-charges]
+requires: [charge-density-analysis]
+vaspTags: [LAECHG, LCHARG, NGXF]
+sources: [S-019, S-042, S-084]
+noLab: true
+status: draft
+updated: 2026-11-26
+---
+
+<Why>
+
+"How much charge moved from the metal to the oxygen?" is one of the most common questions asked of a calculation, and the density alone does not answer it: the density is a smooth cloud with no labels. A <Term id="bader-charge">Bader analysis</Term> cuts the cloud into one region per atom and counts the electrons in each, which gives a reproducible charge per atom to compare across structures <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+Picture the density as a landscape with a peak on each nucleus. Rain falling anywhere runs uphill (in reverse) to one peak; every point that drains to the same peak belongs to that atom. The borders between the regions are where the density has no slope across the surface, the zero-flux surfaces <Cite id="S-042" /> <Cite id="S-084" />.
+
+There is a catch with PAW: the `CHGCAR` holds only the pseudo valence density, which has no peaks at the nuclei. So the regions are drawn on the all-electron reference density (core plus valence), and the valence charge is counted inside them <Cite id="S-042" />.
+
+</Intuition>
+
+<TheMath>
+
+For atom $i$ of a species with $Z_\text{val}$ valence electrons (`ZVAL` in its POTCAR), the net Bader charge is <Cite id="S-042" />
+
+$$q_i = Z_\text{val} - N_i$$
+
+where $N_i$ is the `CHARGE` column of `ACF.dat`. A positive $q_i$ means the atom lost electrons (cation-like).
+
+</TheMath>
+
+<InVasp>
+
+A static run that writes the core and valence densities <Cite id="S-042" />:
+
+<VaspFile
+  name="INCAR"
+  code={`PREC    = Accurate
+ENCUT   = 520
+EDIFF   = 1E-6
+ISMEAR  = 0
+SIGMA   = 0.05
+NSW     = 0
+LAECHG  = .TRUE.       # writes AECCAR0 (core) and AECCAR2 (valence)
+LCHARG  = .TRUE.
+LWAVE   = .FALSE.
+# For accurate charges refine the fine FFT grid, e.g. NGXF, NGYF, NGZF about 2 x default (see OUTCAR)`}
+/>
+
+Then, with the Henkelman group's `bader` program and the VTST script `chgsum.pl` <Cite id="S-042" /> <Cite id="S-084" />:
+
+<VaspFile
+  name="shell"
+  code={`chgsum.pl AECCAR0 AECCAR2           # writes CHGCAR_sum, the reference density
+bader CHGCAR -ref CHGCAR_sum        # writes ACF.dat, BCF.dat, AVF.dat
+grep ZVAL POTCAR                    # valence electrons per species
+cat ACF.dat                         # columns: # X Y Z CHARGE MIN_DIST ATOMIC_VOL`}
+/>
+
+- **Why `-ref CHGCAR_sum`:** the regions are found on the all-electron density, which has the peaks at the nuclei that the pseudo density lacks.
+- **Why a finer grid:** the borders are drawn on the FFT grid, so a coarse grid moves them.
+- Magnetic: add `ISPIN = 2` and `MAGMOM` as in your SCF.
+
+</InVasp>
+
+<WhatChanges>
+
+| Check                                    | Good sign                                    | If not                                  |
+| ---------------------------------------- | -------------------------------------------- | --------------------------------------- |
+| Sum of the `CHARGE` column               | Equals the total number of valence electrons | Wrong reference file or a truncated run |
+| Vacuum charge at the bottom of `ACF.dat` | About zero for a bulk crystal                | Check the files and the grid            |
+| Repeat with a finer FFT grid             | Charges change by less than 0.01 e           | Keep refining the grid                  |
+
+For charge transfer at an interface or to an adsorbate, sum the Bader charges of each fragment and compare with the isolated fragments, together with a charge-density difference plot on the same grid and cell <Cite id="S-042" />.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Reading Bader charges as oxidation states">
+
+Bader charges are always smaller than formal oxidation states; oxygen in an oxide is typically about -1.0 to -1.3, not -2. Compare trends between structures, not absolute values <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Running bader on CHGCAR alone">
+
+Without `-ref CHGCAR_sum` the regions are drawn on the pseudo density, which has no peaks at the nuclei. Write the AECCAR files with `LAECHG = .TRUE.` and sum them first <Cite id="S-042" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m12-ba-1', 'q-m12-ba-2', 'q-m12-ba-3', 'q-m12-ba-4']} />
+
+<GoDeeper>
+
+- The grid-based Bader algorithm and its program <Cite id="S-084" />.
+- VASP wiki page LAECHG (by page name) <Cite id="S-019" />.
+- The [charge density topic](/handbook/09-analysis/charge-density/) for viewing densities and difference plots.
+
+</GoDeeper>

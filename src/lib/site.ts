@@ -11,7 +11,7 @@ export const SITE = {
  */
 export const INDEXING_ENABLED = false;
 
-/** The eleven handbook modules (SPEC section 6), numbered as in the `module` front matter field. */
+/** The twelve handbook modules (SPEC section 6), numbered as in the `module` front matter field. */
 export const MODULES = [
   'Why DFT exists',
   'Quantum basics without math',
@@ -24,6 +24,7 @@ export const MODULES = [
   'Analysis',
   'Worked example: a perovskite oxide',
   'Screening Studio and Material Builder',
+  'Lattice response and properties',
 ] as const;
 
 export const moduleName = (n: number): string => MODULES[n - 1] ?? `Module ${n}`;

@@ -24,6 +24,7 @@
    "why": "Accurate avoids wrap-around errors; needed for forces, stress, phonons, elastic.",
    "breaks": "Normal can give wrap-around errors and noisy forces or stress.",
    "tasks": [
+    "aimd-nvt",
     "bader",
     "band",
     "convergence",
@@ -246,6 +247,7 @@
    "why": "Prevents a too-early exit that yields poor forces.",
    "breaks": "Too small can end the electronic loop too early and give poor forces.",
    "tasks": [
+    "aimd-nvt",
     "relax"
    ],
    "related": [
@@ -352,6 +354,7 @@
    "why": "0 is safe everywhere. 1 for metal relaxations, never for semiconductors. −5 for accurate DOS and total energies on a uniform mesh with ≥ 4 k-points; not for band paths, not for metal forces.",
    "breaks": "Method 1 on a semiconductor gives wrong energies. Method -5 should not be used for band paths or metal forces.",
    "tasks": [
+    "aimd-nvt",
     "bader",
     "band",
     "convergence",
@@ -404,6 +407,7 @@
    "why": "Check grep EENTRO OUTCAR: the entropy term T·S should be below ~1 meV/atom.",
    "breaks": "Too wide blurs gaps and adds an entropy error; check the T*S term in OUTCAR is below about 1 meV per atom.",
    "tasks": [
+    "aimd-nvt",
     "bader",
     "band",
     "convergence",
@@ -799,6 +803,7 @@
    "why": "2 far from minimum, 1 close to it. 6 + ISIF≥3 gives elastic constants. 8 gives force constants, ε and Z* by DFPT.",
    "breaks": "Left unset with NSW above 1 it defaults to molecular dynamics. Always set it explicitly for relaxations.",
    "tasks": [
+    "aimd-nvt",
     "dielectric",
     "elastic",
     "relax"
@@ -836,6 +841,7 @@
    "why": "3 for equilibrium structures, 4 for E–V points, 2 for slabs and defects. ISIF=3 required with IBRION=6 for Cij.",
    "breaks": "ISIF = 3 on a slab changes the vacuum. ISIF = 3 is required with IBRION = 6 for elastic constants.",
    "tasks": [
+    "aimd-nvt",
     "elastic",
     "relax"
    ],
@@ -877,6 +883,7 @@
    "why": "Reaching NSW is not convergence; check for “reached required accuracy”.",
    "breaks": "Reaching NSW is not convergence. Check the output for the message that the required accuracy was reached.",
    "tasks": [
+    "aimd-nvt",
     "bader",
     "band",
     "convergence",
@@ -927,6 +934,7 @@
    "why": "Lower it when relaxations oscillate or ZBRENT errors appear.",
    "breaks": "Too large makes relaxations oscillate or fail with ZBRENT errors.",
    "tasks": [
+    "aimd-nvt",
     "elastic",
     "relax"
    ],
@@ -992,6 +1000,7 @@
    "why": "Real-space projection introduces small force/energy errors; use .FALSE. for phonons, elastic, final energies.",
    "breaks": "Real-space projection adds small errors; use .FALSE. for phonons, elastic constants and final energies.",
    "tasks": [
+    "aimd-nvt",
     "band",
     "convergence",
     "dielectric",
@@ -1376,6 +1385,7 @@
    "why": "Saves disk; SCF must write CHGCAR for later ICHARG=11 runs.",
    "breaks": "Turned off in a run you later want to restart from, the WAVECAR is missing. Left on, it uses disk space.",
    "tasks": [
+    "aimd-nvt",
     "bader",
     "band",
     "dielectric",
@@ -1417,6 +1427,7 @@
    "why": "Saves disk; SCF must write CHGCAR for later ICHARG=11 runs.",
    "breaks": "An SCF run must write CHGCAR if a later run uses ICHARG = 11.",
    "tasks": [
+    "aimd-nvt",
     "bader",
     "band",
     "dielectric",
@@ -2192,7 +2203,9 @@
    },
    "why": "Change only to fix symmetry errors or for LOBSTER/defects.",
    "breaks": "Leaving it on can fight a hand-built antiferromagnetic MAGMOM pattern; changing it is only for fixing symmetry errors.",
-   "tasks": [],
+   "tasks": [
+    "aimd-nvt"
+   ],
    "related": [
     "SYMPREC",
     "MAGMOM"
@@ -2332,6 +2345,158 @@
    "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
   },
   {
+   "name": "MDALGO",
+   "group": "md",
+   "type": "int",
+   "default": "Not stated in the handbooks. See the VASP wiki page for MDALGO.",
+   "typical": "Not stated in the handbooks.",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Chooses the molecular dynamics algorithm and thermostat. The handbook uses 2, the Nose-Hoover thermostat, for NVT runs.",
+    "intermediate": "Chooses the molecular dynamics algorithm and thermostat. The handbook uses 2, the Nose-Hoover thermostat, for NVT runs."
+   },
+   "why": "The handbooks show this tag only inside the example INCAR files; they do not give a separate reason.",
+   "breaks": "The handbooks show only MDALGO = 2; for other thermostats see the VASP wiki page.",
+   "tasks": [
+    "aimd-nvt"
+   ],
+   "related": [
+    "IBRION",
+    "SMASS",
+    "TEBEG"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041"
+   ],
+   "fromHandbook": [
+    "field"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "SMASS",
+   "group": "md",
+   "type": "real",
+   "default": "Not stated in the handbooks. See the VASP wiki page for SMASS.",
+   "typical": "Not stated in the handbooks.",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "The Nose mass of the thermostat. The handbook says to tune it for the period of the temperature oscillation.",
+    "intermediate": "The Nose mass of the thermostat. The handbook says to tune it for the period of the temperature oscillation."
+   },
+   "why": "The handbooks show this tag only inside the example INCAR files; they do not give a separate reason.",
+   "breaks": "A badly chosen value couples the thermostat poorly, so the temperature is not held well.",
+   "tasks": [
+    "aimd-nvt"
+   ],
+   "related": [
+    "MDALGO",
+    "TEBEG"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041"
+   ],
+   "fromHandbook": [
+    "field"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "TEBEG",
+   "group": "md",
+   "type": "real",
+   "default": "Not stated in the handbooks. See the VASP wiki page for TEBEG.",
+   "typical": "Not stated in the handbooks.",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "The temperature at the start of a molecular dynamics run, in kelvin.",
+    "intermediate": "The temperature at the start of a molecular dynamics run, in kelvin."
+   },
+   "why": "The handbooks show this tag only inside the example INCAR files; they do not give a separate reason.",
+   "breaks": "For a constant-temperature run TEEND must match it; the handbook sets both to 300.",
+   "tasks": [
+    "aimd-nvt"
+   ],
+   "related": [
+    "TEEND",
+    "MDALGO",
+    "POTIM"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041"
+   ],
+   "fromHandbook": [
+    "field"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "TEEND",
+   "group": "md",
+   "type": "real",
+   "default": "Not stated in the handbooks. See the VASP wiki page for TEEND.",
+   "typical": "Not stated in the handbooks.",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "The temperature at the end of a molecular dynamics run, in kelvin.",
+    "intermediate": "The temperature at the end of a molecular dynamics run, in kelvin."
+   },
+   "why": "The handbooks show this tag only inside the example INCAR files; they do not give a separate reason.",
+   "breaks": "A value different from TEBEG makes the target temperature change during the run.",
+   "tasks": [
+    "aimd-nvt"
+   ],
+   "related": [
+    "TEBEG",
+    "MDALGO"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041"
+   ],
+   "fromHandbook": [
+    "field"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "NBLOCK",
+   "group": "md",
+   "type": "int",
+   "default": "Not stated in the handbooks. See the VASP wiki page for NBLOCK.",
+   "typical": "Not stated in the handbooks.",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "The sampling interval, in ionic steps, for XDATCAR and PCDAT in molecular dynamics.",
+    "intermediate": "The sampling interval, in ionic steps, for XDATCAR and PCDAT in molecular dynamics."
+   },
+   "why": "The handbooks show this tag only inside the example INCAR files; they do not give a separate reason.",
+   "breaks": "A large value samples the trajectory coarsely.",
+   "tasks": [
+    "aimd-nvt"
+   ],
+   "related": [
+    "NSW",
+    "IBRION"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-041"
+   ],
+   "fromHandbook": [
+    "field"
+   ],
+   "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
    "name": "SYSTEM",
    "group": "output",
    "type": "string",
@@ -2345,6 +2510,7 @@
    "why": "The handbooks show this tag only inside the example INCAR files; they do not give a separate reason.",
    "breaks": "It has no effect on the physics.",
    "tasks": [
+    "aimd-nvt",
     "band",
     "dos",
     "elastic",
@@ -2355,9 +2521,11 @@
    "handbook": null,
    "sources": [
     "S-019",
+    "S-041",
     "S-042"
    ],
    "fromHandbook": [
+    "field",
     "workflow"
    ],
    "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."

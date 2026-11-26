@@ -1,0 +1,111 @@
+---
+id: equation-of-state
+title: Energy-volume curves and the equation of state
+module: 12
+order: 2
+summary: Scan the volume at fixed cell size, fit a Birch-Murnaghan equation of state, check the fit, and compare polymorphs to find a transition pressure.
+concepts: [equation-of-state]
+requires: [relaxation-analysis]
+vaspTags: [ISIF, IBRION, NSW, EDIFF, EDIFFG]
+sources: [S-019, S-020, S-034, S-042, S-061]
+noLab: true
+status: draft
+updated: 2026-11-26
+---
+
+<Why>
+
+An <Term id="equation-of-state">equation of state</Term> is the curve of energy against volume. Its lowest point is the equilibrium volume, its curvature is the <Term id="bulk-modulus">bulk modulus</Term>, and comparing the curves of two structures tells you which is stable and at what pressure one turns into the other. It gets the volume and bulk modulus without the stress tensor, so at a fixed cutoff it is free of <Term id="pulay-stress">Pulay stress</Term> <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+Instead of letting VASP change the volume, you choose it. Make several copies of the relaxed cell (the script below uses seven), each scaled a little (up to about 9 % up and down in volume), let the atoms and the cell shape relax at that fixed volume, and record the final energy and volume of each. The points trace a bowl. A smooth formula fitted through them gives the bottom of the bowl and how steep it is <Cite id="S-042" />.
+
+Because every point uses the same plane-wave basis settings and none relies on the stress, the bowl stays honest even where a cell relaxation would be thrown off by Pulay stress.
+
+</Intuition>
+
+<TheMath>
+
+The third-order Birch-Murnaghan form <Cite id="S-061" /> fits four numbers: the minimum energy $E_0$, the equilibrium volume $V_0$, the bulk modulus $B_0$ and its pressure derivative $B_0'$:
+
+With the shorthand $x = (V_0/V)^{2/3}$ it reads
+
+$$
+\begin{aligned}
+E(V) = E_0 + \frac{9 V_0 B_0}{16}\Big\{ &(x - 1)^3 B_0' \\
+&+ (x - 1)^2 (6 - 4x) \Big\}
+\end{aligned}
+$$
+
+With $E$ in eV and $V$ in cubic angstrom, $B_0$ comes out in eV per cubic angstrom; multiply by 160.2177 for GPa <Cite id="S-042" />.
+
+<Level min="intermediate">
+
+The pressure is $P = -dE/dV$. To compare two phases at the same pressure, compare their enthalpies $H = E + PV$; graphically, the common tangent to the two $E(V)$ curves has slope $-P_t$, the transition pressure <Cite id="S-042" />.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+Each point is a fixed-volume relaxation. The author's script scales the lattice constant (line 2 of POSCAR) from 0.97 to 1.03, which is roughly plus or minus 9 % in volume <Cite id="S-042" />:
+
+<VaspFile
+  name="shell"
+  code={`#!/bin/bash
+# INCAR: ISIF = 4 (shape + ions relax at fixed volume; ISIF = 2 for cubic), IBRION = 2,
+#        NSW = 100, EDIFF = 1E-6, EDIFFG = -0.005, same ENCUT and k-mesh everywhere
+for s in 0.97 0.98 0.99 1.00 1.01 1.02 1.03; do
+  d=s_\$s; mkdir -p \$d; cp INCAR KPOINTS POTCAR \$d/
+  awk -v s=\$s 'NR==2{print \$1*s; next}1' POSCAR > \$d/POSCAR
+  (cd \$d && mpirun -np 32 vasp_std > vasp.out)
+  V=\$(grep "volume of cell" \$d/OUTCAR | tail -1 | awk '{print \$NF}')
+  E=\$(grep "energy  without entropy" \$d/OUTCAR | tail -1 | awk '{print \$NF}')
+  echo "\$V \$E" >> ev.dat
+done`}
+/>
+
+- **Why `ISIF = 4`:** the ions and the cell shape relax but the volume stays the one you set. For a cubic cell the shape cannot change, so `ISIF = 2` (ions only) is enough <Cite id="S-042" />.
+- **Why the same ENCUT and k-mesh everywhere:** the points are compared with each other; a setting that changes between them puts a step in the curve.
+- **Fit it** with the site's [equation-of-state tool](/tools/eos/), VASPKIT task 205 <Cite id="S-020" />, or pymatgen's `EOS(eos_name="birch_murnaghan")` <Cite id="S-034" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| Check after the fit            | Good sign                | If not                                                                |
+| ------------------------------ | ------------------------ | --------------------------------------------------------------------- |
+| Where is the lowest point?     | Inside the scanned range | At an edge: extend the scan on that side <Cite id="S-042" />          |
+| $B_0'$                         | Usually 3.5 to 5         | Far outside: too few points, too narrow a range or noisy energies     |
+| $B_0$ against B_Hill from C_ij | Within a few percent     | Unconverged ENCUT or k-points, or residual stress <Cite id="S-042" /> |
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Letting the volume relax in the scan">
+
+With `ISIF = 3` every point slides back to the same volume, and the curve collapses to one point. Use `ISIF = 4` or `2`.
+
+</Callout>
+
+<Callout variant="mistake" title="Comparing polymorphs from one volume each">
+
+The energy at one volume does not tell you which phase wins under pressure. Scan both phases and compare whole curves or enthalpies <Cite id="S-042" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m12-eos-1', 'q-m12-eos-2', 'q-m12-eos-3', 'q-m12-eos-4']} />
+
+<GoDeeper>
+
+- Birch on finite strain and the equation of state <Cite id="S-061" />.
+- VASP wiki page ISIF (by page name) <Cite id="S-019" />; pymatgen's equation-of-state module <Cite id="S-034" />.
+
+</GoDeeper>

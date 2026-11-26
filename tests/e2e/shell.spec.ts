@@ -215,9 +215,9 @@ test.describe('navigation', () => {
     await expect(page.getByRole('navigation', { name: 'On this page' })).toBeVisible();
   });
 
-  test('handbook index lists all eleven modules', async ({ page }) => {
+  test('handbook index lists all twelve modules', async ({ page }) => {
     await page.goto('/handbook/');
-    await expect(page.locator('.module-map > li')).toHaveCount(11);
+    await expect(page.locator('.module-map > li')).toHaveCount(12);
     await expect(page.getByRole('link', { name: 'How to use this site' })).toBeVisible();
   });
 
