@@ -12,7 +12,7 @@ async function open(page: Page) {
 const overflow = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
 
-// Crystal mode is DFT Studio in a same-origin frame (D-100); the frame's own keyboard and checks are tested here.
+// Crystal mode is DFT Studio in a same-origin frame (D-103), started from a poster; the frame's own keyboard and checks are tested here.
 const studio = (page: Page) => page.frameLocator('iframe.mb-studio-frame');
 const atomCount = (page: Page) =>
   page
@@ -29,6 +29,10 @@ test.describe('material builder: crystal mode (DFT Studio)', () => {
     page,
   }) => {
     await open(page);
+    // 3D loads lazily: no Studio frame until the poster's button is pressed (here with the keyboard).
+    await expect(page.locator('iframe.mb-studio-frame')).toHaveCount(0);
+    await page.getByRole('button', { name: 'Start the 3D crystal editor' }).focus();
+    await page.keyboard.press('Enter');
     const f = studio(page);
     await f.locator('html[data-studio-ready="true"]').waitFor();
     await expect.poll(() => atomCount(page)).toBe(8);
@@ -63,6 +67,7 @@ test.describe('material builder: crystal mode (DFT Studio)', () => {
 
   test('the handbook templates are in the structure menu', async ({ page }) => {
     await open(page);
+    await page.getByRole('button', { name: 'Start the 3D crystal editor' }).click();
     const f = studio(page);
     await f.locator('html[data-studio-ready="true"]').waitFor();
     await f.locator('#sample-select').selectOption('site:perovskite');

@@ -48,7 +48,7 @@ feature the site had, and connect Studio to the rest of the site.
 | G2 Guards | pass | part of verify (em dash, sources, links) |
 | G3 Science | partial | site code reused through the bridge is golden tested; Studio's own science is Heuristic and listed in Q-059 |
 | G4 UI | pass | `tests/e2e/dft-studio.spec.ts` (production CSP boot, axe all steps and tabs in both themes, checks and gate, hand-offs), `builder.spec.ts` rewritten for the frame (not weakened: supercell, undo, redo, checks, templates, axe), `/dft-studio/` added to the 360 px CSP smoke |
-| G5 Performance | pass | three chunk 131.4 of 150 KB gz; `/dft-studio/` 60.6 KB initial JS; `/builder/` 76.2 KB |
+| G5 Performance | pass | three chunk 131.4 of 150 KB gz; `/dft-studio/` 60.6 KB initial JS; `/builder/` 76.2 KB. Lighthouse CI first failed on `/builder/` (performance 0.68) because the Studio frame loaded at once; it now starts from a poster button (or at once when a structure was handed over), and `/builder/` scores 1.0 locally |
 | G7 Done when | pass | author's request: replace, keep features, connect |
 
 ## Unit tests added
@@ -58,7 +58,7 @@ feature the site had, and connect Studio to the rest of the site.
 ## Not done
 - Studio's analyzers, presets and element data are not verified (Q-059). Crystal library source unknown (Q-061).
 - POTCAR metadata licence and the branch history (Q-060).
-- Lighthouse was not run for `/dft-studio/` (a tool page with a WebGL canvas at load).
+- Lighthouse is not run for `/dft-studio/` (not in the Lighthouse CI URL list; a tool page with a WebGL canvas at load).
 
 ## Full e2e run
 636 tests: 618 passed, 12 skipped, 6 failed on the first run. `palette.spec.ts` expected 12 starting points; the home
