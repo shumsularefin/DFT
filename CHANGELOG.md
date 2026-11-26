@@ -8,10 +8,14 @@ All notable changes to the DFT Handbook are listed here. The format follows
 ### Added
 
 - DFT Studio at `/dft-studio/`: a VESTA-style 3D crystal viewer and editor with the VASP workflow (POTCAR, INCAR, KPOINTS, k-point convergence, run bundle, analysis). It is now the Material Builder crystal mode, runs the site structure checks live, and hands structures and results to and from the Input Builder, k-path, magnetic and convergence tools (D-103).
+- Calm app layout: a left sidebar with icon navigation, search, reading level, progress and theme on wide screens, a top bar and drawer on phones, and a warm palette with one accent (D-104).
 - Tests for the Material Builder: crystal templates, molecule export, and an end-to-end keyboard and axe spec at 360 px (M15.3).
 
 ### Fixed
 
+- Guided path figures are no longer solid black: the plot styles now load on `/learn/`, labels no longer collide, and 3D stations use an angled camera.
+- Buttons, text fields, menus and file pickers on the labs, 3D scenes, periodic table and tools pages have the site look instead of browser grey.
+- No sideways scroll at 360 px on the k-path, EOS and progress pages or in open equation sections; React hydration error 418 on handbook, practice and progress pages.
 - Deploy runs only after CI succeeds on main (D-089).
 - Crystal and molecule builder, and the Input Builder Task step, no longer overflow the page at 360 px wide.
 - Tolerance-factor element buttons now start their accessible name with the visible symbol (axe `label-content-name-mismatch`).

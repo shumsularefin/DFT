@@ -91,6 +91,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M15.8 | Handbook: beyond-PBE depth and the property catalogue | done | M15.7 | M | B | claude/compassionate-einstein-ls4ab4 | [#71](https://github.com/shumsularefin/DFT/pull/71) | 2026-11-26 | [report](reports/M15.8.md), [work order](milestones/M15-coverage-and-repair.md) |
 | M15.9 | Reference pages: units, where to read it, checklist, layout, VASPKIT map | done | M15.6 | M | B | claude/compassionate-einstein-ls4ab4 | [#72](https://github.com/shumsularefin/DFT/pull/72) | 2026-11-26 | [report](reports/M15.9.md), [work order](milestones/M15-coverage-and-repair.md) |
 | DS.1 | DFT Studio merged: VESTA-style viewer as the builder crystal mode, VASP workflow, links to the site tools | done | M10.4, M13.2, M15.9 | L | A | claude/hopeful-rubin-adj3m0 | pending | 2026-11-26 | [report](reports/DS.1.md), D-103; Studio science Heuristic (Q-059) |
+| DS.2 | UI repair and redesign: sidebar app shell, warm palette, Guided path figures, site-wide UI audit fixes | done | DS.1 | L | A | claude/hopeful-rubin-adj3m0 | pending | 2026-11-26 | [report](reports/DS.2.md), D-104 |
 
 ## Session log
 
