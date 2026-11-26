@@ -84,7 +84,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M15.1 | Make main green and gate deploy on CI | done | none | S | B | claude/m15-1-green-main | PR pending | 2026-11-26 | [report](reports/M15.1.md), [work order](milestones/M15-coverage-and-repair.md) |
 | M15.2 | Science re-audit of the 2026-11-24 batch | todo | M15.1 | L | A | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
 | M15.3 | Process repair: missing tests and records | todo | M15.1 | M | B | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
-| M15.4 | Elastic tensor: reader and mechanical analysis | done | M4.1 | L | A | claude/compassionate-einstein-ls4ab4 | PR pending | 2026-11-26 | [report](reports/M15.4.md), [work order](milestones/M15-coverage-and-repair.md). Library only; UI in M15.7 |
+| M15.4 | Elastic tensor: reader and mechanical analysis | done | M4.1 | L | A | claude/compassionate-einstein-ls4ab4 | [#65](https://github.com/shumsularefin/DFT/pull/65) | 2026-11-26 | [report](reports/M15.4.md), [work order](milestones/M15-coverage-and-repair.md). Library only; UI in M15.7 |
 | M15.5 | Optics and dielectric response: readers and derived quantities | todo | M4.1 | M | A | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
 | M15.6 | Phonon output reader: Gamma modes and units | todo | M4.1 | S | A | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
 | M15.7 | Handbook module 12: lattice response and properties | todo | M15.4, M15.5, M15.6 | L | B | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
