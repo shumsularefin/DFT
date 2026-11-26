@@ -3,6 +3,7 @@ import Badge from '../../ui/Badge';
 import type { MpManifest } from '../../../lib/mp/schema';
 import { materializeRow, type MaterialRow, type MpIndex } from '../../../lib/mp/query';
 import { buildStarterProjectSteps, evaluateFeasibility } from '../../../lib/mp/feasibility';
+import { RECOMMENDED_PAW_ELEMENTS } from '../../../lib/mp/pawTable';
 import './studio.css';
 
 export default function ProjectCardTool() {
@@ -45,7 +46,10 @@ export default function ProjectCardTool() {
     };
   }, []);
 
-  const report = useMemo(() => (row ? evaluateFeasibility(row) : null), [row]);
+  const report = useMemo(
+    () => (row ? evaluateFeasibility(row, { recommendedPawTable: RECOMMENDED_PAW_ELEMENTS }) : null),
+    [row],
+  );
   const steps = useMemo(() => (row ? buildStarterProjectSteps(row, encut) : []), [row, encut]);
 
   return (

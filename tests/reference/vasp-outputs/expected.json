@@ -130,7 +130,13 @@
      ]
     ]
    ]
-  }
+  },
+  "eigenvalue_band_properties": [
+   2.200248,
+   0.751337,
+   -1.448911,
+   false
+  ]
  },
  "EIGENVAL_ispin2": {
   "reader": "pymatgen Eigenval",
@@ -272,7 +278,13 @@
      ]
     ]
    ]
-  }
+  },
+  "eigenvalue_band_properties": [
+   0.3,
+   0.048963,
+   -0.251037,
+   true
+  ]
  },
  "OSZICAR_relax_spin": {
   "reader": "pymatgen Oszicar",

@@ -1,5 +1,5 @@
 // Transparent Green/Yellow/Red feasibility engine and compute-time bucket estimator for Screening Studio (M9.3).
-// @source S-019 (PAW table Q-010; ISPIN), S-042 (Field Handbook PBE caveats and workflows), S-010 (N^3 scaling, D-091)
+// @source S-019 (PAW table Q-010; ISPIN), S-042 (Field Handbook PBE caveats and workflows), S-010 (N^3 scaling, D-092)
 import elementsData from '../../data/elements.json';
 import { parseIncar, type IncarEntry } from '../vasp/incar';
 import type { MaterialRow } from './query';
@@ -16,7 +16,7 @@ export interface FeasibilityRuleResult {
 }
 
 /**
- * Relative cost estimate (D-091). No absolute hours: the site has no sourced timing data, and wall time depends on
+ * Relative cost estimate (D-092). No absolute hours: the site has no sourced timing data, and wall time depends on
  * the machine, ENCUT, the k-mesh and the parallel setup. What is sourced is the scaling: the orthogonalization and
  * subspace rotation of plane-wave codes grow as N^3 with system size (S-010), and ISPIN = 2 solves two spin
  * channels, so about twice the work (S-019, ISPIN).
@@ -80,7 +80,7 @@ const worst = (a: Verdict, b: Verdict): Verdict => (RANK[b] > RANK[a] ? b : a);
 /** Size of the reference cell for the relative estimate (a small cell such as a 4-atom primitive cell). */
 export const REFERENCE_SITES = 4;
 
-/** Relative compute cost, Heuristic (D-091). @source S-010 (N^3 scaling), S-019 (ISPIN) */
+/** Relative compute cost, Heuristic (D-092). @source S-010 (N^3 scaling), S-019 (ISPIN) */
 export function estimateRelativeCost(mat: Pick<MaterialRow, 'nsites' | 'is_magnetic'>): ComputeEstimate {
   const n = Math.max(1, mat.nsites);
   const spinPolarized = mat.is_magnetic === true;
@@ -205,7 +205,7 @@ export function evaluateFeasibility(
       reason:
         missing.length > 0
           ? `No recommended PAW listed for ${missing.join(', ')}.`
-          : 'All elements have a recommended PAW potential in the supplied table.',
+          : 'All elements have a recommended PAW potential (VASP wiki, Choosing pseudopotentials, PBE potpaw.64).',
       heuristic: true,
       source: 'S-019',
     });

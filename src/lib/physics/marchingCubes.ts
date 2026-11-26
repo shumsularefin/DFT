@@ -1,6 +1,8 @@
 // Isosurface mesh extraction on 3D scalar grids (Marching Tetrahedra decomposition of each cube,
 // guaranteeing consistent watertight manifold triangulation without ambiguous cube faces).
-// @source S-030 (Lorensen & Cline 1987, Marching Cubes / tetrahedral isosurface extraction)
+// @source S-030 (Lorensen & Cline 1987: the cell-by-cell isosurface idea). S-030 describes marching CUBES only; the
+// 6-tetrahedra split used here is a known variant whose paper is not in the register (Q-056). It is checked by the
+// closed-manifold and sphere-volume tests, not by a citation.
 
 export interface IsosurfaceMesh {
   /** Flat array [x0, y0, z0, x1, y1, z1, ...] in grid coordinates [0..nx-1, 0..ny-1, 0..nz-1]. */

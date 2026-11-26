@@ -7,6 +7,7 @@ import {
   REFERENCE_SITES,
 } from './feasibility';
 import { materializeRow, type MpIndex } from './query';
+import { PAW_TABLE_META, RECOMMENDED_PAW_ELEMENTS, recommendedPotential } from './pawTable';
 import { validate } from '../vasp/validate';
 
 const sample = JSON.parse(readFileSync('public/data/mp/sample/index.json', 'utf8')) as MpIndex;
@@ -35,7 +36,7 @@ describe('M9.3 feasibility rules and starter project builder', () => {
     expect(evaluateFeasibility(bigMat).overall).toBe('red');
   });
 
-  it('relative cost scales as (N / 4)^3 and doubles for spin (D-091, S-010, S-019); no absolute hours', () => {
+  it('relative cost scales as (N / 4)^3 and doubles for spin (D-092, S-010, S-019); no absolute hours', () => {
     expect(REFERENCE_SITES).toBe(4);
     expect(estimateRelativeCost({ nsites: 4, is_magnetic: false }).relativeCost).toBe(1);
     expect(estimateRelativeCost({ nsites: 8, is_magnetic: false }).relativeCost).toBe(8);
@@ -57,5 +58,20 @@ describe('M9.3 feasibility rules and starter project builder', () => {
       const errors = issues.filter((i) => i.severity === 'error');
       expect(errors, step.id).toEqual([]);
     }
+  });
+
+  it('bundled PAW name table (Q-010, S-019): wiki values, green when every element is listed', () => {
+    // Values read from the VASP wiki page "Choosing pseudopotentials" (PBE potpaw.64 standard table).
+    expect(PAW_TABLE_META.oldid).toBe(38312);
+    expect(recommendedPotential('Li')).toEqual({ potential: 'Li_sv', valence: 3 });
+    expect(recommendedPotential('Ti')).toEqual({ potential: 'Ti_sv', valence: 12 });
+    expect(recommendedPotential('Pb')).toEqual({ potential: 'Pb_d', valence: 14 });
+    expect(RECOMMENDED_PAW_ELEMENTS.size).toBe(96);
+    const srtio3 = materializeRow(sample, sample.columns.formula_pretty.indexOf('SrTiO3'));
+    const rep = evaluateFeasibility(srtio3, { recommendedPawTable: RECOMMENDED_PAW_ELEMENTS });
+    expect(rep.rules.find((r) => r.id === 'F-PAW')?.verdict).toBe('green');
+    const noSr = new Set([...RECOMMENDED_PAW_ELEMENTS].filter((e) => e !== 'Sr'));
+    const red = evaluateFeasibility(srtio3, { recommendedPawTable: noSr });
+    expect(red.rules.find((r) => r.id === 'F-PAW')?.verdict).toBe('red');
   });
 });

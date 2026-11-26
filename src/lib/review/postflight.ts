@@ -5,6 +5,13 @@ import { cellVolume } from '../crystal/lattice';
 import type { ReviewIntake } from './intake';
 import { runPreflightChecks, type ReviewCheck } from './preflight';
 
+/** kB. Heuristic warning level for |Pulay stress|, no cited basis (Q-014); the EOS plotter uses its own adjustable 5 kB. */
+export const PULAY_WARN_KB = 1.0;
+/** Percent. Heuristic warning level for the POSCAR to CONTCAR volume change, no cited basis (Q-054). */
+export const VOLUME_CHANGE_WARN_PCT = 10;
+/** meV per atom. Smearing entropy rule of thumb from the Field Handbook (S-042, "about 1 meV/atom"). */
+export const ENTROPY_WARN_MEV_PER_ATOM = 1.0;
+
 function getTagNumber(intake: ReviewIntake, key: string): number | undefined {
   const item = intake.incar?.entries.find((e) => e.name.toUpperCase() === key.toUpperCase());
   if (!item) return undefined;
@@ -97,7 +104,7 @@ export function runPostflightChecks(intake: ReviewIntake): ReviewCheck[] {
     ) {
       const entropyMeVPerAtom =
         (Math.abs(lastIonic.freeEnergyTOTEN - lastIonic.energyWithoutEntropy) / nions) * 1000;
-      const ok = entropyMeVPerAtom < 1.0;
+      const ok = entropyMeVPerAtom < ENTROPY_WARN_MEV_PER_ATOM;
       checks.push({
         id: 'POST-ENTROPY',
         phase: 'postflight',
@@ -112,14 +119,14 @@ export function runPostflightChecks(intake: ReviewIntake): ReviewCheck[] {
 
     // 5. Pulay stress check
     const lastPressure = outcar.pressure.at(-1);
-    if (lastPressure && Math.abs(lastPressure.pulayKb) > 1.0) {
+    if (lastPressure && Math.abs(lastPressure.pulayKb) > PULAY_WARN_KB) {
       checks.push({
         id: 'POST-PULAY',
         phase: 'postflight',
         title: 'Pulay stress magnitude',
         status: 'warn',
         kind: 'heuristic',
-        reason: `OUTCAR reports Pulay stress ${lastPressure.pulayKb.toFixed(2)} kB (external pressure ${lastPressure.pressureKb.toFixed(2)} kB).`,
+        reason: `OUTCAR reports Pulay stress ${lastPressure.pulayKb.toFixed(2)} kB (external pressure ${lastPressure.pressureKb.toFixed(2)} kB). Heuristic: the ${PULAY_WARN_KB} kB warning level has no cited basis (Q-014).`,
         source: 'S-042',
         fix: 'Verify ENCUT >= 1.3 x ENMAX or use fixed-volume EOS fitting (/tools/eos/).',
       });
@@ -148,14 +155,14 @@ export function runPostflightChecks(intake: ReviewIntake): ReviewCheck[] {
     const v1 = Math.abs(cellVolume(intake.contcar.lattice));
     if (v0 > 0) {
       const pct = ((v1 - v0) / v0) * 100;
-      const large = Math.abs(pct) > 10;
+      const large = Math.abs(pct) > VOLUME_CHANGE_WARN_PCT;
       checks.push({
         id: 'POST-VOL',
         phase: 'postflight',
         title: 'Volume change (POSCAR to CONTCAR)',
         status: large ? 'warn' : 'pass',
-        kind: 'computed',
-        reason: `Cell volume changed from ${v0.toFixed(2)} to ${v1.toFixed(2)} A^3 (${pct >= 0 ? '+' : ''}${pct.toFixed(2)} %).`,
+        kind: 'heuristic',
+        reason: `Cell volume changed from ${v0.toFixed(2)} to ${v1.toFixed(2)} A^3 (${pct >= 0 ? '+' : ''}${pct.toFixed(2)} %). Heuristic: the ${VOLUME_CHANGE_WARN_PCT} % warning level has no cited basis (Q-054).`,
         source: 'S-042',
         ...(large
           ? { fix: 'A >10 % volume change alters the plane-wave basis; re-run relaxation from CONTCAR.' }

@@ -144,7 +144,7 @@ export default function PlannerTool() {
           </label>
 
           <label style={{ display: 'grid', gap: '0.25rem' }}>
-            <span>Max POTCAR ENMAX (eV)</span>
+            <span>Max POTCAR ENMAX (eV; 400 is a placeholder, read the largest ENMAX in your POTCAR)</span>
             <input
               type="number"
               min={150}
@@ -363,7 +363,7 @@ export default function PlannerTool() {
 
           <div>
             <h3 style={{ margin: '0 0 0.5rem', fontSize: 'var(--step-0)' }}>
-              Neutral formation energy (S-042)
+              Formation enthalpy from elemental references (S-042)
             </h3>
             <div style={{ display: 'grid', gap: '0.35rem', fontSize: 'var(--step--1)' }}>
               <label>

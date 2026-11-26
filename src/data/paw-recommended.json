@@ -1,0 +1,397 @@
+{
+ "_meta": {
+  "generator": "scripts/data/build_paw_table.py",
+  "source": "S-019",
+  "page": "Choosing pseudopotentials, section Recommended PAW potentials, table Standard potentials (PBE, potpaw.64)",
+  "url": "https://www.vasp.at/wiki/Choosing_pseudopotentials",
+  "oldid": 38312,
+  "read": "2026-11-26",
+  "note": "Names and valence counts only. No POTCAR content is hosted; users need their own licensed POTCAR library."
+ },
+ "elements": {
+  "H": {
+   "potential": "H",
+   "valence": 1
+  },
+  "He": {
+   "potential": "He",
+   "valence": 2
+  },
+  "Li": {
+   "potential": "Li_sv",
+   "valence": 3
+  },
+  "Be": {
+   "potential": "Be_sv",
+   "valence": 4
+  },
+  "B": {
+   "potential": "B",
+   "valence": 3
+  },
+  "C": {
+   "potential": "C",
+   "valence": 4
+  },
+  "N": {
+   "potential": "N",
+   "valence": 5
+  },
+  "O": {
+   "potential": "O",
+   "valence": 6
+  },
+  "F": {
+   "potential": "F",
+   "valence": 7
+  },
+  "Ne": {
+   "potential": "Ne",
+   "valence": 8
+  },
+  "Na": {
+   "potential": "Na_pv",
+   "valence": 7
+  },
+  "Mg": {
+   "potential": "Mg_pv",
+   "valence": 8
+  },
+  "Al": {
+   "potential": "Al",
+   "valence": 3
+  },
+  "Si": {
+   "potential": "Si",
+   "valence": 4
+  },
+  "P": {
+   "potential": "P",
+   "valence": 5
+  },
+  "S": {
+   "potential": "S",
+   "valence": 6
+  },
+  "Cl": {
+   "potential": "Cl",
+   "valence": 7
+  },
+  "Ar": {
+   "potential": "Ar",
+   "valence": 8
+  },
+  "K": {
+   "potential": "K_sv",
+   "valence": 9
+  },
+  "Ca": {
+   "potential": "Ca_sv",
+   "valence": 10
+  },
+  "Sc": {
+   "potential": "Sc_sv",
+   "valence": 11
+  },
+  "Ti": {
+   "potential": "Ti_sv",
+   "valence": 12
+  },
+  "V": {
+   "potential": "V_sv",
+   "valence": 13
+  },
+  "Cr": {
+   "potential": "Cr_pv",
+   "valence": 12
+  },
+  "Mn": {
+   "potential": "Mn_pv",
+   "valence": 13
+  },
+  "Fe": {
+   "potential": "Fe_pv",
+   "valence": 14
+  },
+  "Co": {
+   "potential": "Co_pv",
+   "valence": 15
+  },
+  "Ni": {
+   "potential": "Ni_pv",
+   "valence": 16
+  },
+  "Cu": {
+   "potential": "Cu_pv",
+   "valence": 17
+  },
+  "Zn": {
+   "potential": "Zn",
+   "valence": 12
+  },
+  "Ga": {
+   "potential": "Ga_d",
+   "valence": 13
+  },
+  "Ge": {
+   "potential": "Ge_d",
+   "valence": 14
+  },
+  "As": {
+   "potential": "As",
+   "valence": 5
+  },
+  "Se": {
+   "potential": "Se",
+   "valence": 6
+  },
+  "Br": {
+   "potential": "Br",
+   "valence": 7
+  },
+  "Kr": {
+   "potential": "Kr",
+   "valence": 8
+  },
+  "Rb": {
+   "potential": "Rb_sv",
+   "valence": 9
+  },
+  "Sr": {
+   "potential": "Sr_sv",
+   "valence": 10
+  },
+  "Y": {
+   "potential": "Y_sv",
+   "valence": 11
+  },
+  "Zr": {
+   "potential": "Zr_sv",
+   "valence": 12
+  },
+  "Nb": {
+   "potential": "Nb_sv",
+   "valence": 13
+  },
+  "Mo": {
+   "potential": "Mo_sv",
+   "valence": 14
+  },
+  "Tc": {
+   "potential": "Tc_pv",
+   "valence": 13
+  },
+  "Ru": {
+   "potential": "Ru_pv",
+   "valence": 14
+  },
+  "Rh": {
+   "potential": "Rh_pv",
+   "valence": 15
+  },
+  "Pd": {
+   "potential": "Pd",
+   "valence": 10
+  },
+  "Ag": {
+   "potential": "Ag",
+   "valence": 11
+  },
+  "Cd": {
+   "potential": "Cd",
+   "valence": 12
+  },
+  "In": {
+   "potential": "In_d",
+   "valence": 13
+  },
+  "Sn": {
+   "potential": "Sn_d",
+   "valence": 14
+  },
+  "Sb": {
+   "potential": "Sb",
+   "valence": 5
+  },
+  "Te": {
+   "potential": "Te",
+   "valence": 6
+  },
+  "I": {
+   "potential": "I",
+   "valence": 7
+  },
+  "Xe": {
+   "potential": "Xe",
+   "valence": 8
+  },
+  "Cs": {
+   "potential": "Cs_sv",
+   "valence": 9
+  },
+  "Ba": {
+   "potential": "Ba_sv",
+   "valence": 10
+  },
+  "La": {
+   "potential": "La",
+   "valence": 11
+  },
+  "Ce": {
+   "potential": "Ce",
+   "valence": 12
+  },
+  "Pr": {
+   "potential": "Pr_3",
+   "valence": 11
+  },
+  "Nd": {
+   "potential": "Nd_3",
+   "valence": 11
+  },
+  "Pm": {
+   "potential": "Pm_3",
+   "valence": 11
+  },
+  "Sm": {
+   "potential": "Sm_3",
+   "valence": 11
+  },
+  "Eu": {
+   "potential": "Eu_3",
+   "valence": 9
+  },
+  "Gd": {
+   "potential": "Gd_3",
+   "valence": 9
+  },
+  "Tb": {
+   "potential": "Tb_3",
+   "valence": 9
+  },
+  "Dy": {
+   "potential": "Dy_3",
+   "valence": 9
+  },
+  "Ho": {
+   "potential": "Ho_3",
+   "valence": 9
+  },
+  "Er": {
+   "potential": "Er_3",
+   "valence": 9
+  },
+  "Tm": {
+   "potential": "Tm_3",
+   "valence": 9
+  },
+  "Yb": {
+   "potential": "Yb_3",
+   "valence": 9
+  },
+  "Lu": {
+   "potential": "Lu_3",
+   "valence": 9
+  },
+  "Hf": {
+   "potential": "Hf_pv",
+   "valence": 10
+  },
+  "Ta": {
+   "potential": "Ta_pv",
+   "valence": 11
+  },
+  "W": {
+   "potential": "W_sv",
+   "valence": 14
+  },
+  "Re": {
+   "potential": "Re_pv",
+   "valence": 13
+  },
+  "Os": {
+   "potential": "Os_pv",
+   "valence": 14
+  },
+  "Ir": {
+   "potential": "Ir",
+   "valence": 9
+  },
+  "Pt": {
+   "potential": "Pt",
+   "valence": 10
+  },
+  "Au": {
+   "potential": "Au",
+   "valence": 11
+  },
+  "Hg": {
+   "potential": "Hg",
+   "valence": 12
+  },
+  "Tl": {
+   "potential": "Tl_d",
+   "valence": 13
+  },
+  "Pb": {
+   "potential": "Pb_d",
+   "valence": 14
+  },
+  "Bi": {
+   "potential": "Bi_d",
+   "valence": 15
+  },
+  "Po": {
+   "potential": "Po_d",
+   "valence": 16
+  },
+  "At": {
+   "potential": "At",
+   "valence": 7
+  },
+  "Rn": {
+   "potential": "Rn",
+   "valence": 8
+  },
+  "Fr": {
+   "potential": "Fr_sv",
+   "valence": 9
+  },
+  "Ra": {
+   "potential": "Ra_sv",
+   "valence": 10
+  },
+  "Ac": {
+   "potential": "Ac",
+   "valence": 11
+  },
+  "Th": {
+   "potential": "Th",
+   "valence": 12
+  },
+  "Pa": {
+   "potential": "Pa",
+   "valence": 13
+  },
+  "U": {
+   "potential": "U",
+   "valence": 14
+  },
+  "Np": {
+   "potential": "Np",
+   "valence": 15
+  },
+  "Pu": {
+   "potential": "Pu",
+   "valence": 16
+  },
+  "Am": {
+   "potential": "Am",
+   "valence": 17
+  },
+  "Cm": {
+   "potential": "Cm",
+   "valence": 18
+  }
+ }
+}

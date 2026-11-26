@@ -149,7 +149,7 @@
     "usedFor": "Tag meaning, defaults, rules",
     "access": "web; reachable from builder sessions since 2026-11-18",
     "status": "cited-from-memory",
-    "notes": "The author's handbooks quote it. Always cite the page name. Read on 2026-11-18 for M7.1 (status kept for the wiki as a whole): GGA (default from POTCAR LEXCH), IMIX (default 4, Broyden and Pulay; Kerker formula A G^2/(G^2+B^2)), AMIX (0.4 with PAW; metals often much smaller, e.g. 0.02), BMIX (1.0), NELM (60), NBANDS (all occupied states plus one empty band, default about NELECT/2 + NIONS/2)"
+    "notes": "The author's handbooks quote it. Always cite the page name. Read on 2026-11-18 for M7.1 (status kept for the wiki as a whole): GGA (default from POTCAR LEXCH), IMIX (default 4, Broyden and Pulay; Kerker formula A G^2/(G^2+B^2)), AMIX (0.4 with PAW; metals often much smaller, e.g. 0.02), BMIX (1.0), NELM (60), NBANDS (all occupied states plus one empty band, default about NELECT/2 + NIONS/2). Read on 2026-11-26 for M15.2: KPOINTS (oldid 38298; fully automatic mode N_i = int(max(1, R_k abs(b_i) + 0.5)), Gamma-centred, Q-018), Pulay stress (oldid 32951; no numeric threshold, Q-014), Choosing pseudopotentials (oldid 38312; recommended PBE potpaw.64 names, Q-010)"
   },
   {
     "id": "S-020",
