@@ -19,7 +19,7 @@ describe('Module 10 worked example values integrity (M7.6)', () => {
       const body = readFileSync(join(dir, file), 'utf8').replace(/^---[\s\S]*?---/, '');
       if (manifest.status === 'pending') {
         expect(body, `${file} must show the pending-data notice`).toContain(
-          'Results pending: author data not yet supplied',
+          'Will be updated: results come from ongoing research',
         );
         // Ensure no fabricated physical result numbers with units appear in body text
         const resultMatches = [...body.matchAll(/\b\d+\.\d+\s*(?:eV|GPa|mu_B|bohr)\b/g)];
