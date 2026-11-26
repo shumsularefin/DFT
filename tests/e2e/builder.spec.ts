@@ -28,6 +28,7 @@ test.describe('material builder: crystal mode (DFT Studio)', () => {
   test('keyboard: supercell, undo and redo shortcuts, structure checks; no overflow; axe clean', async ({
     page,
   }) => {
+    test.setTimeout(90_000); // Studio boots three.js and the editor in the frame
     await open(page);
     // 3D loads lazily: no Studio frame until the poster's button is pressed (here with the keyboard).
     await expect(page.locator('iframe.mb-studio-frame')).toHaveCount(0);
@@ -62,7 +63,10 @@ test.describe('material builder: crystal mode (DFT Studio)', () => {
     await expect(f.locator('#checks-summary')).toContainText(/all clear|^0 error/);
 
     expect(await overflow(page)).toBeLessThanOrEqual(0);
-    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    // The builder page around the frame; every step and tab inside Studio is axe tested in dft-studio.spec.ts.
+    expect((await new AxeBuilder({ page }).exclude('iframe.mb-studio-frame').analyze()).violations).toEqual(
+      [],
+    );
   });
 
   test('the handbook templates are in the structure menu', async ({ page }) => {

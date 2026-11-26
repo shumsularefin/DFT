@@ -69,10 +69,10 @@ test.describe('DFT Studio', () => {
     expect(errors).toEqual([]);
   });
 
-  test('every workflow step is axe clean, in light and dark themes', async ({ page }) => {
-    test.setTimeout(150_000); // 2 themes x (7 steps + 10 panel tabs) axe runs
-    await openStudio(page, []);
-    for (const theme of ['light', 'dark']) {
+  for (const theme of ['light', 'dark']) {
+    test(`every workflow step and panel tab is axe clean, ${theme} theme`, async ({ page }) => {
+      test.setTimeout(240_000); // 7 steps + 10 panel tabs axe runs; CI runners are about 2x slower
+      await openStudio(page, []);
       if (theme === 'dark') await page.locator('#btn-theme').click();
       await expect(page.locator('html')).toHaveClass(new RegExp(theme));
       for (const stage of ['structure', 'potcar', 'incar', 'kpoints', 'kconv', 'bundle', 'analyze']) {
@@ -97,8 +97,8 @@ test.describe('DFT Studio', () => {
         expect(r.violations.map((v) => `${theme} left:${tab} ${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
       }
       await page.locator('#btn-toggle-left').click();
-    }
-  });
+    });
+  }
 
   test('site structure checks: an overlap shows in the badge, the fix clears it, export needs a reason', async ({
     page,
