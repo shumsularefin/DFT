@@ -741,6 +741,17 @@
     "status": "published"
   },
   {
+    "id": "property-catalogue",
+    "label": "Other property calculations",
+    "module": 12,
+    "summary": "The wider set of properties a finished VASP project can add: formation and hull energies, surfaces, work functions, bonding, defects and dynamics.",
+    "prerequisites": [
+      "dft-energies-forces"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
     "id": "perovskite-structure",
     "label": "The perovskite structure",
     "module": 10,

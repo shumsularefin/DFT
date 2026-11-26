@@ -10,7 +10,7 @@ vaspTags: [IBRION, POTIM, EDIFFG, NSW, ISIF]
 sources: [S-019, S-040, S-041, S-042]
 noLab: true
 status: draft
-updated: 2026-11-19
+updated: 2026-11-26
 ---
 
 <Why>
@@ -69,6 +69,18 @@ ENCUT  = 520`}
     6: 'smaller steps near the minimum',
   }}
 />
+
+**The ionic ladder.** When the relaxation itself is the problem, the Workflow Handbook gives this order <Cite id="S-042" />. First check that every ionic step converged electronically (see [the SCF topic](/handbook/08-convergence-and-errors/scf-trouble/)).
+
+1. **Relax in stages.** `ISIF = 2` (ions only) first, then `ISIF = 3` from that `CONTCAR`. Why: a large starting stress together with bad positions is the usual cause of a runaway relaxation.
+2. **Loose, then tight `EDIFFG`.** Start with an energy criterion (`EDIFFG = 1E-3`) or `-0.05` eV per angstrom, then tighten to `-0.005` and `-0.001`. Keep `EDIFF` at least 10 times smaller than an energy `EDIFFG`; with a force criterion use `EDIFF` of `1E-6` or smaller. Why: forces from a loosely converged density are noisy, and a tight criterion on noisy forces never closes.
+3. **Step size.** Reduce `POTIM` (0.1 to 0.2) if the energy oscillates or `ZBRENT` complains. Why: smaller steps stop the overshoot.
+4. **Switch optimizer.** `IBRION = 2` (conjugate gradient) far from the minimum, `1` (RMM-DIIS) close to it, `3` (damped MD, `POTIM` about 0.1) for very rough landscapes or soft modes. Why: conjugate gradient copes with large steps far from the minimum, RMM-DIIS is efficient close to it, and damped MD survives rough landscapes.
+5. **Restart cleanly.** Copy `CONTCAR` to `POSCAR`; delete `WAVECAR` and `CHGCAR` if the cell changed a lot. Rerun until it converges in 1 to 3 steps. Why: this removes Pulay stress from the old basis.
+6. **Check symmetry.** A symmetric start is a saddle point if the true minimum breaks the symmetry. Rattle the positions slightly (0.01 to 0.05 angstrom) or set `ISYM = 0`. Why: symmetry keeps the forces that would lead out of the saddle at zero.
+7. **Fix what should not move.** Selective dynamics for the bottom layers of a slab; `ISIF = 2` for defects in a fixed host cell. Why: those atoms or that cell stand for the bulk and must not relax.
+
+Before you use the result, check the four [signs of a good calculation](/handbook/08-convergence-and-errors/scf-trouble/) <Cite id="S-042" />.
 
 For a printed message use the [error finder](/errors/).
 

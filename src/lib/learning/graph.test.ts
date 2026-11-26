@@ -126,6 +126,7 @@ describe('shipped concept graph', () => {
       'dielectric-response',
       'optical-properties',
       'bader-charges',
+      'property-catalogue',
     ]);
     for (const x of g.filter((y) => y.module >= 6))
       expect(x.status, x.id).toBe(m73.has(x.id) ? 'published' : 'planned');
