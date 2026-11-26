@@ -89,7 +89,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M15.6 | Phonon output reader: Gamma modes and units | done | M4.1 | S | A | claude/compassionate-einstein-ls4ab4 | [#69](https://github.com/shumsularefin/DFT/pull/69) | 2026-11-26 | [report](reports/M15.6.md), [work order](milestones/M15-coverage-and-repair.md). Library and review checks; UI in M15.7 |
 | M15.7 | Handbook module 12: lattice response and properties | done | M15.4, M15.5, M15.6 | L | B | claude/compassionate-einstein-ls4ab4 | [#70](https://github.com/shumsularefin/DFT/pull/70) | 2026-11-26 | [report](reports/M15.7.md), [work order](milestones/M15-coverage-and-repair.md). Six topics, AIMD preset |
 | M15.8 | Handbook: beyond-PBE depth and the property catalogue | done | M15.7 | M | B | claude/compassionate-einstein-ls4ab4 | [#71](https://github.com/shumsularefin/DFT/pull/71) | 2026-11-26 | [report](reports/M15.8.md), [work order](milestones/M15-coverage-and-repair.md) |
-| M15.9 | Reference pages: units, where to read it, checklist, layout, VASPKIT map | done | M15.6 | M | B | claude/compassionate-einstein-ls4ab4 | | 2026-11-26 | [report](reports/M15.9.md), [work order](milestones/M15-coverage-and-repair.md) |
+| M15.9 | Reference pages: units, where to read it, checklist, layout, VASPKIT map | done | M15.6 | M | B | claude/compassionate-einstein-ls4ab4 | [#72](https://github.com/shumsularefin/DFT/pull/72) | 2026-11-26 | [report](reports/M15.9.md), [work order](milestones/M15-coverage-and-repair.md) |
 
 ## Session log
 
