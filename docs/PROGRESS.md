@@ -6,7 +6,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 
 ## How to read this table
 
-- **Next stage to build: M15.3 (Process repair), Tier B**, size M (M15.1 is done). Start it with `STAGE: NEXT`, `TIER: B`. **Next Tier A stage: M15.4** (elastic tensor), with M15.5 and M15.6 also ready; M15.2 (science re-audit) follows M15.1. Plan M15 (2026-11-26, D-086): repair after the process audit of main at 33414fb, and the parts of the author's handbooks (S-041, S-042) that had no page; see [work order](milestones/M15-coverage-and-repair.md). M7.6 stays `partial` until `data/author/` exists.
+- **Next stage to build: M15.3 (Process repair), Tier B**, size M (M15.1 is done). Start it with `STAGE: NEXT`, `TIER: B`. **Next Tier A stage: M15.5** (optics and dielectric), with M15.6 also ready (M15.4 is done); M15.2 (science re-audit) follows M15.1. Plan M15 (2026-11-26, D-086): repair after the process audit of main at 33414fb, and the parts of the author's handbooks (S-041, S-042) that had no page; see [work order](milestones/M15-coverage-and-repair.md). M7.6 stays `partial` until `data/author/` exists.
 - **Tier** says which model to open the session with. **A** = the strongest model (Opus class): stages where a subtle mistake would put a wrong number in front of a researcher. **B** = the fast model (Sonnet class): UI, content and wiring on top of tested libraries. `-` = already done.
 - **Size** says how much work it is: **S** short session, **M** one normal session, **L** a long session that may stop as `partial` and need a second one.
 - A session started on the wrong tier does not build. It names the model to switch to and stops (`docs/WORKFLOW.md` section 2, step 0).
@@ -84,7 +84,7 @@ Plan v3 (2026-11-16): stages M12 to M14 were added and the remaining rows reorde
 | M15.1 | Make main green and gate deploy on CI | done | none | S | B | claude/m15-1-green-main | PR pending | 2026-11-26 | [report](reports/M15.1.md), [work order](milestones/M15-coverage-and-repair.md) |
 | M15.2 | Science re-audit of the 2026-11-24 batch | todo | M15.1 | L | A | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
 | M15.3 | Process repair: missing tests and records | todo | M15.1 | M | B | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
-| M15.4 | Elastic tensor: reader and mechanical analysis | todo | M4.1 | L | A | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
+| M15.4 | Elastic tensor: reader and mechanical analysis | done | M4.1 | L | A | claude/compassionate-einstein-ls4ab4 | [#65](https://github.com/shumsularefin/DFT/pull/65) | 2026-11-26 | [report](reports/M15.4.md), [work order](milestones/M15-coverage-and-repair.md). Library only; UI in M15.7 |
 | M15.5 | Optics and dielectric response: readers and derived quantities | todo | M4.1 | M | A | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
 | M15.6 | Phonon output reader: Gamma modes and units | todo | M4.1 | S | A | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
 | M15.7 | Handbook module 12: lattice response and properties | todo | M15.4, M15.5, M15.6 | L | B | | | 2026-11-26 | [work order](milestones/M15-coverage-and-repair.md) |
@@ -122,6 +122,7 @@ Newest first. One line per session: date, stage, outcome, branch.
 - 2026-11-26, Q-042/Q-050/Q-051 from the literature (D-087): Heisenberg default now minus sign (J > 0 FM), Heuristic mean-field T_C for FM ground states in `/tools/magnetic/` (S-070, S-071), handbook erratum on the T_C reference state; sources S-070 to S-081; MP U values confirmed against pymatgen.
 - 2026-11-26, process (D-088): lean execution made binding (`docs/WORKFLOW.md` 2a): budgets on every M15 stage, targeted tests while working, full runs once, no CI polling. M15.1 rewritten around the 15 diagnosed e2e failures in four groups; M15.2 and M15.7 split into two sessions.
 - 2026-11-26, M15.1: deploy now runs only after CI succeeds on a push to main (D-089); 25 e2e failures traced to 6 layout or test causes and fixed without loosening any assertion; see report.
+- 2026-11-26, M15.4: OUTCAR `TOTAL ELASTIC MODULI` reader with the XX YY ZZ XY YZ ZX to Voigt reorder, `src/lib/mechanics/elastic.ts` (compliance, eigenvalue stability, Born class forms, VRH, E, nu, A^U, sound velocities, Debye, Heuristic indicators, EOS cross-check); pymatgen golden file `elastic_reference.json` (D-090).
 
 ## Author actions outstanding
 

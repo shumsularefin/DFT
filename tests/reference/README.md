@@ -15,6 +15,7 @@ python -m venv .venv && .venv/bin/pip install -r scripts/reference/requirements.
 .venv/bin/python scripts/reference/gen_vasp_output_fixtures.py
 .venv/bin/python scripts/reference/gen_element_reference.py   # downloads the SMACT wheel for its data file
 .venv/bin/python scripts/reference/gen_magnetic_reference.py  # after gen_kpaths.py (reuses its fixtures)
+.venv/bin/python scripts/reference/gen_elastic_reference.py
 ```
 
 | File | Content | Used by | Caveat |
@@ -30,5 +31,6 @@ python -m venv .venv && .venv/bin/pip install -r scripts/reference/requirements.
 | `vasp-outputs/*`, `vasp-outputs/expected.json` | SYNTHETIC CHGCAR (spin and non-spin, non-cubic grid), EIGENVAL (ISPIN 1, 2), OSZICAR, XDATCAR written or read back by pymatgen; DOSCAR from the documented layout | M4.1, M7.3, M7.5 | Parser tests only, never results; DOSCAR not independently validated (Q-008) |
 | `element_reference.json` | 30 elements: Pauling electronegativity, mass, vdW radius (pymatgen), Cordero covalent radius (via ASE), ICSD 2024 oxidation-state counts and shares (SMACT) | M8.2, M10.1 | Recalled anchors asserted at generation |
 | `magnetic_reference.json` | FM, A-, C-, G-type orderings of the cubic and Pnma perovskite fixtures and rock-salt type II of the NaCl fixture: wave vector, minimal and diagonal supercell, per-site parallel and antiparallel nearest-neighbour counts (pymatgen cells and neighbours); common supercell determinants; numbers of symmetry-distinct collinear configurations (brute force with spglib operations) | M13.1 | Supercells found by brute force over matrices with entries in [-2, 2]; pseudocubic axes typed in per fixture, not detected |
+| `elastic_reference.json`, `elastic/OUTCAR_*` | Three illustrative stiffness tensors (cubic, hexagonal, triclinic with mixed signs): compliance and eigenvalues (numpy), Voigt, Reuss and Hill B and G, E, nu, A^U, sound velocities and Debye temperature (pymatgen `ElasticTensor`); two SYNTHETIC OUTCAR files whose TOTAL ELASTIC MODULI block is permuted to VASP order and read back by pymatgen `Outcar.read_elastic_tensor`, one non-symmetric with all entries distinct | M15.4 | Tensors are illustrative, not results for any material; the OUTCAR layout is from pymatgen's reader pattern, not a real file (Q-008) |
 
 Provenance and versions are inside each file's `_meta`.
