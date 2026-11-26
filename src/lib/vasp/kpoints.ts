@@ -65,8 +65,9 @@ export function meshFromResolution(
 }
 
 /**
- * VASP "Auto" length mode: N_i = max(1, int(length x |b_i| + 0.5)) with |b_i| WITHOUT 2 pi.
- * UNVERIFIED (Q-018): recalled from the VASP wiki KPOINTS page.
+ * VASP "Auto" length mode: N_i = max(1, int(length x |b_i| + 0.5)) with |b_i| WITHOUT 2 pi, Gamma-centred.
+ * Confirmed against the VASP wiki KPOINTS page (S-019, read 2026-11-26, oldid 38298; Q-018 closed), which also
+ * states it is "similar to KSPACING when R_k = 2 pi / KSPACING".
  */
 export function meshFromLength(m: Mat3, length: number): Mesh {
   if (!(length > 0) || !Number.isFinite(length)) throw new RangeError('length must be positive');

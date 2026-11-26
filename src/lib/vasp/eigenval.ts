@@ -73,6 +73,8 @@ export function parseEigenval(text: string): EigenvalResult {
 export interface BandGapResult {
   readonly kind: 'metal' | 'direct' | 'indirect';
   readonly gapEv: number;
+  /** True when VBM and CBM are in different spin channels (ISPIN = 2). Absent for metals. */
+  readonly crossSpin?: boolean;
   readonly vbm?: {
     readonly energyEv: number;
     readonly kIndex: number;
@@ -87,7 +89,13 @@ export interface BandGapResult {
   };
 }
 
-/** Compute band gap and direct/indirect character from eigenvalues and occupations (threshold occ >= 0.5). */
+/**
+ * Compute band gap and direct/indirect character from eigenvalues and occupations.
+ * A state counts as occupied when occ >= 0.5 (half of a full occupation; builder choice, Q-055). For VASP's 0/1
+ * insulator occupations this agrees with pymatgen's occ > 1e-8 (tested on the golden EIGENVAL files).
+ * "direct" means VBM and CBM at the same k-point whatever their spin, the pymatgen convention; `crossSpin` flags
+ * a gap whose VBM and CBM lie in different spin channels (not a spin-conserving optical transition).
+ */
 export function computeBandGap(ev: EigenvalResult, occThreshold = 0.5): BandGapResult {
   let vbm: { energyEv: number; kIndex: number; bandIndex: number; spin: number } | undefined;
   let cbm: { energyEv: number; kIndex: number; bandIndex: number; spin: number } | undefined;
@@ -115,5 +123,5 @@ export function computeBandGap(ev: EigenvalResult, occThreshold = 0.5): BandGapR
   }
   const gapEv = cbm.energyEv - vbm.energyEv;
   const kind = vbm.kIndex === cbm.kIndex ? 'direct' : 'indirect';
-  return { kind, gapEv, vbm, cbm };
+  return { kind, gapEv, vbm, cbm, crossSpin: vbm.spin !== cbm.spin };
 }

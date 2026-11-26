@@ -234,7 +234,13 @@ export function BandViewer() {
       readouts={[
         { label: 'k-points', value: ev ? String(ev.nkpt) : 'none' },
         { label: 'Bands', value: ev ? String(ev.nbands) : 'none' },
-        { label: 'Gap', value: gap ? `${gap.gapEv.toFixed(3)} (${gap.kind})` : 'none', unit: 'eV' },
+        {
+          label: 'Gap',
+          value: gap
+            ? `${gap.gapEv.toFixed(3)} (${gap.kind}${gap.crossSpin ? ', VBM and CBM in different spin channels' : ''})`
+            : 'none',
+          unit: 'eV',
+        },
       ]}
       notice="Drop your own EIGENVAL file. Band gap and direct/indirect character are computed directly from occupations >= 0.5."
       description={

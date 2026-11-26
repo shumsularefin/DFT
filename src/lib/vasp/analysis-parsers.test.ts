@@ -114,6 +114,37 @@ describe('M7.5 analysis parsers against golden fixtures', () => {
     expect(res.sites.length).toBe(exp.nions);
     expect(res.sites[0]!.orbitals).toEqual(exp.orbital_order);
     expect(smoothDos(res.energies, res.totalUp, 0)).toEqual(res.totalUp);
+    for (let i = 0; i < exp.nedos; i++) {
+      expect(res.sites[0]!.up.s![i]).toBeCloseTo(exp.ion1_s_up[i], 12);
+      expect(res.sites[1]!.down!.dx2![i]).toBeCloseTo(exp.ion2_dx2_down[i], 12);
+    }
+  });
+
+  it('Gaussian smoothing: normalised weights, hand-computed on (0, 1, 0) with sigma 1 eV', () => {
+    const s = smoothDos([0, 1, 2], [0, 1, 0], 1);
+    const a = Math.exp(-0.5);
+    const b = Math.exp(-2);
+    expect(s[1]).toBeCloseTo(1 / (1 + 2 * a), 12);
+    expect(s[0]).toBeCloseTo(a / (1 + a + b), 12);
+    // points further than 4 sigma are dropped: with sigma 0.2 eV the neighbours 1 eV away do not count
+    expect(smoothDos([0, 1, 2], [0, 1, 0], 0.2)).toEqual([0, 1, 0]);
+  });
+
+  it('band gap of the golden EIGENVAL files agrees with pymatgen eigenvalue_band_properties', () => {
+    for (const name of ['EIGENVAL_ispin1', 'EIGENVAL_ispin2'] as const) {
+      const res = computeBandGap(parseEigenval(readFileSync(`tests/reference/vasp-outputs/${name}`, 'utf8')));
+      const [gap, cbm, vbm, isDirect] = expected[name].eigenvalue_band_properties;
+      expect(res.gapEv).toBeCloseTo(gap, 6);
+      expect(res.cbm!.energyEv).toBeCloseTo(cbm, 6);
+      expect(res.vbm!.energyEv).toBeCloseTo(vbm, 6);
+      expect(res.kind === 'direct').toBe(isDirect);
+    }
+    // ISPIN 2 case: VBM (spin down) and CBM (spin up) share a k-point; both codes call it direct.
+    const sp = computeBandGap(
+      parseEigenval(readFileSync('tests/reference/vasp-outputs/EIGENVAL_ispin2', 'utf8')),
+    );
+    expect(sp.vbm!.spin).not.toBe(sp.cbm!.spin);
+    expect(sp.crossSpin).toBe(true);
   });
 
   it('extracts a closed watertight sphere on a 64^3 grid with volume within 1 % of 4/3 pi R^3', () => {

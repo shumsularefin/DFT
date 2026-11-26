@@ -1,5 +1,5 @@
 // Small research-planner calculators with exact SI unit conversions (M14.2).
-// @source S-031 S-042 S-065
+// @source S-031 (exact e), S-042 (surface energy and formation enthalpy formulas)
 import { ELEMENTARY_CHARGE_C } from './constants';
 
 /**
@@ -51,8 +51,10 @@ export interface FormationEnergyResult {
 }
 
 /**
- * Neutral compound or neutral defect formation energy (S-042, S-065):
- *   E_f = E_total - sum_i (n_i * mu_i)
+ * Formation enthalpy of a compound from elemental references (S-042, Workflow Handbook "Other calculations"):
+ *   Delta H_f = [E(A_x B_y) - x E(A) - y E(B)] / (x + y)  per atom; totalEv is the bracket.
+ * Not a defect formation energy: that needs E_defect - E_host -/+ n_i mu_i (plus charge terms), which this
+ * function does not compute (M15.2 audit).
  */
 export function neutralFormationEnergy(
   eTotalEv: number,

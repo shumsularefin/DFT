@@ -5,26 +5,26 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | ID | Status | Owner |
 |---|---|---|
 | Q-001 | open | author |
-| Q-002 | open | author + builder (M8.1) |
+| Q-002 | open | author (licence; Eu CN VII decision) |
 | Q-003 | closed | builder (needs arxiv access) or author (PDF) |
 | Q-004 | open | author (5-minute VASP run) |
-| Q-005 | open | builder (M8.4) |
+| Q-005 | closed | builder (M8.4, closed M15.2) |
 | Q-006 | open | author |
 | Q-007 | open | author |
 | Q-008 | open | author |
 | Q-009 | open | author (licence text; M9.1 did the rest) |
-| Q-010 | open | builder (M9.3, needs vasp.at) |
+| Q-010 | closed | builder (closed M15.2) |
 | Q-011 | open | author |
-| Q-012 | open | builder (M8.2, M10.1) |
+| Q-012 | open | author (licence of ICSD-derived counts) |
 | Q-013 | open | author (one VASPKIT run) |
-| Q-014 | open | builder (M4.1) |
+| Q-014 | closed | builder (closed M15.2) |
 | Q-015 | open | author |
 | Q-016 | closed | builder (M8.2) |
 | Q-017 | open | author (confirm erratum) |
-| Q-018 | open | builder (M3.2, needs vasp.at) or author (one run) |
+| Q-018 | closed | builder (closed M15.2) |
 | Q-019 | open | author |
 | Q-020 | open | author or auditor (before any glossary or topic is marked verified) |
-| Q-021 | open | builder (M11.2) |
+| Q-021 | open | author (WebKit and Firefox check) |
 | Q-022 | open | author or auditor |
 | Q-023 | open | author |
 | Q-024 | open | author or auditor |
@@ -56,6 +56,10 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-050 | closed | author + builder (M15.4) |
 | Q-051 | closed | author + builder (M15.8) |
 | Q-052 | open | builder |
+| Q-053 | open | author |
+| Q-054 | open | author |
+| Q-055 | open | author or builder |
+| Q-056 | open | builder |
 
 ## Release triage (M11.3)
 
@@ -76,6 +80,7 @@ Which licence for the code and which for the written content and data (a common 
 The tolerance explorer bundles Shannon (1976) radii built from pymatgen's table (pymatgen is MIT; the numbers are Shannon's published data). Two things are unverified: (a) whether bundling a compiled copy of the table needs more than attribution; (b) completeness. pymatgen has 492 spin-resolved entries; check against the original table (Acta Cryst. A32, 751) or the Imperial College online database, listing any missing rows. 34 textbook anchor values agree, but they were written down after some pymatgen values had been seen, so that is a consistency check only; this question is about a genuinely independent comparison. **Close:** M8.1 diffs the dataset against the original and records the result here; the author confirms the licence position.
 
 **Update (M8.1, 2026-11-18).** `src/data/shannon-radii.json` exports all 492 pymatgen entries (94 elements). Compared with the Imperial College online Shannon database (http://abulafia.mt.ic.ac.uk/shannon/radius.php, reachable over plain HTTP; HTTPS reset; it states that all its data are taken from Shannon 1976) by `scripts/data/compare_shannon_ic.py`: 497 rows there, 491 keys shared, **no value differences** (ionic and crystal, exact). Only in the database: D+ CN II and four OH- rows (not elements, so pymatgen has no place for them), and Eu3+ CN VII (ionic 1.01, crystal 1.15). pymatgen has that same Eu row with an **empty oxidation-state key**; the bundled file keeps it as `ox: null`, lists it in `_meta.anomalies`, and the lookup never returns it. Not done: a comparison with the paper itself (journals.iucr.org and doi.org returned 403), and the database is a transcription that pymatgen may itself have been built from, so this shows a faithful copy, not an independent derivation. The database page shows no licence or terms. **Still open:** (a) the licence position (author); (b) whether to assign Eu3+ to the Eu CN VII entry: the database says Eu3+, but doing so changes the Ln3+ coverage in `tests/reference/perovskite_reference.json`, so the generator would have to be updated and re-run (author decision).
+**Update (M15.2, 2026-11-26):** nothing new a builder can check. The value comparison is done (M8.1); the two remaining items are author decisions: (a) the licence position for bundling the table, (b) whether to assign Eu3+ to the Eu CN VII row. Owner changed to author.
 
 ## Q-003. Bartel tau: equation, threshold and radius conventions
 Implemented from memory: tau = r_X/r_B - n_A (n_A - (r_A/r_B)/ln(r_A/r_B)), perovskite predicted when tau < 4.18 (Bartel et al., Sci. Adv. 5, eaav0693, 2019). The paper could not be fetched when the plan was made (arxiv.org and PMC unreachable). Also unconfirmed: which Shannon coordination numbers the paper used for A, B, X, and how it treats mixed oxidation states. Sanity values from the golden file look right (SrTiO3 3.80, CsPbBr3 4.10, CsPbI3 4.30). **Close:** read the paper (allow arxiv.org / pmc.ncbi.nlm.nih.gov, or the author attaches the PDF to the session); M8.2 must not be marked done until this is closed or the UI shows "formula not yet confirmed against the paper".
@@ -88,6 +93,7 @@ The rounding rule VASP applies for KSPACING and the one VASPKIT task 102 applies
 The t-mu map needs region boundaries from the literature. Derivable without a citation: mu >= sqrt(2) - 1 = 0.414 (octahedral hole), mu < sqrt(3) - 1 = 0.732 (cubic coordination), the classic radius-ratio limits. Widely quoted for t: roughly 0.8 to 1.0 for perovskites, cubic near 0.9 to 1.0, tilted below. Formability-window papers (for example Li et al. on ABO3 and ABX3 formability) are cited from memory only. **Close:** M8.4 reads and cites the exact windows, or labels the map regions "textbook ranges" and does not show window numbers it has not verified.
 **Note (M8.2, 2026-11-18):** Bartel et al. (S-003, arXiv v2, Fig. 2A and text) report that a decision tree places the best t window at 0.825 < t < 1.059 on their 576 compounds (74 % accuracy) and quote 0.414 < mu < 0.732 as the geometric range. M8.2 cites these in the t and mu check messages; the formability-window paper (S-004) is still unread, so this question stays open for M8.4.
 **Note (M10.1, 2026-11-18):** M8.2's rule-of-thumb check warns for any t > 1.0, so cubic SrTiO3 (t = 1.0016) reads "above about 1". The validity engine (B008, D-067) therefore warns on t only outside S-003's 0.825 to 1.059 window. M8.4 should decide the boundary for the map and the M8 check together.
+**Closed (M15.2, 2026-11-26).** The close condition's second branch is met: the map (`ToleranceMaps.tsx`) draws the 0.8 to 1.0 t band labelled "rule-of-thumb" with this question ID, draws only the derivable mu limits sqrt(2) - 1 and sqrt(3) - 1 (S-022), and the only quoted window numbers are S-003's 0.825 < t < 1.059, read from the paper in M8.2. The validity engine uses that window (D-067). The formability-window paper (S-004) is still unread; S-004 stays marked unverified in the register, and no number from it is shown.
 
 ## Q-006. Firebase Spark plan limits
 v1 of the SPEC says hosting transfer is 10 GB per month in current sources but 360 MB per day in older ones. firebase.google.com was unreachable when checked, so neither is confirmed, nor the Firestore figures (1 GiB storage, 50K reads, 20K writes, 20K deletes per day) or whether Cloud Storage for Firebase is unavailable on Spark. **Design rule until closed:** assume the stricter 360 MB/day. **Close:** author opens the pricing page and records the current numbers here; M0.2 and M11.1 re-compute the page-weight budget against them.
@@ -115,6 +121,7 @@ Confirm the current licence for redistributing derived data (believed CC BY 4.0 
 
 ## Q-010. PAW availability table
 Which elements have recommended VASP PAW potentials in the PBE set (and their recommended names such as Ti_pv). Source is the VASP wiki "Available PAW potentials" page. Needed by the feasibility check. **Close:** M9.3 builds the table from the wiki with the page cited, or the author supplies the list.
+**Closed (M15.2, 2026-11-26).** Built from the VASP wiki page "Choosing pseudopotentials" (https://www.vasp.at/wiki/Choosing_pseudopotentials, revision oldid 38312, read 2026-11-26; the "Available PAW potentials" page links there), section "Recommended PAW potentials", table "Standard potentials (PBE, potpaw.64)": 96 elements, H to Cm. `scripts/data/build_paw_table.py` writes `src/data/paw-recommended.json` with the element, the potential name and the valence-electron count only (no POTCAR content, no ENMAX, no checksums). `src/lib/mp/pawTable.ts` feeds it to `evaluateFeasibility`, so F-PAW is now green or red instead of unknown in the Project card. Tested: Li_sv 3, Ti_sv 12, Pb_d 14 (values on the page).
 
 ## Q-011. Cost and toxicity flags data
 Cost tiers need a cited price source (for example USGS Mineral Commodity Summaries, public domain) and toxicity flags need a cited list (for example EU RoHS restricted substances). Neither could be fetched. **Close:** author supplies the source tables, or the Studio ships without a cost filter and says so.
@@ -122,6 +129,7 @@ Cost tiers need a cited price source (for example USGS Mineral Commodity Summari
 ## Q-012. Oxidation-state data provenance
 Common and uncommon oxidation states per element are needed for charge-balance checks. Candidates: pymatgen's `common_oxidation_states` / `oxidation_states` (MIT) or SMACT (MIT code, but its data may derive from ICSD statistics). Planning found that pymatgen's `Common oxidation states` lists only +2 for Cu (unusable: it would flag Cu(I) as unusual), while SMACT 4.0.2 ships ICSD 2024 occurrence counts that separate common from rare states sensibly (Cu +2 56 %, +1 41 %, +3 3 %; `tests/reference/element_reference.json`). Proposed: use the SMACT counts with a 10 % share threshold. Still open: whether redistributing statistics derived from ICSD needs more than attribution. **Close:** M8.2 adopts the proposal or another source, records it, and the author confirms the licence position.
 **Update (M8.2, 2026-11-18):** adopted. `src/data/oxidation-states.json` copies SMACT 4.0.2's ICSD 2024 counts for 96 elements (`scripts/data/build_oxidation.py`); classification `common` (share >= 0.10 of non-zero states), `known-rare` (count > 0), `not-observed` (no count) is D-061, and shares match `tests/reference/element_reference.json` for all 30 reference elements. **Still open (author):** whether redistributing counts derived from ICSD needs more than attribution. The SMACT wheel's LICENSE file is the MIT licence for the code; it says nothing specific about the data.
+**Update (M15.2, 2026-11-26):** nothing new a builder can check; the data are adopted and tested (M8.2). The open item, whether ICSD-derived counts can be redistributed with attribution only, is an author decision. Owner changed to author.
 
 ## Q-013. VASPKIT 303 convention
 The Workflow Handbook says VASPKIT 303 uses the same algorithm as SeeK-path (HPKOT). **Close (author, one run):** run `vaspkit -task 303` on a Cu fcc primitive cell and check that `KPATH.in` follows `Γ-X-U | K-Γ-L-W-X` (the HPKOT golden path), not `Γ-X-W-K-Γ-L-U-W-L-K | U-X`. If it differs, change D-005's default.
@@ -130,6 +138,7 @@ The Workflow Handbook says VASPKIT 303 uses the same algorithm as SeeK-path (HPK
 The convergence plotter warns when pressure is not converged where energy is. The threshold (default 5 kB) is a heuristic with no cited basis. **Close:** M4.1 either finds a citable guideline or keeps it adjustable and labelled "heuristic".
 
 **M4.1 update:** no citable guideline was found (the VASP wiki was unreachable). `pressureThresholdKb` defaults to 5 and is an option; the explanation text calls it heuristic. The question stays open until the author supplies a basis.
+**Closed (M15.2, 2026-11-26).** The VASP wiki page "Pulay stress" (read 2026-11-26, oldid 32951) explains the cause and the remedies (larger ENCUT, constant-ENCUT EOS fits) but gives no numeric kB threshold, so none is citable. The close condition's second branch holds: the convergence plotter's 5 kB is an adjustable option (`pressureThresholdKb`) explained as heuristic, and the review tool's fixed 1 kB warning (`PULAY_WARN_KB`, `src/lib/review/postflight.ts`) is now labelled heuristic in its message with this ID (M15.2 audit). Neither value claims a source.
 
 ## Q-015. Firebase and GitHub wiring state
 Is the Firebase project created, the GitHub repository variable `FIREBASE_PROJECT_ID` and secret `FIREBASE_SERVICE_ACCOUNT` set, and is the repository connected to the Firebase console? See `docs/SETUP_FIREBASE.md`. M0.2 cannot show a live deploy without them. **Owner: author.**
@@ -143,6 +152,7 @@ The "Input and output files" table lists "Odd MP meshes on hexagonal cells (use 
 
 ## Q-018. KPOINTS fully automatic ("Auto") length mode
 The planned formula `N_i = max(1, int(R_k |b_i| + 0.5))`, with |b_i| the reciprocal lattice vector length **without** 2 pi, is recalled from the VASP wiki KPOINTS page and was not checked. **Close:** read the KPOINTS page (needs vasp.at), or the author runs VASP once with a KPOINTS file `Auto` / `0` / `Auto` / `20` on the fcc Cu primitive cell (|b| without 2 pi = 0.47979 1/Angstrom, so the recalled rule gives int(20 x 0.47979 + 0.5) = 10) and reports the mesh.
+**Closed (M15.2, 2026-11-26).** The VASP wiki KPOINTS page (read 2026-11-26, oldid 38298) gives, for the fully automatic mode, N_i = int(max(1, R_k |b_i| + 0.5)) with a Gamma-centred mesh, and says it is "similar to KSPACING when R_k = 2 pi / KSPACING", which fixes |b_i| as the length without 2 pi. This is the implemented formula. `src/lib/vasp/kpoints.ts` now says confirmed; the `it.todo` is replaced by tests on fcc Cu (R_k 20 gives 10), hexagonal Mg (R_k 30 gives 11, 11, 6) and the max(1, ...) floor.
 
 ## Q-019. LMAXMIX missing from the handbook's SCF and band INCARs
 The Workflow Handbook's dictionary says LMAXMIX = 4 (d) or 6 (f) is "vital for +U and for ICHARG = 11 runs on d/f systems", and its "ISTART and ICHARG" rule says LMAXMIX must be identical between the SCF and the ICHARG = 11 run. Its relaxation INCAR sets `LMAXMIX = 4`, but the "SCF (101 -> ST, edited)" and "route B run on KPATH.in" INCARs, written for the same magnetic d-element example (`MAGMOM = 2*5.0 4*0.6`), do not. Either the omission is deliberate (and the dictionary is too strong), or both INCARs should carry `LMAXMIX = 4`. The site's validator (V018) warns on the band INCAR either way. **Close:** the author decides; the presets and the content follow.
@@ -152,6 +162,7 @@ The 70 glossary terms in `src/data/glossary.json` (modules 1 to 3; 14 added in M
 
 ## Q-021. MathML fonts
 Build-time MathML (D-008) renders correctly in Chromium on the build machine, but the Greek letter nu in $E = h\nu$ looks like a Latin v in the body font. The topic stylesheet lists math fonts (Cambria Math, STIX Two Math, Latin Modern Math, Noto Sans Math) that were not available to test. **Close:** M11.2 checks MathML in WebKit and Firefox, and per D-008 switches a formula to `htmlAndMathml` with the needed KaTeX fonts if one renders poorly.
+**Update (M15.2, 2026-11-26):** M11.2 did not check MathML in WebKit or Firefox, and this builder session has only Chromium (installing other Playwright browsers is not allowed here). Still open. Close: the author opens a topic with formulas (for example /handbook/02-quantum-basics/) in Safari and Firefox and reports any formula that renders poorly; per D-008 that formula switches to `htmlAndMathml`.
 
 ## Q-022. Formal scaling exponents in the cost-of-exactness lab
 The lab (`src/lib/physics/scaling.ts`) draws Kohn-Sham DFT as N^3 (S-049) and Hartree-Fock N^4, MP2 N^5, CCSD N^6, CCSD(T) N^7 (S-048). These are standard textbook formal scalings recalled from memory; both books are `cited-from-memory` in the register and no page was read. The force-field curve (roughly linear) and the exact-solution curve (exponential shape, arbitrary rate) are drawn as "qualitative" and claim no number. **Close:** the author or auditor checks the exponents against S-048 and S-049 (page numbers go in the register notes), and confirms that "Hartree-Fock N^4" is the form meant (formal, not the effective scaling of modern codes). **Owner: author or auditor.**
@@ -251,3 +262,14 @@ S-042 lists Ueff (eV) for Co 3.32, Cr 3.7, Fe 5.3, Mn 3.9, Mo 4.38, Ni 6.2, V 3.
 ## Q-052. Module 5 e2e: some topic pages sometimes never finish hydrating under load
 In full local runs (2 workers, 4 CPUs) two to four of the 36 `module-05.spec.ts` tests fail with a hung hydration wait (`astro-island[ssr]` never clears, even with a 90 s test timeout), on a different page each run. Every page hydrates in 0.3 to 5 s when opened alone, also with the CPU throttled 20 times, so the cause is not a single broken island. A reload after 15 s did not help. CI passed the same spec on PR #64 after one retry. The M15.1 and M15.3 sessions stopped here to stay inside their budgets. **Close:** find the stall (suspects: the static server `scripts/build/serve.mjs` under parallel load, or the shared WebGL context across workers) and fix it, or lower the spec's parallelism. **Owner: builder.**
 
+## Q-053. Feasibility cut-offs in Screening Studio (M9.3)
+The feasibility rules in `src/lib/mp/feasibility.ts` use three cut-offs that no source states: cell size green up to 10 atoms, yellow up to 30, red above (F-SIZE), and 'heavy element' meaning Z > 54 (F-HEAVY, a hint that spin-orbit coupling may matter; S-042 says only "heavy elements"). They are labelled Heuristic and cite S-042 for the reasoning, not for the numbers. The unsourced absolute runtime formula was removed in M15.2 (D-092). **Close:** author confirms these cut-offs as house rules, or gives the values to use. **Owner: author.**
+
+## Q-054. Volume-change warning level in the calculation review
+`src/lib/review/postflight.ts` (POST-VOL) warns when the cell volume changes by more than 10 % between POSCAR and CONTCAR (`VOLUME_CHANGE_WARN_PCT`). No source states 10 %; the handbooks (S-042) say to re-relax after a large volume change because the plane-wave basis was set up for the starting cell, without a number. The check is now labelled heuristic (M15.2 audit; it was marked "computed"). **Close:** the author confirms or replaces 10 %, or a source for a threshold is found.
+
+## Q-055. Occupation threshold in the band-gap finder
+`computeBandGap` (`src/lib/vasp/eigenval.ts`) counts a state as occupied when its EIGENVAL occupation is at least 0.5. No source picks 0.5; pymatgen counts occ > 1e-8 as occupied. The two agree for insulators with 0/1 occupations (tested on both golden EIGENVAL files, M15.2), but differ for smeared metals and partially occupied states. **Close:** decide which rule the viewer should use (author or builder), record it in DECISIONS, and add a fractional-occupation test.
+
+## Q-056. Source for the marching-tetrahedra isosurface
+`src/lib/physics/marchingCubes.ts` splits each cube into six tetrahedra. S-030 (Lorensen and Cline 1987) describes marching cubes only. The method is checked by tests (closed manifold, sphere volume within 1 % on a 64^3 grid), so no number depends on it, but the register has no paper for the variant. **Close:** add a register entry for a marching-tetrahedra paper read by a builder (for example Doi and Koide 1991, not yet read), or keep S-030 with this note.

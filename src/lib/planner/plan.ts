@@ -44,6 +44,7 @@ const PRESET_MAP = new Map<string, Preset>(
  */
 export function buildStepIncar(
   step: RecipeStep,
+  /** Placeholder default, not a property of any element: the UI asks for the user's largest POTCAR ENMAX. */
   enmax = 400,
 ): {
   entries: IncarEntry[];

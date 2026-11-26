@@ -87,7 +87,11 @@ def eigenval_fixture(expected):
         expected[name] = {"reader": "pymatgen Eigenval", "ispin": ev.ispin, "nkpt": ev.nkpt, "nbands": ev.nbands,
                           "kpoints": [list(map(float, k)) for k in ev.kpoints],
                           "kpoint_weights": [float(w) for w in ev.kpoints_weights],
-                          "eigenvalues_and_occupations_by_spin": eig}
+                          "eigenvalues_and_occupations_by_spin": eig,
+                          # (gap, cbm, vbm, is_direct); pymatgen counts a state as occupied when occ > 1e-8 and
+                          # calls the gap direct when VBM and CBM share a k-point, whatever their spin (M15.2).
+                          "eigenvalue_band_properties": [round(float(x), 8) if not isinstance(x, (bool, np.bool_))
+                                                         else bool(x) for x in ev.eigenvalue_band_properties]}
 
 
 def oszicar_fixture(expected):

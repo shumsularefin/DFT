@@ -104,11 +104,16 @@ describe('KSPACING versus golden for all three rules', () => {
   });
 });
 
-describe('Auto length mode (formula UNVERIFIED, Q-018)', () => {
-  it('arithmetic of the recalled formula: fcc Cu, length 20 -> 10', () => {
+describe('Auto length mode, N_i = max(1, int(R_k |b_i| + 0.5)), |b_i| without 2 pi (S-019 KPOINTS page, Q-018 closed)', () => {
+  it('fcc Cu, R_k = 20: |b| = 0.47979 1/A gives int(10.096) = 10', () => {
     expect(meshFromLength(FCC_CU, 20)).toEqual([10, 10, 10]);
   });
-  it.todo('Q-018: confirm the Auto length formula against the VASP wiki KPOINTS page or one VASP run');
+  it('hexagonal Mg (a 3.21, c 5.21), R_k = 30: |b1| = 2/(a sqrt 3) = 0.35970, |b3| = 1/c = 0.19194 give 11, 11, 6', () => {
+    expect(meshFromLength(fromParameters(3.21, 3.21, 5.21, 90, 90, 120), 30)).toEqual([11, 11, 6]);
+  });
+  it('a short length never gives zero subdivisions (the max(1, ...) in the wiki formula)', () => {
+    expect(meshFromLength(FCC_CU, 1)).toEqual([1, 1, 1]);
+  });
 });
 
 describe('meshSymmetryRisk reproduces the golden mesh_point_group_symmetry', () => {

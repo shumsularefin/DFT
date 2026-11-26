@@ -1,11 +1,10 @@
 // Transparent Green/Yellow/Red feasibility engine and compute-time bucket estimator for Screening Studio (M9.3).
-// @source S-019 (PAW table Q-010), S-042 (Field Handbook PBE caveats and workflows)
+// @source S-019 (PAW table Q-010; ISPIN), S-042 (Field Handbook PBE caveats and workflows), S-010 (N^3 scaling, D-092)
 import elementsData from '../../data/elements.json';
 import { parseIncar, type IncarEntry } from '../vasp/incar';
 import type { MaterialRow } from './query';
 
 export type Verdict = 'green' | 'yellow' | 'red';
-export type RuntimeBucket = 'minutes' | 'hours' | 'days' | 'weeks';
 
 export interface FeasibilityRuleResult {
   readonly id: string;
@@ -16,10 +15,19 @@ export interface FeasibilityRuleResult {
   readonly source: string;
 }
 
+/**
+ * Relative cost estimate (D-092). No absolute hours: the site has no sourced timing data, and wall time depends on
+ * the machine, ENCUT, the k-mesh and the parallel setup. What is sourced is the scaling: the orthogonalization and
+ * subspace rotation of plane-wave codes grow as N^3 with system size (S-010), and ISPIN = 2 solves two spin
+ * channels, so about twice the work (S-019, ISPIN).
+ */
 export interface ComputeEstimate {
-  readonly bucket: RuntimeBucket;
-  readonly cores: number;
-  readonly estimatedCoreHours: number;
+  /** Cost relative to the reference cell, same settings: (nsites / REFERENCE_SITES)^3, times 2 when spin-polarized. */
+  readonly relativeCost: number;
+  readonly referenceSites: number;
+  readonly spinPolarized: boolean;
+  /** Plain-language sentence, for example "about 8 times the cost of a 4-atom non-magnetic cell". */
+  readonly text: string;
   readonly formula: string;
   readonly heuristic: true;
 }
@@ -69,28 +77,28 @@ const F_BLOCK_SYMBOLS = new Set([
 const RANK: Record<Verdict, number> = { green: 0, yellow: 1, red: 2 };
 const worst = (a: Verdict, b: Verdict): Verdict => (RANK[b] > RANK[a] ? b : a);
 
-export function estimateComputeBucket(mat: MaterialRow, cores = 16): ComputeEstimate {
-  const safeCores = Math.max(1, Math.round(cores));
-  // Heuristic scaling: ~ O(N_atoms^2.5) * spinFactor * metalFactor / cores
-  const spinFactor = mat.is_magnetic ? 2.0 : 1.0;
-  const metalFactor = mat.is_metal ? 1.5 : 1.0;
-  const baseCoreHours = 0.02 * Math.pow(Math.max(1, mat.nsites), 2.5) * spinFactor * metalFactor * 5;
-  const wallHours = baseCoreHours / safeCores;
-  const bucket: RuntimeBucket =
-    wallHours < 1 ? 'minutes' : wallHours < 24 ? 'hours' : wallHours < 168 ? 'days' : 'weeks';
+/** Size of the reference cell for the relative estimate (a small cell such as a 4-atom primitive cell). */
+export const REFERENCE_SITES = 4;
+
+/** Relative compute cost, Heuristic (D-092). @source S-010 (N^3 scaling), S-019 (ISPIN) */
+export function estimateRelativeCost(mat: Pick<MaterialRow, 'nsites' | 'is_magnetic'>): ComputeEstimate {
+  const n = Math.max(1, mat.nsites);
+  const spinPolarized = mat.is_magnetic === true;
+  const relativeCost = (n / REFERENCE_SITES) ** 3 * (spinPolarized ? 2 : 1);
+  const rounded = relativeCost >= 10 ? Math.round(relativeCost).toString() : relativeCost.toPrecision(2);
   return {
-    bucket,
-    cores: safeCores,
-    estimatedCoreHours: baseCoreHours,
-    formula:
-      'coreHours ~ 0.02 * nsites^2.5 * spinFactor * metalFactor * 5_steps; wallHours = coreHours / cores',
+    relativeCost,
+    referenceSites: REFERENCE_SITES,
+    spinPolarized,
+    text: `about ${rounded} times the cost of a ${REFERENCE_SITES}-atom non-magnetic cell with the same settings`,
+    formula: `relative cost ~ (nsites / ${REFERENCE_SITES})^3${spinPolarized ? ' x 2 (ISPIN = 2)' : ''}; N^3 is the large-cell limit of plane-wave DFT, so small cells cost relatively more than this`,
     heuristic: true,
   };
 }
 
 export function evaluateFeasibility(
   mat: MaterialRow,
-  options: { cores?: number; recommendedPawTable?: ReadonlySet<string> | null } = {},
+  options: { recommendedPawTable?: ReadonlySet<string> | null } = {},
 ): FeasibilityReport {
   const rules: FeasibilityRuleResult[] = [];
   let overall: Verdict = 'green';
@@ -197,7 +205,7 @@ export function evaluateFeasibility(
       reason:
         missing.length > 0
           ? `No recommended PAW listed for ${missing.join(', ')}.`
-          : 'All elements have a recommended PAW potential in the supplied table.',
+          : 'All elements have a recommended PAW potential (VASP wiki, Choosing pseudopotentials, PBE potpaw.64).',
       heuristic: true,
       source: 'S-019',
     });
@@ -206,7 +214,7 @@ export function evaluateFeasibility(
   return {
     overall,
     rules,
-    estimate: estimateComputeBucket(mat, options.cores ?? 16),
+    estimate: estimateRelativeCost(mat),
   };
 }
 

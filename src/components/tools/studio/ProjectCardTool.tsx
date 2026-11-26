@@ -3,12 +3,12 @@ import Badge from '../../ui/Badge';
 import type { MpManifest } from '../../../lib/mp/schema';
 import { materializeRow, type MaterialRow, type MpIndex } from '../../../lib/mp/query';
 import { buildStarterProjectSteps, evaluateFeasibility } from '../../../lib/mp/feasibility';
+import { RECOMMENDED_PAW_ELEMENTS } from '../../../lib/mp/pawTable';
 import './studio.css';
 
 export default function ProjectCardTool() {
   const [manifest, setManifest] = useState<MpManifest | null>(null);
   const [row, setRow] = useState<MaterialRow | null>(null);
-  const [cores, setCores] = useState(16);
   const [encut, setEncut] = useState(520);
   const [err, setErr] = useState<string | null>(null);
 
@@ -46,7 +46,10 @@ export default function ProjectCardTool() {
     };
   }, []);
 
-  const report = useMemo(() => (row ? evaluateFeasibility(row, { cores }) : null), [row, cores]);
+  const report = useMemo(
+    () => (row ? evaluateFeasibility(row, { recommendedPawTable: RECOMMENDED_PAW_ELEMENTS }) : null),
+    [row],
+  );
   const steps = useMemo(() => (row ? buildStarterProjectSteps(row, encut) : []), [row, encut]);
 
   return (
@@ -67,20 +70,9 @@ export default function ProjectCardTool() {
             </h2>
             <p>
               Space group {row.spacegroup.symbol} ({row.spacegroup.crystalSystem}), {row.nsites} atoms/cell,
-              estimated compute bucket on {report.estimate.cores} cores:{' '}
-              <strong>{report.estimate.bucket}</strong>.
+              relative compute cost: <strong>{report.estimate.text}</strong>.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
-              <label className="st-field">
-                <span>CPU cores</span>
-                <input
-                  type="number"
-                  min={1}
-                  max={1024}
-                  value={cores}
-                  onChange={(e) => setCores(Math.max(1, Number(e.target.value) || 1))}
-                />
-              </label>
               <label className="st-field">
                 <span>ENCUT (eV, set &gt;= 1.3 x ENMAX)</span>
                 <input
@@ -94,7 +86,7 @@ export default function ProjectCardTool() {
               </label>
             </div>
             <p style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--step--1)' }}>
-              Runtime heuristic: {report.estimate.formula}
+              Cost heuristic: {report.estimate.formula}
             </p>
             <ul>
               {report.rules.map((r) => (
