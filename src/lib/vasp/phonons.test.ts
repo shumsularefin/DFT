@@ -40,7 +40,15 @@ describe('OUTCAR Gamma-mode reader (fixtures read back by ASE read_vib_freq)', (
     it(`${name}: every mode, f and f/i, in THz, cm-1 and meV`, () => {
       const out = parseOutcar(text(name));
       expect(out.phonons).toBeDefined();
-      expect(out.phonons!.modes.map(({ line: _l, ...m }) => m)).toEqual(fx.modes);
+      expect(
+        out.phonons!.modes.map((m) => ({
+          index: m.index,
+          imaginary: m.imaginary,
+          thz: m.thz,
+          cm1: m.cm1,
+          meV: m.meV,
+        })),
+      ).toEqual(fx.modes);
       expect(out.phonons!.modes.filter((m) => !m.imaginary).map((m) => m.meV)).toEqual(fx.ase_real_meV);
       expect(out.phonons!.modes.filter((m) => m.imaginary).map((m) => m.meV)).toEqual(fx.ase_imaginary_meV);
       expect(out.warnings.some((w) => w.includes('dynamical'))).toBe(false);
