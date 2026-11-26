@@ -61,6 +61,7 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-055 | open | author or builder |
 | Q-056 | open | builder |
 | Q-057 | open | builder |
+| Q-058 | open | author |
 
 ## Release triage (M11.3)
 
@@ -279,3 +280,6 @@ The feasibility rules in `src/lib/mp/feasibility.ts` use three cut-offs that no 
 
 ## Q-057. Fox, Optical Properties of Solids, not read for M15.5
 The work order asked for a textbook source for n, k, alpha, R, L and sigma from eps1 and eps2. S-082 (Fox, 2nd ed., 2010) is registered as cited-from-memory: no copy was reachable from the builder session. The formulas in `src/lib/optics/derived.ts` are the ones printed in S-042 and are standard; the golden values (`scripts/reference/gen_optics_reference.py`) are computed by numpy from the same closed forms, and alpha also agrees with pymatgen `optical_absorption_coeff` (S-034), so no number depends on the unread book. **Close:** a builder or the author reads Fox chapters 1 and 2 and confirms the forms (in particular sigma = eps0 omega eps2 in SI and R at normal incidence), then marks S-082 as read. **Owner: builder.**
+
+## Q-058. Near-zero level for the acoustic modes in the phonon check
+`ACOUSTIC_NEAR_ZERO_CM1 = 5` in `src/lib/vasp/phonons.ts` decides when one of the three lowest Gamma modes counts as near zero (review check POST-PHONON-ACOUSTIC, Heuristic). S-042 says only that a small imaginary acoustic dip of "a few cm^-1" is numerical noise; 5 is the builder's reading of that phrase, not a sourced value. The imaginary-mode check (POST-PHONON-IMAG) does not use it: it flags every f/i mode outside the three lowest. **Close:** the author confirms 5 cm^-1 or gives the level to use. **Owner: author.**
