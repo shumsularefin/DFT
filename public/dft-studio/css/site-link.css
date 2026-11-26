@@ -1,0 +1,68 @@
+/* DFT Studio: styles for the site integration layer (site-link.js) and the CSP-clean shell. */
+.studio-skip { position: absolute; left: -9999px; top: 4px; z-index: 100; background: var(--bg-card); color: var(--text-primary); padding: 4px 8px; border: 1px solid var(--border); border-radius: 4px; }
+.studio-skip:focus { left: 8px; }
+.studio-boot-error { margin: 8px; padding: 8px 10px; border: 1px solid #dc2626; border-radius: 6px; color: #991b1b; background: #fef2f2; font-size: 12px; }
+.heur-badge { display: inline-block; font-size: 9.5px; font-weight: 600; padding: 0 5px; border-radius: 8px; border: 1px solid #b45309; color: #92400e; background: #fffbeb; vertical-align: middle; }
+.dark .heur-badge { color: #fcd34d; background: transparent; border-color: #d97706; }
+#btn-site-checks.checks-err { border-color: #dc2626; color: #b91c1c; }
+#btn-site-checks.checks-warn { border-color: #d97706; color: #b45309; }
+.dark #btn-site-checks.checks-err { color: #fca5a5; }
+.dark #btn-site-checks.checks-warn { color: #fcd34d; }
+.checks-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.check-ok { font-size: 11px; color: var(--text-secondary); }
+.check-item { border: 1px solid var(--border-subtle); border-left-width: 3px; border-radius: 5px; padding: 5px 7px; font-size: 11px; }
+.check-item p { margin: 3px 0; color: var(--text-secondary); line-height: 1.35; }
+.check-item.sev-error { border-left-color: #dc2626; }
+.check-item.sev-warning { border-left-color: #d97706; }
+.check-item.sev-info { border-left-color: #2563eb; }
+.check-head { display: flex; flex-wrap: wrap; gap: 4px; align-items: baseline; color: var(--text-primary); }
+.check-actions { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.check-src { font-size: 9.5px; color: var(--text-secondary); margin-left: auto; }
+.pt-grid { display: grid; grid-template-columns: repeat(18, minmax(0, 1fr)); gap: 1px; }
+.pt-cell { font: 600 8.5px/1 'JetBrains Mono', monospace; padding: 3px 0; min-width: 0; border: 1px solid var(--border-subtle); background: var(--bg-input); color: var(--text-primary); border-radius: 2px; cursor: pointer; }
+.pt-cell:hover, .pt-cell:focus-visible, .pt-cell[aria-pressed='true'] { background: #2563eb; color: #fff; outline: none; }
+.send-site-menu { position: absolute; right: 0; top: calc(100% + 4px); z-index: 60; width: min(300px, 90vw); background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,.25); padding: 4px; display: flex; flex-direction: column; }
+.send-site-menu.hidden { display: none; }
+.send-item, .site-link { display: flex; flex-direction: column; gap: 1px; text-align: left; padding: 6px 8px; border-radius: 6px; border: 1px solid transparent; background: none; color: var(--text-primary); font-size: 11.5px; cursor: pointer; text-decoration: none; }
+.send-item span, .site-link span { font-size: 10.5px; color: var(--text-secondary); }
+.send-item:hover, .send-item:focus-visible, .site-link:hover, .site-link:focus-visible { background: var(--bg-input); border-color: var(--border); outline: none; }
+.site-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px; margin-top: 6px; }
+.site-card { border-style: dashed; }
+.site-home { text-decoration: none; }
+/* Header: the structure picker is the only item that shrinks, so buttons never slide over it at medium widths. */
+body > header > div:first-of-type > * { flex-shrink: 0; }
+body > header > div:first-of-type > div:has(> #sample-select) { flex: 0 1 auto; min-width: 0; }
+body > header #sample-select { min-width: 64px; width: 100%; }
+@media (max-width: 1279px) { body > header .leading-tight { display: none !important; } }
+@media (max-width: 640px) { body > header > div:first-of-type { flex-shrink: 0; } }
+/* Contrast (WCAG AA 4.5:1 on every panel background, checked with axe in tests/e2e/dft-studio.spec.ts). */
+:root { --text-muted: #4f5866; }
+html.dark { --text-muted: #a8b3c5; }
+html:not(.dark) .check-pill.ok { color: #047857; }
+html:not(.dark) .check-pill.warn { color: #b45309; }
+html:not(.dark) .text-blue-500 { color: #1d4ed8; }
+html:not(.dark) #console-log .text-amber-500 { color: #b45309; }
+.pp-pick { all: unset; cursor: pointer; font-size: 11.5px; font-weight: 700; color: var(--text-primary); border-radius: 3px; }
+.pp-pick:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tab-btn.active { color: var(--accent-text); }
+html:not(.dark) .sp-badge.ok { color: #047857; }
+html:not(.dark) .sp-badge.warn { color: #b45309; }
+html.dark .v-btn-primary { background: #2563eb; border-color: #2563eb; }
+html.dark .v-btn-primary:hover { background: #1d4ed8; border-color: #1d4ed8; }
+html.dark .check-pill.ok, html.dark .sp-badge.ok { color: #34d399; }
+html.dark .check-pill.warn, html.dark .sp-badge.warn { color: #fbbf24; }
+html.dark .text-blue-500 { color: #60a5fa; }
+/* Accent text at AA contrast on the light panels (Tailwind 700 shades). */
+html:not(.dark) .text-amber-500, html:not(.dark) .text-amber-600 { color: #b45309; }
+html:not(.dark) .text-green-600, html:not(.dark) .text-emerald-600 { color: #047857; }
+html:not(.dark) .text-rose-500 { color: #be123c; }
+html:not(.dark) .text-red-500 { color: #b91c1c; }
+html:not(.dark) .text-sky-500 { color: #0369a1; }
+html:not(.dark) .text-purple-500 { color: #7e22ce; }
+/* The same accents on the dark panels (Tailwind 300/400 shades). */
+html.dark .text-red-500 { color: #f87171; }
+html.dark .text-rose-500 { color: #fb7185; }
+html.dark .text-amber-500, html.dark .text-amber-600 { color: #fbbf24; }
+html.dark .text-green-600, html.dark .text-emerald-600 { color: #34d399; }
+html.dark .text-sky-500 { color: #38bdf8; }
+html.dark .text-purple-500 { color: #c084fc; }

@@ -426,6 +426,24 @@ export default function MoleculeBuilder() {
                 >
                   Send to Input Builder
                 </button>
+                <button
+                  type="button"
+                  className="mb-btn"
+                  onClick={() =>
+                    sendHandoff(
+                      {
+                        v: 1,
+                        kind: 'structure',
+                        from: 'builder',
+                        structure: boxed.structure,
+                        label: `${smiles} in box`,
+                      },
+                      '/dft-studio/',
+                    )
+                  }
+                >
+                  Open in DFT Studio
+                </button>
               </div>
             </>
           ) : (

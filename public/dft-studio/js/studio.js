@@ -194,7 +194,7 @@
   function plotLayout(extra = {}) {
     const fg = cssVar('--text-secondary') || '#4b5563', bg = cssVar('--bg-card') || '#fff', grid = cssVar('--border-subtle') || '#e5e7eb';
     return Object.assign({
-      paper_bgcolor: bg, plot_bgcolor: bg, font: { color: fg, family: 'Inter, sans-serif', size: 11 },
+      paper_bgcolor: bg, plot_bgcolor: bg, font: { color: fg, family: 'IBM Plex Sans, sans-serif', size: 11 },
       margin: { t: 34, r: 14, b: 42, l: 54 },
       xaxis: { gridcolor: grid, zerolinecolor: grid }, yaxis: { gridcolor: grid, zerolinecolor: grid },
       legend: { orientation: 'h', y: -0.2 },
@@ -522,7 +522,7 @@ echo "POTCAR written:"; grep TITEL POTCAR
     return `<div class="sp-file"><div class="sp-file-head"><span class="font-mono-code">${esc(name)}</span><span class="sp-row">${extra}
       <button class="v-btn py-0.5 px-2 text-[10.5px]" data-copy="${esc(name)}">Copy</button>
       <button class="v-btn v-btn-primary py-0.5 px-2 text-[10.5px]" data-dl="${esc(name)}">Download</button></span></div>
-      <textarea class="code-area w-full" rows="12" readonly data-file="${esc(name)}">${esc(text)}</textarea></div>`;
+      <textarea class="code-area w-full" rows="12" readonly data-file="${esc(name)}" aria-label="${esc(name)} file contents">${esc(text)}</textarea></div>`;
   }
   function bindFileButtons(root, getter) {
     root.querySelectorAll('[data-copy]').forEach((b) => { b.onclick = () => copyText(getter(b.dataset.copy), b.dataset.copy); });
@@ -546,7 +546,7 @@ echo "POTCAR written:"; grep TITEL POTCAR
     body.innerHTML = `
       <div class="sp-card">
         <div class="sp-card-title">Pseudopotential library ${helpBtn('Which library?', { meaning: 'PAW_PBE_64 is the current recommended PAW set for PBE (VASP 6.x). Use the LDA sets only with an LDA functional and keep one library for every species.', when: 'Pick PAW_PBE_64 unless your project protocol says otherwise.' })}</div>
-        <select id="pp-func" class="v-input w-full">${funcs.map((f) => `<option value="${f}" ${f === S.potFunc ? 'selected' : ''}>${f} (${Object.keys(idx[f]).length} elements)</option>`).join('')}</select>
+        <select id="pp-func" class="v-input w-full" aria-label="POTCAR functional set">${funcs.map((f) => `<option value="${f}" ${f === S.potFunc ? 'selected' : ''}>${f} (${Object.keys(idx[f]).length} elements)</option>`).join('')}</select>
         <div class="sp-stats">
           <div><span>Species (POSCAR order)</span><b class="font-mono-code">${esc(species.map((s) => s.el).join(' '))}</b></div>
           <div><span>max(ENMAX)</span><b class="font-mono-code">${maxEnmax() ? maxEnmax().toFixed(1) + ' eV' : '-'}</b></div>
@@ -574,8 +574,9 @@ echo "POTCAR written:"; grep TITEL POTCAR
           ${vars.length ? `<div class="pp-grid">${vars.map((v) => {
             const suf = Object.keys(D.SUFFIX_GUIDE).find((k) => k !== 'standard' && v.variant.includes(k)) || 'standard';
             const g = D.SUFFIX_GUIDE[suf];
-            return `<div class="pp-opt ${S.potSel[el] === v.variant ? 'sel' : ''}" data-pe="${esc(el)}" data-pv="${esc(v.variant)}" role="button" tabindex="0">
-              <div class="sp-row" style="justify-content:space-between"><b class="font-mono-code">${esc(v.variant)}</b>${helpBtn(`${v.variant}: ${g.label}`, { meaning: g.meaning, when: g.when, pre: v.header_preview || v.titel })}</div>
+            const on = S.potSel[el] === v.variant;
+            return `<div class="pp-opt ${on ? 'sel' : ''}" data-pe="${esc(el)}" data-pv="${esc(v.variant)}">
+              <div class="sp-row" style="justify-content:space-between"><button type="button" class="pp-pick font-mono-code" aria-pressed="${on}" aria-label="Use ${esc(v.variant)} for ${esc(el)}">${esc(v.variant)}</button>${helpBtn(`${v.variant}: ${g.label}`, { meaning: g.meaning, when: g.when, pre: v.header_preview || v.titel })}</div>
               <div class="text-mut text-[10.5px]">${esc(g.label)}</div>
               <div class="text-mut text-[10.5px] font-mono-code">ZVAL ${v.zval ?? '?'} | ENMAX ${v.enmax ?? '?'} eV</div></div>`;
           }).join('')}</div>` : `<div class="sp-note warn">No ${esc(el)} entry in ${esc(S.potFunc)}.</div>`}
@@ -588,7 +589,6 @@ echo "POTCAR written:"; grep TITEL POTCAR
     body.querySelectorAll('[data-pv]').forEach((c) => {
       const pick = () => { S.potSel[c.dataset.pe] = c.dataset.pv; rerenderBody(); };
       c.onclick = (e) => { if (!e.target.closest('[data-help]')) pick(); };
-      c.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } };
     });
     bindFileButtons(body, () => makePotcarScript());
     const real = $('pp-dl-real');
@@ -642,7 +642,7 @@ echo "POTCAR written:"; grep TITEL POTCAR
 
       <div class="sp-card">
         <div class="sp-card-title">Tags <span class="text-mut font-normal">edit a value; clear it to remove the tag</span></div>
-        <div class="tag-grid">${Object.entries(tags).map(([k, v]) => `<span class="font-mono-code tag-k">${esc(k)}</span><input class="v-input font-mono-code" data-tk="${esc(k)}" value="${esc(v)}"/>${helpBtn(k, D.INCAR_TAGS_HELP[k] || `VASP INCAR tag ${k}. See the VASP wiki.`)}`).join('')}</div>
+        <div class="tag-grid">${Object.entries(tags).map(([k, v]) => `<span class="font-mono-code tag-k">${esc(k)}</span><input class="v-input font-mono-code" data-tk="${esc(k)}" aria-label="INCAR tag ${esc(k)}" value="${esc(v)}"/>${helpBtn(k, D.INCAR_TAGS_HELP[k] || `VASP INCAR tag ${k}. See the VASP wiki.`)}`).join('')}</div>
         <label class="sp-field" style="margin-top:8px"><span>Extra tags (one KEY = value per line)</span><textarea id="in-extra" class="code-area w-full" rows="3" placeholder="KPAR = 4&#10;NCORE = 8">${esc(S.extraTags)}</textarea></label>
       </div>
       ${checkList('incar')}
@@ -828,7 +828,7 @@ ${c.length ? c.map((x) => `- [${x.level}] ${x.msg}`).join('\n') : '- none'}
           <label class="sp-field"><span>Wall time</span><input id="bn-wall" class="v-input font-mono-code" value="${esc(B.walltime)}"/></label>
         </div>
         <label class="sp-inline"><input id="bn-sweep" type="checkbox" ${B.sweep ? 'checked' : ''}/> ENCUT convergence sweep:</label>
-        <input id="bn-sweep-v" class="v-input font-mono-code" value="${esc(B.sweepVals)}" ${B.sweep ? '' : 'disabled'}/>
+        <input id="bn-sweep-v" class="v-input font-mono-code" aria-label="ENCUT values for the sweep (eV)" value="${esc(B.sweepVals)}" ${B.sweep ? '' : 'disabled'}/>
         <label class="sp-inline" style="margin-top:6px"><input id="bn-kconv" type="checkbox" ${B.kconv && kc ? 'checked' : ''} ${kc ? '' : 'disabled'}/> Include kpoint_convergence/ folder ${kc ? '' : '(set up step 5 first)'}</label>
         <label class="sp-inline" style="margin-top:6px"><input id="bn-realpot" type="checkbox" ${B.potMode === 'real' ? 'checked' : ''} ${S.ppLibrary === true ? '' : 'disabled'}/> Include real POTCAR ${S.ppLibrary === true ? '' : '(load the POTCAR library in step 2 first; make_potcar.sh is used until then)'}</label>
         <div class="sp-row" style="margin-top:10px"><button id="bn-zip" class="v-btn v-btn-primary">Download ${esc(B.name)}.zip</button><span id="bn-st" class="text-[11px] text-mut"></span></div>
@@ -994,6 +994,6 @@ ${c.length ? c.map((x) => `- [${x.level}] ${x.msg}`).join('\n') : '- none'}
   }
 
   window.Studio = { getIncar, getKpoints, useBandPath: () => { S.kpt.mode = 'line'; go('kpoints'); }, go, setMesh: (m) => { S.kpt.mode = 'manual'; S.kpt.manual = m.slice(); S.visited.add('kpoints'); } };
-  window.StudioKit = { importPotcarFiles,  S, V, $, esc, helpBtn, filePreview, bindFileButtons, downloadText, downloadBlob, readFileText, plot, plotLayout, getIncar, getKpoints, currentMesh, go, rerenderBody, renderStepbar, stageRenderers, updateWasmPill, copyText, elements };
+  window.StudioKit = { importPotcarFiles, maxEnmax, S, V, $, esc, helpBtn, filePreview, bindFileButtons, downloadText, downloadBlob, readFileText, plot, plotLayout, getIncar, getKpoints, currentMesh, go, rerenderBody, renderStepbar, stageRenderers, updateWasmPill, copyText, elements };
   setTimeout(init, 0);
 })();

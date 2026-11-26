@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { analyzeSeries, type EnergyQuantity } from '../../../lib/vasp/convergence';
 import { X_LABEL, energyView, explain, formatMeV, toCsv } from '../../../lib/vasp/convergenceView';
 import type { SeriesKind } from '../../../lib/vasp/kseries';
@@ -11,6 +11,7 @@ import {
   type SeriesRow,
 } from '../../../lib/vasp/seriesInput';
 import { downloadBlob, useLevel } from '../input-builder/hooks';
+import { takeHandoff } from '../../../lib/handoff';
 import './convergence.css';
 import ConvergencePlot, { H, W } from './ConvergencePlot';
 import { svgToPng, svgToString } from './exportSvg';
@@ -55,6 +56,17 @@ export default function ConvergenceTool() {
     if (r.kind) setKind(r.kind);
     setNotes(r.warnings);
   };
+  // A series handed over by another tool (DFT Studio step 5 sends its kpoint_convergence.csv rows).
+  useEffect(() => {
+    const h = takeHandoff(['series']);
+    if (!h || h.kind !== 'series') return;
+    try {
+      add(ingestCsv(h.csv));
+      setMsg(`Loaded ${h.label ?? 'a series'} from ${h.from === 'dft-studio' ? 'DFT Studio' : h.from}.`);
+    } catch (e) {
+      setNotes([(e as Error).message]);
+    }
+  }, []);
   const onFiles = async (list: FileList | null) => {
     if (!list || list.length === 0) return;
     const files: { name: string; text: string }[] = [];

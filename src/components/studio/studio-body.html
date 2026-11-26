@@ -1,0 +1,1851 @@
+<!-- TOP VESTA-STYLE HEADER / MENU BAR -->
+<header
+  aria-label="DFT Studio toolbar"
+  class="header-bg border-b border-theme h-11 px-2.5 flex items-center justify-between gap-2 shrink-0 z-30"
+>
+  <h1 class="sr-only">DFT Studio</h1>
+  <div class="flex items-center gap-2 min-w-0">
+    <button id="btn-toggle-left" class="v-btn px-1.5 py-1" title="Toggle Left Panel">
+      <i data-lucide="panel-left" class="w-3.5 h-3.5"></i>
+    </button>
+    <a
+      id="site-home"
+      href="/"
+      target="_top"
+      class="site-home v-btn px-1.5 py-1"
+      title="Back to the DFT Handbook"
+      aria-label="DFT Handbook home"
+    >
+      <i data-lucide="house" class="w-3.5 h-3.5"></i>
+    </a>
+    <div class="flex items-center gap-1.5 shrink-0">
+      <div
+        class="w-6 h-6 rounded bg-blue-600 flex items-center justify-center text-white font-bold text-[10px] shadow-sm"
+      >
+        DFT
+      </div>
+      <div class="leading-tight hidden sm:block">
+        <div class="font-bold text-xs tracking-tight text-main">DFT Studio</div>
+        <div class="text-[9.5px] text-mut -mt-0.5">Structure to VASP run to analysis</div>
+      </div>
+    </div>
+
+    <div class="h-5 w-px bg-[var(--border)] mx-1 hidden sm:block"></div>
+
+    <!-- Sample Library Selector -->
+    <div class="flex items-center gap-1.5 min-w-0">
+      <label for="sample-select" class="text-[11px] font-medium text-sub hidden md:inline shrink-0"
+        >Structure:</label
+      >
+      <select
+        id="sample-select"
+        class="v-input max-w-[170px] sm:max-w-[215px] font-medium"
+        aria-label="Structure"
+      >
+        <optgroup label="Studio samples">
+          <option value="nio_afm">NiO (AFM-II Rocksalt)</option>
+          <option value="batio3">BaTiO3 (Tetragonal Perovskite)</option>
+          <option value="fe_bcc">Fe (BCC Ferromagnetic)</option>
+          <option value="mos2_2d">MoS2 (2D Monolayer + Vacuum)</option>
+          <option value="fe2o3">Fe2O3 (Corundum AFM)</option>
+          <option value="si_diamond">Si (Diamond Cubic)</option>
+        </optgroup>
+        <optgroup id="site-templates" label="Handbook templates"></optgroup>
+      </select>
+    </div>
+
+    <!-- Import / Paste -->
+    <input id="file-input" type="file" accept=".vasp,.poscar,.contcar,.cif,.xyz,.txt,*" class="hidden" />
+    <button id="btn-import-file" class="v-btn" title="Open POSCAR, CONTCAR, CIF, or XYZ file">
+      <i data-lucide="folder-open" class="w-3.5 h-3.5 text-blue-500"></i>
+      <span class="hidden sm:inline">Open</span>
+    </button>
+    <button id="btn-library" class="v-btn" title="Browse the 350-structure crystal library">
+      <i data-lucide="library" class="w-3.5 h-3.5 text-blue-500"></i>
+      <span class="hidden md:inline">Library</span>
+    </button>
+    <button id="btn-paste-modal" class="v-btn" title="Paste POSCAR / CIF / XYZ text">
+      <i data-lucide="clipboard-paste" class="w-3.5 h-3.5"></i>
+      <span class="hidden lg:inline">Paste</span>
+    </button>
+  </div>
+
+  <div class="flex items-center gap-1.5 shrink-0">
+    <button id="btn-cmd" class="v-btn" title="Find any VASPKIT function or step (Ctrl+K)">
+      <i data-lucide="search" class="w-3.5 h-3.5"></i>
+      <span class="hidden lg:inline text-mut">Search tools</span>
+      <kbd class="hidden lg:inline text-[9.5px] font-mono-code text-mut border border-theme rounded px-1"
+        >Ctrl K</kbd
+      >
+    </button>
+    <button id="btn-guide" class="v-btn" title="How DFT Studio works">
+      <i data-lucide="circle-help" class="w-3.5 h-3.5"></i>
+    </button>
+    <button id="btn-undo" class="v-btn" title="Undo last structure edit (Ctrl+Z)" aria-label="Undo" disabled>
+      <i data-lucide="undo-2" class="w-3.5 h-3.5"></i>
+      <span class="hidden md:inline">Undo</span>
+    </button>
+    <button id="btn-redo" class="v-btn" title="Redo (Ctrl+Shift+Z)" aria-label="Redo" disabled>
+      <i data-lucide="redo-2" class="w-3.5 h-3.5"></i>
+      <span class="hidden xl:inline">Redo</span>
+    </button>
+    <button
+      id="btn-site-checks"
+      class="v-btn"
+      title="Structure checks B001 to B012 (the site's validity rules)"
+      aria-label="Structure checks"
+    >
+      <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+      <span id="site-checks-count" class="text-[10.5px] font-mono-code">0</span>
+    </button>
+    <div class="relative">
+      <button
+        id="btn-send-site"
+        class="v-btn"
+        title="Send this structure to a site tool"
+        aria-haspopup="menu"
+        aria-expanded="false"
+        aria-controls="send-site-menu"
+      >
+        <i data-lucide="send" class="w-3.5 h-3.5"></i>
+        <span class="hidden lg:inline">Send to</span>
+      </button>
+      <div
+        id="send-site-menu"
+        class="send-site-menu hidden"
+        role="menu"
+        aria-label="Send structure to a site tool"
+      ></div>
+    </div>
+    <button id="btn-export-poscar" class="v-btn v-btn-primary" title="Download VASP POSCAR">
+      <i data-lucide="download" class="w-3.5 h-3.5"></i>
+      <span class="hidden sm:inline">POSCAR</span>
+    </button>
+    <button id="btn-snapshot" class="v-btn" title="Save high-res PNG screenshot">
+      <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+    </button>
+    <button id="btn-theme" class="v-btn" title="Switch Light / Dark VESTA Theme">
+      <i id="theme-icon" data-lucide="moon" class="w-3.5 h-3.5"></i>
+    </button>
+    <button id="btn-toggle-right" class="v-btn v-btn-active px-2" title="Toggle VASP Workbench">
+      <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+      <span class="hidden sm:inline text-[11px]">VASP</span>
+    </button>
+  </div>
+</header>
+
+<!-- WORKFLOW STEP BAR -->
+<nav id="stepbar" aria-label="Workflow steps">
+  <button id="btn-step-prev" class="v-btn px-1.5" title="Previous step" aria-label="Previous step">
+    <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+  </button>
+  <div id="stepbar-steps"></div>
+  <span id="status-formula"></span>
+  <button
+    id="check-pill"
+    class="check-pill"
+    type="button"
+    onclick="window.Studio && window.Studio.go('bundle')"
+    title="Open the pre-flight checks"
+  >
+    Checks
+  </button>
+  <button
+    id="wasm-pill"
+    class="wasm-pill"
+    type="button"
+    title="Load the in-browser Python engine (spglib, SeekPath, phonopy)"
+  >
+    Python: idle
+  </button>
+  <button id="btn-step-next" class="v-btn v-btn-primary whitespace-nowrap">Next</button>
+</nav>
+
+<!-- MAIN WORKSPACE AREA -->
+<div class="flex flex-1 min-h-0 overflow-hidden relative">
+  <!-- LEFT VERTICAL VESTA TOOL STRIP -->
+  <aside
+    id="tool-strip"
+    aria-label="Viewer tools"
+    class="panel-bg border-r border-theme w-[42px] py-2 flex flex-col items-center gap-1 shrink-0 z-30"
+  >
+    <button class="tool-btn active" data-tool="rotate" title="Rotate (Drag 3D View)">
+      <i data-lucide="orbit" class="w-4 h-4"></i>
+    </button>
+    <button class="tool-btn" data-tool="select" title="Select Atom (Click / Shift+Click)">
+      <i data-lucide="mouse-pointer-2" class="w-4 h-4"></i>
+    </button>
+    <button class="tool-btn" data-tool="pan" title="Translate / Pan View">
+      <i data-lucide="move" class="w-4 h-4"></i>
+    </button>
+    <button class="tool-btn" data-tool="zoom" title="Zoom (Drag Up/Down or Wheel)">
+      <i data-lucide="zoom-in" class="w-4 h-4"></i>
+    </button>
+    <div class="w-6 h-px bg-[var(--border)] my-1"></div>
+    <button class="tool-btn" data-tool="distance" title="Measure Bond Distance (Click 2 Atoms)">
+      <i data-lucide="ruler" class="w-4 h-4"></i>
+    </button>
+    <button class="tool-btn" data-tool="angle" title="Measure Bond Angle (Click 3 Atoms)">
+      <i data-lucide="triangle-right" class="w-4 h-4"></i>
+    </button>
+    <button class="tool-btn" data-tool="dihedral" title="Measure Dihedral Angle (Click 4 Atoms)">
+      <i data-lucide="spline" class="w-4 h-4"></i>
+    </button>
+    <div class="w-6 h-px bg-[var(--border)] my-1"></div>
+    <button id="btn-fit-tool" class="tool-btn" title="Fit Structure to Screen">
+      <i data-lucide="maximize-2" class="w-4 h-4"></i>
+    </button>
+    <button id="btn-clear-meas" class="tool-btn" title="Clear Measurements &amp; Selection">
+      <i data-lucide="eraser" class="w-4 h-4"></i>
+    </button>
+  </aside>
+
+  <!-- LEFT DOCKABLE PANEL (VESTA STYLE / BOUNDARY / LATTICE) -->
+  <aside
+    id="left-sidebar"
+    aria-label="Display and lattice options"
+    class="panel-bg border-r border-theme w-[248px] flex flex-col shrink-0 min-h-0"
+  >
+    <div class="flex border-b border-theme header-bg px-1 shrink-0">
+      <button class="tab-btn active flex-1" data-left-tab="style">Style</button>
+      <button class="tab-btn flex-1" data-left-tab="objects">Boundary</button>
+      <button class="tab-btn flex-1" data-left-tab="lattice">Lattice</button>
+    </div>
+
+    <!-- TAB: STYLE -->
+    <div id="left-tab-style" class="p-2.5 overflow-y-auto flex-1 space-y-3">
+      <div>
+        <div class="text-[10.5px] font-semibold uppercase tracking-wider text-mut mb-1.5">Representation</div>
+        <div class="grid grid-cols-2 gap-1" id="style-mode-group">
+          <button class="v-btn v-btn-active text-[11px] py-1.5" data-style-mode="ballstick">
+            Ball &amp; Stick
+          </button>
+          <button class="v-btn text-[11px] py-1.5" data-style-mode="polyhedral">Polyhedral</button>
+          <button class="v-btn text-[11px] py-1.5" data-style-mode="spacefill">Space-Filling</button>
+          <button class="v-btn text-[11px] py-1.5" data-style-mode="stick">Stick</button>
+          <button class="v-btn text-[11px] py-1.5 col-span-2" data-style-mode="wireframe">Wireframe</button>
+        </div>
+      </div>
+
+      <div class="card-bg border border-subtle rounded-md p-2 space-y-2">
+        <div class="text-[10.5px] font-semibold uppercase tracking-wider text-mut">Display Options</div>
+        <label class="flex items-center justify-between cursor-pointer">
+          <span class="text-sub">Show Unit Cell</span>
+          <input id="chk-unitcell" type="checkbox" checked class="accent-blue-600" />
+        </label>
+        <label class="flex items-center justify-between cursor-pointer">
+          <span class="text-sub">Show Magnetic Vectors</span>
+          <input id="chk-vectors" type="checkbox" checked class="accent-blue-600" />
+        </label>
+        <label class="flex items-center justify-between cursor-pointer">
+          <span class="text-sub">Show Atom Labels</span>
+          <input id="chk-labels" type="checkbox" class="accent-blue-600" />
+        </label>
+        <label class="flex items-center justify-between cursor-pointer">
+          <span class="text-sub">Show Polyhedra Edges</span>
+          <input id="chk-poly-edges" type="checkbox" checked class="accent-blue-600" />
+        </label>
+        <label class="flex items-center justify-between cursor-pointer">
+          <span class="text-sub">Orthographic Camera</span>
+          <input id="chk-ortho" type="checkbox" checked class="accent-blue-600" />
+        </label>
+      </div>
+
+      <div class="card-bg border border-subtle rounded-md p-2 space-y-2.5">
+        <div class="text-[10.5px] font-semibold uppercase tracking-wider text-mut">Geometry Scales</div>
+        <div>
+          <div class="flex justify-between text-[11px] mb-0.5">
+            <span class="text-sub">Atom Radius</span
+            ><span id="val-atom-scale" class="font-mono-code text-mut">0.42</span>
+          </div>
+          <input
+            id="rng-atom-scale"
+            aria-label="Atom radius"
+            type="range"
+            min="0.15"
+            max="1.0"
+            step="0.01"
+            value="0.42"
+            class="w-full"
+          />
+        </div>
+        <div>
+          <div class="flex justify-between text-[11px] mb-0.5">
+            <span class="text-sub">Bond Radius</span
+            ><span id="val-bond-rad" class="font-mono-code text-mut">0.10</span>
+          </div>
+          <input
+            id="rng-bond-rad"
+            aria-label="Bond radius"
+            type="range"
+            min="0.03"
+            max="0.24"
+            step="0.01"
+            value="0.10"
+            class="w-full"
+          />
+        </div>
+        <div>
+          <div class="flex justify-between text-[11px] mb-0.5">
+            <span class="text-sub">Bond Cutoff Factor</span
+            ><span id="val-bond-cut" class="font-mono-code text-mut">1.18</span>
+          </div>
+          <input
+            id="rng-bond-cut"
+            aria-label="Bond cutoff factor"
+            type="range"
+            min="0.80"
+            max="1.60"
+            step="0.02"
+            value="1.18"
+            class="w-full"
+          />
+        </div>
+        <div>
+          <div class="flex justify-between text-[11px] mb-0.5">
+            <span class="text-sub">Polyhedra Opacity</span
+            ><span id="val-poly-op" class="font-mono-code text-mut">0.48</span>
+          </div>
+          <input
+            id="rng-poly-op"
+            aria-label="Polyhedra opacity"
+            type="range"
+            min="0.10"
+            max="0.95"
+            step="0.05"
+            value="0.48"
+            class="w-full"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: BOUNDARY & ELEMENTS -->
+    <div id="left-tab-objects" class="p-2.5 overflow-y-auto flex-1 space-y-3 hidden">
+      <div class="card-bg border border-subtle rounded-md p-2 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[10.5px] font-semibold uppercase tracking-wider text-mut">Visual Boundary</span>
+          <button id="btn-reset-boundary" class="text-[10.5px] text-blue-500 hover:underline">Reset</button>
+        </div>
+        <p class="text-[10px] text-mut leading-snug">
+          Extends periodic visual display without modifying the actual VASP cell.
+        </p>
+        <div class="grid grid-cols-3 gap-1.5 text-[10.5px]">
+          <div class="text-center font-semibold text-sub">Axis</div>
+          <div class="text-center text-mut">Min</div>
+          <div class="text-center text-mut">Max</div>
+
+          <div class="flex items-center justify-center font-mono-code font-bold text-red-500">x (a)</div>
+          <input
+            id="bnd-xmin"
+            aria-label="x minimum (a)"
+            type="number"
+            step="0.1"
+            value="-0.05"
+            class="v-input text-center font-mono-code"
+          />
+          <input
+            id="bnd-xmax"
+            aria-label="x maximum (a)"
+            type="number"
+            step="0.1"
+            value="1.05"
+            class="v-input text-center font-mono-code"
+          />
+
+          <div class="flex items-center justify-center font-mono-code font-bold text-green-600">y (b)</div>
+          <input
+            id="bnd-ymin"
+            aria-label="y minimum (b)"
+            type="number"
+            step="0.1"
+            value="-0.05"
+            class="v-input text-center font-mono-code"
+          />
+          <input
+            id="bnd-ymax"
+            aria-label="y maximum (b)"
+            type="number"
+            step="0.1"
+            value="1.05"
+            class="v-input text-center font-mono-code"
+          />
+
+          <div class="flex items-center justify-center font-mono-code font-bold text-blue-500">z (c)</div>
+          <input
+            id="bnd-zmin"
+            aria-label="z minimum (c)"
+            type="number"
+            step="0.1"
+            value="-0.05"
+            class="v-input text-center font-mono-code"
+          />
+          <input
+            id="bnd-zmax"
+            aria-label="z maximum (c)"
+            type="number"
+            step="0.1"
+            value="1.05"
+            class="v-input text-center font-mono-code"
+          />
+        </div>
+        <button id="btn-apply-boundary" class="v-btn v-btn-primary w-full mt-1">Apply Boundary</button>
+      </div>
+
+      <div class="card-bg border border-subtle rounded-md p-2 space-y-1.5">
+        <div class="text-[10.5px] font-semibold uppercase tracking-wider text-mut">
+          Species &amp; Polyhedra
+        </div>
+        <div id="species-list" class="space-y-1.5"></div>
+      </div>
+    </div>
+
+    <!-- TAB: LATTICE & INFO -->
+    <div id="left-tab-lattice" class="p-2.5 overflow-y-auto flex-1 space-y-2.5 hidden">
+      <div class="card-bg border border-subtle rounded-md p-2 space-y-1.5">
+        <div class="text-[10.5px] font-semibold uppercase tracking-wider text-mut">Summary</div>
+        <div class="grid grid-cols-2 gap-y-1 text-[11px]">
+          <span class="text-mut">Formula</span
+          ><span id="info-formula" class="font-mono-code font-semibold text-right">-</span>
+          <span class="text-mut">Atoms</span><span id="info-natoms" class="font-mono-code text-right">-</span>
+          <span class="text-mut">Volume</span><span id="info-vol" class="font-mono-code text-right">-</span>
+          <span class="text-mut">Density</span
+          ><span id="info-density" class="font-mono-code text-right">-</span>
+          <span class="text-mut">Space Group</span
+          ><span id="info-sg" class="font-mono-code text-right text-blue-500 font-semibold">-</span>
+        </div>
+      </div>
+
+      <div class="card-bg border border-subtle rounded-md p-2 space-y-1">
+        <div class="text-[10.5px] font-semibold uppercase tracking-wider text-mut">Cell Parameters</div>
+        <div class="grid grid-cols-2 gap-x-2 gap-y-1 font-mono-code text-[11px]" id="info-cell-params"></div>
+      </div>
+
+      <div class="card-bg border border-subtle rounded-md p-2 space-y-1">
+        <div class="text-[10.5px] font-semibold uppercase tracking-wider text-mut">Direct Lattice A (Å)</div>
+        <pre
+          id="info-direct-mat"
+          class="font-mono-code text-[10px] leading-relaxed text-sub selectable-text overflow-x-auto m-0"
+        ></pre>
+      </div>
+
+      <div class="card-bg border border-subtle rounded-md p-2 space-y-1">
+        <div class="text-[10.5px] font-semibold uppercase tracking-wider text-mut">
+          Reciprocal Lattice B (Å⁻¹)
+        </div>
+        <pre
+          id="info-recip-mat"
+          class="font-mono-code text-[10px] leading-relaxed text-sub selectable-text overflow-x-auto m-0"
+        ></pre>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CENTER 3D VIEWPORT + ORIENTATION BAR + CONSOLE -->
+  <main
+    id="center-main"
+    aria-label="DFT Studio 3D viewer"
+    class="flex-1 flex flex-col min-w-0 min-h-0 relative"
+  >
+    <!-- 3D Canvas Container -->
+    <div
+      id="viewport-wrap"
+      class="flex-1 relative min-h-0 overflow-hidden"
+      style="background: var(--viewport-bg)"
+    >
+      <div id="three-container" class="w-full h-full"></div>
+
+      <!-- Floating HUD Badge (Top-Left of Viewport) -->
+      <div class="absolute top-2.5 left-2.5 pointer-events-none flex flex-wrap items-center gap-1.5">
+        <div
+          id="hud-title"
+          class="px-2.5 py-1 rounded-md text-[11.5px] font-semibold shadow-sm border border-theme backdrop-blur-sm"
+          style="background: color-mix(in srgb, var(--bg-card) 85%, transparent)"
+        >
+          NiO (AFM-II Rocksalt)
+        </div>
+        <div
+          id="hud-tool-hint"
+          class="px-2 py-1 rounded-md text-[10.5px] text-sub border border-subtle backdrop-blur-sm"
+          style="background: color-mix(in srgb, var(--bg-card) 82%, transparent)"
+        >
+          Drag to rotate · Right-drag to pan · Scroll to zoom
+        </div>
+      </div>
+
+      <!-- Floating Labels Overlay (Projected 2D labels) -->
+      <div id="labels-overlay" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+
+      <!-- Corner 3D Axes Gizmo Canvas -->
+      <canvas
+        id="axes-gizmo"
+        width="108"
+        height="108"
+        class="absolute bottom-2.5 left-2.5 pointer-events-none"
+      ></canvas>
+
+      <!-- Floating Selection & Measurement Quick Action Bar -->
+      <div
+        id="selection-hud"
+        class="absolute bottom-3 left-1/2 -translate-x-1/2 hidden items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-theme shadow-xl backdrop-blur-md z-30 max-w-[94%] flex-wrap justify-center"
+        style="background: color-mix(in srgb, var(--bg-card) 92%, transparent)"
+      >
+        <span id="sel-hud-info" class="font-mono-code text-[11px] font-semibold text-main px-1"></span>
+        <span
+          id="sel-hud-dist"
+          class="hidden font-mono-code text-[11px] font-bold text-amber-500 px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-500/30"
+        ></span>
+        <div class="h-4 w-px bg-[var(--border)]"></div>
+        <button
+          id="hud-btn-del"
+          class="v-btn py-0.5 px-2 text-[10.5px] text-red-500"
+          title="Delete selected atom(s) [Del]"
+        >
+          <i data-lucide="trash-2" class="w-3 h-3"></i> Delete
+        </button>
+        <button
+          id="hud-btn-tf"
+          class="v-btn py-0.5 px-2 text-[10.5px]"
+          title="Toggle Selective Dynamics T/F on selected"
+        >
+          T/F
+        </button>
+        <button
+          id="hud-btn-adsorb"
+          class="v-btn v-btn-primary py-0.5 px-2 text-[10.5px]"
+          title="Open Catalyst Adsorbate Placer on selected site"
+        >
+          + Adsorb (*H/*OH)
+        </button>
+        <button id="hud-btn-clear" class="v-btn py-0.5 px-1.5 text-[10.5px]" title="Clear selection">
+          <i data-lucide="x" class="w-3 h-3"></i>
+        </button>
+      </div>
+
+      <!-- Toast Notification -->
+      <div
+        id="toast"
+        class="absolute top-3 right-3 px-3 py-1.5 rounded-md bg-slate-900 text-white text-[11.5px] font-medium shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 z-50"
+      ></div>
+    </div>
+
+    <!-- VESTA ORIENTATION & CAMERA BAR -->
+    <div
+      class="header-bg border-t border-theme px-2.5 py-1.5 flex items-center justify-between gap-2 flex-wrap shrink-0"
+    >
+      <div class="flex items-center gap-1 flex-wrap">
+        <span class="text-[10.5px] font-semibold text-mut mr-0.5">View:</span>
+        <button class="orient-btn text-red-500" data-axis="a" title="Look along +a">a</button>
+        <button class="orient-btn text-green-600" data-axis="b" title="Look along +b">b</button>
+        <button class="orient-btn text-blue-500" data-axis="c" title="Look along +c">c</button>
+        <button class="orient-btn" data-axis="a*" title="Look along reciprocal a*">a*</button>
+        <button class="orient-btn" data-axis="b*" title="Look along reciprocal b*">b*</button>
+        <button class="orient-btn" data-axis="c*" title="Look along reciprocal c*">c*</button>
+        <button class="orient-btn" data-axis="iso" title="Standard Isometric View">Std</button>
+        <div class="h-4 w-px bg-[var(--border)] mx-1"></div>
+        <select
+          id="step-angle"
+          class="v-input py-0.5 px-1 text-[10.5px] font-mono-code"
+          title="Rotation step angle"
+          aria-label="Rotation step angle"
+        >
+          <option value="15">15°</option>
+          <option value="45">45°</option>
+          <option value="90" selected>90°</option>
+        </select>
+        <button class="orient-btn" data-rot="left" title="Rotate Left">←</button>
+        <button class="orient-btn" data-rot="right" title="Rotate Right">→</button>
+        <button class="orient-btn" data-rot="up" title="Rotate Up">↑</button>
+        <button class="orient-btn" data-rot="down" title="Rotate Down">↓</button>
+        <button class="orient-btn" data-rot="ccw" title="Roll CCW">↺</button>
+        <button class="orient-btn" data-rot="cw" title="Roll CW">↻</button>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <span id="selection-badge" class="text-[10.5px] font-mono-code text-mut">0 selected</span>
+        <button id="btn-toggle-console" class="orient-btn text-[10.5px] px-2" title="Toggle Output Console">
+          Console
+        </button>
+      </div>
+    </div>
+
+    <!-- VESTA-STYLE OUTPUT CONSOLE -->
+    <div
+      id="console-panel"
+      class="border-t border-theme h-[92px] flex flex-col shrink-0"
+      style="background: var(--console-bg)"
+    >
+      <div
+        class="flex items-center justify-between px-2.5 py-0.5 border-b border-subtle text-[10px] font-semibold uppercase tracking-wider text-mut"
+      >
+        <span>Output Console (Measurements, Symmetry &amp; Coordinates)</span>
+        <button id="btn-clear-console" class="hover:text-main cursor-pointer">Clear</button>
+      </div>
+      <div
+        id="console-log"
+        class="flex-1 overflow-y-auto px-2.5 py-1 font-mono-code text-[10.5px] leading-snug space-y-0.5 selectable-text"
+      ></div>
+    </div>
+  </main>
+
+  <!-- RIGHT DOCKABLE PANEL: VASP WORKFLOW WORKBENCH -->
+  <aside
+    id="right-workbench"
+    aria-label="Structure workbench"
+    class="panel-bg border-l border-theme w-[328px] flex flex-col shrink-0 min-h-0"
+  >
+    <div class="flex border-b border-theme header-bg px-1 shrink-0 overflow-x-auto">
+      <button class="tab-btn active flex-1" data-right-tab="supercell">Cell</button>
+      <button class="tab-btn flex-1" data-right-tab="catalyst">Catalyst</button>
+      <button class="tab-btn flex-1" data-right-tab="symmetry">Symmetry</button>
+      <button class="tab-btn flex-1" data-right-tab="magnetic">Magnetic</button>
+      <button class="tab-btn flex-1" data-right-tab="atoms">Atoms</button>
+      <button class="tab-btn flex-1" data-right-tab="vasp">VASP</button>
+      <button class="tab-btn flex-1" data-right-tab="checks">Checks</button>
+    </div>
+
+    <!-- RIGHT TAB 7: SITE CHECKS AND CLEAN-UP (the Material Builder's validity rules, D-100) -->
+    <div id="right-tab-checks" class="p-2.5 overflow-y-auto flex-1 space-y-3 hidden">
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-main">Structure checks (B001 to B012)</span>
+          <span id="checks-summary" class="text-[10.5px] font-mono-code text-sub"></span>
+        </div>
+        <p class="text-[10.5px] text-sub leading-snug m-0">
+          The same sourced rules as the handbook: close contacts, charge balance, coordination, density,
+          vacuum and symmetry. Errors block POSCAR export unless you give a reason, which is written into the
+          file.
+        </p>
+        <ul id="checks-list" class="checks-list" aria-live="polite"></ul>
+      </div>
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
+        <span class="text-[11px] font-bold text-main block">Clean-up</span>
+        <div class="grid grid-cols-1 gap-1.5">
+          <button id="op-wrap" class="v-btn justify-start" type="button">Wrap atoms into the cell</button>
+          <button id="op-merge" class="v-btn justify-start" type="button">Merge duplicate atoms</button>
+          <button id="op-relax" class="v-btn justify-start" type="button">
+            Gentle relax (geometric clean-up) <span class="heur-badge">Heuristic</span>
+          </button>
+        </div>
+        <p class="text-[10.5px] text-sub leading-snug m-0">
+          Gentle relax only pushes apart atoms that are too close (below 0.75 of the covalent-radius sum). It
+          is not a DFT relaxation; run ISIF = 2 or 3 in VASP for that.
+        </p>
+        <p id="ops-status" class="text-[10.5px] text-sub m-0" role="status"></p>
+      </div>
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-1.5">
+        <span class="text-[11px] font-bold text-main block">Add an atom from the periodic table</span>
+        <div
+          id="pt-grid"
+          class="pt-grid"
+          role="group"
+          aria-label="Periodic table: choose the element for new atoms"
+        ></div>
+        <p class="text-[10.5px] text-sub m-0">
+          Picked: <b id="pt-picked" class="font-mono-code">Na</b>. It fills the element boxes in the Atoms
+          tab.
+        </p>
+      </div>
+    </div>
+
+    <!-- RIGHT TAB 1: SUPERCELL, TRANSFORM & SLAB -->
+    <div id="right-tab-supercell" class="p-2.5 overflow-y-auto flex-1 space-y-3">
+      <!-- Diagonal Supercell -->
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-main">Diagonal Supercell</span>
+          <span id="sc-preview-count" class="text-[10.5px] font-mono-code text-blue-500">×1</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="text-[10px] text-mut block mb-0.5">Na (a)</label>
+            <input
+              id="sc-na"
+              aria-label="Supercell repeats along a"
+              type="number"
+              min="1"
+              max="6"
+              value="2"
+              class="v-input w-full text-center font-mono-code"
+            />
+          </div>
+          <div>
+            <label class="text-[10px] text-mut block mb-0.5">Nb (b)</label>
+            <input
+              id="sc-nb"
+              aria-label="Supercell repeats along b"
+              type="number"
+              min="1"
+              max="6"
+              value="2"
+              class="v-input w-full text-center font-mono-code"
+            />
+          </div>
+          <div>
+            <label class="text-[10px] text-mut block mb-0.5">Nc (c)</label>
+            <input
+              id="sc-nc"
+              aria-label="Supercell repeats along c"
+              type="number"
+              min="1"
+              max="6"
+              value="1"
+              class="v-input w-full text-center font-mono-code"
+            />
+          </div>
+        </div>
+        <button id="btn-apply-supercell" class="v-btn v-btn-primary w-full">
+          Build Supercell (Apply to Cell)
+        </button>
+      </div>
+
+      <!-- General 3x3 Transformation Matrix P -->
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-main">Transformation Matrix P</span>
+          <span id="p-det-badge" class="text-[10.5px] font-mono-code text-mut">det(P) = 1</span>
+        </div>
+        <div class="flex gap-1 flex-wrap">
+          <button class="v-btn text-[10px] py-0.5 px-1.5" data-p-preset="identity">Identity</button>
+          <button class="v-btn text-[10px] py-0.5 px-1.5" data-p-preset="sqrt2">√2×√2×1</button>
+          <button class="v-btn text-[10px] py-0.5 px-1.5" data-p-preset="fcc2prim">Conv→Prim (F)</button>
+          <button class="v-btn text-[10px] py-0.5 px-1.5" data-p-preset="hex2ortho">Hex→Ortho</button>
+        </div>
+        <div class="grid grid-cols-3 gap-1.5 font-mono-code">
+          <input
+            id="p00"
+            aria-label="Transformation matrix P row 1 column 1"
+            type="number"
+            step="0.5"
+            value="1"
+            class="v-input text-center"
+          />
+          <input
+            id="p01"
+            aria-label="Transformation matrix P row 1 column 2"
+            type="number"
+            step="0.5"
+            value="0"
+            class="v-input text-center"
+          />
+          <input
+            id="p02"
+            aria-label="Transformation matrix P row 1 column 3"
+            type="number"
+            step="0.5"
+            value="0"
+            class="v-input text-center"
+          />
+          <input
+            id="p10"
+            aria-label="Transformation matrix P row 2 column 1"
+            type="number"
+            step="0.5"
+            value="0"
+            class="v-input text-center"
+          />
+          <input
+            id="p11"
+            aria-label="Transformation matrix P row 2 column 2"
+            type="number"
+            step="0.5"
+            value="1"
+            class="v-input text-center"
+          />
+          <input
+            id="p12"
+            aria-label="Transformation matrix P row 2 column 3"
+            type="number"
+            step="0.5"
+            value="0"
+            class="v-input text-center"
+          />
+          <input
+            id="p20"
+            aria-label="Transformation matrix P row 3 column 1"
+            type="number"
+            step="0.5"
+            value="0"
+            class="v-input text-center"
+          />
+          <input
+            id="p21"
+            aria-label="Transformation matrix P row 3 column 2"
+            type="number"
+            step="0.5"
+            value="0"
+            class="v-input text-center"
+          />
+          <input
+            id="p22"
+            aria-label="Transformation matrix P row 3 column 3"
+            type="number"
+            step="0.5"
+            value="1"
+            class="v-input text-center"
+          />
+        </div>
+        <button id="btn-apply-matrix" class="v-btn w-full">Apply Matrix Transformation (A' = P·A)</button>
+      </div>
+
+      <!-- Slab / Vacuum & Origin Shift -->
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
+        <div class="text-[11px] font-bold text-main">Vacuum, Slab &amp; Selective Dynamics</div>
+        <div class="grid grid-cols-3 gap-1.5 items-end">
+          <div>
+            <label class="text-[10px] text-mut block mb-0.5">Axis</label>
+            <select id="vac-axis" aria-label="Vacuum axis" class="v-input w-full">
+              <option value="2" selected>c (z)</option>
+              <option value="1">b (y)</option>
+              <option value="0">a (x)</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] text-mut block mb-0.5">Add Vac (Å)</label>
+            <input
+              id="vac-amount"
+              type="number"
+              step="1"
+              value="15"
+              min="1"
+              max="50"
+              class="v-input w-full font-mono-code"
+            />
+          </div>
+          <button id="btn-add-vacuum" class="v-btn v-btn-primary h-[26px]">Add Vac</button>
+        </div>
+        <div class="flex gap-1.5">
+          <button id="btn-center-c" class="v-btn flex-1 text-[11px]">Center Along c</button>
+          <button id="btn-wrap-atoms" class="v-btn flex-1 text-[11px]">Wrap [0, 1)</button>
+        </div>
+        <div class="border-t border-subtle pt-2 space-y-1.5">
+          <label class="flex items-center justify-between cursor-pointer">
+            <span class="text-[11px] font-medium text-sub">Enable Selective Dynamics (POSCAR)</span>
+            <input id="chk-seldyn" type="checkbox" class="accent-blue-600" />
+          </label>
+          <div class="flex items-center gap-1.5">
+            <span class="text-[10.5px] text-mut shrink-0">Fix z ≤</span>
+            <input
+              id="seldyn-zcut"
+              type="number"
+              step="0.05"
+              min="0"
+              max="1"
+              value="0.35"
+              class="v-input w-16 font-mono-code text-center"
+            />
+            <button id="btn-apply-seldyn-z" class="v-btn flex-1 text-[10.5px]">Set F F F Below</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT TAB 1B: CATALYSIS, SLAB, OER/HER ADSORBATES & HETEROSTRUCTURES -->
+    <div id="right-tab-catalyst" class="p-2.5 overflow-y-auto flex-1 space-y-2.5 hidden">
+      <!-- 1. Surface Slab Cleave & Vacuum Builder -->
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-main">1. Surface Slab Builder</span>
+          <span class="text-[9.5px] text-mut">Auto-Vacuum + Fix Bottom</span>
+        </div>
+        <div class="grid grid-cols-3 gap-1.5">
+          <div>
+            <label class="text-[9.5px] text-mut block">Facet (hkl)</label>
+            <select id="cat-facet" class="v-input w-full font-mono-code text-[10.5px]">
+              <option value="001" selected>(001)</option>
+              <option value="010">(010)</option>
+              <option value="100">(100)</option>
+              <option value="110">(110)</option>
+              <option value="111">(111)</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[9.5px] text-mut block">Layers (c)</label>
+            <input
+              id="cat-layers"
+              type="number"
+              min="1"
+              max="4"
+              value="2"
+              class="v-input w-full text-center font-mono-code"
+            />
+          </div>
+          <div>
+            <label class="text-[9.5px] text-mut block">Vacuum (Å)</label>
+            <input
+              id="cat-vac"
+              type="number"
+              min="8"
+              max="35"
+              step="1"
+              value="15"
+              class="v-input w-full text-center font-mono-code"
+            />
+          </div>
+        </div>
+        <label class="flex items-center justify-between cursor-pointer text-[10.5px] text-sub">
+          <span>Auto-fix bottom 50% layers (Selective Dynamics F F F)</span>
+          <input id="cat-fix-bottom" type="checkbox" checked class="accent-blue-600" />
+        </label>
+        <button id="btn-build-slab" class="v-btn v-btn-primary w-full">Build Catalyst Slab</button>
+      </div>
+
+      <!-- 2. OER / HER / CO2RR Adsorbate Placer -->
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-main">2. HER / OER Adsorbate Placer</span>
+          <span id="cat-site-badge" class="text-[9.5px] font-mono-code text-blue-500">Auto top-z</span>
+        </div>
+        <p class="text-[10px] text-mut leading-snug">
+          Click 1 atom (Top), 2 atoms (Bridge), or 3 atoms (Hollow) in 3D, or leave empty to target highest-z
+          metal site.
+        </p>
+        <div class="grid grid-cols-2 gap-1.5">
+          <div>
+            <label class="text-[9.5px] text-mut block">Height h (Å)</label>
+            <input
+              id="cat-ads-h"
+              type="number"
+              step="0.05"
+              min="1.0"
+              max="4.0"
+              value="1.85"
+              class="v-input w-full font-mono-code text-center"
+            />
+          </div>
+          <div>
+            <label class="text-[9.5px] text-mut block">Azimuth (°)</label>
+            <input
+              id="cat-ads-az"
+              type="number"
+              step="15"
+              min="0"
+              max="360"
+              value="45"
+              class="v-input w-full font-mono-code text-center"
+            />
+          </div>
+        </div>
+        <div>
+          <div class="text-[9.5px] font-semibold uppercase text-mut mb-1">
+            HER &amp; 4e⁻ OER Intermediates
+          </div>
+          <div class="grid grid-cols-4 gap-1">
+            <button
+              class="v-btn text-[10.5px] py-1 font-mono-code font-bold"
+              data-adsorbate="H"
+              title="HER intermediate (*H)"
+            >
+              *H
+            </button>
+            <button
+              class="v-btn text-[10.5px] py-1 font-mono-code font-bold text-rose-500"
+              data-adsorbate="O"
+              title="OER oxo (*O)"
+            >
+              *O
+            </button>
+            <button
+              class="v-btn text-[10.5px] py-1 font-mono-code font-bold text-blue-500"
+              data-adsorbate="OH"
+              title="OER hydroxyl (*OH)"
+            >
+              *OH
+            </button>
+            <button
+              class="v-btn text-[10.5px] py-1 font-mono-code font-bold text-purple-500"
+              data-adsorbate="OOH"
+              title="OER hydroperoxo (*OOH)"
+            >
+              *OOH
+            </button>
+          </div>
+        </div>
+        <div>
+          <div class="text-[9.5px] font-semibold uppercase text-mut mb-1">CO₂RR / NRR / Solvent</div>
+          <div class="grid grid-cols-3 gap-1">
+            <button class="v-btn text-[10.5px] py-1 font-mono-code" data-adsorbate="CO">*CO</button>
+            <button class="v-btn text-[10.5px] py-1 font-mono-code" data-adsorbate="H2O">*H₂O</button>
+            <button class="v-btn text-[10.5px] py-1 font-mono-code" data-adsorbate="N2">*N₂</button>
+          </div>
+        </div>
+        <div
+          class="rounded border border-subtle p-1.5 text-[9.5px] font-mono-code text-sub leading-snug"
+          style="background: var(--console-bg)"
+        >
+          <div><b>OER:</b> * → *OH → *O → *OOH → O₂ (η = max ΔGᵢ/e − 1.23 V)</div>
+          <div><b>HER:</b> * + H⁺ + e⁻ → *H (ΔG<sub>*H</sub> ≈ ΔE<sub>*H</sub> + 0.24 eV)</div>
+          <div class="text-mut mt-0.5">
+            VASP Slab INCAR: <span class="text-main">IDIPOL=3, LDIPOL=.TRUE., IVDW=11</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Heterostructure / Interface Stacker -->
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-main">3. Heterostructure Stacker</span>
+          <span
+            id="het-mismatch-badge"
+            class="text-[9.5px] font-mono-code text-emerald-600 dark:text-emerald-400"
+          ></span>
+        </div>
+        <div>
+          <label class="text-[9.5px] text-mut block mb-0.5"
+            >Top Overlayer (stacked onto current cell along c)</label
+          >
+          <select id="het-top-layer" class="v-input w-full text-[10.5px]">
+            <option value="graphene">Graphene (2D C honeycomb)</option>
+            <option value="mos2">MoS₂ Monolayer (2H)</option>
+            <option value="nio_layer">NiO (001) Monolayer</option>
+            <option value="pt111">Pt (111) Catalyst Layer</option>
+            <option value="custom">Paste Custom POSCAR Overlayer...</option>
+          </select>
+        </div>
+        <textarea
+          id="het-custom-poscar"
+          rows="4"
+          placeholder="Paste 2nd POSCAR here for custom heterostructure..."
+          class="code-area w-full hidden"
+        ></textarea>
+        <div class="grid grid-cols-2 gap-1.5">
+          <div>
+            <label class="text-[9.5px] text-mut block">Interlayer d (Å)</label>
+            <input
+              id="het-dint"
+              type="number"
+              step="0.1"
+              min="1.5"
+              max="6.0"
+              value="3.0"
+              class="v-input w-full font-mono-code text-center"
+            />
+          </div>
+          <div>
+            <label class="text-[9.5px] text-mut block">Top Vacuum (Å)</label>
+            <input
+              id="het-vac"
+              type="number"
+              step="1"
+              min="8"
+              max="30"
+              value="15"
+              class="v-input w-full font-mono-code text-center"
+            />
+          </div>
+        </div>
+        <button id="btn-build-hetero" class="v-btn v-btn-primary w-full">
+          Stack Heterostructure Interface
+        </button>
+      </div>
+    </div>
+
+    <!-- RIGHT TAB 2: SYMMETRY & CONTCAR STRUCTURAL ANALYSIS -->
+    <div id="right-tab-symmetry" class="p-2.5 overflow-y-auto flex-1 space-y-2.5 hidden">
+      <!-- Space Group & Symmetry Card -->
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
+        <div class="flex items-center justify-between gap-2">
+          <div>
+            <div class="text-[11px] font-bold text-main">Space Group &amp; CONTCAR Analysis</div>
+            <div class="text-[10px] text-mut">IT #1–230, Wyckoff, ECoN, Bonds &amp; XRD</div>
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="text-[10px] text-mut">tol</span>
+            <input
+              id="sym-tol"
+              aria-label="Symmetry tolerance"
+              type="number"
+              step="0.0005"
+              min="0.0001"
+              max="0.5"
+              value="0.001"
+              class="v-input w-16 font-mono-code text-center"
+            />
+          </div>
+        </div>
+        <div class="flex gap-1.5">
+          <button id="btn-run-symmetry" class="v-btn v-btn-primary flex-1">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Analyze
+          </button>
+          <button
+            id="btn-open-report"
+            class="v-btn flex-1"
+            title="Open Full Relaxed CONTCAR Structural Report"
+          >
+            <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 text-blue-500"></i> Full Report
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-y-1 text-[11px] pt-1 border-t border-subtle">
+          <span class="text-mut">Space Group (IT)</span
+          ><span id="sym-sg" class="font-mono-code font-bold text-right text-blue-500">-</span>
+          <span class="text-mut">Crystal System</span
+          ><span id="sym-system" class="font-semibold text-right">-</span>
+          <span class="text-mut">Bravais / Point Grp</span
+          ><span id="sym-pg" class="font-mono-code font-semibold text-right">-</span>
+          <span class="text-mut">Symmetry Ops</span
+          ><span id="sym-nops" class="font-mono-code text-right">-</span>
+          <span class="text-mut">Inversion Center</span
+          ><span id="sym-inv" class="font-mono-code text-right">-</span>
+          <span class="text-mut">Vol/atom · c/a</span
+          ><span id="sym-bulk-meta" class="font-mono-code text-right">-</span>
+        </div>
+        <span id="sym-centering" class="hidden">-</span>
+        <!-- Multi-Tolerance Symmetry Breaking Detector (spglib / pymatgen style) -->
+        <div
+          id="sym-breaking-box"
+          class="hidden rounded border border-amber-500/50 bg-amber-500/10 p-1.5 text-[10px] leading-snug space-y-0.5"
+        >
+          <div class="font-bold text-amber-600 dark:text-amber-400">
+            Symmetry Breaking Detected (symprec scan)
+          </div>
+          <div id="sym-breaking-text" class="font-mono-code text-main"></div>
+        </div>
+        <div class="pt-1 border-t border-subtle">
+          <div class="text-[9.5px] text-mut mb-1">symprec Tolerance Scan (click to switch):</div>
+          <div id="sym-tol-ladder" class="grid grid-cols-3 gap-1 font-mono-code text-[9.5px]"></div>
+        </div>
+      </div>
+
+      <!-- Wyckoff Positions & Coordinates -->
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-1.5">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-main">Wyckoff Coordinates</span>
+          <span id="sym-orbit-count" class="text-[10px] font-mono-code text-mut">0 sites</span>
+        </div>
+        <div id="sym-orbits-list" class="space-y-1 max-h-36 overflow-y-auto text-[10px]"></div>
+      </div>
+
+      <!-- Effective Coordination Number (ECoN) & Local Distortion -->
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-1.5">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-main">Fractional CN (Hoppe ECoN) &amp; Bonds</span>
+          <span class="text-[9.5px] text-mut">per Wyckoff site</span>
+        </div>
+        <div id="econ-list" class="space-y-1 max-h-40 overflow-y-auto text-[10px] font-mono-code"></div>
+      </div>
+
+      <!-- Pairwise NN Bond Distances -->
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-1.5">
+        <div class="text-[11px] font-bold text-main">Nearest-Neighbor Pair Distances (PBC)</div>
+        <div
+          id="nn-pairs-list"
+          class="space-y-0.5 max-h-28 overflow-y-auto text-[10px] font-mono-code text-sub"
+        ></div>
+      </div>
+
+      <!-- High-Symmetry k-Path -->
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-1.5">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-main">Recommended Band k-Path</span>
+          <button id="btn-send-kpath" class="text-[10.5px] text-blue-500 font-semibold hover:underline">
+            Use in KPOINTS →
+          </button>
+        </div>
+        <div id="sym-kpath-str" class="font-mono-code text-[10.5px] font-semibold text-blue-500"></div>
+        <div
+          id="sym-kpoints-table"
+          class="font-mono-code text-[10px] text-sub space-y-0.5 max-h-24 overflow-y-auto"
+        ></div>
+      </div>
+    </div>
+
+    <!-- RIGHT TAB 3: MAGNETIC MOMENTS & VECTORS -->
+    <div id="right-tab-magnetic" class="p-2.5 overflow-y-auto flex-1 space-y-2.5 hidden">
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-main">VASP Magnetism Mode</span>
+          <div class="flex rounded overflow-hidden border border-theme">
+            <button
+              id="btn-mag-col"
+              class="px-2 py-0.5 text-[10.5px] font-semibold bg-blue-600 text-white cursor-pointer"
+            >
+              Collinear
+            </button>
+            <button id="btn-mag-ncol" class="px-2 py-0.5 text-[10.5px] font-semibold text-sub cursor-pointer">
+              Non-Collinear
+            </button>
+          </div>
+        </div>
+
+        <!-- Automatic Bond-Graph Magnetic Order Presets -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-semibold uppercase text-mut">Auto AFM / FM Presets (NN Graph)</span>
+            <button
+              id="btn-afm-theory"
+              class="text-[10px] font-semibold text-blue-500 hover:underline flex items-center gap-0.5 cursor-pointer"
+              title="Wollan–Koehler &amp; Goodenough–Kanamori Theory"
+            >
+              <i data-lucide="book-open" class="w-3 h-3"></i> Theory
+            </button>
+          </div>
+          <div class="grid grid-cols-3 gap-1 items-center">
+            <select
+              id="mag-sublattice"
+              class="v-input col-span-2 text-[10.5px]"
+              title="Choose which magnetic sublattice to order"
+            >
+              <option value="auto3d">Auto (3d metals)</option>
+              <option value="auto3d4f">3d + 4f metals</option>
+            </select>
+            <div class="flex items-center gap-0.5">
+              <input
+                id="mag-preset-val"
+                type="number"
+                step="0.5"
+                min="0.5"
+                max="10"
+                value="3.0"
+                class="v-input w-full text-center font-mono-code text-[10.5px]"
+                title="Moment magnitude (μB)"
+              />
+              <span class="text-[9.5px] text-mut">μB</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-1">
+            <button
+              class="v-btn text-[10.5px] py-1"
+              data-mag-preset="fm"
+              title="All magnetic neighbors parallel"
+            >
+              FM (Parallel)
+            </button>
+            <button
+              class="v-btn text-[10.5px] py-1"
+              data-mag-preset="afm-a"
+              title="FM in-plane (ab), AFM between layers (c)"
+            >
+              AFM-A (Layered)
+            </button>
+            <button
+              class="v-btn text-[10.5px] py-1"
+              data-mag-preset="afm-c"
+              title="AFM in-plane (ab), FM along columns (c)"
+            >
+              AFM-C (Chain/Col)
+            </button>
+            <button
+              class="v-btn text-[10.5px] py-1"
+              data-mag-preset="afm-g"
+              title="3D nearest-neighbor checkerboard AFM"
+            >
+              AFM-G (3D Néel)
+            </button>
+            <button
+              class="v-btn text-[10.5px] py-1"
+              data-mag-preset="afm-ii"
+              title="FM {111} planes, AFM along [111] (Rocksalt 2nd-NN)"
+            >
+              AFM-II (Rocksalt)
+            </button>
+            <button
+              class="v-btn text-[10.5px] py-1"
+              data-mag-preset="spiral"
+              title="120° non-collinear in-plane spin texture"
+            >
+              120° Non-Collinear
+            </button>
+            <button class="v-btn text-[10.5px] py-1 col-span-2 text-red-500" data-mag-preset="clear">
+              Zero All Moments
+            </button>
+          </div>
+          <!-- Auto NN Graph Diagnostics & Supercell Suggestion -->
+          <div
+            id="afm-diagnostics"
+            class="rounded border border-subtle p-1.5 text-[10px] leading-snug space-y-1"
+            style="background: var(--console-bg)"
+          >
+            <div class="flex items-center justify-between">
+              <span class="font-semibold text-main" id="afm-diag-title">NN Spin-Coupling Analysis</span>
+              <span class="font-mono-code text-mut" id="afm-diag-dnn">d_NN: -</span>
+            </div>
+            <div id="afm-diag-body" class="text-sub font-mono-code">
+              Click any FM/AFM preset to auto-solve from PBC bond distances.
+            </div>
+            <button id="btn-afm-auto-sc" class="v-btn v-btn-primary w-full py-0.5 text-[10px] hidden">
+              Auto-Expand Supercell &amp; Apply
+            </button>
+          </div>
+        </div>
+
+        <!-- Assign to Species or Selected -->
+        <div class="border-t border-subtle pt-2 space-y-1.5">
+          <div class="text-[10px] font-semibold uppercase text-mut">Assign Vector (μB)</div>
+          <div class="flex gap-1.5">
+            <select id="mag-target" class="v-input flex-1 text-[11px]">
+              <option value="selected">Selected Atoms</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-3 gap-1.5 font-mono-code">
+            <div>
+              <label class="text-[9.5px] text-mut block">mx</label>
+              <input id="mag-mx" type="number" step="0.5" value="0" class="v-input w-full text-center" />
+            </div>
+            <div>
+              <label class="text-[9.5px] text-mut block">my</label>
+              <input id="mag-my" type="number" step="0.5" value="0" class="v-input w-full text-center" />
+            </div>
+            <div>
+              <label class="text-[9.5px] text-mut block">mz</label>
+              <input id="mag-mz" type="number" step="0.5" value="3.0" class="v-input w-full text-center" />
+            </div>
+          </div>
+          <button id="btn-assign-mag" class="v-btn v-btn-primary w-full">Set Magnetic Moment</button>
+        </div>
+      </div>
+
+      <!-- 3D Vector Appearance -->
+      <div class="card-bg border border-subtle rounded-md p-2 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] font-semibold uppercase text-mut">3D Vector Style</span>
+          <div class="flex items-center gap-2">
+            <label class="flex items-center gap-1 text-[10px] text-sub"
+              >Up
+              <input
+                id="col-mag-up"
+                type="color"
+                value="#e11d48"
+                class="w-4 h-4 border-0 bg-transparent cursor-pointer"
+            /></label>
+            <label class="flex items-center gap-1 text-[10px] text-sub"
+              >Dn
+              <input
+                id="col-mag-dn"
+                type="color"
+                value="#0284c7"
+                class="w-4 h-4 border-0 bg-transparent cursor-pointer"
+            /></label>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 items-center">
+          <div>
+            <div class="flex justify-between text-[10px]">
+              <span class="text-sub">Length Scale</span
+              ><span id="val-vec-scale" class="font-mono-code text-mut">0.95</span>
+            </div>
+            <input
+              id="rng-vec-scale"
+              aria-label="Magnetic vector length scale"
+              type="range"
+              min="0.25"
+              max="2.0"
+              step="0.05"
+              value="0.95"
+              class="w-full"
+            />
+          </div>
+          <div>
+            <div class="flex justify-between text-[10px]">
+              <span class="text-sub">Visual Tilt</span
+              ><span id="val-vec-tilt" class="font-mono-code text-blue-500 font-semibold">45°</span>
+            </div>
+            <input
+              id="rng-vec-tilt"
+              aria-label="Magnetic vector visual tilt"
+              type="range"
+              min="0"
+              max="60"
+              step="5"
+              value="45"
+              class="w-full"
+            />
+          </div>
+        </div>
+        <div class="text-[9.5px] text-mut leading-tight">
+          45° visual tilt keeps collinear arrows clear of vertical [001] bonds while preserving exact VASP
+          MAGMOM values.
+        </div>
+      </div>
+
+      <!-- Atom Spin Quick Flip List -->
+      <div class="card-bg border border-subtle rounded-md p-2 space-y-1">
+        <div class="flex justify-between items-center">
+          <span class="text-[10px] font-semibold uppercase text-mut">Atom Spins (Click ± to Flip)</span>
+          <span id="mag-total-net" class="font-mono-code text-[10px] text-blue-500">Net: 0.0 μB</span>
+        </div>
+        <div
+          id="mag-atom-list"
+          class="max-h-32 overflow-y-auto space-y-0.5 text-[10.5px] font-mono-code"
+        ></div>
+      </div>
+
+      <!-- Generated MAGMOM Tag -->
+      <div class="card-bg border border-subtle rounded-md p-2 space-y-1">
+        <div class="flex items-center justify-between">
+          <span class="text-[10.5px] font-bold text-main">VASP INCAR MAGMOM</span>
+          <button id="btn-copy-magmom" class="v-btn py-0.5 px-2 text-[10px]">
+            <i data-lucide="copy" class="w-3 h-3"></i> Copy
+          </button>
+        </div>
+        <textarea
+          id="magmom-output"
+          aria-label="MAGMOM line for INCAR"
+          rows="2"
+          readonly
+          class="code-area w-full"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- RIGHT TAB 4: ATOMS & DEFECT EDITOR -->
+    <div id="right-tab-atoms" class="p-2.5 overflow-y-auto flex-1 space-y-2.5 hidden">
+      <!-- Edit Selected -->
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-main">Defect / Substitution Editor</span>
+          <button id="btn-sort-species" class="text-[10.5px] text-blue-500 hover:underline">
+            Sort by Species
+          </button>
+        </div>
+        <div class="flex gap-1.5">
+          <input
+            id="edit-el-input"
+            type="text"
+            placeholder="Element (e.g. Co)"
+            class="v-input flex-1 font-mono-code"
+          />
+          <button id="btn-substitute" class="v-btn v-btn-primary">Substitute</button>
+          <button id="btn-delete-selected" class="v-btn text-red-500" title="Delete Selected (Vacancy)">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Add Interstitial Atom -->
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-1.5">
+        <div class="text-[11px] font-bold text-main">Add Atom / Interstitial (Fractional)</div>
+        <div class="grid grid-cols-4 gap-1 font-mono-code">
+          <input
+            id="add-el"
+            aria-label="Element of the new atom"
+            type="text"
+            value="Li"
+            placeholder="El"
+            class="v-input text-center"
+          />
+          <input
+            id="add-fx"
+            aria-label="New atom fractional x"
+            type="number"
+            step="0.05"
+            value="0.25"
+            class="v-input text-center"
+          />
+          <input
+            id="add-fy"
+            aria-label="New atom fractional y"
+            type="number"
+            step="0.05"
+            value="0.25"
+            class="v-input text-center"
+          />
+          <input
+            id="add-fz"
+            aria-label="New atom fractional z"
+            type="number"
+            step="0.05"
+            value="0.25"
+            class="v-input text-center"
+          />
+        </div>
+        <button id="btn-add-atom" class="v-btn w-full">+ Add Atom to Unit Cell</button>
+      </div>
+
+      <!-- Atom Table -->
+      <div class="card-bg border border-subtle rounded-md p-2 flex flex-col min-h-0">
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="text-[10.5px] font-semibold uppercase text-mut">Atom Table</span>
+          <input
+            id="atom-filter"
+            type="text"
+            placeholder="Filter (e.g. Ni)"
+            class="v-input w-24 py-0.5 text-[10.5px]"
+          />
+        </div>
+        <div
+          id="atoms-table-body"
+          class="max-h-64 overflow-y-auto divide-y divide-[var(--border-subtle)] font-mono-code text-[10.5px]"
+        ></div>
+      </div>
+    </div>
+
+    <!-- RIGHT TAB 5: VASP FILES (POSCAR, KPOINTS, INCAR) -->
+    <div id="right-tab-vasp" class="p-2.5 overflow-y-auto flex-1 space-y-2.5 hidden">
+      <div class="flex gap-1">
+        <button class="v-btn v-btn-active flex-1 text-[11px]" data-vasp-file="POSCAR">POSCAR</button>
+        <button class="v-btn flex-1 text-[11px]" data-vasp-file="KPOINTS">KPOINTS</button>
+        <button class="v-btn flex-1 text-[11px]" data-vasp-file="INCAR">INCAR</button>
+      </div>
+
+      <!-- POSCAR Options -->
+      <div
+        id="vasp-opt-POSCAR"
+        class="card-bg border border-subtle rounded-md p-2 flex items-center justify-between gap-2"
+      >
+        <label class="flex items-center gap-1.5 text-[11px] text-sub">
+          Coord:
+          <select id="poscar-coord-mode" class="v-input py-0.5 text-[11px]">
+            <option value="Direct" selected>Direct (Fractional)</option>
+            <option value="Cartesian">Cartesian (Å)</option>
+          </select>
+        </label>
+        <button id="btn-export-cif" class="v-btn text-[10.5px] py-0.5">Export .CIF</button>
+      </div>
+
+      <!-- KPOINTS Options -->
+      <div id="vasp-opt-KPOINTS" class="card-bg border border-subtle rounded-md p-2 space-y-1.5 hidden">
+        <div class="route-card">
+          <span
+            >KPOINTS is built in <b>step 4</b> (mesh from k-spacing, explicit mesh, or band path) and can come
+            from the k-point convergence test (step 5).</span
+          >
+          <button class="v-btn v-btn-primary text-[11px]" onclick="window.Studio.go('kpoints')">
+            Edit KPOINTS in step 4
+          </button>
+        </div>
+      </div>
+
+      <!-- INCAR Options -->
+      <div id="vasp-opt-INCAR" class="card-bg border border-subtle rounded-md p-2 space-y-1.5 hidden">
+        <div class="route-card">
+          <span
+            >INCAR is built in <b>step 3</b> from a preset, the POTCAR ENMAX (step 2) and the spins you set in
+            the Magnetic tab.</span
+          >
+          <button class="v-btn v-btn-primary text-[11px]" onclick="window.Studio.go('incar')">
+            Edit INCAR in step 3
+          </button>
+        </div>
+      </div>
+
+      <!-- Live File Preview -->
+      <div class="flex items-center justify-between">
+        <span id="vasp-file-label" class="text-[11px] font-bold font-mono-code text-main">POSCAR</span>
+        <div class="flex gap-1">
+          <button id="btn-copy-vasp" class="v-btn py-0.5 px-2 text-[10.5px]">
+            <i data-lucide="copy" class="w-3 h-3"></i> Copy
+          </button>
+          <button id="btn-download-vasp" class="v-btn v-btn-primary py-0.5 px-2 text-[10.5px]">
+            <i data-lucide="download" class="w-3 h-3"></i> Download
+          </button>
+        </div>
+      </div>
+      <textarea
+        id="vasp-file-preview"
+        aria-label="VASP file preview"
+        rows="16"
+        readonly
+        class="code-area w-full"
+      ></textarea>
+    </div>
+  </aside>
+
+  <!-- WORKFLOW STEP PANE (steps 2 to 7) -->
+  <section id="stage-pane" aria-live="polite"></section>
+</div>
+
+<!-- FULL CONTCAR / POSCAR STRUCTURAL REPORT MODAL -->
+<div
+  id="contcar-report-modal"
+  class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4"
+>
+  <div
+    class="card-bg border border-theme rounded-lg shadow-2xl w-full max-w-3xl max-h-[88vh] flex flex-col overflow-hidden"
+  >
+    <div class="header-bg border-b border-theme px-4 py-2.5 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <i data-lucide="file-spreadsheet" class="w-4 h-4 text-blue-500"></i>
+        <span class="font-bold text-xs text-main">Relaxed CONTCAR / POSCAR Full Structural Report</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <button id="btn-copy-report-md" class="v-btn py-0.5 px-2 text-[10.5px]">Copy Summary</button>
+        <button id="btn-copy-report-latex" class="v-btn py-0.5 px-2 text-[10.5px]">Copy LaTeX</button>
+        <button id="btn-dl-report-txt" class="v-btn v-btn-primary py-0.5 px-2 text-[10.5px]">
+          Download .TXT
+        </button>
+        <button id="btn-close-report" class="v-btn px-1.5 py-0.5">
+          <i data-lucide="x" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex border-b border-theme header-bg px-3 shrink-0">
+      <button class="tab-btn active" data-rep-tab="overview">Cell &amp; Wyckoff</button>
+      <button class="tab-btn" data-rep-tab="econ">ECoN &amp; Bonding</button>
+      <button class="tab-btn" data-rep-tab="xrd">Powder XRD (Cu Kα)</button>
+      <button class="tab-btn" data-rep-tab="symops">Symmetry Ops (x,y,z)</button>
+    </div>
+
+    <div class="p-4 overflow-y-auto flex-1 text-[11px] selectable-text">
+      <div id="rep-tab-overview" class="space-y-3"></div>
+      <div id="rep-tab-econ" class="space-y-3 hidden"></div>
+      <div id="rep-tab-xrd" class="space-y-3 hidden"></div>
+      <div id="rep-tab-symops" class="space-y-2 hidden"></div>
+    </div>
+  </div>
+</div>
+
+<!-- AFM THEORY & LITERATURE REFERENCE MODAL -->
+<div
+  id="afm-theory-modal"
+  class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4"
+>
+  <div
+    class="card-bg border border-theme rounded-lg shadow-2xl w-full max-w-2xl max-h-[86vh] flex flex-col overflow-hidden"
+  >
+    <div class="header-bg border-b border-theme px-4 py-2.5 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <i data-lucide="book-open" class="w-4 h-4 text-blue-500"></i>
+        <span class="font-bold text-xs text-main"
+          >Antiferromagnetic Ordering Theory &amp; Automatic NN Logic (VASP)</span
+        >
+      </div>
+      <button id="btn-close-theory" class="v-btn px-1.5 py-0.5">
+        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+      </button>
+    </div>
+    <div class="p-4 overflow-y-auto space-y-3 text-[11.5px] leading-relaxed selectable-text">
+      <p class="text-sub">
+        Magnetic ground-state screening in DFT/VASP compares total energies across the canonical
+        <b>Wollan–Koehler (1955)</b> spin configurations and
+        <b>Goodenough–Kanamori–Anderson (GKA)</b> superexchange rules. This studio automatically inspects the
+        periodic nearest-neighbor (NN) bond graph of magnetic ions to assign each ordering without manual
+        index calculation.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <div class="border border-subtle rounded-md p-2.5 space-y-1" style="background: var(--console-bg)">
+          <div class="font-bold text-main flex justify-between">
+            <span>FM: Ferromagnetic</span
+            ><span class="font-mono-code text-rose-500">J∥ &gt; 0, J⊥ &gt; 0</span>
+          </div>
+          <p class="text-[11px] text-sub">
+            All magnetic ions align parallel (↑↑) both in-plane and out-of-plane. Typical in metallic
+            ferromagnets (BCC Fe, Co, Ni) or double-exchange perovskites
+            (La<sub>1−x</sub>Sr<sub>x</sub>MnO<sub>3</sub>).
+          </p>
+          <div class="text-[10px] font-mono-code text-mut">Logic: All magnetic sites → +m</div>
+        </div>
+
+        <div class="border border-subtle rounded-md p-2.5 space-y-1" style="background: var(--console-bg)">
+          <div class="font-bold text-main flex justify-between">
+            <span>AFM-A: Layered A-Type</span
+            ><span class="font-mono-code text-blue-500">J∥ &gt; 0, J⊥ &lt; 0</span>
+          </div>
+          <p class="text-[11px] text-sub">
+            Ferromagnetic within each basal <i>ab</i>-plane, antiferromagnetic between adjacent planes along
+            <i>c</i>. Classic in Jahn–Teller LaMnO<sub>3</sub> and layered vdW magnets
+            (MnBi<sub>2</sub>Te<sub>4</sub>, CrI<sub>3</sub> bilayer).
+          </p>
+          <div class="text-[10px] font-mono-code text-mut">
+            Logic: Cluster z-planes → alternate (+, −) along c
+          </div>
+        </div>
+
+        <div class="border border-subtle rounded-md p-2.5 space-y-1" style="background: var(--console-bg)">
+          <div class="font-bold text-main flex justify-between">
+            <span>AFM-C: Chain / Columnar C-Type</span
+            ><span class="font-mono-code text-blue-500">J∥ &lt; 0, J⊥ &gt; 0</span>
+          </div>
+          <p class="text-[11px] text-sub">
+            Antiferromagnetic checkerboard within each <i>ab</i>-plane, ferromagnetic along chains parallel to
+            <i>c</i>. Observed in orbital-ordered vanadates/chromates (LaVO<sub>3</sub>, CaCrO<sub>3</sub>,
+            Sr<sub>1−x</sub>Ca<sub>x</sub>MnO<sub>3</sub>).
+          </p>
+          <div class="text-[10px] font-mono-code text-mut">
+            Logic: 2D BFS 2-coloring on in-plane NN graph; same spin along c-columns
+          </div>
+        </div>
+
+        <div class="border border-subtle rounded-md p-2.5 space-y-1" style="background: var(--console-bg)">
+          <div class="font-bold text-main flex justify-between">
+            <span>AFM-G: 3D Néel G-Type</span
+            ><span class="font-mono-code text-blue-500">J∥ &lt; 0, J⊥ &lt; 0</span>
+          </div>
+          <p class="text-[11px] text-sub">
+            Every 3D nearest-neighbor magnetic pair is antiparallel (↑↓ in both <i>ab</i> and <i>c</i>).
+            Driven by strong 180° M–O–M superexchange in half-filled shells (LaFeO<sub>3</sub>,
+            BiFeO<sub>3</sub>, CaMnO<sub>3</sub>, LaCrO<sub>3</sub>).
+          </p>
+          <div class="text-[10px] font-mono-code text-mut">
+            Logic: Full 3D BFS bipartite 2-coloring on PBC 1st-NN shell (d_NN)
+          </div>
+        </div>
+      </div>
+
+      <div class="border border-subtle rounded-md p-2.5 space-y-1" style="background: var(--console-bg)">
+        <div class="font-bold text-main flex justify-between">
+          <span>AFM-II: Type-II Rocksalt (180° 2nd-NN Superexchange)</span
+          ><span class="font-mono-code text-amber-500">J₂ &lt; 0 (FCC)</span>
+        </div>
+        <p class="text-[11px] text-sub">
+          In FCC rocksalt oxides (NiO, MnO, CoO, FeO), the 1st-NN metal sublattice forms edge-sharing
+          triangles (geometrically frustrated for 1st-NN AFM). Instead, 180° M–O–M superexchange couples
+          2nd-NN sites along ⟨100⟩, creating FM {111} sheets stacked antiferromagnetically along [111].
+        </p>
+        <div class="text-[10px] font-mono-code text-mut">
+          Logic: Alternate spin by {111} plane parity / 2nd-NN superexchange shell
+        </div>
+      </div>
+
+      <div class="text-[10.5px] text-mut border-t border-subtle pt-2">
+        <b>Key References:</b> E. O. Wollan &amp; W. C. Koehler, <i>Phys. Rev.</i> <b>100</b>, 545 (1955); J.
+        B. Goodenough, <i>Phys. Rev.</i> <b>100</b>, 564 (1955); J. Kanamori, <i>J. Phys. Chem. Solids</i>
+        <b>10</b>, 87 (1959).
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXPORT GATE: structure errors need a reason before POSCAR export (site rule, D-100) -->
+<div
+  id="gate-modal"
+  class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="gate-title"
+>
+  <div
+    class="card-bg border border-theme rounded-lg shadow-2xl w-full max-w-md flex flex-col overflow-hidden"
+  >
+    <div class="header-bg border-b border-theme px-4 py-2.5 flex items-center justify-between">
+      <span id="gate-title" class="font-bold text-xs text-main">This structure has errors</span>
+      <button class="v-btn px-1.5 py-0.5" data-close="gate-modal" aria-label="Close">
+        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+      </button>
+    </div>
+    <div class="p-4 space-y-2 text-[11.5px] text-sub">
+      <ul id="gate-list" class="list-disc pl-5 space-y-0.5"></ul>
+      <p class="m-0">
+        Fix them in the Checks tab, or say why you export anyway. The reason is written into the POSCAR
+        comment line so the file keeps the record.
+      </p>
+      <label for="gate-reason" class="block font-semibold text-main">Reason</label>
+      <input
+        id="gate-reason"
+        class="v-input w-full"
+        type="text"
+        placeholder="For example: a deliberately compressed test cell"
+      />
+      <div class="flex justify-end gap-2 pt-1">
+        <button class="v-btn" type="button" data-close="gate-modal">Cancel</button>
+        <button id="gate-ok" class="v-btn v-btn-primary" type="button">Export with reason</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PASTE / TEXT IMPORT MODAL -->
+<div
+  id="paste-modal"
+  class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4"
+>
+  <div
+    class="card-bg border border-theme rounded-lg shadow-2xl w-full max-w-xl flex flex-col overflow-hidden"
+  >
+    <div class="header-bg border-b border-theme px-4 py-2.5 flex items-center justify-between">
+      <span class="font-bold text-xs text-main">Paste Structure (VASP POSCAR/CONTCAR, CIF, or XYZ)</span>
+      <button id="btn-close-paste" class="v-btn px-1.5 py-0.5">
+        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+      </button>
+    </div>
+    <div class="p-4 space-y-3">
+      <textarea
+        id="paste-textarea"
+        rows="13"
+        placeholder="Paste your POSCAR, CONTCAR, CIF, or XYZ file text here..."
+        class="code-area w-full"
+      ></textarea>
+      <div class="flex items-center justify-between">
+        <span class="text-[11px] text-mut">Format is auto-detected (POSCAR, CIF, XYZ).</span>
+        <div class="flex gap-2">
+          <button id="btn-cancel-paste" class="v-btn">Cancel</button>
+          <button id="btn-load-paste" class="v-btn v-btn-primary">Load Structure</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  id="lib-modal"
+  class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-start justify-center z-50 p-4 pt-[8vh]"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="lib-modal-t"
+>
+  <div
+    class="card-bg border border-theme rounded-lg shadow-2xl w-full max-w-2xl flex flex-col overflow-hidden max-h-[80vh]"
+  >
+    <div class="header-bg border-b border-theme px-4 py-2.5 flex items-center justify-between">
+      <span id="lib-modal-t" class="font-bold text-xs text-main"
+        >Crystal library (350 structures, CIF and POSCAR)</span
+      >
+      <button class="v-btn px-1.5 py-0.5" data-close="lib-modal" aria-label="Close">
+        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+      </button>
+    </div>
+
+    <div class="p-3 flex gap-2 border-b border-theme">
+      <input
+        id="lib-q"
+        class="v-input flex-1"
+        placeholder="Search: Si, GaAs, SiC, calcite..."
+        aria-label="Search structures"
+      />
+      <select id="lib-cat" class="v-input" aria-label="Category"></select>
+      <span id="lib-count" class="text-[11px] text-mut self-center whitespace-nowrap"></span>
+    </div>
+    <div id="lib-list" class="overflow-y-auto flex-1"></div>
+  </div>
+</div>
+
+<div
+  id="cmd-modal"
+  class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-start justify-center z-50 p-4 pt-[8vh]"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="cmd-modal-t"
+>
+  <div
+    class="card-bg border border-theme rounded-lg shadow-2xl w-full max-w-xl flex flex-col overflow-hidden max-h-[80vh]"
+  >
+    <div class="header-bg border-b border-theme px-4 py-2.5 flex items-center justify-between">
+      <span id="cmd-modal-t" class="font-bold text-xs text-main">Go to any step or VASPKIT function</span>
+      <button class="v-btn px-1.5 py-0.5" data-close="cmd-modal" aria-label="Close">
+        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+      </button>
+    </div>
+
+    <div class="p-3 border-b border-theme">
+      <input
+        id="cmd-input"
+        class="v-input w-full"
+        placeholder="Type a VASPKIT code (102, 303...) or a name (band, DOS, supercell, phonon)"
+        aria-label="Search commands"
+      />
+    </div>
+    <div id="cmd-results" class="overflow-y-auto flex-1"></div>
+  </div>
+</div>
+
+<div
+  id="help-modal"
+  class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-start justify-center z-50 p-4 pt-[8vh]"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="help-modal-t"
+>
+  <div
+    class="card-bg border border-theme rounded-lg shadow-2xl w-full max-w-xl flex flex-col overflow-hidden max-h-[80vh]"
+  >
+    <div class="header-bg border-b border-theme px-4 py-2.5 flex items-center justify-between">
+      <span id="help-modal-t" class="font-bold text-xs text-main"><span id="help-title">Help</span></span>
+      <button class="v-btn px-1.5 py-0.5" data-close="help-modal" aria-label="Close">
+        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+      </button>
+    </div>
+    <div id="help-body" class="p-4 overflow-y-auto"></div>
+  </div>
+</div>

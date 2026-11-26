@@ -108,8 +108,8 @@
           <label class="sp-field"><span>Step (A)</span><input id="kc-step" type="number" class="v-input font-mono-code" value="${C.step}"/></label>
           <label class="sp-field" style="grid-column:1/-1"><span>Extra meshes (e.g. 4x4x2 12x12x6)</span><input id="kc-custom" class="v-input font-mono-code" value="${esc(C.custom)}"/></label>
         </div>
-        <div class="kc-table-wrap"><table class="kc-table"><thead><tr><th></th><th>Mesh</th><th>L (A)</th><th>Grid points</th><th>kpts x atoms</th><th></th></tr></thead><tbody>
-          ${r.all.map((x) => { const n = K.meshName(x.m); const g = x.m[0] * x.m[1] * x.m[2]; return `<tr><td><input type="checkbox" data-mesh="${n}" ${C.unchecked.has(n) ? '' : 'checked'}/></td><td class="font-mono-code">${n}</td><td>${x.L === null ? 'custom' : x.L}</td><td>${g}</td><td>${g * p.nat}</td><td><button class="sp-link" data-use="${n}">use in KPOINTS</button></td></tr>`; }).join('')}
+        <div class="kc-table-wrap"><table class="kc-table"><thead><tr><th><span class="sr-only">Include</span></th><th>Mesh</th><th>L (A)</th><th>Grid points</th><th>kpts x atoms</th><th><span class="sr-only">Action</span></th></tr></thead><tbody>
+          ${r.all.map((x) => { const n = K.meshName(x.m); const g = x.m[0] * x.m[1] * x.m[2]; return `<tr><td><input type="checkbox" data-mesh="${n}" aria-label="Include mesh ${n}" ${C.unchecked.has(n) ? '' : 'checked'}/></td><td class="font-mono-code">${n}</td><td>${x.L === null ? 'custom' : x.L}</td><td>${g}</td><td>${g * p.nat}</td><td><button class="sp-link" data-use="${n}">use in KPOINTS</button></td></tr>`; }).join('')}
         </tbody></table></div>
       </div>
       <div class="sp-card">
@@ -183,5 +183,7 @@
   }
 
   T.stageRenderers.kconv = render;
+  T.kconvCsv = () => C.csv;
+  T.kconvParse = parseCsv;
   window.StudioKConv = { outputs, parseCsv, verdicts };
 })();

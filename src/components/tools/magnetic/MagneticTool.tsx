@@ -832,6 +832,26 @@ export default function MagneticTool() {
                   Open in the k-path tool
                 </button>
               )}
+              {structure && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    sendHandoff(
+                      {
+                        v: 1,
+                        kind: 'structure',
+                        from: 'magnetic',
+                        structure: activeOut.result.structure,
+                        label: activeOut.config.label,
+                        magmom: activeOut.result.magmom,
+                      },
+                      '/dft-studio/',
+                    )
+                  }
+                >
+                  Open in DFT Studio (3D spins)
+                </button>
+              )}
             </div>
           </>
         )}

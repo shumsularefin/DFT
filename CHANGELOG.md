@@ -7,6 +7,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- DFT Studio at `/dft-studio/`: a VESTA-style 3D crystal viewer and editor with the VASP workflow (POTCAR, INCAR, KPOINTS, k-point convergence, run bundle, analysis). It is now the Material Builder crystal mode, runs the site structure checks live, and hands structures and results to and from the Input Builder, k-path, magnetic and convergence tools (D-103).
 - Tests for the Material Builder: crystal templates, molecule export, and an end-to-end keyboard and axe spec at 360 px (M15.3).
 
 ### Fixed

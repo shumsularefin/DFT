@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from 'react';
-import CrystalBuilder from './CrystalBuilder';
+import StudioFrame from './StudioFrame';
 
 // Molecule mode (and any RDKit integration) loads lazily only when selected, never in crystal mode.
 const MoleculeBuilder = lazy(() => import('./MoleculeBuilder'));
@@ -17,7 +17,7 @@ export default function MaterialBuilder() {
           className="mb-btn"
           onClick={() => setMode('crystal')}
         >
-          Crystal mode
+          Crystal mode (DFT Studio)
         </button>
         <button
           type="button"
@@ -31,7 +31,7 @@ export default function MaterialBuilder() {
       </div>
 
       {mode === 'crystal' ? (
-        <CrystalBuilder />
+        <StudioFrame />
       ) : (
         <Suspense fallback={<p>Loading molecule editor...</p>}>
           <MoleculeBuilder />

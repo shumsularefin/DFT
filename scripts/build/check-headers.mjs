@@ -51,5 +51,32 @@ for (const [h, v] of [
   check(`security header ${h}`, home.headers.get(h) === v, `got ${home.headers.get(h)}`);
 }
 
+// D-103: DFT Studio has its own CSP (Pyodide from cdn.jsdelivr.net, frameable by the builder page only);
+// every other page keeps the strict site CSP and X-Frame-Options DENY.
+const csp = (r) => r.headers.get('content-security-policy') ?? '';
+for (const p of ['/', '/builder/', '/tools/convergence/']) {
+  const r = await get(p);
+  check(
+    `${p} strict CSP (no CDN)`,
+    csp(r).includes("script-src 'self'") && !csp(r).includes('jsdelivr'),
+    csp(r),
+  );
+  check(
+    `${p} X-Frame-Options DENY`,
+    r.headers.get('x-frame-options') === 'DENY',
+    r.headers.get('x-frame-options'),
+  );
+}
+for (const p of ['/dft-studio/', '/dft-studio/js/vesta.js']) {
+  const r = await get(p);
+  check(`${p} Studio CSP allows Pyodide`, csp(r).includes('https://cdn.jsdelivr.net'), csp(r));
+  check(`${p} framed by the site only`, csp(r).includes("frame-ancestors 'self'"), csp(r));
+  check(
+    `${p} X-Frame-Options SAMEORIGIN`,
+    r.headers.get('x-frame-options') === 'SAMEORIGIN',
+    r.headers.get('x-frame-options'),
+  );
+}
+
 // .wasm, /data/, /pagefind/ rules cannot be exercised yet: no such files exist in dist/ (later stages).
 process.exit(failed ? 1 : 0);

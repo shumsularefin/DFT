@@ -1,0 +1,40 @@
+---
+// DFT Studio: VESTA-style 3D structure editor plus the VASP workflow (POTCAR, INCAR, KPOINTS, k-point
+// convergence, run bundle, analysis). The Studio scripts live in public/dft-studio/js; this page gives them
+// a CSP-clean shell: local three.js, icons, zip and plots, and a bridge to the site's verified code (D-100).
+import '../../styles/fonts.css';
+import body from '../../components/studio/studio-body.html?raw';
+import { SITE } from '../../lib/site';
+
+const title = `DFT Studio | ${SITE.name}`;
+const description =
+  'VESTA-style crystal viewer and editor with the full VASP workflow: POTCAR, INCAR, KPOINTS, k-point convergence, a run bundle and output analysis, all in your browser.';
+---
+
+<!doctype html>
+<html lang="en" class="light" data-page-class="tool">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/dft-studio/css/tailwind.css" />
+    <link rel="stylesheet" href="/dft-studio/css/vesta.css" />
+    <link rel="stylesheet" href="/dft-studio/css/studio.css" />
+    <link rel="stylesheet" href="/dft-studio/css/site-link.css" />
+  </head>
+  <body class="flex flex-col h-screen w-screen overflow-hidden">
+    <a class="studio-skip" href="#viewport-wrap">
+      Skip to the 3D viewer
+    </a>
+    <div id="studio-boot-error" class="studio-boot-error" role="alert" hidden></div>
+    <noscript>
+      <p class="studio-boot-error">DFT Studio needs JavaScript. The handbook pages work without it.</p>
+    </noscript>
+    <Fragment set:html={body} />
+    <script>
+      import '../../components/studio/boot';
+    </script>
+  </body>
+</html>

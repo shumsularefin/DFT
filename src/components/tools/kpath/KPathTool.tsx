@@ -447,7 +447,12 @@ export default function KPathTool() {
         <section aria-labelledby="kp-real" className="kp-card">
           <h2 id="kp-real">Your cell in real space</h2>
           <p>The standardized primitive cell the path below belongs to, drawn from the atoms.</p>
-          <StructureView structure={sym.primStdCell} label="the standardized primitive cell" id="kp-sv" />
+          <StructureView
+            structure={sym.primStdCell}
+            label="the standardized primitive cell"
+            id="kp-sv"
+            from="kpath"
+          />
         </section>
       )}
 

@@ -6,15 +6,15 @@ import MaterialBuilder from '../../components/tools/builder/MaterialBuilder';
 
 <BaseLayout
   title="Material Builder"
-  description="Build, edit, validate and export crystals (POSCAR, CIF) and molecules (2D canvas, rough 3D clean-up, XYZ, MOL, POSCAR in a box) locally in your browser."
+  description="Build, view and edit crystals in DFT Studio (VESTA-style 3D viewer, supercells, slabs, defects, symmetry, magnetism, structure checks) and molecules (2D canvas, rough 3D clean-up, XYZ, MOL, POSCAR in a box), locally in your browser."
   pageClass="tool"
 >
   <div class="container">
     <h1>Material Builder</h1>
     <p>
-      Switch between Crystal mode and Molecule mode (loaded lazily). Validate structures live against B001 to
-      B012, export POSCAR/CIF/XYZ/MOL, or hand off directly to the Input Builder, k-path tool, or Magnetic
-      configuration tool.
+      Crystal mode is DFT Studio, a VESTA-style viewer and editor: build or import a crystal, check it live
+      against B001 to B012, export POSCAR or CIF, or send it to the Input Builder, k-path tool or magnetic
+      tool. Molecule mode (loaded lazily) draws molecules and puts them in a box for VASP.
     </p>
     <MaterialBuilder client:load />
   </div>

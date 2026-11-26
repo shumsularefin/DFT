@@ -57,6 +57,11 @@ const tools = [
 ];
 const more = [
   {
+    id: 'dft-studio',
+    title: 'DFT Studio',
+    text: 'A VESTA-style 3D crystal viewer and editor with the 350-crystal library, structure checks, INCAR, KPOINTS and POTCAR set-up, a k-point convergence kit and output analysis. It hands structures and results to every tool on this page.',
+  },
+  {
     id: 'studio',
     title: 'Screening Studio',
     text: 'Explore a table of candidate materials and turn a shortlist into a first project.',
@@ -83,8 +88,8 @@ const more = [
     <p>
       These tools run entirely in your browser. The input builder, the convergence plotter, the error finder,
       the k-path tool, the magnetic configuration tool and the equation-of-state fit are available now, and so
-      is practice. All research tools, Screening Studio, Material Builder, and Practice are available locally
-      in your browser.
+      is practice. All research tools, DFT Studio, Screening Studio, Material Builder, and Practice are
+      available locally in your browser.
     </p>
     <h2>Research tools</h2>
     <div class="tool-grid">
@@ -142,7 +147,7 @@ const more = [
         </Card>
       ))}
     </div>
-    <h2>Also planned</h2>
+    <h2>Studios and practice</h2>
     <div class="tool-grid">
       {more.map((t) => (
         <Card as="section">
@@ -150,7 +155,11 @@ const more = [
             {t.title}
           </h3>
           <p>{t.text}</p>
-          {t.id === 'studio' ? (
+          {t.id === 'dft-studio' ? (
+            <p>
+              <a href="/dft-studio/">Open DFT Studio</a>
+            </p>
+          ) : t.id === 'studio' ? (
             <p>
               <a href="/studio/">Open Screening Studio</a>
             </p>

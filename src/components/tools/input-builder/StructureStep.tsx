@@ -108,7 +108,13 @@ export default function StructureStep() {
       {structure && (
         <div className="ib-view">
           <h3>See it</h3>
-          <StructureView structure={structure} label="your POSCAR" magmom={magmom} id="ib-sv" />
+          <StructureView
+            structure={structure}
+            label="your POSCAR"
+            magmom={magmom}
+            id="ib-sv"
+            from="input-builder"
+          />
         </div>
       )}
     </section>

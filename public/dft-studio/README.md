@@ -34,29 +34,40 @@ The step bar under the header runs left to right. Every step reads the live stru
 
 POTCAR files are licensed by VASP Software GmbH. They are **never shipped** with this tool and must never be committed.
 
-- `data/pp_index.js` holds only header metadata (TITEL, ZVAL, ENMAX and similar), which is enough to choose variants and set ENCUT.
+- `data/pp_index.js` holds only summary metadata (TITEL, VRHFIN, LEXCH, POMASS, ZVAL, ENMAX, ENMIN), which is enough to choose variants and set ENCUT. No lines of POTCAR text are kept.
 - The bundle contains `make_potcar.sh`, which builds POTCAR on the cluster from `VASP_PP_PATH`.
 - **Lab-internal copies only:** put the licensed library in `data/potcars/<FUNCTIONAL>/<variant>.js` and set `window.PP_LOCAL_LIBRARY = true` in `data/pp_local.js`. The POTCAR and bundle steps can then include the real file. `data/potcars/` is in `.gitignore`.
 
-## Running it
+## Running it (inside the DFT Handbook)
 
-It is a static site with no build step. Serve the folder with any static server, for example:
-
-```
-python -m http.server 8000
-```
-
-Then open http://localhost:8000. Opening `index.html` straight from disk also works.
+DFT Studio is part of the site build (decision D-100). The page is `src/pages/dft-studio/index.astro`, its markup is
+`src/components/studio/studio-body.html`, and `src/components/studio/boot.ts` loads these scripts in order. Run
+`npm run dev` or `npm run build` from the repository root and open `/dft-studio/`. The Material Builder embeds the
+same page at `/builder/` (crystal mode).
 
 Network use:
 
-- Tailwind, three.js, lucide, Plotly and JSZip load from CDNs.
-- The optional Python engine (Pyodide with spglib, SeekPath and phonopy) downloads about 30 MB the first time it is used. It runs entirely in the browser.
+- Nothing loads from a CDN. three.js comes from the site bundle (only the classes the viewer uses), the icons are
+  inline SVG (`src/components/studio/icons.generated.ts`, lucide-static, ISC), plots are drawn by a small SVG plotter
+  (`miniPlot.ts`), zip files use fflate (`zipShim.ts`), and the Tailwind classes are prebuilt in `css/tailwind.css`
+  (`scripts/studio/build-tailwind.sh`).
+- The optional Python engine (Pyodide with spglib, SeekPath and phonopy) downloads about 30 MB from cdn.jsdelivr.net
+  and PyPI the first time it is used. Only `/dft-studio/` allows those hosts (firebase.json). It runs in the browser.
+
+## Links to the rest of the site (`js/site-link.js`, `src/components/studio/bridge.ts`)
+
+- The site's structure checks B001 to B012 run on every edit (header badge, Checks tab, fixes, clean-up tools).
+  Exporting a POSCAR with an error asks for a reason, which is written into the comment line.
+- "Send to" hands the structure (and MAGMOM) to the Input Builder, k-path tool, magnetic tool or planner.
+- Structures from the site tools (k-path, Input Builder, magnetic tool, Tolerance Explorer, molecule mode) open here.
+- Step 3 shows the site's INCAR rules, step 4 links to the verified k-path tool, step 5 sends the convergence rows to
+  the convergence plotter, and step 7 links to the golden-tested analysis tools. Studio's own analyzers are marked
+  Heuristic until they have reference tests.
 
 ## Files
 
 ```
-index.html            page (VESTA-Web layout + step bar + step pane + modals)
+(page markup now lives in src/components/studio/studio-body.html)
 css/vesta.css         VESTA-Web theme and tokens
 css/studio.css        workflow layer, built on the same tokens
 js/vesta.js           viewer and structure editor; exposes window.VESTA (bridge)

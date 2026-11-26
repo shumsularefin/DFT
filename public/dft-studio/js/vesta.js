@@ -449,8 +449,36 @@
   function pushHistory() {
     if (!state.structure) return;
     state.history.push(cloneStructure(state.structure));
-    if (state.history.length > 25) state.history.shift();
+    if (state.history.length > 100) state.history.shift();
+    state.future = [];
+    syncHistoryButtons();
+  }
+  // Undo and redo stacks (redo added when Studio replaced the site's Material Builder, D-100).
+  function syncHistoryButtons() {
     document.getElementById('btn-undo').disabled = state.history.length === 0;
+    const r = document.getElementById('btn-redo');
+    if (r) r.disabled = !state.future || state.future.length === 0;
+  }
+  function undoStep() {
+    if (state.history.length === 0) return false;
+    if (!state.future) state.future = [];
+    state.future.push(cloneStructure(state.structure));
+    state.structure = state.history.pop();
+    syncHistoryButtons();
+    state.selectedAtomIndices = [];
+    refreshAllUI(true);
+    showToast('Undid last change');
+    return true;
+  }
+  function redoStep() {
+    if (!state.future || state.future.length === 0) return false;
+    state.history.push(cloneStructure(state.structure));
+    state.structure = state.future.pop();
+    syncHistoryButtons();
+    state.selectedAtomIndices = [];
+    refreshAllUI(true);
+    showToast('Redid change');
+    return true;
   }
 
   // =========================================================================
@@ -650,6 +678,11 @@
       if (/^[A-Za-z]{1,2}\s+[-+]?\d/.test(l2.trim())) return parseXYZ(text, fileName);
     }
     return parsePOSCAR(text, fileName);
+  }
+
+  // POSCAR site i is atoms[poscarOrder(atoms)[i]] (POSCAR groups the sites by species).
+  function poscarOrder(atoms) {
+    return Array.from(getSpeciesOrder(atoms).values()).flat().map(a => a.origIdx);
   }
 
   // Group atoms by element preserving order
@@ -1490,8 +1523,11 @@
       vNorm(L[0]), vNorm(L[1]), vNorm(L[2])
     );
     const span = Math.max(4, diag * 0.85);
-    camState.orthoSize = span * 0.92;
-    camState.dist = span * 2.8;
+    // Portrait viewports (phones, narrow panels) are limited by width, so widen the fit by the aspect ratio.
+    const aspect = Math.max(1, container.clientWidth) / Math.max(1, container.clientHeight);
+    const portrait = Math.min(1, aspect);
+    camState.orthoSize = (span * 0.92) / portrait;
+    camState.dist = (span * 2.8) / portrait;
     updateCameraTransform();
   }
 
@@ -2149,7 +2185,7 @@
       row.className = 'flex items-center justify-between gap-1.5 py-1 px-1.5 rounded border border-subtle';
       row.innerHTML = `
         <div class="flex items-center gap-1.5">
-          <input type="color" value="${cfg.color}" class="w-4 h-4 border-0 bg-transparent cursor-pointer sp-col" data-el="${el}" />
+          <input type="color" value="${cfg.color}" class="w-4 h-4 border-0 bg-transparent cursor-pointer sp-col" data-el="${el}" aria-label="Colour of ${el}" />
           <span class="font-mono-code font-bold text-main">${el}</span>
           <span class="text-[10px] text-mut">(${list.length})</span>
         </div>
@@ -2495,7 +2531,8 @@
   function loadSample(key) {
     state.structure = cloneStructure(SAMPLES[key]);
     state.history = [];
-    document.getElementById('btn-undo').disabled = true;
+    state.future = [];
+    syncHistoryButtons();
     state.selectedAtomIndices = [];
     state.measurements = [];
     state.speciesConfig = {};
@@ -2506,7 +2543,15 @@
   }
 
   // Header Controls
-  document.getElementById('sample-select').addEventListener('change', e => loadSample(e.target.value));
+  document.getElementById('sample-select').addEventListener('change', e => {
+    const v = e.target.value;
+    if (v.startsWith('site:')) {
+      const t = window.SiteBridge && window.SiteBridge.templates.find(x => 'site:' + x.id === v);
+      if (t) { loadStructureText(t.poscar, 'POSCAR', t.label); setCameraViewDirection([1.1, 0.75, 1.35], [0, 0, 1]); fitCameraToStructure(); }
+      return;
+    }
+    loadSample(v);
+  });
   document.getElementById('btn-import-file').addEventListener('click', () => document.getElementById('file-input').click());
   document.getElementById('file-input').addEventListener('change', e => {
     const file = e.target.files[0];
@@ -2558,17 +2603,15 @@
     }
   });
 
-  document.getElementById('btn-undo').addEventListener('click', () => {
-    if (state.history.length === 0) return;
-    state.structure = state.history.pop();
-    document.getElementById('btn-undo').disabled = state.history.length === 0;
-    state.selectedAtomIndices = [];
-    refreshAllUI(true);
-    fitCameraToStructure();
-    showToast('Undid last change');
-  });
+  document.getElementById('btn-undo').addEventListener('click', () => { if (undoStep()) fitCameraToStructure(); });
+  const redoBtn = document.getElementById('btn-redo');
+  if (redoBtn) redoBtn.addEventListener('click', () => { if (redoStep()) fitCameraToStructure(); });
 
-  document.getElementById('btn-export-poscar').addEventListener('click', () => downloadTextFile('POSCAR', generatePOSCAR()));
+  // The site export gate (B-rule errors need a reason) wraps the download when the bridge is present.
+  document.getElementById('btn-export-poscar').addEventListener('click', () => {
+    if (window.StudioExportGate) window.StudioExportGate(generatePOSCAR(), (text) => downloadTextFile('POSCAR', text));
+    else downloadTextFile('POSCAR', generatePOSCAR());
+  });
   document.getElementById('btn-export-cif').addEventListener('click', () => downloadTextFile('structure.cif', generateCIF()));
   document.getElementById('btn-snapshot').addEventListener('click', () => {
     renderer.render(scene, activeCam);
@@ -2649,7 +2692,7 @@
   document.querySelectorAll('[data-right-tab]').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('[data-right-tab]').forEach(b => b.classList.toggle('active', b === btn));
-      ['supercell','catalyst','symmetry','magnetic','atoms','vasp'].forEach(t => {
+      ['supercell','catalyst','symmetry','magnetic','atoms','vasp','checks'].forEach(t => {
         document.getElementById(`right-tab-${t}`).classList.toggle('hidden', t !== btn.dataset.rightTab);
       });
     });
@@ -3410,6 +3453,9 @@
   // Delete / Backspace keyboard shortcut when atoms are selected (not typing in an input)
   window.addEventListener('keydown', e => {
     if (['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return;
+    const mod = e.ctrlKey || e.metaKey;
+    if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); if (e.shiftKey) redoStep(); else undoStep(); return; }
+    if (mod && e.key.toLowerCase() === 'y') { e.preventDefault(); redoStep(); return; }
     if ((e.key === 'Delete' || e.key === 'Backspace') && state.selectedAtomIndices.length > 0) {
       e.preventDefault();
       document.getElementById('btn-delete-selected').click();
@@ -3660,6 +3706,9 @@
 
   // Resize Handler
   window.addEventListener('resize', updateCameraTransform);
+  // The panel around the viewer can change size without a window resize (layout settling, embedded frame,
+  // side panels, phone layout); keep the drawing buffer matched to the container.
+  if (typeof ResizeObserver !== 'undefined') new ResizeObserver(() => updateCameraTransform()).observe(container);
 
   // =========================================================================
   // 11C. BRIDGE: shared structure API used by the workflow steps (studio.js)
@@ -3702,6 +3751,32 @@
     bandPathKPOINTS: nseg => { const m = state.kptsMode, n = state.kptsNseg; state.kptsMode = 'Line-mode'; state.kptsNseg = nseg; const t = generateKPOINTS(); state.kptsMode = m; state.kptsNseg = n; return t; },
     bandPathLabel: () => { const k = state.symmetryResult ? state.symmetryResult.kpathKey : 'Cubic-P'; const kp = KPATHS[k] || KPATHS['Cubic-P']; return { key: k, path: kp.segments.map(([x, y]) => x + '-' + y).join(' | ') }; },
     loadText: loadStructureText,
+    // Replace the structure with edited POSCAR text (site checks and operations). Undo-able; keeps the
+    // species colours, and keeps the moments when the atom count is unchanged.
+    applyPOSCAR: (text, note) => {
+      const prev = state.structure;
+      pushHistory();
+      const next = autoParseStructure(text, 'POSCAR');
+      next.name = prev.name;
+      const order = poscarOrder(prev.atoms);
+      if (next.atoms.length === prev.atoms.length) next.atoms.forEach((a, i) => { a.mag = prev.atoms[order[i]].mag.slice(); });
+      state.structure = next;
+      state.selectedAtomIndices = [];
+      refreshAllUI(true);
+      if (note) logConsole(note, 'accent');
+    },
+    setMomentsByIndex: (vals) => {
+      if (!Array.isArray(vals) || vals.length !== state.structure.atoms.length) return false;
+      state.magMode = 'collinear';
+      state.structure.atoms.forEach((a, i) => { a.mag = [0, 0, Number(vals[i]) || 0]; });
+      refreshAllUI(false);
+      return true;
+    },
+    poscarToAtomIndex: (idxs) => { const o = poscarOrder(state.structure.atoms); return idxs.map(i => o[i]).filter(i => i !== undefined); },
+    selectAtoms: (idxs) => { state.selectedAtomIndices = idxs.slice(); syncSelectionUI(); rebuildScene(); },
+    undo: undoStep,
+    redo: redoStep,
+    loadSampleKey: loadSample,
     setMomentsByElement: (map) => {
       pushHistory();
       state.magMode = 'collinear';

@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
-// M15.3: keyboard path and axe for the Material Builder (M10.4 crystal mode, M10.5 molecule mode).
+// M15.3: keyboard path and axe for the Material Builder (crystal mode is DFT Studio, M10.5 molecule mode).
 // The project runs at 360 px (mobile-360) and desktop; each test also checks there is no sideways scroll.
 const URL = '/builder/';
 
@@ -12,35 +12,61 @@ async function open(page: Page) {
 const overflow = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
 
-test.describe('material builder: crystal mode', () => {
-  test('keyboard: supercell button, undo shortcut, help dialog; no overflow; axe clean', async ({ page }) => {
+// Crystal mode is DFT Studio in a same-origin frame (D-100); the frame's own keyboard and checks are tested here.
+const studio = (page: Page) => page.frameLocator('iframe.mb-studio-frame');
+const atomCount = (page: Page) =>
+  page
+    .frames()
+    .find((f) => f.url().includes('/dft-studio/'))!
+    .evaluate(
+      () =>
+        (window as unknown as { VESTA: { getStructure(): { atoms: unknown[] } } }).VESTA.getStructure().atoms
+          .length,
+    );
+
+test.describe('material builder: crystal mode (DFT Studio)', () => {
+  test('keyboard: supercell, undo and redo shortcuts, structure checks; no overflow; axe clean', async ({
+    page,
+  }) => {
     await open(page);
-    const summary = page.getByText(/^Summary:/);
-    await expect(summary).toContainText('8 atoms');
+    const f = studio(page);
+    await f.locator('html[data-studio-ready="true"]').waitFor();
+    await expect.poll(() => atomCount(page)).toBe(8);
 
-    const button = page.getByRole('button', { name: '2x2x2 supercell' });
-    await button.focus();
+    // On narrow frames the workbench is a drawer that starts closed; open it from the header with the keyboard.
+    if (!(await f.locator('#right-workbench').isVisible())) {
+      await f.locator('#btn-toggle-right').focus();
+      await page.keyboard.press('Enter');
+    }
+    await f.locator('#sc-na').fill('2');
+    await f.locator('#sc-nb').fill('2');
+    await f.locator('#sc-nc').fill('2');
+    await f.locator('#btn-apply-supercell').focus();
     await page.keyboard.press('Enter');
-    await expect(summary).toContainText('64 atoms');
+    await expect.poll(() => atomCount(page)).toBe(64);
 
+    // Focus stays on the Apply button (outside a text field), where Studio's shortcuts apply.
     await page.keyboard.press('Control+z');
-    await expect(summary).toContainText('8 atoms');
+    await expect.poll(() => atomCount(page)).toBe(8);
     await page.keyboard.press('Control+Shift+z');
-    await expect(summary).toContainText('64 atoms');
+    await expect.poll(() => atomCount(page)).toBe(64);
 
-    await page.locator('body').click({ position: { x: 1, y: 1 } });
-    await page.keyboard.press('?');
-    // The site-wide help dialog also answers to "?", so name the builder's own panel by its class.
-    await expect(page.locator('.mb-panel[role="dialog"]')).toBeVisible();
+    // The site's B001 to B012 checks run on every change and show in the header badge and the Checks tab.
+    await expect(f.locator('#site-checks-count')).toHaveText('0');
+    await f.locator('#btn-site-checks').focus();
+    await page.keyboard.press('Enter');
+    await expect(f.locator('#checks-summary')).toContainText(/all clear|^0 error/);
 
     expect(await overflow(page)).toBeLessThanOrEqual(0);
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   });
 
-  test('the template menu loads another structure', async ({ page }) => {
+  test('the handbook templates are in the structure menu', async ({ page }) => {
     await open(page);
-    await page.getByLabel('Crystal template').selectOption('perovskite');
-    await expect(page.getByText(/^Summary:/)).toContainText('5 atoms');
+    const f = studio(page);
+    await f.locator('html[data-studio-ready="true"]').waitFor();
+    await f.locator('#sample-select').selectOption('site:perovskite');
+    await expect.poll(() => atomCount(page)).toBe(5);
   });
 });
 

@@ -2,7 +2,14 @@
 import type { Mat3, Structure, Vec3 } from './crystal/types';
 
 export type ToolId =
-  'tolerance-factor' | 'input-builder' | 'convergence' | 'kpath' | 'studio' | 'builder' | 'magnetic';
+  | 'tolerance-factor'
+  | 'input-builder'
+  | 'convergence'
+  | 'kpath'
+  | 'studio'
+  | 'builder'
+  | 'magnetic'
+  | 'dft-studio';
 export const TOOL_IDS: readonly ToolId[] = [
   'tolerance-factor',
   'input-builder',
@@ -11,6 +18,7 @@ export const TOOL_IDS: readonly ToolId[] = [
   'studio',
   'builder',
   'magnetic',
+  'dft-studio',
 ];
 
 export interface SiteSpec {
@@ -26,7 +34,9 @@ export interface SiteSpec {
 export type Handoff =
   | { v: 1; kind: 'structure'; from: ToolId; structure: Structure; label?: string; magmom?: string }
   | { v: 1; kind: 'composition'; from: ToolId; a: SiteSpec; b: SiteSpec; x: SiteSpec; label?: string }
-  | { v: 1; kind: 'molecule'; from: ToolId; xyz: string; smiles?: string };
+  | { v: 1; kind: 'molecule'; from: ToolId; xyz: string; smiles?: string }
+  /** A convergence table (the plotter's CSV columns) for /tools/convergence/, e.g. DFT Studio step 5 results. */
+  | { v: 1; kind: 'series'; from: ToolId; csv: string; label?: string };
 
 export type HandoffKind = Handoff['kind'];
 export const HANDOFF_KEY = 'dft:handoff';
@@ -97,6 +107,8 @@ export function validateHandoff(x: unknown): Handoff | null {
       return isSite(x.a) && isSite(x.b) && isSite(x.x) ? (x as unknown as Handoff) : null;
     case 'molecule':
       return isStr(x.xyz) && (x.smiles === undefined || isStr(x.smiles)) ? (x as unknown as Handoff) : null;
+    case 'series':
+      return isStr(x.csv) && x.csv.length <= 1_000_000 ? (x as unknown as Handoff) : null;
     default:
       return null;
   }
