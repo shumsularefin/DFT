@@ -75,7 +75,9 @@ export interface ResolvedScene {
 }
 
 export const MAX_BOND_ATOMS = 1200;
-const ATOM_SCALE = 0.5;
+// a drawing choice: at 0.5 the atoms of a projected cell (and its images) hid each other, the bonds and the lattice
+// vectors; 0.35 keeps them clearly separate while staying big enough to read the species colours
+const ATOM_SCALE = 0.35;
 
 /** The spec with the step's overrides applied (step -1 or no steps: the spec itself). */
 export function applyStep(spec: SceneSpec, step: number): SceneSpec {

@@ -11,6 +11,45 @@ async function open(page: Page, hash = '') {
 }
 const count = (page: Page) => page.locator('canvas').count();
 
+/** What is wrong with the station picture: black (unstyled) shapes, default-size text, clipped or colliding labels. */
+async function pictureProblems(page: Page): Promise<string[]> {
+  const svg = page.locator('.lp-visual svg[role="img"]').first();
+  await expect(svg).toBeVisible();
+  return svg.evaluate((root) => {
+    const bad: string[] = [];
+    const box = root.getBoundingClientRect();
+    for (const el of root.querySelectorAll('path, rect, circle, ellipse, polygon')) {
+      if (el.closest('defs')) continue;
+      if (getComputedStyle(el).fill === 'rgb(0, 0, 0)')
+        bad.push(`black fill on <${el.tagName} class="${el.getAttribute('class') ?? ''}">`);
+    }
+    const texts = [...root.querySelectorAll('text')].filter((t) => (t.textContent ?? '').trim());
+    for (const t of texts) {
+      const fs = parseFloat(getComputedStyle(t).fontSize);
+      if (fs > 13) bad.push(`unstyled text "${t.textContent}" at ${fs}px`);
+    }
+    const rects = texts.map((t) => ({ s: t.textContent ?? '', r: t.getBoundingClientRect() }));
+    for (const { s, r } of rects)
+      if (
+        r.left < box.left - 1 ||
+        r.right > box.right + 1 ||
+        r.top < box.top - 1 ||
+        r.bottom > box.bottom + 1
+      )
+        bad.push(`text "${s}" is cut off at the picture edge`);
+    // glyph boxes include the line gap, so allow a pixel of touch before calling it an overlap
+    for (let a = 0; a < rects.length; a++)
+      for (let b = a + 1; b < rects.length; b++) {
+        const p = rects[a]!.r;
+        const q = rects[b]!.r;
+        const w = Math.min(p.right, q.right) - Math.max(p.left, q.left);
+        const h = Math.min(p.bottom, q.bottom) - Math.max(p.top, q.top);
+        if (w > 1 && h > 1) bad.push(`text "${rects[a]!.s}" overlaps "${rects[b]!.s}"`);
+      }
+    return bad;
+  });
+}
+
 test.describe('guided path (M12.4)', () => {
   test('runs end to end by keyboard and marks the path complete', async ({ page }) => {
     await open(page);
@@ -81,6 +120,29 @@ test.describe('guided path (M12.4)', () => {
     await expect(page.locator('canvas')).toHaveCount(0);
     await expect(page.locator('.scene-flat svg')).toBeVisible();
   });
+
+  // Regression guard: the plot SVGs carry class names only, so a page without the plot stylesheet drew every shape in
+  // the SVG default black and every label at the default 16 px, where the labels ran into each other and off the edge.
+  for (const theme of ['light', 'dark'] as const) {
+    test(`every station picture is styled and its labels do not collide (${theme})`, async ({ page }) => {
+      await open(page);
+      await page.evaluate((t) => (document.documentElement.dataset.theme = t), theme);
+      for (let i = 1; i <= N; i++) {
+        await page.getByRole('button', { name: new RegExp(`^Station ${i}:`) }).click();
+        await expect(page.getByText(`Station ${i} of ${N}`)).toBeVisible();
+        expect(await pictureProblems(page), `station ${i}`).toEqual([]);
+        // a plot station's choices redraw the plot: check every option too
+        if ((await page.getByTestId('lp-visual').getAttribute('data-kind')) !== 'plot') continue;
+        const radios = page.locator('.lp-choices input[type="radio"]');
+        for (let k = 0; k < (await radios.count()); k++) {
+          const before = await page.locator('.lp-plot-svg').innerHTML();
+          await radios.nth(k).check();
+          if (k > 0) await expect.poll(() => page.locator('.lp-plot-svg').innerHTML()).not.toBe(before);
+          expect(await pictureProblems(page), `station ${i}, option ${k + 1}`).toEqual([]);
+        }
+      }
+    });
+  }
 
   test('is axe clean on a plot station and a scene station, at 360 px with no sideways scroll', async ({
     page,

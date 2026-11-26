@@ -85,6 +85,23 @@ const line = (x1: number, y1: number, x2: number, y2: number, cls: string): stri
 const path = (pts: [number, number][], cls: string, close = false): string =>
   `<path class="${cls}" d="M${pts.map(([x, y]) => `${r1(x)} ${r1(y)}`).join('L')}${close ? 'Z' : ''}"/>`;
 
+/** Rough width of a label in user units at the 11 px plot font (about 0.56 em per character): enough for layout. */
+const textWidth = (s: string): number => (/^10\^/.test(s) ? 2 + 0.75 * (s.length - 3) : s.length) * 6.2;
+/** One line when it fits the length `room`, else two lines split at the space nearest the middle. */
+function splitTitle(s: string, room: number): string[] {
+  if (textWidth(s) <= room) return [s];
+  let best = -1;
+  for (let i = 0; i < s.length; i++)
+    if (s[i] === ' ' && (best < 0 || Math.abs(i - s.length / 2) < Math.abs(best - s.length / 2))) best = i;
+  return best < 0 ? [s] : [s.slice(0, best), s.slice(best + 1)];
+}
+/** A tick label; "10^19" is drawn as 10 with a raised, smaller 19 (the page font has no superscript digits). */
+function tickText(x: number, y: number, s: string, anchor: string): string {
+  const m = /^10\^(-?\d+)$/.exec(s);
+  if (!m) return text(x, y, s, 'vp-t', anchor);
+  return `<text class="vp-t" x="${r1(x)}" y="${r1(y)}" text-anchor="${anchor}">10<tspan class="vp-sup" dy="-4">${m[1]}</tspan></text>`;
+}
+
 interface Chart {
   h: number;
   sx: (x: number) => number;
@@ -106,19 +123,26 @@ function chart(
   opts: { h?: number; xticks?: [number, string][]; yticks?: [number, string][] } = {},
 ): Chart {
   const h = opts.h ?? 200;
-  const x0 = 46;
-  const x1 = W - 14;
   const y0 = h - 36;
   const y1 = 14;
+  // the y title is one rotated line, or two when it is longer than the axis; the tick labels sit between it and the
+  // axis, so the plot area starts far enough right that neither ever overlaps the other
+  const yLines = splitTitle(ylabel, y0 - y1);
+  const titleRight = yLines.length > 1 ? 30 : 17;
+  const tickW = Math.max(0, ...(opts.yticks ?? []).map(([, s]) => textWidth(s)));
+  const x0 = Math.max(46, Math.ceil(titleRight + 4 + tickW + 7));
+  const x1 = W - 14;
   const sx = (x: number) => x0 + ((x - xmin) / (xmax - xmin || 1)) * (x1 - x0);
   const sy = (y: number) => y0 - ((y - ymin) / (ymax - ymin || 1)) * (y0 - y1);
   let axes = line(x0, y0, x1, y0, 'vp-axis') + line(x0, y0, x0, y1, 'vp-axis');
   axes += text((x0 + x1) / 2, h - 8, xlabel, 'vp-t');
-  axes += `<text class="vp-t" transform="translate(12 ${r1((y0 + y1) / 2)}) rotate(-90)" text-anchor="middle">${esc(ylabel)}</text>`;
+  yLines.forEach((s, i) => {
+    axes += `<text class="vp-t" transform="translate(${12 + i * 13} ${r1((y0 + y1) / 2)}) rotate(-90)" text-anchor="middle">${esc(s)}</text>`;
+  });
   for (const [v, s] of opts.xticks ?? [])
-    axes += line(sx(v), y0, sx(v), y0 + 4, 'vp-axis') + text(sx(v), y0 + 16, s, 'vp-t');
+    axes += line(sx(v), y0, sx(v), y0 + 4, 'vp-axis') + tickText(sx(v), y0 + 16, s, 'middle');
   for (const [v, s] of opts.yticks ?? [])
-    axes += line(x0 - 4, sy(v), x0, sy(v), 'vp-axis') + text(x0 - 7, sy(v) + 4, s, 'vp-t', 'end');
+    axes += line(x0 - 4, sy(v), x0, sy(v), 'vp-axis') + tickText(x0 - 7, sy(v) + 4, s, 'end');
   return { h, sx, sy, axes, x0, x1, y0, y1 };
 }
 const sample = (a: number, b: number, n: number): number[] =>
@@ -462,7 +486,8 @@ function bandGap(p: P): string {
     body += `<rect class="vp-band vp-filled" x="${c.x0 + 60}" y="${r1(c.sy(-0.2))}" width="90" height="${r1(c.sy(-2.2) - c.sy(-0.2))}"/>`;
     body += `<rect class="vp-band" x="${c.x0 + 60}" y="${r1(c.sy(2.2))}" width="90" height="${r1(c.sy(gap - 0.2) - c.sy(2.2))}"/>`;
     body += text(c.x0 + 105, c.sy(-1.2) + 4, 'band, full', 'vp-t');
-    body += text(c.x0 + 105, c.sy(1.2) + 4, 'band, empty', 'vp-t');
+    // label at the middle of the empty band (it spans gap - 0.2 to 2.2), as the full band's label is at its middle
+    body += text(c.x0 + 105, c.sy((gap - 0.2 + 2.2) / 2) + 4, 'band, empty', 'vp-t');
     if (p.labels !== false) {
       body += `<text class="vp-t" x="${c.x0 + 170}" y="${r1(c.sy(0.5) + 4)}" text-anchor="start">gap</text>`;
       body += line(c.x0 + 160, c.sy(-0.2), c.x0 + 160, c.sy(gap - 0.2), 'vp-guide');
@@ -843,8 +868,8 @@ function kmeshGrid(p: P): string {
     }
   const [gx, gy] = pt(0, 0);
   body +=
-    `<circle class="vp-node" cx="${r1(gx)}" cy="${r1(gy)}" r="7"/>` +
-    text(gx + 14, gy - 8, 'Γ', 'vp-t', 'start');
+    `<circle class="vp-node vp-ring" cx="${r1(gx)}" cy="${r1(gy)}" r="7"/>` +
+    text(gx + 9, gy - 9, 'Γ', 'vp-t vp-halo', 'start');
   body += text(W / 2, h - 6, 'reciprocal cell with the k-points of the mesh', 'vp-t');
   return wrap(p.alt as string, h, body);
 }
