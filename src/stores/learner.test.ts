@@ -28,6 +28,18 @@ afterEach(() => {
 });
 
 describe('learner store', () => {
+  it('gives hydration a stable, empty server snapshot whatever the browser has stored', async () => {
+    const ls = fakeStorage();
+    vi.stubGlobal('localStorage', ls);
+    const a = await import('./learner');
+    a.answerQuestion(q, { correct: true, hintsUsed: 0 });
+    const snap = a.learnerServerSnapshot();
+    expect(a.learnerServerSnapshot()).toBe(snap);
+    expect(snap.persisted).toBe(true);
+    expect(snap.activity.answers).toBe(0);
+    expect(Object.keys(snap.learner.concepts)).toEqual([]);
+  });
+
   it('records an answer, persists it and reloads it', async () => {
     const ls = fakeStorage();
     vi.stubGlobal('localStorage', ls);
