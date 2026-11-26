@@ -48,8 +48,14 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-042 | closed | author + builder (M13.3) |
 | Q-043 | open | author |
 | Q-044 | closed | builder (M13.5) |
+| Q-045 | open | author + builder (M10.5) |
+| Q-046 | open | builder or author (M7.2) |
+| Q-047 | open | author (M7.3, with Q-008) |
+| Q-048 | open | author (M7.4) |
+| Q-049 | open | author (M6.5) |
 | Q-050 | closed | author + builder (M15.4) |
 | Q-051 | closed | author + builder (M15.8) |
+| Q-052 | open | builder |
 
 ## Release triage (M11.3)
 
@@ -241,3 +247,7 @@ S-042 gives Pugh ratio B/G above 1.75 as ductile, Poisson ratio above 0.26 as du
 ## Q-051. Materials Project U values in the DFT+U topic
 S-042 lists Ueff (eV) for Co 3.32, Cr 3.7, Fe 5.3, Mn 3.9, Mo 4.38, Ni 6.2, V 3.25, W 6.2 as Materials Project values for oxides and fluorides. These must be checked against the Materials Project documentation for the compatibility scheme in use (MP2020) before the site shows them, because the values have changed between schemes. **Close:** builder reads the pymatgen `MPRelaxSet` / MP2020 compatibility files from the package and records the match or the difference. **Owner: author + builder (M15.8).**
  **Closed (2026-11-26, D-087):** all eight S-042 values (Co 3.32, Cr 3.7, Fe 5.3, Mn 3.9, Mo 4.38, Ni 6.2, V 3.25, W 6.2 eV) equal `LDAUU` in pymatgen 2026.10.31 `MPRelaxSet.yaml` (S-034), with LDAUTYPE = 2 (Dudarev, Ueff = U - J, LDAUJ = 0), LDAUL = 2 (d), applied only when O or F is present. MP2020 (S-081; `MP2020Compatibility.yaml`) changed the energy corrections, not these U values. Their origin is a fit to oxide formation enthalpies (S-080), so they are database-compatibility values, not physical U for a given compound. Materials Project's r2SCAN sets (`MPSCANRelaxSet`, `MP24RelaxSet`) use no +U, so the table applies to GGA (PBE)+U only. The site may show the table with these four conditions next to it.
+
+## Q-052. Module 5 e2e: some topic pages sometimes never finish hydrating under load
+In full local runs (2 workers, 4 CPUs) two to four of the 36 `module-05.spec.ts` tests fail with a hung hydration wait (`astro-island[ssr]` never clears, even with a 90 s test timeout), on a different page each run. Every page hydrates in 0.3 to 5 s when opened alone, also with the CPU throttled 20 times, so the cause is not a single broken island. A reload after 15 s did not help. CI passed the same spec on PR #64 after one retry. The M15.1 and M15.3 sessions stopped here to stay inside their budgets. **Close:** find the stall (suspects: the static server `scripts/build/serve.mjs` under parallel load, or the shared WebGL context across workers) and fix it, or lower the spec's parallelism. **Owner: builder.**
+

@@ -5,6 +5,10 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- Tests for the Material Builder: crystal templates, molecule export, and an end-to-end keyboard and axe spec at 360 px (M15.3).
+
 ### Fixed
 
 - Deploy runs only after CI succeeds on main (D-089).
