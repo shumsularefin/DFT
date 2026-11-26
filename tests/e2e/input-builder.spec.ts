@@ -23,6 +23,8 @@ async function goStep(page: Page, name: string) {
 
 async function loadStructure(page: Page, text: string) {
   await page.goto(URL);
+  // the builder is a React island: fill only after it has hydrated, or React resets the text
+  await page.waitForFunction(() => document.querySelectorAll('astro-island[ssr]').length === 0);
   await page.getByLabel('POSCAR text').fill(text);
 }
 

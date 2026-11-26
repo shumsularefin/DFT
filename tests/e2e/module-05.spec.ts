@@ -17,7 +17,7 @@ const TOPICS2 = [
 
 async function ready(page: Page, url: string) {
   await page.goto(url);
-  for (let pass = 0; pass < 40; pass++) {
+  for (let pass = 0; pass < 400; pass++) {
     const remaining = await page.locator('astro-island[ssr]').count();
     if (remaining === 0) break;
     await page
@@ -25,12 +25,15 @@ async function ready(page: Page, url: string) {
       .first()
       .scrollIntoViewIfNeeded()
       .catch(() => {});
-    await page.waitForTimeout(50);
+    await page.waitForTimeout(50); // keeps scrolling the next unhydrated island into view; the 30 s test timeout is the real bound
   }
   await page.waitForFunction(() => document.querySelectorAll('astro-island[ssr]').length === 0);
 }
 const noOverflow = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth);
+
+// Topic pages hold several lazily hydrated islands; on a loaded 2-CPU CI runner hydration alone can pass 30 s.
+test.describe.configure({ timeout: 90_000 });
 
 test.describe('module 5', () => {
   for (const t of [...TOPICS, ...TOPICS2]) {

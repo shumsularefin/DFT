@@ -1,11 +1,17 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 const URL = '/design/explorer-demo/';
 
+async function open(page: Page) {
+  await page.goto(URL);
+  // the explorer is a React island: wait until it has hydrated before using the keyboard
+  await page.waitForFunction(() => document.querySelectorAll('astro-island[ssr]').length === 0);
+}
+
 test.describe('file explorer', () => {
   test('click opens an explanation; Escape closes and returns focus', async ({ page }) => {
-    await page.goto(URL);
+    await open(page);
     const poscar = page.getByRole('list', { name: 'POSCAR lines' });
     await poscar.getByRole('button', { name: /Line 2: Scaling factor/ }).click();
     await expect(page.getByRole('region', { name: 'Explanation for POSCAR' })).toContainText(
@@ -19,7 +25,7 @@ test.describe('file explorer', () => {
   });
 
   test('arrow keys move between annotated lines and Enter opens', async ({ page }) => {
-    await page.goto(URL);
+    await open(page);
     const poscar = page.getByRole('list', { name: 'POSCAR lines' });
     await poscar.getByRole('button', { name: /Line 1:/ }).focus();
     await page.keyboard.press('ArrowDown');
@@ -31,7 +37,7 @@ test.describe('file explorer', () => {
   });
 
   test('INCAR: known tag has a tag card, unknown tag is flagged', async ({ page }) => {
-    await page.goto(URL);
+    await open(page);
     const incar = page.getByRole('list', { name: 'INCAR lines' });
     await incar.getByRole('button', { name: /Line 2: ENCUT/ }).click();
     await page.getByText('Full tag card for ENCUT').click();
@@ -41,7 +47,7 @@ test.describe('file explorer', () => {
   });
 
   test('POTCAR panel lists header fields and no numbers', async ({ page }) => {
-    await page.goto(URL);
+    await open(page);
     const panel = page.getByRole('region', { name: /Inside a POTCAR header/ });
     await expect(panel.getByText('ZVAL', { exact: true })).toBeVisible();
     await expect(panel.getByText('LEXCH', { exact: true })).toBeVisible();
@@ -52,7 +58,7 @@ test.describe('file explorer', () => {
       await page.addInitScript((t) => {
         localStorage.setItem('dft:theme', JSON.stringify({ v: 1, data: t }));
       }, theme);
-      await page.goto(URL);
+      await open(page);
       await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
       await page
         .getByRole('list', { name: 'INCAR lines' })

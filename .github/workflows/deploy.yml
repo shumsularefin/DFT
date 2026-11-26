@@ -1,10 +1,13 @@
 name: Deploy to Firebase Hosting
 
-# Runs on every merge to main. Needs the repository secret FIREBASE_SERVICE_ACCOUNT and the
+# Runs only after the CI workflow has succeeded on a push to main (M15.1): a red main never deploys.
+# Needs the repository secret FIREBASE_SERVICE_ACCOUNT and the
 # repository variable (or secret) FIREBASE_PROJECT_ID. Without them it does nothing and passes.
 
 on:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [main]
   workflow_dispatch:
 
@@ -19,10 +22,14 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # workflow_run fires for every CI completion on main; only a successful push run may deploy.
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
     env:
       HAS_FIREBASE: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' && (vars.FIREBASE_PROJECT_ID || secrets.FIREBASE_PROJECT_ID) != '' }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
       - name: Detect project
         id: detect
         run: |

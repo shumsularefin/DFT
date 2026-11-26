@@ -315,7 +315,7 @@ export default function ToleranceFactorTool() {
                       <button
                         type="button"
                         className="tf-el-btn"
-                        aria-label={`Pick element for ${site} site occupant ${idx + 1} (currently ${occ.el})`}
+                        aria-label={`${occ.el}: pick element for ${site} site occupant ${idx + 1}`}
                         onClick={() =>
                           setPickerTarget((cur) =>
                             cur && cur.site === site && cur.index === idx ? null : { site, index: idx },
