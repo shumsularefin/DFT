@@ -16,6 +16,12 @@ The author designs the UI later, so new UI in these stages stays minimal: reuse 
 
 **Order:** M15.1 first (a red main blocks everything). M15.2 and M15.3 can run in parallel with M15.4 to M15.6.
 
+**Lean execution (binding, `docs/WORKFLOW.md` section 2a).** Every stage below has a **Budget**. Inside it:
+- Read `CLAUDE.md`, workflow sections 2, 2a and 7, your PROGRESS row and your stage section only. Look up S-, D- and Q- ids with `grep -n`. The handbook copies in `docs/source-material/` are large: grep the section you need (for example `grep -n "Born" docs/source-material/*Workflow*`), never read them whole.
+- Work with targeted tests (`npx vitest run <file>`, one Playwright spec on `--project=mobile-360`). Run full `npm run verify` and the full e2e suite once at the end, logs to the scratchpad, `tail -n 20` only.
+- Push, open the PR, record the CI run URL, stop. Never poll or watch CI.
+- At the budget, finish `partial` with an exact remaining list. A second short session is cheaper than one long one.
+
 ---
 
 ## M15.1 Make main green and gate deploy on CI (Tier B)
@@ -23,22 +29,28 @@ The author designs the UI later, so new UI in these stages stays minimal: reuse 
 **Goal**: No version reaches Firebase unless CI passed, and CI passes on main.
 **Depends on**: none
 **Size**: S
+**Budget**: 30 min. Two sessions if needed: M15.1 gate first (5 min), then the spec groups in order.
 **Deliverables**:
-- `deploy.yml` runs only after the CI workflow succeeds on main (a `workflow_run` trigger with `conclusion == 'success'`, or one workflow with `needs:`).
-- Fix every failing e2e spec; start with `tests/e2e/input-builder.spec.ts:102`, where the page overflows by 2 px at 360 px. Fix the layout, never the assertion.
-- Report the CI run ids before and after.
-**Tasks**: 1. Change the deploy trigger. 2. Reproduce each failing spec locally (desktop and mobile-360). 3. Fix the layout or code. 4. Push and watch CI.
+- `deploy.yml` deploys only after the CI workflow succeeds on `main`: a `workflow_run` trigger on `CI` with `if: github.event.workflow_run.conclusion == 'success'`, checking out `github.event.workflow_run.head_sha`. This is a 10-line YAML change; do it first and commit it on its own.
+- Main's e2e suite green. The failures already diagnosed (log of 2026-11-25, 15 tests, 7 specs) all appeared after the macOS theme merge (PR 63, commit 055c3cd). Fix them **by group, in this order**, and re-run only that group:
+  1. **Builder layout** (one cause, most of the red): `/builder/` overflows by 61 px at 360 px (`a11y-csp.spec.ts:18`, both projects) and 2 px per step (`input-builder.spec.ts:89`). Clicks on the builder then time out (`input-builder.spec.ts:30`, `:55` V029 not shown, `kpath-tool.spec.ts:134`). Find the wide element (`document.querySelectorAll('*')` with `scrollWidth > clientWidth`, one `page.evaluate`) and fix its CSS. Then re-run these three specs.
+  2. **Landing page** (`palette.spec.ts:116`): the "Starting points" list has 12 links, the test expects 5. Check `git show 055c3cd --stat` and the stage that wrote the test (`git log --oneline -S 'Starting points' -- tests/e2e/palette.spec.ts`) to see which is intended. If the theme added links on purpose, this is the author's call: record a Q, keep the test, mark the stage `partial` for this item. Do not change the count to 12.
+  3. **File explorer focus** (`file-explorer.spec.ts:21`, desktop): Line 2 button not focused after the arrow key. Likely a focus handler lost in the theme's markup.
+  4. **Tolerance factor and module 5** (`tolerance-factor.spec.ts:5`, `module-05.spec.ts:37` smearing and reading-magnetic-output): re-run first; if they still fail, read the error line, fix, or record it.
+- In the report: before and after pass counts, and the CI run URL of the push (do not wait for it).
+**Tasks**: 1. Deploy trigger (commit). 2. `npm run build` once, serve `dist` on 4321 in the background, run the four groups in order with `--reporter=line`. 3. Full e2e once at the end. 4. Push, PR, stop.
 **Tests and reference values**: The existing e2e suite, unchanged; no assertion is loosened.
 **Done when**:
-- [ ] Full Playwright run (desktop and mobile-360) green locally and in CI on main.
-- [ ] A deliberately failing CI run does not deploy (show the run).
-**Not in this stage**: new features.
+- [ ] Full Playwright run (desktop and mobile-360) green locally, or each remaining red test recorded with its cause and a Q id.
+- [ ] `deploy.yml` uses `workflow_run` with the success condition (review of the YAML is enough; no deliberately failing run is needed).
+**Not in this stage**: new features; waiting on or re-running CI.
 
 ## M15.2 Science re-audit of the 2026-11-24 batch (Tier A)
 
-**Goal**: Bring the Tier A stages that skipped the process up to the rules in `CLAUDE.md`, using `/audit-stage` on each.
+**Goal**: Bring the Tier A stages that skipped the process up to the rules in `CLAUDE.md`. Apply the `/audit-stage` checklist inline; do not invoke `/audit-stage` five times (each call re-reads the start-up documents).
 **Depends on**: M15.1
 **Size**: L (may finish `partial`)
+**Budget**: 2 sessions of about 75 min (split below). Finish session 1 as `partial`.
 **Deliverables**:
 - **M14.3:** a pymatgen golden file for planar averages (`get_average_along_axis`, work order tolerance 1e-9), made by a script in `scripts/reference/`. The hand-computed test stays as a second test.
 - **M9.3:** `src/lib/mp/feasibility.ts` runtime model.
@@ -48,8 +60,8 @@ The author designs the UI later, so new UI in these stages stays minimal: reuse 
 - **Builder-owned questions:**
   - Close or update Q-002, Q-005, Q-010, Q-012, Q-014, Q-018 and Q-021 with evidence.
   - Add the missing DECISIONS entries for real choices made in those stages, for example the screening query engine and the planner schema.
-- One report per audited stage, plus a summary in `docs/reports/M15.2.md`.
-**Tasks**: 1. `/audit-stage` on M14.3, M9.3, M7.5, M14.1, M14.2 in that order. 2. Golden generators and tests. 3. Questions and decisions. 4. Reports.
+- One report, `docs/reports/M15.2.md`, with a findings section per audited stage.
+**Tasks**: **Session 1:** M14.3 (golden generator and test) and M9.3 (runtime model and D entry); finish `partial`. **Session 2:** science-verifier once over the files M7.5, M14.1 and M14.2 added (`git log --stat` on their merge commits gives the list), golden files where their work orders asked, then the questions and DECISIONS entries, then the reports. One combined report `docs/reports/M15.2.md` with a section per audited stage is enough.
 **Tests and reference values**: New golden files in `tests/reference/` made by `scripts/reference/` scripts (pymatgen from PyPI); never hand-edited.
 **Done when**:
 - [ ] Every audited stage has a findings list with each item fixed or recorded as a question.
@@ -61,6 +73,7 @@ The author designs the UI later, so new UI in these stages stays minimal: reuse 
 **Goal**: Close the non-science gaps from the audit.
 **Depends on**: M15.1
 **Size**: M
+**Budget**: 60 min. Lighthouse: one `lhci autorun` with the existing config, once.
 **Deliverables**:
 - Tests for the crystal editor (M10.4) and the molecule builder (M10.5): unit tests for their models, plus e2e and axe at 360 px for the keyboard path. Test what the code does now. If it is wrong, record a question; do not change the behaviour without one.
 - Write a DECISIONS entry for the macOS scientific theme (commit 055c3cd): what it replaces in D-054 and why. Link it to Q-043, which stays open for the author.
@@ -78,6 +91,7 @@ The author designs the UI later, so new UI in these stages stays minimal: reuse 
 **Goal**: The user drops an OUTCAR from an `IBRION = 6, ISIF = 3` run and gets Cij in GPa, the Born stability test and the averaged moduli, each traced to its line and its source.
 **Depends on**: M4.1
 **Size**: L
+**Budget**: 90 min. Generator and golden file first (about 20 min), then library, then reader.
 **Sources**: S-042 (elastic chapter). The primary papers must be added to `docs/SCIENCE_SOURCES.md` before use:
 - Born and Huang, or Mouhat and Coudert 2014, for the stability criteria;
 - Hill 1952 for the Voigt-Reuss-Hill averages;
@@ -107,6 +121,7 @@ The author designs the UI later, so new UI in these stages stays minimal: reuse 
 **Goal**: From ε1(ω) and ε2(ω) in `vasprun.xml`, compute n, k, α, R, L and σ. From the OUTCAR of an `LEPSILON` or `LCALCEPS` run, read ε∞, the ionic ε and the Born charges, and check the acoustic sum rule.
 **Depends on**: M4.1
 **Size**: M
+**Budget**: 60 min.
 **Sources**: S-042 (optics and dielectric chapters), plus a textbook source for the relations (for example Fox, *Optical Properties of Solids*), to be added to the register.
 **Deliverables**:
 - `src/lib/optics/derived.ts`:
@@ -127,6 +142,7 @@ The author designs the UI later, so new UI in these stages stays minimal: reuse 
 **Goal**: Read the Γ-point modes from an OUTCAR (IBRION = 5 to 8), mark imaginary modes and the three acoustic modes, and give every frequency in THz, cm^-1 and meV with sourced conversions.
 **Depends on**: M4.1
 **Size**: S
+**Budget**: 40 min.
 **Sources**: S-042 (phonon chapter, units table) and CODATA (already registered) for the conversions.
 **Deliverables**:
 - Mode parser (`f` and `f/i` lines) in `src/lib/vasp/outcar.ts`.
@@ -145,6 +161,7 @@ The author designs the UI later, so new UI in these stages stays minimal: reuse 
 **Goal**: Teach the S-042 chapters that have no page yet, in the site's voice (`docs/CONTENT_GUIDE.md`): why, which values, what happens if you skip it.
 **Depends on**: M15.4, M15.5, M15.6
 **Size**: L (split into two sessions if needed)
+**Budget**: 2 sessions of about 60 min (split below). Content only: no new components.
 **Deliverables**: new module `src/content/handbook/12-properties/` with these topics:
 - **Elastic constants:**
   - the run, and the "before you run" checks;
@@ -167,7 +184,7 @@ The author designs the UI later, so new UI in these stages stays minimal: reuse 
 - **Magnetocrystalline anisotropy:** the vasp_ncl steps, LORBMOM, and the k-mesh. This one goes into the existing `noncollinear-and-spin-orbit` topic rather than a new page.
 - 4 to 6 practice questions per topic in `src/data/questions/module-12.json`, plus glossary terms.
 - Add the AIMD (NVT) recipe from S-041 as a preset. Add `MDALGO`, `TEBEG` and `SMASS` to the tag data through the generator (`scripts/build/build-vasp-data.mjs`), not by hand.
-**Tasks**: 1. Topic outlines from S-042 sections. 2. Write each topic (levels as in the content guide). 3. Questions and glossary. 4. AIMD preset through the generator. 5. e2e, axe, guards.
+**Tasks**: **Session 1:** elastic constants, equation of state, phonons, dielectric tensor, each with its practice questions and glossary terms; finish `partial`. **Session 2:** optical properties, Bader, the anisotropy section, their questions and terms, then the AIMD preset through the generator. Per topic: grep its S-042 section, write it (levels as in the content guide), add its questions. One parametrised e2e spec loops over all module 12 topics (copy the pattern of `module-05.spec.ts`).
 **Tests and reference values**: Question schema tests; preset passes the M3.4 validator with no errors; generator output diff reviewed.
 **Done when**:
 - [ ] Every formula on a page comes from a Tier A library or carries its S-id. Nothing new is invented on a content page.
@@ -179,6 +196,7 @@ The author designs the UI later, so new UI in these stages stays minimal: reuse 
 **Goal**: Fill the depth gaps in existing topics, and add the S-042 "Other calculations" table as a catalogue page.
 **Depends on**: M15.7
 **Size**: M
+**Budget**: 60 min. Edit topics in place.
 **Deliverables**:
 - **`dft-plus-u`:**
   - choosing U (database values, linear response with LDAUTYPE = 3, empirical fit, U scan);
@@ -203,6 +221,7 @@ The author designs the UI later, so new UI in these stages stays minimal: reuse 
 **Goal**: The quick-reference parts of both handbooks, as pages a researcher keeps open.
 **Depends on**: M15.6 (units library)
 **Size**: M
+**Budget**: 60 min. Reuse the existing table and page components.
 **Deliverables**:
 - `/reference/units/`: the S-042 units table, rendered from `src/lib/physics/units.ts` (no typed numbers). It also shows the VASPKIT k-resolution to KSPACING relation.
 - `/reference/where-to-read/`: the S-041 `QUICK` table (14 rows) merged with the S-042 "Where to read it" table. Each row has the file, the grep line and a link to the parser that reads it.

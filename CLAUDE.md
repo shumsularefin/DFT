@@ -6,11 +6,11 @@ Read this file at the start of every session. It is short on purpose.
 
 ## Start of session
 
-1. Read this file, `SPEC.md`, `docs/WORKFLOW.md`, `docs/PROGRESS.md`, then **only your assigned stage** in `docs/milestones/` and the docs that stage cites.
+1. Read this file, `docs/WORKFLOW.md` sections 2, 2a and 7, your row of `docs/PROGRESS.md`, then **only your assigned stage** in `docs/milestones/` and the docs it cites. Read `SPEC.md` and the registers (DECISIONS, OPEN_QUESTIONS, SCIENCE_SOURCES) by `grep -n` on the ids you need, never whole.
 2. Check the stage's **Tier** in `docs/PROGRESS.md` (A = strongest model, B = fast model). On the wrong tier for a Tier A stage, stop and tell the author to switch models.
 3. Confirm the stage's dependencies are `done` in `docs/PROGRESS.md`. If not, stop and report. Do not build on missing foundations.
 4. Do **only the stage you were named**. Never start the next one, even if time remains.
-5. Plan v3 (stages M12 to M14 and the new build order): `docs/ROADMAP_V3.md`. Its section 5 (working lean) applies to every stage.
+5. Plan v3: `docs/ROADMAP_V3.md`. **Work lean (`docs/WORKFLOW.md` section 2a, binding):** respect the stage Budget, run targeted tests while working, run full verify and full e2e once at the end, never poll CI, finish `partial` rather than overrun.
 
 ## Hard rules
 

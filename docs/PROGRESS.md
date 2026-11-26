@@ -120,6 +120,7 @@ Newest first. One line per session: date, stage, outcome, branch.
 - 2026-10-27, planning: environment created (rules, SPEC v2, workflow, 53 work orders, guards, CI, hosting config, golden reference data). Branch `claude/great-dijkstra-oj0kbx`.
 - 2026-11-26, planning: process audit of main (CI e2e red on every recent merge while deploy runs regardless; 19 stages of 2026-11-24/25 without DECISIONS entries, golden files or full reports) and a coverage check of S-041 and S-042 against the site. Added milestone M15 (9 stages, Tier A: M15.2, M15.4, M15.5, M15.6; Tier B: M15.1, M15.3, M15.7, M15.8, M15.9), D-086, Q-050, Q-051, Q-042 update.
 - 2026-11-26, Q-042/Q-050/Q-051 from the literature (D-087): Heisenberg default now minus sign (J > 0 FM), Heuristic mean-field T_C for FM ground states in `/tools/magnetic/` (S-070, S-071), handbook erratum on the T_C reference state; sources S-070 to S-081; MP U values confirmed against pymatgen.
+- 2026-11-26, process (D-088): lean execution made binding (`docs/WORKFLOW.md` 2a): budgets on every M15 stage, targeted tests while working, full runs once, no CI polling. M15.1 rewritten around the 15 diagnosed e2e failures in four groups; M15.2 and M15.7 split into two sessions.
 
 ## Author actions outstanding
 
