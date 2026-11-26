@@ -7,7 +7,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Fixed
 
-- Deploy runs only after CI succeeds on main (D-088).
+- Deploy runs only after CI succeeds on main (D-089).
 - Crystal and molecule builder, and the Input Builder Task step, no longer overflow the page at 360 px wide.
 - Tolerance-factor element buttons now start their accessible name with the visible symbol (axe `label-content-name-mismatch`).
 - End-to-end specs wait for island hydration before typing or using the keyboard; the landing page spec expects the 12 starting points the page now has.

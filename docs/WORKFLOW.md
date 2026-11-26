@@ -21,9 +21,24 @@ Run these in order and do not skip any.
    - Fresh branch with no commits of its own: `git reset --hard origin/<BASE>`.
    - Branch that already has commits: `git merge --no-ff origin/<BASE>`.
    After this, `docs/PROGRESS.md` on your branch must show every dependency of your stage as `done`. If not, stop and report which dependency is missing.
-3. Read the documents named in `CLAUDE.md`. Read your stage section completely, including "Not in this stage".
-4. `npm ci` (or `npm install` if there is no lockfile yet, only in M0.1). Run `npm run verify` once to learn the baseline. If the baseline is red, report it before changing anything.
+3. Read narrowly (section 2a): `CLAUDE.md`, your stage section completely (including "Not in this stage") and the files it names. Look up D-, Q- and S- ids with `grep -n`; do not read `DECISIONS.md`, `OPEN_QUESTIONS.md`, `SCIENCE_SOURCES.md` or `SPEC.md` whole.
+4. `npm ci` (or `npm install` if there is no lockfile yet, only in M0.1). Learn the baseline cheaply: `npm run verify > $SCRATCH/verify0.log 2>&1; tail -n 15 $SCRATCH/verify0.log`. Do not run the full e2e suite as a baseline; CI on `main` already tells you which specs are red. If the baseline is red outside your stage, note it in the report and carry on unless the stage is the fix.
 5. Create `docs/reports/<stage-id>.md` from the template in section 8 and fill in the plan (the Tasks list as a checklist). Commit it: `docs(<stage>): start report`.
+
+## 2a. Budget and lean execution (binding for every stage)
+
+Time and tokens are part of the gate. A stage that burns an hour re-running suites is a process failure even if it ends green.
+
+- **Budget.** Each stage has a `Budget` line in its work order (default by size: S = 30 min, M = 60 min, L = 90 min of wall time, roughly). When you pass it, stop adding work, run the final gates once, and finish as `partial` (section 7) with an exact remaining list. Never extend a session to "just finish".
+- **Read once, read ranges.** `grep -n` first, then `sed -n 'a,bp'`. Never `cat` a file over 200 lines, a golden file, a log or a built page. Do not re-read a file you just edited.
+- **Inner loop is targeted.** `npx vitest run <file>`; one e2e spec on one project: `npx playwright test <spec> --project=mobile-360 --trace off --reporter=line` (add `-g "<title>"` for one test). Build once (`npm run build`), then reuse the server: Playwright's `reuseExistingServer` is on locally, so start `node scripts/build/serve.mjs dist 4321` in the background and keep it while you iterate. Rebuild only when `src/` changed.
+- **Full runs exactly once at the end:** `npm run verify`, then the full e2e suite, each piped to a log in the scratchpad, quoting only `tail -n 20`. Run them in the background if your tools allow and do docs (report, PROGRESS) meanwhile. Re-run only the specs that failed, never the whole suite again.
+- **Never wait on CI.** Push, open the pull request, record the run URL in the report, and stop. Do not poll, sleep or watch CI. A red CI found later is a new fix, not a reason to hold the session open.
+- **Lighthouse** only when the stage says so or adds a new page class; one run, one page per class.
+- **Screenshots** only when the work order asks; at most 2.
+- **Subagents** (`science-verifier`, `stage-reviewer`) once, at the end, only on Tier A stages or when the work order names them.
+- **Diagnose before fixing.** For a failing test, read its error line and the one component it names. Group failures by cause; several red specs usually share one cause. Fix the cause once, re-run that group only.
+- **Short report.** Fill the template; quote summary lines, not logs. No narrative of the session.
 
 ## 3. Build loop
 
@@ -33,7 +48,7 @@ Run these in order and do not skip any.
 - **Sources.** Each formula, constant or table gets a `@source S-xxx` comment. If the source is not in `docs/SCIENCE_SOURCES.md` yet, add it there (mark "verified" honestly: "cited from memory" until you have actually read it).
 - **Unknowns.** Add to `docs/OPEN_QUESTIONS.md` with the next free `Q-nnn`, point to it from an `it.todo`, and keep going. Do not guess.
 - **Decisions.** A non-obvious choice goes into `docs/DECISIONS.md` with the next free `D-nnn`: context, decision, consequences, 5 lines at most.
-- Run `npm test` often and `npm run verify` before each push.
+- Run targeted tests often (section 2a) and the full `npm run verify` once before the push.
 
 ## 4. Gates (all must pass before you finish)
 
@@ -42,8 +57,8 @@ Run these in order and do not skip any.
 | G1 Verify | `npm run verify` | every stage |
 | G2 Guards | `node scripts/guard/run-all.mjs` (also part of verify) | every stage |
 | G3 Science | every formula/constant/table has `@source`, a unit test with a reference value, and no unexplained skip | stages with `src/lib/` logic or data |
-| G4 UI | `npm run test:e2e` incl. axe-core with zero violations, keyboard path tested, 360 px and desktop projects | stages with UI |
-| G5 Performance | `npm run size` within `budgets.json`; Lighthouse run recorded in the report (`CHROME_PATH=/opt/pw-browsers/chromium npx lhci autorun`) | stages with UI |
+| G4 UI | the specs the stage added or touched, on both projects, while working; the full `npm run test:e2e` once before the push (section 2a); axe-core zero violations, keyboard path tested | stages with UI |
+| G5 Performance | `npm run size` within `budgets.json`; Lighthouse (`CHROME_PATH=/opt/pw-browsers/chromium npx lhci autorun`) only when the work order asks or a new page class is added | stages with UI |
 | G6 Content | `npm run lint:content` clean (from M1.2 on) | stages that add or change content |
 | G7 Stage-specific | the "Done when" checklist of the stage | every stage |
 
@@ -51,7 +66,7 @@ A gate you cannot run (missing tool, blocked network) is **not** a pass. Write i
 
 ## 5. Evidence
 
-The report must contain real output, trimmed: the test summary line, bundle sizes, Lighthouse scores per page class, axe result, and 1 to 4 screenshots (taken with Playwright, each under 200 KB, saved in `docs/reports/img/<stage>/`). The auditor reads these first.
+The report must contain real output, trimmed: the test summary line, bundle sizes, Lighthouse scores (when run), axe result, and screenshots only where the work order asks (at most 2, each under 200 KB, in `docs/reports/img/<stage>/`). The auditor reads these first.
 
 ## 6. Finish
 

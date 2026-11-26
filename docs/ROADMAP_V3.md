@@ -58,7 +58,7 @@ The tier of every stage is the **Tier** column of `docs/PROGRESS.md` (that colum
 
 ## 5. Working lean (time and tokens) without losing accuracy
 
-These refine `docs/WORKFLOW.md`; where they seem to conflict, `CLAUDE.md` and the workflow win.
+These refine `docs/WORKFLOW.md`; the binding version, with budgets, is `docs/WORKFLOW.md` section 2a. Where they seem to conflict, `CLAUDE.md` and the workflow win.
 
 1. **Read narrowly.** Read `CLAUDE.md`, the stage section and the documents it cites. For `SPEC.md`, read section 0 once and then only the sections your stage touches. Find things with `grep -n` and read ranges, not whole files. Never print a whole golden file; load it in a test.
 2. **Reuse first.** Before writing a helper, search `src/lib/` (linear algebra, reduction, symmetry, parsers, scene controllers, writers and the zip builder all exist). Extend a file in place; never fork a second version.
