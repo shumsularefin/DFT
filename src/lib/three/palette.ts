@@ -14,8 +14,8 @@ export const ATOM_PALETTE: readonly string[] = [
 ];
 
 /** Page backgrounds the colours are drawn against (the `bg` token of each theme, src/styles/tokens.css). */
-export const LIGHT_BG = '#eef1f6';
-export const DARK_BG = '#1c1f26';
+export const LIGHT_BG = '#faf9f5';
+export const DARK_BG = '#262624';
 
 export function hexToRgb(hex: string): [number, number, number] {
   const m = /^#([0-9a-f]{6})$/i.exec(hex);
@@ -46,7 +46,7 @@ export const worstContrast = (hex: string): number =>
 
 /**
  * Colour for the i-th distinct element. Several palette colours stay below 3:1 against one of the two page backgrounds
- * (yellow, sky blue and orange on white, grey on dark), so the scenes draw every atom with a thin outline in the text
+ * (yellow, sky blue, orange and pink on light, blue and grey on dark), so the scenes draw every atom with a thin outline in the text
  * colour, and the legend always names the element: colour is never the only cue (WCAG 1.4.1, 1.4.11).
  */
 export const atomColor = (index: number): string => ATOM_PALETTE[index % ATOM_PALETTE.length]!;

@@ -15,13 +15,13 @@ describe('contrast', () => {
   });
 
   it('reports a deliberately bad pair', () => {
-    const bad = css.replace('--text-muted: #4b5563;', '--text-muted: #c0c0c0;');
+    const bad = css.replace('--text-muted: #5e5d59;', '--text-muted: #c0c0c0;');
     const { failures } = check(bad);
     expect(failures.some((f) => f.startsWith('light: text-muted on bg'))).toBe(true);
   });
 
   it('flags a media block that drifts from the dark theme block', () => {
-    const drift = css.replace('--surface: #252932;', '--surface: #161b24;');
+    const drift = css.replace('--surface: #30302e;', '--surface: #161b24;');
     expect(check(drift).failures.some((f) => f.includes('differ'))).toBe(true);
   });
 });
