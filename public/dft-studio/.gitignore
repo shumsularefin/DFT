@@ -1,0 +1,3 @@
+# Licensed VASP pseudopotentials: never commit
+data/potcars/
+POTCAR*

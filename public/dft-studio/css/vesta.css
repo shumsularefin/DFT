@@ -1,0 +1,197 @@
+    :root {
+      --bg-app: #eef0f4;
+      --bg-panel: #f7f8fa;
+      --bg-card: #ffffff;
+      --bg-header: #e6e9ef;
+      --bg-input: #ffffff;
+      --bg-hover: #e2e6ee;
+      --bg-active: #dbeafe;
+      --border: #cfd5df;
+      --border-subtle: #e2e6ee;
+      --text-primary: #14181f;
+      --text-secondary: #4b5563;
+      --text-muted: #6b7280;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --accent-text: #1e40af;
+      --console-bg: #f9fafb;
+      --viewport-bg: #ffffff;
+    }
+    html.dark {
+      --bg-app: #12151c;
+      --bg-panel: #181c25;
+      --bg-card: #1f2430;
+      --bg-header: #141821;
+      --bg-input: #141821;
+      --bg-hover: #282e3d;
+      --bg-active: #1e3a5f;
+      --border: #2c3342;
+      --border-subtle: #232936;
+      --text-primary: #eef2f7;
+      --text-secondary: #b4bece;
+      --text-muted: #7f8ca0;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --accent-text: #93c5fd;
+      --console-bg: #11141b;
+      --viewport-bg: #0f131a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-app);
+      color: var(--text-primary);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      font-size: 12px;
+      user-select: none;
+    }
+    .font-mono-code { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace; }
+    .panel-bg { background: var(--bg-panel); }
+    .card-bg { background: var(--bg-card); }
+    .header-bg { background: var(--bg-header); }
+    .border-theme { border-color: var(--border); }
+    .border-subtle { border-color: var(--border-subtle); }
+    .text-main { color: var(--text-primary); }
+    .text-sub { color: var(--text-secondary); }
+    .text-mut { color: var(--text-muted); }
+
+    .v-input {
+      background: var(--bg-input);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 3px 6px;
+      font-size: 11.5px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .v-input:focus { border-color: var(--accent); }
+    .v-btn {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 4px 8px;
+      font-size: 11.5px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .v-btn:hover { background: var(--bg-hover); }
+    .v-btn-primary {
+      background: var(--accent);
+      color: #ffffff;
+      border: 1px solid var(--accent);
+    }
+    .v-btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+    .v-btn-active {
+      background: var(--bg-active);
+      color: var(--accent-text);
+      border-color: var(--accent);
+    }
+
+    .tool-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+    .tool-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .tool-btn.active {
+      background: var(--bg-active);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .tab-btn {
+      padding: 6px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.12s, border-color 0.12s;
+    }
+    .tab-btn:hover { color: var(--text-primary); }
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .orient-btn {
+      min-width: 26px;
+      height: 24px;
+      padding: 0 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .orient-btn:hover { background: var(--bg-hover); border-color: var(--accent); }
+
+    /* Custom thin scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    input[type="range"] {
+      accent-color: var(--accent);
+      height: 4px;
+    }
+    textarea.code-area {
+      user-select: text;
+      background: var(--console-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      line-height: 1.45;
+      padding: 8px;
+      resize: none;
+    }
+    .selectable-text { user-select: text; }
+
+    /* Responsive drawer behavior for smaller screens */
+    @media (max-width: 1024px) {
+      #left-sidebar {
+        position: fixed;
+        top: 44px;
+        bottom: 0;
+        left: 42px;
+        z-index: 40;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.22);
+      }
+      #right-workbench {
+        position: fixed;
+        top: 44px;
+        bottom: 0;
+        right: 0;
+        z-index: 40;
+        box-shadow: -4px 0 20px rgba(0,0,0,0.22);
+      }
+    }
+
+    /* Keep the WebGL canvas at CSS size on HiDPI screens (renderer.setSize is called with updateStyle = false). */
+    #three-container canvas { display: block; width: 100% !important; height: 100% !important; }
