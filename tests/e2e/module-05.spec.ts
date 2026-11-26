@@ -23,7 +23,9 @@ async function ready(page: Page, url: string) {
     await page
       .locator('astro-island[ssr]')
       .first()
-      .scrollIntoViewIfNeeded()
+      // Bounded: the island can hydrate between count() and this call, and an unbounded wait for an element
+      // that no longer matches would hang until the test timeout (the module 5 flake of Q-052).
+      .scrollIntoViewIfNeeded({ timeout: 1000 })
       .catch(() => {});
     await page.waitForTimeout(50); // keeps scrolling the next unhydrated island into view; the 30 s test timeout is the real bound
   }

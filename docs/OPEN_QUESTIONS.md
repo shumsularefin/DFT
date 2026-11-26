@@ -55,7 +55,7 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-049 | open | author (M6.5) |
 | Q-050 | closed | author + builder (M15.4) |
 | Q-051 | closed | author + builder (M15.8) |
-| Q-052 | open | builder |
+| Q-052 | closed | builder (closed M15.5) |
 | Q-053 | open | author |
 | Q-054 | open | author |
 | Q-055 | open | author or builder |
@@ -262,6 +262,8 @@ S-042 lists Ueff (eV) for Co 3.32, Cr 3.7, Fe 5.3, Mn 3.9, Mo 4.38, Ni 6.2, V 3.
 
 ## Q-052. Module 5 e2e: some topic pages sometimes never finish hydrating under load
 In full local runs (2 workers, 4 CPUs) two to four of the 36 `module-05.spec.ts` tests fail with a hung hydration wait (`astro-island[ssr]` never clears, even with a 90 s test timeout), on a different page each run. Every page hydrates in 0.3 to 5 s when opened alone, also with the CPU throttled 20 times, so the cause is not a single broken island. A reload after 15 s did not help. CI passed the same spec on PR #64 after one retry. The M15.1 and M15.3 sessions stopped here to stay inside their budgets. **Close:** find the stall (suspects: the static server `scripts/build/serve.mjs` under parallel load, or the shared WebGL context across workers) and fix it, or lower the spec's parallelism. **Owner: builder.**
+
+**Closed (M15.5, 2026-11-26):** two races in the tests, not in the site. (1) The `ready()` helper of `module-05.spec.ts` counts unhydrated islands, then calls `.first().scrollIntoViewIfNeeded()` with no timeout; when the last island hydrates in between, the call waits for an element that no longer matches until the test timeout, and the `.catch` hides why. Reproduced 5 times in 6 on `vdw-corrections` (one `client:idle` island). Fixed by bounding that call to 1 s. (2) `kpath-tool.spec.ts` filled the Input Builder textarea before React hydrated, so hydration reset it and the handoff button never appeared (1 in 4). Fixed by waiting for hydration first, as `structure-view.spec.ts` does. After both fixes: 30 of 30 repeated runs pass. Not fixed here: a React hydration text mismatch (error #418) logged on that page, which React recovers from; it does not fail any test.
 
 ## Q-053. Feasibility cut-offs in Screening Studio (M9.3)
 The feasibility rules in `src/lib/mp/feasibility.ts` use three cut-offs that no source states: cell size green up to 10 atoms, yellow up to 30, red above (F-SIZE), and 'heavy element' meaning Z > 54 (F-HEAVY, a hint that spin-orbit coupling may matter; S-042 says only "heavy elements"). They are labelled Heuristic and cite S-042 for the reasoning, not for the numbers. The unsourced absolute runtime formula was removed in M15.2 (D-092). **Close:** author confirms these cut-offs as house rules, or gives the values to use. **Owner: author.**
