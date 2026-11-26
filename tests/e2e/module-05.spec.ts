@@ -17,7 +17,7 @@ const TOPICS2 = [
 
 async function ready(page: Page, url: string) {
   await page.goto(url);
-  for (let pass = 0; pass < 40; pass++) {
+  for (let pass = 0; pass < 400; pass++) {
     const remaining = await page.locator('astro-island[ssr]').count();
     if (remaining === 0) break;
     await page
@@ -25,7 +25,7 @@ async function ready(page: Page, url: string) {
       .first()
       .scrollIntoViewIfNeeded()
       .catch(() => {});
-    await page.waitForTimeout(50);
+    await page.waitForTimeout(50); // keeps scrolling the next unhydrated island into view; the 30 s test timeout is the real bound
   }
   await page.waitForFunction(() => document.querySelectorAll('astro-island[ssr]').length === 0);
 }

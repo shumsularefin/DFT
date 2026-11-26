@@ -115,7 +115,7 @@ test.describe('status line', () => {
 
 test('landing page is a session: prompt line and starting points', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('list', { name: 'Starting points' }).getByRole('link')).toHaveCount(5);
+  await expect(page.getByRole('list', { name: 'Starting points' }).getByRole('link')).toHaveCount(12);
   await page.locator('[data-palette-open]').click();
   await expect(page.getByRole('dialog', { name: 'Command palette' })).toBeVisible();
 });

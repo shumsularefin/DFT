@@ -23,8 +23,10 @@ test.describe('tolerance-factor explorer', () => {
     await page.getByRole('button', { name: /Pick element for A site occupant 1/i }).click();
     const search = page.getByLabel(/Filter elements/i);
     await search.fill('Ba');
+    // wide screens show the grid (buttons named "Barium, Ba, ..."), narrow ones the list view ("Ba (56) Barium")
     await page
       .getByRole('button', { name: /Barium, Ba/i })
+      .or(page.getByRole('button', { name: /^Ba \(56\) Barium/ }))
       .first()
       .click();
     await expect(page.locator('[data-factor="t"] .tf-metric')).not.toHaveText('0.9342');
