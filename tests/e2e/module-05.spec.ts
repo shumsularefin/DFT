@@ -32,6 +32,9 @@ async function ready(page: Page, url: string) {
 const noOverflow = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth);
 
+// Topic pages hold several lazily hydrated islands; on a loaded 2-CPU CI runner hydration alone can pass 30 s.
+test.describe.configure({ timeout: 90_000 });
+
 test.describe('module 5', () => {
   for (const t of [...TOPICS, ...TOPICS2]) {
     test(`${t}: anatomy, no horizontal scroll, axe clean`, async ({ page }) => {
