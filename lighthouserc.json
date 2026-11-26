@@ -27,7 +27,12 @@
             "minScore": 0.95
           }
         ],
-        "categories:seo": "off",
+        "categories:seo": [
+          "error",
+          {
+            "minScore": 0.95
+          }
+        ],
         "document-title": "error",
         "meta-description": "error",
         "http-status-code": "error",
@@ -36,7 +41,7 @@
         "canonical": "error",
         "robots-txt": "error",
         "image-alt": "error",
-        "is-crawlable": "off"
+        "is-crawlable": "error"
       }
     }
   }
