@@ -1,6 +1,7 @@
 // OUTCAR parser. Pure, tolerant: a missing optional item is simply absent, unknown formats produce warnings.
 // @source S-019, S-041 (Field Handbook OUTCAR grep list), S-042, D-015, S-034 (pymatgen Outcar magnetization table)
 // Line formats are from the documentation and hand-written fixtures; not yet validated on real output (Q-008).
+import { KBAR_IN_GPA } from '../physics/constants';
 import { NUM_SRC, toNum } from './num';
 
 export interface Found<T> {
@@ -44,6 +45,58 @@ export interface MagnetizationTable {
   total?: Record<string, number>;
 }
 
+/**
+ * The last "TOTAL ELASTIC MODULI (kBar)" block of an IBRION = 6, ISIF >= 3 run (clamped-ion part plus the ionic
+ * relaxation correction). @source S-042 (elastic chapter, "ordering trap"), S-034 (pymatgen Outcar.read_elastic_tensor
+ * reads the same layout; the golden fixtures are read back by it).
+ */
+export interface ElasticModuli {
+  /** Line of the "TOTAL ELASTIC MODULI" heading. */
+  line: number;
+  /** As printed: rows and columns in VASP order XX YY ZZ XY YZ ZX, kBar. */
+  vaspOrderKbar: number[][];
+  /** Reordered to Voigt 11 22 33 23 13 12 and converted to GPa. Not symmetrized. */
+  voigtGPa: number[][];
+  /** Largest |C_ij - C_ji| in GPa: VASP prints a nearly symmetric matrix; a large value means noise. */
+  asymmetryGPa: number;
+}
+
+/** Voigt index (0-based) of each VASP position: XX YY ZZ XY YZ ZX = Voigt 1 2 3 6 4 5 (S-042). */
+export const VASP_TO_VOIGT = [0, 1, 2, 5, 3, 4] as const;
+
+/** Reorder a 6x6 matrix from VASP's XX YY ZZ XY YZ ZX order to Voigt order and scale it. */
+export function vaspToVoigt(m: readonly (readonly number[])[], scale = 1): number[][] {
+  const out = Array.from({ length: 6 }, () => new Array<number>(6).fill(0));
+  for (let i = 0; i < 6; i++)
+    for (let j = 0; j < 6; j++) out[VASP_TO_VOIGT[i]!]![VASP_TO_VOIGT[j]!] = m[i]![j]! * scale;
+  return out;
+}
+
+const ELASTIC_ROWS = ['XX', 'YY', 'ZZ', 'XY', 'YZ', 'ZX'];
+
+/** Read one moduli block whose heading is line i. Undefined when the six rows are not all there. */
+function readElastic(lines: string[], i: number): ElasticModuli | undefined {
+  const head = lines[i + 1]?.trim().split(/\s+/) ?? [];
+  if (head[0] !== 'Direction' || head.slice(1).join(' ') !== ELASTIC_ROWS.join(' ')) return undefined;
+  const rows: number[][] = [];
+  for (let j = i + 2; j < lines.length && rows.length < 6; j++) {
+    const t = lines[j]!.trim();
+    if (/^-+$/.test(t)) continue;
+    const parts = t.split(/\s+/);
+    if (parts[0] !== ELASTIC_ROWS[rows.length]) return undefined;
+    const v = parts.slice(1).map(toNum);
+    if (v.length !== 6 || !v.every(Number.isFinite)) return undefined;
+    rows.push(v);
+  }
+  if (rows.length !== 6) return undefined;
+  const voigtGPa = vaspToVoigt(rows, KBAR_IN_GPA);
+  let asymmetryGPa = 0;
+  for (let a = 0; a < 6; a++)
+    for (let b = a + 1; b < 6; b++)
+      asymmetryGPa = Math.max(asymmetryGPa, Math.abs(voigtGPa[a]![b]! - voigtGPa[b]![a]!));
+  return { line: i + 1, vaspOrderKbar: rows, voigtGPa, asymmetryGPa };
+}
+
 export interface OutcarResult {
   /** VASP version string such as "6.3.2" when found. */
   version?: string;
@@ -68,6 +121,8 @@ export interface OutcarResult {
   siteMagnetization?: MagnetizationTable;
   /** Last "volume of cell :" value, cubic angstrom (S-042 reads the E(V) volume from this line). */
   volume?: Found<number>;
+  /** The last TOTAL ELASTIC MODULI block (IBRION = 6, ISIF >= 3), when present. */
+  elastic?: ElasticModuli;
   /** One per electronic loop: true when EDIFF was reached. */
   electronicLoops: { line: number; reached: boolean }[];
   warnings: string[];
@@ -201,6 +256,14 @@ export function parseOutcar(text: string): OutcarResult {
     if (s.trim() === 'magnetization (x)') {
       const tab = readMagTable(lines, i);
       if (tab) out.siteMagnetization = tab;
+    }
+    if (/^\s*TOTAL ELASTIC MODULI \(kBar\)/.test(s)) {
+      const el = readElastic(lines, i);
+      if (el) out.elastic = el;
+      else
+        out.warnings.push(
+          `Line ${ln}: a TOTAL ELASTIC MODULI block was found but its six rows could not be read.`,
+        );
     }
     if ((m = R.magnet.exec(s))) out.magnetization = { value: toNum(m[2]!), line: ln };
     if (R.ediffYes.test(s)) out.electronicLoops.push({ line: ln, reached: true });
