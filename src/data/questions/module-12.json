@@ -1298,5 +1298,217 @@
       "caption": "The Bader workflow.",
       "alt": "A four-step flow: a static run writing AECCAR files, sum them with chgsum.pl, run bader with the summed reference, subtract CHARGE from ZVAL."
     }
+  },
+  {
+    "id": "q-m12-oc-1",
+    "concepts": [
+      "property-catalogue"
+    ],
+    "type": "single",
+    "prompt": "You want the formation enthalpy of an oxide. Which reference energies may you use?",
+    "options": [
+      {
+        "text": "Elemental reference phases computed with the same functional, ENCUT and POTCARs",
+        "correct": true,
+        "why": "Differences only cancel the systematic errors when every energy comes from the same setup."
+      },
+      {
+        "text": "Any published elemental energies, whatever code made them",
+        "correct": false,
+        "why": "Energies from a different setup carry different offsets, which do not cancel."
+      },
+      {
+        "text": "The isolated atoms in a box",
+        "correct": false,
+        "why": "Isolated atoms are the reference for the cohesive energy, not the formation enthalpy."
+      }
+    ],
+    "hints": [
+      "What must match for an energy difference to mean anything?",
+      "Which property uses isolated atoms?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Compound energy"
+          },
+          {
+            "label": "Elemental references, same setup"
+          },
+          {
+            "label": "Delta H_f per atom"
+          }
+        ],
+        "active": 0
+      },
+      "caption": "Formation enthalpy in three steps.",
+      "alt": "A three-step flow: compound energy, elemental reference energies from the same setup, then the formation enthalpy per atom."
+    }
+  },
+  {
+    "id": "q-m12-oc-2",
+    "concepts": [
+      "property-catalogue"
+    ],
+    "type": "single",
+    "prompt": "A compound sits 30 meV/atom above the convex hull. What does the Workflow Handbook's rule of thumb say?",
+    "options": [
+      {
+        "text": "It is not the ground state, but it may be synthesizable",
+        "correct": true,
+        "why": "The handbook gives E_hull = 0 as stable and below about 50 meV/atom as possibly synthesizable."
+      },
+      {
+        "text": "It is stable",
+        "correct": false,
+        "why": "Only E_hull = 0 is on the hull."
+      },
+      {
+        "text": "It cannot exist",
+        "correct": false,
+        "why": "Many metastable compounds sit a little above the hull."
+      }
+    ],
+    "hints": [
+      "What value of E_hull means stable?",
+      "What threshold does the handbook give for possibly synthesizable?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Compute all competing phases"
+          },
+          {
+            "label": "Build the hull"
+          },
+          {
+            "label": "Read E_hull"
+          }
+        ],
+        "active": 0
+      },
+      "caption": "The hull check.",
+      "alt": "A three-step flow: compute the competing phases, build the convex hull, read the energy above the hull."
+    }
+  },
+  {
+    "id": "q-m12-oc-3",
+    "concepts": [
+      "property-catalogue"
+    ],
+    "type": "single",
+    "prompt": "For a charge density difference of a molecule A on a surface B, how are the fragment runs set up?",
+    "options": [
+      {
+        "text": "Static runs of A and of B at their positions in the relaxed AB, same cell and grid, not relaxed",
+        "correct": true,
+        "why": "Delta rho = rho_AB - rho_A - rho_B is only meaningful point by point when all three share the cell, grid and positions."
+      },
+      {
+        "text": "Relax A and B on their own first",
+        "correct": false,
+        "why": "Relaxed fragments move the atoms, so the densities no longer line up."
+      },
+      {
+        "text": "Any cell is fine, VASPKIT interpolates",
+        "correct": false,
+        "why": "The difference is taken grid point by grid point; the grids must be the same."
+      }
+    ],
+    "hints": [
+      "What does the subtraction need to line up?",
+      "Should the fragments move?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Relax AB"
+          },
+          {
+            "label": "Static A and B at the AB positions"
+          },
+          {
+            "label": "VASPKIT 314"
+          }
+        ],
+        "active": 0
+      },
+      "caption": "Charge density difference.",
+      "alt": "A three-step flow: relax AB, run static A and B at their positions in AB, subtract with VASPKIT 314."
+    }
+  },
+  {
+    "id": "q-m12-oc-4",
+    "concepts": [
+      "property-catalogue"
+    ],
+    "type": "single",
+    "prompt": "An AIMD run at 600 K is meant to test thermal stability. What does the Workflow Handbook say a stable result looks like?",
+    "options": [
+      {
+        "text": "The structure stays intact and the energy fluctuates around a constant",
+        "correct": true,
+        "why": "That is the handbook's sign of thermal stability at finite temperature."
+      },
+      {
+        "text": "The energy falls steadily through the run",
+        "correct": false,
+        "why": "A steady drift means the structure is still changing, not that it is stable."
+      },
+      {
+        "text": "The energy is exactly constant at every step",
+        "correct": false,
+        "why": "At finite temperature the energy always fluctuates; the question is whether it settles around a constant."
+      }
+    ],
+    "hints": [
+      "What happens to the energy of a system held at a temperature?",
+      "What should not change?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "IBRION = 0, MDALGO, TEBEG"
+          },
+          {
+            "label": "Thousands of steps"
+          },
+          {
+            "label": "Check structure and energy"
+          }
+        ],
+        "active": 2
+      },
+      "caption": "The AIMD stability check.",
+      "alt": "A three-step flow: set up the MD run, run thousands of steps, then check the structure and the energy trace."
+    }
   }
 ]

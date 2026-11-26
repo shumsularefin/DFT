@@ -10,6 +10,7 @@ const TOPICS = [
   'dielectric-tensor',
   'optical-properties',
   'bader-charges',
+  'other-calculations',
 ];
 
 async function ready(page: Page, url: string) {

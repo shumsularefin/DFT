@@ -1,0 +1,150 @@
+---
+id: other-calculations
+title: Other calculations for a complete picture
+module: 12
+order: 7
+summary: A catalogue of the further properties a VASP project can add, from formation enthalpy and the hull to work functions, bonding, defects and molecular dynamics, each with its formula and the run it needs.
+concepts: [property-catalogue]
+requires: [dft-energies-forces]
+vaspTags: [LVHAR, IDIPOL, LELF, LORBIT, ISYM, LSORBIT, IVDW, MDALGO]
+sources: [S-042, S-067]
+noLab: true
+status: draft
+updated: 2026-11-26
+---
+
+<Why>
+
+The five-step protocol ends with a converged structure, a density of states and a band structure. Most papers need one or two more numbers: is the compound stable, what is its work function, how strong is a bond, how does it behave when hot. This page is a map of those further calculations, taken from the "Other calculations" table of the author's Workflow Handbook <Cite id="S-042" />. Each entry says what to run, which formula turns the output into the number, and where the site already has a tool for it.
+
+</Why>
+
+<Intuition>
+
+Almost every entry is one of three kinds:
+
+- **An energy difference.** Formation enthalpy, hull energy, cohesive energy, surface energy and defect formation energy all subtract total energies. They only mean something if every energy in the difference was computed with the same functional, `ENCUT` and `POTCAR` set <Cite id="S-042" />.
+- **A reading of the potential or the density.** Work function, band offsets, charge density difference, spin density and ELF come from a static run that writes a grid file (`LOCPOT`, `CHGCAR`, `ELFCAR`) which you then average, subtract or plot.
+- **A reading of the bands or the states.** Effective mass, d-band centre, and Fermi surface come from the eigenvalues or the projected density of states; wavefunction plots come from the wavefunctions themselves (`WAVECAR`).
+
+The rest (spin-orbit bands, van der Waals, bonding analysis, free-energy corrections, molecular dynamics) change how the calculation is run rather than how it is read.
+
+</Intuition>
+
+<TheMath>
+
+The formulas, as the handbook gives them <Cite id="S-042" />:
+
+| Property                     | Formula                                                                                                         |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Formation enthalpy, per atom | $\Delta H_f = \dfrac{E(A_xB_y) - x\,E(A) - y\,E(B)}{x+y}$                                                       |
+| Cohesive energy, per atom    | $E_{\text{coh}} = \dfrac{\sum_i n_i E_{\text{atom},i} - E_{\text{bulk}}}{N}$                                    |
+| Work function                | $\Phi = E_{\text{vac}} - E_F$                                                                                   |
+| Surface energy               | $\gamma = \dfrac{E_{\text{slab}} - N\,E_{\text{bulk/atom}}}{2A}$                                                |
+| Effective mass               | $\dfrac{1}{m^*} = \dfrac{1}{\hbar^2}\dfrac{\partial^2 E}{\partial k^2}$                                         |
+| Charge density difference    | $\Delta\rho = \rho_{AB} - \rho_A - \rho_B$                                                                      |
+| d-band centre                | $\varepsilon_d = \dfrac{\int n_d(\varepsilon)\,\varepsilon\,d\varepsilon}{\int n_d(\varepsilon)\,d\varepsilon}$ |
+| Defect formation energy      | $E_f = E_{\text{def}} - E_{\text{bulk}} - \sum_i n_i\mu_i + q\,(E_F + E_{\text{VBM}}) + E_{\text{corr}}$        |
+
+<Level min="intermediate">
+
+Signs and factors to watch:
+
+- A negative $\Delta H_f$ means stable relative to the elements <Cite id="S-042" />, not stable against every competing compound; that is what the hull is for.
+- The 2 in the surface energy counts the two surfaces of a symmetric slab, and $A$ is the area of one of them.
+- In the defect formula $n_i$ is the number of atoms of species $i$ added ($n_i > 0$) or removed ($n_i < 0$), $\mu_i$ its chemical potential and $q$ the charge state. $E_{\text{corr}}$ is the finite-size correction for a charged defect in a periodic cell <Cite id="S-067" />.
+- The d-band integrals run up to $E_F$.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+One entry per row of the handbook's table <Cite id="S-042" />. Where the site has a tool, the entry links to it.
+
+**Formation enthalpy.** Total energies of the compound and of the elemental reference phases, with the same functional, `ENCUT` and `POTCAR`s. Gas references such as O₂ need corrections. Tool: the formation-enthalpy calculator in the [research planner](/tools/planner/).
+
+**Thermodynamic stability (hull).** The energy above the convex hull against all competing phases (pymatgen `PhaseDiagram`). $E_{\text{hull}} = 0$ is stable; below about 50 meV/atom the compound is possibly synthesizable. Tool: the hull filter in [Screening Studio](/studio/).
+
+**Cohesive energy.** Isolated atoms in a large box with unequal sides (the handbook's example is 15 x 15.5 x 16 Å), Γ-only, spin-polarized, `ISYM = 0`.
+
+**Work function.** A slab with at least 15 Å of vacuum, `LVHAR = .TRUE.` (the electrostatic potential reaches the vacuum level faster than the total potential), and a dipole correction (`IDIPOL = 3`) for an asymmetric slab. VASPKIT 426 along z prints the vacuum level and writes `POTPAVG.dat`. Check that the vacuum level is converged with the vacuum thickness. The handbook's VASPKIT example, Au(111), gives 6.695 − 1.520 = 5.18 eV. Tool: the [work-function tool](/tools/work-function/), which also draws the planar average.
+
+**Surface energy.** Symmetric slabs of increasing thickness, relaxed with `ISIF = 2`. Tool: the surface-energy calculator in the [research planner](/tools/planner/).
+
+**Effective mass.** A fine k-grid around the valence-band maximum or conduction-band minimum; VASPKIT 912.
+
+**ELF.** A static run with `LELF = .TRUE.` and `NCORE = 1`; view `ELFCAR` in VESTA. ELF near 1 means localized electrons (a covalent bond, a lone pair); near 0.5 means electron-gas-like (metallic).
+
+**Charge density difference.** Relax AB. Then run A and B statically at their positions in the relaxed AB (do not relax the fragments), with the same cell and grid. VASPKIT 314 with `./CHGCAR ./A/CHGCAR ./B/CHGCAR` writes `CHGDIFF.vasp`. The same tool gives the deformation density and a field-induced difference. Tool: the CHGCAR difference in the [work-function tool](/tools/work-function/).
+
+**Spin density.** A spin-polarized `CHGCAR`, then VASPKIT 312 (`SPIN.vasp`) or 313 (up and down separately). It shows which sites and orbitals carry the moment.
+
+**Band offsets.** A heterostructure with `LVHAR`; VASPKIT 427 with a period of about the layer repeat length. The offset is the step in the macroscopic average across the interface. Tool: the macroscopic average in the [work-function tool](/tools/work-function/).
+
+**d-band centre.** A DOS run with `LORBIT = 11`, then VASPKIT 503 with the window up to $E_F$. Trends in it predict adsorption strength on metals.
+
+**Fermi surface.** The primitive cell, VASPKIT 261 (resolution about 0.01), run, then 262. View `FERMISURFACE.bxsf` in XCrySDen.
+
+**Wavefunction plots.** A static run with `LWAVE`; VASPKIT 511 with the k-point and band (for example the band-edge indices from `EIGENVAL`). The real part (`RWAV_*.vasp`) shows the orbital character of the band edges.
+
+**Free-energy corrections.** A frequency run (`IBRION = 5`) with only the molecule or adsorbate free to move; VASPKIT 502 for a gas (temperature, pressure, spin multiplicity) or 501 for an adsorbate (temperature). It gives the zero-point energy and TS for catalysis free energies; modes below 50 cm⁻¹ are raised to 50 cm⁻¹.
+
+**Spin-orbit bands.** `vasp_ncl` with `LSORBIT`, from a collinear `CHGCAR`. Gives splittings for heavy elements, Rashba splitting and topological band inversions. See [noncollinear magnetism and spin-orbit coupling](/handbook/05-practical-choices/noncollinear-and-spin-orbit/).
+
+**Van der Waals.** `IVDW = 11` or `12` in the relaxation. Essential for layered and molecular crystals. See [van der Waals corrections](/handbook/05-practical-choices/vdw-corrections/).
+
+**Bonding (COHP).** LOBSTER after a static run with `ISYM = 0` (or `-1`), `LWAVE = .TRUE.` and enough `NBANDS`. −COHP above zero is bonding, below zero antibonding; the integrated ICOHP measures bond strength.
+
+**Defects.** A supercell with a vacancy or substitution, charged states through `NELECT`, and finite-size corrections; the formula is in the table above.
+
+**Ab initio MD.** `IBRION = 0`, `MDALGO`, `TEBEG`, `POTIM` about 1 fs, `NSW` in the thousands (the input builder has an AIMD preset). For thermal stability at finite temperature the structure should stay intact and the energy fluctuate around a constant. VASPKIT 721 gives the mean squared displacement (diffusion), 722 the radial distribution function.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...                               | ...in VASP                                                                      |
+| ---------------------------------------------- | ------------------------------------------------------------------------------- |
+| One reference energy uses another functional   | The energy difference carries the offset between functionals                    |
+| The fragments of a Δρ are relaxed              | The densities no longer line up point by point; the difference shows the motion |
+| The vacuum of a work-function slab is too thin | The planar average never flattens, so there is no vacuum level to read          |
+| A surface-energy slab is too thin              | The two surfaces interact and $\gamma$ changes with thickness                   |
+
+These rows follow from the formulas and settings above; they are reasoning, not quoted values.
+
+Why add these calculations: they turn a converged structure into the number a reader asks about. Why these settings: each formula assumes them (same setup, unrelaxed fragments, converged vacuum). What happens if you skip them: a number that looks precise and is set by an artefact.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Mixing setups in an energy difference">
+
+Every energy in a formation, cohesive, surface or defect energy must come from the same functional, `ENCUT` and `POTCAR` set. Energies with different `U` are not comparable either <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Relaxing the fragments of a charge density difference">
+
+Run A and B at the positions they have in the relaxed AB, in the same cell and grid <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Reading E_hull below 50 meV/atom as stable">
+
+Only $E_{\text{hull}} = 0$ is on the hull. The 50 meV/atom level is a rule of thumb for "possibly synthesizable" <Cite id="S-042" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m12-oc-1', 'q-m12-oc-2', 'q-m12-oc-3', 'q-m12-oc-4']} />
+
+<GoDeeper>
+
+- The author's Workflow Handbook, "Other calculations for a complete picture" <Cite id="S-042" />.
+- The [VASPKIT in practice](/handbook/07-running/vaspkit-in-practice/) topic for the task codes.
+
+</GoDeeper>

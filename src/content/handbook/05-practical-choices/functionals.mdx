@@ -6,10 +6,10 @@ order: 4
 summary: The ladder of exchange-correlation approximations, what each rung adds and costs, and which VASP tags switch on meta-GGA and hybrid functionals.
 concepts: [functionals, hybrid-functionals]
 requires: [exchange-correlation-term]
-vaspTags: [METAGGA, LHFCALC, HFSCREEN, AEXX, LASPH]
+vaspTags: [METAGGA, LHFCALC, HFSCREEN, AEXX, LASPH, LMIXTAU, LUSE_VDW, BPARAM]
 sources: [S-013, S-025, S-026, S-027, S-042, S-046, S-049]
 status: draft
-updated: 2026-11-19
+updated: 2026-11-26
 ---
 
 <Why>
@@ -63,6 +63,24 @@ A hybrid replaces part of the semilocal exchange by Hartree-Fock exchange, $E_x 
 - Hybrid runs are far more expensive. `PRECFOCK = Fast` and `NKRED = 2` cut the cost several-fold; check that the gap changes by less than about 0.05 eV. `ICHARG = 11` does not work with hybrids <Cite id="S-042" />.
 - Changing the functional means repeating the calculations that depend on it, with the same `ENCUT`, `ISPIN`, `MAGMOM`, `LMAXMIX` and any `LDAU` tags <Cite id="S-042" />.
 - Defaults for `LHFCALC`, `HFSCREEN` and `METAGGA` are not stated in the handbooks: check the VASP wiki <Cite id="S-019" />.
+
+**Meta-GGA in practice** <Cite id="S-042" />:
+
+- **SCAN or r2SCAN.** SCAN is sensitive to the integration grid: if its energies jump between otherwise identical runs, use r2SCAN, which keeps most of SCAN's accuracy with much better numerical stability. Meta-GGAs also need a higher cutoff than PBE (the handbook's example uses `ENCUT = 600`) and are best started from a converged PBE `WAVECAR`.
+- **With van der Waals.** The rVV10 dispersion term is switched on with `LUSE_VDW = .TRUE.`. Its parameter depends on the functional: `BPARAM = 15.7` for SCAN+rVV10 and `11.95` for r2SCAN+rVV10.
+- **mBJ gives no total energy.** mBJ is a model potential, not an energy functional, so it gives no total energy and no forces. Use it at a fixed geometry (`NSW = 0`) taken from a PBE relaxation, for the gap only.
+- **One functional per comparison.** Do not mix meta-GGA and PBE energies in one formation energy: every reference must use the same functional.
+
+**Band structures with hybrids (and meta-GGA)** <Cite id="S-042" />. Exact exchange needs the wavefunctions on a uniform mesh, so the usual `ICHARG = 11` band run is not possible. Instead the path points are added to the SCF k-point list with **zero weight**: they do not change the density but still get correct eigenvalues.
+
+1. PBE SCF on a uniform mesh; keep its `WAVECAR`. Why: the hybrid run starts from it and converges far more easily.
+2. VASPKIT 303 writes `KPATH.in`, then 251 writes a `KPOINTS` with the weighted mesh first and the zero-weight path points after it (path resolution 0.04 to 0.06 for hybrids). Why: one SCF run then gives both the density and the bands.
+3. Run the hybrid SCF with that `KPOINTS`. The cost grows with the extra points, so use about 10 to 20 per segment.
+4. VASPKIT 252 extracts the bands (253 to 255 for projected bands); 911 gives the gap.
+
+The same route is the safest one for meta-GGA bands, because older VASP versions do not store the kinetic-energy density that an `ICHARG = 11` run would need.
+
+**Optics with HSE.** `LOPTICS` works in the HSE SCF run but is expensive. A common compromise is a PBE spectrum shifted rigidly to the HSE gap (a scissor shift) <Cite id="S-042" />. Relaxing with HSE is rarely worth it: a PBE (or PBEsol, r2SCAN) geometry with HSE electronic structure is standard; say which you used.
 
 </InVasp>
 

@@ -6,10 +6,10 @@ order: 12
 summary: What the Hubbard U correction does, why it is needed for some d and f electrons, and how to use it without fooling yourself.
 concepts: [dft-plus-u]
 requires: [functionals, spin-polarization]
-vaspTags: [LDAU, LDAUTYPE, LDAUL, LDAUU, LDAUJ]
-sources: [S-014, S-019, S-041, S-042]
+vaspTags: [LDAU, LDAUTYPE, LDAUL, LDAUU, LDAUJ, LDAUPRINT]
+sources: [S-014, S-019, S-034, S-041, S-042, S-080, S-081]
 status: draft
-updated: 2026-11-19
+updated: 2026-11-26
 ---
 
 <Why>
@@ -32,7 +32,7 @@ Three cautions:
 - **Energies with different U are not comparable.** Compare only runs with the same `U` on the same atoms <Cite id="S-042" />.
 - **It is a correction, not a better functional.** Use it on the d or f orbitals where the self-interaction problem is known to matter, and report it.
 
-This site does not list recommended `U` values for specific elements: none of the sources registered here gives a verified table, and a value copied from a paper may not transfer.
+The section on choosing `U` below gives four ways to pick a value, and one database table with the conditions under which it applies.
 
 </Intuition>
 
@@ -63,6 +63,33 @@ In the full method the penalty is a trace over the occupation matrix of the corr
 - Set `LMAXMIX = 4` for d elements and `6` for f elements: the handbook calls this vital for +U runs. Keep it the same in every run in a chain, such as an SCF run followed by a band run <Cite id="S-042" />. Where the handbook's own example INCARs are inconsistent about this is recorded as Q-019.
 - DFT+U is a spin-polarized tool in practice: magnetic systems need `ISPIN = 2` and a `MAGMOM` with one entry per atom (see the spin topic in this module).
 - Defaults for the `LDAU` tags are not stated in the handbooks. Check the VASP wiki pages `LDAU`, `LDAUTYPE`, `LDAUL`, `LDAUU` and `LDAUJ` for your version <Cite id="S-019" />.
+
+**Choosing U.** Four routes, from the handbook <Cite id="S-042" />. Whichever you use, say which one in your report.
+
+1. **Database values.** Use the same values as a large database, so that your energies can sit on its phase diagrams. Why: compatibility with the database, not a better physical `U`.
+2. **Linear response** (Cococcioni and de Gironcoli). Measure how the d occupation responds to small potential shifts (`LDAUTYPE = 3`) and derive `U` for your own compound. Why: the value belongs to your system, not to someone else's.
+3. **Empirical fit.** Tune `U` to an experimental gap, moment or oxidation enthalpy. Why: it matches the property you care about; state which property you fitted.
+4. **U scan.** Repeat the result for a range of values (for example 0 to 7 eV) and report how your conclusion (gap, magnetic ground state) depends on it. Why: it shows whether the conclusion survives the choice.
+
+**The Materials Project values.** The handbook lists these `U_eff` values <Cite id="S-042" />. They equal `LDAUU` in pymatgen's `MPRelaxSet.yaml` <Cite id="S-034" /> (checked for Q-051, D-087).
+
+| Element    | Co   | Cr  | Fe  | Mn  | Mo   | Ni  | V    | W   |
+| ---------- | ---- | --- | --- | --- | ---- | --- | ---- | --- |
+| U_eff (eV) | 3.32 | 3.7 | 5.3 | 3.9 | 4.38 | 6.2 | 3.25 | 6.2 |
+
+They hold only under all four of these conditions:
+
+- **GGA (PBE)+U only.** The Materials Project's r2SCAN sets use no +U <Cite id="S-034" />.
+- **Dudarev form on d orbitals:** `LDAUTYPE = 2`, `LDAUL = 2`, `LDAUJ = 0` <Cite id="S-034" />.
+- **Only when O or F is in the compound.** The same metal in a sulfide or an alloy gets no `U` in this scheme <Cite id="S-034" />.
+- **Fitted to oxide formation enthalpies**, so they are compatibility values, not the physical `U` of a given compound <Cite id="S-080" />. The MP2020 scheme changed the energy corrections that go with them, not the values <Cite id="S-081" />.
+
+**Pitfalls** <Cite id="S-042" />:
+
+- **Mixing +U and plain GGA in one formation energy.** A formation energy that mixes +U compounds and plain GGA compounds (a metal and its oxide, for example) needs a correction scheme such as MP2020 <Cite id="S-081" />.
+- **Metastable states.** +U can converge to different energies from different `MAGMOM` values or starting occupations. Try several starts and keep the lowest. Ramping `U` from 0 in steps, each run reading the previous `WAVECAR`, or controlling the occupation matrix, helps.
+- **One entry per species, in `POSCAR` order.** A missing entry in `LDAUL`, `LDAUU` or `LDAUJ` silently moves values to the wrong element.
+- **Check the occupations.** With `LDAUPRINT = 1` VASP prints the occupation matrices to `OUTCAR`. The d occupations and the moments should make chemical sense for the oxidation state you expect.
 
 </InVasp>
 
