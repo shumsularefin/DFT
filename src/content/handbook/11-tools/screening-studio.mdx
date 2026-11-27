@@ -1,5 +1,29 @@
 ---
 id: screening-studio
+stage:
+  scene: m11-studio-space
+  states:
+    - id: table
+      section: why
+      params: {}
+      camera: iso
+      caption: 'All 30 entries of the synthetic demo table as points: energy above hull across, band gap back, cell size up. Orange spheres are flagged metals and arrows mark magnetic flags. None of these numbers is a property of a real material.'
+    - id: copper-oxides
+      section: intuition
+      params: { elements: 'Cu, O', pick: sample-0009 }
+      caption: 'Must contain elements set to Cu, O: only NdCuO3, a 20-site cell, stays bright, and every other point fades and shrinks. Rotate to read its height on the sites axis.'
+    - id: hull
+      section: math
+      params: { maxEhull: 0, onlyStable: true }
+      caption: 'Max E_hull at 0: only the entries on the hull, on the shaded wall at E_hull = 0, stay bright, and the dashed filter box shrinks onto that wall. Raise the slider to let entries just above the hull back in.'
+    - id: cost
+      section: in-vasp
+      params: { pick: sample-0009, maxSites: 20 }
+      caption: 'The inspected NdCuO3 row: 20 sites and a magnetic flag give a relative cost of (20 / 4)^3 x 2 = 250 against a 4-atom cell. The box top is the Max sites limit; pick another entry to compare.'
+    - id: preset
+      section: what-changes
+      params: { elements: 'Cu, O', preset: beginner }
+      caption: 'The Beginner-friendly preset sets at most 10 sites and on the hull, and clears the Cu, O field, so 8 entries come back. Set your filters after a preset, not before.'
 title: Tour of the Screening Studio
 module: 11
 order: 1

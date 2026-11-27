@@ -1,5 +1,29 @@
 ---
 id: what-next
+stage:
+  scene: m11-next-map
+  states:
+    - id: map
+      section: why
+      params: { subject: defects, all: true }
+      camera: iso
+      caption: 'The handbook as a rising path of module stations, with the next subjects beside them. You are at module 11, and the route leads to point defects in module 12. Pick another subject to see its route.'
+    - id: deeper
+      section: intuition
+      params: { subject: symmetry, all: true }
+      caption: 'Direction 1 goes deeper: crystal structure and symmetry sits outside the path at module 5, so the route runs back down. The readout gives its handbook address as plain text.'
+    - id: hull
+      section: math
+      params: { subject: hull, all: true }
+      caption: 'Formation energy and the convex hull, the topic behind the first formula here, sits beside module 12 with the other property topics.'
+    - id: next-rare-earth
+      section: in-vasp
+      params: { subject: next-rare-earth, all: true }
+      caption: 'Direction 2, the worked example one step further: the NdCuO3 run starts from the module 10 page on choosing the system, inside the path.'
+    - id: automate
+      section: what-changes
+      params: { subject: automate, all: false }
+      caption: 'Direction 3, automation, has no page on this site, so its station floats above the end of the path. Turn Show every subject station back on to see all the routes.'
 title: Where to go next
 module: 11
 order: 4
