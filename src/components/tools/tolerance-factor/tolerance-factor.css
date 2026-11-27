@@ -150,8 +150,9 @@
 .tf-honesty {
   margin: 0;
   padding: var(--space-3) var(--space-4);
-  background: var(--surface);
-  border-left: 3px solid var(--border-strong);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   color: var(--text-muted);
   font-size: var(--step--1);
 }
@@ -173,15 +174,15 @@
 }
 
 .tf-check-error {
-  border-left: 4px solid var(--danger);
+  border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
 }
 
 .tf-check-warning {
-  border-left: 4px solid var(--warn);
+  border-color: color-mix(in srgb, var(--warn) 45%, var(--border));
 }
 
 .tf-check-info {
-  border-left: 4px solid var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
 }
 
 .tf-actions {

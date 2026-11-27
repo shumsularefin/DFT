@@ -70,8 +70,10 @@
   font-weight: 600;
 }
 .mg-banner {
-  border-inline-start: 4px solid var(--accent, currentColor);
-  padding-inline-start: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
 }
 .mg-tabs button {
   min-height: 2.75rem;

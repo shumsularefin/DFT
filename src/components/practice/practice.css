@@ -48,10 +48,12 @@
   cursor: pointer;
 }
 .qc-opt.is-right {
-  border-left: 6px solid var(--ok);
+  border-color: color-mix(in srgb, var(--ok) 45%, var(--border));
+  background: var(--ok-soft);
 }
 .qc-opt.is-wrong {
-  border-left: 6px dashed var(--border-strong);
+  border-style: dashed;
+  border-color: var(--border-strong);
 }
 .qc-why {
   margin: var(--space-2) 0 0;
@@ -111,8 +113,9 @@
   cursor: not-allowed;
 }
 .qc-hints li {
-  border-left: 4px solid var(--warn);
-  padding-left: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--warn) 45%, var(--border));
+  border-radius: var(--radius);
 }
 .qc-actions {
   display: flex;
@@ -329,8 +332,10 @@
   font-size: var(--step--1);
 }
 .pr-why {
-  border-left: 3px solid var(--border-strong);
-  padding-left: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
 }
 .ck-next {
   margin-top: var(--space-3);
