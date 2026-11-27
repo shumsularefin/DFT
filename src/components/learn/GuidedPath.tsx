@@ -221,6 +221,17 @@ export default function GuidedPath({ stations, scenes }: Props) {
             <p key={i}>{x}</p>
           ))}
 
+          {st.read && (
+            <div className="lp-read">
+              <p className="lp-read-head">How to read the picture</p>
+              <ul>
+                {st.read.map((x, i) => (
+                  <li key={i}>{x}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {tr.kind === 'slider' ? (
             <div className="lp-try">
               <p className="lp-try-head">Try this</p>

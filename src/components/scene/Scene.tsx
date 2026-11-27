@@ -109,7 +109,8 @@ export default function Scene({ spec, initialLive = false, auto3D = false, onLiv
     (reset: boolean) => {
       const m = engine.current;
       if (!ctl.current || !m) return;
-      ctl.current.show(m.frameFromResolved(resolved, spec.alt), reset);
+      // a step without its own camera frames its picture again (M16.5): more copies of the cell, or a bigger cell, stay in view
+      ctl.current.show(m.frameFromResolved(resolved, spec.alt), reset ? true : 'refit');
     },
     [resolved, spec.alt],
   );

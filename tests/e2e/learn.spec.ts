@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
-const N = 14;
+const N = 15;
 
 async function open(page: Page, hash = '') {
   await page.goto(`/learn/${hash}`);
@@ -39,7 +39,7 @@ test.describe('guided path (M12.4)', () => {
     const svg = page.locator('.lp-plot-svg');
     await expect(svg.locator('svg')).toBeVisible();
     const before = await svg.innerHTML();
-    await page.getByRole('slider', { name: 'Mixing fraction' }).press('End');
+    await page.getByRole('slider', { name: 'Step of the loop' }).press('End');
     await expect.poll(async () => svg.innerHTML()).not.toBe(before);
     await page.getByRole('button', { name: 'Station 7: The crystal and its unit cell' }).click();
     await page.getByRole('radio', { name: 'Diamond' }).check();
@@ -66,7 +66,7 @@ test.describe('guided path (M12.4)', () => {
     // going back to the flat view is remembered: the next scene station stays flat until "View in 3D"
     await page.getByRole('button', { name: 'Back to flat view' }).click();
     await expect(page.locator('canvas')).toHaveCount(0);
-    await page.getByRole('button', { name: 'Station 10: Reciprocal space' }).click();
+    await page.getByRole('button', { name: 'Station 11: Reciprocal space' }).click();
     await expect(page.locator('.scene-flat svg')).toBeVisible();
     await expect(page.locator('canvas')).toHaveCount(0);
     await page.getByRole('button', { name: 'View in 3D' }).click();
@@ -171,7 +171,7 @@ test.describe('guided path (M12.4)', () => {
     await open(page, '#kohn-sham');
     await expect(page.locator('.lp-plot-svg svg')).toBeVisible();
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
-    await page.getByRole('button', { name: 'Station 13: Spin up and down, and magnetic orderings' }).click();
+    await page.getByRole('button', { name: 'Station 14: Spin up and down, and magnetic orderings' }).click();
     await expect(page.locator('[data-testid="scene-3d"] canvas')).toHaveCount(1);
     await expect(page.getByText(/Drag to turn it any way/)).toBeVisible();
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);

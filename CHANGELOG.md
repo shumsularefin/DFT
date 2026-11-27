@@ -13,6 +13,8 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Fixed
 
+- Guided path and topic stages: changing an option (n = 1 to 3, the orbital, the number of periodic copies, any stage parameter) keeps the 3D view framed on the new picture, so Reset view is no longer needed; the Try this box no longer spills out of its card (D-124).
+- Guided path pictures explain themselves: the self-consistency loop is shown step by step until the density settles, the density map, cutoff sphere and bands beside the DOS are new pictures, each station says how to read its picture, and a new station and handbook subsection compare real space with reciprocal space (D-124).
 - Guided path: scene stations open a free 3D view by themselves (drag to turn, scroll to zoom, right-drag to move, with keyboard equivalents), atoms in 3D views are lit instead of black, and the flat fallback turns under a drag (D-107).
 - Deploy runs only after CI succeeds on main (D-089).
 - Crystal and molecule builder, and the Input Builder Task step, no longer overflow the page at 360 px wide.

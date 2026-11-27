@@ -9,6 +9,7 @@ import { SCENES, getSceneDef } from '../viewer3d/scenes/eager';
 import { withDefaults } from '../viewer3d/types';
 import { allStates, resolveStation, topicHref, validateStations, type Known, type Station } from './stations';
 import { getScene } from '../scene/library';
+import { runScf } from '../physics/scf1d';
 
 const root = path.resolve(__dirname, '../../..');
 const topicIds = fs
@@ -33,7 +34,7 @@ describe('guided path stations (M12.4)', () => {
     expect(validateStations(list, known)).toEqual([]);
   });
 
-  it('has the fourteen stations of the work order, in order', () => {
+  it('has the fifteen stations of the work order, in order (real space and reciprocal space added in M16.5)', () => {
     expect(list.map((s) => s.id)).toEqual([
       'atom-cloud',
       'orbital',
@@ -44,6 +45,7 @@ describe('guided path stations (M12.4)', () => {
       'unit-cell',
       'periodic-images',
       'plane-waves',
+      'real-vs-reciprocal',
       'reciprocal-space',
       'kpoint-mesh',
       'bands-dos',
@@ -277,5 +279,14 @@ describe('guided path stations (M12.4)', () => {
     expect(msgs).toMatch(/badge/);
     expect(msgs).toMatch(/unknown source/);
     expect(msgs).toMatch(/three/);
+  });
+
+  it('the loop slider reaches every step of the toy run and no more; read lines stay short (M16.5)', () => {
+    const st = list.find((s) => s.id === 'scf-loop')!;
+    if (st.visual.kind !== 'plot' || st.try.kind !== 'slider')
+      throw new Error('scf-loop must be a plot with a slider');
+    const p = st.visual.params as { Z: number; alpha: number; tol: number };
+    expect(st.try.max).toBe(runScf({ Z: p.Z, alpha: p.alpha, tol: p.tol }).iterations.length);
+    for (const s of list) for (const line of s.read ?? []) expect(line.length, s.id).toBeLessThanOrEqual(150);
   });
 });
