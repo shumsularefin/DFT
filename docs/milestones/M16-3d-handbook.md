@@ -2,11 +2,11 @@
 
 Added 2026-11-27 at the author's request (D-106). The author's original idea for the handbook was that a learner **understands DFT by handling it in 3D, not by reading text**, because text about DFT is available everywhere. Today the handbook is text with a few pictures: of 72 topics only 35 carry a `<Scene>` or a `<Lab>` at all, and those scenes open as a flat SVG picture that the reader must click to turn into 3D. The camera (`OrbitControls` in `src/lib/three/SceneController.ts`) also stops at the poles, so a crystal cannot be tumbled freely the way VESTA or the builder's viewer allows. This milestone turns every topic into a side-by-side page: the text on one side, and a live 3D stage on the other that changes as you read, that you can rotate to any angle, zoom and pan, and whose physics you change with sliders and step controls.
 
-Read with: `docs/milestones/M12-visual-layer.md` (the scene library this builds on), D-007, D-023, D-058, D-075, D-084, D-102, and on the layout branch D-103 to D-105. The gap audit of 2026-11-27 (72 topics: 53 solid, 13 thin, 6 stubs, 11 missing subjects) is summarised in section 6.
+Read with: `docs/milestones/M12-visual-layer.md` (the scene library this builds on), D-007, D-023, D-058, D-075, D-084, D-102, and the layout branch decisions numbered 103 to 105 there (Studio merge, sidebar shell, desktop only). The gap audit of 2026-11-27 (72 topics: 53 solid, 13 thin, 6 stubs, 11 missing subjects) is summarised in section 6.
 
 ## 1. What "real 3D" means here (binding for every stage)
 
-A previous pass shipped pictures that look like 3D but do not move, and plot stations that are flat curves. To make that impossible, a scene in this milestone **counts only if all five hold**, and `scripts/guard/check-stages.mjs` (M16.3) plus an e2e test enforce them:
+A previous pass shipped pictures that look like 3D but do not move, and plot stations that are flat curves. To make that impossible, a scene in this milestone **counts only if all five hold**, and `scripts/guard/check-3d-stages.mjs` (M16.3) plus an e2e test enforce them:
 
 1. It is drawn live by the shared engine (`Viewer3D`, section 3) from data or from a tested library. No raster image, no pre-rendered video, no SVG standing in for the live view once WebGL is available.
 2. The camera turns to **any** orientation (no pole lock), zooms and pans, and resets.
@@ -20,7 +20,7 @@ The flat SVG projection of M12.2 stays, but only as the poster shown while the e
 
 ## 2. Page layout: text and 3D side by side
 
-The site is desktop only on the layout branch (D-105). The layout branch `claude/hopeful-rubin-adj3m0` (DS.1 to DS.3, not yet merged when this plan was written) gives every handbook page a fixed left sidebar, a top bar, a header row, and a left rail with a **Modules** card and an **On this page** card (`HandbookLayout.astro`, slot `rail`, `.hb-rail`, `.handbook-main`). M16 keeps all of that and adds a third region, the stage. Nothing here changes the sidebar or the top bar.
+The site is desktop only on the layout branch (its decision 105). The layout branch `claude/hopeful-rubin-adj3m0` (DS.1 to DS.3, not yet merged when this plan was written) gives every handbook page a fixed left sidebar, a top bar, a header row, and a left rail with a **Modules** card and an **On this page** card (`HandbookLayout.astro`, slot `rail`, `.hb-rail`, `.handbook-main`). M16 keeps all of that and adds a third region, the stage. Nothing here changes the sidebar or the top bar.
 
 ```
  sidebar | rail            | text column            | 3D stage (sticky)
@@ -32,7 +32,7 @@ The site is desktop only on the layout branch (D-105). The layout branch `claude
 - **Desktop (64rem to 100rem):** the rail's two cards fold into a **Contents** button in the header row (a disclosure that opens both cards as a panel), so the page is text | stage at about 45 | 55.
 - **Splitter:** a draggable divider between text and stage (ARIA `separator`, arrow keys move it by 2rem, Home and End snap to 35 % and 65 %; the position is a per-reader setting in local storage).
 - **Focus 3D:** a toolbar button widens the stage to the whole main column and turns the text into a narrow drawer that keeps the current section; Escape returns. **Text only** collapses the stage to a thin strip with "Show 3D".
-- **Below 64rem** (not a target under D-105, but it must not break): the stage stacks above the text at 55vh and stays fully interactive. The 360 px rule in CLAUDE.md is read under D-105 as "nothing overflows and nothing is lost", not as a design target; D-106 records this.
+- **Below 64rem** (not a target under the layout branch decision 105, but it must not break): the stage stacks above the text at 55vh and stays fully interactive. The 360 px rule in CLAUDE.md is read under the layout branch decision 105 as "nothing overflows and nothing is lost", not as a design target; D-106 records this.
 - **Labs and inline scenes:** a `<Lab>` or `<Scene>` in the text column no longer opens its own canvas. It shows its poster with a "Show on stage" button that loads it into the one stage. This is how D-058 (one live canvas per page) holds on a page with many pictures.
 
 **Scroll sync.** Each topic declares stage **states**. A section of the text names the state it wants (`<StageState id="octahedra" />` placed in the section, or the `stage.states[].section` field). An `IntersectionObserver` on the section headings picks the section inside the reading band (the top 40 % of the viewport) and the stage moves to that state: a camera tween of 400 ms and a cross-fade of layers, or an instant cut under `prefers-reduced-motion`. A **Pin** toggle stops the stage following the scroll, so a reader can keep exploring one state while reading on. Words in the text can drive the stage directly: `<Show state="octahedra" highlight="Ti">the TiO6 octahedron</Show>` renders as a text button that moves the stage and highlights those atoms.
@@ -48,7 +48,7 @@ The engine is **vanilla three.js 0.186.1**, the version pinned in D-002 and alre
 | Babylon.js | About five times the gzipped size of the three.js subset we load; a second engine on the site. |
 | react-three-fiber | Adds a reconciler on top of three; D-007 keeps 3D vanilla and outside React so the island stays thin and testable in Node. |
 | regl or raw WebGL2 | We would rebuild cameras, picking, materials and text that three already gives us, with no gain. |
-| Keep `vesta.js` as the engine | It is the best viewer on the site, but it is a 185 KB untyped plain-JS file in `public/dft-studio/js/` with its own CSP (`'unsafe-eval'`, D-103), no unit tests, and it cannot be imported by content pages. |
+| Keep `vesta.js` as the engine | It is the best viewer on the site, but it is a 185 KB untyped plain-JS file in `public/dft-studio/js/` with its own CSP (`'unsafe-eval'`, layout branch decision 103), no unit tests, and it cannot be imported by content pages. |
 
 What we **take from `vesta.js`** (branch `claude/hopeful-rubin-adj3m0`, lines 1440 to 1840): its camera model, which is what makes it feel free. It keeps a quaternion and a distance (`camState.quat`, `camState.dist`), rotates by trackball drags with no pole clamp, switches between perspective and orthographic cameras, views along any direction vector with a sensible up hint, redraws only on demand (changed on that branch on 2026-11-27), and draws polyhedra, spin cones and measurement pins. M16.1 ports exactly these ideas into typed, tested TypeScript. It does not copy the file and does not change `vesta.js` or the builder; a later, optional stage may move the builder onto the engine.
 
@@ -118,7 +118,7 @@ The topic page stays in the `content` page class (15 KB initial JS, `budgets.jso
 
 ### 3.6 CSP and security
 
-The main site CSP (`firebase.json`: `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; worker-src 'self' blob:; connect-src 'self' ...`) is not loosened. The engine uses no `eval` or `new Function`; shaders are three's own; workers come from the site origin; datasets are fetched from `'self'` only and cached by the service worker. No CDN at runtime (as for Studio, D-103). The a11y and CSP e2e spec gains a topic page with a live stage and asserts no CSP violation is reported.
+The main site CSP (`firebase.json`: `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; worker-src 'self' blob:; connect-src 'self' ...`) is not loosened. The engine uses no `eval` or `new Function`; shaders are three's own; workers come from the site origin; datasets are fetched from `'self'` only and cached by the service worker. No CDN at runtime (as for Studio, layout branch decision 103). The a11y and CSP e2e spec gains a topic page with a live stage and asserts no CSP violation is reported.
 
 ## 4. How scenes get their data (no server)
 
@@ -379,7 +379,7 @@ Tier rule (ROADMAP_V3, M15): **Tier A** builds anything that computes a number a
 - `src/lib/viewer3d/stageSchema.ts` (pure) and its use in `scripts/lint-content` (or the existing content linter): every state has `alt`; badge present; controls bound to a known parameter; sources exist in `docs/SCIENCE_SOURCES.md`.
 - Dataset format (section 4): `src/lib/viewer3d/dataset.ts` (pure reader with scale and offset dequantisation, bounds checks), `public/data/scenes3d/` layout and versioning, service worker caching entry.
 - `scripts/scenes3d/`: a generator skeleton, the first two datasets (superposed atomic density of NaCl for module 3, one tight-binding band surface for the M16.2 k-points pilot), and their golden tests.
-- `scripts/guard/check-stages.mjs` in `npm run verify`: every topic has a `stage` (warn-only until M16.15, then failing); no stage uses a raster image or video; every state has alt text; every dataset referenced exists and is within 64 KB gz; per-topic total within 200 KB gz.
+- `scripts/guard/check-3d-stages.mjs` in `npm run verify`: every topic has a `stage` (warn-only until M16.15, then failing); no stage uses a raster image or video; every state has alt text; every dataset referenced exists and is within 64 KB gz; per-topic total within 200 KB gz.
 **Tasks**: 1. Schema and linter with tests. 2. Dataset reader with tests. 3. Generators and golden files. 4. Guard script with tests on fixtures. 5. Budgets.
 **Tests and reference values**:
 - Dataset round trip: values dequantised within the stated scale step of the generator's float values (generator writes both).
@@ -399,6 +399,7 @@ Tier rule (ROADMAP_V3, M15): **Tier A** builds anything that computes a number a
 - `GuidedPath.tsx` mounts one `Stage` for the whole path (D-084, D-058); `Scene.tsx` becomes a thin wrapper around `Stage` with its props unchanged.
 - Stations whose visual is a `plot` today (for example `atom-cloud`, `orbital`) move to 3D scenes from section 6 (the hydrogen radial curve becomes the orbital isosurface with its radial node shells; the plot stays as a small panel beside it).
 - `OrbitalScene`, `EncutScene`, `KmeshScene` ported to layers.
+**Tasks**: 1. `Scene.tsx` as a wrapper of `Stage`. 2. `GuidedPath.tsx` on one `Stage`. 3. Plot stations moved to 3D scenes. 4. Port the three remaining scenes. 5. Learn e2e, axe, size.
 **Tests and reference values**: the existing learn e2e (keyboard through all stations, one WebGL context at a time, no-WebGL SVG stations) plus the section 1 check on three stations.
 **Done when**:
 - [ ] Every station is live 3D on a WebGL machine and passes section 1; budgets hold.
@@ -411,6 +412,7 @@ Tier rule (ROADMAP_V3, M15): **Tier A** builds anything that computes a number a
 **Size**: L
 **Budget**: 90 min; split by module if needed (0 and 1, then 2, then 3).
 **Deliverables**: the rows of section 6 for modules 0, 1, 2 and 3 (16 topics). The 3D particle in a box extends `physics/box.ts` with a golden test; the two-electron surfaces reuse `solver1d.ts` golden data.
+**Tasks**: 1. Any new library or dataset first, with its tests. 2. The stage rows of section 6, topic by topic. 3. State markers and `<Show>` links in the text. 4. The module e2e, axe, size and one Lighthouse run.
 **Tests and reference values**: box energies for (1,1,1), (2,1,1), (2,2,1) in a cube equal the analytic values within 1e-12; orbital isosurface of 1s at a set isovalue has the analytic radius within one grid step.
 **Done when**: [ ] all 16 topics pass section 1 and the content-stage checks.
 **Not in this stage**: rewriting the topics' text.
@@ -422,8 +424,10 @@ Tier rule (ROADMAP_V3, M15): **Tier A** builds anything that computes a number a
 **Size**: M
 **Budget**: 60 min.
 **Deliverables**: the module 4 rows (5 topics); a 2D grid toy solver for the Hohenberg-Kohn scene (`physics/solver2d.ts`, pure) with a golden reference from `scripts/reference/`; the SCF waterfall and loop ring on `scf1d.ts`.
+**Tasks**: 1. `solver2d.ts` and its golden generator. 2. The Hohenberg-Kohn and Kohn-Sham scenes. 3. The SCF loop ring and waterfall. 4. The module e2e, axe, size and one Lighthouse run.
 **Tests and reference values**: `solver2d` lowest energies of a 2D harmonic well match the analytic values within the grid error stated in the test; the SCF scene's iteration count equals `scf1d_reference.json`.
 **Done when**: [ ] 5 topics pass section 1.
+**Not in this stage**: rewriting the topics' text beyond state markers, captions and `<Show>` links; topics of other modules.
 
 ## M16.7 Module 5 in 3D: electronic choices (Tier B)
 
@@ -432,7 +436,10 @@ Tier rule (ROADMAP_V3, M15): **Tier A** builds anything that computes a number a
 **Size**: L
 **Budget**: 90 min.
 **Deliverables**: the rows for plane waves, k-points, PAW, functionals, smearing, DFT+U, vdW (7 topics). For vdW, register the dispersion source before building; if none can be verified, ship the scene as `illustrative` without numbers and add a Q.
+**Tasks**: 1. Any new library or dataset first, with its tests. 2. The stage rows of section 6, topic by topic. 3. State markers and `<Show>` links in the text. 4. The module e2e, axe, size and one Lighthouse run.
+**Tests and reference values**: plane-wave counts equal `planewaves.ts` golden counts at each ENCUT; irreducible k-point counts equal the spglib golden counts; plus the content-stage checks above.
 **Done when**: [ ] 7 topics pass section 1.
+**Not in this stage**: rewriting the topics' text beyond state markers, captions and `<Show>` links; topics of other modules.
 
 ## M16.8 Module 5 in 3D: spin and magnetism (Tier B)
 
@@ -441,7 +448,10 @@ Tier rule (ROADMAP_V3, M15): **Tier A** builds anything that computes a number a
 **Size**: M
 **Budget**: 60 min.
 **Deliverables**: the rows for spin and magnetism, spin-polarized, orderings, ground state, reading output, non-collinear (6 topics); the audit's fourth question on the four thin magnetism pages, each with a visual (M12.3), since this stage touches them.
+**Tasks**: 1. Any new library or dataset first, with its tests. 2. The stage rows of section 6, topic by topic. 3. State markers and `<Show>` links in the text. 4. The module e2e, axe, size and one Lighthouse run.
+**Tests and reference values**: the spin signs of FM, A, C and G on the common supercell equal `magnetic_reference.json`; plus the content-stage checks above.
 **Done when**: [ ] 6 topics pass section 1.
+**Not in this stage**: rewriting the topics' text beyond state markers, captions and `<Show>` links; topics of other modules.
 
 ## M16.9 Modules 6 to 8 in 3D: files, running and convergence (Tier B)
 
@@ -450,7 +460,10 @@ Tier rule (ROADMAP_V3, M15): **Tier A** builds anything that computes a number a
 **Size**: L
 **Budget**: 90 min; split 6 and 7, then 8.
 **Deliverables**: the rows for modules 6, 7 and 8 (16 topics) and the parallelisation extension; the KPAR and NCORE mapping as a pure tested function.
+**Tasks**: 1. Any new library or dataset first, with its tests. 2. The stage rows of section 6, topic by topic. 3. State markers and `<Show>` links in the text. 4. The module e2e, axe, size and one Lighthouse run.
+**Tests and reference values**: the KPAR and NCORE mapping gives the core split stated by the tag data for a fixed set of cases written in the test; plus the content-stage checks above.
 **Done when**: [ ] 16 topics pass section 1.
+**Not in this stage**: rewriting the topics' text beyond state markers, captions and `<Show>` links; topics of other modules.
 
 ## M16.10 Module 9 in 3D: bands, DOS, charge density, forces, relaxation (Tier A)
 
@@ -460,6 +473,7 @@ Tier rule (ROADMAP_V3, M15): **Tier A** builds anything that computes a number a
 **Budget**: 90 min; second session likely.
 **Sources**: S-019, S-030, S-043, and those of the tight-binding model
 **Deliverables**: the module 9 rows (5 topics); a 3D tight-binding band library for sc, bcc and fcc s bands (`physics/tightbinding3d.ts`, golden vs the analytic dispersions); example datasets with generators; band cursor linking path, zone and surface.
+**Tasks**: 1. `tightbinding3d.ts` with golden tests. 2. Example datasets and generators. 3. Band, DOS, density, force and relaxation stages. 4. The module e2e, axe, size and one Lighthouse run.
 **Tests and reference values**: fcc s-band E(k) at Gamma, X, L equals the analytic nearest-neighbour values within 1e-12; band width equals the analytic width.
 **Done when**: [ ] 5 topics pass section 1; every viewer has example data with an honest badge.
 **Not in this stage**: the text depth the audit asks for (a separate content stage may follow); this stage adds only what the stage needs.
@@ -471,8 +485,10 @@ Tier rule (ROADMAP_V3, M15): **Tier A** builds anything that computes a number a
 **Size**: L
 **Budget**: 90 min.
 **Deliverables**: the module 12 rows (7 topics); a ball-and-spring phonon library (`physics/phonon_model.ts`: monatomic and diatomic chains, fcc nearest neighbour) with golden analytic dispersions; directional Young's modulus surface from `mechanics/elastic.ts`.
+**Tasks**: 1. `phonon_model.ts` with golden tests. 2. Directional modulus surface. 3. The seven stages. 4. The module e2e, axe, size and one Lighthouse run.
 **Tests and reference values**: chain dispersions equal the analytic formulas within 1e-12; the directional modulus of an isotropic tensor is constant within 1e-9 and matches `elastic_reference.json` for the golden tensors.
 **Done when**: [ ] 7 topics pass section 1.
+**Not in this stage**: rewriting the topics' text beyond state markers, captions and `<Show>` links; topics of other modules.
 
 ## M16.12 Modules 10 and 11 in 3D: worked example and tools (Tier B)
 
@@ -481,7 +497,10 @@ Tier rule (ROADMAP_V3, M15): **Tier A** builds anything that computes a number a
 **Size**: M
 **Budget**: 60 min.
 **Deliverables**: the module 10 and 11 rows (10 topics); module 10 states that need results show an "awaiting results" state with no numbers (D-101); the tool walkthroughs hand off to the tools.
+**Tasks**: 1. Any new library or dataset first, with its tests. 2. The stage rows of section 6, topic by topic. 3. State markers and `<Show>` links in the text. 4. The module e2e, axe, size and one Lighthouse run.
+**Tests and reference values**: the tolerance factor shown for each lanthanide equals the M8 library value; a module 10 state without author results shows no number (asserted in e2e); plus the content-stage checks above.
 **Done when**: [ ] 10 topics pass section 1; no invented result appears.
+**Not in this stage**: author results that have not been supplied (D-101); changes to the tools themselves.
 
 ## M16.13 New topics with 3D, part 1: symmetry, relaxation, surfaces, defects (Tier A)
 
@@ -490,7 +509,10 @@ Tier rule (ROADMAP_V3, M15): **Tier A** builds anything that computes a number a
 **Size**: L
 **Budget**: 90 min; two sessions expected (symmetry and relaxation, then surfaces and defects).
 **Deliverables**: four new topics with full anatomy (CONTENT_GUIDE section 3), questions with visuals, glossary terms, sources, and their stages from section 6; the module 8 pointer to the relaxation topic fixed.
+**Tasks**: 1. Write each topic (anatomy, questions, glossary, sources). 2. Its stage from section 6. 3. Fix the module 8 pointer. 4. Content linter, e2e, axe, size.
+**Tests and reference values**: space groups and symmetry operation counts of the golden structures equal moyo's; slab layer counts and terminations equal `structure_tools_reference.json`; defect formation energy formula checked against its source's worked example; plus the content-stage checks above.
 **Done when**: [ ] 4 topics pass section 1, the content linter and the science gate (G3).
+**Not in this stage**: the part 2 topics (M16.14); charged-defect finite-size corrections beyond what the source states.
 
 ## M16.14 New topics with 3D, part 2: hull, NEB, MD, COHP, beyond DFT (Tier A)
 
@@ -499,8 +521,10 @@ Tier rule (ROADMAP_V3, M15): **Tier A** builds anything that computes a number a
 **Size**: L
 **Budget**: 90 min; two sessions expected.
 **Deliverables**: topics and stages for the convex hull (hull library, golden vs pymatgen), NEB (pure NEB library on an analytic landscape, golden), MD and MLFF (Lennard-Jones toy MD in a worker, golden energy conservation), and the short COHP and beyond-DFT pages.
+**Tasks**: 1. Hull, NEB and MD libraries with golden tests. 2. Write each topic. 3. Its stage from section 6. 4. Content linter, e2e, axe, size.
 **Tests and reference values**: hull vertices for the golden ternary set equal pymatgen's; NEB saddle of the analytic landscape within 1e-6 of the reference; MD total energy drift below the stated tolerance at the stated time step.
 **Done when**: [ ] each topic passes section 1 and G3.
+**Not in this stage**: a real MLFF training run; Wannier functions and topology (later).
 
 ## M16.15 Coverage, performance and accessibility audit (Tier B)
 
@@ -508,9 +532,12 @@ Tier rule (ROADMAP_V3, M15): **Tier A** builds anything that computes a number a
 **Depends on**: M16.4 to M16.14
 **Size**: M
 **Budget**: 60 min.
-**Deliverables**: `check-stages.mjs` switched to failing; a coverage table in the report (every topic, its stage, badge, states, controls); Lighthouse on one topic per module; axe on every topic in both themes; a timing table (boot time, TBT, frame time on the heaviest state per module).
+**Deliverables**: `check-3d-stages.mjs` switched to failing; a coverage table in the report (every topic, its stage, badge, states, controls); Lighthouse on one topic per module; axe on every topic in both themes; a timing table (boot time, TBT, frame time on the heaviest state per module).
+**Tasks**: 1. Switch the 3D stage guard to failing. 2. Coverage table. 3. Lighthouse, axe and timing runs. 4. Fix what fails or record it with a Q.
+**Tests and reference values**: the full e2e suite, the guard on every topic, Lighthouse median of three on one topic per module, axe in both themes.
 **Done when**:
 - [ ] Every topic has a live stage that passes section 1; budgets and the 0.95 floor hold; axe clean.
+**Not in this stage**: new scenes or topics.
 
 ## 8. Not in M16
 
