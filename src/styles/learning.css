@@ -310,7 +310,7 @@ main .topic-section > h2.card-h {
   font-size: var(--step--1);
 }
 
-/* Previous and next: the buttons themselves are styled in PrevNext.astro (D-125); here they only wrap on narrow
+/* Previous and next: the buttons themselves are styled in PrevNext.astro (D-126); here they only wrap on narrow
    columns and keep a sensible minimum width. */
 .handbook-main .prev-next {
   flex-wrap: wrap;

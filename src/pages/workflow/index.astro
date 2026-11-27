@@ -27,7 +27,7 @@ const laneNote: Record<string, string> = {
 const lanes = WORKFLOW_GROUPS.map((name) => ({ name, steps: steps.filter((s) => s.group === name) })).filter(
   (l) => l.steps.length > 0,
 );
-// The stage beside the map (D-125): the handbook's five-step protocol scene, following the sections below.
+// The stage beside the map (D-126): the handbook's five-step protocol scene, following the sections below.
 type StageState = { id: string; section: string; params: Record<string, number | boolean>; caption: string };
 const stage: { scene: string; states: StageState[] } = {
   scene: 'm07-workflow',

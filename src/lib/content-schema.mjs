@@ -56,7 +56,7 @@ const stageOf = (section) =>
   });
 export const stageSchema = stageOf(z.enum(STAGE_SECTIONS));
 /**
- * The same stage beside a Workflow step (D-125). A step page has its own section ids (the `<Section id>` of its body),
+ * The same stage beside a Workflow step (D-126). A step page has its own section ids (the `<Section id>` of its body),
  * so a state may follow any of them; stages.test.ts checks that each one is on the page.
  */
 export const workflowStageSchema = stageOf(kebab);
@@ -131,6 +131,6 @@ export const workflowSchema = z.object({
   sources: z.array(z.string().regex(SOURCE_ID, 'must look like S-012')).min(1),
   status: z.enum(STATUSES),
   updated: date,
-  /** The live 3D stage beside the step (D-125), the same engine and scenes as the handbook topics. */
+  /** The live 3D stage beside the step (D-126), the same engine and scenes as the handbook topics. */
   stage: workflowStageSchema.optional(),
 });

@@ -40,7 +40,7 @@ const sections = [
   ...(rows.length ? [{ id: 'before-you-submit', heading: 'Before you submit' }] : []),
   { id: 'sources', heading: 'Sources' },
 ];
-// The stage beside the step (D-125): its state chips name the step's own sections, shortened to the part before a
+// The stage beside the step (D-126): its state chips name the step's own sections, shortened to the part before a
 // colon or a bracket ("Route A", "Check before you move on").
 const stage = d.stage;
 const sectionLabels = Object.fromEntries(sections.map((s) => [s.id, s.heading.split(/[:(]/)[0]!.trim()]));

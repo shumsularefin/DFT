@@ -12,7 +12,7 @@ The Workflow section (`/workflow/`, D-110) follows a research group's protocol, 
 | "The protocol step" quote and its notes | `src/data/workflow-protocol.json`, shown by `src/components/workflow/Protocol.astro` | Generated from the HTML handbook by `scripts/build/build-vasp-data.mjs`. |
 | "Before you submit" | `CHECKLIST` in `src/lib/reference/tables.ts`, picked by the `checklist:` front matter | Hand-written. The same rows are on `/reference/checklist/`. |
 | Version, revised date and the Revisions list | `src/data/workflow.json` | Hand-written. |
-| The 3D view beside a step | `stage:` in the step's front matter (a scene id and three or four states, each tied to a `<Section id>` of the page) | Hand-written. The scenes are the handbook's (`src/lib/viewer3d/scenes/`); `src/lib/viewer3d/stages.test.ts` checks every state (D-125). |
+| The 3D view beside a step | `stage:` in the step's front matter (a scene id and three or four states, each tied to a `<Section id>` of the page) | Hand-written. The scenes are the handbook's (`src/lib/viewer3d/scenes/`); `src/lib/viewer3d/stages.test.ts` checks every state (D-126). |
 | Order of the steps, the sidebar, the map and previous / next | `group:` and `order:` in each step's front matter | Automatic. |
 | The source of truth | `docs/source-material/VASP_Workflow_Handbook.html` (S-042) | The author's handbook. |
 

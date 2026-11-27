@@ -1,4 +1,4 @@
-// D-125: text inside a card runs to the card's own margin, the right rail never draws one card over another, the
+// D-126: text inside a card runs to the card's own margin, the right rail never draws one card over another, the
 // previous and next buttons stand out from the text, and a Workflow step has the handbook's stage beside its text.
 import { expect, test, type Page } from '@playwright/test';
 

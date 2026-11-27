@@ -79,7 +79,7 @@ describe('topic stages', () => {
   });
 });
 
-// Workflow steps (D-125): every step has a stage on the same engine; its states follow the step's own <Section id>s.
+// Workflow steps (D-126): every step has a stage on the same engine; its states follow the step's own <Section id>s.
 const workflowFiles = Object.keys(import.meta.glob('../../content/workflow/*.mdx')).map((f) =>
   f.replace('../../content/', 'src/content/'),
 );

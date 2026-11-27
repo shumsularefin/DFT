@@ -1,8 +1,8 @@
-# Report: Workflow in the handbook design, previous and next buttons, text width (D-125)
+# Report: Workflow in the handbook design, previous and next buttons, text width (D-126)
 
 - **Date:** 2026-11-27
 - **Branch:** `claude/workflow-design-text-width` (from `main` at 3039c88)
-- **Decision:** D-125. **Questions:** none opened.
+- **Decision:** D-126. **Questions:** none opened.
 
 ## What the owner asked
 
