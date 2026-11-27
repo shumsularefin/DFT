@@ -12,6 +12,8 @@ export interface RecipeStep {
   id: string;
   title: string;
   preset: string;
+  /** Preset variant id; the first variant when omitted. */
+  variant?: string;
   prerequisites: string[];
   carries: string[];
   checks: string[];
@@ -52,7 +54,9 @@ export function buildStepIncar(
 } {
   const preset = PRESET_MAP.get(step.preset);
   if (!preset) throw new Error(`Unknown preset "${step.preset}" in step "${step.id}"`);
-  const variant = preset.variants[0]!;
+  const variant = step.variant ? preset.variants.find((v) => v.id === step.variant) : preset.variants[0];
+  if (!variant)
+    throw new Error(`Unknown variant "${step.variant}" of preset "${step.preset}" in step "${step.id}"`);
   const raw = entriesFromPreset(preset, variant.id, { enmax });
   const entries: IncarEntry[] = [];
   const notes: string[] = [];

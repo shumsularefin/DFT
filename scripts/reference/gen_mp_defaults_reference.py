@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Materials Project GGA+U values and starting moments, read from pymatgen's input-set files (D-110, Q-072).
+"""Materials Project GGA+U values and starting moments, read from pymatgen's input-set files (D-111, Q-072).
 
 Source: pymatgen-core 2026.10.31 (MIT), the package that holds `pymatgen.io.vasp` since the 2026 split:
   * io/vasp/MPRelaxSet.yaml: LDAUTYPE, and LDAUL, LDAUU and LDAUJ keyed by the anion (O, F) then the metal.

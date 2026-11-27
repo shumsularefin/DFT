@@ -77,7 +77,7 @@ if (!mdRecipe) throw new Error('Field Handbook recipe r-md not found');
 const md = entriesOf(mdRecipe.incar);
 
 const H = ['S-019', 'S-041', 'S-042'];
-/** The handbook relaxation block turned into an NEB band: cell fixed, a force criterion, the NEB tags (D-110). */
+/** The handbook relaxation block turned into an NEB band: cell fixed, a force criterion, the NEB tags (D-111). */
 function nebEntries(optimiser) {
   const base = withPlaceholders(relax, ['ENCUT', 'MAGMOM'])
     .filter((e) => !['IBRION', 'POTIM', 'SYSTEM'].includes(e.name))
@@ -135,6 +135,22 @@ const presets = [
             : e,
         ),
         { requires: ['POSCAR', 'POTCAR', 'KPOINTS'] },
+      ),
+      // One point of an E-V curve: the handbook's ev_scan.sh comment (ISIF = 4, IBRION = 2, NSW = 100, EDIFF = 1E-6,
+      // EDIFFG = -0.005, same ENCUT and k-mesh everywhere) on the relaxation INCAR (D-110).
+      v(
+        'fixed-volume',
+        'Fixed volume, one point of an E-V curve (ISIF = 4)',
+        withPlaceholders(relax, ['ENCUT', 'MAGMOM']).map((e) =>
+          e.name === 'ISIF'
+            ? { name: 'ISIF', value: '4', comment: 'shape + ions relax at fixed volume; ISIF = 2 for cubic' }
+            : e.name === 'NSW'
+              ? { name: 'NSW', value: '100' }
+              : e.name === 'SYSTEM'
+                ? { name: 'SYSTEM', value: 'Compound-ev' }
+                : e,
+        ),
+        { requires: ['POSCAR scaled to one volume', 'POTCAR', 'KPOINTS'] },
       ),
     ],
   },
@@ -379,7 +395,7 @@ const presets = [
     ],
   },
   {
-    // D-110: climbing-image NEB from the VASP wiki (S-019), the VTST documentation (S-086) and the papers that
+    // D-111: climbing-image NEB from the VASP wiki (S-019), the VTST documentation (S-086) and the papers that
     // define the method (S-087, S-088, S-089). Built on the handbook relaxation block, cell fixed.
     id: 'neb',
     title: 'Transition state: climbing-image NEB',
@@ -588,7 +604,7 @@ const presets = [
 ];
 /** Presets taken from the Field Handbook alone: their tags count as field-handbook content, not workflow. */
 const FIELD_PRESETS = new Set(['aimd-nvt']);
-/** Presets built from web sources (D-110): using a tag there does not make it handbook content. */
+/** Presets built from web sources (D-111): using a tag there does not make it handbook content. */
 const WEB_PRESETS = new Set(['neb']);
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -803,7 +819,7 @@ const T = [
     ['IBRION', 'NFREE'],
     'POTIM',
   ],
-  // D-110: the NEB tags. Not in the handbooks; their text comes from the VASP wiki and VTST pages (NEB_WEB below).
+  // D-111: the NEB tags. Not in the handbooks; their text comes from the VASP wiki and VTST pages (NEB_WEB below).
   [
     'IMAGES',
     'neb',
@@ -1286,7 +1302,7 @@ const T = [
     'electronic',
     'real',
     'A step size used by the damped electronic algorithm.',
-    'The handbooks only show 0.4 with ALGO = Damped for HSE06; other uses are not described there.',
+    'The Workflow Handbook uses 0.4 with ALGO = Damped (in the SCF troubleshooting ladder and for HSE06) and a smaller 0.2 when an HSE06 run diverges.',
     ['ALGO', 'LHFCALC'],
     null,
   ],
@@ -1319,7 +1335,7 @@ const T = [
   ],
 ];
 
-/** Facts for tags the handbooks do not cover, read on the cited pages on 2026-11-27 (D-110). */
+/** Facts for tags the handbooks do not cover, read on the cited pages on 2026-11-27 (D-111). */
 const NEB_WEB = {
   IMAGES: {
     default: 'None: IMAGES must be set for a NEB run (VASP wiki, Nudged elastic bands).',
@@ -1403,7 +1419,14 @@ const tags = T.map(([name, group, type, beginner, breaks, related, key]) => {
   if (name === 'NEDOS') def = '301';
   const typical = row ? row.typical : f ? f.common : '';
   const interm = row ? row.controls : f ? strip(f.summary) : '';
-  const pro = f ? clip(f.facts.map(strip).join(' '), 600) : row ? row.why : undefined;
+  let pro = f ? clip(f.facts.map(strip).join(' '), 600) : row ? row.why : undefined;
+  // D-110: the Field Handbook's EDIFFG example pairs -0.005 with 1E-7; the Workflow Handbook's relaxation INCAR pairs
+  // it with 1E-6 and keeps 1E-7 to 1E-8 for -0.001. The author chose the Workflow Handbook's pairing.
+  if (name === 'EDIFFG' && pro)
+    pro = pro.replace(
+      '(e.g. −0.005 with 1E-7)',
+      '(the Workflow Handbook pairs −0.005 with 1E-6 and −0.001 with 1E-7 to 1E-8)',
+    );
   const corrections =
     f && f.fixed && !(f.name.includes('/') && name !== f.name.split(' / ')[0])
       ? f.fixed.map((c) => ({ was: strip(c.was), now: strip(c.now) }))
@@ -1426,7 +1449,7 @@ const tags = T.map(([name, group, type, beginner, breaks, related, key]) => {
       sources: w.sources,
       fromHandbook: [],
       readOn: '2026-11-27',
-      notes: 'Not in the handbooks. Read on the cited VASP wiki and VTST pages (D-110).',
+      notes: 'Not in the handbooks. Read on the cited VASP wiki and VTST pages (D-111).',
     };
   }
   return {
@@ -1434,7 +1457,12 @@ const tags = T.map(([name, group, type, beginner, breaks, related, key]) => {
     group,
     type,
     default: def,
-    typical: typical || 'Not stated in the handbooks.',
+    typical:
+      typical ||
+      // D-110: the Workflow Handbook gives TIME only inside its SCF ladder and HSE06 advice, not in a tag row.
+      (name === 'TIME'
+        ? '0.4 with ALGO = Damped; 0.2 when an HSE06 run diverges (Workflow Handbook).'
+        : 'Not stated in the handbooks.'),
     vaspVersion: '6.x',
     summary: { beginner, intermediate: interm || beginner, ...(pro ? { pro } : {}) },
     why: row
@@ -1478,4 +1506,23 @@ writeFileSync(
     1,
   ) + '\n',
 );
-console.log(`build-vasp-data: ${tags.length} tags, ${presets.length} presets`);
+// The author's five-step protocol, word for word, with the notes under each step (D-110). The Workflow section's
+// step pages render it from this file, so a change to the protocol in the handbook reaches every page at once.
+const protocol = wf.protocol.map((p) => ({
+  step: p.step,
+  title: p.title,
+  quote: strip(p.yours).replace(/^[“"]|[”"]$/g, ''),
+  notes: p.notes.map((n) => ({ kind: n.pill, text: strip(n.text) })),
+}));
+if (protocol.length !== 5) throw new Error(`expected 5 protocol steps, found ${protocol.length}`);
+writeFileSync(
+  resolve(root, 'src', 'data', 'workflow-protocol.json'),
+  JSON.stringify(
+    { _meta: { sources: ['S-042'], generator: 'scripts/build/build-vasp-data.mjs', version: 1 }, protocol },
+    null,
+    1,
+  ) + '\n',
+);
+console.log(
+  `build-vasp-data: ${tags.length} tags, ${presets.length} presets, ${protocol.length} protocol steps`,
+);

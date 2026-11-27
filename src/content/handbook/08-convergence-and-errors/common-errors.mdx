@@ -10,7 +10,7 @@ vaspTags: [ISYM, SYMPREC, ALGO, ISTART]
 sources: [S-019, S-041, S-042]
 noLab: true
 status: draft
-updated: 2026-11-19
+updated: 2026-11-27
 ---
 
 <Why>
@@ -81,13 +81,16 @@ The message strings in the finder come from the author's handbooks. They have no
 
 <WhatChanges>
 
-| You see...          | Try first...                                    | Then...                            |
-| ------------------- | ----------------------------------------------- | ---------------------------------- |
-| ZBRENT              | Copy `CONTCAR` to `POSCAR`, restart             | Tighten `EDIFF`, `IBRION = 1`      |
-| BRMIX               | Remove old `CHGCAR` and `WAVECAR`               | `ISYM = 0` if symmetry changed     |
-| IBZKPT              | A Gamma-centred mesh                            | Equal divisions on equivalent axes |
-| Distance very small | Check scale and Direct or Cartesian in `POSCAR` | Look at the structure in a viewer  |
-| Nothing printed     | Scheduler log, memory and wall time             | Reduce `KPAR`, add nodes           |
+| You see...          | Try first...                                    | Then...                                              |
+| ------------------- | ----------------------------------------------- | ---------------------------------------------------- |
+| ZBRENT              | Copy `CONTCAR` to `POSCAR`, restart             | Tighten `EDIFF`, `IBRION = 1`                        |
+| BRMIX               | Remove old `CHGCAR` and `WAVECAR`               | `ISYM = 0` if symmetry changed                       |
+| Sub-Space-Matrix    | `ALGO = All` or `Normal`                        | Change the core count or `NCORE`; check the geometry |
+| IBZKPT              | A Gamma-centred mesh                            | Equal divisions on equivalent axes                   |
+| Distance very small | Check scale and Direct or Cartesian in `POSCAR` | Look at the structure in a viewer                    |
+| Nothing printed     | Scheduler log, memory and wall time             | Reduce `KPAR`, add nodes                             |
+
+The Sub-Space-Matrix message ("not hermitian in DAV") comes from an unstable Davidson step with `ALGO = Fast` or `Normal`, which is why the first fix is a change of `ALGO` <Cite id="S-042" />.
 
 Why start with the cheap fix: most failures are input or file problems. What happens if you change many things at once: you do not learn which one fixed it <Cite id="S-041" />.
 

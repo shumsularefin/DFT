@@ -7,10 +7,18 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
-- Input Builder climbing-image NEB preset, from the VTST documentation and Henkelman et al. 2000, with a plain VASP NEB variant, the tags IMAGES, SPRING, LCLIMB and IOPT, and NEB rules V036 to V041 (D-110).
-- Materials Project U values and starting moments as labelled, editable fills in the Input Builder and the Magnetic tool, with their sources and the fits that disagree (D-110).
-- Selective-dynamics rules V042 and V043: flags that cannot act, every coordinate fixed, and a slab relaxation with no fixed layers (D-110).
-- Input Builder share links keep a typed k-mesh (D-110).
+- Input Builder climbing-image NEB preset, from the VTST documentation and Henkelman et al. 2000, with a plain VASP NEB variant, the tags IMAGES, SPRING, LCLIMB and IOPT, and NEB rules V036 to V041 (D-111).
+- Materials Project U values and starting moments as labelled, editable fills in the Input Builder and the Magnetic tool, with their sources and the fits that disagree (D-111).
+- Selective-dynamics rules V042 and V043: flags that cannot act, every coordinate fixed, and a slab relaxation with no fixed layers (D-111).
+- Input Builder share links keep a typed k-mesh (D-111).
+- A Workflow section at `/workflow/`: the author's VASP protocol as a path to follow, from a CIF file to every property, with one page per step (folder, files in and out, INCAR, commands, checks, checklist, links to the theory and tools), a map, a project layout and a version and revisions list. `docs/WORKFLOW_GUIDE.md` explains how to change it (D-110).
+- The Input Builder opens a task from a link (`?preset=relax&variant=default`), and the relaxation task gains a fixed-volume variant for E-V scans.
+- The VASPkit page holds the Workflow Handbook's full command map; output files, troubleshooting, common errors and other calculations gain the rows they were missing.
+
+### Changed
+
+- Values aligned with the author's Workflow Handbook: EDIFFG -0.005 with EDIFF 1E-6, no LMAXMIX in the band INCAR, elastic as protocol step 4 (NFREE 4, EDIFF 1E-8, ±1 kB), optics (about 3× NBANDS, ALGO Normal, NEDOS 2001), E-V points as fixed-volume relaxations, TIME 0.4 and 0.2, ALGO Fast as a Sub-Space-Matrix cause (D-110).
+
 - Molecule mode editing tools: a common-element row, a searchable periodic table tinted by element category, ring templates (benzene, pyridine, cyclohexane, cyclopentane, pyrrole, furan, thiophene) and groups (CH3, OH, NH2, COOH, CHO) that bond in place of a hydrogen, single, double, triple and aromatic bonds (drawn in the viewer and counted when hydrogens are added), set a distance, move, select linked atoms or hydrogens, remove hydrogens, undo and redo, live distance, angle and dihedral read-out, and a "Crystal or Molecule?" explainer by the mode switch (D-109).
 - The Material Builder's Input files step sends the structure, spins, ENMAX, POTCAR variants, task, system type and tested k-mesh to the Input Builder, which gains a typed N1 x N2 x N3 mesh and slab rules V034 and V035 (D-108).
 

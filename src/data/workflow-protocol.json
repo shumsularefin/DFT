@@ -1,0 +1,110 @@
+{
+ "_meta": {
+  "sources": [
+   "S-042"
+  ],
+  "generator": "scripts/build/build-vasp-data.mjs",
+  "version": 1
+ },
+ "protocol": [
+  {
+   "step": 1,
+   "title": "Relaxation",
+   "quote": "Prepare four INPUT files and changes it as it requires. Run relaxation with encut of 1.3 of Enmax. Ediff, ISPIN, Magmom. INCAR can be prepared from VASPKIT.",
+   "notes": [
+    {
+     "kind": "verified",
+     "text": "ENCUT = 1.3 × ENMAX: the VASP wiki notes the default cutoff often has to be raised by about 30% to converge the stress tensor (Pulay stress). Use the largest ENMAX among your species: grep ENMAX POTCAR."
+    },
+    {
+     "kind": "verified",
+     "text": "Force criterion EDIFFG = -0.005 or -0.001 eV/Å. A negative EDIFFG stops when every force is below |EDIFFG| (VASP wiki)."
+    },
+    {
+     "kind": "note",
+     "text": "ISPIN = 2 with one MAGMOM value per atom, in POSCAR order. VASPkit: 101 → SR (add MG for spin: SRMG)."
+    }
+   ]
+  },
+  {
+   "step": 2,
+   "title": "SCF in the same folder",
+   "quote": "Same folder RUN SCF calculation. ISTART should be 1, INCAR will be generated from VASPkit. Try Converge repeatedly. For DOS, LORBIT = 11.",
+   "notes": [
+    {
+     "kind": "verified",
+     "text": "ISTART = 1 reads the WAVECAR left by the relaxation (VASP wiki: ISTART)."
+    },
+    {
+     "kind": "verified",
+     "text": "IBRION is not written. With NSW = 0 VASP’s default is already IBRION = −1 (VASP wiki: IBRION)."
+    },
+    {
+     "kind": "verified",
+     "text": "ISMEAR = 0, SIGMA = 0.05 as in the VASPkit template. The wiki recommends Gaussian smearing with a small SIGMA for semiconductors and insulators, and warns against the default ISMEAR = 1 for them."
+    },
+    {
+     "kind": "verified",
+     "text": "LORBIT = 11 writes the projected DOS and PROCAR. The DOS is read from this SCF run with VASPkit 111 / 113."
+    }
+   ]
+  },
+  {
+   "step": 3,
+   "title": "Band structure",
+   "quote": "For BAND, Run SCF again without ICHARG=11 in INCAR, then generate KPATH.in which will be KPOINTS vaspkit 3 - 303. For data analyasis, vaspkit 21 211.",
+   "notes": [
+    {
+     "kind": "verified",
+     "text": "The SCF without ICHARG = 11 on a uniform k-mesh writes the converged CHGCAR. 303 writes KPATH.in, which becomes the k-path for the bands, and 211 reads the result."
+    },
+    {
+     "kind": "wiki rule",
+     "text": "The VASP wiki says a line-mode k-path “is not suitable for self-consistent calculations”. So the KPATH.in eigenvalues must come from one of two validated routes (details in Band structure): (A) VASP ≥ 6.3: one SCF without ICHARG = 11, with the uniform mesh in KPOINTS and KPATH.in copied to KPOINTS_OPT; (B) a run with KPOINTS = KPATH.in that reads the SCF CHGCAR (ICHARG = 11). This is the INCAR in the VASPKIT band tutorial."
+    }
+   ]
+  },
+  {
+   "step": 4,
+   "title": "Elastic properties",
+   "quote": "For elastic Properites, Prepare INCAR similar to Relaxation, but IBRION will be 6-8 and ENCUT=620. Comment out NCORE. vaspkit 2 - 203.",
+   "notes": [
+    {
+     "kind": "verified",
+     "text": "The VASP wiki states that IBRION = 6 with ISIF ≥ 3 calculates the elastic constants (six finite lattice distortions, clamped and relaxed ions). Use IBRION = 6, ISIF = 3."
+    },
+    {
+     "kind": "verified",
+     "text": "ENCUT = 620: stress needs the higher cutoff, as in step 1."
+    },
+    {
+     "kind": "verified",
+     "text": "Comment out NCORE. VASP runs IBRION = 6 without band parallelization (NPAR = number of ranks); NCORE in the INCAR can stop the run."
+    },
+    {
+     "kind": "verified",
+     "text": "203 reads TOTAL ELASTIC MODULI from OUTCAR (VASPKIT tutorial)."
+    }
+   ]
+  },
+  {
+   "step": 5,
+   "title": "Optical properties",
+   "quote": "For Optical Properites, run SCF again up to -06 to -08 and then generate INCAR from vaspkit. After SCF calculate get the grep NBANDS OUTCAR. Then take NBANDS 3 times of it with closest ceiling numbers. Add ISPIN and magmom if requires. For data analysis, vaspkit 71 - 711.",
+   "notes": [
+    {
+     "kind": "verified",
+     "text": "VASP wiki (LOPTICS): reasonable results “are usually only obtained if NBANDS is roughly doubled or tripled” with respect to the default. The wiki examples use EDIFF = 1E-8."
+    },
+    {
+     "kind": "verified",
+     "text": "“Closest ceiling”: VASP itself increases NBANDS until it is divisible by the number of cores (or by NCORE) (VASP wiki: NBANDS). Round 3 × NBANDS up to that number."
+    },
+    {
+     "kind": "verified",
+     "text": "VASPkit: 101 → OP, then 711. Wiki values: CSHIFT = 0.1, NEDOS ≈ 2000."
+    }
+   ]
+  }
+ ]
+}

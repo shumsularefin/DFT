@@ -167,7 +167,7 @@
    "summary": {
     "beginner": "When to stop a relaxation. A negative number means: stop when every force is smaller than that many eV per angstrom.",
     "intermediate": "Ionic stop. >0: energy change (eV). <0: max force (eV/Å)",
-    "pro": "Positive: stop when the total-energy change between ionic steps is below EDIFFG (eV). Negative: stop when the force on every atom is below |EDIFFG| (eV/Å). More reliable for finding the true minimum. The force criterion ignores stress. In ISIF = 3 runs, check the stress (OUTCAR \"in kB\") separately. A tight EDIFFG needs a tight EDIFF (e.g. −0.005 with 1E-7); otherwise noisy forces keep the ions \"chattering\" around the minimum."
+    "pro": "Positive: stop when the total-energy change between ionic steps is below EDIFFG (eV). Negative: stop when the force on every atom is below |EDIFFG| (eV/Å). More reliable for finding the true minimum. The force criterion ignores stress. In ISIF = 3 runs, check the stress (OUTCAR \"in kB\") separately. A tight EDIFFG needs a tight EDIFF (the Workflow Handbook pairs −0.005 with 1E-6 and −0.001 with 1E-7 to 1E-8); otherwise noisy forces keep the ions \"chattering\" around the minimum."
    },
    "why": "Negative (force) criteria are more reliable. EDIFF should be at least 10× smaller than any energy-based EDIFFG.",
    "breaks": "A positive value stops on energy change, which can end a relaxation too early. EDIFF should be at least 10 times smaller than any energy-based EDIFFG.",
@@ -1006,7 +1006,7 @@
    ],
    "fromHandbook": [],
    "readOn": "2026-11-27",
-   "notes": "Not in the handbooks. Read on the cited VASP wiki and VTST pages (D-110)."
+   "notes": "Not in the handbooks. Read on the cited VASP wiki and VTST pages (D-111)."
   },
   {
    "name": "SPRING",
@@ -1033,7 +1033,7 @@
    ],
    "fromHandbook": [],
    "readOn": "2026-11-27",
-   "notes": "Not in the handbooks. Read on the cited VASP wiki and VTST pages (D-110)."
+   "notes": "Not in the handbooks. Read on the cited VASP wiki and VTST pages (D-111)."
   },
   {
    "name": "LCLIMB",
@@ -1062,7 +1062,7 @@
    ],
    "fromHandbook": [],
    "readOn": "2026-11-27",
-   "notes": "Not in the handbooks. Read on the cited VASP wiki and VTST pages (D-110)."
+   "notes": "Not in the handbooks. Read on the cited VASP wiki and VTST pages (D-111)."
   },
   {
    "name": "IOPT",
@@ -1092,7 +1092,7 @@
    ],
    "fromHandbook": [],
    "readOn": "2026-11-27",
-   "notes": "Not in the handbooks. Read on the cited VASP wiki and VTST pages (D-110)."
+   "notes": "Not in the handbooks. Read on the cited VASP wiki and VTST pages (D-111)."
   },
   {
    "name": "NFREE",
@@ -2697,14 +2697,14 @@
    "group": "electronic",
    "type": "real",
    "default": "Not stated in the handbooks. See the VASP wiki page for TIME.",
-   "typical": "Not stated in the handbooks.",
+   "typical": "0.4 with ALGO = Damped; 0.2 when an HSE06 run diverges (Workflow Handbook).",
    "vaspVersion": "6.x",
    "summary": {
     "beginner": "A step size used by the damped electronic algorithm.",
     "intermediate": "A step size used by the damped electronic algorithm."
    },
    "why": "The handbooks show this tag only inside the example INCAR files; they do not give a separate reason.",
-   "breaks": "The handbooks only show 0.4 with ALGO = Damped for HSE06; other uses are not described there.",
+   "breaks": "The Workflow Handbook uses 0.4 with ALGO = Damped (in the SCF troubleshooting ladder and for HSE06) and a smaller 0.2 when an HSE06 run diverges.",
    "tasks": [
     "hybrid"
    ],

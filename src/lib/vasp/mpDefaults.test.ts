@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import ref from '../../../tests/reference/mp_defaults_reference.json';
 import { MP_MAGMOM, MP_MAGMOM_DEFAULT, MP_U, MP_U_ANIONS, mpLdau, mpMagmom } from './mpDefaults';
 
-describe('Materials Project defaults (D-110)', () => {
+describe('Materials Project defaults (D-111)', () => {
   it('match pymatgen-core MPRelaxSet.yaml and VASPIncarBase.yaml', () => {
     expect(MP_U).toEqual(ref.u);
     expect([...MP_U_ANIONS].sort()).toEqual(ref.u_anions);

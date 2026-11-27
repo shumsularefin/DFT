@@ -229,7 +229,7 @@ export default function SettingsStep() {
   );
 }
 
-/** Fills the rows with the Materials Project values when O or F is present; says why not otherwise (D-110). */
+/** Fills the rows with the Materials Project values when O or F is present; says why not otherwise (D-111). */
 function MpLdauButton({ order }: { order: string[] }) {
   const s = useBuilder();
   const mp = mpLdau(order);

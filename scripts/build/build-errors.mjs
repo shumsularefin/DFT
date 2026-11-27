@@ -4,6 +4,12 @@
 // map, categories, message strings and one-line plain explanations are authored here.
 import { readFileSync, writeFileSync } from 'node:fs';
 
+/** Field Handbook fix texts replaced by the Workflow Handbook's advice (D-110). */
+const FIX_TEXT = {
+  'Change ALGO (e.g. Normal → Fast, or All).':
+    'Change ALGO to All, or back to Normal if it was Fast (the Workflow Handbook lists Fast as a cause of this error and avoids it for magnetic or +U systems).',
+};
+
 const field = JSON.parse(readFileSync('scripts/__generated__/field-handbook.json', 'utf8'));
 const work = JSON.parse(readFileSync('scripts/__generated__/workflow-handbook.json', 'utf8'));
 const fieldById = new Map(field.TROUBLE.flatMap((p) => p.items.map((i) => [i.id, i])));
@@ -529,7 +535,9 @@ const out = E.map(
       ...extraCauses.map((c) => c),
     ].filter((x, i, a) => x && a.indexOf(x) === i);
     const fixTexts = [
-      ...(f ? f.fix.map(clean) : []),
+      // D-110: the Field Handbook suggests "Normal -> Fast"; the Workflow Handbook lists ALGO = Fast as a cause of the
+      // Davidson errors and advises against Fast for magnetic and +U systems. The author chose the Workflow Handbook.
+      ...(f ? f.fix.map(clean).map((t) => FIX_TEXT[t] ?? t) : []),
       ...rs.flatMap((r) => splitFix(clean(r.fix)).map(up)),
       ...extraFixes,
     ];

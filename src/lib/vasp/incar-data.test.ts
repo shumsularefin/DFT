@@ -23,7 +23,7 @@ const TagInfo = z.object({
   handbook: z.null(),
   sources: z.array(z.string().regex(/^S-\d{3}$/)).min(1),
   fromHandbook: z.array(z.enum(['field', 'workflow'])),
-  /** Date a tag that is not in the handbooks was read on its web sources (D-110). */
+  /** Date a tag that is not in the handbooks was read on its web sources (D-111). */
   readOn: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/)
@@ -73,7 +73,7 @@ describe('vasp-tags.json', () => {
     for (const t of tags) expect(t.summary.beginner.length).toBeGreaterThan(20);
     expect(JSON.stringify(tagsFile)).not.toContain(String.fromCharCode(0x2014));
   });
-  it('every tag comes from a handbook, or was read on its cited web pages and cites no handbook (D-110)', () => {
+  it('every tag comes from a handbook, or was read on its cited web pages and cites no handbook (D-111)', () => {
     for (const t of tags) {
       if (t.fromHandbook.length > 0) continue;
       expect(t.readOn, t.name).toBeDefined();
@@ -111,13 +111,13 @@ describe('vasp-tags.json', () => {
 });
 
 describe('incar-presets.json', () => {
-  it('has 21 presets with unique ids, including the three carried over from the Material Builder (D-108) and NEB (D-110)', () => {
+  it('has 21 presets with unique ids, including the three carried over from the Material Builder (D-108) and NEB (D-111)', () => {
     expect(presets).toHaveLength(21);
     expect(new Set(presets.map((p) => p.id)).size).toBe(21);
     const ids = presets.map((p) => p.id);
     for (const id of ['soc', 'dipole', 'phonon-dfpt', 'neb']) expect(ids).toContain(id);
   });
-  it('the NEB preset follows the VASP wiki and VTST setup (D-110)', () => {
+  it('the NEB preset follows the VASP wiki and VTST setup (D-111)', () => {
     const neb = presets.find((p) => p.id === 'neb')!;
     const get = (variant: string, name: string) =>
       neb.variants.find((v) => v.id === variant)!.entries.find((e) => e.name === name);

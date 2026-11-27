@@ -10,7 +10,7 @@ vaspTags: [LVHAR, IDIPOL, LELF, LORBIT, ISYM, LSORBIT, IVDW, MDALGO]
 sources: [S-042, S-067]
 noLab: true
 status: draft
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 <Why>
@@ -69,7 +69,7 @@ One entry per row of the handbook's table <Cite id="S-042" />. Where the site ha
 
 **Cohesive energy.** Isolated atoms in a large box with unequal sides (the handbook's example is 15 x 15.5 x 16 Å), Γ-only, spin-polarized, `ISYM = 0`.
 
-**Work function.** A slab with at least 15 Å of vacuum, `LVHAR = .TRUE.` (the electrostatic potential reaches the vacuum level faster than the total potential), and a dipole correction (`IDIPOL = 3`) for an asymmetric slab. VASPKIT 426 along z prints the vacuum level and writes `POTPAVG.dat`. Check that the vacuum level is converged with the vacuum thickness. The handbook's VASPKIT example, Au(111), gives 6.695 − 1.520 = 5.18 eV. Tool: the [work-function tool](/tools/work-function/), which also draws the planar average.
+**Work function.** A slab with at least 15 Å of vacuum, `LVHAR = .TRUE.` (the electrostatic potential reaches the vacuum level faster than the total potential that `LVTOT` writes), and a dipole correction (`IDIPOL = 3`) for an asymmetric slab. VASPKIT 426 along z prints the vacuum level and writes `POTPAVG.dat`. Check that the vacuum level is converged with the vacuum thickness. The handbook's VASPKIT example, Au(111), gives 6.695 − 1.520 = 5.18 eV. Tool: the [work-function tool](/tools/work-function/), which also draws the planar average.
 
 **Surface energy.** Symmetric slabs of increasing thickness, relaxed with `ISIF = 2`. Tool: the surface-energy calculator in the [research planner](/tools/planner/).
 
@@ -77,7 +77,7 @@ One entry per row of the handbook's table <Cite id="S-042" />. Where the site ha
 
 **ELF.** A static run with `LELF = .TRUE.` and `NCORE = 1`; view `ELFCAR` in VESTA. ELF near 1 means localized electrons (a covalent bond, a lone pair); near 0.5 means electron-gas-like (metallic).
 
-**Charge density difference.** Relax AB. Then run A and B statically at their positions in the relaxed AB (do not relax the fragments), with the same cell and grid. VASPKIT 314 with `./CHGCAR ./A/CHGCAR ./B/CHGCAR` writes `CHGDIFF.vasp`. The same tool gives the deformation density and a field-induced difference. Tool: the CHGCAR difference in the [work-function tool](/tools/work-function/).
+**Charge density difference.** Relax AB. Then run A and B statically at their positions in the relaxed AB (do not relax the fragments), with the same cell and grid. VASPKIT 314 with `./CHGCAR ./A/CHGCAR ./B/CHGCAR` writes `CHGDIFF.vasp`, which you view in VESTA. The same tool gives the deformation density (the SCF density minus the superposition of atomic densities) and a field-induced difference (from runs with `EFIELD`). Tool: the CHGCAR difference in the [work-function tool](/tools/work-function/).
 
 **Spin density.** A spin-polarized `CHGCAR`, then VASPKIT 312 (`SPIN.vasp`) or 313 (up and down separately). It shows which sites and orbitals carry the moment.
 
@@ -93,13 +93,13 @@ One entry per row of the handbook's table <Cite id="S-042" />. Where the site ha
 
 **Spin-orbit bands.** `vasp_ncl` with `LSORBIT`, from a collinear `CHGCAR`. Gives splittings for heavy elements, Rashba splitting and topological band inversions. See [noncollinear magnetism and spin-orbit coupling](/handbook/05-practical-choices/noncollinear-and-spin-orbit/).
 
-**Van der Waals.** `IVDW = 11` or `12` in the relaxation. Essential for layered and molecular crystals. See [van der Waals corrections](/handbook/05-practical-choices/vdw-corrections/).
+**Van der Waals.** `IVDW = 11` or `12` in the relaxation (VASPKIT 101 with task code D3). Essential for layered crystals (their c axis) and molecular crystals. See [van der Waals corrections](/handbook/05-practical-choices/vdw-corrections/).
 
 **Bonding (COHP).** LOBSTER after a static run with `ISYM = 0` (or `-1`), `LWAVE = .TRUE.` and enough `NBANDS`. −COHP above zero is bonding, below zero antibonding; the integrated ICOHP measures bond strength.
 
 **Defects.** A supercell with a vacancy or substitution, charged states through `NELECT`, and finite-size corrections; the formula is in the table above.
 
-**Ab initio MD.** `IBRION = 0`, `MDALGO`, `TEBEG`, `POTIM` about 1 fs, `NSW` in the thousands (the input builder has an AIMD preset). For thermal stability at finite temperature the structure should stay intact and the energy fluctuate around a constant. VASPKIT 721 gives the mean squared displacement (diffusion), 722 the radial distribution function.
+**Ab initio MD.** `IBRION = 0`, `MDALGO`, `TEBEG`, `POTIM` about 1 fs, `NSW` in the thousands (VASPKIT 101 with task code MD; the input builder also has an AIMD preset). For thermal stability at finite temperature the structure should stay intact and the energy fluctuate around a constant. VASPKIT 721 gives the mean squared displacement (diffusion), 722 the radial distribution function.
 
 </InVasp>
 

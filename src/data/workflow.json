@@ -1,0 +1,15 @@
+{
+ "_meta": {
+  "about": "Version and revision history of the Workflow section (/workflow/, D-110). Hand-edited: when the protocol changes, raise version, set revised to the day of the change and add one line at the top of history. docs/WORKFLOW_GUIDE.md has the steps.",
+  "sources": ["S-042"]
+ },
+ "version": 1,
+ "revised": "2026-11-27",
+ "history": [
+  {
+   "version": 1,
+   "date": "2026-11-27",
+   "change": "First edition, built from the Workflow Handbook (S-042): the five-step protocol and every calculation after it."
+  }
+ ]
+}

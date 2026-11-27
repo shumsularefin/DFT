@@ -1,5 +1,5 @@
 // V034, V035: slab settings the Material Builder checked before D-108 moved its INCAR and KPOINTS steps here.
-// V042, V043: selective dynamics (D-110, Q-071).
+// V042, V043: selective dynamics (D-111, Q-071).
 // @source S-041, S-042, S-066
 // @source S-019 (VASP wiki POSCAR, oldid 37632: the T/F flags decide which coordinates may change during a
 //   relaxation or MD; IBRION, oldid 37190: IBRION = -1, the default for NSW = 0, does not move the ions)

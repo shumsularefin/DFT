@@ -473,7 +473,7 @@ describe('false positives on the author handbook INCARs', () => {
   });
 });
 
-describe('the NEB preset passes its own rules (D-110)', () => {
+describe('the NEB preset passes its own rules (D-111)', () => {
   const presets = (
     presetsJson as {
       presets: {
@@ -506,7 +506,7 @@ describe('the NEB preset passes its own rules (D-110)', () => {
   );
 });
 
-describe('selective dynamics (D-110, Q-071)', () => {
+describe('selective dynamics (D-111, Q-071)', () => {
   it('V042 fires for IBRION = -1 even with NSW > 0, and not without flags', () => {
     expect(ids({ incar: inc('NSW = 50\nIBRION = -1'), structure: si2Sel }, 'V042')).toHaveLength(1);
     expect(ids({ incar: inc('NSW = 0'), structure: si2 }, 'V042')).toHaveLength(0);

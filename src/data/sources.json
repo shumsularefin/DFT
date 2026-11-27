@@ -149,7 +149,7 @@
     "usedFor": "Tag meaning, defaults, rules",
     "access": "web; reachable from builder sessions since 2026-11-18",
     "status": "cited-from-memory",
-    "notes": "The author's handbooks quote it. Always cite the page name. Read on 2026-11-18 for M7.1 (status kept for the wiki as a whole): GGA (default from POTCAR LEXCH), IMIX (default 4, Broyden and Pulay; Kerker formula A G^2/(G^2+B^2)), AMIX (0.4 with PAW; metals often much smaller, e.g. 0.02), BMIX (1.0), NELM (60), NBANDS (all occupied states plus one empty band, default about NELECT/2 + NIONS/2). Read on 2026-11-26 for M15.2: KPOINTS (oldid 38298; fully automatic mode N_i = int(max(1, R_k abs(b_i) + 0.5)), Gamma-centred, Q-018), Pulay stress (oldid 32951; no numeric threshold, Q-014), Choosing pseudopotentials (oldid 38312; recommended PBE potpaw.64 names, Q-010) Read on 2026-11-27 for D-110: Nudged elastic bands (oldid 38133; n images need n + 2 folders with two-digit names, 00 holds the initial state; cores a multiple of IMAGES; IBRION = 1 or 3, CG usually fails; relax the end points first; keep the image count minimal, starting from one; cannot treat structural transitions; climbing image not covered, points to VTST), SPRING (oldid 27428; default -5, negative activates NEB, the recommended setting), POSCAR (oldid 37632; Selective dynamics: only the first letter S is read, T or F per coordinate decides whether it may change during relaxation or MD, the flags refer to direct coordinates), IBRION (oldid 37190; IBRION = -1 is the default for NSW = 0 or -1 and does not move the ions; the page does not mention selective dynamics), Structure optimization (oldid 37636; ISIF and selective dynamics together set the degrees of freedom)"
+    "notes": "The author's handbooks quote it. Always cite the page name. Read on 2026-11-18 for M7.1 (status kept for the wiki as a whole): GGA (default from POTCAR LEXCH), IMIX (default 4, Broyden and Pulay; Kerker formula A G^2/(G^2+B^2)), AMIX (0.4 with PAW; metals often much smaller, e.g. 0.02), BMIX (1.0), NELM (60), NBANDS (all occupied states plus one empty band, default about NELECT/2 + NIONS/2). Read on 2026-11-26 for M15.2: KPOINTS (oldid 38298; fully automatic mode N_i = int(max(1, R_k abs(b_i) + 0.5)), Gamma-centred, Q-018), Pulay stress (oldid 32951; no numeric threshold, Q-014), Choosing pseudopotentials (oldid 38312; recommended PBE potpaw.64 names, Q-010) Read on 2026-11-27 for D-111: Nudged elastic bands (oldid 38133; n images need n + 2 folders with two-digit names, 00 holds the initial state; cores a multiple of IMAGES; IBRION = 1 or 3, CG usually fails; relax the end points first; keep the image count minimal, starting from one; cannot treat structural transitions; climbing image not covered, points to VTST), SPRING (oldid 27428; default -5, negative activates NEB, the recommended setting), POSCAR (oldid 37632; Selective dynamics: only the first letter S is read, T or F per coordinate decides whether it may change during relaxation or MD, the flags refer to direct coordinates), IBRION (oldid 37190; IBRION = -1 is the default for NSW = 0 or -1 and does not move the ions; the page does not mention selective dynamics), Structure optimization (oldid 37636; ISIF and selective dynamics together set the degrees of freedom)"
   },
   {
     "id": "S-020",
@@ -269,7 +269,7 @@
     "usedFor": "Setyawan-Curtarolo reference, data, golden files",
     "access": "open source",
     "status": "cross-checked",
-    "notes": "pymatgen 2026.10.24 used for golden data. D-110: the Materials Project U and MAGMOM defaults are read from pymatgen-core 2026.10.31 (`io/vasp/MPRelaxSet.yaml`, `io/vasp/VASPIncarBase.yaml`; `io/vasp/sets.py` starts unlisted elements at 0.6) by `scripts/reference/gen_mp_defaults_reference.py`. pymatgen disagrees with itself on Co: `VASPIncarBase.yaml` starts Co at 0.6 (low spin, with a warning in `sets.py`), while `analysis/magnetism/default_magmoms.yaml` (pymatgen 2026.10.24), headed \"MPRelaxSet defaults\", lists Co 5; the site uses the input-set file"
+    "notes": "pymatgen 2026.10.24 used for golden data. D-111: the Materials Project U and MAGMOM defaults are read from pymatgen-core 2026.10.31 (`io/vasp/MPRelaxSet.yaml`, `io/vasp/VASPIncarBase.yaml`; `io/vasp/sets.py` starts unlisted elements at 0.6) by `scripts/reference/gen_mp_defaults_reference.py`. pymatgen disagrees with itself on Co: `VASPIncarBase.yaml` starts Co at 0.6 (low spin, with a warning in `sets.py`), while `analysis/magnetism/default_magmoms.yaml` (pymatgen 2026.10.24), headed \"MPRelaxSet defaults\", lists Co 5; the site uses the input-set file"
   },
   {
     "id": "S-035",
@@ -634,10 +634,10 @@
   {
     "id": "S-080",
     "citation": "A. Jain, G. Hautier, S. P. Ong, C. J. Moore, C. C. Fischer, K. A. Persson, G. Ceder, \"Formation enthalpies by mixing GGA and GGA+U calculations\", Phys. Rev. B 84, 045115 (2011); L. Wang, T. Maxisch, G. Ceder, \"Oxidation energies of transition metal oxides within the GGA+U framework\", Phys. Rev. B 73, 195107 (2006)",
-    "usedFor": "Origin of the Materials Project U values (fit to oxide formation enthalpies) (M15.8, Q-051); the U suggestion in the Input Builder and Magnetic tool (D-110, Q-072)",
+    "usedFor": "Origin of the Materials Project U values (fit to oxide formation enthalpies) (M15.8, Q-051); the U suggestion in the Input Builder and Magnetic tool (D-111, Q-072)",
     "access": "paywalled; author copies on perssongroup.lbl.gov and scispace.com",
     "status": "read",
-    "notes": "The values themselves are checked against pymatgen's MPRelaxSet.yaml (S-034). Read 2026-11-27 for D-110: Jain 2011 Table I gives U (eV) V 3.1, Cr 3.5, Mn 3.9, Fe 4.0, Co 3.4, Ni 6.0, Cu 4.0, Mo 3.5, fitted to binary oxide formation enthalpies with Wang's method, and uses the oxide values for fluorides. Wang 2006 fits U to oxidation energies of V, Cr, Mn, Fe, Co, Ni and Cu oxides (Co 3.3, Ni 6.4, Cu 4.0, Cr 3.5; the V, Mn and Fe values were read from a badly scanned table and are not relied on). The current database values (S-034, S-085) differ from Jain's table, most for Fe (5.3 against 4.0) and Mo (4.38 against 3.5)"
+    "notes": "The values themselves are checked against pymatgen's MPRelaxSet.yaml (S-034). Read 2026-11-27 for D-111: Jain 2011 Table I gives U (eV) V 3.1, Cr 3.5, Mn 3.9, Fe 4.0, Co 3.4, Ni 6.0, Cu 4.0, Mo 3.5, fitted to binary oxide formation enthalpies with Wang's method, and uses the oxide values for fluorides. Wang 2006 fits U to oxidation energies of V, Cr, Mn, Fe, Co, Ni and Cu oxides (Co 3.3, Ni 6.4, Cu 4.0, Cr 3.5; the V, Mn and Fe values were read from a badly scanned table and are not relied on). The current database values (S-034, S-085) differ from Jain's table, most for Fe (5.3 against 4.0) and Mo (4.38 against 3.5)"
   },
   {
     "id": "S-081",
@@ -674,7 +674,7 @@
   {
     "id": "S-085",
     "citation": "Materials Project documentation, \"Hubbard U values\", https://docs.materialsproject.org/methodology/materials-methodology/calculation-details/gga+u-calculations/hubbard-u-values",
-    "usedFor": "Which U the database uses and when (D-110, Q-072)",
+    "usedFor": "Which U the database uses and when (D-111, Q-072)",
     "access": "web",
     "status": "read",
     "notes": "Read 2026-11-27: U (eV) Co 3.32, Cr 3.7, Fe 5.3, Mn 3.9, Mo 4.38, Ni 6.2, V 3.25, W 6.2 for oxides, fitted to experimental binary formation enthalpies as in Wang et al. (S-080); fluorides use the oxide values; Ni is fitted to a ternary (LiNiO2) reaction for lack of binary data; the page says U should be site specific but is applied to every site of an element, d orbitals only. The values equal pymatgen-core 2026.10.31 MPRelaxSet.yaml (S-034, `tests/reference/mp_defaults_reference.json`)"
@@ -682,7 +682,7 @@
   {
     "id": "S-086",
     "citation": "VTST Tools documentation (Henkelman group, University of Texas at Austin), https://theory.cm.utexas.edu/vtsttools/ : pages \"Nudged Elastic Band\" (neb) and \"Force based optimizers\" (optimizers.html)",
-    "usedFor": "NEB preset, LCLIMB and IOPT tag text (D-110)",
+    "usedFor": "NEB preset, LCLIMB and IOPT tag text (D-111)",
     "access": "web",
     "status": "read",
     "notes": "Read 2026-11-27 (no revision date shown). NEB page: the improved tangent and the climbing image are \"not yet included in the current version of vasp\" and need the VTST code; LCLIMB = .TRUE. turns the climbing image on (listed default .TRUE.); SPRING default -5.0, a negative value turns nudging on; run some plain NEB before the climbing image; cites Henkelman and Jonsson, J. Chem. Phys. 113, 9901 and 9978 (2000). Optimizers page: only force-based optimisers work; set IBRION = 3 and POTIM = 0 so that IOPT chooses the optimiser (0 VASP, 1 L-BFGS, 2 CG, 3 quick-min, 4 SD, 7 FIRE); quick-min is called the most beginner friendly; example NSW = 100, EDIFFG = -0.01 (\"Must be negative\")"
@@ -690,7 +690,7 @@
   {
     "id": "S-087",
     "citation": "G. Henkelman, B. P. Uberuaga, H. Jonsson, \"A climbing image nudged elastic band method for finding saddle points and minimum energy paths\", J. Chem. Phys. 113, 9901-9904 (2000); with G. Henkelman, H. Jonsson, \"Improved tangent estimate in the nudged elastic band method for finding minimum energy paths and saddle points\", J. Chem. Phys. 113, 9978-9985 (2000)",
-    "usedFor": "CI-NEB method in the NEB preset (D-110)",
+    "usedFor": "CI-NEB method in the NEB preset (D-111)",
     "access": "author copy on theory.cm.utexas.edu",
     "status": "read",
     "notes": "First paper read 2026-11-27 (author PDF): the highest-energy image is identified after a few plain NEB iterations, feels no spring force and has the force along the tangent inverted, so it climbs to the saddle point; regular NEB typically uses 4 to 20 images; both examples use 8. The tangent paper is cited from the VTST page, not read. The VASP wiki NEB page cites the original NEB papers instead: G. Mills, H. Jonsson, G. K. Schenter, Surf. Sci. 324, 305 (1995), and H. Jonsson, G. Mills, K. W. Jacobsen (World Scientific, 1998)"
@@ -698,7 +698,7 @@
   {
     "id": "S-088",
     "citation": "D. Sheppard, R. Terrell, G. Henkelman, \"Optimization methods for finding minimum energy paths\", J. Chem. Phys. 128, 134106 (2008)",
-    "usedFor": "Choice of NEB optimiser and why only force-based ones work (D-110)",
+    "usedFor": "Choice of NEB optimiser and why only force-based ones work (D-111)",
     "access": "author copy on theory.cm.utexas.edu",
     "status": "read",
     "notes": "Read 2026-11-27 (first 40 000 characters of the author PDF): NEB forces are not consistent with an objective function, so optimisers must follow the NEB force; global L-BFGS was the most efficient, FIRE beat quick-min (8-image CI-NEB test, force calls per image to 0.01 eV/A: FIRE 77, quick-min 190, global L-BFGS 49); local L-BFGS can be unstable with NEB"
@@ -706,7 +706,7 @@
   {
     "id": "S-089",
     "citation": "S. Smidstrup, A. Pedersen, K. Stokbro, H. Jonsson, \"Improved initial guess for minimum energy path calculations\", J. Chem. Phys. (2014), doi:10.1063/1.4878664; arXiv:1406.1512",
-    "usedFor": "IDPP interpolation advice in the NEB preset notes (D-110)",
+    "usedFor": "IDPP interpolation advice in the NEB preset notes (D-111)",
     "access": "open access (arXiv)",
     "status": "cited-from-memory",
     "notes": "Abstract read on arXiv 2026-11-27: an image-dependent pair potential built from interpolated interatomic distances gives the starting path without energy evaluations, cutting the DFT effort by half to an order of magnitude in three examples. The journal volume and page were not confirmed on the page read"

@@ -1,0 +1,213 @@
+---
+id: prepare-inputs
+title: Prepare the inputs
+short: Inputs
+group: Geometry
+order: 1
+summary: Make the four files every VASP run reads (POSCAR, POTCAR, KPOINTS and INCAR) with VASPkit, check them, and learn which files a later run will read back.
+folder: Compound/
+needs:
+  - 'A structure file: a CIF, a VESTA export or a Materials Project entry'
+  - 'Your POTCAR library, set in <code>~/.vaspkit</code> (<code>PBE_PATH</code>)'
+  - 'VASPkit (codes from the VASPKIT 1.5 tutorials)'
+run: 'VASPkit 105 (POSCAR), 103 or 104 (POTCAR), 102 (KPOINTS), 101 + task code (INCAR), then 109 to check'
+produces:
+  - '<code>POSCAR</code>, <code>POTCAR</code>, <code>KPOINTS</code> and <code>INCAR</code>'
+  - 'The largest <code>ENMAX</code> of your POTCAR, for ENCUT = 1.3 × ENMAX'
+learn:
+  - { href: '/handbook/06-vasp-files/poscar/', label: 'What is in a POSCAR' }
+  - { href: '/handbook/06-vasp-files/the-potcar-file/', label: 'The POTCAR file' }
+  - { href: '/handbook/06-vasp-files/kpoints/', label: 'The KPOINTS file' }
+  - { href: '/handbook/06-vasp-files/incar/', label: 'The INCAR file' }
+  - { href: '/handbook/07-running/vaspkit-in-practice/', label: 'VASPkit in practice' }
+  - { href: '/handbook/07-running/restarts-istart-icharg/', label: 'Restarts: ISTART and ICHARG' }
+  - { href: '/handbook/06-vasp-files/output-files/', label: 'The output files' }
+tools:
+  - { href: '/builder/', label: 'Material Builder (make the POSCAR)' }
+  - { href: '/tools/input-builder/?preset=relax&variant=default', label: 'Input Builder: relaxation' }
+sources: [S-042, S-020]
+status: draft
+updated: 2026-11-27
+---
+
+<Section id="why" heading="Why this step comes first">
+
+Every VASP run reads four input files from its folder. Most early mistakes live in these files: species in
+the wrong order, a mismatched MAGMOM count, a tag left over from another task. A few minutes of checking
+here saves failed runs later<Cite id="S-042" />.
+
+</Section>
+
+<Section id="inputs" heading="The four input files">
+
+| File    | What it holds                                                                                                             | How to make it                                                       | Common mistakes                                                                                                                    |
+| ------- | ------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| POSCAR  | Lattice vectors, scale factor, species, atom counts, coordinates (Direct or Cartesian), and optionally Selective dynamics | VASPkit 105 from a CIF; a VESTA export; Materials Project            | Species order differs from the POTCAR; partially occupied CIF sites; a conventional cell where the primitive cell would be cheaper |
+| POTCAR  | The PAW datasets, joined in the POSCAR species order. It holds ENMAX, ZVAL and the functional (PE = PBE)                  | VASPkit 103 (recommended sets) or 104 (you choose); or `cat` by hand | Mixing LDA and PBE files; the wrong order; using `_GW` or `_h` sets without a reason                                               |
+| KPOINTS | How the Brillouin zone is sampled: a Gamma-centred or Monkhorst–Pack mesh, a line path, or an explicit list               | VASPkit 102 (mesh), 303 (band path), 251 (hybrid bands)              | Using Monkhorst–Pack on hexagonal cells (use Gamma-centred meshes for hexagonal and trigonal cells); a mesh too coarse for metals  |
+| INCAR   | Every control tag: what to compute and how precisely                                                                      | VASPkit 101 plus a task code, then edit by hand                      | Tags left over from another task (for example IBRION = 6 in a DOS run); a MAGMOM count that does not match the number of atoms     |
+
+Source: the input-file table of the Workflow Handbook<Cite id="S-042" />.
+
+</Section>
+
+<Section id="potcar" heading="Inspect the POTCAR">
+
+You never edit a POTCAR, but you read three things from it. Run these in the folder:
+
+<VaspFile
+  name="shell"
+  code={`grep TITEL POTCAR        # which datasets, in which order
+grep ENMAX POTCAR        # recommended cutoff per species; take the largest × 1.3
+grep ZVAL  POTCAR        # valence electrons per species (needed for Bader net charges)`}
+/>
+
+- **TITEL** lists the datasets. The order must match the species line of your POSCAR.
+- **ENMAX** is the recommended cutoff of each species. Take the largest one and multiply it by 1.3: that is
+  the ENCUT of the relaxation.
+- **ZVAL** is the number of valence electrons of each species. You need it later to turn Bader charges into
+  net charges.
+
+</Section>
+
+<Section id="run-vaspkit" heading="Five ways to run VASPkit">
+
+VASPkit works through menus: type `vaspkit`, pick a group number, then a three-digit task. Every code on
+this page comes from the VASPKIT 1.5 tutorials and feature list<Cite id="S-020" />. Menus still change
+between releases, so if a number does nothing, check the menu of the version you have installed<Cite id="S-042" />.
+
+The same task (102, a k-point mesh, here at resolution 0.04) can be run five ways:
+
+<VaspFile
+  name="shell"
+  code={`vaspkit                                   # interactive menus
+vaspkit -task 102 -kpr 0.04               # command-line mode (vaspkit -help lists options)
+echo -e "102\\n2\\n0.04\\n" | vaspkit         # piped answers, in menu order
+(echo 102; echo 2; echo 0.04) | vaspkit
+vaspkit < cmd.in                          # answers stored one per line in a file
+# batch over sub-folders, e.g. print every band gap
+for d in */; do (cd $d && echo -e "911\\n" | vaspkit | sed -n '40p' | awk '{print $4}'); done`}
+/>
+
+- **Interactive menus** are the easiest way to learn the codes.
+- **Command-line mode** passes the task and its options as flags. `vaspkit -help` lists them.
+- **Piped answers** (the `echo` and bracketed lines) type the menu answers for you, in the order the menu
+  asks them. This is how the scripts on later steps call VASPkit.
+- **An answer file** (`cmd.in`) holds the same answers, one per line.
+- **A loop over sub-folders** runs one task in each folder. The example prints the band gap (task 911) of
+  every folder.
+
+</Section>
+
+<Section id="settings" heading="The ~/.vaspkit settings that matter">
+
+VASPkit reads its settings from the file `~/.vaspkit` in your home folder. Set these once<Cite id="S-042" />:
+
+| Setting                                         | What it does                                                                                                                                                 |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `PBE_PATH`, `POTCAR_TYPE`, `RECOMMENDED_POTCAR` | Where your POTCAR library lives, which functional, and whether VASP's recommended datasets (`_pv`, `_sv` and so on) are used. Required for 102 and 103.      |
+| `SET_INCAR_WRITE_MODE`                          | The default, `OVERRIDE`, replaces an existing INCAR when you run 101. Set `BACK-UP-OLD` or `BACK-UP-NEW` (writes `INCAR.new`) to protect a hand-edited file. |
+| `MINI_INCAR`                                    | `.TRUE.` writes INCARs without the explanatory comments.                                                                                                     |
+| `SET_FERMI_ENERGY_ZERO`                         | `.TRUE.` (the default) shifts DOS and band energies so that EF = 0.                                                                                          |
+| `FERMI_ENERGY.in` (a file, not a setting)       | VASPkit reads EF from DOSCAR unless this file exists. Put your own value on its second line to override it.                                                  |
+| `PYTHON_BIN`, `PLOT_MATPLOTLIB`                 | Let 211 and 252 draw `band.png` automatically.                                                                                                               |
+| `GW_POTCAR`                                     | `.TRUE.` picks the `_GW` datasets.                                                                                                                           |
+
+<Callout variant="warning" title="Protect your hand-edited INCAR">
+
+With the default write mode, running 101 in a folder silently replaces the INCAR you edited. Set
+`SET_INCAR_WRITE_MODE` to `BACK-UP-OLD` or `BACK-UP-NEW` before you start.
+
+</Callout>
+
+</Section>
+
+<Section id="generate" heading="Generate the inputs (group 01)">
+
+| Code      | What it does                                                                                          | Notes                                                                                                                                 |
+| --------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| 101       | An INCAR template for one or more task codes (below)                                                  | Codes are joined into one string: `STMG`, `SRPU`, `STH6D3` (a static HSE06 run with D3)                                               |
+| 102       | KPOINTS for an SCF run. It asks 1 = Monkhorst–Pack or 2 = Gamma, then the resolution in 2π/Å          | Gamma only: 0; low: 0.06 to 0.04; medium: 0.04 to 0.03; fine: 0.02 to 0.01. 0.03 to 0.04 is usually enough. It also writes the POTCAR |
+| 103 / 104 | POTCAR with the default datasets / with datasets you choose                                           | 104 asks for each element, for example `Ti_sv`, `O_h`                                                                                 |
+| 105 / 106 | POSCAR from a CIF (no fractional occupancy) / from a Materials Studio `.xsd` file (keeps fixed atoms) |                                                                                                                                       |
+| 107       | Reorder the elements in the POSCAR                                                                    | Writes `POSCAR_REV`                                                                                                                   |
+| 108 / 109 | Generate all inputs in one go / check all input files                                                 | 109 fixes the INCAR and POSCAR format and checks that the POTCAR matches the POSCAR. Run it before every submission                   |
+
+A smaller 102 resolution means a denser mesh, which is slower and more accurate. Which value you need is
+decided by the k-point test on the [next step](/workflow/convergence-tests/).
+
+### The 101 task codes this workflow uses
+
+101 asks for a task code and writes a commented template for it. Join codes to combine tasks: `SRMG` is a
+relaxation with the spin tags, `SRPU` a relaxation with +U, `STH6D3` a static HSE06 run with the D3
+correction<Cite id="S-042" />. The codes the workflow steps use:
+
+| Code | Template                                          | Code | Template                     |
+| ---- | ------------------------------------------------- | ---- | ---------------------------- |
+| SR   | Standard relaxation                               | ST   | Static calculation           |
+| LR   | Lattice relaxation (ISIF = 3, commented template) | MG   | Magnetic properties          |
+| PU   | DFT+U                                             | H6   | HSE06                        |
+| D3   | DFT-D3 (zero damping)                             | OP   | Optical properties           |
+| DC   | Elastic constants                                 | EC   | Static dielectric constant   |
+| BD   | Bader charge                                      | FD   | Phonons, finite displacement |
+| DT   | Phonons, DFPT                                     | FQ   | Frequency calculation        |
+
+The full list of VASPKIT 1.5 codes is on [VASPkit in practice](/handbook/07-running/vaspkit-in-practice/).
+
+<Callout variant="mistake" title="A template is not a finished INCAR">
+
+The templates start from cautious defaults. The LR template, for example, has PREC = Normal, LREAL = Auto
+and ENCUT commented out. Always set ENCUT, EDIFF, ISMEAR and the spin tags yourself. There is no meta-GGA
+code: add the METAGGA tags to an ST or SR template by hand<Cite id="S-042" />.
+
+</Callout>
+
+</Section>
+
+<Section id="symmetry" heading="Check the cell before you relax">
+
+Four structure codes (group 06) matter before the first relaxation<Cite id="S-042" />:
+
+| Code      | What it does                                                                                   | Output            |
+| --------- | ---------------------------------------------------------------------------------------------- | ----------------- |
+| 601       | Space group, lattice and density of the POSCAR                                                 | A printed summary |
+| 602       | The standardized primitive cell. Run it before relaxing, so that later k-paths match your cell | `PRIMCELL.vasp`   |
+| 603 / 604 | The conventional cell / the standardized crystal cell (use it for elastic constants)           | A structure file  |
+
+- **Run 601** and compare the space group with the one you expect from the CIF.
+- **Run 602** and relax `PRIMCELL.vasp` (copied to POSCAR). The band path you build later (303) is written
+  for this standardized cell, so relaxing a different setting gives a path that does not match.
+- **Keep 604 in mind** for the elastic step, which uses the standardized crystal cell.
+
+</Section>
+
+<Section id="files-read" heading="Which files a run reads">
+
+Two tags, ISTART (wavefunctions) and ICHARG (charge density), decide whether a run starts from scratch or
+continues from files already in the folder. Most "my band structure looks wrong" problems trace back to
+them<Cite id="S-042" />. The full tables are on [Restarts: ISTART and ICHARG](/handbook/07-running/restarts-istart-icharg/).
+
+<Callout variant="note" title="Rule: an ICHARG = 11 run inherits its physics">
+
+An ICHARG = 11 run inherits its physics from the CHGCAR. Keep ENCUT, ISPIN, MAGMOM, LMAXMIX, the
+functional and any LDAU tags identical to the SCF that wrote it. The cell must also be identical.
+
+</Callout>
+
+</Section>
+
+<Section id="outputs" heading="What you will get back">
+
+A finished run leaves a set of output files in the same folder. The ones you will use most: OUTCAR (the
+full log), OSZICAR (one line per step, for a quick convergence check), CONTCAR (the final structure, the
+next run's POSCAR), WAVECAR and CHGCAR (for restarts) and DOSCAR (the density of states). What each file
+holds and which tool reads it is on [The output files](/handbook/06-vasp-files/output-files/).
+
+</Section>
+
+<Section id="next" heading="Files for the next step">
+
+Run `vaspkit` task 109 on the folder, then copy POSCAR, POTCAR and KPOINTS, with a static INCAR, into
+`00_conv/` for the [convergence tests](/workflow/convergence-tests/).
+
+</Section>

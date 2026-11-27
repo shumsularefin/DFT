@@ -1,4 +1,4 @@
-// Materials Project defaults for GGA (PBE)+U and starting moments, offered as labelled suggestions (D-110, Q-072).
+// Materials Project defaults for GGA (PBE)+U and starting moments, offered as labelled suggestions (D-111, Q-072).
 // @source S-080 (the U values come from fitting binary oxide formation enthalpies: Wang et al. 2006 method, Jain
 //   et al. 2011; read 2026-11-27)
 // @source S-085 (Materials Project documentation, "Hubbard U values": oxides, fluorides use the oxide values)

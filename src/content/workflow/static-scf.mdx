@@ -1,0 +1,118 @@
+---
+id: static-scf
+title: Run the static SCF
+short: Static SCF
+group: Electronic
+order: 1
+protocolStep: 2
+summary: In the relaxation folder, run one single-point calculation on the relaxed structure that reads the relaxation WAVECAR. It gives the energy you report, the charge density for the bands and the DOSCAR for the DOS.
+folder: 01_relax/ (same folder)
+needs:
+  - 'The relaxed structure: <code>cp CONTCAR POSCAR</code> in the relaxation folder'
+  - 'The <code>WAVECAR</code> the relaxation left in that folder'
+run: '<code>NSW = 0</code>, <code>ISTART = 1</code>, <code>LORBIT = 11</code>; tighten <code>EDIFF</code> step by step'
+produces:
+  - 'The total energy and <code>E-fermi</code>'
+  - '<code>CHGCAR</code> for the band step, and <code>WAVECAR</code>'
+  - '<code>DOSCAR</code> for the DOS'
+learn:
+  - { href: '/handbook/04-kohn-sham/the-scf-loop/', label: 'The SCF loop' }
+  - { href: '/handbook/08-convergence-and-errors/scf-trouble/', label: 'When the SCF will not converge' }
+  - { href: '/handbook/05-practical-choices/smearing/', label: 'Smearing: ISMEAR and SIGMA' }
+  - { href: '/handbook/07-running/restarts-istart-icharg/', label: 'Restarts: ISTART and ICHARG' }
+  - { href: '/handbook/07-running/reading-oszicar-and-outcar/', label: 'Reading OSZICAR and OUTCAR' }
+tools:
+  - { href: '/tools/input-builder/?preset=dos&variant=default', label: 'Input Builder: SCF with projections' }
+  - { href: '/tools/review/', label: 'Calculation Review (read the OUTCAR)' }
+checklist: [SCF]
+sources: [S-042, S-019, S-020]
+status: draft
+updated: 2026-11-27
+---
+
+<Section id="why" heading="Why a separate static run">
+
+The relaxation's final energy was computed with the plane-wave basis built for the starting cell, not the
+final one. A static run on the final geometry gives the energy you report. It also writes the charge
+density (CHGCAR) for the band step and the DOSCAR for the [DOS](/workflow/dos/)<Cite id="S-042" />.
+
+</Section>
+
+<Section id="inputs" heading="The inputs">
+
+Make the template with VASPkit 101 → ST, then edit it to match this file:
+
+<PresetIncar preset="dos" caption="INCAR for the SCF (101 → ST, edited)" />
+
+| Tag           | Setting               | Reason                                                                      |
+| ------------- | --------------------- | --------------------------------------------------------------------------- |
+| ISTART        | 1                     | Reads the WAVECAR from the relaxation in the same folder.                   |
+| ENCUT         | 520                   | The same 1.3 × ENMAX as the relaxation.                                     |
+| EDIFF         | 1E-6                  | Tighten step by step: 1E-5, then 1E-6 (then 1E-8 before optics). See below. |
+| ISMEAR, SIGMA | 0, 0.05               | The VASPkit template values: Gaussian smearing with a small width.          |
+| ISPIN, MAGMOM | 2, one value per atom | The same spin setup as the relaxation, in POSCAR order.                     |
+| NSW           | 0                     | A single point. IBRION then defaults to −1, so it is left out.              |
+| LORBIT        | 11                    | Writes the projected DOS and PROCAR, used for the DOS.                      |
+| NEDOS         | 3001                  | A fine energy grid for the DOS.                                             |
+| LCHARG, LWAVE | .TRUE.                | Writes CHGCAR, which the band step needs, and WAVECAR.                      |
+
+Keep the KPOINTS of the relaxation. POSCAR is the relaxed CONTCAR.
+
+</Section>
+
+<Section id="run" heading="Back up, then run">
+
+The SCF overwrites the relaxation outputs, so back them up first and put the relaxed structure in place:
+
+<VaspFile
+  name="shell"
+  code={`cp CONTCAR POSCAR
+cp OUTCAR OUTCAR.relax
+cp CONTCAR CONTCAR.relax`}
+/>
+
+Then run VASP in the same folder, as for the relaxation.
+
+</Section>
+
+<Section id="converge" heading="Converging repeatedly">
+
+"Try converge repeatedly" means tightening EDIFF over a few short runs, each one restarting from the
+last<Cite id="S-042" />:
+
+1. **First pass** with EDIFF = 1E-5 (or 1E-4 if the energy oscillates).
+2. **Restart in the same folder** with ISTART = 1, ICHARG = 1 (read the CHGCAR just written) and
+   EDIFF = 1E-6.
+3. **For optics,** repeat once more at EDIFF = 1E-8, as in the VASP wiki LOPTICS examples<Cite id="S-019" />.
+
+The run has converged when the last dE in OSZICAR is below EDIFF before NELM (200 here) electronic steps
+are reached.
+
+</Section>
+
+<Section id="check" heading="Check before you move on">
+
+<VaspFile
+  name="shell"
+  code={`tail -3 OSZICAR                          # last dE below EDIFF?
+grep "E-fermi" OUTCAR | tail -1          # Fermi level (eV)
+grep "energy  without entropy" OUTCAR | tail -1
+grep EENTRO OUTCAR | tail -1             # smearing entropy, keep below ~1 meV/atom`}
+/>
+
+- **The last dE** in OSZICAR is below EDIFF. If the run stopped at NELM, it did not converge: restart as
+  above.
+- **E-fermi** is the Fermi level in eV. VASPkit reads it from DOSCAR for the DOS and bands.
+- **"energy without entropy"** is the energy you report and compare.
+- **EENTRO** is the smearing entropy. Divide it by the number of atoms: it should stay below about 1 meV
+  per atom.
+
+</Section>
+
+<Section id="next" heading="Files for the next step">
+
+This folder now holds CHGCAR, WAVECAR and DOSCAR. Read the DOS here, with no extra run:
+[Read the DOS and PDOS](/workflow/dos/). The CHGCAR is needed for the
+[band structure step](/workflow/band-structure/) (protocol step 3).
+
+</Section>

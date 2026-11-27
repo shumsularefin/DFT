@@ -1,4 +1,4 @@
-// V036 to V041: nudged elastic band runs (D-110, Q-070).
+// V036 to V041: nudged elastic band runs (D-111, Q-070).
 // @source S-019 (VASP wiki, Nudged elastic bands and SPRING, read 2026-11-27)
 // @source S-086 (VTST Tools, NEB and force-based optimizers pages, read 2026-11-27)
 // @source S-088 (Sheppard, Terrell, Henkelman 2008: NEB needs force-based optimisers)

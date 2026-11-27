@@ -1,0 +1,107 @@
+---
+id: hybrid
+title: Use a hybrid functional (HSE06)
+short: Hybrid (HSE06)
+group: Beyond PBE
+order: 3
+summary: Run an HSE06 SCF on the PBE geometry, starting from a converged PBE WAVECAR on the same k-mesh, for accurate gaps and band edges. Get hybrid bands from zero-weight k-points, never from ICHARG = 11.
+folder: 12_hse/
+needs:
+  - 'The PBE-relaxed structure'
+  - 'A converged PBE <code>WAVECAR</code>, on the same k-mesh'
+  - '<code>INCAR</code> from VASPkit 101 → H6'
+run: '<code>LHFCALC</code>, <code>HFSCREEN</code>, <code>ALGO = Damped</code> or <code>All</code>, starting from the <code>WAVECAR</code>'
+produces:
+  - 'Accurate band gaps and band edges'
+  - 'Defect levels'
+  - 'The hybrid band structure, from zero-weight k-points'
+learn:
+  - { href: '/handbook/05-practical-choices/functionals/', label: 'Choosing a functional' }
+  - { href: '/handbook/09-analysis/band-structures/', label: 'Reading a band structure' }
+  - { href: '/handbook/07-running/restarts-istart-icharg/', label: 'Restarts with ISTART and ICHARG' }
+  - { href: '/handbook/04-kohn-sham/when-scf-goes-wrong/', label: 'When the SCF goes wrong' }
+tools:
+  - { href: '/tools/input-builder/?preset=hybrid&variant=default', label: 'Input Builder: HSE06 SCF' }
+  - { href: '/tools/kpath/', label: 'k-path finder (KPATH.in)' }
+  - { href: '/errors/', label: 'Error helper (SCF divergence)' }
+  - { href: '/tools/review/', label: 'Calculation Review (check the run)' }
+checklist: [Hybrid]
+sources: [S-042, S-025, S-020]
+status: draft
+updated: 2026-11-27
+---
+
+<Section id="why" heading="What a hybrid changes, and what it costs">
+
+A hybrid functional replaces part of the semilocal exchange of PBE with exact (Fock) exchange. That reduces
+the self-interaction error<Cite id="S-042" />.
+
+- **HSE06** screens the long-range part of the exact exchange (`HFSCREEN = 0.2` Å<sup>−1</sup>). The
+  screening is what makes it practical for solids<Cite id="S-025" />.
+- **Accuracy.** For sp semiconductors the gap typically lands within about 10 to 20% of experiment.
+- **Cost.** A hybrid run costs 10 to 100 times more than PBE, and the cost grows mostly with the number of
+  k-points.
+
+</Section>
+
+<Section id="inputs" heading="The inputs">
+
+First run a PBE SCF on a uniform k-mesh and keep its WAVECAR. The HSE run reads it (`ISTART = 1`) and must
+use the **same k-mesh**<Cite id="S-042" />.
+
+<PresetIncar preset="hybrid" caption="INCAR for the HSE06 SCF (VASPkit 101 → H6)" />
+
+| Tag           | Setting                 | Reason                                                                |
+| ------------- | ----------------------- | --------------------------------------------------------------------- |
+| ISTART        | 1                       | Start from the converged PBE WAVECAR.                                 |
+| LHFCALC       | .TRUE.                  | Switches on exact exchange.                                           |
+| HFSCREEN      | 0.2                     | HSE06. Set it to 0.0 for PBE0, the unscreened hybrid.                 |
+| AEXX          | 0.25                    | The fraction of exact exchange.                                       |
+| ALGO          | Damped (or All, Normal) | Damped with `TIME = 0.4` is the handbook's choice for the hybrid SCF. |
+| PRECFOCK      | Normal                  | The FFT grid for the exchange. Fast saves time.                       |
+| NSW           | 0                       | A static run on the PBE geometry.                                     |
+| LORBIT, NEDOS | 11, 3001                | Writes the projected DOS, with 3001 points in the DOS.                |
+
+**Faster exchange (optional).** `NKRED = 2` halves the k-mesh used for the exchange. It works only with even
+meshes. It is commented out in the handbook INCAR.
+
+</Section>
+
+<Section id="bands" heading="Hybrid band structure (no ICHARG = 11)">
+
+Exact exchange needs the wavefunctions on a uniform k-mesh. So the usual band run, which freezes the
+density with `ICHARG = 11` and puts only the path in KPOINTS, does not work with a hybrid. Instead, the path
+points are added to the SCF k-point list with **zero weight**. They do not contribute to the density, but
+their eigenvalues come out right<Cite id="S-042" />.
+
+1. **PBE SCF on a uniform mesh.** Keep its WAVECAR to start the hybrid run.
+2. **Make the KPOINTS with VASPkit.** Run 303 to write `KPATH.in`, then 251. VASPkit 251 asks for the SCF
+   mesh type and resolution, then for the path resolution (0.04 to 0.06). It writes a KPOINTS with the
+   weighted irreducible mesh first and the zero-weight path points after it<Cite id="S-020" />.
+3. **Run HSE with that KPOINTS.** It is one SCF calculation. The extra points add to the cost, so use about
+   10 to 20 points per segment of the path.
+4. **Read the result.** VASPkit 252 extracts the band structure, 253 to 255 give the projected hybrid bands,
+   and 911 gives the gap.
+
+The same zero-weight route is the safe way to get meta-GGA bands: see
+[Use a meta-GGA](/workflow/meta-gga/#bands).
+
+</Section>
+
+<Section id="check" heading="Check before you move on">
+
+- **The SCF diverges?** Converge PBE first, then use `ALGO = All` or `Damped` with a smaller `TIME` (0.2),
+  and never start from random wavefunctions<Cite id="S-042" />.
+- **Relaxing with HSE is rarely worth it.** The standard approach is a PBE (or PBEsol, or
+  r2SCAN) geometry with the HSE electronic structure on top. Say which geometry you used.
+- **Optics with HSE.** LOPTICS works in the HSE SCF, but it is expensive. A common compromise is to take the
+  PBE spectra and apply a scissor shift to the HSE gap.
+
+</Section>
+
+<Section id="next" heading="Files for the next step">
+
+The HSE run writes its own DOS (`LORBIT = 11`), and the zero-weight run gives the bands. If you need the
+HSE gap for a scissor shift of PBE optics, read it with VASPkit 911.
+
+</Section>

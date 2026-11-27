@@ -11,14 +11,25 @@ import StructureStep from './StructureStep';
 import TagCard, { tagByName } from './TagCard';
 import TaskStep from './TaskStep';
 import { downloadBlob, useLevel } from './hooks';
-import { STEPS, canDownload, filesOf, issuesOf, useBuilder } from './store';
+import { PRESETS, STEPS, canDownload, filesOf, issuesOf, useBuilder } from './store';
 
 export default function InputBuilder() {
   const s = useBuilder();
-  const { step, setStep, selectedTag, applyShare, set, entries, structure } = s;
+  const { step, setStep, selectedTag, applyShare, set, entries, structure, choosePreset } = s;
   const incar = Object.fromEntries(entries.map((e) => [e.name, e.value]));
   const level = useLevel();
   const [mode, setMode] = useState<'single' | 'series'>('single');
+
+  // Deep link from the Workflow section (D-110): /tools/input-builder/?preset=relax&variant=default opens on
+  // that task. Runs before the share link, so a share link in the same URL still wins.
+  useEffect(() => {
+    const q = new URLSearchParams(location.search);
+    const id = q.get('preset');
+    const preset = id ? PRESETS.find((p) => p.id === id) : undefined;
+    if (!preset) return;
+    const variant = q.get('variant');
+    choosePreset(preset.id, preset.variants.some((v) => v.id === variant) ? variant! : undefined);
+  }, [choosePreset]);
 
   useEffect(() => {
     const m = /(?:^|[#&])s=([^&]+)/.exec(location.hash);
