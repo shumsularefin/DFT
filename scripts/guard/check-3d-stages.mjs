@@ -10,7 +10,7 @@ import { ROOT, walk, rel, result } from './lib.mjs';
 
 export const STRICT = false;
 
-const SCENE_ID = /^m(\d\d)-[a-z0-9]+(-[a-z0-9]+)*$/;
+const SCENE_ID = /^(m\d\d[a-z]?)-[a-z0-9]+(-[a-z0-9]+)*$/;
 
 export function stageSceneOf(text) {
   const fm = /^---\r?\n([\s\S]*?)\r?\n---/.exec(text);
@@ -36,10 +36,10 @@ export function check3dStages(root = ROOT) {
       problems.push(`${rel(t)}: stage scene "${scene}" is not an id like m02-orbital`);
       continue;
     }
-    const file = path.join(sceneDir, `m${m[1]}.ts`);
+    const file = path.join(sceneDir, `${m[1]}.ts`);
     if (!sceneText.has(file)) sceneText.set(file, fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null);
     const src = sceneText.get(file);
-    if (src === null) problems.push(`${rel(t)}: stage scene "${scene}" needs src/lib/viewer3d/scenes/m${m[1]}.ts`);
+    if (src === null) problems.push(`${rel(t)}: stage scene "${scene}" needs src/lib/viewer3d/scenes/${m[1]}.ts`);
     else if (!src.includes(`'${scene}'`)) problems.push(`${rel(t)}: stage scene "${scene}" is not defined in ${rel(file)}`);
   }
   return { topics: topics.length, problems };

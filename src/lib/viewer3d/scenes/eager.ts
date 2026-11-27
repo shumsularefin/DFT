@@ -2,12 +2,12 @@
 import type { SceneDef, SceneModule } from '../types';
 import { SCENE_ID } from './index';
 
-const all = import.meta.glob<SceneModule>('./m[0-9][0-9].ts', { eager: true });
+const all = import.meta.glob<SceneModule>(['./m[0-9][0-9].ts', './m[0-9][0-9][a-z].ts'], { eager: true });
 
 export const SCENES: ReadonlyMap<string, SceneDef> = (() => {
   const out = new Map<string, SceneDef>();
   for (const [file, mod] of Object.entries(all)) {
-    const prefix = file.replace(/^\.\/(m\d\d)\.ts$/, '$1');
+    const prefix = file.replace(/^\.\/(m\d\d[a-z]?)\.ts$/, '$1');
     for (const [id, def] of Object.entries(mod.scenes)) {
       if (!SCENE_ID.test(id) || !id.startsWith(`${prefix}-`))
         throw new Error(`${file}: scene id "${id}" must start with "${prefix}-"`);

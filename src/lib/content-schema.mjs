@@ -32,7 +32,7 @@ export const STAGE_CAMERAS = ['iso', 'a', 'b', 'c', 'a*', 'b*', 'c*', 'top', 'fr
  * a set of parameter values, visible layer groups and a camera, chosen by the section the reader is in.
  */
 export const stageSchema = z.object({
-  scene: z.string().regex(/^m\d\d-[a-z0-9]+(-[a-z0-9]+)*$/, 'must be a scene id like m02-orbital'),
+  scene: z.string().regex(/^m\d\d[a-z]?-[a-z0-9]+(-[a-z0-9]+)*$/, 'must be a scene id like m02-orbital'),
   states: z
     .array(
       z.object({
