@@ -1,6 +1,40 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { STAGES } from '../lib/workspace';
+
+/* Line icons (24 px grid, stroke only), the same set as the sidebar. Decorative: the title carries the name. */
+const ICONS: Record<string, string> = {
+  cube: 'M21 7.5 12 3 3 7.5v9L12 21l9-4.5ZM3 7.5l9 4.5 9-4.5M12 12v9',
+  atom: 'M12 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2ZM12 21c-2.2 0-4-4-4-9s1.8-9 4-9 4 4 4 9-1.8 9-4 9ZM3 12c0-2.2 4-4 9-4s9 1.8 9 4-4 4-9 4-9-1.8-9-4Z',
+  filter: 'M4 6h16M7 12h10M10 18h4',
+  file: 'M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8Zm0 0v5h5M9 13h6M9 17h6',
+  kpath: 'M4 19 9 6l5 9 6-10',
+  magnet: 'M6 3v8a6 6 0 0 0 12 0V3h-4v8a2 2 0 0 1-4 0V3ZM6 7h4m4 0h4',
+  chart: 'M3 3v18h18M7 15l4-5 3 3 5-6',
+  curve: 'M3 3v18h18M6 6c2 9 4 11 6 11s4-2 7-7',
+  cal: 'M4 6h16v14H4ZM4 10h16M8 3v4m8-4v4',
+  search: 'M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14Zm9 2-3.5-3.5',
+  check: 'M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm3 9 3 3 5-6',
+  grid: 'M4 4h7v7H4Zm9 0h7v7h-7ZM4 13h7v7H4Zm9 0h7v7h-7Z',
+  wave: 'M3 12h3l2-6 4 12 2-6h7',
+};
+
+/* Icon and a one-line note of what each tool reads or writes (from the tool itself, not a claim about speed). */
+const CARD: Record<string, { icon: string; meta: string }> = {
+  builder: { icon: 'cube', meta: '3D crystal, VASP workflow' },
+  molecule: { icon: 'atom', meta: 'XYZ, MOL, POSCAR in a box' },
+  studio: { icon: 'filter', meta: 'Filter, inspect, export CSV' },
+  'input-builder': { icon: 'file', meta: 'POSCAR, KPOINTS, INCAR, job script' },
+  kpath: { icon: 'kpath', meta: 'Brillouin zone, line-mode KPOINTS' },
+  magnetic: { icon: 'magnet', meta: 'MAGMOM orderings' },
+  convergence: { icon: 'chart', meta: 'ENCUT and k-mesh series' },
+  eos: { icon: 'curve', meta: 'E(V) fit: V0, B0, B0 prime' },
+  planner: { icon: 'cal', meta: 'PLAN.md and starter INCARs' },
+  errors: { icon: 'search', meta: 'Paste a log excerpt' },
+  review: { icon: 'check', meta: 'Pre-flight and post-flight' },
+  tolerance: { icon: 'grid', meta: 'Goldschmidt and Bartel factors' },
+  'work-function': { icon: 'wave', meta: 'LOCPOT, CHGCAR' },
+};
 ---
 
 <BaseLayout
@@ -8,12 +42,14 @@ import { STAGES } from '../lib/workspace';
   description="Every browser tool of the DFT Handbook in the order of a calculation: structure, inputs, convergence, run and review, properties."
 >
   <div class="container">
-    <div class="page-head">
-      <h1>Tools</h1>
-      <p>
-        One workspace, in the order you meet it in a calculation. Every tool runs entirely in your browser,
-        and nothing you open or paste is uploaded.
-      </p>
+    <div class="page-h tool-index-head">
+      <div>
+        <h1>Tools</h1>
+        <p>
+          One workspace, in the order you meet it in a calculation. Every tool runs entirely in your browser,
+          and nothing you open or paste is uploaded.
+        </p>
+      </div>
     </div>
     {STAGES.map((stage, i) => (
       <section class="tool-stage" aria-labelledby={stage.id}>
@@ -24,15 +60,24 @@ import { STAGES } from '../lib/workspace';
           {stage.title}
         </h2>
         <p class="tool-stage-text">{stage.text}</p>
-        <ul class="card-grid">
-          {stage.tools.map((t) => (
-            <li>
-              <a class="feature" href={t.href} id={t.id}>
-                <span class="feature-title">{t.title}</span>
-                <span class="feature-text">{t.text}</span>
-              </a>
-            </li>
-          ))}
+        <ul class="grid g3 tool-cards">
+          {stage.tools.map((t) => {
+            const c = CARD[t.id];
+            return (
+              <li>
+                <a class="feature" href={t.href} id={t.id}>
+                  <span class="feature-title">
+                    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                      <path d={ICONS[c?.icon ?? 'grid']} />
+                    </svg>
+                    {t.title}
+                  </span>
+                  {c && <span class="feature-meta">{c.meta}</span>}
+                  <span class="feature-text">{t.text}</span>
+                </a>
+              </li>
+            );
+          })}
         </ul>
       </section>
     ))}
@@ -46,6 +91,39 @@ import { STAGES } from '../lib/workspace';
 <style is:global>
   .tool-stage + .tool-stage {
     margin-top: var(--space-6);
+  }
+  .tool-cards {
+    align-items: stretch;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: none;
+  }
+  .tool-cards > li {
+    margin: 0;
+  }
+  .tool-cards .feature {
+    transition:
+      border-color var(--dur-fast),
+      transform var(--dur-fast);
+  }
+  .tool-cards .feature-title svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .tool-cards .feature-meta {
+    margin-inline-start: 1.5rem;
+  }
+  .tool-cards .feature-text {
+    margin-top: var(--space-2);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .tool-cards a.feature:hover {
+      transform: translateY(-1px);
+    }
   }
   .tool-stage-title {
     display: flex;

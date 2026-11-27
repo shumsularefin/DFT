@@ -100,35 +100,17 @@ export default function ToleranceMaps({ A, B, X, kind, lnPolicy, evalRes }: Tole
   }
 
   return (
-    <section className="tf-site" aria-label="Stability maps and family sweep">
-      <div className="tf-site-head">
-        <h2>Maps, family trend and exports</h2>
-        <div className="tf-actions" role="tablist" aria-label="Plot view">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={tab === 'tmu'}
-            className="tf-preset-btn"
-            onClick={() => setTab('tmu')}
-          >
+    <section className="card tool-card tf-maps" aria-label="Stability maps and family sweep">
+      <h2 className="card-h">Maps, family trend and exports</h2>
+      <div>
+        <div className="tabbar" role="tablist" aria-label="Plot view">
+          <button type="button" role="tab" aria-selected={tab === 'tmu'} onClick={() => setTab('tmu')}>
             t vs mu map
           </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={tab === 'tau'}
-            className="tf-preset-btn"
-            onClick={() => setTab('tau')}
-          >
+          <button type="button" role="tab" aria-selected={tab === 'tau'} onClick={() => setTab('tau')}>
             Bartel tau view
           </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={tab === 'family'}
-            className="tf-preset-btn"
-            onClick={() => setTab('family')}
-          >
+          <button type="button" role="tab" aria-selected={tab === 'family'} onClick={() => setTab('family')}>
             Lanthanide sweep
           </button>
         </div>

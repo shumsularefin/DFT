@@ -15,12 +15,14 @@ import {
   decodeShare,
   encodeShare,
   SHARE_STRUCTURE_LIMIT,
+  buildFiles,
+  type BuiltFile,
   type LdauRow,
   type Preset,
   type ShareState,
 } from '../../../lib/vasp/builder';
-import { DEFAULT_JOB, type JobOptions } from '../../../lib/vasp/jobscript';
-import type { IncarEntry } from '../../../lib/vasp/incar';
+import { DEFAULT_JOB, jobScript, type JobOptions } from '../../../lib/vasp/jobscript';
+import { writeIncar, type IncarEntry } from '../../../lib/vasp/incar';
 import {
   meshFromKspacing,
   parseKpoints,
@@ -278,5 +280,26 @@ export function shareOf(s: BuilderState): string {
     kpMode: s.kpMode,
     spacing: s.spacing,
     ...(s.poscarText && s.poscarText.length <= SHARE_STRUCTURE_LIMIT ? { poscar: s.poscarText } : {}),
+  });
+}
+
+/** The files the bundle holds. Without a structure there is no POSCAR or README yet, so the preview shows the
+ *  files that do not need one; the download stays blocked by canDownload until a structure is loaded. */
+export function filesOf(s: BuilderState): BuiltFile[] {
+  const kpoints = kpointsOf(s).text;
+  if (!s.structure) {
+    return [
+      { name: 'INCAR', text: writeIncar(s.entries) },
+      ...(kpoints ? [{ name: 'KPOINTS', text: kpoints }] : []),
+      { name: 'job.sh', text: jobScript(s.job) },
+    ];
+  }
+  return buildFiles({
+    structure: s.structure,
+    entries: s.entries,
+    kpoints,
+    job: s.job,
+    presetTitle: presetOf(s.presetId).title,
+    vaspVersion: s.version,
   });
 }

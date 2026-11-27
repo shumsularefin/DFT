@@ -12,6 +12,7 @@ import {
 } from '../../../lib/vasp/seriesInput';
 import { downloadBlob, useLevel } from '../input-builder/hooks';
 import { takeHandoff } from '../../../lib/handoff';
+import '../../../styles/tools.css';
 import './convergence.css';
 import ConvergencePlot, { H, W } from './ConvergencePlot';
 import { svgToPng, svgToString } from './exportSvg';
@@ -150,328 +151,380 @@ export default function ConvergenceTool() {
 
   return (
     <div className="cv">
-      <p className="cv-banner" role="note">
-        Everything is read in this page and nothing is uploaded. The convergence rule is explained in the
-        result panel. The pressure threshold of 5 kB is a <strong>Heuristic</strong>, not a published limit.
-      </p>
-      <section aria-labelledby="cv-in">
-        <h2 id="cv-in">1. Your results</h2>
-        <p>
-          Drop OSZICAR or OUTCAR files from a series. Name each file or folder after its setting, like{' '}
-          <code>encut_450</code> or <code>kpt_0.04</code>, or type the setting in the table below.
-        </p>
-        <div
-          className="cv-drop"
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e) => {
-            e.preventDefault();
-            void onFiles(e.dataTransfer.files);
-          }}
-        >
-          <label htmlFor="cv-files">
-            Choose OSZICAR or OUTCAR files (several at once, or drop them here)
-          </label>
-          <input id="cv-files" type="file" multiple onChange={(e) => void onFiles(e.target.files)} />
+      <header className="page-h tool-head">
+        <div>
+          <h1>Convergence plotter</h1>
+          <p>
+            Drop the results of a series of runs and see which setting is the cheapest one that has stopped
+            changing the energy.
+          </p>
         </div>
-        <div className="cv-field">
-          <label htmlFor="cv-paste">Or paste a table (CSV, tab or spaces; collect.sh output works)</label>
-          <textarea
-            id="cv-paste"
-            rows={5}
-            spellCheck={false}
-            value={paste}
-            onChange={(e) => setPaste(e.target.value)}
-          />
-        </div>
-        <div className="cv-actions">
-          <button type="button" onClick={onPaste} disabled={paste.trim() === ''}>
-            Add pasted table
+        <div className="row">
+          <button type="button" className="btn" disabled={!result} onClick={() => exportSvg('energy')}>
+            Export energy SVG
           </button>
-          <button type="button" onClick={loadSample}>
-            Load sample data
-          </button>
-          <button type="button" onClick={addRow}>
-            Add a row
+          <button type="button" className="btn" disabled={!result} onClick={() => void exportPng('energy')}>
+            Export energy PNG
           </button>
           <button
             type="button"
+            className="btn btn-primary"
+            disabled={!result}
             onClick={() => {
-              setRows([]);
-              setNotes([]);
-              setSample(false);
+              if (!result) return;
+              downloadBlob('convergence.csv', toCsv(result, kind), 'text/csv');
+              setMsg('Downloaded convergence.csv');
             }}
-            disabled={rows.length === 0}
           >
-            Clear table
+            Export table CSV
           </button>
         </div>
-        {sample && (
-          <p className="cv-sample" role="note">
-            <strong>Sample data.</strong> These numbers are invented to show the plot. They are not a real
-            calculation.
-          </p>
-        )}
-        {notes.map((n) => (
-          <p key={n} className="cv-note" role="alert">
-            {n}
-          </p>
-        ))}
-        {model.skipped.length > 0 && (
-          <p className="cv-note" role="note">
-            Row {model.skipped.join(', ')} left out: it needs a setting (x) and an energy.
-          </p>
-        )}
-      </section>
-
-      <section aria-labelledby="cv-opt">
-        <h2 id="cv-opt">2. Settings</h2>
-        <div className="cv-row">
-          <fieldset className="cv-fieldset">
-            <legend>Series type</legend>
-            {KINDS.map((k) => (
-              <label key={k.id} className="cv-radio">
-                <input type="radio" name="cv-kind" checked={kind === k.id} onChange={() => setKind(k.id)} />{' '}
-                {k.label}
-              </label>
-            ))}
-          </fieldset>
-          <div className="cv-field">
-            <label htmlFor="cv-q">Energy quantity</label>
-            <select
-              id="cv-q"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value as EnergyQuantity)}
-            >
-              {QUANTITIES.map((q) => (
-                <option key={q.id} value={q.id}>
-                  {q.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="cv-field">
-            <label htmlFor="cv-nat">Atoms in the cell (for rows without a count)</label>
-            <input
-              id="cv-nat"
-              inputMode="numeric"
-              value={natoms}
-              onChange={(e) => setNatoms(e.target.value)}
-            />
-          </div>
-          <div className="cv-field">
-            <label htmlFor="cv-enmax">Largest ENMAX in your POTCAR (eV, optional)</label>
-            <input
-              id="cv-enmax"
-              inputMode="decimal"
-              value={enmax}
-              onChange={(e) => setEnmax(e.target.value)}
-            />
-          </div>
-          <div className="cv-field">
-            <label htmlFor="cv-th">
-              Threshold: <output htmlFor="cv-th">{threshold.toFixed(1)}</output> meV/atom
-            </label>
-            <input
-              id="cv-th"
-              type="range"
-              min={0.1}
-              max={10}
-              step={0.1}
-              value={threshold}
-              onChange={(e) => setThreshold(Number(e.target.value))}
-            />
-          </div>
-          <label className="cv-radio">
-            <input type="checkbox" checked={relative} onChange={(e) => setRelative(e.target.checked)} /> Show
-            energy relative to the last point
-          </label>
-        </div>
-        {missingNatoms && (
-          <p className="cv-note" role="note">
-            Some rows have no atom count, so their energies are used as given. Type the number of atoms above.
-          </p>
-        )}
-      </section>
-
-      <section aria-labelledby="cv-res">
-        <h2 id="cv-res">3. Result</h2>
-        {!result || !model.view || !model.text ? (
-          <p>Add results above to see the plot.</p>
-        ) : (
-          <>
-            <div className="cv-explain" aria-live="polite" data-testid="explanation">
-              <p>
-                <strong>{model.text.headline}</strong>
-              </p>
-              {model.text.details.map((d) => (
-                <p key={d}>{d}</p>
-              ))}
-              {model.text.advice.map((d) => (
-                <p key={d} className="cv-advice">
-                  {d}
-                </p>
-              ))}
-            </div>
-            <ConvergencePlot
-              ref={energyRef}
-              title="Energy convergence"
-              xLabel={X_LABEL[kind]}
-              yLabel={model.view.yLabel}
-              points={model.view.points}
-              band={{
-                ...model.view.band,
-                label: `Threshold band: +/- ${threshold.toFixed(1)} meV/atom around the last point`,
+      </header>
+      <p className="notice tool-note" role="note">
+        Everything is read in this page and nothing is uploaded. The convergence rule is explained in the
+        result panel. The pressure threshold of 5 kB is a <strong>Heuristic</strong>, not a published limit.
+      </p>
+      <div className="split left">
+        <div className="card tool-inputs">
+          <h2 className="card-h">Inputs</h2>
+          <section aria-labelledby="cv-in">
+            <h3 id="cv-in">1. Your results</h3>
+            <p>
+              Drop OSZICAR or OUTCAR files from a series. Name each file or folder after its setting, like{' '}
+              <code>encut_450</code> or <code>kpt_0.04</code>, or type the setting in the table below.
+            </p>
+            <div
+              className="cv-drop"
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                void onFiles(e.dataTransfer.files);
               }}
-              convergedIndex={model.view.convergedIndex}
-              reverseX={kind === 'kresolution'}
-              description={`${result.points.length} points. ${model.text.headline}`}
-            />
+            >
+              <label htmlFor="cv-files">
+                Choose OSZICAR or OUTCAR files (several at once, or drop them here)
+              </label>
+              <input id="cv-files" type="file" multiple onChange={(e) => void onFiles(e.target.files)} />
+            </div>
+            <div className="cv-field">
+              <label htmlFor="cv-paste">Or paste a table (CSV, tab or spaces; collect.sh output works)</label>
+              <textarea
+                id="cv-paste"
+                rows={5}
+                spellCheck={false}
+                value={paste}
+                onChange={(e) => setPaste(e.target.value)}
+              />
+            </div>
             <div className="cv-actions">
-              <button type="button" onClick={() => exportSvg('energy')}>
-                Export energy SVG
+              <button type="button" onClick={onPaste} disabled={paste.trim() === ''}>
+                Add pasted table
               </button>
-              <button type="button" onClick={() => void exportPng('energy')}>
-                Export energy PNG
+              <button type="button" onClick={loadSample}>
+                Load sample data
+              </button>
+              <button type="button" onClick={addRow}>
+                Add a row
               </button>
               <button
                 type="button"
                 onClick={() => {
-                  downloadBlob('convergence.csv', toCsv(result, kind), 'text/csv');
-                  setMsg('Downloaded convergence.csv');
+                  setRows([]);
+                  setNotes([]);
+                  setSample(false);
                 }}
+                disabled={rows.length === 0}
               >
-                Export table CSV
+                Clear table
               </button>
             </div>
-            {hasPressure && (
-              <>
-                <ConvergencePlot
-                  ref={pressureRef}
-                  title="Pressure convergence"
-                  xLabel={X_LABEL[kind]}
-                  yLabel="External pressure (kB)"
-                  points={result.points.map((p, i) => ({
-                    x: p.x,
-                    y: p.pressure!,
-                    tooltip: `x = ${p.x}: pressure ${p.pressure} kB`,
-                    converged: result.pressure?.convergedIndex != null && i >= result.pressure.convergedIndex,
-                  }))}
-                  convergedIndex={result.pressure?.convergedIndex ?? null}
-                  reverseX={kind === 'kresolution'}
-                  description="Pressure of each run. Heuristic threshold of 5 kB between points."
+            {sample && (
+              <p className="cv-sample" role="note">
+                <strong>Sample data.</strong> These numbers are invented to show the plot. They are not a real
+                calculation.
+              </p>
+            )}
+            {notes.map((n) => (
+              <p key={n} className="cv-note" role="alert">
+                {n}
+              </p>
+            ))}
+            {model.skipped.length > 0 && (
+              <p className="cv-note" role="note">
+                Row {model.skipped.join(', ')} left out: it needs a setting (x) and an energy.
+              </p>
+            )}
+          </section>
+
+          <section aria-labelledby="cv-opt">
+            <h3 id="cv-opt">2. Settings</h3>
+            <div className="cv-row">
+              <fieldset className="cv-fieldset">
+                <legend>Series type</legend>
+                {KINDS.map((k) => (
+                  <label key={k.id} className="cv-radio">
+                    <input
+                      type="radio"
+                      name="cv-kind"
+                      checked={kind === k.id}
+                      onChange={() => setKind(k.id)}
+                    />{' '}
+                    {k.label}
+                  </label>
+                ))}
+              </fieldset>
+              <div className="cv-field">
+                <label htmlFor="cv-q">Energy quantity</label>
+                <select
+                  id="cv-q"
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value as EnergyQuantity)}
+                >
+                  {QUANTITIES.map((q) => (
+                    <option key={q.id} value={q.id}>
+                      {q.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="cv-field">
+                <label htmlFor="cv-nat">Atoms in the cell (for rows without a count)</label>
+                <input
+                  id="cv-nat"
+                  inputMode="numeric"
+                  value={natoms}
+                  onChange={(e) => setNatoms(e.target.value)}
                 />
-                <div className="cv-actions">
-                  <button type="button" onClick={() => exportSvg('pressure')}>
-                    Export pressure SVG
-                  </button>
-                  <button type="button" onClick={() => void exportPng('pressure')}>
-                    Export pressure PNG
-                  </button>
+              </div>
+              <div className="cv-field">
+                <label htmlFor="cv-enmax">Largest ENMAX in your POTCAR (eV, optional)</label>
+                <input
+                  id="cv-enmax"
+                  inputMode="decimal"
+                  value={enmax}
+                  onChange={(e) => setEnmax(e.target.value)}
+                />
+              </div>
+              <div className="cv-field">
+                <label htmlFor="cv-th">
+                  Threshold: <output htmlFor="cv-th">{threshold.toFixed(1)}</output> meV/atom
+                </label>
+                <input
+                  id="cv-th"
+                  type="range"
+                  min={0.1}
+                  max={10}
+                  step={0.1}
+                  value={threshold}
+                  onChange={(e) => setThreshold(Number(e.target.value))}
+                />
+              </div>
+              <label className="cv-radio">
+                <input type="checkbox" checked={relative} onChange={(e) => setRelative(e.target.checked)} />{' '}
+                Show energy relative to the last point
+              </label>
+            </div>
+            {missingNatoms && (
+              <p className="cv-note" role="note">
+                Some rows have no atom count, so their energies are used as given. Type the number of atoms
+                above.
+              </p>
+            )}
+          </section>
+        </div>
+        <div className="stack tool-results">
+          <div className="grid g3 tool-tiles">
+            <div className="tile">
+              <div className="k">Converged from</div>
+              <div className={`v${result?.convergedIndex != null ? '' : ' is-empty'}`}>
+                {result && result.convergedIndex != null ? result.points[result.convergedIndex]!.x : 'n/a'}
+              </div>
+              <div className="tile-sub">{X_LABEL[kind]}</div>
+            </div>
+            <div className="tile">
+              <div className="k">Last point energy</div>
+              <div className={`v${result ? '' : ' is-empty'}`}>
+                {result ? result.perAtom[result.perAtom.length - 1]!.toFixed(4) : 'n/a'}
+              </div>
+              <div className="tile-sub">eV/atom</div>
+            </div>
+            <div className="tile">
+              <div className="k">Points</div>
+              <div className={`v${result ? '' : ' is-empty'}`}>{result ? result.points.length : 0}</div>
+              <div className="tile-sub">threshold {threshold.toFixed(1)} meV/atom</div>
+            </div>
+          </div>
+          <section className="card tool-card" aria-labelledby="cv-res">
+            <h2 id="cv-res" className="card-h">
+              Result
+            </h2>
+            {!result || !model.view || !model.text ? (
+              <p className="ph">Add results in the Inputs card to see the plot.</p>
+            ) : (
+              <>
+                <div className="cv-explain" aria-live="polite" data-testid="explanation">
+                  <p>
+                    <strong>{model.text.headline}</strong>
+                  </p>
+                  {model.text.details.map((d) => (
+                    <p key={d}>{d}</p>
+                  ))}
+                  {model.text.advice.map((d) => (
+                    <p key={d} className="cv-advice">
+                      {d}
+                    </p>
+                  ))}
                 </div>
+                <ConvergencePlot
+                  ref={energyRef}
+                  title="Energy convergence"
+                  xLabel={X_LABEL[kind]}
+                  yLabel={model.view.yLabel}
+                  points={model.view.points}
+                  band={{
+                    ...model.view.band,
+                    label: `Threshold band: +/- ${threshold.toFixed(1)} meV/atom around the last point`,
+                  }}
+                  convergedIndex={model.view.convergedIndex}
+                  reverseX={kind === 'kresolution'}
+                  description={`${result.points.length} points. ${model.text.headline}`}
+                />
+                {hasPressure && (
+                  <>
+                    <ConvergencePlot
+                      ref={pressureRef}
+                      title="Pressure convergence"
+                      xLabel={X_LABEL[kind]}
+                      yLabel="External pressure (kB)"
+                      points={result.points.map((p, i) => ({
+                        x: p.x,
+                        y: p.pressure!,
+                        tooltip: `x = ${p.x}: pressure ${p.pressure} kB`,
+                        converged:
+                          result.pressure?.convergedIndex != null && i >= result.pressure.convergedIndex,
+                      }))}
+                      convergedIndex={result.pressure?.convergedIndex ?? null}
+                      reverseX={kind === 'kresolution'}
+                      description="Pressure of each run. Heuristic threshold of 5 kB between points."
+                    />
+                    <div className="cv-actions">
+                      <button type="button" onClick={() => exportSvg('pressure')}>
+                        Export pressure SVG
+                      </button>
+                      <button type="button" onClick={() => void exportPng('pressure')}>
+                        Export pressure PNG
+                      </button>
+                    </div>
+                  </>
+                )}
+                <p role="status">{msg}</p>
+                <table className="cv-table">
+                  <caption>Results per point (text version of the plot)</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">{X_LABEL[kind]}</th>
+                      <th scope="col">Energy (eV/atom)</th>
+                      <th scope="col">From last point</th>
+                      <th scope="col">Pressure (kB)</th>
+                      <th scope="col">Converged</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {result.points.map((p, i) => (
+                      <tr key={`${p.x}-${i}`}>
+                        <th scope="row">{p.x}</th>
+                        <td>{result.perAtom[i]!.toFixed(5)}</td>
+                        <td>{formatMeV(result.diffs[i]!)}</td>
+                        <td>{p.pressure ?? 'n/a'}</td>
+                        <td>{result.convergedIndex !== null && i >= result.convergedIndex ? 'yes' : 'no'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </>
             )}
-            <p role="status">{msg}</p>
-            <table className="cv-table">
-              <caption>Results per point (text version of the plot)</caption>
-              <thead>
-                <tr>
-                  <th scope="col">{X_LABEL[kind]}</th>
-                  <th scope="col">Energy (eV/atom)</th>
-                  <th scope="col">From last point</th>
-                  <th scope="col">Pressure (kB)</th>
-                  <th scope="col">Converged</th>
-                </tr>
-              </thead>
-              <tbody>
-                {result.points.map((p, i) => (
-                  <tr key={`${p.x}-${i}`}>
-                    <th scope="row">{p.x}</th>
-                    <td>{result.perAtom[i]!.toFixed(5)}</td>
-                    <td>{formatMeV(result.diffs[i]!)}</td>
-                    <td>{p.pressure ?? 'n/a'}</td>
-                    <td>{result.convergedIndex !== null && i >= result.convergedIndex ? 'yes' : 'no'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </>
-        )}
-      </section>
+          </section>
 
-      {rows.length > 0 && (
-        <section aria-labelledby="cv-tab">
-          <h2 id="cv-tab">Your table (editable)</h2>
-          <div className="cv-scroll">
-            <table className="cv-table">
-              <caption>Input rows. Energies are total energy of the cell in eV.</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Row</th>
-                  <th scope="col">Setting (x)</th>
-                  <th scope="col">Energy (eV)</th>
-                  <th scope="col">Atoms</th>
-                  <th scope="col">Pressure (kB)</th>
-                  <th scope="col">
-                    <span className="sr-only">Remove</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((r, i) => (
-                  <tr key={r.id}>
-                    <th scope="row" title={r.label}>
-                      {i + 1}
-                    </th>
-                    <td>
-                      <input
-                        aria-label={`Row ${i + 1} setting`}
-                        value={r.x}
-                        onChange={(e) => edit(r.id, { x: e.target.value })}
-                      />
-                    </td>
-                    <td>
-                      <input
-                        aria-label={`Row ${i + 1} energy`}
-                        value={r.energies?.[quantity] !== undefined ? String(r.energies[quantity]) : r.energy}
-                        onChange={(e) => {
-                          const { energies: _drop, ...rest } = r;
-                          void _drop;
-                          setRows((old) =>
-                            old.map((o) => (o.id === r.id ? { ...rest, energy: e.target.value } : o)),
-                          );
-                        }}
-                      />
-                    </td>
-                    <td>
-                      <input
-                        aria-label={`Row ${i + 1} atoms`}
-                        value={r.natoms}
-                        onChange={(e) => edit(r.id, { natoms: e.target.value })}
-                      />
-                    </td>
-                    <td>
-                      <input
-                        aria-label={`Row ${i + 1} pressure`}
-                        value={r.pressure}
-                        onChange={(e) => edit(r.id, { pressure: e.target.value })}
-                      />
-                    </td>
-                    <td>
-                      <button
-                        type="button"
-                        aria-label={`Remove row ${i + 1}`}
-                        onClick={() => setRows((old) => old.filter((o) => o.id !== r.id))}
-                      >
-                        Remove
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
+          {rows.length > 0 && (
+            <section className="card tool-card" aria-labelledby="cv-tab">
+              <h2 id="cv-tab" className="card-h">
+                Your table (editable)
+              </h2>
+              <div className="cv-scroll">
+                <table className="cv-table">
+                  <caption>Input rows. Energies are total energy of the cell in eV.</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Row</th>
+                      <th scope="col">Setting (x)</th>
+                      <th scope="col">Energy (eV)</th>
+                      <th scope="col">Atoms</th>
+                      <th scope="col">Pressure (kB)</th>
+                      <th scope="col">
+                        <span className="sr-only">Remove</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((r, i) => (
+                      <tr key={r.id}>
+                        <th scope="row" title={r.label}>
+                          {i + 1}
+                        </th>
+                        <td>
+                          <input
+                            aria-label={`Row ${i + 1} setting`}
+                            value={r.x}
+                            onChange={(e) => edit(r.id, { x: e.target.value })}
+                          />
+                        </td>
+                        <td>
+                          <input
+                            aria-label={`Row ${i + 1} energy`}
+                            value={
+                              r.energies?.[quantity] !== undefined ? String(r.energies[quantity]) : r.energy
+                            }
+                            onChange={(e) => {
+                              const { energies: _drop, ...rest } = r;
+                              void _drop;
+                              setRows((old) =>
+                                old.map((o) => (o.id === r.id ? { ...rest, energy: e.target.value } : o)),
+                              );
+                            }}
+                          />
+                        </td>
+                        <td>
+                          <input
+                            aria-label={`Row ${i + 1} atoms`}
+                            value={r.natoms}
+                            onChange={(e) => edit(r.id, { natoms: e.target.value })}
+                          />
+                        </td>
+                        <td>
+                          <input
+                            aria-label={`Row ${i + 1} pressure`}
+                            value={r.pressure}
+                            onChange={(e) => edit(r.id, { pressure: e.target.value })}
+                          />
+                        </td>
+                        <td>
+                          <button
+                            type="button"
+                            aria-label={`Remove row ${i + 1}`}
+                            onClick={() => setRows((old) => old.filter((o) => o.id !== r.id))}
+                          >
+                            Remove
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
