@@ -56,7 +56,7 @@ The author's rule: pick the smallest setting where the energy per atom changes b
 
 **What converges and what does not.**
 
-- The total energy with respect to `ENCUT` and the k-mesh **does** converge as you raise them.
+- The total energy with respect to `ENCUT` and the k-mesh **does** converge as you raise them. The Workflow Handbook puts it the other way, "the total energy itself is never converged; what converges is the difference between structures and the derived quantities" <Cite id="S-042" />. Both lead to the same practice: the total energy approaches a limit, but its absolute value means little on its own, so test the energy differences and derived quantities you will report.
 - Stress and pressure converge more slowly than energy, so a cell relaxation needs a higher `ENCUT` than a fixed-cell energy <Cite id="S-040" />.
 - A **difference** between two energies (two structures, two magnetic orders) often converges sooner than either total energy, because errors partly cancel. Test the quantity you will report.
 - Your **physical model** (the functional, `U`, the pseudopotential) does not converge. Raising `ENCUT` will never turn PBE into a better functional. Convergence removes numerical error only.

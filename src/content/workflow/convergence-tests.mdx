@@ -1,0 +1,139 @@
+---
+id: convergence-tests
+title: Test ENCUT and k-points
+short: Convergence
+group: Geometry
+order: 2
+summary: Run a series of single-point calculations on the unrelaxed structure, first over ENCUT and then over the k-mesh, and keep the smallest settings at which the energy changes by less than 1 meV/atom.
+folder: 00_conv/
+needs:
+  - '<code>POSCAR</code> and <code>POTCAR</code> from the previous step'
+  - 'A static <code>INCAR</code> with an <code>ENCUT</code> line'
+  - '<code>KPOINTS</code> at a reasonable mesh (for the ENCUT scan)'
+run: 'A series of single-point runs: <code>encut_test.sh</code>, then <code>kpt_test.sh</code>'
+produces:
+  - 'An ENCUT and a k-mesh you can defend in a paper'
+  - '<code>encut.dat</code> and <code>kpt.dat</code>: the energies of each scan'
+learn:
+  - { href: '/handbook/08-convergence-and-errors/why-converge/', label: 'Why converge, and what converges' }
+  - { href: '/handbook/08-convergence-and-errors/encut-convergence/', label: 'The ENCUT test' }
+  - { href: '/handbook/08-convergence-and-errors/kpoint-convergence/', label: 'The k-point test' }
+  - { href: '/handbook/05-practical-choices/smearing/', label: 'Smearing (the test for metals)' }
+  - { href: '/handbook/10-worked-example/convergence/', label: 'A worked convergence test' }
+tools:
+  - {
+      href: '/tools/input-builder/?preset=convergence&variant=default',
+      label: 'Input Builder: convergence series',
+    }
+  - { href: '/tools/convergence/', label: 'Convergence plotter (read the scans)' }
+sources: [S-042, S-020]
+status: draft
+updated: 2026-11-27
+---
+
+<Section id="why" heading="Why test before you relax">
+
+ENCUT (how many plane waves) and the k-mesh (how finely the Brillouin zone is sampled) control the accuracy
+of every later run. Energy differences between structures and the quantities derived from them converge
+much faster than the total energy itself, so judge convergence on those differences, not on the absolute
+total energy<Cite id="S-042" />.
+
+The method, from the Workflow Handbook<Cite id="S-042" />:
+
+- **Test on the unrelaxed structure** with static (single-point) runs. You do not need the relaxed cell yet.
+- **Change one setting at a time.** Scan ENCUT with the k-mesh fixed, then scan the k-mesh with ENCUT
+  fixed at the value you chose.
+- **Pick the smallest setting** at which the energy changes by less than 1 meV/atom from the next step up.
+- **For stress-based quantities** (elastic constants, the equation of state), also watch the pressure.
+
+</Section>
+
+<Section id="inputs" heading="The inputs">
+
+Both scans use the same static INCAR. The scripts below rewrite only its ENCUT line:
+
+<PresetIncar preset="convergence" caption="Static INCAR for the scans" />
+
+Use the POSCAR and POTCAR from [Prepare the inputs](/workflow/prepare-inputs/). For the ENCUT scan, keep
+KPOINTS fixed at a reasonable mesh, for example VASPkit 102 at 0.04.
+
+</Section>
+
+<Section id="encut" heading="Scan ENCUT">
+
+The script makes one folder per cutoff (400 to 700 eV in steps of 50), runs VASP in each, and writes the
+cutoff and the "energy without entropy" to `encut.dat`:
+
+<VaspFile
+  name="shell"
+  code={`#!/bin/bash
+# static INCAR with an ENCUT line; KPOINTS fixed at a reasonable mesh
+NP=32
+for e in 400 450 500 550 600 650 700; do
+  d=encut_$e; mkdir -p $d; cp POSCAR POTCAR KPOINTS $d/
+  sed "s/^ *ENCUT.*/ENCUT = $e/" INCAR > $d/INCAR
+  (cd $d && mpirun -np $NP vasp_std > vasp.out)
+  E=$(grep "energy  without entropy" $d/OUTCAR | tail -1 | awk '{print $NF}')
+  echo "$e $E" >> encut.dat
+done
+# divide by number of atoms and look at successive differences`}
+/>
+
+Save it as `encut_test.sh` in `00_conv/`. `NP=32` is the number of MPI ranks: set it to the cores you have.
+When it finishes, divide each energy by the number of atoms in the cell and look at the difference between
+each cutoff and the next one up. Keep the smallest cutoff whose energy per atom differs from the next
+cutoff up by less than 1 meV/atom.
+
+</Section>
+
+<Section id="kpoints" heading="Scan the k-mesh">
+
+Now fix ENCUT at the converged value in the INCAR. The script lets VASPkit build each mesh (task 102,
+Gamma-centred, at resolutions 0.06 down to 0.02) and writes the resolution, the mesh and the energy to
+`kpt.dat`:
+
+<VaspFile
+  name="shell"
+  code={`#!/bin/bash
+# ENCUT fixed at the converged value; VASPkit builds each mesh
+for r in 0.06 0.05 0.04 0.03 0.025 0.02; do
+  d=kpt_$r; mkdir -p $d; cp POSCAR POTCAR INCAR $d/
+  (cd $d && printf "102\\n2\\n$r\\n" | vaspkit > /dev/null && mpirun -np 32 vasp_std > vasp.out)
+  E=$(grep "energy  without entropy" $d/OUTCAR | tail -1 | awk '{print $NF}')
+  echo "$r $(sed -n 4p $d/KPOINTS) $E" >> kpt.dat
+done`}
+/>
+
+Save it as `kpt_test.sh`. The `printf` line types the answers to the 102 menu: 2 picks a Gamma-centred
+mesh, then the resolution. `sed -n 4p` copies the mesh line of each KPOINTS into `kpt.dat`, so you can see
+which mesh each resolution gave. Read the result the same way as the ENCUT scan: energy per atom,
+differences to the next step, 1 meV/atom.
+
+</Section>
+
+<Section id="read" heading="Reading the result">
+
+Paste `encut.dat` into the [Convergence plotter](/tools/convergence/), choose "ENCUT series", give the
+number of atoms and pick "energy without entropy". It plots the energy per atom against the cutoff and
+marks where the change drops below your threshold. For `kpt.dat`, paste only the resolution and the energy
+(the first and last columns, for example `awk '{print $1, $NF}' kpt.dat`) and choose "k-mesh by
+resolution".
+
+Rules of thumb from the Workflow Handbook<Cite id="S-042" />:
+
+- **Insulators** converge with coarse meshes (resolution 0.04). **Metals** need 0.02 or finer, plus a
+  smearing test.
+- Use Gamma-centred meshes for hexagonal and trigonal cells.
+- **Convergence carries over.** A supercell N times larger needs about N times fewer k-points in each
+  direction.
+- **Report both settings,** the cutoff and the k-mesh (or its resolution), in your methods section.
+
+</Section>
+
+<Section id="next" heading="Files for the next step">
+
+Take the converged ENCUT and the converged KPOINTS (or its 102 resolution) to `01_relax/` for the
+[relaxation](/workflow/relaxation/). The protocol relaxes with ENCUT = 1.3 × the largest ENMAX of your
+POTCAR.
+
+</Section>

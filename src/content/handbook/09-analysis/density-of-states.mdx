@@ -138,7 +138,7 @@ LCHARG = .FALSE.`}
   }}
 />
 
-- **Or skip the extra run.** The Workflow Handbook writes the DOS from the SCF run itself with `LORBIT = 11` and `NEDOS = 3001`, and uses a denser SCF mesh for a smoother curve <Cite id="S-042" />.
+- **Or skip the extra run.** The author's Workflow Handbook reads the DOS straight from the static SCF: with `LORBIT = 11` and `NEDOS = 3001` the SCF already writes the total and projected DOS into `DOSCAR`, and a denser k-mesh in that SCF (VASPkit 102 at about 0.02) gives a smoother curve. A separate non-self-consistent run (`ICHARG = 11`) on a denser mesh is optional. See the [DOS step of the Workflow](/workflow/dos/) <Cite id="S-042" />.
 - **Keep `ISPIN`, `MAGMOM` and `LMAXMIX` identical to the SCF**, exactly as for bands <Cite id="S-041" />.
 - **`EMIN` and `EMAX` are absolute energies.** Look up `E-fermi` in the SCF `OUTCAR` and put the window around it <Cite id="S-041" />.
 - **Sphere radii.** For `LORBIT = 10` to `12` the radii come from the `POTCAR`; only `LORBIT = 0` to `2` need `RWIGS` in the INCAR, one value per species <Cite id="S-041" />.

@@ -1,0 +1,105 @@
+---
+id: meta-gga
+title: Use a meta-GGA (r2SCAN, mBJ)
+short: Meta-GGA
+group: Beyond PBE
+order: 2
+summary: 'Restart from a converged PBE run with a meta-GGA: r2SCAN for better structures and energies, mBJ for better band gaps. Both need POTCARs that carry kinetic-energy-density data.'
+folder: 12_r2scan/
+needs:
+  - 'POTCARs with kinetic-energy-density data (the PBE.52, PBE.54 or PBE.64 sets)'
+  - 'A <code>WAVECAR</code> from a converged PBE run, as the start'
+run: 'The <code>METAGGA</code> tag, <code>LASPH = .TRUE.</code>, <code>ALGO = All</code>'
+produces:
+  - 'Better structures and energetics (r2SCAN)'
+  - 'Better band gaps (mBJ)'
+learn:
+  - { href: '/handbook/05-practical-choices/functionals/', label: 'Choosing a functional' }
+  - { href: '/handbook/05-practical-choices/pseudopotentials-and-paw/', label: 'POTCAR sets and PAW' }
+  - { href: '/handbook/05-practical-choices/vdw-corrections/', label: 'van der Waals corrections' }
+  - { href: '/handbook/07-running/restarts-istart-icharg/', label: 'Restarts with ISTART and ICHARG' }
+tools:
+  - { href: '/tools/input-builder/?preset=r2scan&variant=default', label: 'Input Builder: r2SCAN' }
+  - { href: '/tools/input-builder/?preset=mbj&variant=default', label: 'Input Builder: mBJ band gap' }
+  - { href: '/tools/review/', label: 'Calculation Review (check the run)' }
+sources: [S-042, S-026, S-027, S-020]
+status: draft
+updated: 2026-11-27
+---
+
+<Section id="why" heading="What a meta-GGA adds">
+
+A meta-GGA adds one more ingredient to the functional: the kinetic-energy density, written τ<Cite id="S-042" />.
+
+- **SCAN** satisfies all the known exact constraints that a semilocal functional can satisfy. Compared with
+  PBE it improves lattice constants, formation energies and intermediate-range bonding, at a moderate extra
+  cost<Cite id="S-026" />.
+- **r2SCAN** keeps most of that accuracy and is much more stable numerically.
+- **mBJ** is different: it is a model potential built for band gaps, not a full functional<Cite id="S-027" />.
+
+</Section>
+
+<Section id="inputs" heading="What you need first">
+
+- **The right POTCARs.** A meta-GGA needs POTCARs that carry kinetic-energy-density data: use the PBE.52,
+  PBE.54 or PBE.64 set<Cite id="S-042" />.
+- **A converged PBE run.** Both INCARs below start from its WAVECAR (`ISTART = 1`), so copy the PBE WAVECAR
+  into `12_r2scan/` first.
+
+</Section>
+
+<Section id="route-r2scan" heading="r2SCAN: structures and energies">
+
+Add these tags to a VASPkit 101 → ST template<Cite id="S-042" /><Cite id="S-020" />:
+
+<PresetIncar preset="r2scan" caption="r2SCAN (add to a VASPkit 101 → ST template)" />
+
+- **`METAGGA = R2SCAN`**, or `SCAN`. Remove any GGA tag from the INCAR.
+- **`LASPH = .TRUE.` is mandatory** for a meta-GGA.
+- **`LMIXTAU = .TRUE.`** mixes τ along with the density, which keeps the SCF stable.
+- **`ENCUT = 600`.** Meta-GGAs need a higher cutoff than PBE.
+
+**With van der Waals.** You can add the rVV10 dispersion term with
+`LUSE_VDW = .TRUE.`. Its parameter depends on the functional: `BPARAM = 15.7` for SCAN+rVV10 and
+`BPARAM = 11.95` for r2SCAN+rVV10.
+
+</Section>
+
+<Section id="route-mbj" heading="mBJ: band gaps">
+
+<PresetIncar preset="mbj" caption="mBJ band gap" />
+
+- **`ALGO = All`**, or Normal, with `NELM = 300` electronic steps.
+- **`NSW = 0`: keep the PBE geometry.** mBJ is a potential, so it gives no total energy and no forces. You
+  cannot relax with it.
+- **`CMBJ` (optional).** It fixes the mBJ parameter c. Without it, VASP computes c self-consistently, which is
+  the default.
+
+</Section>
+
+<Section id="bands" heading="Band structures with a meta-GGA">
+
+The safest route is the zero-weight k-point method used for hybrids: VASPkit 251 writes the KPOINTS, you
+run the SCF with that KPOINTS, and VASPkit 252 reads the bands<Cite id="S-042" />. The steps are on the
+[hybrid page](/workflow/hybrid/#bands).
+
+The usual non-self-consistent `ICHARG = 11` band run needs τ, and in older VASP versions τ is not stored in
+the CHGCAR. That is why this route avoids it.
+
+</Section>
+
+<Section id="check" heading="Check before you move on">
+
+- **Energies jump between runs?** SCAN is sensitive to the integration grid. If its energies jump from one
+  run to the next, switch to r2SCAN.
+- **One functional per formation energy.** Do not mix meta-GGA and PBE energies in one formation-energy
+  calculation. Every reference phase must use the same functional.
+
+</Section>
+
+<Section id="next" heading="Files for the next step">
+
+Any energy you compare with an r2SCAN energy must also come from r2SCAN, with the same POTCARs.
+The mBJ result is a band gap on the PBE geometry, with no total energy to compare.
+
+</Section>

@@ -4,6 +4,7 @@ import { dftuRules } from './dftu';
 import { functionalRules } from './functional';
 import { ionicRules } from './ionic';
 import { magnetismRules } from './magnetism';
+import { nebRules } from './neb';
 import { parallelRules } from './parallel';
 import { restartRules } from './restart';
 import { slabRules } from './slab';
@@ -22,4 +23,5 @@ export const ALL_RULES: readonly Rule[] = [
   ...bandRules,
   ...parallelRules,
   ...slabRules,
+  ...nebRules,
 ].sort((a, b) => a.id.localeCompare(b.id));

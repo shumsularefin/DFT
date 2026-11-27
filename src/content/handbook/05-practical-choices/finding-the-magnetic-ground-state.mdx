@@ -55,6 +55,8 @@ The author's recipe has five steps <Cite id="S-042" />:
 4. **Run a static SCF for each** and take the energy without entropy.
 5. **Check that each run kept its pattern**, then compare energies per formula unit. If an AFM start ended as FM, that ordering is unstable or the start was poor.
 
+The author's Workflow Handbook compares the **energy without entropy** (from `OUTCAR`) **per formula unit** instead, and calls differences below a few meV per formula unit within DFT uncertainty <Cite id="S-042" />. Both give the same ranking, because they divide the same energies by different counts. Say which one you use when you report the numbers. The [magnetic step of the Workflow](/workflow/magnetic/) follows the per-formula-unit convention.
+
 <Scene id="afm-g" />
 
 Two more ideas help.

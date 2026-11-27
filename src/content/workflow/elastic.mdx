@@ -1,0 +1,251 @@
+---
+id: elastic
+title: Compute the elastic constants
+short: Elastic constants
+group: Lattice and response
+order: 1
+protocolStep: 4
+summary: Strain the relaxed cell with IBRION = 6 and ISIF = 3, read the TOTAL ELASTIC MODULI with VASPkit 203, then check the Born stability criteria and the derived moduli.
+folder: 06_elastic/
+needs:
+  - 'Structure re-relaxed at the elastic run’s <code>ENCUT</code>, residual pressure ≈ 0'
+run: '<code>IBRION = 6</code>, <code>ISIF = 3</code>, <code>NFREE = 4</code>, <code>POTIM = 0.015</code>'
+produces:
+  - '“TOTAL ELASTIC MODULI” in <code>OUTCAR</code> → VASPkit 203'
+learn:
+  - { href: '/handbook/12-properties/elastic-constants/', label: 'Elastic constants explained' }
+  - { href: '/handbook/05-practical-choices/plane-waves-and-encut/', label: 'ENCUT and Pulay stress' }
+  - { href: '/handbook/09-analysis/relaxations/', label: 'How a relaxation works' }
+tools:
+  - { href: '/tools/input-builder/?preset=elastic&variant=default', label: 'Input Builder: elastic' }
+  - { href: '/tools/eos/', label: 'Equation of state fit (cross-check B)' }
+checklist: [Elastic]
+sources: [S-042, S-019, S-020, S-072, S-076, S-077, S-078, S-073, S-075, S-079, S-074]
+status: draft
+updated: 2026-11-27
+---
+
+<Section id="why" heading="What VASP does in this step">
+
+With IBRION = 6 and ISIF ≥ 3, VASP applies small positive and negative strains to the lattice, one for
+each of the six independent strain components. It also displaces the ions, then computes how the stress
+responds. You get two parts: the clamped-ion elastic tensor (ions held fixed) and a correction from the
+internal relaxation of the ions. Their sum is printed in OUTCAR as TOTAL ELASTIC MODULI<Cite id="S-042" />.
+
+The stress is very sensitive to the plane-wave basis. That is why a high cutoff and a fully relaxed
+cell are essential for this step.
+
+</Section>
+
+<Section id="before" heading="Before you run">
+
+- **Re-relax at the elastic settings.** Relax with exactly the ENCUT, PREC and k-mesh of the elastic
+  run. Then `grep "external pressure" OUTCAR | tail -1` should be within about ±1 kB. A larger leftover
+  pressure means the cell is not at its minimum, and the Cij come out wrong.
+- **Use a denser k-mesh than for the relaxation**, especially for metals. The Cij converge slowly with
+  k-points.
+- **Use the conventional cell** when its axes line up with the crystal axes you want the Cij in (cubic,
+  for example). Then VASPkit's analysis for your crystal system applies cleanly. VASPkit 603
+  (conventional cell) or 604 (standardized crystal cell) writes the cell to use for elastic
+  constants<Cite id="S-020" />.
+
+The relaxation itself is described in [Relax the structure](/workflow/relaxation/).
+
+</Section>
+
+<Section id="inputs" heading="The inputs">
+
+Start from VASPkit 101 → DC and edit it to match this file:
+
+<PresetIncar preset="elastic" caption="INCAR for the elastic run (101 → DC, edited)" />
+
+The author's file ends with the line `# NCORE = 4`, commented out with the note that IBRION = 6 runs
+without band parallelization. Keep NCORE out of your INCAR for this run.
+
+| Tag    | Setting | Reason                                                                |
+| ------ | ------- | --------------------------------------------------------------------- |
+| ENCUT  | 620     | At least 1.3 × ENMAX, and the same value as the re-relaxation.        |
+| EDIFF  | 1E-8    | 1E-7 is the minimum. The stress is only as good as the SCF behind it. |
+| IBRION | 6       | Finite differences that use the crystal symmetry.                     |
+| ISIF   | 3       | Required for VASP to compute the elastic tensor.                      |
+| NFREE  | 4       | Displacements per direction: 2 is cheaper, 4 is more accurate.        |
+| POTIM  | 0.015   | The size of each displacement and strain step.                        |
+| ISPIN  | 2       | Only if the material is magnetic, with one MAGMOM value per atom.     |
+
+</Section>
+
+<Section id="run" heading="Run and extract">
+
+Run VASP as usual, then read the tensor:
+
+<VaspFile
+  name="shell"
+  code={`grep -A 9 "TOTAL ELASTIC MODULI" OUTCAR   # kBar; divide by 10 for GPa
+printf "203\\n" | vaspkit                  # reads TOTAL ELASTIC MODULI from OUTCAR`}
+/>
+
+The first line prints the matrix from OUTCAR in kBar (divide by 10 for GPa). The second feeds the menu
+choice 203 to VASPkit, which does the full analysis.
+
+<Callout variant="mistake" title="The ordering trap">
+
+OUTCAR orders the rows and columns as XX YY ZZ XY YZ ZX. Voigt notation orders them 11 22 33 23 13 12,
+that is YZ ZX XY for the last three. So VASP's 4th, 5th and 6th entries are Voigt 6, 4 and 5. VASPkit 203
+converts this for you. If you parse OUTCAR yourself, swap them yourself.
+
+</Callout>
+
+</Section>
+
+<Section id="read" heading="What VASPkit 203 reports">
+
+203 analyses the OUTCAR of VASP's IBRION = 6 run, which is the route of this protocol<Cite id="S-020" />.
+It prints:
+
+- the Cij (in GPa) and the compliance matrix Sij;
+- the bulk modulus B, Young's modulus E, shear modulus G and Poisson ratio ν as Voigt, Reuss and Hill
+  averages, plus their directional minimum and maximum (anisotropy);
+- the P-wave modulus and the Pugh ratio;
+- the Vickers hardness by two models (Chen and Tian);
+- the Cauchy pressure and the Kleinman parameter;
+- the universal and the Chung–Buessem anisotropy indices;
+- the longitudinal, transverse and average sound velocities, and the Debye temperature;
+- the six eigenvalues of the stiffness matrix and the Born stability criteria.
+
+It also writes the tensor to the file `ELASTIC_TENSOR`. For the Cauchy pressure, read the sign as in
+the indicator table below: positive means metallic and ductile<Cite id="S-042" />.
+
+</Section>
+
+<Section id="stability" heading="Is the crystal stable? (Born criteria)">
+
+The general test in the first row works for any lattice. The other rows are the conditions the author
+gives for three crystal systems<Cite id="S-072" />.
+
+| Lattice        | Conditions                                                                               |
+| -------------- | ---------------------------------------------------------------------------------------- |
+| Any            | All six eigenvalues of the 6×6 C matrix are positive (general, necessary and sufficient) |
+| Cubic          | `C₁₁ − C₁₂ > 0`; `C₁₁ + 2C₁₂ > 0`; `C₄₄ > 0`                                             |
+| Hexagonal      | `C₁₁ > \|C₁₂\|`; `2C₁₃² < C₃₃(C₁₁ + C₁₂)`; `C₄₄ > 0`; `C₆₆ = (C₁₁ − C₁₂)/2 > 0`          |
+| Tetragonal (I) | `C₁₁ > \|C₁₂\|`; `2C₁₃² < C₃₃(C₁₁ + C₁₂)`; `C₄₄ > 0`; `C₆₆ > 0`                          |
+
+If one eigenvalue is negative, the structure is mechanically unstable as given. VASPkit 203 prints the
+six eigenvalues and checks the criteria for you.
+
+</Section>
+
+<Section id="moduli" heading="Derived moduli (Voigt, Reuss, Hill)">
+
+VASPkit 203 averages the Cij in three ways: Voigt (from the Cij), Reuss (from the compliance Sij) and
+Hill, the mean of the two<Cite id="S-076" />. These are the formulas behind the 203 numbers, as the
+author gives them<Cite id="S-042" />:
+
+- `B_V = [(C11+C22+C33) + 2(C12+C13+C23)] / 9`
+- `G_V = [(C11+C22+C33) − (C12+C13+C23) + 3(C44+C55+C66)] / 15`
+- `B_R = 1 / [(S11+S22+S33) + 2(S12+S13+S23)]`, where `S = C⁻¹` (the compliance matrix)
+- `G_R = 15 / [4(S11+S22+S33) − 4(S12+S13+S23) + 3(S44+S55+S66)]`
+- `B_H = (B_V + B_R)/2` and `G_H = (G_V + G_R)/2`
+- `E = 9BG / (3B + G)` and `ν = (3B − 2G) / [2(3B + G)]`
+- `A_U = 5 G_V/G_R + B_V/B_R − 6`: the universal anisotropy index, 0 for an isotropic
+  crystal<Cite id="S-077" />
+- `v_l = √[(B + 4G/3)/ρ]`, `v_t = √(G/ρ)` and `v_m = [(2/v_t³ + 1/v_l³)/3]^(−1/3)`: the longitudinal,
+  transverse and average sound velocities (ρ is the density)
+- `θ_D = (h/k_B) [3n N_A ρ / (4π M)]^(1/3) v_m`: the Debye temperature, with n the number of atoms per
+  formula unit and M the molar mass<Cite id="S-078" />
+
+</Section>
+
+<Section id="indicators" heading="Reading the indicators">
+
+| Indicator                     | Reading                                                                                                      |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Pugh ratio B/G                | Above 1.75: ductile. Below 1.75: brittle<Cite id="S-073" />                                                  |
+| Poisson ratio ν               | Above 0.26: ductile. About 0.1: covalent, about 0.25: ionic, about 0.33: metallic bonding<Cite id="S-075" /> |
+| Cauchy pressure `C₁₂ − C₄₄`   | Positive: metallic, ductile. Negative: directional (covalent) bonding<Cite id="S-079" />                     |
+| Zener `A = 2C₄₄/(C₁₁ − C₁₂)`  | Anisotropy of a cubic crystal: 1 means isotropic                                                             |
+| Vickers hardness (Chen model) | `H_V = 2(k²G)^0.585 − 3`, with `k = G/B` (in GPa); empirical<Cite id="S-074" />                              |
+
+<Callout variant="note" title="Heuristic">
+
+These readings are empirical rules of thumb for comparing materials, not measured properties. Use them
+to describe trends, and say that they are estimates when you report them.
+
+</Callout>
+
+</Section>
+
+<Section id="check" heading="Check before you move on">
+
+- **The crystal passes the Born test:** all six stiffness eigenvalues are positive.
+- **Cross-check the bulk modulus.** B_H from the Cij should agree with B0 from the
+  [energy–volume fit](/workflow/equation-of-state/) within a few percent. A large disagreement points to
+  an unconverged ENCUT or k-mesh, or to residual stress<Cite id="S-042" />.
+- **The pre-relaxation was done at this ENCUT**, with the residual pressure within about ±1 kB.
+
+</Section>
+
+<Section id="energy-strain" heading="Alternative: the energy–strain method (VASPkit 201)">
+
+VASPkit's authors also implement a route that fits energies instead of stresses, because energies are
+less sensitive to numerical noise than stresses. It needs more runs: for a cubic crystal, 3 strain types
+× 7 strains<Cite id="S-020" />. The steps:
+
+1. Start from a fully relaxed, standardized conventional cell (603 or 604) and a fine k-mesh (102).
+2. Use this INCAR for every strained cell. ISIF must be 2: the ions relax, while the cell is fixed by the
+   applied strain.
+
+<VaspFile
+  name="INCAR"
+  code={`PREC    = High
+EDIFF   = 1E-8
+ISIF    = 2        # must be 2: ions relax, cell is fixed by the strain
+IBRION  = 2
+NSW     = 100
+EDIFFG  = -1E-2
+LREAL   = F
+ADDGRID = .TRUE.`}
+/>
+
+3. Write a `VPKIT.in` whose first line is `1` (pre-processing), then run 201. It creates one folder per
+   strain, such as `C44/strain_-0.015` up to `strain_+0.015`.
+4. Run VASP in every strain folder.
+5. Change line 1 of `VPKIT.in` to `2` and run 201 again. It fits the energies and gives the same
+   analysis as 203.
+
+The `VPKIT.in` for a bulk crystal with 7 strains:
+
+<VaspFile
+  name="shell"
+  code={`1                       ! 1 for pre-processing; 2 for post-processing
+3D                      ! 2D for two-dimensional, 3D for bulk
+7                       ! number of strain cases
+-0.015 -0.010 -0.005 0.000 0.005 0.010 0.015   ! strain range`}
+/>
+
+</Section>
+
+<Section id="other-routes" heading="Other VASPkit routes">
+
+| Code | What it does                                                                      | Output               |
+| ---- | --------------------------------------------------------------------------------- | -------------------- |
+| 203  | Elastic analysis of the OUTCAR from VASP's IBRION = 6 run. The protocol route.    | The list above       |
+| 201  | Energy–strain method: VPKIT.in step 1 makes the strain folders, step 2 fits       | Same analysis as 203 |
+| 200  | VASPkit's own stress–strain workflow                                              | Same analysis        |
+| 202  | Analyses a tensor you type into `ELASTIC_TENSOR.in` (handy for literature values) | Same analysis        |
+| 926  | Elastic constants of 2D materials                                                 |                      |
+
+On the same VASPkit menu line as 926, 927 gives band edges relative to the vacuum level; it is a slab
+tool, not an elastic one<Cite id="S-020" />.
+
+</Section>
+
+<Section id="next" heading="Files and folders">
+
+Run this step in its own folder, `06_elastic/` (IBRION = 6, ISIF = 3). Copy in the CONTCAR of the
+re-relaxation at ENCUT = 620 as POSCAR, with the same POTCAR and the denser KPOINTS. For the
+energy–strain route, 201 makes the strain folders inside it.
+
+Keep the OUTCAR and the `ELASTIC_TENSOR` file: the bulk modulus is compared with the
+[energy–volume curve](/workflow/equation-of-state/), which runs in `07_eos/`.
+
+</Section>

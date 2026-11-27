@@ -50,6 +50,12 @@ The five quoted sentences below are the author's own notes, reproduced word for 
 
 </Callout>
 
+<Callout variant="note" title="Follow it step by step">
+
+The [Workflow](/workflow/) section turns this protocol, and every calculation after it, into a path you can follow: one page per step with the INCAR, the commands, the files to carry over and what to check before moving on.
+
+</Callout>
+
 **Step 1, Relaxation.** "Prepare four INPUT files and changes it as it requires. Run relaxation with encut of 1.3 of Enmax. Ediff, ISPIN, Magmom. INCAR can be prepared from VASPKIT."
 
 Why: forces and stress are only meaningful at the structure you want. The 1.3 factor reduces Pulay stress when the cell changes, and `ISPIN` with one `MAGMOM` value per atom tells VASP the system is magnetic <Cite id="S-042" />.

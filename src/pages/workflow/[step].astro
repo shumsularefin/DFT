@@ -1,0 +1,191 @@
+---
+import { getCollection, render } from 'astro:content';
+import WorkflowLayout from '../../layouts/WorkflowLayout.astro';
+import Section from '../../components/handbook/Section.astro';
+import Cite from '../../components/handbook/Cite.astro';
+import VaspFile from '../../components/handbook/VaspFile.astro';
+import Callout from '../../components/ui/Callout.astro';
+import PresetIncar from '../../components/workflow/PresetIncar.astro';
+import Protocol from '../../components/workflow/Protocol.astro';
+import sources from '../../data/sources.json';
+import { citeOrder } from '../../lib/topic';
+import { checklistRow } from '../../lib/workflow';
+import edition from '../../data/workflow.json';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('workflow');
+  return entries.map((entry) => ({ params: { step: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const d = entry.data;
+const { Content } = await render(entry);
+const body = entry.body ?? '';
+// The protocol quote (rendered from workflow-protocol.json above the page body) cites S-042 first.
+Astro.locals.cites = citeOrder((d.protocolStep ? '<Cite id="S-042" />' : '') + body);
+const cites: string[] = Astro.locals.cites;
+const byId = new Map(sources.map((s) => [s.id, s]));
+for (const id of [...cites, ...d.sources]) {
+  if (!byId.has(id)) throw new Error(`workflow/${entry.id}: unknown source ${id}`);
+}
+const others = d.sources.filter((id) => !cites.includes(id));
+const rows = d.checklist.map(checklistRow);
+const sections = [
+  ...(d.protocolStep ? [{ id: 'protocol', heading: 'The protocol step' }] : []),
+  ...[...body.matchAll(/<Section\s+id="([^"]+)"\s+heading="([^"]+)"/g)].map((m) => ({
+    id: m[1]!,
+    heading: m[2]!,
+  })),
+  ...(rows.length ? [{ id: 'before-you-submit', heading: 'Before you submit' }] : []),
+  { id: 'sources', heading: 'Sources' },
+];
+const statusLabel = { draft: 'First edition', review: 'Awaiting verification', verified: 'Verified' }[
+  d.status
+];
+const components = { Section, Cite, VaspFile, Callout, PresetIncar };
+---
+
+<WorkflowLayout id={entry.id} title={d.title} description={d.summary} group={d.group}>
+  <nav class="card toc" aria-label="On this page" slot="rail">
+    <p class="card-h">On this page</p>
+    <ol>
+      {sections.map((s) => (
+        <li>
+          <a href={`#${s.id}`}>{s.heading}</a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+  {(d.learn.length > 0 || d.tools.length > 0) && (
+    <nav class="card wf-links" aria-label="Theory and tools for this step" slot="rail">
+      {d.learn.length > 0 && (
+        <>
+          <p class="wf-links-h">Learn why</p>
+          <ul>
+            {d.learn.map((l) => (
+              <li>
+                <a href={l.href}>{l.label}</a>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+      {d.tools.length > 0 && (
+        <>
+          <p class="wf-links-h">Tools</p>
+          <ul>
+            {d.tools.map((l) => (
+              <li>
+                <a href={l.href}>{l.label}</a>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </nav>
+  )}
+  <div class="topic" data-pagefind-body data-pagefind-meta="module:Workflow">
+    <header class="topic-head">
+      <div class="page-h">
+        <div>
+          <h1>{d.title}</h1>
+          <p class="topic-summary">{d.summary}</p>
+          <p class="topic-meta">
+            {d.protocolStep && <>Protocol step {d.protocolStep} of 5. </>}
+            {statusLabel}, updated <time datetime={d.updated}>{d.updated}</time>. Workflow{' '}
+            <a href="/workflow/#revisions">version {edition.version}</a>.
+          </p>
+        </div>
+      </div>
+    </header>
+    <div class="prose">
+      <section class="card wf-stepcard" aria-label="This step at a glance">
+        <dl>
+          <div>
+            <dt>Folder</dt>
+            <dd>
+              <code>{d.folder}</code>
+            </dd>
+          </div>
+          <div>
+            <dt>You need</dt>
+            <dd>
+              <ul>
+                {d.needs.map((n) => (
+                  <li set:html={n} />
+                ))}
+              </ul>
+            </dd>
+          </div>
+          <div>
+            <dt>You run</dt>
+            <dd set:html={d.run} />
+          </div>
+          <div>
+            <dt>It leaves for the next step</dt>
+            <dd>
+              <ul>
+                {d.produces.map((n) => (
+                  <li set:html={n} />
+                ))}
+              </ul>
+            </dd>
+          </div>
+        </dl>
+      </section>
+      {d.protocolStep && <Protocol step={d.protocolStep} />}
+      <Content components={components} />
+      {rows.length > 0 && (
+        <Section id="before-you-submit" heading="Before you submit">
+          <p class="check-lede">
+            The pre-submit checklist of the Workflow Handbook for this step. The full list is on the{' '}
+            <a href="/reference/checklist/">checklist page</a>.
+          </p>
+          {rows.map((r) => (
+            <>
+              {rows.length > 1 && <p class="wf-checkname">{r.calculation}</p>}
+              <div class="wf-check">
+                <div>
+                  <h3>Must have</h3>
+                  <ul>
+                    {r.must.map((i) => (
+                      <li>{i.text}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h3>Must not have</h3>
+                  <ul>
+                    {r.mustNot.map((i) => (
+                      <li>{i.text}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </>
+          ))}
+        </Section>
+      )}
+      <Section id="sources" heading="Sources">
+        {cites.length > 0 && (
+          <ol class="cite-list">
+            {cites.map((id) => (
+              <li id={`ref-${id}`}>
+                {byId.get(id)?.citation} <a href={`/references/#${id}`}>[{id}]</a>
+              </li>
+            ))}
+          </ol>
+        )}
+        {others.length > 0 && (
+          <ul>
+            {others.map((id) => (
+              <li>
+                {byId.get(id)?.citation} <a href={`/references/#${id}`}>[{id}]</a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Section>
+    </div>
+  </div>
+</WorkflowLayout>

@@ -1,0 +1,41 @@
+---
+// Left rail of the Workflow section: every step, grouped as the Workflow Handbook runs them.
+interface Step {
+  id: string;
+  short: string;
+  group: string;
+}
+interface Props {
+  groups: { name: string; steps: Step[] }[];
+  currentId?: string;
+}
+const { groups, currentId } = Astro.props;
+let n = 0;
+---
+
+<nav class="sidebar card tree wf-nav" aria-label="Workflow steps">
+  <p class="card-h">
+    <a href="/workflow/" class="wf-nav-home">
+      Workflow
+    </a>
+  </p>
+  <ul class="tree-modules">
+    {groups.map((g) => (
+      <li>
+        <p class="tree-row wf-nav-group">{g.name}</p>
+        <ul class="tree-sub">
+          {g.steps.map((s) => (
+            <li>
+              <a href={`/workflow/${s.id}/`} aria-current={s.id === currentId ? 'page' : undefined}>
+                <span class="wf-n" aria-hidden="true">
+                  {++n}
+                </span>
+                <span class="tree-label">{s.short}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </li>
+    ))}
+  </ul>
+</nav>

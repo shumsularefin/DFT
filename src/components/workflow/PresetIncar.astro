@@ -1,0 +1,40 @@
+---
+// The INCAR of a workflow step, written from the Input Builder preset (D-110). The preset holds the
+// Workflow Handbook's INCAR tag for tag (src/lib/workflow.test.ts), so the page never retypes it.
+import VaspFile from '../handbook/VaspFile.astro';
+import { exampleIncar, inputBuilderHref, presetVariant, valuesToReplace } from '../../lib/workflow';
+
+interface Props {
+  preset: string;
+  variant?: string;
+  /** What this INCAR is for, shown above the file. */
+  caption?: string;
+}
+const { preset, variant, caption } = Astro.props;
+const { preset: p, variant: v } = presetVariant(preset, variant);
+const replace = valuesToReplace(preset, variant);
+const label = p.variants.length > 1 ? `${p.title}, ${v.title}` : p.title;
+---
+
+<div class="wf-incar">
+  {caption && <p class="wf-incar-cap">{caption}</p>}
+  <VaspFile name="INCAR" code={exampleIncar(preset, variant)} />
+  <p class="wf-incar-foot">
+    {replace.length > 0 ? (
+      <>
+        Replace for your own system:{' '}
+        {replace.map((t, i) => (
+          <>
+            {i > 0 && ', '}
+            <code>{t}</code>
+          </>
+        ))}
+        . The values shown are the handbook's worked example.{' '}
+      </>
+    ) : (
+      <>These values can be used as they are. </>
+    )}
+    <a href={inputBuilderHref(preset, variant)}>Open “{label}” in the Input Builder</a> to fill them in for
+    your structure and download the files.
+  </p>
+</div>

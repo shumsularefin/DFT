@@ -219,6 +219,8 @@ export const useBuilder = create<BuilderState & BuilderActions>((set, get) => {
         ack: false,
       });
       if (d.poscar) get().loadPoscar(d.poscar);
+      // After the structure, because loading a POSCAR clears the typed mesh (Q-073).
+      set({ meshOverride: d.mesh && d.kpMode !== 'kspacing' && d.kpMode !== 'line' ? d.mesh : null });
       return true;
     },
   };
@@ -315,6 +317,7 @@ export function shareOf(s: BuilderState): string {
     kpMode: s.kpMode,
     spacing: s.spacing,
     ...(s.poscarText && s.poscarText.length <= SHARE_STRUCTURE_LIMIT ? { poscar: s.poscarText } : {}),
+    ...(s.meshOverride ? { mesh: [...s.meshOverride] as [number, number, number] } : {}),
   });
 }
 
