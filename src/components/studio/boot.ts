@@ -21,11 +21,13 @@ const SCRIPTS = [
   'js/site-link.js',
 ];
 
-// A script that throws while it runs still fires onload, so keep its first error to report it.
+// A script that throws while it runs still fires onload, so keep the first error raised during start-up
+// to report it. Not only errors from the Studio files: WebGL fails inside the three.js chunk.
 let scriptError: string | null = null;
-window.addEventListener('error', (e) => {
-  if (scriptError === null && e.filename.includes(BASE)) scriptError = e.message;
-});
+const keepError = (e: ErrorEvent) => {
+  if (scriptError === null) scriptError = e.message;
+};
+window.addEventListener('error', keepError);
 
 function load(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -69,6 +71,7 @@ async function boot() {
   }
   // Crystal | Molecule: the Molecule tab, and the switch between the two modes of this one workspace.
   initMolecule();
+  window.removeEventListener('error', keepError);
   document.documentElement.dataset.studioReady = 'true';
 }
 
