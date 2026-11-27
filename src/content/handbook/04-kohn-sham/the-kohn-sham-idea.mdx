@@ -1,5 +1,24 @@
 ---
 id: the-kohn-sham-idea
+stage:
+  scene: m04-kohn-sham
+  states:
+    - id: same-density
+      section: why
+      params: { Z: '2', t: 1 }
+      caption: 'Left, two interacting electrons; right, two independent helper electrons. The surfaces differ, yet the densities on the back walls match: that is the Kohn-Sham construction.'
+    - id: bare-potential
+      section: intuition
+      params: { Z: '2', t: 0 }
+      caption: 'With only the pull of the nucleus the helper electrons crowd too close to it: their density (blue) misses the target (dashed). The helper potential on the front wall is plain v_ext.'
+    - id: half-way
+      section: math
+      params: { Z: '2', t: 0.5 }
+      caption: 'Half of the Hartree-exchange-correlation potential switched on: the helper potential becomes shallower and the helper density moves toward the target. Slide to 1 to make them match.'
+    - id: weak-binding
+      section: check
+      params: { Z: '1', t: 1 }
+      caption: 'For Z = 1 the two wavefunctions differ more, but the densities still match exactly and the helper orbital energy equals minus the ionisation energy.'
 title: The Kohn-Sham idea
 module: 4
 order: 2

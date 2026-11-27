@@ -1,75 +1,199 @@
 ---
 id: what-next
+stage:
+  scene: m11-next-map
+  states:
+    - id: map
+      section: why
+      params: { subject: defects, all: true }
+      camera: iso
+      caption: 'The handbook as a rising path of module stations, with the next subjects beside them. You are at module 11, and the route leads to point defects in module 12. Pick another subject to see its route.'
+    - id: deeper
+      section: intuition
+      params: { subject: symmetry, all: true }
+      caption: 'Direction 1 goes deeper: crystal structure and symmetry sits outside the path at module 5, so the route runs back down. The readout gives its handbook address as plain text.'
+    - id: hull
+      section: math
+      params: { subject: hull, all: true }
+      caption: 'Formation energy and the convex hull, the topic behind the first formula here, sits beside module 12 with the other property topics.'
+    - id: next-rare-earth
+      section: in-vasp
+      params: { subject: next-rare-earth, all: true }
+      caption: 'Direction 2, the worked example one step further: the NdCuO3 run starts from the module 10 page on choosing the system, inside the path.'
+    - id: automate
+      section: what-changes
+      params: { subject: automate, all: false }
+      caption: 'Direction 3, automation, has no page on this site, so its station floats above the end of the path. Turn Show every subject station back on to see all the routes.'
 title: Where to go next
 module: 11
 order: 4
-summary: Moving from this handbook into independent DFT research, open-source Python ecosystems, and reproducible publication practices.
-concepts: [screening]
+summary: Three ways to go on after the handbook, deeper methods, the next step of the worked example and automation with Python libraries, with the formulas the next topics rest on and the habits that keep a growing project reproducible.
+concepts: [screening, worked-example-workflow]
 requires: [material-builder, screening]
-vaspTags: []
-sources: [S-019, S-024, S-042]
+vaspTags: [ISIF, KSPACING, LDAUTYPE]
+sources: [S-019, S-024, S-034, S-042, S-052, S-065, S-067, S-083, S-095, S-096, S-102]
 noLab: true
 status: draft
-updated: 2026-11-24
+updated: 2026-11-27
 ---
 
 <Why>
 
-Finishing the handbook gives you the core mental models and browser tools to run trustworthy VASP workflows; the next step is scaling up to automated scripts and literature-grade verification <Cite id="S-042" />.
+After module 10 you can take one compound from screening to electronic structure and say what each setting is for. Research asks for more: other properties, many compounds instead of one, and a record good enough that someone else can repeat it a year later. This page lays out three directions from here, each with a concrete first step, and the formulas the next topics build on, so that you know what they will ask of your calculations before you get there.
 
 </Why>
 
 <Intuition>
 
-Once you are comfortable running single calculations and checking `OUTCAR` by hand, Python libraries such as `pymatgen`, `ASE`, and `phonopy` let you automate high-throughput workflows, phase diagrams, and full phonon dispersions across the entire Brillouin zone <Cite id="S-024" />. Keep returning to the <a href="/tools/review/">Calculation Review</a> and <a href="/errors/">Error Finder</a> whenever an automated job behaves unexpectedly.
+**1. Go deeper into the method.** These topics extend the handbook:
 
-<Scene id="fcc" />
+- Module 5: [crystal structure and symmetry](/handbook/05-practical-choices/crystal-structure-and-symmetry/); [relaxation](/handbook/05-practical-choices/relaxation/); [beyond DFT](/handbook/05-practical-choices/beyond-dft/).
+- Module 7: [performance and parallelisation](/handbook/07-running/performance-and-parallelisation/).
+- Module 9: [bonding analysis with COHP](/handbook/09-analysis/bonding-analysis-cohp/); [Wannier functions and topology](/handbook/09-analysis/wannier-functions-and-topology/).
+- Module 12: [surfaces and slabs](/handbook/12-properties/surfaces-and-slabs/); [point and charged defects](/handbook/12-properties/point-and-charged-defects/); [formation energy and the convex hull](/handbook/12-properties/formation-energy-and-convex-hull/); [transition states and NEB](/handbook/12-properties/transition-states-and-neb/); [molecular dynamics and machine-learned force fields](/handbook/12-properties/molecular-dynamics-and-mlff/).
 
-For every calculation you plan to publish, verify your primary sources on <a href="/references/">References</a> and record every numerical parameter and convergence check in your supporting information <Cite id="S-019" />.
+For the copper oxide of module 10, the most direct continuations are point defects (the oxygen-deficient phases are common <Cite id="S-096" />), formation energy and the hull (is $\mathrm{LaCuO}_3$ stable against $\mathrm{La_2CuO_4}$, CuO and oxygen in your model?), and beyond DFT (what to do when $+U$ is not enough).
+
+**2. Take the worked example one step further.** Three natural next calculations:
+
+- **The next rare earth.** Repeat the chain for $\mathrm{NdCuO}_3$. The recommended PAW potential for Nd is `Nd_3`, which keeps the $4f$ electrons in the core <Cite id="S-019" />, so the $f$ shell needs no $U$ and no moment; say so in the methods.
+- **U from linear response.** Instead of scanning $U$, compute it with the linear-response method of Cococcioni and de Gironcoli, which VASP runs with `LDAUTYPE = 3` <Cite id="S-095" /> <Cite id="S-042" />.
+- **An oxygen vacancy.** Build the 80-site cell of the Material Builder page, remove one O, and compute a formation energy as in the formula below.
+
+**3. Automate.** When the number of runs grows past what you can check by hand, Python libraries take over the bookkeeping: pymatgen for structures, input sets and phase diagrams <Cite id="S-034" />, ASE for structures and calculators <Cite id="S-052" />, phonopy for phonons by finite displacements <Cite id="S-083" />, and the Materials Project API for reference data <Cite id="S-024" />. Scripts do not replace reading output: spot-check runs in Calculation Review and keep the same checks you used by hand.
 
 </Intuition>
 
 <TheMath>
 
-Reproducibility in computational materials science rests on three pillars: exact input provenance (`POSCAR`, `INCAR`, `KPOINTS`, `POTCAR` titles), explicit convergence criteria, and honest reporting of functional limitations <Cite id="S-042" />.
+Three formulas carry most of what comes next. Each is a difference of total energies, so each needs the same settings for every term.
+
+**Formation energy and the hull.** The formation energy per atom of a compound with $n_i$ atoms of element $i$ is
+
+$$\Delta H_f = \frac{E_\mathrm{compound} - \sum_i n_i\, \mu_i^0}{\sum_i n_i},$$
+
+with $\mu_i^0$ the energy per atom of the elemental reference. The convex hull of these values over composition decides stability, as on the Materials Screening page <Cite id="S-102" />.
+
+**Neutral point defects.** For a defect made by adding ($n_i > 0$) or removing ($n_i < 0$) atoms,
+
+$$E_f = E_\mathrm{defect} - E_\mathrm{bulk} - \sum_i n_i\, \mu_i,$$
+
+where both energies come from the same supercell and the chemical potentials $\mu_i$ are bounded by the stability of the host against competing phases <Cite id="S-067" />. For one oxygen vacancy $n_\mathrm{O} = -1$, so $E_f = E_\mathrm{defect} - E_\mathrm{bulk} + \mu_\mathrm{O}$. Charged defects add terms for the Fermi level and an electrostatic correction.
+
+**Surface energy.** For a symmetric, stoichiometric slab of $N$ bulk formula units with two equal surfaces of area $A$,
+
+$$\gamma = \frac{E_\mathrm{slab} - N\, E_\mathrm{bulk}}{2A},$$
+
+which the Research Planner evaluates as a calculator <Cite id="S-042" />.
+
+<Level min="intermediate">
+
+**Where the choices hide.** In $\Delta H_f$ the reference for oxygen is the hard part: the $\mathrm{O}_2$ molecule is poorly described by semilocal functionals, and mixing runs with and without $U$ needs a correction scheme, which is why databases apply fitted adjustments. In $E_f$ the chemical potential $\mu_\mathrm{O}$ is a choice between oxygen-rich and oxygen-poor limits, and the result should be reported for both. In $\gamma$, $E_\mathrm{bulk}$ must come from the same functional, cutoff and k-point spacing as the slab.
+
+</Level>
+
+<Level min="pro">
+
+A defect supercell converges with size because of the interaction between periodic images; for charged defects that interaction decays slowly and needs a correction rather than a larger cell alone <Cite id="S-067" />. A slab converges with both thickness and vacuum, and an asymmetric slab needs a dipole correction (`LDIPOL` and `IDIPOL`, VASP wiki pages by name) <Cite id="S-065" />.
+
+</Level>
 
 </TheMath>
 
 <InVasp>
 
-- Use <a href="/practice/">Practice</a> periodically so spaced repetition keeps key VASP rules and physics fresh.
-- Check <a href="/progress/">Progress</a> to see your mastery map across all modules.
-- Consult the official VASP wiki for newly released tags and version-specific defaults <Cite id="S-019" />.
+**A first run for the next rare earth.** The cubic $\mathrm{NdCuO}_3$ cell with the same settings as $\mathrm{LaCuO}_3$, so the two can be compared directly. Build the POTCAR as `Nd_3`, `Cu_pv`, `O`, and use the larger `ENMAX` of the three for `ENCUT`.
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM   = NdCuO3 cubic relax, FM start, Nd 4f in core
+PREC     = Accurate
+ENCUT    = 520
+EDIFF    = 1E-6
+ALGO     = Normal
+NELM     = 120
+ISMEAR   = 0
+SIGMA    = 0.05
+KSPACING = 0.2
+IBRION   = 2
+ISIF     = 3
+NSW      = 100
+EDIFFG   = -0.005
+ISPIN    = 2
+MAGMOM   = 0 3 3*0
+LORBIT   = 11
+LASPH    = .TRUE.
+LMAXMIX  = 4
+LREAL    = .FALSE.`}
+  annotations={{
+    3: 'keep the converged LaCuO3 value unless the new ENMAX is larger',
+    9: 'the converged spacing; remove KPOINTS from the folder',
+    15: 'Nd, Cu, three O: no moment on Nd, since its 4f shell is in the core',
+  }}
+/>
+
+Before you compare energies across the series, look at how the tolerance factor changes (it falls across the series, as module 10 showed, so the tilts are likely to grow), and relax the tilted cell, not only the cubic one.
+
+**Keep the record as you go.** One folder per run, the INCAR, KPOINTS, POSCAR and `TITEL` lines archived with each energy, and a short note of why each setting was chosen. The <a href="/tools/planner/">Research Planner</a> writes a plan file and a methods checklist; <a href="/tools/review/">Calculation Review</a> exports a report per run. Keep practising the rules on <a href="/practice/">Practice</a> and track them on <a href="/progress/">Progress</a>.
 
 </InVasp>
 
 <WhatChanges>
 
-| Next step                    | Best resource                                                                             | When to use                                 |
-| ---------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------- |
-| Start a new VASP calculation | <a href="/tools/planner/">Research Planner</a>                                            | Setting up a clean multi-step folder tree   |
-| Automate 50+ runs            | `pymatgen` / `ASE` / `atomate2`                                                           | High-throughput screening or phase diagrams |
-| Debug a failed job           | <a href="/errors/">Error Finder</a> &amp; <a href="/tools/review/">Calculation Review</a> | Diagnosing convergence or force errors      |
+| Direction              | First step                                | What it asks of your runs                                     |
+| ---------------------- | ----------------------------------------- | ------------------------------------------------------------- |
+| Defects                | Vacancy in the 80-site cell               | Same cell and settings for bulk and defect; a choice of $\mu$ |
+| Stability              | Formation energy against competing phases | Same functional and $U$ for every phase, a fair O reference   |
+| Surfaces               | Symmetric slab and the Planner calculator | Thickness and vacuum tests; bulk at the same settings         |
+| Next rare earth        | `Nd_3` POTCAR, same settings              | A stated treatment of the $4f$ shell                          |
+| U from linear response | `LDAUTYPE = 3` runs                       | A supercell large enough for the response                     |
+| Automation             | pymatgen or ASE scripts                   | The same checks, now applied to every run                     |
 
-Why combine interactive tools with scripting: visual inspection catches subtle geometric and physical mistakes that batch scripts silently overlook.
+Why choose one direction: each adds its own convergence tests, and doing them one at a time keeps errors traceable. What happens if you jump ahead: a formation energy or surface energy computed with settings that differ between its terms is meaningless, however carefully each run was done.
 
 </WhatChanges>
 
 <Mistakes>
 
-<Callout variant="mistake" title="Running high-throughput scripts without spot-checking individual OUTCARs">
+<Callout variant="mistake" title="Comparing energies computed with different POTCARs or U">
 
-Automated pipelines can silently accept unconverged electronic steps or collapsed magnetic moments if exit codes are the only check. Always audit representative runs manually.
+A formation or defect energy subtracts total energies, so any difference in POTCARs, `ENCUT` or $U$ between the terms enters the result. Fix: run every term with one set of settings and record it.
+
+</Callout>
+
+<Callout variant="mistake" title="Using a 4f-in-core potential and then setting a moment on the rare earth">
+
+With `Nd_3` the $4f$ electrons are not in the valence, so a moment on Nd has nothing to act on. Fix: put zero for Nd in `MAGMOM`, or use a potential with $f$ in the valence and treat the $f$ shell explicitly.
+
+</Callout>
+
+<Callout variant="mistake" title="Quoting one oxygen chemical potential">
+
+A defect formation energy depends on $\mu_\mathrm{O}$, which depends on the conditions. Fix: report the oxygen-rich and oxygen-poor limits <Cite id="S-067" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Automating before the manual run works">
+
+A script repeats a mistake a hundred times. Fix: get one run right by hand, check it in Calculation Review, then automate.
+
+</Callout>
+
+<Callout variant="mistake" title="Trusting exit codes in a pipeline">
+
+A run can finish normally after hitting `NELM` or losing its moments. Fix: parse `OSZICAR` and `OUTCAR` for the same checks you made by hand.
 
 </Callout>
 
 </Mistakes>
 
-<Check ids={['q-m11-2', 'q-m11-4', 'q-m11-6', 'q-m11-8']} />
+<Check ids={['q-m11-14', 'q-m11-15', 'q-m11-16', 'q-m11-17']} />
 
 <GoDeeper>
 
-- Official VASP Wiki <Cite id="S-019" /> and Materials Project documentation <Cite id="S-024" />.
-- Check all cited works on <a href="/references/">References</a>.
+- Freysoldt et al. on point defects <Cite id="S-067" />; Ong et al. on phase diagrams from first principles <Cite id="S-102" />.
+- Cococcioni and de Gironcoli on linear-response $U$ <Cite id="S-095" />.
+- pymatgen <Cite id="S-034" />, ASE <Cite id="S-052" />, phonopy (Togo and Tanaka) <Cite id="S-083" /> and the Materials Project <Cite id="S-024" />.
+- The VASP wiki for every new tag (by page name) <Cite id="S-019" />, and the full list of works on <a href="/references/">References</a>.
 
 </GoDeeper>

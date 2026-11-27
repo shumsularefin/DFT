@@ -1,77 +1,195 @@
 ---
 id: screening-studio
+stage:
+  scene: m11-studio-space
+  states:
+    - id: table
+      section: why
+      params: {}
+      camera: iso
+      caption: 'All 30 entries of the synthetic demo table as points: energy above hull across, band gap back, cell size up. Orange spheres are flagged metals and arrows mark magnetic flags. None of these numbers is a property of a real material.'
+    - id: copper-oxides
+      section: intuition
+      params: { elements: 'Cu, O', pick: sample-0009 }
+      caption: 'Must contain elements set to Cu, O: only NdCuO3, a 20-site cell, stays bright, and every other point fades and shrinks. Rotate to read its height on the sites axis.'
+    - id: hull
+      section: math
+      params: { maxEhull: 0, onlyStable: true }
+      caption: 'Max E_hull at 0: only the entries on the hull, on the shaded wall at E_hull = 0, stay bright, and the dashed filter box shrinks onto that wall. Raise the slider to let entries just above the hull back in.'
+    - id: cost
+      section: in-vasp
+      params: { pick: sample-0009, maxSites: 20 }
+      caption: 'The inspected NdCuO3 row: 20 sites and a magnetic flag give a relative cost of (20 / 4)^3 x 2 = 250 against a 4-atom cell. The box top is the Max sites limit; pick another entry to compare.'
+    - id: preset
+      section: what-changes
+      params: { elements: 'Cu, O', preset: beginner }
+      caption: 'The Beginner-friendly preset sets at most 10 sites and on the hull, and clears the Cu, O field, so 8 entries come back. Set your filters after a preset, not before.'
 title: Tour of Materials Screening
 module: 11
 order: 1
-summary: How to filter candidate materials, inspect feasibility and starter INCARs, and understand the synthetic demo banner vs real Materials Project snapshots.
+summary: A step-by-step pass through Materials Screening and its Project Card with a copper oxide as the example, what energy above the hull and the cost estimate mean, and why the current table is synthetic demo data.
 concepts: [screening]
 requires: [worked-example-workflow]
-vaspTags: []
-sources: [S-024, S-042]
+vaspTags: [ISPIN, ISMEAR, KSPACING]
+sources: [S-010, S-019, S-024, S-042, S-044, S-102]
 noLab: true
 status: draft
-updated: 2026-11-24
+updated: 2026-11-27
 ---
 
 <Why>
 
-When exploring a chemical family, filtering a structured catalog by stability, band gap, element constraints, and cell size lets you focus VASP compute on the most promising candidates <Cite id="S-024" />.
+Before a project like the $\mathrm{RCuO}_3$ example of module 10 there is a quieter step: deciding which compound is worth the compute at all. Materials databases hold hundreds of thousands of computed entries, and a few filters (elements, stability, cell size) can reduce a family to a shortlist in minutes <Cite id="S-024" />. Materials Screening does that filtering in the browser and turns one candidate into a first-project plan: what makes it hard, roughly what it costs, and three starter INCARs. This page walks through it once with a real question and explains the two numbers it relies on, the energy above the hull and the relative cost.
 
 </Why>
 
 <Intuition>
 
-<a href="/studio/">Materials Screening</a> runs entirely in your browser: it loads a compact columnar dataset,
-filters tens of thousands of entries in milliseconds, and exports shortlists to CSV. Clicking any candidate
-opens its <a href="/studio/project/">Project Card</a> with a transparent Green/Yellow/Red feasibility rubric,
-runtime bucket, and a three-step starter `INCAR` sequence <Cite id="S-042" />.
+**Read the banner first.** Until the site's author runs a real data pull from the Materials Project, the <a href="/studio/">Materials Screening</a> loads a small synthetic table: 30 entries whose formulas, volumes, densities and space groups come from the site's test structures, while every energy, band gap and magnetic value is made up. The banner at the top says so, and so does this page. Everything below describes how the tool works; none of the numbers it shows today is a property of a real material.
 
-<Scene id="perovskite-octahedra" />
+**A walkthrough: copper oxides for a first project.**
 
-Check the banner at the top of Materials Screening: until the author runs a real Materials Project data pull, the page clearly labels its table as synthetic demo data so demonstration numbers are never confused with real materials entries <Cite id="S-024" />.
+1. Open Materials Screening and read the banner and the line under the filters ("Showing ... of ... matching material(s)").
+2. In **Must contain elements** type `Cu, O`. Only entries that contain both elements remain. In the demo table that leaves one row, `NdCuO3`, a 20-site orthorhombic cell.
+3. Try the presets to see what they set: **Beginner-friendly** (at most 10 sites and on the hull), **Stable oxides** (contains O and on the hull) and **Magnetic candidates** (magnetic only). With `Cu, O` typed, the Beginner-friendly preset clears the element field, so set filters after a preset, not before.
+4. Narrow further with **Max E_hull (eV/atom)**, **Max sites**, **Crystal system**, the **On hull (stable)** and **Magnetic only** boxes, and sort by energy above hull, band gap, sites, density or formula.
+5. Press **Export selection CSV** to keep the shortlist, then **Inspect** on a row. The details panel offers the **Feasibility & First-Project Card**, a link to the tolerance-factor tool for perovskite-like formulas, and the Input Builder.
+
+**The Project Card.** For the `NdCuO3` row the card lists six rules, each with a verdict and a reason <Cite id="S-042" />:
+
+| Rule       | What it looks at                         | For this row                       |
+| ---------- | ---------------------------------------- | ---------------------------------- |
+| `F-SIZE`   | Atoms in the cell: 10 or fewer is green  | Yellow: 20 atoms, 11 to 30         |
+| `F-FBLOCK` | Lanthanide or actinide f elements        | Yellow: contains Nd                |
+| `F-MAG`    | Magnetic flag or ordering in the dataset | Yellow: spin-polarized             |
+| `F-METAL`  | Metallic flag in the dataset             | Yellow: denser k-mesh needed       |
+| `F-HEAVY`  | Elements with atomic number above 54     | Yellow: Nd, spin-orbit may matter  |
+| `F-PAW`    | A recommended PAW potential per element  | Green when every element is listed |
+
+The overall verdict is the worst single verdict. The magnetic and metallic flags here are synthetic, so on this row the card shows how the rules work, not what $\mathrm{NdCuO}_3$ is like. On a real snapshot the same row would tell you what module 10 found the hard way: an f element, a $d$ shell that needs care, and a cell four times larger than the cubic one.
 
 </Intuition>
 
 <TheMath>
 
-Thermodynamic stability against competing phases is tracked by the energy above the convex hull $E_{\mathrm{hull}}$ (in eV/atom). Compounds with $E_{\mathrm{hull}} = 0$ lie on the zero-temperature hull; small positive values may still be synthetically accessible depending on kinetics and temperature <Cite id="S-024" />.
+**Energy above the hull.** Take all computed phases in a chemical system and plot their formation energy per atom against composition. The lower convex envelope of those points is the hull. A compound with energy per atom $E(c)$ at composition $c$ sits a distance
+
+$$E_\mathrm{above\ hull}(c) = E(c) - E_\mathrm{hull}(c) \ge 0$$
+
+above it, where $E_\mathrm{hull}(c)$ is the hull energy at that composition <Cite id="S-102" />. In a binary system, between two hull phases $\alpha$ and $\beta$ at compositions $x_\alpha < x < x_\beta$, the hull is the straight line
+
+$$E_\mathrm{hull}(x) = E_\alpha + \frac{x - x_\alpha}{x_\beta - x_\alpha}\,(E_\beta - E_\alpha).$$
+
+A compound on the hull has $E_\mathrm{above\ hull} = 0$: no mixture of other phases in the database is lower in energy. A compound above it would, at zero temperature and in that database, lower its energy by decomposing into the hull phases at its composition. Materials Screening does not build the hull itself; it shows the `energy_above_hull` field of the dataset <Cite id="S-044" />.
+
+**Relative cost.** The Project Card gives no hours. It gives a relative cost against a four-atom non-magnetic cell at the same settings:
+
+$$\text{relative cost} \approx \left(\frac{N_\mathrm{sites}}{4}\right)^3 \times \begin{cases} 2 & \text{spin-polarized} \\ 1 & \text{otherwise} \end{cases}$$
+
+The cube is the large-cell scaling of the orthogonalization steps of plane-wave codes <Cite id="S-010" />, and spin polarization solves two spin channels <Cite id="S-019" />. For the 20-site magnetic row: $(20/4)^3 \times 2 = 250$. The card says the same, with the warning that small cells cost relatively more than this formula suggests.
+
+<Level min="intermediate">
+
+**What the hull does not say.** The hull depends on which phases the database contains and on the functional; a phase missing from the database cannot appear on the hull. Small positive values are often still synthesizable, because entropy, kinetics or pressure can stabilize them, and $\mathrm{LaCuO}_3$ itself needs high oxygen pressure to form. Treat a maximum `E_hull` as a soft filter and look at the entries just above your threshold.
+
+</Level>
+
+<Level min="pro">
+
+The `ml_e_above_hull` column of the data schema is reserved and empty, and Materials Screening explains under "Why there is no ML column yet" that no machine-learned estimate is shown. When a real snapshot is loaded, its manifest records the database version and query, which belong in your methods section next to the date of the pull <Cite id="S-044" />.
+
+</Level>
 
 </TheMath>
 
 <InVasp>
 
-- Filter by elements, band-gap window, $E_{\mathrm{hull}}$, and atom count in <a href="/studio/">Materials Screening</a>.
-- Open a candidate's <a href="/studio/project/">Project Card</a> to inspect its feasibility flags and download starter `INCAR` files.
-- Always confirm magnetic ground states and PAW choices in VASP rather than relying solely on database metadata <Cite id="S-042" />.
+**From the card to VASP.** The card writes three starter steps (relaxation, static SCF with DOS, band structure on a path) from the author's protocol <Cite id="S-042" />, using the `ENCUT` you enter (set it to at least 1.3 times the largest `ENMAX` of your POTCARs). For a magnetic metal such as the demo `NdCuO3` row, step 1 reads:
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM = NdCuO3 relax
+ENCUT = 520
+PREC = Accurate
+EDIFF = 1E-6
+EDIFFG = -0.02
+IBRION = 2
+ISIF = 3
+NSW = 60
+ISMEAR = 1
+SIGMA = 0.2
+KSPACING = 0.25
+ISPIN = 2
+LORBIT = 11`}
+  annotations={{
+    2: 'the value you type on the card',
+    9: 'Methfessel-Paxton, because the row is flagged metallic',
+    12: 'because the row is flagged magnetic',
+  }}
+/>
+
+This is a skeleton, not a finished input. For a compound like this you still add what module 10 needed: a `MAGMOM` line with one entry per atom, `LMAXMIX = 4` and `LASPH` for the $d$ and $f$ shells, a decision about $U$ and about the Nd $4f$ electrons, the spin starts, and your own convergence tests. The **Customize in Input Builder** button and the k-path link on the card take you to the tools that do that. With `ISMEAR = 1`, check that the smearing entropy per atom stays small, and use `ISMEAR = 0` for the final DOS <Cite id="S-042" />.
+
+**Before you trust a row.** Open the entry on the Materials Project itself (from a real snapshot), check its calculation type and magnetic ordering, and remember that its band gap comes from a semilocal functional <Cite id="S-024" />.
 
 </InVasp>
 
 <WhatChanges>
 
-| Screening filter     | What it narrows         | Practical effect                                 |
-| -------------------- | ----------------------- | ------------------------------------------------ |
-| `E_hull` max         | Thermodynamic stability | Drops highly unstable polymorphs early           |
-| Max sites (`nsites`) | Supercell cost          | Keeps starter runs within modest HPC wall-time   |
-| Band gap range       | Electronic class        | Separates metals, semiconductors, and insulators |
+| Filter or control      | What it narrows                     | What to keep in mind                             |
+| ---------------------- | ----------------------------------- | ------------------------------------------------ |
+| Must contain elements  | Chemistry                           | Every listed element must be present             |
+| Max E_hull             | Thermodynamic stability             | Soft filter; metastable phases can still be made |
+| Max sites              | Cost                                | Cost grows roughly as the cube of the atom count |
+| Crystal system         | Symmetry                            | A tilted perovskite is not cubic                 |
+| On hull, Magnetic only | Stable entries, spin-polarized ones | Flags come from the dataset, not from the tool   |
+| Project Card `ENCUT`   | The starter INCARs                  | Set from your POTCAR `ENMAX`, then converge      |
 
-Why screen before simulating: a two-minute filter prevents spending weeks relaxing unstable or prohibitively large cells.
+Why screen: a few filters prevent weeks spent on an unstable or very large cell. Why look at the card: it names the hard parts before you meet them in `OUTCAR`. What happens if you skip both: the first sign of trouble is a failed or unaffordable run.
 
 </WhatChanges>
 
 <Mistakes>
 
-<Callout variant="mistake" title="Treating database band gaps as experimental values">
+<Callout variant="mistake" title="Quoting numbers from the demo table">
 
-High-throughput catalogs such as the Materials Project primarily use semi-local GGA/GGA+U functionals, which systematically underestimate band gaps relative to experiment.
+The current table is synthetic: its energies, gaps and moments are made up. Fix: read the banner, and quote database values only from a real snapshot, with its version.
+
+</Callout>
+
+<Callout variant="mistake" title="Treating a database band gap as a measured gap">
+
+Database gaps come from semilocal (or $+U$) functionals, which usually underestimate gaps <Cite id="S-024" />. Fix: use them to sort candidates, not as predictions.
+
+</Callout>
+
+<Callout variant="mistake" title="Reading E_hull = 0 as 'can be made'">
+
+On the hull means lowest in that database at zero temperature; it says nothing about kinetics or synthesis conditions <Cite id="S-102" />. Fix: check the literature, and look at entries just above the hull too.
+
+</Callout>
+
+<Callout variant="mistake" title="Running the starter INCAR as it is">
+
+The starter steps have no `MAGMOM`, no `LMAXMIX` and no $U$. Fix: use them as a skeleton and complete them in the Input Builder, as in module 10.
+
+</Callout>
+
+<Callout variant="mistake" title="Taking the relative cost as wall time">
+
+The estimate is a ratio to a small cell at the same settings, not hours. Fix: time one short run of your own and scale from that.
 
 </Callout>
 
 </Mistakes>
 
-<Check ids={['q-m11-1', 'q-m11-2', 'q-m11-3', 'q-m11-4']} />
+<Check ids={['q-m11-1', 'q-m11-2', 'q-m11-3', 'q-m11-4', 'q-m11-18']} />
 
 <GoDeeper>
 
-- Open <a href="/studio/">Materials Screening</a> and inspect the attribution and data-licence notes on <a href="/about/">About</a> <Cite id="S-024" />.
+- Jain et al. on the Materials Project <Cite id="S-024" /> and the Materials Project documentation on its fields <Cite id="S-044" />.
+- Ong et al. on building a phase diagram and convex hull from first-principles energies <Cite id="S-102" />.
+- Kresse and Furthmuller on the cost of plane-wave iterations <Cite id="S-010" />.
+- The site's <a href="/about/">About</a> page for data licences and attribution.
 
 </GoDeeper>

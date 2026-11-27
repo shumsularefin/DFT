@@ -1,78 +1,209 @@
 ---
 id: material-builder
+stage:
+  scene: m11-builder-tour
+  states:
+    - id: template
+      section: why
+      params: { step: 0, scale: 1 }
+      camera: iso
+      caption: 'Step 1, the template Cubic perovskite (SrTiO3): five sites in a 3.905 Å cube with the TiO6 octahedron. Turn the cell over to find the Ti at the centre of its six oxygens.'
+    - id: substitute
+      section: intuition
+      params: { step: 1, scale: 1 }
+      caption: 'Step 2, Sub La on the Sr row and Sub Cu on the Ti row: the outlined atoms changed species. The readout lists the validity messages B005, B006, B008 and B011, none of them an error.'
+    - id: supercell
+      section: math
+      params: { step: 2, scale: 1, compare: true }
+      caption: 'Step 3, Defect supercell: M = [[4, 0, 0], [2, 2, 0], [2, 0, 2]] holds 16 copies, 80 atoms, with a shortest vector of 11.05 Å. The red dashed cube is the 3x3x3 cell of 135 atoms. Rotate to see how slanted the chosen cell is.'
+    - id: vacancy
+      section: in-vasp
+      params: { step: 3, scale: 1 }
+      caption: 'Step 4, Vacancy on one O row: the cell becomes La16Cu16O47 with 79 atoms, so a ferromagnetic MAGMOM reads 16*0 16*3 47*0. Find the faint outlined sphere where the oxygen was.'
+    - id: overlap
+      section: what-changes
+      params: { step: 4, scale: 0.72, shells: true }
+      caption: 'The overlap test: solid spheres of 0.5 r and faint shells of 0.75 r. At scale 0.72 the shells of neighbouring La touch, the dashed B002 warnings. Drag the scale below 0.5 for solid B001 errors, or back to 1 where nothing is flagged.'
 title: Tour of the Material Builder
 module: 11
 order: 2
-summary: Building and editing crystals, supercells, slabs, defects, and molecules in the browser with live validity checks and POSCAR/CIF export.
-concepts: [material-builder]
+summary: A step-by-step pass through the Material Builder with LaCuO3, building the cubic cell from a template, reading its validity checks, making a defect supercell with an oxygen vacancy, and what the supercell and slab formulas behind such cells are.
+concepts: [material-builder, supercells]
 requires: [poscar-file, perovskite-structure]
-vaspTags: [ISIF]
-sources: [S-021, S-041]
+vaspTags: [ISIF, MAGMOM]
+sources: [S-002, S-021, S-022, S-041, S-052, S-063, S-064, S-096]
 noLab: true
 status: draft
-updated: 2026-11-24
+updated: 2026-11-27
 ---
 
 <Why>
 
-Bad starting geometries such as overlapping atoms, polar uncompensated slabs, or tiny vacuum boxes are one of the fastest ways to waste VASP jobs <Cite id="S-041" />.
+Most VASP problems that look mysterious start in the `POSCAR`: two atoms on top of each other, a cell vector typed wrong, a species line in a different order from the `POTCAR`. The <a href="/builder/">Material Builder</a> lets you make and edit a structure in the browser and checks it while you work, so these mistakes show up before a job is queued. This page builds the cubic $\mathrm{LaCuO}_3$ cell of module 10 with it, makes the supercell an oxygen-vacancy calculation needs, and explains the arithmetic behind supercells and slabs so you can check what any tool gives you.
 
 </Why>
 
 <Intuition>
 
-The <a href="/builder/">Material Builder</a> combines two browser-only workspaces: **Crystal mode** for periodic solids (templates, supercells, Miller-index slabs, vacancies, substitutions, and strain) and **Molecule mode** for 2D sketching, 3D valence clean-up, and molecule-in-a-box `POSCAR` export.
+**What the Builder is.** In crystal mode it shows the cell in 3D, a table of sites with fractional coordinates, a toolbar (template, undo and redo, wrap, merge duplicates, gentle relax, a fixed 2×2×2 supercell, a defect supercell, import of a POSCAR or CIF) and a validity panel with the checks B001 to B012. It exports POSCAR or CIF and hands the structure to the Input Builder, the k-path tool or the magnetic-orderings tool. A molecule mode draws molecules on a 2D canvas, makes a rough 3D geometry ("Clean up in 3D", marked heuristic) and puts the molecule in a vacuum box.
 
-<Scene id="fcc" />
+**Walkthrough: cubic LaCuO3.**
 
-In Crystal mode, a live chemistry-and-geometry validity panel runs rules `B001` through `B012` on every edit, flagging overlapping atoms, unrelaxed cell collapses, or thin vacuum before you export `POSCAR` or `CIF` <Cite id="S-021" />. Every edit supports undo/redo and one-click hand-off straight into the Input Builder, k-path tool, or Magnetic Configuration tool.
+1. Choose the template **Cubic perovskite (SrTiO3)**. You get five sites: Sr at the corner, Ti at the centre, three O on the face centres, in a cubic cell of 3.905 Å.
+2. Click **Element** and pick La from the periodic table, then press **Sub La** on the Sr row. Pick Cu and press **Sub Cu** on the Ti row.
+3. Read the validity panel. For this cell it shows four messages: B005 (charge neutral only with a rare oxidation state, since neutrality needs $\mathrm{Cu}^{3+}$), B006 (the cation is small for its coordination, Pauling's first rule), B008 (the perovskite check with $t$ and $\mu$: $t$ near 1, $\mu$ below the usual limit, as on the first page of module 10) and B011 (symmetry not analysed, an info line) <Cite id="S-002" /> <Cite id="S-022" />. None is an error, so export is allowed; the warnings are the same concerns module 10 worked through.
+4. The Builder has no field for the lattice parameter. To use the cell of the structure page, import its POSCAR with **Import POSCAR/CIF**, or export this one and edit the scale line.
+5. Press **Export POSCAR**, or **Magnetic orderings** to send the cell to the tool that writes the G-type cell and `MAGMOM`.
+
+**Walkthrough: an oxygen vacancy.** Fully oxidized $\mathrm{LaCuO}_3$ is hard to make and oxygen-deficient phases are common <Cite id="S-096" />, so a vacancy calculation is a natural next step. Press **Defect supercell (>= 10 A)**: the Builder searches supercells up to 64 copies for the one with the fewest atoms whose shortest lattice vector is at least 10 Å. For the template cell it picks 16 copies, 80 atoms, with a shortest vector of about 11 Å, rather than the 3×3×3 cell with 135 atoms. Then press **Vacancy** on one O row: the cell becomes $\mathrm{La_{16}Cu_{16}O_{47}}$. The 10 Å is a convention, not a converged value, so test the property you want against a larger cell.
 
 </Intuition>
 
 <TheMath>
 
-Overlap checks compare every pair distance $d_{ij}$ (under periodic minimum-image convention) against the sum of Cordero single-bond covalent radii <Cite id="S-021" />:
+**Supercells.** Write the lattice vectors as the rows of a matrix $L$. A supercell is $L' = M L$ with an integer matrix $M$; it holds $\det M$ copies of the original cell, so $N' = \det M \cdot N$ atoms. The Builder's 2×2×2 button uses $M = 2I$, $\det M = 8$, 40 atoms for the perovskite. The defect supercell above is
 
-$$d_{ij} < f_{\mathrm{min}}\,(r_{\mathrm{cov}, i} + r_{\mathrm{cov}, j})$$
+$$M = \begin{pmatrix} 4 & 0 & 0 \\ 2 & 2 & 0 \\ 2 & 0 & 2 \end{pmatrix}, \qquad \det M = 16,$$
 
-Flagging severe overlaps before exporting prevents immediate VASP `ZHEGV` or ionic-step blow-ups.
+whose vectors $4\mathbf a_1$, $2\mathbf a_1 + 2\mathbf a_2$ and $2\mathbf a_1 + 2\mathbf a_3$ are all at least $2\sqrt 2\, a$ long. The search runs over matrices in Hermite normal form (lower triangular, with each off-diagonal entry smaller than the diagonal one in its column), which list every distinct supercell of a given size exactly once.
+
+**Validity: the overlap test.** For every pair of atoms $i, j$, including periodic images, the Builder compares the shortest distance $d_{ij}$ with the sum of covalent radii $r_i + r_j$ from Cordero et al. <Cite id="S-021" /> (as transcribed in ASE <Cite id="S-052" />):
+
+$$d_{ij} < 0.5\,(r_i + r_j) \Rightarrow \text{B001 error (overlap)}, \qquad d_{ij} < 0.75\,(r_i + r_j) \Rightarrow \text{B002 warning}.$$
+
+An error blocks export unless you type a reason, which is then written into the file's comment line.
+
+<Level min="intermediate">
+
+**Slabs.** The site has slab-building code that follows Sun and Ceder <Cite id="S-064" />, but the Builder has no slab button yet, so here is what such a tool does. For planes $(hkl)$ the spacing is $d_{hkl} = 1/\lvert\mathbf G_{hkl}\rvert$ with $\mathbf G_{hkl} = h\mathbf b_1 + k\mathbf b_2 + l\mathbf b_3$ (reciprocal vectors without the $2\pi$); for a cubic cell $d_{hkl} = a/\sqrt{h^2+k^2+l^2}$. A minimum thickness $t_\mathrm{min}$ is rounded up to whole repeats,
+
+$$n = \left\lceil \frac{t_\mathrm{min}}{d_{hkl}} \right\rceil, \qquad c_\mathrm{slab} = n\, d_{hkl} + t_\mathrm{vac},$$
+
+with defaults of 10 Å for $t_\mathrm{min}$ and 15 Å of vacuum in the site's code. For the perovskite (001) planes, $d_{001} = a$, so about three cells give 10 Å.
+
+</Level>
+
+<Level min="pro">
+
+**Polarity.** In the ionic picture a (001) slab of $\mathrm{LaCuO}_3$ alternates $\mathrm{LaO}^+$ and $\mathrm{CuO_2}^-$ layers. Stacked charged layers make a dipole that grows with thickness, Tasker's type 3 surface <Cite id="S-063" />, and the energy then converges badly. A symmetric slab with the same termination on both sides, or a dipole correction, is needed. Relax any slab or molecule in vacuum with `ISIF = 2`, so that the vacuum is not squeezed out <Cite id="S-041" />.
+
+</Level>
 
 </TheMath>
 
 <InVasp>
 
-- Build or drop a `POSCAR`/`CIF` in <a href="/builder/">Material Builder</a> and resolve all error-level validity warnings before exporting.
-- For slabs and molecules in a box, keep vacuum padding $\ge 10$ to $15\text{ \AA}$ and use `ISIF = 2` (fixed cell) in VASP <Cite id="S-041" />.
-- Click **Send to Input Builder** or **Send to k-path** to keep the exact structure across tools without re-uploading.
+**The exported POSCAR.** For the cubic cell after the two substitutions the Builder writes (its comment line may differ):
+
+<VaspFile
+  name="POSCAR"
+  code={`LaCuO3
+1.0
+  3.905  0.000  0.000
+  0.000  3.905  0.000
+  0.000  0.000  3.905
+La Cu O
+1 1 3
+Direct
+  0.0  0.0  0.0
+  0.5  0.5  0.5
+  0.5  0.5  0.0
+  0.5  0.0  0.5
+  0.0  0.5  0.5`}
+  annotations={{
+    2: 'scale factor: edit this to set another lattice parameter',
+    6: 'the POTCAR must follow this order: La, Cu_pv, O',
+  }}
+/>
+
+**A first INCAR for the vacancy cell.** The supercell has 79 atoms after the vacancy. A ferromagnetic start needs one `MAGMOM` entry per atom in POSCAR order:
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM   = LaCuO3 80-site cell, one O vacancy, FM start
+PREC     = Accurate
+ENCUT    = 520
+EDIFF    = 1E-5
+ALGO     = Normal
+ISMEAR   = 0
+SIGMA    = 0.05
+KSPACING = 0.2
+IBRION   = 2
+ISIF     = 2
+NSW      = 100
+EDIFFG   = -0.02
+ISPIN    = 2
+MAGMOM   = 16*0 16*3 47*0
+LASPH    = .TRUE.
+LMAXMIX  = 4
+LREAL    = Auto`}
+  annotations={{
+    10: 'positions only: the cell stays at the bulk lattice parameter',
+    14: '16 La, 16 Cu, 47 O: 79 entries',
+    17: 'real-space projection is usual for cells this large',
+  }}
+/>
+
+`ISIF = 2` keeps the bulk lattice, which is the usual choice for a dilute defect. Check the species counts in the exported POSCAR before you write `MAGMOM`; a removed atom changes the count of its species only.
 
 </InVasp>
 
 <WhatChanges>
 
-| Builder mode  | Core operations                                           | Export formats                |
-| ------------- | --------------------------------------------------------- | ----------------------------- |
-| Crystal mode  | Supercell, slab, vacancy, substitute, strain, standardize | `POSCAR`, `CIF`, hand-off     |
-| Molecule mode | 2D sketch, bond order, formal charge, 3D valence clean-up | `XYZ`, `MOL`, `POSCAR` in box |
+| Builder action             | What it does to the structure                                     | What to check                                      |
+| -------------------------- | ----------------------------------------------------------------- | -------------------------------------------------- |
+| Template, then Sub         | Changes the species on a site                                     | Species line order and the POTCAR order            |
+| Gentle relax               | Pushes apart atoms closer than 0.75 of the radius sum, cell fixed | Not a physical relaxation; VASP still relaxes      |
+| 2x2x2 supercell            | $\det M = 8$ copies                                               | Atom count and k-mesh for the larger cell          |
+| Defect supercell (>= 10 A) | Fewest atoms with images at least 10 Å apart                      | Convergence of the defect property with size       |
+| Vacancy                    | Removes one site                                                  | The `MAGMOM` count and the charge state you intend |
+| Export with an error       | Needs a written reason                                            | The reason in the comment line                     |
 
-Why validate in the browser: geometric bugs are caught in milliseconds before touching an HPC queue.
+Why build here: the checks catch overlaps and impossible cells before VASP does. Why know the formulas: any supercell or slab tool can be checked by hand with $\det M$ and $d_{hkl}$. What happens if you skip the checks: VASP may run with overlapping atoms and fail, or worse, converge to nonsense.
 
 </WhatChanges>
 
 <Mistakes>
 
-<Callout variant="mistake" title="Treating the 3D molecule clean-up as a DFT-optimized geometry">
+<Callout variant="mistake" title="Using the 2x2x2 cell for a defect without checking the image distance">
 
-Molecule mode's 3D clean-up uses a fast valence-geometry heuristic to produce a clean starting geometry; always relax the molecule in VASP (or a quantum-chemistry code) before computing properties.
+For a 3.9 Å perovskite the 2×2×2 cell puts a defect only about 7.8 Å from its image. Fix: use the defect supercell, read its shortest vector, and test a larger cell for the property you need.
+
+</Callout>
+
+<Callout variant="mistake" title="Taking Gentle relax for a relaxation">
+
+Gentle relax only pushes atoms apart by a geometric rule, at most 0.05 Å per step, with the cell fixed. Fix: use it to clear overlaps, then relax in VASP.
+
+</Callout>
+
+<Callout variant="mistake" title="Ignoring the warnings because export is allowed">
+
+For $\mathrm{LaCuO}_3$ the B005, B006 and B008 warnings are real chemistry: a rare oxidation state and a small B cation. Fix: read each warning and decide whether it matters, as module 10 did.
+
+</Callout>
+
+<Callout variant="mistake" title="Relaxing a slab or molecule with ISIF = 3">
+
+The stress of the empty vacuum pushes the cell to shrink. Fix: use `ISIF = 2` for anything with vacuum <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Forgetting MAGMOM after removing an atom">
+
+The atom count drops by one, and a `MAGMOM` with the old count no longer matches. Fix: recount from the species line of the exported POSCAR.
 
 </Callout>
 
 </Mistakes>
 
-<Check ids={['q-m11-5', 'q-m11-6', 'q-m11-7', 'q-m11-8']} />
+<Check ids={['q-m11-5', 'q-m11-6', 'q-m11-7', 'q-m11-8', 'q-m11-9']} />
 
 <GoDeeper>
 
-- Open the <a href="/builder/">Material Builder</a> to try both Crystal and Molecule modes.
-- Cordero et al. (2008) covalent radii used in the overlap checks <Cite id="S-021" />.
+- Cordero et al. on covalent radii <Cite id="S-021" />, transcribed in ASE <Cite id="S-052" />.
+- Sun and Ceder on building slabs <Cite id="S-064" />; Tasker on polar surfaces <Cite id="S-063" />.
+- The VASP wiki pages POSCAR and ISIF (by page name) <Cite id="S-041" />.
+- Module 6 on the POSCAR file, and the Builder itself at <a href="/builder/">/builder/</a>.
 
 </GoDeeper>

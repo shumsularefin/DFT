@@ -4,6 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { parse as parseYaml } from 'yaml';
 import { glossarySchema, handbookSchema, SECTIONS, SOURCE_ID } from '../src/lib/content-schema.mjs';
 import { parseSources } from './build/sources-to-json.mjs';
 
@@ -21,6 +22,14 @@ export function parseFrontMatter(text) {
     const kv = /^([A-Za-z][\w-]*):\s*(.*)$/.exec(line);
     if (!kv) continue;
     data[kv[1]] = scalar(kv[2].trim());
+  }
+  // The one nested block (the M16 3D stage) is read with a real YAML parser; everything else stays flat.
+  if ('stage' in data) {
+    try {
+      data.stage = parseYaml(m[1])?.stage;
+    } catch (e) {
+      data.stage = `unreadable YAML: ${e.message}`;
+    }
   }
   return { data, body: text.slice(m[0].length), bodyStart: m[0].length };
 }

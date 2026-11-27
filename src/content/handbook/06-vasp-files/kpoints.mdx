@@ -1,5 +1,29 @@
 ---
 id: kpoints
+stage:
+  scene: m06-kpoints
+  states:
+    - id: coarse
+      section: why
+      params: { lattice: si, n: 2, centering: gamma }
+      caption: 'A 2 x 2 x 2 mesh in the Brillouin zone of Si: eight points, of which only three differ by symmetry (orange). Raise the subdivisions and watch the count grow as the cube.'
+    - id: mesh
+      section: intuition
+      params: { lattice: si, n: 8, centering: gamma }
+      caption: 'The explorer file, Gamma 8 8 8: 512 points fill the zone, and symmetry leaves 29 irreducible points (orange) for VASP to compute.'
+    - id: shifted
+      section: math
+      params: { lattice: si, n: 4, centering: monkhorst-pack, fold: false }
+      caption: 'An even Monkhorst-Pack mesh is shifted by half a step, so Gamma is not a mesh point. With folding off the points sit in the reciprocal cell spanned by b1, b2 and b3.'
+    - id: hex-gamma
+      section: in-vasp
+      params: { lattice: hcp, n: 8, centering: gamma }
+      camera: 'c*'
+      caption: 'A Gamma-centred mesh on hexagonal Mg: 8 x 8 x 5, fewer points along c because the cell is longer that way. Seen down c, the mesh keeps the sixfold symmetry.'
+    - id: hex-mp
+      section: mistakes
+      params: { lattice: hcp, n: 4, centering: monkhorst-pack }
+      caption: 'Hexagonal Mg with an even Monkhorst-Pack mesh: the readout reports symmetry operations that send points off the mesh. Switch line 3 to Gamma and the problem goes away.'
 title: KPOINTS, the sampling file
 module: 6
 order: 2

@@ -9,6 +9,7 @@ import { parseStages } from './check-stages.mjs';
 import runAll from './check-doc-links.mjs';
 import { definedQ, definedD } from './check-refs.mjs';
 import { sourceSections, checkCoverage } from './check-handbook-coverage.mjs';
+import { STRICT as STAGES_STRICT, check3dStages, stageSceneOf } from './check-3d-stages.mjs';
 
 const EM = '\u2014';
 
@@ -70,4 +71,13 @@ test('handbook coverage reads all 8 S-041 and 26 S-042 sections and finds every 
   assert.equal(s.filter((x) => x.key.startsWith('S-041#')).length, 8);
   assert.equal(s.filter((x) => x.key.startsWith('S-042#')).length, 26);
   assert.deepEqual(checkCoverage().stale, []);
+});
+
+test('3D stage guard is strict (M16.15) and every topic has a stage whose scene exists', () => {
+  assert.equal(STAGES_STRICT, true);
+  assert.equal(stageSceneOf('---\nid: x\nstage:\n  scene: m02-orbital\n  states: []\n---\n'), 'm02-orbital');
+  assert.equal(stageSceneOf('---\nid: x\n---\n'), null);
+  const { topics, problems } = check3dStages();
+  assert.ok(topics >= 83);
+  assert.deepEqual(problems, []);
 });

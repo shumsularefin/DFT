@@ -10,6 +10,7 @@ import {
   relativeLuminance,
   speciesColors,
 } from './palette';
+import { elementColor } from './vestaStyle';
 import fs from 'node:fs';
 
 describe('contrast ratio (WCAG 2.1, S-056)', () => {
@@ -47,11 +48,16 @@ describe('atom palette (Okabe-Ito, S-057)', () => {
     const light = new Set(lowContrastOn(LIGHT_BG));
     for (const c of lowContrastOn(DARK_BG)) expect(light.has(c)).toBe(false);
   });
-  it('assigns colours by first appearance and wraps', () => {
+  it('lists elements by first appearance, each in its element colour (D-122), the same in every structure', () => {
     const m = speciesColors(['Na', 'Cl', 'Na', 'Cl', 'Ti']);
     expect([...m.keys()]).toEqual(['Na', 'Cl', 'Ti']);
-    expect(m.get('Na')).toBe(ATOM_PALETTE[0]);
-    expect(m.get('Ti')).toBe(ATOM_PALETTE[2]);
+    expect(m.get('Na')).toBe(elementColor('Na'));
+    expect(m.get('Ti')).toBe(elementColor('Ti'));
+    expect(speciesColors(['Ti', 'Na']).get('Na')).toBe(m.get('Na'));
+    expect(new Set(m.values()).size).toBe(3);
+  });
+  it('keeps the order-based tones for non-atom marks and wraps', () => {
+    expect(atomColor(0)).toBe(ATOM_PALETTE[0]);
     expect(atomColor(8)).toBe(ATOM_PALETTE[0]);
   });
 });

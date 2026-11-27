@@ -1,5 +1,28 @@
 ---
 id: why-converge
+stage:
+  scene: m08-convergence-surface
+  states:
+    - id: surface
+      section: why
+      params: { system: insulator, encut: 120, kmesh: 4, tol: 1 }
+      caption: 'The energy error of a toy insulator over ENCUT and the number of k-points. The lit region is good enough at 1 meV and the ball is your test point. Drag the two sliders and watch it sink under the plane or climb out.'
+    - id: scans
+      section: intuition
+      params: { system: insulator, encut: 200, kmesh: 8, scans: true }
+      caption: 'The two coloured lines are the scans you actually run: ENCUT at a fixed mesh (solid) and the mesh at a fixed ENCUT (dashed). Each one falls steeply, then flattens onto the plateau.'
+    - id: metal
+      section: math
+      params: { system: metal, encut: 200, kmesh: 8, tol: 1 }
+      caption: 'A metal: along the k-axis the error rises and falls instead of falling steadily, and only scattered patches dip under 1 meV. Raise the tolerance to 5 meV to find a setting that stays under it.'
+    - id: cheapest
+      section: in-vasp
+      params: { system: insulator, encut: 140, kmesh: 7, tol: 1 }
+      caption: 'The orange marker is the cheapest setting from which every finer one stays within tolerance. That pair of ENCUT and mesh is what you use and report with the result.'
+    - id: stricter
+      section: mistakes
+      params: { system: insulator, encut: 140, kmesh: 7, tol: 0.2 }
+      caption: 'Tighten the tolerance to 0.2 meV and the safe region shrinks toward the far corner. A stricter question costs more plane waves and more k-points, so test the quantity you will report.'
 title: Why you must test convergence
 module: 8
 order: 1
@@ -7,10 +30,10 @@ summary: What a convergence test is, what converges and what does not, the 1 meV
 concepts: [convergence-testing]
 requires: [cutoff-energy, k-points, output-files]
 vaspTags: [ENCUT, KPOINTS]
-sources: [S-019, S-041, S-042]
+sources: [S-019, S-040, S-041, S-042, S-063, S-064, S-066, S-067]
 noLab: true
 status: draft
-updated: 2026-11-19
+updated: 2026-11-27
 ---
 
 <Why>
@@ -41,6 +64,8 @@ The author's rule: pick the smallest setting where the energy per atom changes b
 </Intuition>
 
 <TheMath>
+
+Adding plane waves can only lower the energy or leave it unchanged, so as you raise `ENCUT` the energy slides down toward its limit from above. The k-mesh follows no such rule, which is why its energies can wobble <Cite id="S-040" />.
 
 <Level min="intermediate">
 
@@ -80,6 +105,16 @@ NSW    = 0`}
 
 Always **report both settings** with a result, for example "ENCUT 520 eV, 8x8x8 Gamma-centred mesh". A reader cannot judge a number without them.
 
+**Three sizes that also need a test.** Once a calculation has a surface or a defect, the size of the model becomes a setting too. Each is tested with the same rule: change one size, keep everything else fixed, and watch the quantity you report.
+
+| Size             | Why it matters                                            | How to test it                                                                   |
+| ---------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Vacuum thickness | A slab or molecule feels its periodic copy across the gap | Same slab, more vacuum each run, until the reported quantity stops moving        |
+| Slab thickness   | The middle layers must look like the bulk                 | Symmetric slabs with more layers each run, until the surface energy stops moving |
+| Supercell size   | A defect interacts with its own periodic images           | The same defect in larger supercells, until the formation energy stops moving    |
+
+For a work function the handbook uses at least 15 angstrom of vacuum, and for an asymmetric slab the dipole correction (`LDIPOL = .TRUE.`, `IDIPOL = 3` along z); without it the potential does not flatten in the vacuum and the vacuum test cannot settle <Cite id="S-042" /> <Cite id="S-066" />. The surface energy is the slab energy minus the bulk energy of the same atoms, divided by twice the surface area (a slab has two surfaces), and it should settle as layers are added <Cite id="S-042" /> <Cite id="S-064" />. Polar surfaces can need more care than adding layers <Cite id="S-063" />. Defects in charged states need finite-size corrections on top of a larger cell <Cite id="S-042" /> <Cite id="S-067" />. The topics [Surfaces and slabs](/handbook/12-properties/surfaces-and-slabs/) and [Point and charged defects](/handbook/12-properties/point-and-charged-defects/) give the full recipes.
+
 </InVasp>
 
 <WhatChanges>
@@ -115,9 +150,15 @@ A new structure, a new element or a new quantity (stress, band gap) can need a n
 
 </Callout>
 
+<Callout variant="mistake" title="Converging ENCUT and k-points but not the model size">
+
+A slab with too little vacuum or too few layers, or a defect in a small supercell, carries an error that no cutoff or mesh removes. Test the vacuum, the slab thickness or the supercell size as well, one at a time <Cite id="S-042" />.
+
+</Callout>
+
 </Mistakes>
 
-<Check ids={['q-cv-1', 'q-cv-2', 'q-cv-3', 'q-cv-4']} />
+<Check ids={['q-cv-1', 'q-cv-2', 'q-cv-3', 'q-cv-4', 'q-cv-5']} />
 
 <GoDeeper>
 

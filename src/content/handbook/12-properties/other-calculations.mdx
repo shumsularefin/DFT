@@ -1,5 +1,31 @@
 ---
 id: other-calculations
+stage:
+  scene: m12-property-hub
+  states:
+    - id: hull
+      section: why
+      params: { family: hull, formation: -120 }
+      camera: iso
+      caption: 'A ternary convex hull: example formation energies hang below the composition triangle. ABC sits above the hull facet, so it would split into AB, BC and AC; lower its formation energy until it touches the hull.'
+    - id: on-hull
+      section: intuition
+      params: { family: hull, formation: -200 }
+      caption: 'At -200 meV per atom ABC lies on the hull and E_hull is 0. Differences like this only mean something when every energy used the same functional, ENCUT and POTCARs.'
+    - id: effective-mass
+      section: math
+      params: { family: effective-mass, hopping: 1 }
+      caption: 'A model band over the Brillouin zone. Near Gamma the orange parabola of effective mass m* follows it; raise the hopping and the band steepens while the mass drops.'
+    - id: thin-vacuum
+      section: in-vasp
+      params: { family: work-function, vacuum: 6 }
+      camera: front
+      caption: 'A slab and its model planar-average potential along z. With 6 angstrom of vacuum the potential never flattens, so the work function read in the middle is too small.'
+    - id: thick-vacuum
+      section: what-changes
+      params: { family: work-function, vacuum: 18 }
+      camera: front
+      caption: 'With a thicker vacuum the plateau is flat and the work function read there settles at the model value for an infinite vacuum.'
 title: Other calculations for a complete picture
 module: 12
 order: 7
@@ -65,7 +91,7 @@ One entry per row of the handbook's table <Cite id="S-042" />. Where the site ha
 
 **Formation enthalpy.** Total energies of the compound and of the elemental reference phases, with the same functional, `ENCUT` and `POTCAR`s. Gas references such as O₂ need corrections. Tool: the formation-enthalpy calculator in the [research planner](/tools/planner/).
 
-**Thermodynamic stability (hull).** The energy above the convex hull against all competing phases (pymatgen `PhaseDiagram`). $E_{\text{hull}} = 0$ is stable; below about 50 meV/atom the compound is possibly synthesizable. Tool: the hull filter in [Screening Studio](/studio/).
+**Thermodynamic stability (hull).** The energy above the convex hull against all competing phases (pymatgen `PhaseDiagram`). $E_{\text{hull}} = 0$ is stable; below about 50 meV/atom the compound is possibly synthesizable. Tool: the hull filter in [Materials Screening](/studio/).
 
 **Cohesive energy.** Isolated atoms in a large box with unequal sides (the handbook's example is 15 x 15.5 x 16 Å), Γ-only, spin-polarized, `ISYM = 0`.
 

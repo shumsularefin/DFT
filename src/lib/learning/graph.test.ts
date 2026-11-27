@@ -100,6 +100,7 @@ describe('shipped concept graph', () => {
       'output-file-reference',
       'five-step-protocol',
       'job-scripts',
+      'parallel-performance',
       'restart-files',
       'output-files',
       'vaspkit',
@@ -126,7 +127,14 @@ describe('shipped concept graph', () => {
       'dielectric-response',
       'optical-properties',
       'bader-charges',
+      'surface-slabs',
+      'point-defects',
       'property-catalogue',
+      'formation-energy-hull',
+      'transition-states',
+      'molecular-dynamics',
+      'bonding-analysis',
+      'wannier-functions',
     ]);
     for (const x of g.filter((y) => y.module >= 6))
       expect(x.status, x.id).toBe(m73.has(x.id) ? 'published' : 'planned');

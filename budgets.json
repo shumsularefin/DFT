@@ -34,6 +34,10 @@
     "rdkit": {
       "contains": "set_new_coords",
       "maxKB": 2500
+    },
+    "viewer3d": {
+      "contains": "v3d-gizmo",
+      "maxKB": 45
     }
   }
 }

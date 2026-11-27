@@ -1,5 +1,24 @@
 ---
 id: spin-and-magnetism
+stage:
+  scene: m05s-spin-density
+  states:
+    - id: d5
+      section: why
+      params: { electrons: 5, ispin: true, show: both }
+      caption: 'A d5 ion with ISPIN = 2: five up electrons fill every d orbital once, so the up density is a sphere, the down density is empty and the moment arrow is 5 μB.'
+    - id: no-spin
+      section: intuition
+      params: { electrons: 5, ispin: false, show: both }
+      caption: 'Turn ISPIN off and each orbital holds half an up and half a down electron. The two densities coincide and the moment vanishes.'
+    - id: magnetization
+      section: math
+      params: { electrons: 7, ispin: true, show: magnetization }
+      caption: 'The magnetization n_up minus n_down for d7: the up shell is full and two down electrons sit in xy and yz, so what is left is the shape of xz, z2 and x2-y2.'
+    - id: d3
+      section: in-vasp
+      params: { electrons: 3, ispin: true, show: up }
+      caption: 'A d3 ion: three up electrons in t2g give 3 μB. Start MAGMOM above the moment you expect, so the run does not fall back to zero.'
 title: Spin and magnetism
 module: 5
 order: 6

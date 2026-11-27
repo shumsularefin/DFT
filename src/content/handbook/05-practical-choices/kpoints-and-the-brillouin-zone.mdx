@@ -1,5 +1,31 @@
 ---
 id: kpoints-and-the-brillouin-zone
+stage:
+  scene: m05-kmesh
+  states:
+    - id: zone
+      section: why
+      params: { lattice: fcc, n: 4, centering: monkhorst-pack, reduce: false, path: true }
+      camera: iso
+      caption: 'The first Brillouin zone of fcc copper in 1/Angstrom, with the high-symmetry path in orange. Turn it over: every wavevector the crystal can carry has a copy inside this zone.'
+    - id: mesh
+      section: intuition
+      params: { lattice: fcc, n: 4, centering: gamma, reduce: true, path: false }
+      caption: 'A 4 x 4 x 4 Gamma-centred mesh folded into the zone. The large balls are the 8 points that symmetry leaves to compute; drag the divisions slider and watch the total grow as n cubed.'
+    - id: lattices
+      section: lab
+      params: { lattice: hcp, n: 6, centering: gamma, reduce: true, path: true }
+      camera: c
+      caption: 'Switch the lattice. Here hcp magnesium seen along c shows the hexagonal face, and the mesh is 6 x 6 x 3 because the zone is shorter along c. Try bcc and simple cubic too.'
+    - id: shift
+      section: in-vasp
+      params: { lattice: hcp, n: 4, centering: monkhorst-pack, reduce: true, path: false }
+      camera: c
+      caption: 'An even Monkhorst-Pack mesh on hcp is shifted off Gamma and no longer has the hexagonal symmetry; the description says so. Switch to Gamma-centred to keep it.'
+    - id: dense
+      section: what-changes
+      params: { lattice: fcc, n: 8, centering: monkhorst-pack, reduce: true, path: false }
+      caption: 'An 8 x 8 x 8 mesh: 512 points but only 60 irreducible ones. The largest spacing readout is the number KSPACING controls; a metal needs it small.'
 title: k-points and the Brillouin zone
 module: 5
 order: 2
@@ -9,7 +35,7 @@ requires: [plane-waves]
 vaspTags: [KSPACING]
 sources: [S-007, S-019, S-036, S-041, S-042, S-049, S-050]
 status: draft
-updated: 2026-11-19
+updated: 2026-11-27
 ---
 
 <Why>
@@ -19,6 +45,33 @@ A crystal repeats forever, so it has an endless number of electrons. The trick t
 </Why>
 
 <Intuition>
+
+### Real space and reciprocal space
+
+A crystal calculation uses two spaces. It helps to keep them apart from the start.
+
+**Real space is where the atoms are.** A point in real space is a place. Positions are in angstroms. The <Term id="unit-cell">unit cell</Term> is built from three lattice vectors $\mathbf{a}_1, \mathbf{a}_2, \mathbf{a}_3$, and copies of it fill the crystal.
+
+**Reciprocal space is where the waves are.** A point in reciprocal space is not a place. It is a wave vector, $\mathbf{k}$ or $\mathbf{G}$, in 1/angstrom. It says how fast a wave's phase changes as you step from one cell to the next. Reciprocal space has its own lattice vectors $\mathbf{b}_1, \mathbf{b}_2, \mathbf{b}_3$ <Cite id="S-050" />.
+
+**The two are linked, the long way round.** The vectors obey $\mathbf{b}_i\cdot\mathbf{a}_j = 2\pi\delta_{ij}$: each $\mathbf{b}_i$ is at right angles to the other two real-space vectors <Cite id="S-036" />. So a long real-space direction gives a short reciprocal direction, and a short one gives a long one. A cell twice as long along x has a Brillouin zone half as wide along x. The repeat unit follows the same rule in both spaces: the Wigner-Seitz cell is the set of points closer to one lattice point than to any other, and the Brillouin zone is the Wigner-Seitz cell of the reciprocal lattice <Cite id="S-036" />.
+
+**An analogy.** Think of striped wallpaper. You can describe it by where each stripe sits (real space) or by how many stripes there are per metre (reciprocal space). Both describe the same wallpaper. Wide stripes mean few stripes per metre. The analogy is loose: a crystal repeats in three directions, not one.
+
+| Question                          | Real space                                 | Reciprocal space                              |
+| --------------------------------- | ------------------------------------------ | --------------------------------------------- |
+| What a point means                | A place, such as an atom position          | A wave vector: how the phase changes per cell |
+| Units                             | angstrom                                   | 1/angstrom                                    |
+| Lattice vectors                   | $\mathbf{a}_1, \mathbf{a}_2, \mathbf{a}_3$ | $\mathbf{b}_1, \mathbf{b}_2, \mathbf{b}_3$    |
+| The repeat cell                   | Unit cell (or the Wigner-Seitz cell)       | Brillouin zone                                |
+| VASP file                         | `POSCAR`                                   | `KPOINTS` (or `KSPACING` in `INCAR`)          |
+| What grows when the other shrinks | The cell grows as the zone shrinks         | The zone grows as the cell shrinks            |
+
+**A worked example.** Take a simple cubic cell with $a = 4$ angstrom. Then each reciprocal vector has length $|\mathbf{b}| = 2\pi/4 \approx 1.571$ 1/angstrom. Double the cell to $a = 8$ angstrom and the length halves to $2\pi/8 \approx 0.785$ 1/angstrom. A 4 x 4 x 4 mesh on the small cell puts points about $1.571/4 \approx 0.393$ 1/angstrom apart. On the large cell, 2 points per direction give the same spacing, $0.785/2 \approx 0.393$ 1/angstrom.
+
+**Why it matters in VASP.** <Term id="poscar">`POSCAR`</Term> lives in real space: it holds the lattice vectors and the atom positions. `KPOINTS` lives in reciprocal space: its mesh divides the reciprocal vectors $\mathbf{b}_i$, and VASP reports k-points as fractions of them <Cite id="S-041" />. That is why a larger cell needs fewer k-points per direction.
+
+### From waves to a k-mesh
 
 **Repetition gives waves with a label.** In a repeating crystal every orbital can be written as a wave that runs through the crystal, times a pattern that repeats from cell to cell. This is <Term id="bloch-theorem">Bloch's theorem</Term> <Cite id="S-050" />. The label on the wave, its wave vector $\mathbf{k}$, tells you how the phase changes from one cell to the next.
 

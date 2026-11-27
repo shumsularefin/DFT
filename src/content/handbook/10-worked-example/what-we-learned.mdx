@@ -1,21 +1,44 @@
 ---
 id: what-we-learned
+stage:
+  scene: m10-pipeline
+  states:
+    - id: chain
+      section: why
+      params: { station: 0, loops: false }
+      caption: 'The worked example as five stations on one path, each with the LaCuO3 cell it works on. Step through them in order and read the check done at each.'
+    - id: links
+      section: intuition
+      params: { station: 2, loops: false }
+      caption: 'Convergence sits between the inputs and the relaxation: its tests decide whether the relaxation energies can be compared at all.'
+    - id: difference
+      section: math
+      params: { station: 3, loops: false }
+      caption: 'The relaxation station uses the doubled cell with the G-type start, the cell in which both energy differences of the study are taken.'
+    - id: record
+      section: in-vasp
+      params: { station: 4, loops: false }
+      caption: 'The last station, the electronic structure, reads the density of the static SCF. The methods record is the INCAR of that run.'
+    - id: go-back
+      section: mistakes
+      params: { station: 4, loops: true }
+      caption: 'The loops back: a moment that jumps or flips sends you back to the spin starts, and a wide gap in a reported metal sends you back to U.'
 title: What the worked example teaches
 module: 10
 order: 6
-summary: Reviewing the full decision chain from geometric screening to verified electronic structure, and what to record in a methods section.
+summary: The full decision chain of the LaCuO3 example from screening to electronic structure, the methods record that makes it reproducible, and which claims the method alone does and does not allow.
 concepts: [worked-example-workflow]
 requires: [worked-example-workflow]
-vaspTags: []
-sources: [S-001, S-002, S-042]
+vaspTags: [ENCUT, KSPACING, EDIFF, EDIFFG, ISPIN, MAGMOM, LDAUU, LORBIT]
+sources: [S-001, S-002, S-003, S-019, S-022, S-040, S-042, S-051, S-096, S-098, S-101]
 noLab: true
 status: draft
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 <Why>
 
-A trustworthy DFT study is defined by its reproducible decision chain: every choice from starting geometry to convergence threshold and post-flight check must be documented <Cite id="S-042" />.
+A calculation is only useful if someone else can repeat it and see why each choice was made. The five earlier pages made a long chain of decisions for $\mathrm{LaCuO}_3$: which compound, which potentials, which spin starts, which cutoff and mesh, which cells to relax, which plots to read. This page lays that chain out in one place, turns it into the record a methods section needs, and sets out what the method alone lets you claim before any result is in. The same chain applies to the next rare earth in the series and to most first projects on an oxide.
 
 </Why>
 
@@ -23,60 +46,173 @@ A trustworthy DFT study is defined by its reproducible decision chain: every cho
 
 <Callout variant="note" title="Will be updated: results come from ongoing research">
 
-This summary closes the `RCuO3` worked-example protocol. Quantitative takeaways from the author's VASP outputs will be added after the research is published. Until then this page shows the method and the inputs only; no result on it is a real or invented number.
+This page summarizes the decision chain used in the `RCuO3` worked example. A comparison of computed and literature values, and the conclusions of the study, will be added after the research is published. Until then this page describes the method and the reasoning only; it contains no results.
 
 </Callout>
 
-Across the five stages of this worked example, each step fed directly into the next: tolerance-factor screening prioritized candidate compositions <Cite id="S-001" /> <Cite id="S-002" />, structure checks verified the starting cell, convergence testing locked in `ENCUT` and k-mesh spacing, variable-cell relaxation plus static confirmation established the equilibrium geometry, and fixed-potential non-SCF runs produced the DOS and band structure <Cite id="S-042" />.
+**The chain, one link per page.**
 
-<Scene id="perovskite-octahedra" />
+1. **Choosing the system.** A <Term id="tolerance-factor">tolerance factor</Term> near 1 and the octahedral factor said a <Term id="perovskite">perovskite</Term> is geometrically plausible for La and less so for the small rare earths; the octahedral factor of $\mathrm{Cu}^{3+}$ sat below the usual limit, and $\mathrm{Cu}^{3+}$ is uncommon in the structure database <Cite id="S-002" /> <Cite id="S-022" /> <Cite id="S-051" />. Screening said "worth calculating", never "stable".
+2. **Structure and inputs.** A five-atom cubic cell, PAW potentials with the Cu $3p$ semicore states, `ENCUT` set from `ENMAX`, `LMAXMIX = 4` and `LASPH` for the $d$ shell, and three spin starts, because $d^8$ can be high-spin or low-spin and the charge-transfer picture makes the nominal count uncertain <Cite id="S-042" /> <Cite id="S-098" />.
+3. **Convergence.** `ENCUT`, k-mesh and the magnetic energy difference, one at a time, to 1 meV per atom with every later point inside the tolerance <Cite id="S-042" />.
+4. **Relaxation.** The cubic cell per spin start, then a doubled cell that can show the $a^-a^-a^-$ <Term id="octahedral-tilting">tilt</Term> and G-type order, with the oxygen atoms pushed so that symmetry does not freeze the cubic structure <Cite id="S-101" />.
+5. **Electronic structure.** A static SCF, the projected DOS and the bands, all with identical spin and $U$ settings, judged against the reported metallic behaviour <Cite id="S-096" />.
 
-You can generate this entire multi-step folder hierarchy and methods checklist automatically for your own material using the <a href="/tools/planner/">Research Planner</a>.
+**What links them.** Each step uses the output of the step before and tests an assumption of it. The convergence tests decide whether the relaxation energies can be compared; the relaxation decides which magnetic state the DOS is computed for; the DOS checks whether $U$ and the spin state make physical sense. If a later step contradicts an earlier one, go back: a wide gap in a reported metal sends you back to $U$, and a moment that flips sends you back to the spin starts.
 
 </Intuition>
 
 <TheMath>
 
-Every methods section should report the exact inputs that fix the numerical energy surface: functional, `POTCAR` titles, `ENCUT`, k-mesh spacing, `EDIFF`, `EDIFFG`, smearing (`ISMEAR`, `SIGMA`), and any spin (`ISPIN`, `MAGMOM`) or $+U$ parameters <Cite id="S-042" />.
+Three quantities carry the conclusions of a study like this one, and each is a difference taken at fixed settings:
+
+$$\Delta E_\mathrm{mag} = \frac{E_\mathrm{AFM} - E_\mathrm{FM}}{N_\mathrm{fu}}, \qquad \Delta E_\mathrm{tilt} = \frac{E_\mathrm{tilted} - E_\mathrm{cubic}}{N_\mathrm{fu}}, \qquad \frac{a_\mathrm{calc} - a_\mathrm{exp}}{a_\mathrm{exp}}.$$
+
+The first two are only meaningful when both energies come from static runs in the same cell, with the same `ENCUT`, mesh, POTCARs and $U$ <Cite id="S-042" />. Their numerical error is bounded by the convergence tolerance: with $\delta$ = 1 meV per atom on each energy and five atoms per formula unit, a difference per formula unit carries an error of up to about $2 \times 5\,\delta$ in the worst case. That is why the energy difference itself was converged, since errors that are the same for both states cancel. The third is a check against experiment; the author's protocol expects PBE to overestimate lattice parameters by one to two percent and treats a much larger error as a sign of a wrong magnetic state <Cite id="S-042" />.
+
+<Level min="intermediate">
+
+**The geometric screen, restated.** The quantities of the first page were
+
+$$t = \frac{r_A + r_X}{\sqrt 2\,(r_B + r_X)}, \qquad \mu = \frac{r_B}{r_X}, \qquad \tau = \frac{r_X}{r_B} - n_A\left(n_A - \frac{r_A/r_B}{\ln(r_A/r_B)}\right),$$
+
+with Shannon radii <Cite id="S-001" />, the Goldschmidt factor <Cite id="S-002" />, the octahedral factor <Cite id="S-022" /> and Bartel's $\tau$ with $n_A$ the oxidation state of A <Cite id="S-003" />. They depend only on radii and say nothing about the electronic structure, which is why every page after the first is needed.
+
+</Level>
+
+<Level min="pro">
+
+The weakest link of the chain is $U$. Its value changes the moment, the relative energy of the magnetic states and the gap, and Cu has no value in the Materials Project list of $U$ values quoted in the author's handbook <Cite id="S-042" />. A defensible study either computes $U$ by linear response or reports its main results across the scanned range, so that a reader can see which conclusions hold for every value and which do not.
+
+</Level>
 
 </TheMath>
 
 <InVasp>
 
-- Archive `INCAR`, `POSCAR`, `KPOINTS`, `CONTCAR`, `OSZICAR`, and key `OUTCAR` metrics for every production run.
-- Export the Markdown report from <a href="/tools/review/">Calculation Review</a> straight into your lab notebook.
-- Never share licensed `POTCAR` files in public repositories; record their `TITEL` lines instead.
+**The methods record.** Archive the INCAR of the run each result comes from, and write the methods section from it, not from memory. This is the static SCF for the ten-atom cell, the one the DOS and the reported energies come from; the `LDAU` lines go in only if the study uses $+U$.
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM    = LaCuO3 static SCF, record copy
+PREC      = Accurate
+ENCUT     = 520
+EDIFF     = 1E-6
+ALGO      = Normal
+NELM      = 120
+ISMEAR    = 0
+SIGMA     = 0.05
+KSPACING  = 0.2
+NSW       = 0
+IBRION    = -1
+ISPIN     = 2
+MAGMOM    = 2*0 3 -3 6*0
+LORBIT    = 11
+NEDOS     = 3001
+LASPH     = .TRUE.
+LMAXMIX   = 4
+LREAL     = .FALSE.
+LDAU      = .TRUE.
+LDAUTYPE  = 2
+LDAUL     = -1 2 -1
+LDAUU     = 0 4 0
+LDAUJ     = 0 0 0
+LDAUPRINT = 1`}
+  annotations={{
+    3: 'the converged cutoff, at least 1.3 times ENMAX',
+    9: 'the converged spacing',
+    13: 'La La Cu Cu then six O',
+    21: 'one entry per species: La, Cu, O',
+    22: 'a placeholder from the scan, not a recommended value',
+  }}
+/>
+
+The `LDAU` lines have one entry per species on the POSCAR species line, here La, Cu, O, while `MAGMOM` has one entry per atom <Cite id="S-042" />. The two Cu atoms with opposite moments are still one species, so they share one $U$.
+
+**The checklist for the methods section.** Every row is something a reader needs to repeat a run. Fill each from your files.
+
+| Item                    | Where it comes from                            | Example of what to write                                  |
+| ----------------------- | ---------------------------------------------- | --------------------------------------------------------- |
+| Code and version        | First line of `OUTCAR`                         | VASP version and build                                    |
+| Functional and $U$      | INCAR, `LDAU` block                            | PBE, $U$ on Cu $d$ and how it was chosen                  |
+| PAW potentials          | `TITEL` lines of `POTCAR`                      | La, Cu_pv, O with their dates                             |
+| Cutoff                  | INCAR and the convergence record               | `ENCUT` and the tolerance it met                          |
+| k-mesh                  | `KSPACING` or `KPOINTS`, and the record        | Mesh per cell and the tolerance it met                    |
+| Smearing                | INCAR                                          | Gaussian, `SIGMA`, entropy per atom checked               |
+| Relaxation criterion    | INCAR, `EDIFFG`                                | Forces below the absolute value of `EDIFFG`, cell relaxed |
+| Magnetic configurations | `MAGMOM` and final site moments in `OUTCAR`    | NM, FM, G-type, same cell, moments kept                   |
+| Cells and symmetry      | `POSCAR` of each run, space group of `CONTCAR` | Five-atom cubic, ten-atom tilted                          |
+| Final energies          | Static runs, `energy(sigma->0)`                | Per formula unit, from static runs only                   |
+
+Collect the raw lines with a short script so nothing is retyped:
+
+<VaspFile
+  name="shell"
+  code={`head -1 OUTCAR                      # version
+grep TITEL POTCAR                    # potentials
+grep -E "ENCUT|EDIFFG|LDAUU|MAGMOM" INCAR
+grep "energy(sigma->0)" OUTCAR | tail -1`}
+/>
+
+The site's <a href="/tools/planner/">Planner</a> has a methods checklist, and <a href="/tools/review/">Calculation Review</a> exports a Markdown report of its checks that can go in the supplementary material.
 
 </InVasp>
 
 <WhatChanges>
 
-| Workflow stage       | Output carried forward  | Verification check                           |
-| -------------------- | ----------------------- | -------------------------------------------- | ------ | ------------------------- |
-| Screening            | Candidate stoichiometry | Tolerance factor & oxidation states recorded |
-| Convergence          | Locked `ENCUT` & k-mesh | Energy/atom plateau verified                 |
-| Relaxation + Static  | `CONTCAR` & `CHGCAR`    | Max force `<                                 | EDIFFG | `, entropy `< 1 meV/atom` |
-| Electronic structure | `DOSCAR` & `EIGENVAL`   | Fermi alignment and path labels checked      |
+| If this changes                 | What has to be redone                       | Why                                                 |
+| ------------------------------- | ------------------------------------------- | --------------------------------------------------- |
+| The rare earth (La to Nd, say)  | Screening, inputs, convergence, relaxations | New radii, new POTCAR, possibly an f shell          |
+| The value of $U$                | Relaxations and electronic structure        | $U$ changes moments, volumes and energy differences |
+| `ENCUT` or the mesh             | Every energy you compare                    | Differences are only valid at identical settings    |
+| The magnetic ground state found | Electronic structure                        | DOS and bands belong to one magnetic state          |
+| The cell (five to ten atoms)    | Energies for comparison, k-mesh numbers     | Compare in one cell; keep the k spacing             |
 
-Why document every link in the chain: another researcher (or your future self) can reproduce every number without guessing hidden defaults.
+Why keep this table: a change in one link quietly invalidates the links after it. What happens if you ignore it: the paper reports energies that were never computed with the same settings.
 
 </WhatChanges>
 
 <Mistakes>
 
-<Callout variant="mistake" title="Publishing results without recording POTCAR titles and smearing">
+<Callout variant="mistake" title="Treating the screening result as a stability result">
 
-Saying only "we used PBE in VASP" leaves out the PAW variant, `ENCUT`, k-mesh, and smearing width, making the calculation impossible to reproduce reliably.
+A tolerance factor near 1 says the ions fit, not that the compound is stable or can be made. Fix: describe screening as a filter and base stability statements on computed energies, with the high-pressure synthesis of the real compound in mind <Cite id="S-096" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Writing the methods section from memory">
+
+Remembered settings drift from the ones actually used. Fix: copy every value from the archived INCAR, POTCAR and OUTCAR of the run that produced each number.
+
+</Callout>
+
+<Callout variant="mistake" title="Reporting one value of U as if it were the answer">
+
+A single value hides how much the conclusions depend on it. Fix: state how $U$ was chosen and show the main result across the scanned range <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Mixing energies from relaxation and static runs">
+
+The last relaxation step and a static run on the same structure differ because of the basis (the <Term id="pulay-stress">Pulay</Term> effect). Fix: take every reported energy from a static run <Cite id="S-040" /> <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Presenting an illustrative number as a result">
+
+A number written to explain a method, like the placeholder $U$ above, can end up quoted as a finding. Fix: label such numbers in the text and keep them out of tables of results.
 
 </Callout>
 
 </Mistakes>
 
-<Check ids={['q-m10-1', 'q-m10-5', 'q-m10-12', 'q-m10-16']} />
+<Check ids={['q-m10-8', 'q-m10-11', 'q-m10-16', 'q-m10-31', 'q-m10-32']} />
 
 <GoDeeper>
 
-- Open the <a href="/tools/planner/">Research Planner</a> to build a downloadable zip for your own project.
-- Continue to Module 11 for a guided tour of all browser tools on this site.
+- Shannon on ionic radii <Cite id="S-001" />; Goldschmidt <Cite id="S-002" /> and Bartel et al. <Cite id="S-003" /> on tolerance factors.
+- Bringley et al. on the $\mathrm{LaCuO}_{3-\delta}$ perovskites <Cite id="S-096" />.
+- The VASP wiki pages for every tag in the record INCAR (by page name) <Cite id="S-019" />.
+- The author's Workflow Handbook, the full protocol <Cite id="S-042" />.
 
 </GoDeeper>

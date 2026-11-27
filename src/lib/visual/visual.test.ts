@@ -8,6 +8,9 @@ import m6 from '../../data/questions/module-06.json';
 import m7 from '../../data/questions/module-07.json';
 import m8 from '../../data/questions/module-08.json';
 import { boxEnergyEV } from '../physics/box';
+import { log10Big, slaterDeterminants } from '../physics/combinatorics';
+import { HBAR2_OVER_2M_EV_A2 } from '../physics/constants';
+import { runScf } from '../physics/scf1d';
 import { loadQuestionBank } from '../learning/questions';
 import { PLOT_IDS, renderPlot } from './plots';
 import { resolveVisual } from './resolve';
@@ -119,5 +122,83 @@ describe('lint plot list', () => {
   it('equals the registry', async () => {
     const { PLOT_IDS: linted } = await import('../../../scripts/lint-questions.mjs');
     expect([...linted].sort()).toEqual([...PLOT_IDS].sort());
+  });
+});
+
+// M16.5: the guided path pictures that explain themselves. Each number they print is checked against the physics.
+describe('guided path pictures (M16.5)', () => {
+  const texts = (svg: string) => [...svg.matchAll(/<text[^>]*>([^<]*)</g)].map((m) => m[1]!);
+
+  it('scf-iterations: one bar per step of the toy loop, the last step settled below the tolerance', () => {
+    const r = runScf({ Z: 2, alpha: 0.3, tol: 1e-6 });
+    const n = r.iterations.length;
+    expect(r.iterations[n - 1]!.residual).toBeLessThan(1e-6);
+    const last = renderPlot('scf-iterations', { Z: 2, alpha: 0.3, tol: 1e-6, step: n }, 'a').svg;
+    expect(last.match(/class="vp-bar[^"]*"/g)).toHaveLength(n);
+    expect(texts(last).join(' ')).toContain(`Step ${n} of ${n}`);
+    expect(texts(last).join(' ')).toMatch(/Settled, the loop stops/);
+    const first = renderPlot('scf-iterations', { Z: 2, alpha: 0.3, tol: 1e-6, step: 1 }, 'a').svg;
+    expect(texts(first).join(' ')).toMatch(/Not settled yet/);
+    // the bars still to come are drawn open, the chosen one highlighted
+    expect(first.match(/vp-bar vp-later/g)).toHaveLength(n - 1);
+    expect(first.match(/vp-bar vp-hot/g)).toHaveLength(1);
+    // past the end clamps to the last step, never NaN
+    expect(renderPlot('scf-iterations', { step: 999 }, 'a').svg).not.toMatch(/NaN|undefined|Infinity/);
+  });
+
+  it('pw-sphere: the kept count is every grid wave with (hbar^2/2m) G^2 at or below the cutoff, and grows with it', () => {
+    const count = (ecut: number) => {
+      const g = (2 * Math.PI) / 4;
+      let k = 0;
+      for (let i = -7; i <= 7; i++)
+        for (let j = -7; j <= 7; j++) if (HBAR2_OVER_2M_EV_A2 * g * g * (i * i + j * j) <= ecut) k++;
+      return k;
+    };
+    let prev = 0;
+    for (const ecut of [50, 100, 200, 400]) {
+      const svg = renderPlot('pw-sphere', { cutoff: ecut, a: 4, span: 7 }, 'a').svg;
+      const shown = Number(/(\d+) waves kept/.exec(texts(svg).join(' '))![1]);
+      expect(shown, `${ecut} eV`).toBe(count(ecut));
+      expect(svg.match(/vp-node vp-solid/g)).toHaveLength(shown);
+      expect(shown).toBeGreaterThan(prev);
+      prev = shown;
+    }
+  });
+
+  it('bands-dos: unequal hoppings give an insulator, equal ones a metal', () => {
+    expect(texts(renderPlot('bands-dos', { t2: 0.6 }, 'a').svg).join(' ')).toMatch(
+      /A gap at the Fermi level/,
+    );
+    expect(texts(renderPlot('bands-dos', { t2: 1 }, 'a').svg).join(' ')).toMatch(/No gap at the Fermi level/);
+  });
+
+  it('real-reciprocal: |b| = 2 pi / a for a square cell, half as long for a twice-as-long side, 2 pi / (a sin 60) for a hexagon', () => {
+    const lens = (lattice: string) =>
+      /\|b1\| = ([\d.]+), \|b2\| = ([\d.]+)/
+        .exec(texts(renderPlot('real-reciprocal', { lattice, a: 4 }, 'a').svg).join(' '))!
+        .slice(1)
+        .map(Number);
+    expect(lens('square')).toEqual([1.57, 1.57]);
+    expect(lens('rect')).toEqual([1.57, 0.79]);
+    const hex = Math.round(((2 * Math.PI) / (4 * Math.sin(Math.PI / 3))) * 100) / 100;
+    expect(lens('hex')).toEqual([hex, hex]);
+  });
+
+  it('density-map: the map strip is darkest where the curve is highest and empty at the walls', () => {
+    const svg = renderPlot('density-map', { L: 5, electrons: 2 }, 'a').svg;
+    const ops = [...svg.matchAll(/class="vp-heat"[^>]* fill-opacity="([\d.]+)"/g)].map((m) => Number(m[1]));
+    expect(ops).toHaveLength(48);
+    expect(ops[0]!).toBeLessThan(0.05);
+    expect(ops[47]!).toBeLessThan(0.05);
+    expect(Math.max(...ops)).toBe(ops[24]);
+  });
+
+  it('exp-wall labels: the factor printed is the ratio of the last two counts', () => {
+    const svg = renderPlot('exp-wall', { perElectron: 4, maxN: 20, labels: true }, 'a').svg;
+    // C(80,20) / C(76,19), both computed by the combinatorics module
+    const ratio = Math.round(
+      10 ** (log10Big(slaterDeterminants(20, 80)) - log10Big(slaterDeterminants(19, 76))),
+    );
+    expect(texts(svg).join(' ')).toContain(`multiplied the count by ${ratio}`);
   });
 });

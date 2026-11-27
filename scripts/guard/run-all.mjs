@@ -9,8 +9,9 @@ import docLinks from './check-doc-links.mjs';
 import stages from './check-stages.mjs';
 import refs from './check-refs.mjs';
 import recipes from './check-recipes.mjs';
+import stages3d from './check-3d-stages.mjs';
 
-const checks = { emdash, secrets, potcar, sources, 'doc-links': docLinks, stages, refs, recipes };
+const checks = { emdash, secrets, potcar, sources, 'doc-links': docLinks, stages, refs, recipes, '3d-stages': stages3d };
 const onlyArg = process.argv.indexOf('--only');
 const only = onlyArg > -1 ? process.argv[onlyArg + 1].split(',') : Object.keys(checks);
 

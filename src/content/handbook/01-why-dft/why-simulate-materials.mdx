@@ -1,5 +1,24 @@
 ---
 id: why-simulate-materials
+stage:
+  scene: m01-scales
+  states:
+    - id: block
+      section: why
+      params: { scale: block, lens: experiment }
+      caption: 'A block of rock salt, 3 by 3 by 3 cells. An experiment sees a regular stack of ions and planes. Turn it over, then switch the lens to what DFT computes.'
+    - id: nuclei
+      section: intuition
+      params: { scale: block, lens: dft }
+      caption: 'The same block as DFT sees it: nuclei held fixed as dots, and the electrons worked out in one repeating cell, because every other cell is a copy of it.'
+    - id: cell
+      section: math
+      params: { scale: cell, lens: dft, level: 0.06 }
+      caption: 'One cell with an illustrative electron cloud. Lower the surface level and the clouds around the ions merge into one shared cloud, the thing the Schrodinger equation is about.'
+    - id: atom
+      section: in-vasp
+      params: { scale: atom, lens: dft }
+      caption: 'Zoomed in on one Cl ion: the coloured slice shows the cloud thinning away from each nucleus. A real calculation stores this density on a grid of points.'
 title: Why simulate materials at all
 module: 1
 order: 1

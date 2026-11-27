@@ -1,5 +1,6 @@
 // Colours for atoms and orbits (M5.5) and the contrast check that guards them.
 // @source S-057 (Okabe-Ito colour-blind-safe palette), S-056 (WCAG 2.1 relative luminance and contrast ratio)
+import { elementColor } from './vestaStyle';
 
 /** Okabe-Ito order. Colours are assigned to elements by order of first appearance, so colour never carries chemistry. */
 export const ATOM_PALETTE: readonly string[] = [
@@ -51,10 +52,13 @@ export const worstContrast = (hex: string): number =>
  */
 export const atomColor = (index: number): string => ATOM_PALETTE[index % ATOM_PALETTE.length]!;
 
-/** Colours of the elements in order of first appearance. */
+/**
+ * Colours of the elements, in order of first appearance. Since D-122 each element has its colour of the Studio viewer
+ * (`vestaStyle.ts`), the same on every page; the legend still names every element, so colour is never the only cue.
+ */
 export function speciesColors(species: readonly string[]): Map<string, string> {
   const m = new Map<string, string>();
-  for (const s of species) if (!m.has(s)) m.set(s, atomColor(m.size));
+  for (const s of species) if (!m.has(s)) m.set(s, elementColor(s));
   return m;
 }
 

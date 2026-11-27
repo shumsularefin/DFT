@@ -26,10 +26,14 @@ All notable changes to the DFT Handbook are listed here. The format follows
 - Topic pages show a Modules tree, "On this page", "First edition, updated <date>" and Mark complete; Progress shows tiles and module bars; the Input Builder shows a stepper and a Generated files card.
 - DFT Studio at `/dft-studio/`: a VESTA-style 3D crystal viewer and editor with the VASP workflow (POTCAR, INCAR, KPOINTS, k-point convergence, run bundle, analysis). It is now the Material Builder crystal mode, runs the site structure checks live, and hands structures and results to and from the Input Builder, k-path, magnetic and convergence tools (D-103).
 - Calm app layout: a left sidebar with icon navigation, search, reading level, progress and theme on wide screens, a top bar and drawer on phones, and a warm palette with one accent (D-104).
+- The 3D handbook (M16): every topic has a live 3D stage beside the text that turns freely (no pole lock), follows the reading position and has VESTA-style views, orthographic, layers and parameters; eleven new topics; module 9 deepened, module 10 as a results-free method walkthrough, module 11 guided builds (D-106 to D-116, D-120).
+- One VESTA-style look for every 3D view: the Studio viewer's lights, finish, element colours, two-tone bonds and a lettered axes marker (D-122).
 - Tests for the Material Builder: crystal templates, molecule export, and an end-to-end keyboard and axe spec at 360 px (M15.3).
 
 ### Fixed
 
+- Guided path and topic stages: changing an option (n = 1 to 3, the orbital, the number of periodic copies, any stage parameter) keeps the 3D view framed on the new picture, so Reset view is no longer needed; the Try this box no longer spills out of its card (D-124).
+- Guided path pictures explain themselves: the self-consistency loop is shown step by step until the density settles, the density map, cutoff sphere and bands beside the DOS are new pictures, each station says how to read its picture, and a new station and handbook subsection compare real space with reciprocal space (D-124).
 - The benzene preset in molecule mode no longer puts its hydrogens inside the ring: the 3D start points every hydrogen away from the atom's neighbours.
 - The Material Builder no longer redraws its 3D scene every frame; it draws on demand and starts in short tasks, so an idle page uses no CPU.
 - The Material Builder structure picker no longer slides under the Open button at medium widths.
@@ -37,6 +41,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 - Guided path figures are no longer solid black: the plot styles now load on `/learn/`, labels no longer collide, and 3D stations use an angled camera.
 - Buttons, text fields, menus and file pickers on the labs, 3D scenes, periodic table and tools pages have the site look instead of browser grey.
 - No sideways scroll at 360 px on the k-path, EOS and progress pages or in open equation sections; React hydration error 418 on handbook, practice and progress pages.
+- Guided path: scene stations open a free 3D view by themselves (drag to turn, scroll to zoom, right-drag to move, with keyboard equivalents), atoms in 3D views are lit instead of black, and the flat fallback turns under a drag (D-112).
 - Deploy runs only after CI succeeds on main (D-089).
 - Crystal and molecule builder, and the Input Builder Task step, no longer overflow the page at 360 px wide.
 - Tolerance-factor element buttons now start their accessible name with the visible symbol (axe `label-content-name-mismatch`).

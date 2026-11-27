@@ -1,5 +1,24 @@
 ---
 id: from-wavefunction-to-density
+stage:
+  scene: m03-projection
+  states:
+    - id: shadow
+      section: why
+      params: { Z: '2', lambda: 1, sweep: 1, full: false }
+      caption: 'The probability |psi|^2 over both electron positions, and its shadow on the back wall: the density n(x), a function of one position only.'
+    - id: half-way
+      section: intuition
+      params: { Z: '2', lambda: 1, sweep: 0.5, full: true }
+      caption: 'Adding up |psi|^2 along x2, row by row: the cut has swept half the range and put one of the two electrons on the wall. Drag the sweep to finish; the dashed curve is the full density.'
+    - id: repulsion
+      section: math
+      params: { Z: '2', lambda: 0, sweep: 1, full: false }
+      caption: 'With the repulsion off the shadow is the density of two independent electrons. Raise the repulsion: the surface changes shape and so does its shadow, so the density still carries the interaction.'
+    - id: diffuse
+      section: check
+      params: { Z: '1', lambda: 1, sweep: 1, full: false }
+      caption: 'The weakly bound Z = 1 atom spreads wide, yet its density still integrates to exactly 2 electrons. Read the total in the readouts.'
 title: From wavefunction to density
 module: 3
 order: 4

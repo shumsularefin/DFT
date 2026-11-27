@@ -163,3 +163,34 @@
   stroke-width: 3px;
   stroke-linejoin: round;
 }
+/* M16.5 guided path pictures: steps still to come, the chosen step, a shaded map strip, frames and the cutoff circle */
+.vp-bar.vp-later {
+  fill: none;
+  stroke: var(--border-strong);
+}
+.vp-bar.vp-hot {
+  fill-opacity: 1;
+  stroke: var(--text);
+  stroke-width: 1.5;
+}
+/* the map strip sets its own fill-opacity attribute per cell, so this class must not set one */
+.vp-heat {
+  fill: var(--accent);
+  stroke: none;
+}
+.vp-frame {
+  fill: none;
+  stroke: var(--border-strong);
+  stroke-width: 1;
+}
+.vp-heavyline {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 3;
+}
+.vp-cut {
+  fill: var(--accent);
+  fill-opacity: 0.08;
+  stroke: var(--accent);
+  stroke-width: 2;
+}

@@ -1,0 +1,268 @@
+---
+// The 3D stage beside a topic (M16.2, D-114 to D-116). Everything a reader needs is rendered here on the server: the
+// poster of the first state (the same layers as the live view), the badge and sources from the scene itself, the caption
+// and description of every state, and the state list. The boot script turns it into the live engine when the browser is
+// idle or the reader reaches for it; without JavaScript or WebGL the poster and the text stay.
+import Badge from '../ui/Badge.astro';
+import { getSceneDef } from '../../lib/viewer3d/scenes/eager';
+import { withDefaults } from '../../lib/viewer3d/types';
+import { posterSVG } from '../../lib/viewer3d/poster';
+import sources from '../../data/sources.json';
+import './v3d.css';
+import './stage.css';
+
+interface Props {
+  stage: {
+    scene: string;
+    states: {
+      id: string;
+      section?: string;
+      params: Record<string, number | string | boolean>;
+      layers?: string[];
+      camera?: unknown;
+      caption: string;
+    }[];
+  };
+  topicId: string;
+}
+const { stage, topicId } = Astro.props;
+const def = getSceneDef(stage.scene);
+const frames = stage.states.map((st) => def.build(withDefaults(def, st.params)));
+const first = stage.states[0]!;
+const poster = posterSVG(frames[0]!, { groups: first.layers ?? null, camera: first.camera as never });
+const uid = `stage-${topicId.replace(/[^a-z0-9]+/gi, '-')}`;
+const sectionNames: Record<string, string> = {
+  why: 'Why this matters',
+  intuition: 'Intuition',
+  lab: 'Lab',
+  math: 'The math',
+  'in-vasp': 'In VASP',
+  'what-changes': 'What changes',
+  mistakes: 'Mistakes',
+  check: 'Check',
+  'go-deeper': 'Go deeper',
+};
+const cited = def.sources
+  .map((id) => (sources as { id: string; citation: string }[]).find((s) => s.id === id))
+  .filter((s): s is { id: string; citation: string } => !!s);
+const hasLattice = frames.some((f) => !!f.lattice);
+const data = JSON.stringify({ scene: stage.scene, states: stage.states }).replace(/</g, '\\u003c');
+const views = [
+  ['iso', 'Iso', 'Iso, three-quarter view'],
+  ['top', 'Top', 'from the top'],
+  ['front', 'Front', 'from the front'],
+  ['side', 'Side', 'from the side'],
+] as const;
+const crystalViews = ['a', 'b', 'c', 'a*', 'b*', 'c*'] as const;
+---
+
+<aside class="stage" id={uid} data-stage data-scene={stage.scene} aria-labelledby={`${uid}-title`}>
+  <div class="stage-head">
+    <h2 class="stage-title" id={`${uid}-title`}>
+      <span class="stage-kicker">3D view</span>
+      {def.title}
+    </h2>
+    <Badge variant={def.badge} />
+    <div class="stage-modes js-only" role="group" aria-label="Layout">
+      <button type="button" class="btn btn-small" data-mode="focus" aria-pressed="false">
+        Focus 3D
+      </button>
+      <button type="button" class="btn btn-small" data-mode="text" aria-pressed="false">
+        Text only
+      </button>
+    </div>
+  </div>
+  {def.banner && <p class="stage-banner">{def.banner}</p>}
+  <div
+    class="stage-view"
+    data-stage-view
+    tabindex="0"
+    role="group"
+    aria-roledescription="3D view"
+    aria-label={`${def.title}. Drag to turn it freely, scroll to zoom, Shift-drag to move. With the keyboard: arrows turn, plus and minus zoom, Q and E roll, R resets.`}
+    aria-describedby={`${uid}-describe`}
+  >
+    <div class="stage-poster" set:html={poster} />
+    <div class="stage-canvas" data-stage-canvas></div>
+    <p class="stage-nogl" data-stage-nogl hidden>
+      This browser cannot draw WebGL, so the picture above is a still view of the same scene. The description
+      below follows it.
+    </p>
+    <p class="stage-loading js-only" aria-hidden="true">
+      Loading the live view
+    </p>
+  </div>
+  <div class="stage-toolbar js-only" role="toolbar" aria-label="View">
+    <button type="button" class="btn btn-small" data-act="reset">
+      Reset
+    </button>
+    {views.map(([v, label, aria]) => (
+      <button type="button" class="btn btn-small" data-view={v} aria-label={aria}>
+        {label}
+      </button>
+    ))}
+    {hasLattice &&
+      crystalViews.map((v) => (
+        <button
+          type="button"
+          class="btn btn-small stage-axis"
+          data-view={v}
+          data-needs-lattice
+          aria-label={`along ${v.replace('*', ' star')}`}
+        >
+          {v}
+        </button>
+      ))}
+    <button type="button" class="btn btn-small" data-act="ortho" aria-pressed="false">
+      Orthographic
+    </button>
+    <button
+      type="button"
+      class="btn btn-small"
+      data-act="pin"
+      aria-pressed="false"
+      title="Keep this view while you scroll"
+    >
+      Pin
+    </button>
+  </div>
+  {hasLattice && (
+    <form class="stage-indices js-only" data-stage-indices data-needs-lattice>
+      <label class="sr-only" for={`${uid}-kind`}>
+        Direction or plane
+      </label>
+      <select id={`${uid}-kind`}>
+        <option value="direction">Along [uvw]</option>
+        <option value="plane">Normal of (hkl)</option>
+      </select>
+      <label class="sr-only" for={`${uid}-idx`}>
+        Three integers
+      </label>
+      <input id={`${uid}-idx`} inputmode="numeric" placeholder="1 1 0" size="7" />
+      <button type="submit" class="btn btn-small">
+        Look
+      </button>
+      <span class="stage-msg" data-indices-msg aria-live="polite"></span>
+    </form>
+  )}
+  <nav class="stage-states" aria-label="Steps of this view">
+    <button type="button" class="btn btn-small js-only" data-step="-1" aria-label="Previous step">
+      Previous
+    </button>
+    <ol>
+      {stage.states.map((st, i) => (
+        <li>
+          <button
+            type="button"
+            class="stage-state"
+            data-state={i}
+            disabled
+            aria-current={i === 0 ? 'step' : 'false'}
+          >
+            <span class="stage-state-n">{i + 1}</span>
+            <span class="stage-state-s">
+              {st.section ? sectionNames[st.section] : st.id.replace(/-/g, ' ')}
+            </span>
+          </button>
+        </li>
+      ))}
+    </ol>
+    <button type="button" class="btn btn-small js-only" data-step="1" aria-label="Next step">
+      Next
+    </button>
+    <span class="stage-count js-only" data-stage-count>
+      1 of {stage.states.length}
+    </span>
+  </nav>
+  <p class="stage-caption" data-stage-caption>
+    {first.caption}
+  </p>
+  <p class="sr-only" aria-live="polite" data-stage-live></p>
+  <div class="stage-controls js-only" data-stage-controls aria-label="Controls" role="group"></div>
+  <p class="stage-pick js-only" data-stage-pick aria-live="polite"></p>
+  <details class="stage-more">
+    <summary>Describe this view</summary>
+    <p id={`${uid}-describe`} data-stage-describe>
+      {frames[0]!.describe}
+    </p>
+    <dl class="stage-readouts" data-stage-readouts>
+      {(frames[0]!.readouts ?? []).map((r) => (
+        <div>
+          <dt>{r.label}</dt>
+          <dd>{r.value}</dd>
+        </div>
+      ))}
+    </dl>
+    <p class="stage-axes" data-stage-axes hidden={!frames[0]!.axes}>
+      {frames[0]!.axes && `Axes: x ${frames[0]!.axes[0]}, y ${frames[0]!.axes[1]}, z ${frames[0]!.axes[2]}`}
+    </p>
+    <noscript>
+      <ol class="stage-all">
+        {stage.states.map((st, i) => (
+          <li>
+            <strong>{st.caption}</strong> {frames[i]!.describe}
+          </li>
+        ))}
+      </ol>
+    </noscript>
+  </details>
+  <details class="stage-more js-only">
+    <summary>Layers</summary>
+    <div class="stage-layers" data-stage-layers></div>
+  </details>
+  <details class="stage-more">
+    <summary>Keys and sources</summary>
+    <ul class="stage-keys">
+      <li>
+        Drag: turn freely, past the poles. Right-drag: roll. Shift-drag or two fingers: move. Wheel or pinch:
+        zoom to the pointer.
+      </li>
+      <li>
+        Arrows: turn (Shift for 15 degrees). Shift and arrows: move. Plus and minus: zoom. Q and E: roll. R:
+        reset. O: perspective or orthographic. [ and ]: previous or next step.
+      </li>
+      <li>Click an atom or a surface to read it.</li>
+    </ul>
+    {cited.length > 0 && (
+      <ul class="stage-sources">
+        {cited.map((s) => (
+          <li>
+            <span class="stage-sid">{s.id}</span> {s.citation}
+          </li>
+        ))}
+      </ul>
+    )}
+  </details>
+  <script type="application/json" data-stage-data set:html={data} />
+</aside>
+
+<script>
+  import { initLayout } from '../../lib/viewer3d/stage/layout';
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-stage]')) {
+    initLayout(root, () => window.dispatchEvent(new Event('resize')));
+    let started = false;
+    const go = () => {
+      if (started) return;
+      started = true;
+      root.classList.add('is-loading');
+      import('../../lib/viewer3d/stage/stageApp')
+        .then((m) => m.mountStage(root))
+        .catch(() => root.classList.add('stage-failed'))
+        .finally(() => root.classList.remove('is-loading'));
+    };
+    root.addEventListener('pointerenter', go, { once: true });
+    root.addEventListener('focusin', go, { once: true });
+    root.addEventListener('touchstart', go, { once: true, passive: true });
+    const idle = (cb: () => void): void => {
+      const w = window as Window & {
+        requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number;
+      };
+      if (w.requestIdleCallback) w.requestIdleCallback(cb, { timeout: 4000 });
+      else setTimeout(cb, 1500);
+    };
+    const later = () => window.setTimeout(() => idle(go), 1200);
+    if (document.readyState === 'complete') later();
+    else window.addEventListener('load', later, { once: true });
+  }
+</script>

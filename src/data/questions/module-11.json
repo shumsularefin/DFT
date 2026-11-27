@@ -25,17 +25,16 @@
     ],
     "hints": [
       "Distinguish thermodynamic phase stability from electronic band structure.",
-      "Review the summary table and callouts on the topic page."
+      "On the hull means no mixture of other phases in the database is lower in energy."
     ],
     "difficulty": -0.3,
     "level": "beginner",
     "sources": [
-      "S-024"
+      "S-024",
+      "S-102"
     ],
     "visual": {
-      "scene": "perovskite-octahedra",
-      "caption": "Candidate screening by thermodynamic stability.",
-      "alt": "Perovskite screening candidate."
+      "none": "The question is about the meaning of a database field; no plot on this site draws a convex hull."
     }
   },
   {
@@ -63,8 +62,8 @@
       }
     ],
     "hints": [
-      "Recall the functional ladder and band-gap problem from Module 5.",
-      "Review the summary table and callouts on the topic page."
+      "Recall the functional ladder and the band-gap problem from module 5.",
+      "Which functional family do high-throughput databases mostly use?"
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -73,9 +72,12 @@
       "S-042"
     ],
     "visual": {
-      "scene": "reciprocal-fcc",
-      "caption": "Band-gap screening caveats in semi-local DFT catalogs.",
-      "alt": "Reciprocal-space Brillouin zone."
+      "plot": "band-gap",
+      "params": {
+        "labels": false
+      },
+      "caption": "A filled block, an empty block and the gap between them. Toy model.",
+      "alt": "Two blocks of energy, a lower one drawn full and an upper one empty, with a space between them."
     }
   },
   {
@@ -104,17 +106,16 @@
     ],
     "hints": [
       "Think about scientific honesty and data provenance.",
-      "Review the summary table and callouts on the topic page."
+      "What does the attribution text in the banner say about the energies?"
     ],
     "difficulty": -0.4,
     "level": "beginner",
     "sources": [
-      "S-024"
+      "S-024",
+      "S-044"
     ],
     "visual": {
-      "scene": "perovskite-octahedra",
-      "caption": "Provenance transparency in Materials Screening.",
-      "alt": "Perovskite candidate visual."
+      "none": "A question about how a site tool behaves; a picture would only restate the answer."
     }
   },
   {
@@ -142,18 +143,24 @@
       }
     ],
     "hints": [
-      "Think about computational scaling with electron count.",
-      "Review the summary table and callouts on the topic page."
+      "Think about how the cost of a plane-wave run grows with the number of atoms.",
+      "The Project Card turns the atom count into a relative cost."
     ],
     "difficulty": -0.2,
     "level": "beginner",
     "sources": [
+      "S-010",
       "S-042"
     ],
     "visual": {
-      "scene": "fcc",
-      "caption": "Cell size directly impacts DFT runtime.",
-      "alt": "Unit cell illustration."
+      "plot": "cost-scaling",
+      "params": {
+        "methods": [
+          "dft"
+        ]
+      },
+      "caption": "Cost against system size for a method that grows as size to the power 3. Both axes logarithmic.",
+      "alt": "Straight line on logarithmic axes for DFT, cost rising with system size."
     }
   },
   {
@@ -165,9 +172,9 @@
     "prompt": "What does the live validity panel in the Material Builder check before you export a POSCAR?",
     "options": [
       {
-        "text": "Geometric and chemical issues such as overlapping atoms, collapsed cells, or thin vacuum",
+        "text": "Geometric and chemical issues such as overlapping atoms, short contacts, degenerate cells, duplicate atoms and charge neutrality",
         "correct": true,
-        "why": "Catching severe overlaps and cell issues locally prevents immediate VASP failures."
+        "why": "Rules B001 to B012 cover overlaps against covalent radii, short contacts, impossible packing, nearly degenerate cells, charge neutrality, Pauling rules, a perovskite check, periodic images and symmetry, all before export."
       },
       {
         "text": "Whether your HPC cluster queue is currently empty",
@@ -181,19 +188,17 @@
       }
     ],
     "hints": [
-      "Recall rules B001 through B012 in the Material Builder.",
-      "Review the summary table and callouts on the topic page."
+      "Recall rules B001 to B012 in the Material Builder.",
+      "For LaCuO3 the panel showed charge-neutrality and perovskite warnings."
     ],
     "difficulty": -0.4,
     "level": "beginner",
     "sources": [
       "S-021",
-      "S-041"
+      "S-052"
     ],
     "visual": {
-      "scene": "fcc",
-      "caption": "Structure validation prior to POSCAR export.",
-      "alt": "Crystal unit cell."
+      "none": "A question about how a site tool behaves; a picture would only restate the answer."
     }
   },
   {
@@ -222,17 +227,23 @@
     ],
     "hints": [
       "Think about what happens to empty vacuum space if VASP optimizes the cell volume.",
-      "Review the summary table and callouts on the topic page."
+      "Which ISIF value relaxes positions only?"
     ],
     "difficulty": -0.2,
     "level": "beginner",
     "sources": [
+      "S-019",
       "S-041"
     ],
     "visual": {
-      "scene": "miller-111-fcc",
-      "caption": "Surface slab with fixed vacuum padding.",
-      "alt": "FCC 111 surface slab."
+      "plot": "dof-cell",
+      "params": {
+        "atoms": true,
+        "shape": false,
+        "volume": false
+      },
+      "caption": "ISIF = 2 lets the atoms move and keeps the cell fixed.",
+      "alt": "Diagram of a cell with arrows on the atoms only; cell shape and volume are held fixed."
     }
   },
   {
@@ -260,18 +271,17 @@
       }
     ],
     "hints": [
-      "Check the source cited in the Material Builder tour.",
-      "Review the summary table and callouts on the topic page."
+      "Which radii does the Builder compare distances with?",
+      "Do periodic images count as neighbours?"
     ],
     "difficulty": 0.1,
     "level": "intermediate",
     "sources": [
-      "S-021"
+      "S-021",
+      "S-052"
     ],
     "visual": {
-      "scene": "fcc",
-      "caption": "Minimum-image distance check in a periodic cell.",
-      "alt": "FCC crystal lattice."
+      "none": "A question about how a site tool behaves; a picture would only restate the answer."
     }
   },
   {
@@ -300,7 +310,7 @@
     ],
     "hints": [
       "Remember the Heuristic badge shown on Molecule mode's 3D clean-up panel.",
-      "Review the summary table and callouts on the topic page."
+      "Is any electronic structure computed in the browser?"
     ],
     "difficulty": 0,
     "level": "beginner",
@@ -308,9 +318,407 @@
       "S-021"
     ],
     "visual": {
-      "scene": "diamond",
-      "caption": "Tetrahedral 3D starting geometry.",
-      "alt": "3D tetrahedral molecular/crystal geometry."
+      "none": "A question about how a site tool behaves; a picture would only restate the answer."
+    }
+  },
+  {
+    "id": "q-m11-9",
+    "concepts": [
+      "supercells",
+      "material-builder"
+    ],
+    "type": "single",
+    "prompt": "For the 3.905 Å cubic perovskite template, \"Defect supercell (>= 10 A)\" builds a cell of 16 copies (80 atoms) instead of the 3×3×3 cell (135 atoms). Why?",
+    "options": [
+      {
+        "text": "It searches all supercells up to 64 copies for the fewest atoms whose shortest lattice vector is at least 10 Å, and a non-diagonal cell of 16 copies already reaches about 11 Å",
+        "correct": true,
+        "why": "A non-diagonal matrix with determinant 16 gives vectors of at least 2 sqrt(2) a, about 11 Å, with far fewer atoms than the diagonal 3×3×3 cell."
+      },
+      {
+        "text": "It always doubles the cell four times",
+        "correct": false,
+        "why": "The search picks the smallest determinant that meets the distance; for another cell it can be a different number."
+      },
+      {
+        "text": "VASP cannot run cells with more than 100 atoms",
+        "correct": false,
+        "why": "VASP runs much larger cells; the choice is about cost for a given image distance."
+      }
+    ],
+    "hints": [
+      "How many atoms does a cell of det(M) copies hold?",
+      "Is the shortest lattice vector of a non-diagonal supercell always a multiple of a?"
+    ],
+    "difficulty": 0.3,
+    "level": "intermediate",
+    "sources": [
+      "S-067"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "The five-atom cubic perovskite cell (SrTiO3 drawn here, the same structure type as the LaCuO3 template) that a supercell repeats. Illustrative.",
+      "alt": "A cubic perovskite cell: one atom at the centre inside an octahedron of six oxygen atoms, other atoms at the corners."
+    }
+  },
+  {
+    "id": "q-m11-10",
+    "concepts": [
+      "magnetic-orderings"
+    ],
+    "type": "single",
+    "prompt": "Which site tool gives you the doubled LaCuO3 cell for G-type order together with a matching MAGMOM line?",
+    "options": [
+      {
+        "text": "The Magnetic configuration tool",
+        "correct": true,
+        "why": "It builds ferromagnetic, A-, C- and G-type cells, finds the smallest supercell that holds the order, and writes POSCAR, MAGMOM and an INCAR fragment."
+      },
+      {
+        "text": "The Convergence Plotter",
+        "correct": false,
+        "why": "The plotter reads finished runs and marks converged settings; it does not build cells."
+      },
+      {
+        "text": "Materials Screening",
+        "correct": false,
+        "why": "The Studio filters a materials table and writes starter INCARs without MAGMOM; it does not build magnetic supercells."
+      }
+    ],
+    "hints": [
+      "Which tool lists A-, C- and G-type orders?",
+      "The relaxation page of module 10 uses it in stage 2."
+    ],
+    "difficulty": -0.4,
+    "level": "beginner",
+    "sources": [
+      "S-058"
+    ],
+    "visual": {
+      "scene": "afm-g",
+      "caption": "G-type order: every neighbour is opposite, so one cubic cell cannot hold it and a larger cell is needed. Toy model, hand-set signs.",
+      "alt": "Eight atoms in a 2 by 2 by 2 cubic block with alternating up and down arrows; up arrows have a solid head, down arrows an open head."
+    }
+  },
+  {
+    "id": "q-m11-11",
+    "concepts": [
+      "equation-of-state"
+    ],
+    "type": "single",
+    "prompt": "The equation-of-state fit warns that its minimum lies outside the sampled volumes. What should you do?",
+    "options": [
+      {
+        "text": "Run more volumes on the other side of the minimum so the points bracket it, then fit again",
+        "correct": true,
+        "why": "A fit that extrapolates past the data gives an unreliable V0 and an especially unreliable B0 prime."
+      },
+      {
+        "text": "Switch from Birch-Murnaghan to Murnaghan to remove the warning",
+        "correct": false,
+        "why": "Changing the form does not add data; the extrapolation problem stays."
+      },
+      {
+        "text": "Ignore it, since the bulk modulus does not depend on the minimum",
+        "correct": false,
+        "why": "B0 is the curvature at the minimum, so it depends on where the minimum is."
+      }
+    ],
+    "hints": [
+      "What does extrapolation do to a fitted curvature?",
+      "B0 is defined at V0."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-061",
+      "S-068"
+    ],
+    "visual": {
+      "none": "A question about sampling a fit well; the tool itself draws the curve for your own data."
+    }
+  },
+  {
+    "id": "q-m11-12",
+    "concepts": [
+      "screening"
+    ],
+    "type": "single",
+    "prompt": "A result on the site carries the badge \"Heuristic\". How should you use it?",
+    "options": [
+      {
+        "text": "As a rule of thumb to decide what to run, not as a result to report",
+        "correct": true,
+        "why": "Tolerance factors, feasibility verdicts and cost estimates are useful guides, but they are not computed properties of the material."
+      },
+      {
+        "text": "As an exact value computed from your files",
+        "correct": false,
+        "why": "That is the \"computed\" badge; a heuristic rests on an empirical rule."
+      },
+      {
+        "text": "As a toy model that has nothing to do with real materials",
+        "correct": false,
+        "why": "Toy models carry their own badge; heuristics do apply to real materials, only approximately."
+      }
+    ],
+    "hints": [
+      "The overview page lists three kinds of badge.",
+      "Is a tolerance factor a measured property?"
+    ],
+    "difficulty": -0.5,
+    "level": "beginner",
+    "sources": [
+      "S-002",
+      "S-042"
+    ],
+    "visual": {
+      "none": "A question about how a site tool behaves; a picture would only restate the answer."
+    }
+  },
+  {
+    "id": "q-m11-13",
+    "concepts": [
+      "kpoint-mesh"
+    ],
+    "type": "single",
+    "prompt": "For the cubic LaCuO3 cell with a = 3.88 Å and KSPACING = 0.2 per Å, how many k-points does VASP use along each axis?",
+    "options": [
+      {
+        "text": "9",
+        "correct": true,
+        "why": "N = ceil(|b| / KSPACING) with |b| = 2 pi / a = 1.619 per Å, so 1.619 / 0.2 = 8.1, rounded up to 9."
+      },
+      {
+        "text": "8",
+        "correct": false,
+        "why": "The formula rounds up, not to the nearest integer, so 8.1 becomes 9."
+      },
+      {
+        "text": "2",
+        "correct": false,
+        "why": "That forgets the factor 2 pi in the length of the reciprocal vector."
+      }
+    ],
+    "hints": [
+      "The length of the reciprocal vector of a cubic cell is 2 pi / a.",
+      "Does VASP round up or to the nearest integer?"
+    ],
+    "difficulty": 0.2,
+    "level": "intermediate",
+    "sources": [
+      "S-019"
+    ],
+    "visual": {
+      "plot": "kmesh-grid",
+      "params": {
+        "n": 9,
+        "gamma": true,
+        "angle": 90,
+        "ratio": 1
+      },
+      "caption": "A 9 by 9 slice of a Gamma-centred mesh in a cubic reciprocal cell.",
+      "alt": "Square reciprocal cell with a nine by nine grid of dots for the k-points and a circle marking the Gamma point."
+    }
+  },
+  {
+    "id": "q-m11-14",
+    "concepts": [
+      "total-energy",
+      "supercells"
+    ],
+    "type": "single",
+    "prompt": "For one neutral oxygen vacancy in LaCuO3, which expression is the formation energy?",
+    "options": [
+      {
+        "text": "E_f = E_defect - E_bulk + mu_O",
+        "correct": true,
+        "why": "One O atom is removed, so n_O = -1 in E_f = E_defect - E_bulk - sum n_i mu_i, which turns the minus into a plus."
+      },
+      {
+        "text": "E_f = E_defect - E_bulk - mu_O",
+        "correct": false,
+        "why": "That would be the sign for an added O atom (an interstitial), not a removed one."
+      },
+      {
+        "text": "E_f = E_defect - E_bulk",
+        "correct": false,
+        "why": "The removed atom goes to a reservoir with chemical potential mu_O, which must be counted."
+      }
+    ],
+    "hints": [
+      "Is n_O positive or negative for a vacancy?",
+      "Where does the removed atom go?"
+    ],
+    "difficulty": 0.2,
+    "level": "intermediate",
+    "sources": [
+      "S-067"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "A cubic perovskite cell (SrTiO3 drawn here, the same structure type as LaCuO3). A vacancy removes one of the oxygen atoms. Illustrative.",
+      "alt": "A cubic perovskite cell with an octahedron of six oxygen atoms around the central atom."
+    }
+  },
+  {
+    "id": "q-m11-15",
+    "concepts": [
+      "pseudopotentials",
+      "spin-polarized-dft"
+    ],
+    "type": "single",
+    "prompt": "You run NdCuO3 with the Nd_3 POTCAR. What should MAGMOM hold for Nd?",
+    "options": [
+      {
+        "text": "Zero, because Nd_3 keeps the 4f electrons in the core, so there is no f moment to start",
+        "correct": true,
+        "why": "With the f shell frozen in the core the valence has no open f shell; a moment on Nd has nothing to act on."
+      },
+      {
+        "text": "3 per Nd, one for each unpaired 4f electron of Nd3+",
+        "correct": false,
+        "why": "That would need the 4f electrons in the valence, which Nd_3 does not have."
+      },
+      {
+        "text": "The same value as Cu, so that all cations are treated alike",
+        "correct": false,
+        "why": "MAGMOM should reflect the expected moment of each species, and Cu and Nd differ."
+      }
+    ],
+    "hints": [
+      "What does the _3 in the potential name stand for?",
+      "Where are the 4f electrons in this potential?"
+    ],
+    "difficulty": 0.1,
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "none": "A question about one POTCAR choice; no structure or plot shows the frozen core."
+    }
+  },
+  {
+    "id": "q-m11-16",
+    "concepts": [
+      "total-energy"
+    ],
+    "type": "single",
+    "prompt": "In the surface energy gamma = (E_slab - N E_bulk) / (2A) of a symmetric slab, why is there a factor 2?",
+    "options": [
+      {
+        "text": "The slab has two surfaces, top and bottom, both of area A",
+        "correct": true,
+        "why": "The excess energy of the slab over bulk is shared by two equal surfaces, so it is divided by twice the area."
+      },
+      {
+        "text": "To convert from eV to joules",
+        "correct": false,
+        "why": "Unit conversion uses the electron charge and the area unit, not a factor 2."
+      },
+      {
+        "text": "Because of spin polarization",
+        "correct": false,
+        "why": "The factor counts surfaces; spin does not enter the formula."
+      }
+    ],
+    "hints": [
+      "How many surfaces does a slab in a periodic cell with vacuum have?",
+      "What does symmetric mean here?"
+    ],
+    "difficulty": -0.4,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "none": "A question about counting surfaces in a formula; a picture would only restate it."
+    }
+  },
+  {
+    "id": "q-m11-17",
+    "concepts": [
+      "worked-example-workflow"
+    ],
+    "type": "single",
+    "prompt": "You move from single runs to a Python pipeline. Which habit keeps the results trustworthy?",
+    "options": [
+      {
+        "text": "Check representative runs by hand (moments, NELM, forces) and have the scripts test the same things in OSZICAR and OUTCAR",
+        "correct": true,
+        "why": "A run can finish normally after hitting NELM or losing its moments; the checks you made by hand must become part of the pipeline."
+      },
+      {
+        "text": "Trust the exit code: a run that exits normally is correct",
+        "correct": false,
+        "why": "VASP often exits normally from runs whose results are unusable."
+      },
+      {
+        "text": "Automate first and debug later on the full set",
+        "correct": false,
+        "why": "A mistake in the first run is then repeated in every run."
+      }
+    ],
+    "hints": [
+      "What can a normal exit hide?",
+      "Which checks did Calculation Review make for you?"
+    ],
+    "difficulty": -0.2,
+    "level": "beginner",
+    "sources": [
+      "S-034",
+      "S-042"
+    ],
+    "visual": {
+      "none": "A question about working habits; no plot or structure shows a habit."
+    }
+  },
+  {
+    "id": "q-m11-18",
+    "concepts": [
+      "screening",
+      "scaling"
+    ],
+    "type": "single",
+    "prompt": "The Project Card estimates relative cost as (nsites / 4)^3, times 2 if spin-polarized. What does it give for a magnetic cell of 20 sites?",
+    "options": [
+      {
+        "text": "About 250 times a four-atom non-magnetic cell",
+        "correct": true,
+        "why": "(20 / 4)^3 = 125, and the factor 2 for two spin channels gives 250, at the same settings."
+      },
+      {
+        "text": "About 125 times",
+        "correct": false,
+        "why": "That leaves out the factor 2 for a spin-polarized run."
+      },
+      {
+        "text": "About 10 times",
+        "correct": false,
+        "why": "That treats the cost as linear in the atom count, but the large-cell scaling of plane-wave DFT is cubic."
+      }
+    ],
+    "hints": [
+      "Compute (20 / 4)^3 first.",
+      "A spin-polarized run solves two spin channels."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-010",
+      "S-019"
+    ],
+    "visual": {
+      "plot": "cost-scaling",
+      "params": {
+        "methods": [
+          "dft"
+        ]
+      },
+      "caption": "Cost against system size for a method that grows as size to the power 3. Both axes logarithmic.",
+      "alt": "Straight line on logarithmic axes for DFT, cost rising with system size."
     }
   }
 ]

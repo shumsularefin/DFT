@@ -1,21 +1,44 @@
 ---
 id: relaxation
+stage:
+  scene: m10-relaxation
+  states:
+    - id: cubic
+      section: why
+      params: { cell: cubic, isif: '3', start: fm }
+      caption: 'Stage 1: in the cubic cell every force is zero by symmetry, so ISIF = 3 can only change the lattice parameter. Try ISIF = 2 and 4: then nothing can move at all.'
+    - id: doubled
+      section: intuition
+      params: { cell: doubled, isif: '3', start: g, seed: 0.02 }
+      caption: 'Stage 2: the ten-atom cell holds two octahedra and two Cu. The oxygen arrows are the seed in the a-a-a- pattern, the push that lets a tilt grow; the Cu carry the G-type start.'
+    - id: no-seed
+      section: math
+      params: { cell: doubled, isif: '3', start: g, seed: 0 }
+      caption: 'Without a seed the forces that would start a tilt vanish by symmetry, and the cell stays cubic. Raise the seed slider and watch the octahedra turn.'
+    - id: same-cell
+      section: in-vasp
+      params: { cell: doubled, isif: '3', start: fm, seed: 0.02 }
+      caption: 'The ferromagnetic start MAGMOM = 2*0 2*3 6*0 in the same ten-atom cell, so every configuration shares one cell and its k-point and basis errors cancel.'
+    - id: fixed-volume
+      section: what-changes
+      params: { cell: doubled, isif: '4', start: g, seed: 0.02 }
+      caption: 'ISIF = 4 frees the ions and the cell shape but holds the volume: the handles lie along the faces only. Switch to ISIF = 2 to hold the cell fixed.'
 title: Structural relaxation of RCuO3
 module: 10
 order: 4
-summary: Relaxing cell parameters and octahedral tilts cleanly with ISIF = 3, followed by a static confirmation run on CONTCAR.
-concepts: [worked-example-workflow]
+summary: Relaxing LaCuO3 in two stages, the cubic cell for each spin start and then a doubled cell that can tilt and order antiferromagnetically, with the checks that decide whether a relaxation can be trusted.
+concepts: [worked-example-workflow, relaxation-analysis]
 requires: [relaxation-analysis]
-vaspTags: [IBRION, ISIF, EDIFFG]
-sources: [S-019, S-042]
+vaspTags: [IBRION, ISIF, EDIFFG, NSW, KSPACING, MAGMOM]
+sources: [S-019, S-040, S-041, S-042, S-058, S-096, S-101]
 noLab: true
 status: draft
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 <Why>
 
-Perovskite stability and electronic structure depend sensitively on octahedral tilting and Cu-O bond lengths, so the crystal must be relaxed to tight force and stress tolerances before computing DOS or bands <Cite id="S-042" />.
+Every later property, the density of states, the bands and the energy differences between magnetic states, is evaluated at the relaxed geometry, so an error here travels through the whole project <Cite id="S-042" />. For $\mathrm{LaCuO}_3$ the relaxation answers three structural questions: how long the Cu-O bonds are, whether the octahedra want to tilt, and whether the answer depends on the spin state. It also gives the first honest comparison with experiment, since the fully oxidized compound is reported as rhombohedral, that is, tilted <Cite id="S-096" />.
 
 </Why>
 
@@ -27,58 +50,170 @@ This page documents the structural relaxation protocol for `RCuO3`. Relaxed latt
 
 </Callout>
 
-Run a variable-cell ionic relaxation (`ISIF = 3`, `IBRION = 2`) at the converged `ENCUT` ($\ge 1.3 \times \mathrm{ENMAX}$) until `OUTCAR` reports `reached required accuracy` and every residual force falls below `|EDIFFG|` <Cite id="S-019" />. Afterward, copy `CONTCAR` to `POSCAR` and run one clean static calculation (`IBRION = -1`, `NSW = 0`) so the plane-wave basis is built directly for the relaxed cell <Cite id="S-042" />.
+**Stage 1: the cubic cell, once per spin start.** Relax the five-atom cell of the structure page with `ISIF = 3` (positions, shape and volume) three times: non-magnetic, high-moment start and low-moment start. In the cubic cell all atoms sit on positions fixed by symmetry, so only the lattice parameter can change. The three runs tell you whether the spin state changes the volume, and they give the reference energy of the untilted structure.
 
-<Scene id="perovskite-octahedra" />
+**Restart until the volume stops moving.** A single `ISIF = 3` run keeps the plane-wave basis of the cell it started in. When the volume changes a lot, the basis no longer matches `ENCUT` for the final cell. The author's protocol therefore re-relaxes from `CONTCAR` and then runs a static SCF in the same folder for the reported energy <Cite id="S-042" />.
 
-Drop the finished `OUTCAR`, `OSZICAR`, `POSCAR`, and `CONTCAR` into <a href="/tools/review/">Calculation Review</a> to verify force convergence, electronic convergence, volume change, and whether the space group changed during relaxation.
+**Stage 2: give the octahedra room to tilt.** A rhombohedral perovskite usually has the tilt system that Glazer writes $a^-a^-a^-$: the octahedra rotate by the same angle about all three cubic axes, alternating in sign from one octahedron to the next <Cite id="S-101" />. Because neighbouring octahedra rotate in opposite senses, the repeating unit holds two of them. The same doubled cell also holds the G-type antiferromagnetic order, in which every Cu has neighbours of the opposite spin <Cite id="S-058" />. So one ten-atom cell serves both questions.
+
+**Why you must push the atoms.** From the ideal cubic positions the forces that would start a tilt are exactly zero by symmetry, so a relaxation that starts there stays cubic, even if a tilted structure is lower in energy. Give the oxygen atoms a small displacement in the pattern of the tilt (or a small random "rattle") before relaxing. If the tilt grows during the relaxation, the cubic structure was unstable against it; if it relaxes back, it was stable in this model.
+
+**What to compare.** Run non-magnetic, ferromagnetic and G-type starts in the same ten-atom cell, with and without the tilt, and compare the energies per formula unit from the static runs. Keeping every configuration in the same cell lets k-point and basis errors cancel <Cite id="S-042" />.
 
 </Intuition>
 
 <TheMath>
 
-At equilibrium, both the atomic forces and the stress tensor vanish within numerical tolerances:
+At equilibrium the force on every atom and the stress on the cell vanish. In practice the relaxation stops when they are small enough. With a negative `EDIFFG`, VASP stops when every force is below its magnitude <Cite id="S-019" />:
 
-$$\max_{I} \|\mathbf{F}_I\| < |\mathrm{EDIFFG}|, \qquad \sigma_{\alpha\beta} \approx 0$$
+$$\max_I \lVert \mathbf F_I \rVert < \lvert \mathrm{EDIFFG} \rvert, \qquad \sigma_{\alpha\beta} \approx 0 .$$
 
-For high-precision lattice constants without Pulay-stress bias, fit a fixed-volume energy-volume curve using the <a href="/tools/eos/">Equation of state fit</a> tool <Cite id="S-042" />.
+The author's protocol uses `EDIFFG = -0.005` or `-0.001` <Cite id="S-042" />.
+
+**The doubled cell.** A supercell has lattice vectors $L' = M L$, where the rows of $L$ are the old lattice vectors and $M$ is an integer matrix. It holds $\det M$ copies of the original cell. For the $a^-a^-a^-$ tilt and for G-type order the doubled cell is
+
+$$M = \begin{pmatrix} 0 & 1 & 1 \\ 1 & 0 & 1 \\ 1 & 1 & 0 \end{pmatrix}, \qquad \det M = 2,$$
+
+so it holds two formula units, ten atoms. Its two Cu sites form the same pattern as the two sublattices of a rock-salt crystal, which is exactly what G-type order needs.
+
+**Tilt energy and bond angle.** The quantity to report is
+
+$$\Delta E_\mathrm{tilt} = \frac{E_\mathrm{tilted} - E_\mathrm{untilted}}{N_\mathrm{fu}},$$
+
+both in the same cell, same spin state and same settings. For a rigid octahedron rotated by an angle $\varphi$ about one cubic axis, the Cu-O-Cu angle through the oxygen atoms in the rotation plane drops from 180° to $180° - 2\varphi$ (geometry, not a result). The relaxed Cu-O-Cu angle is the clearest single number for how tilted the structure is.
+
+<Level min="intermediate">
+
+**Pulay stress again.** The stress converges more slowly with `ENCUT` than the energy does, so a relaxation at too low a cutoff finds the wrong volume even when its energy looks converged <Cite id="S-040" />. That is why the relaxation uses 1.3 times `ENMAX`, and why the final energy comes from a static run on the relaxed cell <Cite id="S-042" />.
+
+</Level>
+
+<Level min="pro">
+
+The size of the oxygen displacement matters little as long as it breaks the cubic symmetry in the tilt pattern. Too small and the first ionic steps can take it back towards the high-symmetry point; too large and the first step starts with large forces. A spin-polarized run also has its own symmetry: VASP lowers the symmetry according to `MAGMOM`, so an antiferromagnetic start keeps the two Cu sites apart <Cite id="S-041" />.
+
+</Level>
 
 </TheMath>
 
 <InVasp>
 
-- Use `ISIF = 3` for bulk relaxation and check that `ENCUT >= 1.3 x ENMAX` <Cite id="S-042" />.
-- Always follow a variable-cell relaxation with a static run on `CONTCAR` <Cite id="S-019" />.
-- Inspect the trajectory and final forces in <a href="/tools/review/">Calculation Review</a>.
+**Stage 1 INCAR.** The relaxation INCAR of the structure page, unchanged: `IBRION = 2`, `ISIF = 3`, `NSW = 100`, `EDIFFG = -0.005`. Run it, check it, then:
+
+<VaspFile
+  name="shell"
+  code={`grep "reached required accuracy" OUTCAR   # the ionic loop finished
+cp OUTCAR OUTCAR.relax1; cp CONTCAR CONTCAR.relax1
+cp CONTCAR POSCAR                        # re-relax from the new cell
+mpirun vasp_std > vasp.out
+grep "volume of cell" OUTCAR | tail -1   # compare with the first run`}
+/>
+
+Repeat until the volume no longer changes noticeably between restarts. Then run the static SCF in the same folder, as the next page describes.
+
+**Stage 2: build the ten-atom cell.**
+
+1. Load the relaxed cubic `CONTCAR` into the <a href="/tools/magnetic/">Magnetic configuration tool</a>, choose the G-type ordering, and download its POSCAR and `MAGMOM` line. That gives the doubled cell with the two Cu sites already separated.
+2. Import that POSCAR into the <a href="/builder/">Material Builder</a>, and in the site table move each oxygen by a few hundredths of a lattice unit in the tilt pattern. Check the validity panel for short contacts, then export the POSCAR.
+3. Use the INCAR below, with a `MAGMOM` line that matches the POSCAR order. The example assumes the order La, La, Cu, Cu, then six O. It sets the mesh with `KSPACING`, which VASP uses only when the folder has no `KPOINTS` file, so remove that file <Cite id="S-041" />.
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM   = LaCuO3 doubled cell, tilt seeded, G-type start
+PREC     = Accurate
+ENCUT    = 520
+EDIFF    = 1E-6
+ALGO     = Normal
+NELM     = 120
+ISMEAR   = 0
+SIGMA    = 0.05
+KSPACING = 0.2
+IBRION   = 2
+ISIF     = 3
+NSW      = 150
+EDIFFG   = -0.005
+ISPIN    = 2
+MAGMOM   = 2*0 3 -3 6*0
+LORBIT   = 11
+LASPH    = .TRUE.
+LMAXMIX  = 4
+LREAL    = .FALSE.`}
+  annotations={{
+    9: 'replace with the spacing of your converged cubic mesh',
+    15: 'La La, then Cu up and Cu down, then six O: ten entries',
+  }}
+/>
+
+For the ferromagnetic start use `MAGMOM = 2*0 2*3 6*0`; for the non-magnetic run use `ISPIN = 1`. Run every configuration in this same cell, both with and without the oxygen displacement.
+
+**Checks after each relaxation.** Drop `OUTCAR`, `OSZICAR`, `POSCAR` and `CONTCAR` into <a href="/tools/review/">Calculation Review</a>. It reports whether the ionic loop reached the required accuracy, the final maximum force against the absolute value of `EDIFFG`, whether the electronic loop converged, the smearing entropy per atom and the volume change from `POSCAR` to `CONTCAR`. For the space group, load `CONTCAR` into the <a href="/tools/kpath/">k-path tool</a>, which reports the space group it detects before it builds a path (or use VASPKIT, as in module 7). Then read the moments yourself:
+
+<VaspFile
+  name="shell"
+  code={`grep "mag=" OSZICAR | tail -1                   # total moment of the cell
+grep -A 16 "magnetization (x)" OUTCAR | tail -16  # moment per site`}
+/>
+
+If a G-type start ends with both Cu moments of the same sign, or with no moment, that configuration did not survive; record it as such rather than as an antiferromagnetic energy <Cite id="S-042" />.
 
 </InVasp>
 
 <WhatChanges>
 
-| Stage               | `IBRION` / `ISIF`        | Purpose                                      |
-| ------------------- | ------------------------ | -------------------------------------------- |
-| Bulk relaxation     | `IBRION = 2`, `ISIF = 3` | Relax cell shape, volume, and internal tilts |
-| Static confirmation | `IBRION = -1`, `NSW = 0` | Rebuild plane-wave basis on final `CONTCAR`  |
+| Stage or setting                | What it does                               | What to check                                   |
+| ------------------------------- | ------------------------------------------ | ----------------------------------------------- |
+| Cubic cell, `ISIF = 3`          | Relaxes the lattice parameter only         | Volume per spin start; moment kept              |
+| Re-relax from `CONTCAR`         | Rebuilds the basis for the new cell        | Volume change between restarts becomes small    |
+| Doubled cell, no displacement   | Stays cubic by symmetry                    | The untilted reference energy                   |
+| Doubled cell, oxygen displaced  | Lets the tilt grow if it lowers the energy | Cu-O-Cu angle; space group of `CONTCAR`         |
+| G-type instead of ferromagnetic | Antiparallel Cu moments                    | Both moments keep opposite signs                |
+| `EDIFFG` from -0.005 to -0.001  | Tighter forces, more ionic steps           | Needed for phonons or precise small distortions |
 
-Why run a static step after `ISIF = 3`: the FFT grid and plane-wave sphere stay tied to the starting cell during a single `ISIF = 3` run.
+Why two stages: the cubic cell is cheap and gives the reference; the doubled cell is the smallest that can show the reported distortion and the simplest antiferromagnetic order. Why push the atoms: symmetry keeps an undisturbed cell from ever tilting. What happens if you skip stage 2: you never learn whether the cubic model is even stable.
 
 </WhatChanges>
 
 <Mistakes>
 
-<Callout variant="mistake" title="Using the energy from the last step of a large-volume-change ISIF = 3 run">
+<Callout variant="mistake" title="Relaxing from the ideal positions and concluding there is no tilt">
 
-If the cell volume changes significantly during relaxation, the final step's plane-wave basis no longer matches `ENCUT`. Always copy `CONTCAR` to `POSCAR` and run a fresh static step.
+Forces that would start the tilt are zero at the cubic positions, so the run cannot leave them. Fix: displace the oxygen atoms in the tilt pattern before the relaxation.
+
+</Callout>
+
+<Callout variant="mistake" title="Reporting the energy of the last relaxation step">
+
+After a large volume change the basis belongs to the starting cell. Fix: re-relax from `CONTCAR` and take the energy from a static run on the final cell <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="A positive EDIFFG when you meant forces">
+
+A positive `EDIFFG` stops on the energy change between ionic steps, not on the forces <Cite id="S-019" />. Fix: use a negative value, such as `-0.005`, and confirm `reached required accuracy` in `OUTCAR`.
+
+</Callout>
+
+<Callout variant="mistake" title="Comparing configurations in different cells">
+
+Taking the ferromagnetic energy from the five-atom cell and the G-type energy from the ten-atom cell mixes k-point and basis errors into the difference. Fix: run every configuration in the same ten-atom cell <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Not noticing that an antiferromagnetic start flipped">
+
+A G-type start can end ferromagnetic or non-magnetic, and its energy then belongs to another state. Fix: read the site moments in `OUTCAR` after every run <Cite id="S-041" />.
 
 </Callout>
 
 </Mistakes>
 
-<Check ids={['q-m10-13', 'q-m10-14', 'q-m10-15', 'q-m10-16']} />
+<Check ids={['q-m10-13', 'q-m10-24', 'q-m10-25', 'q-m10-26', 'q-m10-27']} />
 
 <GoDeeper>
 
-- VASP wiki on `ISIF`, `IBRION`, and `EDIFFG` <Cite id="S-019" />.
-- The author's VASP Workflow Handbook on relaxation and static follow-up <Cite id="S-042" />.
+- VASP wiki pages IBRION, ISIF, EDIFFG and KSPACING (by page name) <Cite id="S-019" />.
+- Glazer on tilt systems <Cite id="S-101" />; Wollan and Koehler on the A-, C- and G-type orders <Cite id="S-058" />.
+- Francis and Payne on Pulay stress <Cite id="S-040" />.
+- The author's Workflow Handbook, sections Structural relaxation and Magnetism <Cite id="S-042" />.
 
 </GoDeeper>

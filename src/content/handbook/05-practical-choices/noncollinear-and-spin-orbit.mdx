@@ -1,5 +1,24 @@
 ---
 id: noncollinear-and-spin-orbit
+stage:
+  scene: m05s-noncollinear
+  states:
+    - id: canted
+      section: why
+      params: { texture: canted, angle: 15, saxis: '001' }
+      caption: 'An antiferromagnet canted by 15 degrees: the tilt leaves a small net moment along x, which collinear ISPIN = 2 cannot describe. Drag the angle to see the moment grow.'
+    - id: saxis
+      section: intuition
+      params: { texture: helix, q: 0.17, saxis: '111' }
+      caption: 'Change SAXIS and every spin turns together while the energy readout stays the same. Only spin-orbit coupling makes the directions differ.'
+    - id: helix
+      section: math
+      params: { texture: helix, q: 0.17, j2: -0.5, saxis: '001' }
+      caption: 'A flat helix near q = 1/6, the lowest energy for J2 = -J1/2. Each site needs three MAGMOM numbers; move J2 and compare q with the best helix readout.'
+    - id: cone
+      section: in-vasp
+      params: { texture: cone, angle: 40, q: 0.17, saxis: '001' }
+      caption: 'A conical helix: a net moment along the chain while the rest of each spin turns. MAGMOM holds three components per atom, written in the SAXIS frame.'
 title: Non-collinear magnetism and spin-orbit coupling
 module: 5
 order: 11

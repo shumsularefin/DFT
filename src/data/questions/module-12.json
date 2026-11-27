@@ -1510,5 +1510,1259 @@
       "caption": "The AIMD stability check.",
       "alt": "A three-step flow: set up the MD run, run thousands of steps, then check the structure and the energy trace."
     }
+  },
+  {
+    "id": "q-m12-hull-1",
+    "concepts": [
+      "formation-energy-hull"
+    ],
+    "type": "numeric",
+    "prompt": "A compound AB2 has a total energy of -15.0 eV per formula unit. The elemental references are -3.0 eV per atom for A and -5.0 eV per atom for B. What is its formation energy per atom, in eV?",
+    "answer": -0.667,
+    "tolerance": 0.01,
+    "unit": "eV/atom",
+    "hints": [
+      "Subtract one A reference and two B references from the compound energy.",
+      "Divide by the number of atoms in the formula unit, which is 3, not 2."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Total energy of the compound"
+          },
+          {
+            "label": "Subtract the elemental references"
+          },
+          {
+            "label": "Divide by the atoms per formula unit"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "The three steps from total energies to a formation energy.",
+      "alt": "A three-step flow: take the compound's total energy, subtract the reference energies of its elements, divide by the number of atoms."
+    }
+  },
+  {
+    "id": "q-m12-hull-2",
+    "concepts": [
+      "formation-energy-hull"
+    ],
+    "type": "single",
+    "prompt": "On a binary A-B hull, A is at (0, 0), AB at (0.5, -1.0 eV/atom) and B at (1, 0). A new compound A3B (fraction of B 0.25) has a formation energy of -0.40 eV/atom, and no other phases exist. What does the hull say?",
+    "options": [
+      {
+        "text": "It is 0.10 eV/atom above the hull and decomposes into A and AB",
+        "correct": true,
+        "why": "The hull at x = 0.25 lies halfway along the segment from A to AB, at -0.50 eV/atom. The compound sits 0.10 eV/atom higher, so splitting into A and AB (A3B to 2A + AB) lowers the energy."
+      },
+      {
+        "text": "It is stable because its formation energy is negative",
+        "correct": false,
+        "why": "Tempting, but negative only means lower than the elements. The test is against every mixture of other phases, and A plus AB is lower here."
+      },
+      {
+        "text": "It is 0.40 eV/atom above the hull",
+        "correct": false,
+        "why": "That compares it with the elements at zero. The hull at this composition is set by A and AB, not by the elements alone."
+      },
+      {
+        "text": "It decomposes into AB and B",
+        "correct": false,
+        "why": "B lies on the other side of AB. A composition of 0.25 sits between A (0) and AB (0.5), so those are the products."
+      }
+    ],
+    "hints": [
+      "Draw the straight line from A at (0, 0) to AB at (0.5, -1.0).",
+      "Read that line at x = 0.25 and compare with -0.40."
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-034"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Place every phase by composition and energy"
+          },
+          {
+            "label": "Draw the lower envelope"
+          },
+          {
+            "label": "Measure each phase against it"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "Building a binary hull.",
+      "alt": "A three-step flow: plot each phase at its composition and formation energy, draw the lower convex envelope, measure the vertical distance of each phase from it."
+    }
+  },
+  {
+    "id": "q-m12-hull-3",
+    "concepts": [
+      "formation-energy-hull"
+    ],
+    "type": "single",
+    "prompt": "You want to put a transition-metal oxide computed with GGA+U on the same hull as the metal computed with plain GGA. What does the Materials Project scheme do?",
+    "options": [
+      {
+        "text": "It computes each with its own method and adds a fitted energy per transition-metal atom to the GGA+U compound",
+        "correct": true,
+        "why": "Jain and co-workers fitted these corrections so that GGA and GGA+U energies share one hull; MP2020 refitted them with uncertainties."
+      },
+      {
+        "text": "It subtracts the two energies directly; U cancels out",
+        "correct": false,
+        "why": "U adds an energy term that depends on the d occupation, which differs between metal and oxide. It does not cancel."
+      },
+      {
+        "text": "It recomputes the metal with the same U, so no correction is needed",
+        "correct": false,
+        "why": "A U on a metal spoils its description; the scheme avoids that by keeping the metal at GGA and correcting the oxide."
+      },
+      {
+        "text": "It ignores the oxides and builds the hull from metals only",
+        "correct": false,
+        "why": "Then no oxide could be judged at all. The correction exists precisely to mix the two classes."
+      }
+    ],
+    "hints": [
+      "Can energies with and without U be subtracted directly?",
+      "Where is the fitted constant added: to the element or to the compound?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-080",
+      "S-081"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Metals and alloys with GGA"
+          },
+          {
+            "label": "Oxides and fluorides with GGA+U"
+          },
+          {
+            "label": "Fitted corrections"
+          },
+          {
+            "label": "One hull"
+          }
+        ],
+        "active": 2
+      },
+      "caption": "Combining two kinds of calculation.",
+      "alt": "A four-step flow: compute metals with GGA, transition-metal oxides and fluorides with GGA+U, apply fitted corrections, build one hull."
+    }
+  },
+  {
+    "id": "q-m12-hull-4",
+    "concepts": [
+      "formation-energy-hull"
+    ],
+    "type": "single",
+    "prompt": "A screening study keeps every candidate within 25 meV/atom of the hull. Which description of that cut-off is honest?",
+    "options": [
+      {
+        "text": "A heuristic, about the thermal energy at room temperature; many known compounds are metastable and some sit further above",
+        "correct": true,
+        "why": "k_B T at 300 K is about 25.9 meV, and surveys of known crystals find a spread of metastability. The number is a rule of thumb, not a law."
+      },
+      {
+        "text": "A law: compounds above 25 meV/atom cannot be made",
+        "correct": false,
+        "why": "Tempting because a threshold looks sharp, but many synthesized materials lie above such cut-offs; kinetics can trap them."
+      },
+      {
+        "text": "It guarantees that every compound below it can be made",
+        "correct": false,
+        "why": "The hull ignores kinetics, entropy and missing competing phases, so passing the filter guarantees nothing."
+      },
+      {
+        "text": "It is the error bar of PBE energies",
+        "correct": false,
+        "why": "It is not an error estimate; it is a screening choice tied loosely to the thermal energy."
+      }
+    ],
+    "hints": [
+      "What is k_B T at 300 K in meV?",
+      "Is the hull a statement about kinetics?"
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-031",
+      "S-042",
+      "S-120"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Compute E_hull for each candidate"
+          },
+          {
+            "label": "Apply a cut-off"
+          },
+          {
+            "label": "Treat the survivors as candidates, not certainties"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "A hull-based screen.",
+      "alt": "A three-step flow: compute the energy above the hull, apply a threshold, and treat the remaining compounds as candidates."
+    }
+  },
+  {
+    "id": "q-m12-hull-5",
+    "concepts": [
+      "formation-energy-hull"
+    ],
+    "type": "single",
+    "prompt": "Your new ternary oxide comes out on the hull, but you left out one known competing ternary phase. What is the risk?",
+    "options": [
+      {
+        "text": "The hull is drawn too high, so the compound can look stable when it is not",
+        "correct": true,
+        "why": "A missing phase can only remove points from below; with it included, the hull could pass below your compound and give it a positive energy above the hull."
+      },
+      {
+        "text": "None: the hull only uses binary phases",
+        "correct": false,
+        "why": "A ternary hull uses every phase in the chemical system, ternaries included."
+      },
+      {
+        "text": "The compound will look less stable than it is",
+        "correct": false,
+        "why": "Adding phases can only lower the hull, so leaving one out can only flatter the compound."
+      },
+      {
+        "text": "The formation energy per atom changes",
+        "correct": false,
+        "why": "The formation energy depends only on the compound and the elemental references; the hull is what changes."
+      }
+    ],
+    "hints": [
+      "Can adding a phase raise the hull or only lower it?",
+      "What does a missing point do to the rubber band?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-034"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "List every known phase in the system"
+          },
+          {
+            "label": "Compute them with one recipe"
+          },
+          {
+            "label": "Build the hull"
+          }
+        ],
+        "active": 0
+      },
+      "caption": "Preparing a phase diagram.",
+      "alt": "A three-step flow: list all known phases, compute them with consistent settings, build the convex hull."
+    }
+  },
+  {
+    "id": "q-m12-neb-1",
+    "concepts": [
+      "transition-states"
+    ],
+    "type": "numeric",
+    "prompt": "In harmonic transition state theory, k = nu exp(-Ea / k_B T). At 300 K (k_B T = 0.02585 eV), by what factor does the rate grow if the barrier drops by 0.1 eV and nu stays the same?",
+    "answer": 47.9,
+    "tolerance": 1.5,
+    "unit": "times",
+    "hints": [
+      "The prefactor cancels in the ratio of the two rates.",
+      "Compute exp(0.1 / 0.02585)."
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-122",
+      "S-031"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Write the two rates"
+          },
+          {
+            "label": "Take their ratio"
+          },
+          {
+            "label": "Evaluate the exponential"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "Comparing two rates.",
+      "alt": "A three-step flow: write the rate for each barrier, divide one by the other, evaluate the exponential."
+    }
+  },
+  {
+    "id": "q-m12-neb-2",
+    "concepts": [
+      "transition-states"
+    ],
+    "type": "single",
+    "prompt": "In the nudged elastic band, which parts of the forces act on each image?",
+    "options": [
+      {
+        "text": "The true force perpendicular to the path and the spring force along it",
+        "correct": true,
+        "why": "The perpendicular true force pulls the band onto the valley floor; the parallel spring force keeps the images spaced. This projection is the nudge."
+      },
+      {
+        "text": "The full true force and the full spring force",
+        "correct": false,
+        "why": "Then the images slide down into the end valleys and the springs cut corners: the band drifts off the minimum energy path."
+      },
+      {
+        "text": "The true force along the path and the spring force perpendicular to it",
+        "correct": false,
+        "why": "That is reversed: the true force along the path would push images into the minima."
+      },
+      {
+        "text": "Only the spring force",
+        "correct": false,
+        "why": "Without the true force the band never finds the valley floor; it stays a straight line."
+      }
+    ],
+    "hints": [
+      "Which force should push the band onto the valley floor?",
+      "Which force should keep the images apart?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-121"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Compute the true force on each image"
+          },
+          {
+            "label": "Project it onto the tangent"
+          },
+          {
+            "label": "Add the spring force"
+          },
+          {
+            "label": "Move the images"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "One step of an elastic band.",
+      "alt": "A four-step flow: compute the force on each image, project with the path tangent, add spring forces, move the images."
+    }
+  },
+  {
+    "id": "q-m12-neb-3",
+    "concepts": [
+      "transition-states"
+    ],
+    "type": "single",
+    "prompt": "Why turn on the climbing image (LCLIMB = .TRUE.) for the final NEB run?",
+    "options": [
+      {
+        "text": "So that the highest image ends exactly on the saddle point and the barrier is not underestimated",
+        "correct": true,
+        "why": "The climbing image drops its springs and has the force along the path reversed, so it climbs to the saddle; plain images only bracket it."
+      },
+      {
+        "text": "To make the springs stiffer",
+        "correct": false,
+        "why": "The climbing image removes the springs on one image; it does not change the spring constant of the others."
+      },
+      {
+        "text": "To relax the two end points",
+        "correct": false,
+        "why": "The end points stay fixed in NEB; they must be relaxed beforehand."
+      },
+      {
+        "text": "To find a second, lower path",
+        "correct": false,
+        "why": "It refines the same path; finding a different path needs a different starting guess."
+      }
+    ],
+    "hints": [
+      "Does any plain image sit exactly on the highest point?",
+      "What happens to the climbing image's force along the path?"
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-121"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Converge a plain NEB"
+          },
+          {
+            "label": "Restart with the climbing image"
+          },
+          {
+            "label": "Read the barrier"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "A two-stage NEB strategy.",
+      "alt": "A three-step flow: converge a plain elastic band, restart with the climbing image switched on, read the barrier."
+    }
+  },
+  {
+    "id": "q-m12-neb-4",
+    "concepts": [
+      "transition-states"
+    ],
+    "type": "single",
+    "prompt": "You run a CI-NEB with 5 images and the VTST optimizer. Which setup is right?",
+    "options": [
+      {
+        "text": "Folders 00 to 06, IMAGES = 5, IBRION = 3 and POTIM = 0, a rank count divisible by 5",
+        "correct": true,
+        "why": "00 and 06 hold the end points, 01 to 05 the images; IBRION = 3 with POTIM = 0 hands the moves to the VTST optimizer, and each image gets an equal share of ranks."
+      },
+      {
+        "text": "Folders 01 to 05, IMAGES = 7",
+        "correct": false,
+        "why": "The end points need their own folders, 00 and N+1, and IMAGES counts only the movable images."
+      },
+      {
+        "text": "IBRION = 2 and POTIM = 0.5 with IOPT = 1",
+        "correct": false,
+        "why": "With IBRION = 2 VASP's own optimizer also moves the images; the VTST optimizers expect IBRION = 3 and POTIM = 0."
+      },
+      {
+        "text": "Any number of MPI ranks",
+        "correct": false,
+        "why": "The ranks are split evenly over the images, so the count must be a multiple of IMAGES."
+      }
+    ],
+    "hints": [
+      "How many folders hold the end points?",
+      "Which VASP optimizer setting leaves the moves to VTST?"
+    ],
+    "difficulty": 1,
+    "level": "pro",
+    "sources": [
+      "S-124",
+      "S-034"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Relax both end points"
+          },
+          {
+            "label": "Make folders 00 to N+1"
+          },
+          {
+            "label": "Set IMAGES and the optimizer"
+          },
+          {
+            "label": "Run"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "Preparing an NEB run.",
+      "alt": "A four-step flow: relax the end points, create the numbered folders, set the image count and the optimizer, run."
+    }
+  },
+  {
+    "id": "q-m12-neb-5",
+    "concepts": [
+      "transition-states"
+    ],
+    "type": "single",
+    "prompt": "A frequency calculation on your converged climbing image shows two imaginary modes. What does that mean?",
+    "options": [
+      {
+        "text": "It is a higher-order saddle, not a transition state; rethink the path",
+        "correct": true,
+        "why": "A first-order saddle has exactly one imaginary mode, along the path. Two mean the structure is a maximum in a second direction too."
+      },
+      {
+        "text": "It is a confirmed transition state",
+        "correct": false,
+        "why": "A transition state has exactly one imaginary mode; two is one too many."
+      },
+      {
+        "text": "It is a local minimum",
+        "correct": false,
+        "why": "A minimum has no imaginary modes at all."
+      },
+      {
+        "text": "Nothing; NEB results never need checking",
+        "correct": false,
+        "why": "An NEB that converged is a path, not a proof; the frequency check is what confirms the saddle."
+      }
+    ],
+    "hints": [
+      "How many imaginary modes does a first-order saddle have?",
+      "What does an extra imaginary mode say about another direction?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-121",
+      "S-122"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Converged CI-NEB"
+          },
+          {
+            "label": "Frequency run on the climbing image"
+          },
+          {
+            "label": "Count the imaginary modes"
+          }
+        ],
+        "active": 2
+      },
+      "caption": "Checking a saddle point.",
+      "alt": "A three-step flow: converge the climbing-image NEB, run a frequency calculation on the top image, count the imaginary modes."
+    }
+  },
+  {
+    "id": "q-m12-md-1",
+    "concepts": [
+      "molecular-dynamics"
+    ],
+    "type": "single",
+    "prompt": "Why does an AIMD run of a hydrogen-containing material need a smaller POTIM than one of a heavy-atom oxide?",
+    "options": [
+      {
+        "text": "Light atoms vibrate faster, so the time step must be shorter to follow them",
+        "correct": true,
+        "why": "A spring's frequency goes as one over the square root of the mass, so hydrogen vibrates fastest; the Field Handbook uses 0.5 fs with hydrogen instead of 1 fs."
+      },
+      {
+        "text": "Hydrogen needs a higher ENCUT",
+        "correct": false,
+        "why": "The cutoff is a separate convergence choice; the time step is about how fast the atoms move."
+      },
+      {
+        "text": "Hydrogen atoms are larger",
+        "correct": false,
+        "why": "Size is not the issue; mass is. Hydrogen is the lightest atom."
+      },
+      {
+        "text": "The thermostat does not work with hydrogen",
+        "correct": false,
+        "why": "Thermostats work with any atoms; the problem is resolving fast vibrations."
+      }
+    ],
+    "hints": [
+      "How does the frequency of a spring depend on the mass?",
+      "What happens if a step is a large fraction of a vibration period?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-041",
+      "S-047"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Pick the time step"
+          },
+          {
+            "label": "Run a short NVE test"
+          },
+          {
+            "label": "Check energy conservation"
+          }
+        ],
+        "active": 0
+      },
+      "caption": "Choosing an MD time step.",
+      "alt": "A three-step flow: choose a time step, run a short constant-energy test, check that the total energy stays constant."
+    }
+  },
+  {
+    "id": "q-m12-md-2",
+    "concepts": [
+      "molecular-dynamics"
+    ],
+    "type": "single",
+    "prompt": "In an NVE run the total energy drifts steadily upward. What is the most likely cause?",
+    "options": [
+      {
+        "text": "The time step is too large or the electronic convergence too loose",
+        "correct": true,
+        "why": "In NVE the total energy is conserved by the equations of motion; drift means the integration or the forces are not accurate enough."
+      },
+      {
+        "text": "The thermostat is too weak",
+        "correct": false,
+        "why": "NVE has no thermostat; that is what makes the total energy a clean check."
+      },
+      {
+        "text": "Nothing; the total energy always rises in MD",
+        "correct": false,
+        "why": "In NVE it should fluctuate around a constant."
+      },
+      {
+        "text": "The cell is too small",
+        "correct": false,
+        "why": "A small cell gives noisy averages, but it does not make a conserved quantity drift."
+      }
+    ],
+    "hints": [
+      "Which quantity is conserved in NVE?",
+      "What controls the accuracy of each step?"
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-125"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Run NVE"
+          },
+          {
+            "label": "Plot the total energy"
+          },
+          {
+            "label": "Look for drift"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "An energy conservation check.",
+      "alt": "A three-step flow: run a constant-energy simulation, plot the total energy against time, look for a drift."
+    }
+  },
+  {
+    "id": "q-m12-md-3",
+    "concepts": [
+      "molecular-dynamics"
+    ],
+    "type": "numeric",
+    "prompt": "In the straight, long-time part of an MSD curve from a 3D simulation, the MSD grows by 6.0 square angstrom every 10 ps. What is the diffusion coefficient, in square angstrom per ps?",
+    "answer": 0.1,
+    "tolerance": 0.005,
+    "unit": "angstrom^2/ps",
+    "hints": [
+      "In three dimensions, D is the slope of the MSD divided by 6.",
+      "The slope is 6.0 / 10 square angstrom per ps."
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-125"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Unwrap the trajectory"
+          },
+          {
+            "label": "Compute the MSD"
+          },
+          {
+            "label": "Fit the straight part"
+          },
+          {
+            "label": "Divide the slope by 6"
+          }
+        ],
+        "active": 2
+      },
+      "caption": "From a trajectory to a diffusion coefficient.",
+      "alt": "A four-step flow: unwrap the coordinates, compute the mean squared displacement, fit its straight part, divide the slope by six."
+    }
+  },
+  {
+    "id": "q-m12-md-4",
+    "concepts": [
+      "molecular-dynamics"
+    ],
+    "type": "single",
+    "prompt": "Which MDALGO does VASP use for an NPT run, as pymatgen's NPT input set writes it?",
+    "options": [
+      {
+        "text": "MDALGO = 3 (Langevin) with ISIF = 3, LANGEVIN_GAMMA, LANGEVIN_GAMMA_L and PMASS",
+        "correct": true,
+        "why": "The Langevin thermostat with a lattice friction and a lattice mass lets the cell change; ISIF = 3 turns on the cell degrees of freedom."
+      },
+      {
+        "text": "MDALGO = 2 (Nose-Hoover) with ISIF = 0",
+        "correct": false,
+        "why": "ISIF = 0 does not even compute the stress, so the cell cannot respond to pressure."
+      },
+      {
+        "text": "IBRION = 2 with ISIF = 3",
+        "correct": false,
+        "why": "That is a relaxation of the cell, not molecular dynamics."
+      },
+      {
+        "text": "MDALGO = 1 with ANDERSEN_PROB = 0",
+        "correct": false,
+        "why": "That switches the Andersen thermostat off, giving constant energy, not constant pressure."
+      }
+    ],
+    "hints": [
+      "Which thermostat does the pymatgen NPT set use?",
+      "Which ISIF lets the cell shape and volume change?"
+    ],
+    "difficulty": 1,
+    "level": "pro",
+    "sources": [
+      "S-034",
+      "S-019"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Choose the ensemble"
+          },
+          {
+            "label": "Choose the thermostat"
+          },
+          {
+            "label": "Set the cell degrees of freedom"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "Setting up an MD ensemble.",
+      "alt": "A three-step flow: pick the ensemble, pick the thermostat, set which cell degrees of freedom may change."
+    }
+  },
+  {
+    "id": "q-m12-md-5",
+    "concepts": [
+      "molecular-dynamics"
+    ],
+    "type": "single",
+    "prompt": "During on-the-fly MLFF training in VASP, when does VASP do a DFT calculation instead of using the force field?",
+    "options": [
+      {
+        "text": "When the Bayesian estimate of the force-field error is too large",
+        "correct": true,
+        "why": "The force field predicts forces and an error estimate at every step; a large estimate triggers a first-principles step, whose result joins the training set."
+      },
+      {
+        "text": "At every step, the force field is only used afterwards",
+        "correct": false,
+        "why": "Then training would cost as much as plain AIMD; skipping most DFT steps is the point of on-the-fly learning."
+      },
+      {
+        "text": "Never, the force field is trained on an empty set",
+        "correct": false,
+        "why": "Training needs DFT data; the first steps and the uncertain ones are computed with DFT."
+      },
+      {
+        "text": "Only at the last step",
+        "correct": false,
+        "why": "A single DFT step at the end could not train anything."
+      }
+    ],
+    "hints": [
+      "What does a Bayesian fit give besides the prediction?",
+      "Why would you want DFT exactly where the model is unsure?"
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-127"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Predict forces and an error estimate"
+          },
+          {
+            "label": "Error too large: run DFT and learn"
+          },
+          {
+            "label": "Error small: move with the force field"
+          }
+        ],
+        "active": 0
+      },
+      "caption": "One step of on-the-fly learning.",
+      "alt": "A three-step flow: the force field predicts forces with an error estimate, a large estimate triggers a DFT step, a small one lets the run move on."
+    }
+  },
+  {
+    "id": "q-slab-1",
+    "concepts": [
+      "surface-slabs"
+    ],
+    "type": "numeric",
+    "prompt": "A symmetric, stoichiometric slab holds 8 bulk formula units. Illustrative energies: E_slab = -210.0 eV, E_bulk = -27.0 eV per formula unit, and one face has an area of 15 square angstrom. What is the surface energy in eV per square angstrom?",
+    "answer": 0.2,
+    "tolerance": 0.005,
+    "unit": "eV/A^2",
+    "hints": [
+      "Subtract 8 times the bulk energy from the slab energy.",
+      "A symmetric slab has two faces, so divide by twice the area."
+    ],
+    "difficulty": 0.3,
+    "level": "intermediate",
+    "sources": [
+      "S-018"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Relax the symmetric slab"
+          },
+          {
+            "label": "Subtract n times the bulk energy"
+          },
+          {
+            "label": "Divide by the area of both faces"
+          }
+        ],
+        "active": -1
+      },
+      "caption": "The surface energy from a symmetric slab.",
+      "alt": "A three-step flow: relax the slab, subtract the bulk energy of its formula units, divide by the area of both faces."
+    }
+  },
+  {
+    "id": "q-slab-2",
+    "concepts": [
+      "surface-slabs"
+    ],
+    "type": "single",
+    "prompt": "Your slab has its surface normal along the third lattice vector. Which k-mesh suits it?",
+    "options": [
+      {
+        "text": "8 x 8 x 1, Gamma-centred",
+        "correct": true,
+        "why": "The bands do not disperse across the vacuum, so one point along the normal is enough; the in-plane mesh matches the bulk sampling."
+      },
+      {
+        "text": "8 x 8 x 8",
+        "correct": false,
+        "why": "Tempting because it looks thorough, but points along the vacuum sample nothing and multiply the cost."
+      },
+      {
+        "text": "1 x 1 x 8",
+        "correct": false,
+        "why": "That samples the vacuum direction and leaves the periodic in-plane directions with a single point."
+      },
+      {
+        "text": "8 x 8 x 4, Monkhorst-Pack",
+        "correct": false,
+        "why": "Still wastes points along the vacuum, and a shifted mesh can break the in-plane symmetry."
+      }
+    ],
+    "hints": [
+      "Is there any dispersion across empty space?",
+      "Which directions of a slab are really periodic?"
+    ],
+    "difficulty": -0.5,
+    "level": "beginner",
+    "sources": [
+      "S-018",
+      "S-041"
+    ],
+    "visual": {
+      "plot": "kmesh-grid",
+      "params": {
+        "n": 8,
+        "m": 8,
+        "gamma": true
+      },
+      "caption": "An in-plane 8 by 8 Gamma-centred mesh of a slab.",
+      "alt": "Sixty-four k-points on a square grid in the plane of the surface, the centre point circled."
+    }
+  },
+  {
+    "id": "q-slab-3",
+    "concepts": [
+      "surface-slabs"
+    ],
+    "type": "single",
+    "prompt": "An asymmetric slab (bottom layers fixed at bulk positions, top relaxed) gives a planar-averaged potential that slopes across the vacuum instead of being flat. What should you add?",
+    "options": [
+      {
+        "text": "LDIPOL = .TRUE. and IDIPOL = 3",
+        "correct": true,
+        "why": "The net dipole of an asymmetric slab sets up an artificial field in the periodic cell; the dipole correction removes it so both vacuum regions are flat."
+      },
+      {
+        "text": "More k-points along the vacuum",
+        "correct": false,
+        "why": "The slope comes from electrostatics, not from k-point sampling."
+      },
+      {
+        "text": "ISIF = 3 so the cell can relax the field away",
+        "correct": false,
+        "why": "The vacuum would collapse, and the field is not a stress."
+      },
+      {
+        "text": "LVTOT instead of LVHAR",
+        "correct": false,
+        "why": "That changes which potential is written, not the field that causes the slope."
+      }
+    ],
+    "hints": [
+      "What does an asymmetric slab have that a symmetric one does not?",
+      "Which tags switch on a correction along the third lattice vector?"
+    ],
+    "difficulty": 0.3,
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-066",
+      "S-109"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Build the asymmetric slab"
+          },
+          {
+            "label": "Relax the top layers"
+          },
+          {
+            "label": "Write LOCPOT"
+          },
+          {
+            "label": "Average the potential over planes along the normal"
+          }
+        ],
+        "active": 3
+      },
+      "caption": "The steps that lead to the planar-averaged potential.",
+      "alt": "A four-step flow from building the slab to the planar-averaged potential, with the averaging step highlighted."
+    }
+  },
+  {
+    "id": "q-slab-4",
+    "concepts": [
+      "surface-slabs"
+    ],
+    "type": "single",
+    "prompt": "In rock-salt NaCl, which surface is polar (Tasker type 3)?",
+    "options": [
+      {
+        "text": "(111)",
+        "correct": true,
+        "why": "Along (111) the layers are alternately all Na and all Cl, so the repeat unit carries a dipole."
+      },
+      {
+        "text": "(100)",
+        "correct": false,
+        "why": "Each (100) layer holds equal numbers of Na and Cl, so it is neutral (type 1)."
+      },
+      {
+        "text": "(110)",
+        "correct": false,
+        "why": "The (110) layers of rock salt also hold Na and Cl in equal numbers and are neutral."
+      },
+      {
+        "text": "None: ionic crystals have no polar surfaces",
+        "correct": false,
+        "why": "Tasker type 3 surfaces are exactly the polar surfaces of ionic crystals."
+      }
+    ],
+    "hints": [
+      "Look at which atoms share a layer along each direction.",
+      "A polar surface alternates charged layers of opposite sign."
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-063"
+    ],
+    "visual": {
+      "scene": "rocksalt",
+      "caption": "Rock-salt NaCl in its cubic cell.",
+      "alt": "Sodium and chlorine atoms alternating on a cubic grid, each with six neighbours of the other kind."
+    }
+  },
+  {
+    "id": "q-slab-5",
+    "concepts": [
+      "surface-slabs"
+    ],
+    "type": "numeric",
+    "prompt": "The planar-averaged electrostatic potential of a symmetric slab is flat in the vacuum at 4.80 eV, and OUTCAR gives E-fermi = -0.35 eV. What is the work function in eV?",
+    "answer": 5.15,
+    "tolerance": 0.02,
+    "unit": "eV",
+    "hints": [
+      "The work function is the vacuum level minus the Fermi level.",
+      "Mind the sign of the Fermi level."
+    ],
+    "difficulty": -0.3,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Write LOCPOT with LVHAR"
+          },
+          {
+            "label": "Average the potential over planes along the normal"
+          },
+          {
+            "label": "Read the vacuum level and E-fermi"
+          }
+        ],
+        "active": -1
+      },
+      "caption": "From LOCPOT to a work function.",
+      "alt": "A three-step flow: write LOCPOT, average it over planes, read the vacuum level and the Fermi level."
+    }
+  },
+  {
+    "id": "q-pdef-1",
+    "concepts": [
+      "point-defects"
+    ],
+    "type": "numeric",
+    "prompt": "A neutral vacancy supercell has NELECT = 864 in its OUTCAR. Which NELECT do you set for the same vacancy in charge state 2+?",
+    "answer": 862,
+    "tolerance": 0.5,
+    "hints": [
+      "A positive charge means electrons removed.",
+      "Subtract the charge q from the neutral count."
+    ],
+    "difficulty": -0.3,
+    "level": "beginner",
+    "sources": [
+      "S-042",
+      "S-019"
+    ],
+    "visual": {
+      "scene": "diamond",
+      "caption": "A diamond-structure Si cell; a defect supercell repeats it several times.",
+      "alt": "Diamond cubic cell in which each atom is bonded to four neighbours at the corners of a tetrahedron."
+    }
+  },
+  {
+    "id": "q-pdef-2",
+    "concepts": [
+      "point-defects"
+    ],
+    "type": "single",
+    "prompt": "How does the formation energy of a 2+ defect change when the Fermi level rises by 1 eV inside the gap?",
+    "options": [
+      {
+        "text": "It rises by 2 eV",
+        "correct": true,
+        "why": "The term q times E_F has slope q = +2: the two electrons the defect gave away are worth more when the Fermi level is higher."
+      },
+      {
+        "text": "It falls by 2 eV",
+        "correct": false,
+        "why": "That is the slope of a 2- defect; a positive charge has a positive slope."
+      },
+      {
+        "text": "It does not change",
+        "correct": false,
+        "why": "Only neutral defects have a formation energy independent of the Fermi level."
+      },
+      {
+        "text": "It rises by 1 eV",
+        "correct": false,
+        "why": "The slope is the charge, not 1."
+      }
+    ],
+    "hints": [
+      "Find the term in the formation energy that contains E_F.",
+      "The slope of a line E_f against E_F is the charge q."
+    ],
+    "difficulty": 0.3,
+    "level": "intermediate",
+    "sources": [
+      "S-067",
+      "S-115"
+    ],
+    "visual": {
+      "plot": "band-gap",
+      "params": {},
+      "caption": "Valence and conduction bands of a toy model, with the gap between them.",
+      "alt": "Filled lower band and empty upper band separated by an energy gap, on a vertical energy axis."
+    }
+  },
+  {
+    "id": "q-pdef-3",
+    "concepts": [
+      "point-defects"
+    ],
+    "type": "numeric",
+    "prompt": "Illustrative formation energies at E_F = 0 (the VBM): 1.0 eV for charge +1 and 1.6 eV for charge 0. At what Fermi level above the VBM is the (+/0) transition level, in eV?",
+    "answer": 0.6,
+    "tolerance": 0.02,
+    "unit": "eV",
+    "hints": [
+      "The +1 line rises with slope 1; the neutral line is flat.",
+      "Find where 1.0 + E_F equals 1.6."
+    ],
+    "difficulty": 0.6,
+    "level": "intermediate",
+    "sources": [
+      "S-115"
+    ],
+    "visual": {
+      "plot": "band-gap",
+      "params": {},
+      "caption": "A toy band gap; transition levels lie between the band edges.",
+      "alt": "Filled lower band and empty upper band separated by an energy gap, on a vertical energy axis."
+    }
+  },
+  {
+    "id": "q-pdef-4",
+    "concepts": [
+      "point-defects"
+    ],
+    "type": "single",
+    "prompt": "The leading Makov-Payne error of a charged defect falls as one over the supercell edge L. You double L. What happens to that error?",
+    "options": [
+      {
+        "text": "It halves",
+        "correct": true,
+        "why": "A 1/L term halves when L doubles, which is why charged defects converge slowly and need corrections."
+      },
+      {
+        "text": "It falls to a quarter",
+        "correct": false,
+        "why": "That would be a 1/L squared term."
+      },
+      {
+        "text": "It falls to an eighth",
+        "correct": false,
+        "why": "That is how the next, 1/L cubed, term falls, or how the volume grows."
+      },
+      {
+        "text": "It disappears",
+        "correct": false,
+        "why": "No finite supercell removes it; it has to be corrected or extrapolated."
+      }
+    ],
+    "hints": [
+      "Write the error as a constant divided by L.",
+      "Replace L by 2L."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-106"
+    ],
+    "visual": {
+      "scene": "diamond",
+      "caption": "A Si cell; a larger supercell repeats it more times along each edge.",
+      "alt": "Diamond cubic cell in which each atom is bonded to four neighbours at the corners of a tetrahedron."
+    }
+  },
+  {
+    "id": "q-pdef-5",
+    "concepts": [
+      "point-defects"
+    ],
+    "type": "single",
+    "prompt": "How does the formation energy of an oxygen vacancy in an oxide compare between O-poor and O-rich conditions?",
+    "options": [
+      {
+        "text": "It is lower under O-poor conditions",
+        "correct": true,
+        "why": "The removed O goes to the reservoir, so the formation energy contains plus mu_O; O-poor conditions mean a lower mu_O and a lower cost."
+      },
+      {
+        "text": "It is lower under O-rich conditions",
+        "correct": false,
+        "why": "That reverses the sign: an O-rich reservoir already holds oxygen at a high chemical potential, so giving it more is costly."
+      },
+      {
+        "text": "It is the same in both",
+        "correct": false,
+        "why": "The chemical potential of the removed atom enters the formation energy directly."
+      },
+      {
+        "text": "It depends only on the Fermi level",
+        "correct": false,
+        "why": "The Fermi level matters for charged states, but the reservoir term is there for every charge."
+      }
+    ],
+    "hints": [
+      "For a removed atom n_O = -1, so what is the sign of the mu_O term?",
+      "Is mu_O higher or lower under O-poor conditions?"
+    ],
+    "difficulty": 0.3,
+    "level": "intermediate",
+    "sources": [
+      "S-111",
+      "S-067"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "Cubic perovskite SrTiO3, an oxide in which oxygen vacancies form.",
+      "alt": "Strontium at the corners of a cube and titanium at the centre inside an octahedron of six oxygen atoms."
+    }
   }
 ]

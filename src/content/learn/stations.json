@@ -3,117 +3,149 @@
     "id": "atom-cloud",
     "title": "An atom and its electron cloud",
     "badge": "computed",
-    "alt": "Curve of the probability of finding the electron of a hydrogen atom at each distance from the nucleus, with the most probable distance marked.",
+    "alt": "A live 3D view of the electron of a hydrogen atom in an s state: a cloud of dots where it is likely to be found, the surface where its wavefunction has one fixed size and, from n = 2 on, the spherical radial node shells where it is never found. Beside it, the curve of the probability of finding the electron at each distance from the nucleus, with the most probable distance marked.",
     "sentences": [
       "An atom is a nucleus with electrons around it, but an electron is not a tiny ball on an orbit.",
-      "Quantum mechanics gives a cloud of probability instead: the curve shows how likely the electron is to be found at each distance from the nucleus.",
+      "Quantum mechanics gives a cloud of probability instead: the 3D view shows that cloud around the nucleus, and the curve beside it shows how likely the electron is to be found at each distance.",
       "Everything later in DFT is about these clouds, and about how they overlap and rearrange when atoms meet."
     ],
     "visual": {
-      "kind": "plot",
-      "plot": "hydrogen-radial",
+      "kind": "stage",
+      "scene": "m02-orbital",
       "params": {
-        "n": 1,
-        "l": 0
+        "orbital": "1s",
+        "cloud": true,
+        "nodes": true,
+        "clip": false
+      },
+      "camera": "iso",
+      "panel": {
+        "plot": "hydrogen-radial",
+        "params": {
+          "n": 1,
+          "l": 0
+        }
       }
     },
     "try": {
-      "kind": "slider",
+      "kind": "choice",
       "label": "Shell number n (hydrogen, s state)",
-      "param": "n",
-      "min": 1,
-      "max": 3,
-      "step": 1,
-      "value": 1
+      "initial": 0,
+      "options": [
+        {
+          "label": "n = 1 (1s)",
+          "params": {
+            "orbital": "1s"
+          },
+          "panel": {
+            "n": 1
+          }
+        },
+        {
+          "label": "n = 2 (2s)",
+          "params": {
+            "orbital": "2s"
+          },
+          "panel": {
+            "n": 2
+          }
+        },
+        {
+          "label": "n = 3 (3s)",
+          "params": {
+            "orbital": "3s"
+          },
+          "panel": {
+            "n": 3
+          }
+        }
+      ]
     },
     "topic": "02-quantum-basics/the-wavefunction",
-    "sources": ["S-047"]
+    "sources": ["S-047", "S-031"]
   },
   {
     "id": "orbital",
     "title": "A wavefunction and an orbital",
     "badge": "computed",
-    "alt": "Slices through the electron clouds of hydrogen s, p and d orbitals, showing a round s cloud and clouds with lobes for p and d.",
+    "alt": "A live 3D view of one hydrogen orbital as the surface where its wavefunction has one fixed size, orange where it is positive and blue where it is negative: a round s orbital, a p orbital with two lobes, or a d orbital (3d z2) with two lobes and a ring. Beside it, a slice through the same kind of orbital's cloud.",
     "sentences": [
       "The wavefunction is the quantity that holds everything about one electron, and an orbital is the shape of one allowed wavefunction.",
       "The s cloud is a ball, the p clouds have two lobes, and the d clouds are more complex still.",
       "These shapes decide which neighbouring atoms an electron can bond with, which is why they matter for materials."
     ],
     "visual": {
-      "kind": "plot",
-      "plot": "orbital-slice",
+      "kind": "stage",
+      "scene": "m02-orbital",
       "params": {
-        "orbitals": [
-          {
-            "l": 0,
-            "m": 0,
-            "label": "s"
-          },
-          {
-            "l": 1,
-            "m": 0,
-            "plane": "xz",
-            "label": "p"
-          },
-          {
-            "l": 2,
-            "m": 0,
-            "plane": "xz",
-            "label": "d"
-          }
-        ]
+        "orbital": "2p_z",
+        "cloud": false,
+        "nodes": true,
+        "clip": false
+      },
+      "camera": "iso",
+      "panel": {
+        "plot": "orbital-slice",
+        "params": {
+          "orbitals": [
+            {
+              "l": 1,
+              "m": 0,
+              "plane": "xz",
+              "label": "p"
+            }
+          ]
+        }
       }
     },
     "try": {
       "kind": "choice",
       "label": "Show",
-      "initial": 0,
+      "initial": 1,
       "options": [
         {
-          "label": "s, p and d",
+          "label": "s orbital (1s)",
           "params": {
+            "orbital": "1s"
+          },
+          "panel": {
             "orbitals": [
               {
                 "l": 0,
                 "m": 0,
                 "label": "s"
-              },
+              }
+            ]
+          }
+        },
+        {
+          "label": "p orbital (2p z)",
+          "params": {
+            "orbital": "2p_z"
+          },
+          "panel": {
+            "orbitals": [
               {
                 "l": 1,
                 "m": 0,
                 "plane": "xz",
                 "label": "p"
-              },
+              }
+            ]
+          }
+        },
+        {
+          "label": "d orbital (3d z2)",
+          "params": {
+            "orbital": "3d_z2"
+          },
+          "panel": {
+            "orbitals": [
               {
                 "l": 2,
                 "m": 0,
                 "plane": "xz",
                 "label": "d"
-              }
-            ]
-          }
-        },
-        {
-          "label": "s only",
-          "params": {
-            "orbitals": [
-              {
-                "l": 0,
-                "m": 0,
-                "label": "s"
-              }
-            ]
-          }
-        },
-        {
-          "label": "p only",
-          "params": {
-            "orbitals": [
-              {
-                "l": 1,
-                "m": 0,
-                "plane": "xz",
-                "label": "p"
               }
             ]
           }
@@ -127,18 +159,19 @@
     "id": "exponential-wall",
     "title": "The exponential wall",
     "badge": "computed",
-    "alt": "Curve of how fast the number of values needed to describe many electrons together grows as electrons are added, rising far faster than a straight line.",
+    "alt": "Curve of how many ways there are to place a growing number of electrons in their orbitals, on a powers-of-ten scale, where it looks almost straight because each added electron multiplies the count by about the same factor; labels give the count at the end and that factor.",
     "sentences": [
-      "Describing N electrons exactly, all together, needs a number of values that grows exponentially with N.",
-      "The curve counts the values needed on a coarse grid as electrons are added, and it soon passes anything a computer could store.",
-      "That wall is why DFT replaces the many-electron problem with something much smaller."
+      "To describe N electrons exactly, you have to keep track of every way of placing all of them at once, and the number of ways explodes as N grows.",
+      "The curve counts those ways when N electrons share 4N orbitals, and because each extra electron multiplies the count by roughly ten, the almost straight line on this powers-of-ten scale is really an explosion.",
+      "That wall is why DFT swaps the many-electron wavefunction for the electron density, which needs only one number per point in space however many electrons there are."
     ],
     "visual": {
       "kind": "plot",
       "plot": "exp-wall",
       "params": {
         "perElectron": 4,
-        "maxN": 20
+        "maxN": 20,
+        "labels": true
       }
     },
     "try": {
@@ -151,21 +184,26 @@
       "value": 20
     },
     "topic": "03-many-electrons/the-exponential-wall",
-    "sources": ["S-048", "S-047"]
+    "sources": ["S-048", "S-047"],
+    "read": [
+      "Left to right: more electrons.",
+      "Up: the number of ways (determinants) in powers of ten, so each notch up the axis means ten times more.",
+      "The labels give the count at the end of the curve and how much the last electron multiplied it."
+    ]
   },
   {
     "id": "density-map",
     "title": "Density as a map",
     "badge": "computed",
-    "alt": "Map of electron density along a box for a chosen number of electrons, higher where the electrons are more likely to be.",
+    "alt": "The electron density of electrons in a one-dimensional box, drawn twice: as a curve whose height is the charge at each place, and as a shaded strip below it with the same numbers as a map, darker where there is more charge and empty at the walls.",
     "sentences": [
-      "Instead of following every electron, DFT follows one map: how much electron charge sits at each point in space.",
-      "The picture is the density of electrons in a one-dimensional box, and its shape follows the levels that the electrons fill.",
-      "A theorem of Hohenberg and Kohn says that, in principle, this one map is enough to fix the ground-state energy."
+      "A many-electron wavefunction tracks every electron at once, but the electron density asks a simpler question: how much electron charge sits at each point?",
+      "Here electrons fill the levels of a one-dimensional box, two per level; the curve is the density and the strip below shows the same numbers as a map, darker where there is more charge.",
+      "Hohenberg and Kohn proved that this one map is enough, in principle, to fix the ground-state energy, and that is the idea DFT is built on."
     ],
     "visual": {
       "kind": "plot",
-      "plot": "density-box",
+      "plot": "density-map",
       "params": {
         "L": 5,
         "electrons": 2
@@ -181,23 +219,29 @@
       "value": 2
     },
     "topic": "03-many-electrons/electron-density",
-    "sources": ["S-011", "S-047", "S-048"]
+    "sources": ["S-011", "S-047", "S-048"],
+    "read": [
+      "Curve: its height is how much charge sits at that place in the box.",
+      "Strip: the same curve seen from above, like a heat map; in a real crystal the map fills three dimensions.",
+      "Add electrons: they fill higher levels, which have more bumps, so the map gains detail while the walls stay empty."
+    ]
   },
   {
     "id": "kohn-sham",
     "title": "The Kohn-Sham idea",
     "badge": "toy-model",
-    "alt": "A one-dimensional toy atom showing the electron density and, optionally, the effective potential that the density produces, after a self-consistent run.",
+    "alt": "A one-dimensional toy atom after a self-consistent run: the electron density as a filled curve and, optionally, the shared effective potential as a dashed well, each named on the picture.",
     "sentences": [
-      "Kohn and Sham replaced the hard problem by electrons that do not see each other directly but move in one shared effective potential.",
-      "That potential depends on the density, and the density comes from the electrons moving in it, so the two must agree with each other.",
-      "The picture is a one-dimensional toy model and not a real calculation."
+      "Real electrons push on each other all the time, and that is what makes the exact many-electron problem so hard.",
+      "Kohn and Sham swapped them for stand-in electrons that ignore each other and instead all move in one shared potential, built so that together they have the same density as the real electrons.",
+      "The catch is a loop: the potential is built from the density, and the density comes from electrons moving in that potential, so the two have to agree."
     ],
     "visual": {
       "kind": "plot",
       "plot": "scf-density",
       "params": {
-        "Zs": [2]
+        "Zs": [2],
+        "labels": true
       }
     },
     "try": {
@@ -220,39 +264,49 @@
       ]
     },
     "topic": "04-kohn-sham/the-kohn-sham-idea",
-    "sources": ["S-012", "S-019", "S-048", "S-049"]
+    "sources": ["S-012", "S-019", "S-048", "S-049"],
+    "read": [
+      "Filled curve: the electron density of a one-dimensional toy atom, highest where the electrons are most likely to be.",
+      "Dashed curve: the shared potential every stand-in electron feels; the electrons gather in its low middle.",
+      "The next station shows the loop that makes the density and the potential agree."
+    ]
   },
   {
     "id": "scf-loop",
     "title": "The self-consistency loop",
     "badge": "toy-model",
-    "alt": "Curve of how much the electron density changes from one step of a toy self-consistency loop to the next, falling as the loop settles.",
+    "alt": "A toy self-consistency loop, step by step: on top the density that goes into the chosen step in bold, earlier steps dotted and the converged answer dashed; below, one bar per step for how much the density changed, on a powers-of-ten scale, shrinking until it drops below the dashed stopping line.",
     "sentences": [
-      "Guess a density, build the potential from it, solve for the electrons, and compare the new density with the guess.",
-      "Repeat until the density stops changing; the curve shows how the change shrinks from step to step in a toy model.",
-      "In this toy model a larger mixing fraction settles in fewer steps; real calculations can behave differently, so VASP's mixing settings are worth knowing."
+      "The loop starts from a guess for the density, builds the potential from it, solves for the electrons in that potential and gets a new density.",
+      "The new density is mixed with the old one and goes in as the next guess, and this repeats until the density going in and the density coming out agree.",
+      "Move the slider through the steps of a toy run: the bold curve walks toward the dashed final answer, and the bars underneath shrink until the change is small enough to stop."
     ],
     "visual": {
       "kind": "plot",
-      "plot": "scf-trace",
+      "plot": "scf-iterations",
       "params": {
-        "Z": 2,
+        "Z": 1,
         "alpha": 0.3,
-        "tol": 1e-8,
-        "show": 60
+        "tol": 1e-6,
+        "step": 1
       }
     },
     "try": {
       "kind": "slider",
-      "label": "Mixing fraction",
-      "param": "alpha",
-      "min": 0.1,
-      "max": 0.9,
-      "step": 0.1,
-      "value": 0.3
+      "label": "Step of the loop",
+      "param": "step",
+      "min": 1,
+      "max": 30,
+      "step": 1,
+      "value": 1
     },
     "topic": "04-kohn-sham/the-scf-loop",
-    "sources": ["S-012", "S-019", "S-031", "S-041", "S-047", "S-048", "S-049"]
+    "sources": ["S-012", "S-019", "S-031", "S-041", "S-047", "S-048", "S-049"],
+    "read": [
+      "Top: the density going into the chosen step (bold), the earlier steps (dotted) and the final answer (dashed).",
+      "Bottom: one bar per step for how much the density changed; the scale counts powers of ten, so every equal step down is ten times smaller.",
+      "The dashed line is the stopping point; VASP stops the same way when the energy change falls below EDIFF."
+    ]
   },
   {
     "id": "unit-cell",
@@ -338,31 +392,88 @@
     "id": "plane-waves",
     "title": "Plane waves and the ENCUT sphere",
     "badge": "computed",
-    "alt": "Curve of plane-wave energy against wavevector with a horizontal cutoff line, keeping the waves below the line and dropping the ones above it.",
+    "alt": "A square grid of dots, each one plane wave of a square toy cell, with a circle whose radius is set by the cutoff energy: dots inside are filled and kept, dots outside are open and dropped, with the number kept. Beside it, a long wave for a dot near the centre and a short wave for a dot far out.",
     "sentences": [
-      "VASP writes each electron's wavefunction as a sum of plane waves, which are simple waves that repeat across the cell.",
-      "ENCUT sets the largest plane-wave energy that is kept; on the picture the cutoff line separates the waves that are kept from the ones that are dropped.",
-      "A higher cutoff keeps more waves and costs more time, and a cutoff that is too low gives unreliable energies, which is why you test it."
+      "VASP builds each electron's wavefunction out of plane waves, simple waves that repeat neatly across the cell.",
+      "Each dot in the picture is one plane wave of a square toy cell: dots near the centre are long, gentle waves and dots far out are short waves with high kinetic energy.",
+      "ENCUT draws a circle (a sphere in 3D) and keeps only the waves inside it, so a higher cutoff keeps more waves, costs more time and gives more reliable energies, which is why you test it."
     ],
     "visual": {
       "kind": "plot",
-      "plot": "pw-parabola",
+      "plot": "pw-sphere",
       "params": {
-        "cutoff": 30,
-        "kmax": 4
+        "cutoff": 200,
+        "a": 4,
+        "span": 7
       }
     },
     "try": {
       "kind": "slider",
-      "label": "Cutoff energy (eV)",
+      "label": "Cutoff energy, ENCUT (eV)",
       "param": "cutoff",
-      "min": 10,
-      "max": 80,
-      "step": 5,
-      "value": 30
+      "min": 50,
+      "max": 400,
+      "step": 25,
+      "value": 200
     },
     "topic": "05-practical-choices/plane-waves-and-encut",
-    "sources": ["S-019", "S-031", "S-040", "S-041", "S-042", "S-049"]
+    "sources": ["S-019", "S-031", "S-040", "S-041", "S-042", "S-049"],
+    "read": [
+      "Filled dots: waves kept. Open dots: waves dropped.",
+      "The radius grows with the square root of ENCUT, so doubling ENCUT does not double the circle.",
+      "In a real 3D cell the count grows faster, roughly as ENCUT to the power 3/2."
+    ]
+  },
+  {
+    "id": "real-vs-reciprocal",
+    "title": "Real space and reciprocal space",
+    "badge": "computed",
+    "alt": "Two panels side by side for a two-dimensional lattice. Left, real space: the atoms as dots, the cell vectors a1 and a2 and the shaded unit cell, lengths in angstrom. Right, reciprocal space: the reciprocal lattice as open dots, the vectors b1 and b2 and the shaded first Brillouin zone, lengths in 1/angstrom. A longer cell vector gives a shorter reciprocal vector.",
+    "sentences": [
+      "Real space is the space you know: it says where the atoms are, and its cell vectors a1 and a2 are measured in angstroms.",
+      "Reciprocal space describes the waves that fit the crystal instead: its vectors b1 and b2 are measured in 1/angstrom, and each one is at right angles to the other cell vector.",
+      "The two work like a seesaw, so a longer cell vector gives a shorter reciprocal vector, and a big cell has a small Brillouin zone that needs fewer k-points."
+    ],
+    "read": [
+      "Left: the atoms (dots), the cell vectors a1 and a2 and the unit cell, shaded.",
+      "Right: the reciprocal lattice (open dots), b1 and b2, and the Brillouin zone, shaded: the points closer to the centre than to any other dot.",
+      "Pick Rectangle: a2 doubles, b2 halves and the zone gets thinner in that direction."
+    ],
+    "visual": {
+      "kind": "plot",
+      "plot": "real-reciprocal",
+      "params": {
+        "lattice": "square",
+        "a": 4
+      }
+    },
+    "try": {
+      "kind": "choice",
+      "label": "Cell shape",
+      "initial": 0,
+      "options": [
+        {
+          "label": "Square",
+          "params": {
+            "lattice": "square"
+          }
+        },
+        {
+          "label": "Rectangle",
+          "params": {
+            "lattice": "rect"
+          }
+        },
+        {
+          "label": "Hexagonal",
+          "params": {
+            "lattice": "hex"
+          }
+        }
+      ]
+    },
+    "topic": "05-practical-choices/kpoints-and-the-brillouin-zone",
+    "sources": ["S-036", "S-050", "S-041"]
   },
   {
     "id": "reciprocal-space",
@@ -370,8 +481,8 @@
     "badge": "illustrative",
     "alt": "The three real-space lattice vectors of a face-centred cubic cell and the three reciprocal vectors that go with them, drawn in one picture.",
     "sentences": [
-      "Every crystal has a partner space called reciprocal space, where the repeating pattern is described by waves instead of positions.",
-      "Its repeat unit is the Brillouin zone, and each point in the zone is a k-point: one wave pattern that electrons in the crystal can have.",
+      "In three dimensions the same rule gives three reciprocal vectors, and their repeat unit is the Brillouin zone.",
+      "Each point in the zone is a k-point: one wave pattern that electrons in the crystal can have.",
       "The picture shows the real-space cell vectors with the reciprocal vectors that match them; only directions and relative lengths are meaningful."
     ],
     "visual": {
@@ -404,20 +515,31 @@
     "id": "kpoint-mesh",
     "title": "k-points: sampling the zone",
     "badge": "computed",
-    "alt": "A grid of k-points laid over a square Brillouin zone, with the number of points along each direction set by the slider.",
+    "alt": "A live 3D view of a regular grid of k-points filling the cubic Brillouin zone of a simple cubic crystal, with the points that symmetry makes different marked larger; beside it, the same kind of grid laid over a square zone. The slider sets the number of points along each direction.",
     "sentences": [
       "VASP cannot visit every k-point, so it samples the zone on a regular grid, the mesh you write in KPOINTS.",
       "A finer mesh samples the zone better and costs more time, because each k-point is a separate calculation.",
       "How fine is fine enough is found by testing, not by a fixed rule."
     ],
     "visual": {
-      "kind": "plot",
-      "plot": "kmesh-grid",
+      "kind": "stage",
+      "scene": "m05-kmesh",
       "params": {
+        "lattice": "sc",
         "n": 4,
-        "gamma": true,
-        "angle": 90,
-        "ratio": 1
+        "centering": "gamma",
+        "reduce": true,
+        "path": false
+      },
+      "camera": "iso",
+      "panel": {
+        "plot": "kmesh-grid",
+        "params": {
+          "n": 4,
+          "gamma": true,
+          "angle": 90,
+          "ratio": 1
+        }
       }
     },
     "try": {
@@ -425,51 +547,56 @@
       "label": "Points along each direction",
       "param": "n",
       "min": 1,
-      "max": 12,
+      "max": 8,
       "step": 1,
       "value": 4
     },
     "topic": "05-practical-choices/kpoints-and-the-brillouin-zone",
-    "sources": ["S-007", "S-019", "S-036", "S-041", "S-042", "S-049", "S-050"]
+    "sources": ["S-007", "S-019", "S-036", "S-041", "S-042", "S-049", "S-050", "S-005", "S-032"]
   },
   {
     "id": "bands-dos",
     "title": "Bands and the density of states",
     "badge": "toy-model",
-    "alt": "Energy levels of a toy crystal drawn as bands, or as a density of states, with a gap between the bands.",
+    "alt": "Two panels on one energy axis: on the left the two bands of a toy chain with two atoms per cell, energy against wave vector k, the lower band filled; on the right the density of states as horizontal bars, tall where the bands are flat. A dashed Fermi level crosses both, inside a gap for the insulator and where the bands touch for the metal.",
     "sentences": [
-      "The allowed electron energies in a crystal form bands, ranges of energy with many states, separated by gaps with none.",
-      "A band structure plots those energies along a path through the zone, and the density of states counts how many states sit at each energy.",
-      "Whether the Fermi level lies in a gap or inside a band tells you if a material is an insulator or a metal; the picture is a toy model."
+      "In a crystal the electron energies are not single levels but bands: each wave vector k has its own energy, and together they sweep out a range.",
+      "The left panel draws those energies against k for a toy chain, and the right panel counts how many states sit at each energy; that count is the density of states, or DOS.",
+      "Electrons fill the states up to the Fermi level, so if it lies in a gap the material is an insulator, and if a band crosses it the material is a metal."
     ],
     "visual": {
       "kind": "plot",
-      "plot": "band-gap",
+      "plot": "bands-dos",
       "params": {
-        "labels": true
+        "t2": 0.6
       }
     },
     "try": {
       "kind": "choice",
-      "label": "Show",
+      "label": "Toy chain",
       "initial": 0,
       "options": [
         {
-          "label": "Bands",
+          "label": "Insulator",
           "params": {
-            "dos": false
+            "t2": 0.6
           }
         },
         {
-          "label": "Density of states",
+          "label": "Metal",
           "params": {
-            "dos": true
+            "t2": 1
           }
         }
       ]
     },
     "topic": "02-quantum-basics/why-energy-levels-matter-for-materials",
-    "sources": ["S-047", "S-050", "S-036", "S-049"]
+    "sources": ["S-047", "S-050", "S-036", "S-049"],
+    "read": [
+      "Shaded band: filled with electrons. Upper band: empty.",
+      "Where a band is flat, many k share nearly one energy, so the DOS bar there is long.",
+      "Pick Metal: the gap closes and the bands touch at the Fermi level."
+    ]
   },
   {
     "id": "spin-orderings",

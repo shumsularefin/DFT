@@ -1,5 +1,29 @@
 ---
 id: elastic-constants
+stage:
+  scene: m12-elastic-strain
+  states:
+    - id: stretch
+      section: why
+      params: { tensor: cubic, strain: e1, amount: 2, show: energy }
+      camera: iso
+      caption: 'A volume element stretched 2 percent along x, drawn ten times larger. Solid arrows are the pull each face needs, and the side faces need one too, through C12. Drag the amplitude and watch the marker ride the energy bowl.'
+    - id: shear
+      section: intuition
+      params: { tensor: cubic, strain: e4, amount: 2, show: energy }
+      caption: 'A shear in the yz plane tilts the faces and costs C44 instead of C11. Switch between the strains to feel how differently stiff the crystal is for each way of deforming it.'
+    - id: young
+      section: math
+      params: { tensor: cubic, show: young }
+      caption: 'The directional Young modulus of the cubic example: the distance of the surface from its center is the stiffness along that direction. Turn it to find the stiff and soft directions, then pick the hexagonal tensor, which is round in the basal plane.'
+    - id: low-symmetry
+      section: in-vasp
+      params: { tensor: triclinic, strain: e3, amount: -1.5, show: energy }
+      caption: 'VASP applies six such strains, each plus and minus, and reads the stress of every one (IBRION = 6). In a triclinic crystal a squeeze along z also needs shear stresses, so the arrows tilt.'
+    - id: unstable
+      section: what-changes
+      params: { tensor: unstable, strain: e1, amount: 2, show: energy }
+      caption: 'With C12 larger than C11 the energy surface turns into a saddle: stretching along x while squeezing along y lowers the energy, so the Born test fails and the smallest eigenvalue is negative.'
 title: Elastic constants and mechanical stability
 module: 12
 order: 1

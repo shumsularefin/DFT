@@ -1,5 +1,29 @@
 ---
 id: spin-polarized-calculations
+stage:
+  scene: m05s-stoner
+  states:
+    - id: ispin-1
+      section: why
+      params: { ispin: false, stonerI: 1.5 }
+      caption: 'With ISPIN = 1 the moment is held at m = 0, the ridge in the middle of the surface, even where the energy drops on both sides.'
+    - id: roll-down
+      section: intuition
+      params: { ispin: true, stonerI: 1.5, magmom: 0.4, step: 20 }
+      caption: 'With ISPIN = 2 a start of 0.4 μB rolls down into the valley at 1.0 μB. Step back with the step bar to follow each move of the minimiser.'
+    - id: below-threshold
+      section: lab
+      params: { ispin: true, stonerI: 0.8, magmom: 1.5, step: 20 }
+      caption: 'Below I N = 1 the only minimum is m = 0 and the start decays back to zero. Raise I past 1 eV and watch the single minimum split into two valleys.'
+    - id: criterion
+      section: math
+      params: { ispin: true, stonerI: 2, dos: 1.5, magmom: 2.4, step: 20 }
+      camera: top
+      caption: 'Seen from above, the thick line traces the minimum as I grows: it stays at m = 0 up to I N = 1, then splits into two branches of opposite sign.'
+    - id: zero-start
+      section: mistakes
+      params: { ispin: true, stonerI: 1.5, magmom: 0, step: 20 }
+      caption: 'A start of exactly zero sits on a stationary point and never leaves it, although m = 0 is a maximum here. MAGMOM must break the symmetry.'
 title: Spin-polarized calculations
 module: 5
 order: 7
@@ -9,7 +33,7 @@ requires: [spin-polarization]
 vaspTags: [ISPIN, MAGMOM, NUPDOWN]
 sources: [S-019, S-041, S-042, S-059, S-065]
 status: draft
-updated: 2026-11-24
+updated: 2026-11-27
 ---
 
 <Why>
@@ -92,7 +116,7 @@ Setting `MAGMOM = 4*4.0` does not force the final moment to stay at $4.0\,\mu_B$
 
 </Mistakes>
 
-<Check ids={['q-mag-5', 'q-mag-6', 'q-mag-7']} />
+<Check ids={['q-mag-5', 'q-mag-6', 'q-mag-7', 'q-mag-20']} />
 
 <GoDeeper>
 

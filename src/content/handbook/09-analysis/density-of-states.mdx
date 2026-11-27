@@ -1,28 +1,74 @@
 ---
 id: density-of-states
+stage:
+  scene: m09-dos
+  states:
+    - id: bands-and-dos
+      section: why
+      params: { model: fcc-indirect, method: gaussian, sigma: 0.1, kmesh: 12, energy: 0 }
+      layers: [surface, dos]
+      camera: iso
+      caption: 'The density of states counts how many states of the whole zone sit at each energy. Left, the two bands over the kz = 0 plane; right, their DOS from a 12 x 12 x 12 k-mesh on the same energy axis.'
+    - id: energy-cut
+      section: intuition
+      params: { model: fcc-indirect, method: gaussian, energy: -2 }
+      layers: [cut, dos]
+      camera: iso
+      caption: 'A cut at -2 eV through the valence band. D(E) there counts the k-points of the whole zone whose band energy falls in a narrow window around the cut, so flat parts of a band give tall peaks.'
+    - id: wide-smearing
+      section: lab
+      params: { model: fcc-indirect, method: gaussian, sigma: 0.5, energy: 0 }
+      layers: [dos, reference]
+      camera: front
+      caption: 'Gaussian smearing of SIGMA = 0.5 eV washes the band edges out: the 1.20 eV gap now looks about 0.5 eV wide. Use a small SIGMA, or tetrahedra, before reading a gap off a DOS.'
+    - id: tetrahedra
+      section: in-vasp
+      params: { model: fcc-indirect, method: tetra, nedos: 2001, energy: 0 }
+      layers: [dos]
+      camera: front
+      caption: 'Tetrahedra (ISMEAR = -5) on NEDOS = 2001 energies: sharp band edges and no Gaussian tails. The edges rise slowly from zero, so a gap read at 1 percent of the peak still comes out a little too wide.'
+    - id: coarse-mesh
+      section: mistakes
+      params: { model: fcc-indirect, method: gaussian, sigma: 0.02, kmesh: 4, energy: 0 }
+      layers: [dos]
+      camera: front
+      caption: 'A 4 x 4 x 4 mesh with only 0.02 eV of smearing breaks the DOS into spikes, one per group of k-points. Spikes like these mean the mesh is too coarse for the smearing, not that the material has sharp features.'
 title: Reading a density of states (DOS)
 module: 9
 order: 3
-summary: How to interpret total and site-projected DOS from DOSCAR, shift energies to E - E_F, read mirrored spin channels, and avoid smoothing artefacts.
+summary: How VASP builds the total and projected DOS (NEDOS, EMIN, EMAX, tetrahedra or Gaussian smearing), how to read DOSCAR, integrate the PDOS for occupations and moments, compute a d-band center, and check the DOS against the bands.
 concepts: [dos-analysis]
 requires: [dft-energies-forces, smearing]
-vaspTags: [LORBIT, NEDOS, ISMEAR, ISPIN]
-sources: [S-019, S-042]
+vaspTags: [LORBIT, NEDOS, EMIN, EMAX, ISMEAR, SIGMA, ISPIN, ICHARG, RWIGS]
+sources: [S-017, S-019, S-020, S-034, S-041, S-042, S-171]
 status: draft
-updated: 2026-11-24
+updated: 2026-11-27
 ---
 
 <Why>
 
-The density of states (DOS) counts how many electronic states exist at each energy. It tells you at a glance whether a material is a metal or an insulator, which elements and orbitals (`s`, `p`, `d`, `f`) form the valence and conduction edges, and whether up-spin and down-spin bands are split <Cite id="S-042" />.
+The <Term id="density-of-states">density of states</Term> (DOS) counts how many electron states the crystal has at each energy. One plot answers several first questions about a material: is it a metal (states at the <Term id="fermi-level">Fermi level</Term>) or an insulator (a gap around it), which elements and orbitals form the top of the valence band and the bottom of the conduction band, whether two species hybridize, and how strongly the spin channels split in a magnet <Cite id="S-042" />.
+
+The <Term id="projected-dos">projected DOS</Term> goes further: it splits the total into atoms and orbitals, which is how you tell an oxygen-p peak from a metal-d peak, count d electrons, or compute the <Term id="d-band-center">d-band center</Term> that catalysis papers quote <Cite id="S-171" />. Each of these numbers depends on settings that are easy to leave at a poor default <Cite id="S-041" />.
 
 </Why>
 
 <Intuition>
 
-Always shift the energy axis so the Fermi level sits at zero ($E - E_F = 0$). States below zero are occupied; states above zero are empty. If there is a clean zero-DOS gap around $E - E_F = 0$, the material is a semiconductor or insulator; if the DOS is non-zero at zero, it is metallic.
+Imagine every eigenvalue from every k-point thrown into a histogram, each weighted by its k-point weight. The histogram is the DOS. Two practical problems follow, and VASP's tags solve them.
 
-With `LORBIT = 11`, `DOSCAR` also provides site- and orbital-projected DOS (PDOS) in the order `s, py, pz, px, dxy, dyz, dz2, dxz, dx2` <Cite id="S-019" />. Keep Gaussian smoothing off when reading band edges, because artificial broadening can smear states into the gap and make an insulator look metallic.
+**The histogram needs bins.** VASP evaluates the DOS on `NEDOS` evenly spaced energies between `EMIN` and `EMAX`. The default of 301 points is too coarse for a publication plot; 2000 to 5000 is usual, with the window framing the region you care about <Cite id="S-041" />.
+
+**A finite mesh gives spikes.** With a limited number of k-points the raw histogram is a comb of spikes. Something must turn it into a smooth curve:
+
+- **Gaussian smearing** (`ISMEAR = 0`) replaces each level by a bell of width `SIGMA`. Larger `SIGMA` gives a smoother curve, but it also broadens peaks and lets tails leak into a gap.
+- **The <Term id="tetrahedron-method">tetrahedron method</Term> with Blochl corrections** (`ISMEAR = -5`) fills the space between k-points by interpolating the bands inside small tetrahedra. It gives sharp edges and accurate DOS for bulk cells on a uniform mesh with at least 4 k-points, and it does not use `SIGMA` for the occupations <Cite id="S-017" /> <Cite id="S-041" />.
+
+**Reading the plot.** Shift the energy axis so $E - E_F = 0$, using `E-fermi` from the self-consistent run. States below zero are filled. In an insulator VASP places $E_F$ near the valence-band maximum, so the gap appears just above zero; many people align to the VBM instead <Cite id="S-042" /> <Cite id="S-041" />.
+
+**Projections.** With `LORBIT = 10` or `11`, VASP projects each state onto spheres around the atoms and writes the s, p, d (and f) character per atom. The spheres do not fill the cell, so the projected DOS summed over all atoms is smaller than the total; that is expected <Cite id="S-041" />.
+
+**Spin.** With `ISPIN = 2` there are two DOS curves. The usual plot draws spin up above the axis and spin down mirrored below it, so an exchange splitting shows as a shift between the two halves. Metallic in both channels means a metal; metallic in one and gapped in the other means a half-metal <Cite id="S-042" />.
 
 </Intuition>
 
@@ -30,50 +76,150 @@ With `LORBIT = 11`, `DOSCAR` also provides site- and orbital-projected DOS (PDOS
 
 <TheMath>
 
-The total density of states is the Brillouin-zone sum over bands $n$ and wavevectors $\mathbf k$:
+The total DOS is a sum over bands $n$ and k-points $\mathbf k$ with weights $w_{\mathbf k}$:
 
 $$D(E) = \sum_{n,\mathbf k} w_{\mathbf k}\,\delta\bigl(E - \varepsilon_{n\mathbf k}\bigr)$$
 
-Integrating $D(E)$ up to $E_F$ recovers the number of valence electrons in the cell <Cite id="S-019" />.
+Integrated up to the Fermi level it counts the valence electrons in the cell, $\int_{-\infty}^{E_F} D(E)\,dE = N_{\text{el}}$; the third column of `DOSCAR` is this running integral <Cite id="S-019" /> <Cite id="S-041" />.
+
+**Energy resolution.** The grid spacing is $\Delta E = (E_{\max} - E_{\min})/(N_{\text{EDOS}} - 1)$. With `EMIN = -15`, `EMAX = 10` and `NEDOS = 3001` that is $25/3000 \approx 0.008$ eV; with the default 301 points it would be about 0.08 eV, wider than a typical `SIGMA` of 0.05 eV, so peaks would be under-resolved.
+
+<Level min="intermediate">
+
+**Gaussian broadening.** With `ISMEAR = 0` each level becomes $\delta(x) = e^{-x^2}/\sqrt{\pi}$ with $x = (E - \varepsilon)/\sigma$, the form used throughout [the smearing topic](/handbook/05-practical-choices/smearing/) <Cite id="S-019" />. Its full width at half maximum is $2\sqrt{\ln 2}\,\sigma \approx 1.67\,\sigma$, and its tail falls to about 2 percent of the peak at $2\sigma$ from the level ($e^{-4} \approx 0.018$). So a gap viewed through Gaussian broadening looks narrower by roughly $4\sigma$ (about 0.2 eV for `SIGMA = 0.05`). This is an estimate from the formula, not a rule: read gaps from the eigenvalues, not from the DOS <Cite id="S-042" />.
+
+**Occupations and moments from the PDOS.** Integrating a projected DOS $g_{i,l}(E)$ of atom $i$ and orbital $l$ to the Fermi level gives the occupation inside that atom's sphere, and the spin difference gives the moment:
+
+$$n_{i,l} = \int_{-\infty}^{E_F} g_{i,l}(E)\,dE, \qquad m = \int_{-\infty}^{E_F}\bigl[D_\uparrow(E) - D_\downarrow(E)\bigr]\,dE \;\;(\mu_B)$$
+
+The total $m$ equals the difference of the two integrated-DOS columns at $E_F$, and should agree with `mag=` in `OSZICAR`. Sphere values (also printed in `OUTCAR` under `magnetization (x)`) depend on the sphere radius and are not Bader charges <Cite id="S-041" />.
+
+</Level>
+
+<Level min="pro">
+
+**The d-band center.** In the model of Hammer and Norskov, the first moment of the d-projected DOS of a surface atom tracks how strongly it binds adsorbates: a center closer to $E_F$ means stronger binding on transition-metal surfaces <Cite id="S-171" />.
+
+$$\varepsilon_d = \frac{\int E\,g_d(E)\,dE}{\int g_d(E)\,dE}$$
+
+Two conventions for the integration window are in use: the whole d band, or the occupied part only up to $E_F$. VASPKIT task 503 asks you for the window <Cite id="S-042" />. Always report the window, measure $E$ from $E_F$, and compare centers only between calculations that used the same window, mesh and broadening. The second moment gives the d-band width.
+
+**Why the tetrahedron method is sharper.** It interpolates $\varepsilon_{n\mathbf k}$ linearly inside each tetrahedron and integrates the delta function exactly; Blochl's correction removes most of the error of the linear interpolation <Cite id="S-017" />. The occupations it gives are not variational with respect to the ionic positions, which is why forces in metals should not come from `ISMEAR = -5` <Cite id="S-041" />.
+
+</Level>
 
 </TheMath>
 
 <InVasp>
 
-- Run a dense k-point mesh with `ISMEAR = -5` (tetrahedron method with Bloechl corrections) for clean, sharp DOS features in insulators and semiconductors <Cite id="S-042" />.
-- Set `LORBIT = 11` for $lm$-decomposed PDOS and raise `NEDOS` (e.g. `2000`) for fine energy resolution <Cite id="S-042" />.
-- The author's Workflow Handbook reads the DOS straight from the static SCF: with `LORBIT = 11` and `NEDOS = 3001` the SCF already writes the total and projected DOS into `DOSCAR`, and a denser k-mesh in that SCF (VASPkit 102 at about 0.02) gives a smoother curve. A separate non-self-consistent run (`ICHARG = 11`) on a denser mesh is optional. See the [DOS step of the Workflow](/workflow/dos/) <Cite id="S-042" />.
+**A DOS run on a denser mesh.** Converge the SCF first, copy its `CHGCAR` into a new folder, use a denser uniform `KPOINTS` mesh, and run non-self-consistently. This INCAR is the Field Handbook recipe <Cite id="S-041" />:
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM = DOS
+ICHARG = 11
+PREC   = Accurate
+ENCUT  = 520
+NSW    = 0
+ISMEAR = -5
+NEDOS  = 3001
+EMIN   = -15
+EMAX   = 10
+LORBIT = 11
+LWAVE  = .FALSE.
+LCHARG = .FALSE.`}
+  annotations={{
+    2: 'read the SCF CHGCAR and keep it fixed',
+    4: 'same as the SCF run',
+    6: 'tetrahedron method with Blochl corrections; needs a uniform mesh',
+    7: 'number of energy points; the default 301 is too coarse',
+    8: 'absolute energies in eV: frame the Fermi level of the SCF run',
+    10: 'site- and lm-projected DOS in DOSCAR, sphere radii from the POTCAR',
+  }}
+/>
+
+- **Or skip the extra run.** The author's Workflow Handbook reads the DOS straight from the static SCF: with `LORBIT = 11` and `NEDOS = 3001` the SCF already writes the total and projected DOS into `DOSCAR`, and a denser k-mesh in that SCF (VASPkit 102 at about 0.02) gives a smoother curve. A separate non-self-consistent run (`ICHARG = 11`) on a denser mesh is optional. See the [DOS step of the Workflow](/workflow/dos/) <Cite id="S-042" />.
+- **Keep `ISPIN`, `MAGMOM` and `LMAXMIX` identical to the SCF**, exactly as for bands <Cite id="S-041" />.
+- **`EMIN` and `EMAX` are absolute energies.** Look up `E-fermi` in the SCF `OUTCAR` and put the window around it <Cite id="S-041" />.
+- **Sphere radii.** For `LORBIT = 10` to `12` the radii come from the `POTCAR`; only `LORBIT = 0` to `2` need `RWIGS` in the INCAR, one value per species <Cite id="S-041" />.
+- **Smearing choice.** `ISMEAR = -5` for a bulk DOS on a uniform mesh with at least 4 k-points. For few k-points, molecules or slabs with a coarse mesh, use `ISMEAR = 0` with a small `SIGMA` and accept the broadening <Cite id="S-042" />.
+
+**The layout of `DOSCAR`** <Cite id="S-041" /> <Cite id="S-019" />:
+
+| Lines               | Contents                                                                                          |
+| ------------------- | ------------------------------------------------------------------------------------------------- |
+| 1                   | Number of ions (twice), the PDOS flag, `NCDIJ`                                                    |
+| 2 to 4              | Cell-size information and `POTIM`, the start temperature, the word `CAR`                          |
+| 5                   | The `SYSTEM` name                                                                                 |
+| 6                   | `EMAX`, `EMIN`, `NEDOS`, $E_F$, a weight                                                          |
+| Next `NEDOS` lines  | Total DOS: energy, DOS, integrated DOS (with `ISPIN = 2`: energy, up, down, integrated up, down)  |
+| Then, for each atom | A copy of line 6, then `NEDOS` lines: energy and one column per orbital (two per orbital if spin) |
+
+With `LORBIT = 11` the orbital columns come in the order s, py, pz, px, dxy, dyz, dz2, dxz, dx2-y2 <Cite id="S-019" />. All values are for the whole cell, in states per eV; divide by the number of atoms or formula units before comparing cells of different size <Cite id="S-041" />.
+
+**Tools.** VASPKIT tasks 111 (total DOS), 113 (per element) and 115 (chosen atoms and orbitals) write plain columns with $E_F$ at zero; task 503 gives d-band centers <Cite id="S-042" /> <Cite id="S-020" />. pymatgen reads the DOS from `vasprun.xml` <Cite id="S-034" />.
+
+**Check the DOS against the bands.** Both should come from the same SCF density, use the same $E_F$, and show the same gap within the resolution. The integrated DOS at $E_F$ must equal the electron count. If the DOS shows a gap that the bands do not (or the reverse), suspect a coarse DOS mesh that misses an extremum, a band path that misses one, or Gaussian tails in the DOS <Cite id="S-041" />. Sharp DOS peaks sit where bands are flat; a band that is flat along the path should leave a peak in the DOS.
 
 </InVasp>
 
 <WhatChanges>
 
-| Setting in DOS run           | Effect on `DOSCAR`                                     |
-| ---------------------------- | ------------------------------------------------------ |
-| Dense k-mesh + `ISMEAR = -5` | Sharp van Hove singularities and clean band edges      |
-| Coarse k-mesh                | Spiky, noisy DOS peaks                                 |
-| Heavy post-smoothing         | Can fill in narrow band gaps artificially              |
-| `ISPIN = 2`                  | Separate spin-up and spin-down columns (plot mirrored) |
+| You change...                    | ...the DOS                                     | ...the trade-off                                    |
+| -------------------------------- | ---------------------------------------------- | --------------------------------------------------- |
+| Denser k-mesh                    | Smoother, closer to the true curve             | Longer run                                          |
+| `ISMEAR = -5`                    | Sharp edges and peaks                          | Needs a uniform mesh; not for bands or metal forces |
+| `ISMEAR = 0`, larger `SIGMA`     | Smoother but broader peaks, tails into the gap | The gap looks smaller than it is                    |
+| `NEDOS` 301 to 3001              | Finer energy grid                              | Larger `DOSCAR`                                     |
+| Narrower `EMIN` to `EMAX` window | Finer grid at the same `NEDOS`                 | Features outside the window are lost                |
+| `LORBIT = 11`                    | Adds site- and lm-projected blocks             | Larger files; projections are sphere-limited        |
+| `ISPIN = 2`                      | Separate up and down curves                    | Twice the columns; needs `MAGMOM`                   |
 
-Why use a denser k-mesh for DOS than for relaxation: DOS resolves sharp energy features across the whole Brillouin zone.
+Why a separate DOS run: the DOS needs a denser mesh than the energy. Why these values: enough points to resolve the peaks, and a window around the Fermi level. What happens if you skip it: spiky curves, false gaps or false metals <Cite id="S-041" />.
 
 </WhatChanges>
 
 <Mistakes>
 
-<Callout variant="mistake" title="Forgetting to subtract E_F before reading the plot">
+<Callout variant="mistake" title="Plotting raw energies, or the Fermi level of the wrong run">
 
-Raw `DOSCAR` energies have an arbitrary offset that depends on the cell and potential. Always plot against $E - E_F$.
+Cause: `DOSCAR` energies are absolute, and an `ICHARG = 11` run can write a shifted $E_F$. Fix: subtract `E-fermi` from the SCF `OUTCAR`, or align to the VBM for semiconductors <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Reading the band gap off a Gaussian-broadened DOS">
+
+Cause: tails of width a few `SIGMA` leak into the gap. Fix: take the gap from the eigenvalues (bands, or VASPKIT 911), and use `ISMEAR = -5` for the DOS plot <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Leaving NEDOS at the default">
+
+Cause: 301 points over the default window are coarser than the features. Fix: `NEDOS` 2000 to 5000 with `EMIN` and `EMAX` framing the region of interest <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Using ISMEAR = -5 with too few k-points">
+
+Cause: the tetrahedron method needs a uniform mesh with at least 4 k-points, and VASP stops otherwise. Fix: use a denser mesh, or `ISMEAR = 0` for a Gamma-only or very small mesh <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Expecting the projected DOS to add up to the total">
+
+Cause: the projection spheres leave space between atoms uncounted. Fix: nothing to fix; compare orbitals with each other, and use Bader analysis when you need charges that fill space <Cite id="S-041" />.
 
 </Callout>
 
 </Mistakes>
 
-<Check ids={['q-m9-9', 'q-m9-10', 'q-m9-11', 'q-m9-12']} />
+<Check ids={['q-m9-9', 'q-m9-10', 'q-m9-11', 'q-m9-12', 'q-m9-23', 'q-m9-24', 'q-m9-31']} />
 
 <GoDeeper>
 
-- VASP wiki pages `DOSCAR`, `LORBIT`, and `NEDOS` <Cite id="S-019" />.
-- The author's VASP Field Handbook on DOS workflows <Cite id="S-042" />.
+- VASP wiki pages DOSCAR, LORBIT, NEDOS, EMIN, EMAX, RWIGS and ISMEAR, by page name <Cite id="S-019" />.
+- Blochl, Jepsen and Andersen on the improved tetrahedron method <Cite id="S-017" />.
+- Hammer and Norskov on the d-band model of surface reactivity <Cite id="S-171" />.
+- The Field Handbook entries DOSCAR, LORBIT and NEDOS <Cite id="S-041" />, and the Workflow Handbook DOS step <Cite id="S-042" />.
 
 </GoDeeper>

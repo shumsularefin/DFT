@@ -1,0 +1,196 @@
+---
+id: performance-and-parallelisation
+stage:
+  scene: m07b-parallel
+  states:
+    - id: blocks
+      section: why
+      params: { system: page, nodes: 1, kpar: '1', ncore: '4', serial: 0.05 }
+      camera: iso
+      caption: 'The work of one electronic step as a block: bands across, k-points deep, plane waves up. Each brick is what one rank holds, and rank 0 is outlined. Add nodes to cut the block finer.'
+    - id: kpar
+      section: intuition
+      params: { system: bulk, nodes: 4, kpar: '4', ncore: '4', serial: 0.05 }
+      caption: 'KPAR gives each k group its own k-points, one colour per group. The groups hardly talk to each other, so the speed-up stays high, but each keeps its own copy of the shared arrays.'
+    - id: memory
+      section: math
+      params: { system: page, nodes: 2, kpar: '1', ncore: '8', serial: 0.05 }
+      caption: 'The memory estimate, 16 bytes per plane wave, band, k-point and spin, gives 3.2 GB here, shared by the ranks. Raise the serial fraction to see the Amdahl law cap the speed-up.'
+    - id: padding
+      section: in-vasp
+      params: { system: bulk, nodes: 8, kpar: '1', ncore: '1', serial: 0.05 }
+      caption: 'With KPAR = 1 and NCORE = 1 on 128 ranks there are more band groups than bands, so NBANDS is padded (dashed box) and the efficiency collapses. Raise KPAR and NCORE to fix it.'
+    - id: idle
+      section: mistakes
+      params: { system: supercell, nodes: 8, kpar: '8', ncore: '4', serial: 0.05 }
+      caption: 'A supercell with one k-point cannot use KPAR: seven of the eight k groups sit idle. Set KPAR back to 1 and let NCORE split the plane waves instead.'
+title: Performance and parallelisation
+module: 7
+order: 6
+summary: What makes a plane-wave run slow or memory-hungry, how the cost scales, how KPAR, NCORE, NSIM and LREAL change it, how to choose cores and nodes with a short scaling test, and when to use the Gamma-only and noncollinear builds.
+concepts: [parallel-performance]
+requires: [job-scripts, k-points]
+vaspTags: [KPAR, NCORE, NPAR, NSIM, LREAL]
+sources: [S-010, S-019, S-041, S-042, S-049, S-113]
+noLab: true
+status: draft
+updated: 2026-11-27
+---
+
+<Why>
+
+The [job-script topic](/handbook/07-running/job-scripts/) shows how to start VASP and what `KPAR` and `NCORE` mean. This topic is about making a run fast enough and small enough to finish. The same input can be several times faster or slower depending on a handful of settings, and more cores are not always faster <Cite id="S-041" />. Cluster time is shared and limited: ten minutes spent on a scaling test can save days of queue time, and a run that dies of memory after twelve hours saves nothing.
+
+</Why>
+
+<Intuition>
+
+**What VASP spends its time on.** In every electronic step VASP applies the Hamiltonian to every band at every k-point and keeps the bands orthogonal. Four numbers set the size of that work:
+
+- **Plane waves** per band, set by `ENCUT` and the cell volume.
+- **Bands**, set by the number of electrons, so roughly by the number of atoms.
+- **Irreducible k-points**, set by the mesh and the symmetry.
+- **The <Term id="fft-grid">FFT grid</Term>**, the real-space grid VASP uses to move each band between plane waves and real space.
+
+A spin-polarised run doubles the work, because each spin has its own bands.
+
+**How the work is split.** VASP runs as many copies of itself, each an <Term id="mpi-rank">MPI rank</Term>, which share the work. Three levels of splitting are possible <Cite id="S-041" />:
+
+1. **k-points** (`KPAR`): groups of ranks handle different k-points at the same time. They hardly talk to each other, so the speed-up is often close to ideal, but each group keeps its own copy of large arrays, so memory grows with `KPAR`.
+2. **Bands**: inside a k-point group, the bands are shared out among band groups.
+3. **Plane waves** (`NCORE`): the ranks of one band group share the coefficients and the FFTs of each band. This needs fast communication, so it pays off inside a node, not across nodes.
+
+**Why more cores can be slower.** Each extra rank adds communication. When the work per rank becomes small, ranks spend more time waiting than computing. The point where that happens depends on the system, which is why you test it instead of guessing.
+
+**Memory.** The wavefunctions are usually the biggest array: one complex number per plane wave, per band, per k-point, per spin. Things that make memory blow up are many k-point groups, a large `NBANDS` (optics runs use 2 to 3 times the default), reciprocal-space projectors in a large cell, and the noncollinear build <Cite id="S-041" /> <Cite id="S-042" />.
+
+</Intuition>
+
+<TheMath>
+
+The number of plane waves in a cell of volume $V$ with cutoff wave vector $G_{\text{cut}}$ is about $N_{\text{pw}} \approx V G_{\text{cut}}^3 / (6\pi^2)$, so it grows with the volume and with $E_{\text{cut}}^{3/2}$ (see the [cutoff topic](/handbook/05-practical-choices/plane-waves-and-encut/)) <Cite id="S-049" />. The FFT grid must hold wave vectors up to twice $G_{\text{cut}}$, because the density is a product of two wavefunctions; `PREC = Accurate` chooses grids dense enough to avoid wrap-around errors <Cite id="S-041" />.
+
+<Level min="intermediate">
+
+**Scaling.** Per k-point and per electronic step, with $N_b$ bands and $N_{\text{FFT}}$ grid points, the main costs are roughly <Cite id="S-113" /> <Cite id="S-010" />:
+
+$$\text{cost} \sim c_1\, N_b\, N_{\text{FFT}} \log N_{\text{FFT}} \;+\; c_2\, N_b^2\, N_{\text{pw}} \;+\; c_3\, N_b^3 .$$
+
+The first term is the FFTs, the second the orthogonalisation and subspace work, the third the subspace diagonalisation. Both $N_b$ and $N_{\text{pw}}$ grow in proportion to the number of atoms $N$, so for large cells the cost grows as $N^3$: twice the atoms, about eight times the time per k-point. Bigger cells need fewer k-points for the same sampling, which softens this in practice.
+
+**A memory estimate.** The wavefunctions take about
+
+$$M \approx 16\ \text{bytes} \times N_{\text{pw}} \times N_b \times N_k \times N_s,$$
+
+with $N_k$ the irreducible k-points and $N_s$ the number of spins (16 bytes is one complex number in double precision). Illustrative inputs, not a real system: $N_{\text{pw}} = 20\,000$, $N_b = 500$, $N_k = 10$ and $N_s = 2$ give $3.2 \times 10^9$ bytes, about 3.2 GB, spread over the ranks, before any other array. At Gamma the coefficients obey $c(-\mathbf{G}) = c(\mathbf{G})^*$, so the Gamma-only build stores only half of them and roughly halves this; the noncollinear build stores two spinor components per band and about twice as many bands.
+
+**Parallel efficiency.** With $T_1$ the time on one node and $T_p$ the time on $p$ nodes, the speed-up is $S = T_1/T_p$ and the <Term id="parallel-efficiency">parallel efficiency</Term> is $S/p$. An efficiency of 1 means doubling the nodes halves the time.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+- **`KPAR`** (default 1). Use it when there are many irreducible k-points. The number of ranks must be divisible by `KPAR`; for good balance pick it so that the points in `IBZKPT` divide evenly among the groups (uneven division only wastes time). A common start is one group per node <Cite id="S-041" />.
+- **`NCORE`** (default 1). The number of ranks that work on one band. Good values lie between 4 and the number of cores per socket; on a 32-core node try 4, 8 and 16 and time a few electronic steps. It matters most for large cells with few k-points. GPU (OpenACC) builds need `NCORE = 1`, and with OpenMP threading VASP sets it itself <Cite id="S-041" />.
+- **`NPAR`** is the older tag for the same split: `NPAR` = ranks / `NCORE`. Both still work. Set one, not both; `NCORE` is easier because it does not depend on the total number of ranks <Cite id="S-041" />. VASP rounds `NBANDS` up so the bands divide evenly among the band groups <Cite id="S-019" />.
+- **`NSIM`** (default 4). The number of bands the RMM-DIIS solver (`ALGO = Fast` or `VeryFast`) works on together; larger blocks use the matrix routines more efficiently and use more memory <Cite id="S-019" />.
+- **`LREAL`** (default `.FALSE.`). How the PAW projectors are applied. `.FALSE.` works in reciprocal space and is the most accurate; its cost grows faster with cell size. `Auto` works in real space with optimised projectors and is recommended above roughly 20 atoms. Keep `.FALSE.` for small cells, phonons, linear response and exact exchange <Cite id="S-041" />. In a large cell run with `.FALSE.`, `OUTCAR` notes that real-space projection might be more efficient <Cite id="S-019" />. That note is about speed, not accuracy: if you switch to `Auto`, check once that the energy differences you care about do not change.
+- **Builds.** `vasp_std` for general k-meshes; `vasp_gam` for a mesh with only Gamma (large supercells, molecular dynamics), which uses real wavefunctions and needs less memory and time; `vasp_ncl` for noncollinear magnetism and spin-orbit coupling, with three `MAGMOM` values per atom. Their `WAVECAR` files are not interchangeable <Cite id="S-041" /> <Cite id="S-042" />.
+- **When memory runs out.** Lower `KPAR`, spread the run over more nodes, use `vasp_gam` for a Gamma-only run, and set `LWAVE` and `LCHARG` to `.FALSE.` when you do not need the files <Cite id="S-041" />.
+
+**A scaling test.** Before a long run, time a short one. Take the production input, stop it after a few electronic steps, and compare the time per step, which `OUTCAR` prints on its `LOOP:` lines <Cite id="S-041" />:
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM = timing test (not a result)
+PREC   = Accurate
+ENCUT  = 520
+EDIFF  = 1E-6
+ISMEAR = 0
+SIGMA  = 0.05
+NELM   = 8
+NSW    = 0
+IBRION = -1
+LREAL  = Auto
+NCORE  = 4
+KPAR   = 2
+LWAVE  = .FALSE.
+LCHARG = .FALSE.`}
+  annotations={{
+    3: 'the same cutoff as the production run',
+    7: 'a few electronic steps are enough to time',
+    10: 'test once against .FALSE. for accuracy',
+    11: 'try 4, 8 and 16',
+    12: 'try 1, 2 and the number of nodes',
+  }}
+/>
+
+1. Run it on 1 node with two or three `NCORE` values; keep the fastest.
+2. Run it on 2 and 4 nodes, with `KPAR` equal to the number of nodes if there are enough k-points.
+3. Read `grep "LOOP:" OUTCAR` and average the real time per step; compute the speed-up and efficiency.
+4. Choose the largest node count whose efficiency you are willing to pay for. When doubling the nodes saves much less than half the time, the extra cores mostly wait.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...            | ...the cost...                         | ...and watch for                            |
+| --------------------------- | -------------------------------------- | ------------------------------------------- |
+| `ENCUT` up 30 percent       | About 1.5 times the plane waves        | Memory and time per band rise               |
+| Atoms doubled               | Up to about 8 times per k-point        | Fewer k-points may be needed                |
+| `KPAR` 1 to 4               | Near-ideal speed-up with many k-points | Memory per rank grows                       |
+| `NCORE` 1 to 8              | Less communication across nodes        | Too large a value spreads each FFT too thin |
+| `LREAL` `.FALSE.` to `Auto` | Much faster for large cells            | Small accuracy loss; avoid for small cells  |
+| `vasp_std` to `vasp_gam`    | About half the memory, faster          | Only valid for a Gamma-only mesh            |
+| `vasp_std` to `vasp_ncl`    | Several times the cost                 | Needs three `MAGMOM` values per atom        |
+
+Why test: the best layout depends on the cell, the mesh and the machine. What happens if you skip it: a run that wastes most of its cores, or one that dies of memory near the end.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Asking for more nodes and expecting a faster run">
+
+Beyond some point extra ranks only add communication. Measure the efficiency on a short run before a long one <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="A KPAR that does not divide the ranks">
+
+The number of ranks must be divisible by `KPAR`. The k-points need not divide evenly, but uneven groups waste time <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="LREAL = Auto on a small cell or a phonon run">
+
+Real-space projection is meant for large cells. For a few atoms, phonons, linear response or hybrids keep `.FALSE.` <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Running a Gamma-only mesh with vasp_std">
+
+It works but stores twice the data it needs. Use `vasp_gam` for a mesh with only Gamma, and never feed its `WAVECAR` to another build <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Setting NCORE and NPAR together">
+
+They describe the same split. Set one of them; with OpenMP or a GPU build follow that build's rule for `NCORE` <Cite id="S-041" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-perf-1', 'q-perf-2', 'q-perf-3', 'q-perf-4', 'q-perf-5']} />
+
+<GoDeeper>
+
+- VASP wiki pages NCORE, NPAR, KPAR, NSIM, LREAL and "Optimizing the parallelization" (by page name) <Cite id="S-019" />.
+- Kresse and Furthmuller on the iterative schemes VASP uses <Cite id="S-010" />; Payne and co-workers on the cost of plane-wave methods <Cite id="S-113" />.
+- The Field Handbook entries `KPAR`, `NCORE`, `LREAL` and the performance trouble entry <Cite id="S-041" />.
+- The [job-script topic](/handbook/07-running/job-scripts/) and the site's job-script tool.
+
+</GoDeeper>

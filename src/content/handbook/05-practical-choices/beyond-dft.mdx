@@ -1,0 +1,185 @@
+---
+id: beyond-dft
+stage:
+  scene: m05b-beyond-dft
+  states:
+    - id: pbe
+      section: why
+      params: { method: pbe, view: gap, material: all }
+      camera: iso
+      caption: 'Measured gaps (flat plates) against PBE gaps (bright bars) for seven solids. PBE falls short for every one; the arrows show how far each bar is from experiment.'
+    - id: g0w0
+      section: intuition
+      params: { method: g0w0, view: gap, material: all }
+      caption: 'One rung up the ladder: G0W0 on top of PBE closes most of the gap error. Switch rungs to compare the three.'
+    - id: errors
+      section: math
+      params: { method: gw0, view: error, material: all }
+      caption: 'Height is now computed minus measured gap, so a perfect method would sit at zero. GW0 comes closest for most of these solids.'
+    - id: zno
+      section: mistakes
+      params: { method: gw0, view: error, material: ZnO }
+      caption: 'ZnO is the hard case: even GW0 stays well below the measured gap. These are literature values, quoted until checked against the paper.'
+title: When DFT is not enough
+module: 5
+order: 15
+summary: Where semilocal DFT fails (band gaps, excitons, strong correlation, weak binding), what Hartree-Fock, hybrids, GW, BSE, DMFT and RPA each fix, what they cost, and how a GW run is laid out in VASP.
+concepts: [beyond-dft-methods]
+requires: [hybrid-functionals]
+vaspTags: [ALGO, LHFCALC, NBANDS, LOPTICS, NOMEGA, ENCUTGW, NBANDSO, NBANDSV]
+sources: [S-019, S-034, S-042, S-048, S-049, S-130, S-131, S-132]
+noLab: true
+status: draft
+updated: 2026-11-27
+---
+
+<Why>
+
+DFT with PBE gets structures, phonons and many energy differences right, which is why it is the workhorse. It has known blind spots. The Kohn-Sham band gap is not the measured gap and is usually too small <Cite id="S-049" />. Optical absorption in insulators is shaped by electron-hole attraction that ground-state DFT does not describe. Some oxides of transition metals and rare earths are insulators that DFT calls metals. Weak binding between molecules or layers is poorly described. Knowing which method fixes which failure, and at what price, saves months. For where these methods sit relative to quantum chemistry, see [the ladder of methods](/handbook/01-why-dft/the-ladder-of-methods/).
+
+</Why>
+
+<Intuition>
+
+- **<Term id="hartree-fock">Hartree-Fock</Term>** treats exchange exactly but leaves out correlation: each electron sees the average of the others <Cite id="S-048" />. In solids it overestimates band gaps, the opposite error to PBE <Cite id="S-049" />.
+- **Hybrids** mix a fraction of Hartree-Fock exchange into a GGA, and land in between. HSE06 gaps for sp semiconductors come within about 10 to 20 percent of experiment, at 10 to 100 times the cost of PBE <Cite id="S-042" />. See [functionals](/handbook/05-practical-choices/functionals/).
+- **GW** computes <Term id="quasiparticle">quasiparticle</Term> energies, the energies to add or remove an electron, which is what photoemission measures and what a band gap really is. The name comes from its two ingredients: the Green's function G and the screened Coulomb interaction W <Cite id="S-130" />. It is the standard method for accurate gaps of semiconductors and insulators <Cite id="S-130" /> <Cite id="S-131" />.
+- **BSE** (the <Term id="bethe-salpeter-equation">Bethe-Salpeter equation</Term>) adds the attraction between the excited electron and the hole it left. That gives <Term id="exciton">excitons</Term> and optical spectra that match experiment in shape and position <Cite id="S-132" />.
+- **<Term id="dmft">DMFT</Term>** (dynamical mean-field theory) treats strong local correlation, as in Mott insulators, by solving each correlated site as an impurity coupled to a self-consistent bath <Cite id="S-132" />. It is usually combined with DFT as DFT+DMFT through external codes, using local orbitals such as [Wannier functions](/handbook/09-analysis/wannier-functions-and-topology/).
+- **RPA** total energies use exact exchange plus a correlation energy from the random phase approximation. They describe van der Waals binding and many binding energies better than semilocal DFT, at a cost far above it <Cite id="S-131" />.
+
+</Intuition>
+
+<TheMath>
+
+In atomic units, the quasiparticle equation replaces the exchange-correlation potential by a self-energy $\Sigma$ that depends on energy <Cite id="S-130" />:
+
+$$
+\Big[-\tfrac{1}{2}\nabla^2 + v_{\text{ext}} + v_{\text{H}}\Big]\psi_n + \int \Sigma(\mathbf{r},\mathbf{r}';E_n)\,\psi_n(\mathbf{r}')\,d\mathbf{r}' = E_n\,\psi_n
+$$
+
+In the GW approximation $\Sigma = iGW$: the Green's function times the screened interaction $W = \varepsilon^{-1}v$, where $\varepsilon$ is the dielectric function and $v$ the bare Coulomb interaction <Cite id="S-130" />.
+
+<Level min="intermediate">
+
+**Flavours.** G0W0 evaluates $\Sigma$ once, from DFT orbitals and energies, and corrects each energy to first order:
+
+$$
+E_n^{\text{QP}} = \varepsilon_n + Z_n\,\big\langle\psi_n\big\vert\,\Sigma(\varepsilon_n) - v_{xc}\,\big\vert\psi_n\big\rangle
+$$
+
+with $Z_n$ a renormalization factor. GW0 updates the energies in G a few times and keeps W fixed; it often improves gaps over G0W0. Fully self-consistent variants update W too <Cite id="S-131" />. Results depend on the starting functional, the number of empty bands and the frequency grid, all of which must be converged.
+
+</Level>
+
+<Level min="pro">
+
+**BSE size.** The BSE is an eigenvalue problem in the space of electron-hole pairs: occupied bands times empty bands times k-points. Its matrix grows quickly with all three, and diagonalizing it is the expensive step <Cite id="S-132" />. **Cost scaling.** Semilocal DFT scales formally as $N^3$ and Hartree-Fock as $N^4$ in the number of electrons <Cite id="S-048" /> <Cite id="S-049" />; GW and BSE add many empty bands and a frequency grid on top.
+
+</Level>
+
+| Method   | What it fixes                                | Typical cost (rough)                            |
+| -------- | -------------------------------------------- | ----------------------------------------------- |
+| PBE      | Baseline: structures, phonons, many energies | Reference                                       |
+| HF       | Self-interaction; exact exchange             | Above PBE; gaps too large in solids             |
+| HSE06    | Band gaps of many semiconductors             | About 10 to 100 times PBE                       |
+| G0W0     | Quasiparticle gaps and band energies         | Above hybrids; many empty bands and frequencies |
+| BSE      | Excitons, optical absorption spectra         | Above GW; grows with bands times k-points       |
+| DFT+DMFT | Strong local correlation, Mott physics       | External codes; impurity solver dominates       |
+| RPA      | Binding and van der Waals energies           | Far above PBE                                   |
+
+Only the hybrid cost factor is a quoted number <Cite id="S-042" />; the other entries are qualitative orderings drawn from the sources above.
+
+</TheMath>
+
+<InVasp>
+
+GW in VASP runs in steps, each reading the previous `WAVECAR` <Cite id="S-131" /> <Cite id="S-034" />:
+
+1. **DFT ground state.** A normal SCF (PBE or a hybrid).
+2. **Many empty bands.** A second run with `ALGO = Exact`, `NELM = 1`, a much larger `NBANDS` and `LOPTICS = .TRUE.`, which writes the derivatives in `WAVEDER` that the head of the dielectric matrix needs.
+3. **GW.** The quasiparticle step, with a frequency grid `NOMEGA` and a cutoff for the response functions `ENCUTGW`.
+4. **BSE** (optional). `ALGO = BSE` with `NBANDSO` occupied and `NBANDSV` empty bands in the pair space.
+
+A GW0 step in the VASP 6 form <Cite id="S-019" />:
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM  = GW0 step
+ALGO    = EVGW0
+NELMGW  = 4
+NBANDS  = 192
+NOMEGA  = 80
+ENCUTGW = 250
+ISMEAR  = 0
+SIGMA   = 0.05
+LWAVE   = .TRUE.`}
+  annotations={{
+    2: 'update the energies in G, keep W fixed',
+    3: 'number of GW iterations; 1 gives G0W0',
+    4: 'the same NBANDS as the empty-band run',
+    5: 'frequency points; converge it',
+    6: 'response cutoff in eV; converge it',
+  }}
+/>
+
+`NOMEGA = 80` and `ENCUTGW = 250` are the starting values pymatgen's GW input set writes <Cite id="S-034" />; `NBANDS = 192` is illustrative. Tag names changed between versions: pymatgen writes the VASP 5.4 form, `ALGO = GW0` with `NELM = 1`, while VASP 6 uses `ALGO = EVGW0` with `NELMGW` (check the VASP wiki pages ALGO and NELMGW, Q-069).
+
+Hybrids need only `LHFCALC = .TRUE.` and a few tags (see [functionals](/handbook/05-practical-choices/functionals/)). DMFT is not part of a standard VASP run. RPA total energies have their own VASP workflow; see the VASP wiki pages on ACFDT and RPA calculations, by page name <Cite id="S-019" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...         | ...what happens                                                   |
+| ------------------------ | ----------------------------------------------------------------- |
+| PBE to HSE06             | Larger, usually better gaps; 10 to 100 times the time             |
+| HSE06 to G0W0            | Quasiparticle gaps; many empty bands, more memory                 |
+| G0W0 to GW0              | Energies in G updated; less dependence on the starting functional |
+| `NBANDS` in GW too small | Gaps not converged; they keep moving as `NBANDS` grows            |
+| GW to GW plus BSE        | Excitons and realistic absorption onset                           |
+
+The hybrid cost factor is the Workflow Handbook's <Cite id="S-042" />; the other rows are reasoning from the methods above, not quoted values.
+
+Why go beyond DFT: some quantities, such as a gap or an exciton, are outside what ground-state DFT promises. Why this order: cheapest fix first, then more physics. What happens if you skip convergence of bands and frequencies: GW numbers with errors as large as the correction.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Calling the Kohn-Sham gap the band gap">
+
+The Kohn-Sham gap is not the quasiparticle gap and is usually too small <Cite id="S-049" />. Say which method a gap comes from.
+
+</Callout>
+
+<Callout variant="mistake" title="Comparing a GW gap with an optical gap">
+
+GW gives the gap for adding and removing an electron. An optical measurement includes the exciton binding, which only BSE adds <Cite id="S-132" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Too few empty bands in GW">
+
+GW sums over empty states. With the `NBANDS` of a normal SCF the result is far from converged. Converge `NBANDS`, `ENCUTGW` and `NOMEGA` together <Cite id="S-131" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Using GW where the ground state is wrong">
+
+If DFT puts a Mott insulator in a metallic state, a G0W0 correction on top will not fix the physics. Strong local correlation calls for DFT+U as a first step or DFT+DMFT <Cite id="S-132" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m5-bdft-1', 'q-m5-bdft-2', 'q-m5-bdft-3', 'q-m5-bdft-4']} />
+
+<GoDeeper>
+
+- Hedin's GW paper, and Hybertsen and Louie's first GW gaps for semiconductors <Cite id="S-130" />.
+- Shishkin and Kresse on GW in VASP; Harl and Kresse on RPA <Cite id="S-131" />.
+- Onida, Reining and Rubio on GW and BSE; Georges and co-workers on DMFT <Cite id="S-132" />.
+- Martin's textbook on the band gap problem <Cite id="S-049" />.
+
+</GoDeeper>

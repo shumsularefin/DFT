@@ -1,5 +1,31 @@
 ---
 id: bader-charges
+stage:
+  scene: m12-bader
+  states:
+    - id: basins
+      section: why
+      params: { pair: polar, distance: 2.6, transfer: 0, level: 0.05 }
+      camera: iso
+      caption: 'Two model atoms: each lobe is the density inside one Bader basin, and the gray sheet between them is the zero-flux surface. Lower the density surface to see how far each basin reaches.'
+    - id: identical
+      section: intuition
+      params: { pair: same, distance: 2.6 }
+      camera: front
+      caption: 'For two identical atoms the zero-flux surface is the flat mid plane and each basin holds exactly half the electrons. Change the distance: the split stays even.'
+    - id: transfer
+      section: math
+      params: { pair: polar, transfer: 0.5, level: 0.03 }
+      caption: 'Move half an electron from A to B and the Bader charges follow, though not one for one, because the boundary moves too. The two basins always add up to the grid total.'
+    - id: close
+      section: what-changes
+      params: { pair: polar, distance: 1.8, level: 0.03 }
+      camera: front
+      caption: 'Push the atoms together and the sheet slides toward the diffuse atom A, following the density minimum instead of the midpoint: a Bader volume is not a sphere of fixed radius.'
+    - id: no-sheet
+      section: in-vasp
+      params: { pair: polar, surface: false, level: 0.1 }
+      caption: 'Without the sheet only the two basin densities remain. In VASP the bader program partitions CHGCAR using AECCAR0 plus AECCAR2 as the reference, so the basins see the core density too.'
 title: Bader charges
 module: 12
 order: 6

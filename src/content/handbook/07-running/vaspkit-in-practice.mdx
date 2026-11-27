@@ -1,5 +1,29 @@
 ---
 id: vaspkit-in-practice
+stage:
+  scene: m07-kpath
+  states:
+    - id: path
+      section: why
+      params: { lattice: fcc, density: 20, segments: 10 }
+      caption: 'The band path that VASPKIT task 303 writes to KPATH.in, drawn in the Brillouin zone of Si: straight segments between high-symmetry points, 20 k-points each.'
+    - id: trace
+      section: intuition
+      params: { lattice: fcc, density: 20, segments: 1 }
+      caption: 'Play the step bar to trace the path segment by segment, from Gamma to X and on around the zone.'
+    - id: hexagonal
+      section: in-vasp
+      params: { lattice: hex, density: 20, segments: 10 }
+      camera: c
+      caption: 'Hexagonal Mg: the zone is a hexagonal prism and the path visits M, K, A, L and H. Seen down c, Gamma, M and K lie in one plane.'
+    - id: coarse
+      section: what-changes
+      params: { lattice: fcc, density: 5, segments: 10 }
+      caption: 'Fewer points per segment (line 2 of KPATH.in): the same path, sampled more coarsely, so the bands will be drawn from fewer dots.'
+    - id: bcc
+      section: check
+      params: { lattice: bcc, density: 20, segments: 10 }
+      caption: 'bcc Fe: another lattice, another zone and another path, through H, N and P. A path made for one lattice type does not fit another.'
 title: VASPKIT in practice
 module: 7
 order: 5
@@ -32,6 +56,8 @@ Every code below is the one in the author's Workflow Handbook, which takes them 
 </Intuition>
 
 <TheMath>
+
+VASPKIT does no physics of its own: it writes input files from templates and reads the output files that VASP wrote. Every number it shows you comes from your VASP run <Cite id="S-042" />.
 
 <Level min="intermediate">
 
