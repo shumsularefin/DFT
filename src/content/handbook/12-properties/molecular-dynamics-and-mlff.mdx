@@ -1,0 +1,224 @@
+---
+id: molecular-dynamics-and-mlff
+title: Molecular dynamics and machine-learned force fields
+module: 12
+order: 12
+summary: How ab initio MD moves atoms in time, how to choose the time step, thermostat and ensemble in VASP, how to get diffusion coefficients and radial distribution functions, and how on-the-fly machine-learned force fields make long runs affordable.
+concepts: [molecular-dynamics]
+requires: [relaxation-analysis]
+vaspTags: [IBRION, POTIM, NSW, TEBEG, TEEND, SMASS, MDALGO, ISIF, NBLOCK, ML_LMLFF, ML_MODE]
+sources: [S-019, S-020, S-034, S-041, S-042, S-047, S-125, S-126, S-127]
+noLab: true
+status: draft
+updated: 2026-11-27
+---
+
+<Why>
+
+Everything else in this module is a zero-kelvin snapshot. Real materials are hot: ions in a battery electrolyte hop, liquids flow, crystals melt, and some structures that look fine at 0 K fall apart at 600 K. <Term id="molecular-dynamics">Molecular dynamics</Term> (MD) follows the atoms in time, so you can watch this happen and measure it: a diffusion coefficient, a radial distribution function, whether a structure survives at temperature <Cite id="S-042" />. Ab initio MD (AIMD) takes the forces from DFT at every step. It is accurate and very expensive, because a useful run needs thousands of steps. Machine-learned force fields trained on the fly inside VASP make much longer runs affordable <Cite id="S-127" />.
+
+</Why>
+
+<Intuition>
+
+**A film, one frame at a time.** Start from positions and velocities. Compute the forces, move every atom a little in the direction its force and velocity send it, update the velocities, and repeat. Each step is one frame of a film; the time step is the time between frames.
+
+**The time step.** Atoms vibrate. If the frames are too far apart, an atom overshoots in one step, the energy jumps, and the run blows up. For the same bond stiffness a lighter atom vibrates faster, because the frequency of a spring goes as one over the square root of the mass <Cite id="S-047" />: hydrogen (mass 1) vibrates about four times faster than oxygen (mass 16) would on the same spring. So hydrogen needs a smaller step. The Field Handbook uses 1 fs, and 0.5 fs with hydrogen <Cite id="S-041" />.
+
+**Ensembles.** What the simulation keeps fixed is the <Term id="statistical-ensemble">ensemble</Term> <Cite id="S-125" />:
+
+- **NVE**: number of atoms, volume and total energy fixed. No outside influence; the total energy must stay constant, which makes it the cleanest test of the time step.
+- **NVT**: temperature fixed on average by a <Term id="thermostat">thermostat</Term> that adds or removes kinetic energy.
+- **NPT**: pressure and temperature fixed; the cell can change shape and size, which is how you see thermal expansion or a phase change.
+
+**Thermostats** differ in how they hold the temperature. Andersen gives random atoms new velocities from the target distribution now and then; Nose-Hoover couples the atoms to an extra variable that acts like a heat bath with inertia; Langevin adds friction and random kicks to every atom <Cite id="S-125" /> <Cite id="S-126" />.
+
+**Equilibration and production.** The first part of a run drifts from the starting structure to typical configurations at the target temperature. Discard it, then analyse the rest <Cite id="S-041" />.
+
+**Machine-learned force fields.** A <Term id="machine-learned-force-field">machine-learned force field</Term> (MLFF) learns the map from atomic neighbourhoods to energies and forces from DFT data. VASP trains one during the MD itself: at each step the force field predicts the forces and an estimate of its own error; when the estimated error is too large, VASP does a DFT step instead and adds that structure to the training set <Cite id="S-127" />. Most steps then cost almost nothing.
+
+</Intuition>
+
+<TheMath>
+
+**Verlet integration.** With positions $\mathbf{r}(t)$, force $\mathbf{F}$, mass $m$ and time step $\Delta t$ <Cite id="S-125" />:
+
+$$
+\mathbf{r}(t+\Delta t) = 2\,\mathbf{r}(t) - \mathbf{r}(t-\Delta t) + \frac{\mathbf{F}(t)}{m}\,\Delta t^2
+$$
+
+It is time-reversible and conserves energy well over long runs, which is why MD codes use it or its velocity form.
+
+<Level min="intermediate">
+
+**Diffusion from the mean squared displacement.** With unwrapped positions $\mathbf{r}_i(t)$ of the $N$ diffusing atoms, the <Term id="mean-squared-displacement">mean squared displacement</Term> and the Einstein relation in three dimensions are <Cite id="S-125" />:
+
+$$
+\text{MSD}(t) = \frac{1}{N}\sum_{i=1}^{N}\big\langle \lVert\mathbf{r}_i(t_0+t)-\mathbf{r}_i(t_0)\rVert^2\big\rangle_{t_0}, \qquad D = \lim_{t\to\infty}\frac{\text{MSD}(t)}{6t}
+$$
+
+Fit the straight part of the MSD at long times, not the first ballistic steps. Diffusion is thermally activated, so runs at several temperatures and an Arrhenius plot of $\ln D$ against $1/T$ give an activation energy that can be compared with an NEB barrier (see [transition states](/handbook/12-properties/transition-states-and-neb/)).
+
+**Radial distribution function.** For number density $\rho = N/V$, the number of neighbours between $r$ and $r + dr$ of an average atom is $\rho\,g(r)\,4\pi r^2\,dr$ <Cite id="S-125" />. The <Term id="radial-distribution-function">radial distribution function</Term> $g(r)$ is 0 at short range, peaks at the coordination shells, and tends to 1 in a liquid at long range. Sharp peaks that persist mean a crystal; broad ones that fade mean a liquid or glass.
+
+</Level>
+
+<Level min="pro">
+
+**Statistics.** An MD average has an error set by the number of _independent_ samples, not the number of steps, because successive frames are correlated. Block averaging (splitting the production run into blocks and comparing them) gives an honest error bar <Cite id="S-125" />.
+
+**Bayesian error estimate.** In VASP's MLFF the energy is a sum of atomic energies, each a kernel-weighted function of descriptors of the atom's neighbourhood (radial and angular distributions within a cutoff). Fitting by Bayesian linear regression gives both the prediction and its variance, so each step comes with an estimate of the force error without a DFT reference; that estimate decides when DFT is called <Cite id="S-127" />.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+**An NVT run** following the Field Handbook recipe <Cite id="S-041" />:
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM  = AIMD NVT
+IBRION  = 0
+MDALGO  = 2
+SMASS   = 1.0
+TEBEG   = 300
+TEEND   = 300
+POTIM   = 1.0
+NSW     = 5000
+ISIF    = 0
+ISYM    = 0
+PREC    = Normal
+LREAL   = Auto
+ISMEAR  = 0
+SIGMA   = 0.05
+NELMIN  = 4
+NBLOCK  = 1
+LWAVE   = .FALSE.
+LCHARG  = .FALSE.`}
+  annotations={{
+    2: 'molecular dynamics',
+    3: 'Nose-Hoover thermostat',
+    4: 'Nose mass: sets how fast the thermostat responds',
+    5: 'start temperature in K',
+    6: 'end temperature; equal to TEBEG for constant T',
+    7: 'time step in fs; 0.5 with hydrogen',
+    8: 'number of MD steps',
+    9: 'no stress: faster (ISIF = 2 to monitor the pressure)',
+    10: 'atoms move off symmetric positions, so no symmetry',
+    16: 'write a frame to XDATCAR every step',
+  }}
+/>
+
+- `IBRION = 0` is MD; `POTIM` is then the time step in fs and `NSW` the number of steps <Cite id="S-019" />. `TEBEG` and `TEEND` set the start and end temperature; a ramp between them is a heating or cooling run.
+- `MDALGO` picks the thermostat in VASP 6: 1 Andersen, 2 Nose-Hoover (Nose mass `SMASS`), 3 Langevin (friction `LANGEVIN_GAMMA`, one value per species) <Cite id="S-019" />. NPT uses `MDALGO = 3` with `ISIF = 3`, a lattice friction `LANGEVIN_GAMMA_L` and a lattice mass `PMASS`, as pymatgen's NPT input set writes it <Cite id="S-034" />. For NVE, switch the thermostat off; one way is `MDALGO = 1` with `ANDERSEN_PROB = 0` (check the VASP wiki page MDALGO for your version, Q-069).
+- The trajectory goes to `XDATCAR`, one frame every `NBLOCK` steps, in fractional coordinates folded into the cell. Unwrap them before computing an MSD. VASPKIT option 721 gives the MSD and 722 the radial distribution function <Cite id="S-042" /> <Cite id="S-020" />.
+- A Γ-only build (`vasp_gam`) is common for the large cells MD needs <Cite id="S-041" />. pymatgen's MD input set uses 2 fs without hydrogen and 0.5 fs with it <Cite id="S-034" />; test the step yourself with a short NVE run.
+- **Check energy conservation.** In an NVE run the total energy, kinetic plus potential, should fluctuate around a constant. In VASP the MD lines of `OSZICAR` report it as `E=` (check the OSZICAR page for your version, Q-069). A steady drift means the time step is too large or the electronic convergence too loose.
+- **Thermal stability.** The handbook's test: the structure stays intact and the energy fluctuates around a constant <Cite id="S-042" />.
+
+**On-the-fly MLFF** (VASP 6.3 and later) <Cite id="S-127" /> <Cite id="S-019" />:
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM   = MLFF training run
+ML_LMLFF = .TRUE.
+ML_MODE  = train
+IBRION   = 0
+MDALGO   = 3
+LANGEVIN_GAMMA = 10
+TEBEG    = 300
+TEEND    = 900
+POTIM    = 1.0
+NSW      = 20000
+ISIF     = 3
+PMASS    = 10
+LANGEVIN_GAMMA_L = 1
+ISYM     = 0
+ENCUT    = 520
+ISMEAR   = 0
+SIGMA    = 0.05`}
+  annotations={{
+    2: 'switch the machine-learned force field on',
+    3: 'learn on the fly',
+    5: 'Langevin thermostat, needed for NPT',
+    6: 'friction per species in 1/ps; one value for one species',
+    8: 'heating ramp: sample a range of temperatures',
+    11: 'NPT: the cell can change',
+    15: 'a raised cutoff, because the cell changes',
+  }}
+/>
+
+The friction and lattice mass are the values pymatgen's NPT input set writes, and like that set the run raises `ENCUT` (pymatgen uses 1.5 times `ENMAX`) because a changing cell feels the Pulay stress <Cite id="S-034" />; the temperature ramp and the number of steps are illustrative. The workflow uses four modes of `ML_MODE`, a tag of VASP 6.4 and later (6.3 used `ML_ISTART`; see Q-069):
+
+1. **`train`**: on-the-fly learning during MD. VASP writes the training structures to `ML_ABN`, the force field to `ML_FFN` and a log to `ML_LOGFILE`. To continue training, copy `ML_ABN` to `ML_AB` and run `train` again.
+2. **`select`**: rebuild the set of local reference configurations from an existing `ML_AB` without new DFT steps.
+3. **`refit`**: refit the final force field for fast prediction.
+4. **`run`**: copy `ML_FFN` to `ML_FF` and run MD with the force field alone, no DFT.
+
+**When to trust an MLFF.** Only inside what it has seen: the same elements, similar temperatures, pressures and structures. Before production, take some structures from an MLFF trajectory, recompute them with DFT, and compare energies and forces. Compare one observable you care about (the radial distribution function, a diffusion coefficient) with a short AIMD run. Rare events that never happened during training, such as a bond breaking, are where an MLFF is least reliable <Cite id="S-127" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...                     | ...what happens                                                                    |
+| ------------------------------------ | ---------------------------------------------------------------------------------- |
+| `POTIM` larger                       | Fewer steps for the same time; energy drift and, eventually, an exploding run      |
+| `POTIM` smaller                      | Better energy conservation; more steps (and DFT calls) for the same simulated time |
+| `SMASS` (Nose mass) larger           | The thermostat reacts more slowly; temperature swings take longer to damp          |
+| NVT to NPT                           | The cell can expand or change phase; needs a lattice mass and a converged stress   |
+| Run shorter                          | Fewer independent samples; noisier MSD and a less reliable diffusion coefficient   |
+| MLFF used outside its training range | Unknown error; the Bayesian estimate may also be wrong there                       |
+
+These rows follow from the methods above; they are reasoning, not quoted values.
+
+Why MD: some properties only exist at finite temperature. Why these settings: the time step must resolve the fastest vibration, and the thermostat must sample the ensemble you mean. What happens if you skip equilibration: averages that are biased towards the starting structure.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="A 2 fs step with hydrogen">
+
+Hydrogen vibrates fastest. With a step meant for heavy atoms the energy drifts or the run explodes. Use 0.5 fs with hydrogen <Cite id="S-041" />, and check energy conservation in a short NVE run.
+
+</Callout>
+
+<Callout variant="mistake" title="Computing the MSD from wrapped coordinates">
+
+`XDATCAR` folds atoms back into the cell. An atom that crosses the boundary seems to jump by a whole lattice vector, and the MSD flattens or spikes. Unwrap first.
+
+</Callout>
+
+<Callout variant="mistake" title="Averaging over the equilibration">
+
+The first picoseconds remember the starting structure. Discard them and analyse only the production part <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Fitting the diffusion coefficient to the start of the MSD">
+
+At short times atoms move ballistically and the MSD curves upward. Fit the straight part at long times, and run long enough that the atoms have moved several neighbour distances.
+
+</Callout>
+
+<Callout variant="mistake" title="Trusting an MLFF far from its training data">
+
+A force field trained at 300 K on the crystal does not know the liquid. Train over the range you will simulate and validate against DFT on structures from the production run <Cite id="S-127" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m12-md-1', 'q-m12-md-2', 'q-m12-md-3', 'q-m12-md-4', 'q-m12-md-5']} />
+
+<GoDeeper>
+
+- Frenkel and Smit for the algorithms, ensembles, thermostats, MSD and RDF; Verlet for the integrator <Cite id="S-125" />.
+- Nose, Hoover and Andersen for the thermostats <Cite id="S-126" />.
+- Jinnouchi, Karsai, Kresse and co-workers on on-the-fly MLFFs in VASP <Cite id="S-127" />.
+- VASP wiki pages IBRION, MDALGO, ML_LMLFF and ML_MODE, by page name <Cite id="S-019" />.
+
+</GoDeeper>

@@ -62,6 +62,8 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-056 | open | builder |
 | Q-057 | open | builder |
 | Q-058 | open | author |
+| Q-069 | open | builder (needs vasp.at) or author |
+| Q-070 | open | builder (needs the LOBSTER, VTST and Science Advances pages) |
 
 ## Release triage (M11.3)
 
@@ -285,3 +287,9 @@ The work order asked for a textbook source for n, k, alpha, R, L and sigma from 
 
 ## Q-058. Near-zero level for the acoustic modes in the phonon check
 `ACOUSTIC_NEAR_ZERO_CM1 = 5` in `src/lib/vasp/phonons.ts` decides when one of the three lowest Gamma modes counts as near zero (review check POST-PHONON-ACOUSTIC, Heuristic). S-042 says only that a small imaginary acoustic dip of "a few cm^-1" is numerical noise; 5 is the builder's reading of that phrase, not a sourced value. The imaginary-mode check (POST-PHONON-IMAG) does not use it: it flags every f/i mode outside the three lowest. **Close:** the author confirms 5 cm^-1 or gives the level to use. **Owner: author.**
+
+## Q-069. VASP tag details in the new module 5, 9 and 12 topics (M16)
+The pages on molecular dynamics and MLFF, beyond DFT and Wannier functions name VASP tags that were written from memory because vasp.at was not reachable from the builder session on 2026-11-27: the VASP version that introduced `ML_MODE` (believed 6.4, with `ML_ISTART` in 6.3) and the meaning of `ML_CTIFOR`; the VASP 6 GW tags (`ALGO = EVGW0` with `NELMGW = 1` for G0W0; pymatgen MVLGWSet writes the 5.4 form `ALGO = GW0`, `NELM = 1`); the NVE settings (`MDALGO = 1` with `ANDERSEN_PROB = 0`); the meaning of the `E=` column of an MD line in `OSZICAR`; and the `LWANNIER90` page (files written, `NUM_WANN`, `LWANNIER90_RUN`, and whether `ISYM = -1` is required). Each page states these with "check the VASP wiki page" wording. **Close:** read the VASP wiki pages ML_MODE, ML_CTIFOR, ALGO, NELMGW, MDALGO, OSZICAR and LWANNIER90 for VASP 6.4 and correct the pages where they differ. Owner: builder with web access, or the author.
+
+## Q-070. Non-VASP documentation behind the new module 9 and 12 topics (M16)
+Three outside sources were cited from memory: the LOBSTER manual (the exact ISYM rule; the page follows pymatgen Lobsterin, which writes ISYM = 0 or -1), the VTST Tools pages (default `SPRING = -5`, `LCLIMB`, the `IOPT` numbering with 1 = LBFGS, 2 = CG, 3 = quick-min, 7 = FIRE, and the script names `nebmake.pl`, `nebbarrier.pl`), and the abstract of Sun et al. 2016 (S-120: median metastability of about 15 meV/atom, 90th percentile about 67 meV/atom). **Close:** read the three pages and upgrade S-120, S-124 and S-129 to `read`, or correct the topics. Owner: builder with web access.

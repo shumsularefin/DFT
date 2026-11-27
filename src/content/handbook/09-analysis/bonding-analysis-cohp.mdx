@@ -1,0 +1,164 @@
+---
+id: bonding-analysis-cohp
+title: Bonding analysis with COHP and LOBSTER
+module: 9
+order: 6
+summary: What a crystal orbital Hamilton population shows, how LOBSTER projects plane-wave results onto atomic orbitals, how to read -COHP and ICOHP, and which VASP settings the projection needs.
+concepts: [bonding-analysis]
+requires: [dos-analysis]
+vaspTags: [ISYM, LWAVE, NBANDS, NSW, ISMEAR]
+sources: [S-034, S-042, S-128, S-129]
+noLab: true
+status: draft
+updated: 2026-11-27
+---
+
+<Why>
+
+A density of states tells you where the electron levels are. It does not tell you whether filling a level holds two atoms together or pushes them apart. That is the chemist's question: is this bond strong, are antibonding states filled, why does adding an electron weaken the structure? The <Term id="cohp">crystal orbital Hamilton population</Term> (COHP) answers it by splitting the density of states of an atom pair into bonding and antibonding parts <Cite id="S-128" />. Plane waves have no atoms in them, so the program LOBSTER first projects the VASP wavefunctions onto atomic-like orbitals <Cite id="S-129" />.
+
+</Why>
+
+<Intuition>
+
+Two orbitals on neighbouring atoms combine into a lower, bonding combination and a higher, antibonding one. Filling the bonding one lowers the energy; filling the antibonding one raises it. COHP weights each state at energy $E$ by how much it lowers or raises the energy of one particular pair of atoms.
+
+**The sign convention.** A bonding contribution lowers the energy, so its COHP is _negative_. Plots therefore show **−COHP**: to the right of zero (positive) is bonding, to the left (negative) is antibonding <Cite id="S-128" /> <Cite id="S-042" />. Look at where the Fermi level sits: antibonding states filled just below it signal a weakened or strained bond, and often an instability.
+
+**Integrated COHP.** Integrating the COHP up to the Fermi level gives the <Term id="icohp">ICOHP</Term>, one number per pair. A more negative ICOHP means a stronger covalent interaction. It is a relative measure: compare similar bonds computed with the same basis and settings, not raw values across very different systems <Cite id="S-129" />.
+
+**COOP versus COHP.** The older crystal orbital overlap population (COOP) weights the states by the overlap of the two orbitals instead of their Hamiltonian matrix element. In COOP bonding is positive <Cite id="S-128" />. COHP is the natural choice with DFT because the Hamiltonian element carries an energy, so its integral relates to the band energy.
+
+**Projection quality.** LOBSTER reconstructs the density from its local basis. The fraction it fails to reproduce is the <Term id="charge-spilling">charge spilling</Term>, printed in `lobsterout`. A small spilling means the basis describes the states well; a large one means part of the bonding is missing from the picture <Cite id="S-129" />.
+
+</Intuition>
+
+<TheMath>
+
+For orbital $\mu$ on atom A and orbital $\nu$ on atom B, with Hamiltonian matrix element $H_{\mu\nu}$, band $j$, k-point $\mathbf{k}$, occupation $f_{j\mathbf{k}}$ and expansion coefficients $c$ of the band in the local basis <Cite id="S-128" />:
+
+$$
+\text{COHP}_{\mu\nu}(E) = H_{\mu\nu}\sum_{j,\mathbf{k}} f_{j\mathbf{k}}\,c^{*}_{\mu,j\mathbf{k}}\,c_{\nu,j\mathbf{k}}\,\delta(E - \varepsilon_{j\mathbf{k}})
+$$
+
+Summing over the orbitals of A and B gives the pair's COHP. COOP replaces $H_{\mu\nu}$ by the overlap $S_{\mu\nu}$. The integral is
+
+$$
+\text{ICOHP} = \int_{-\infty}^{E_F} \text{COHP}(E)\,dE
+$$
+
+<Level min="intermediate">
+
+In a plane-wave code the coefficients $c$ do not exist directly. LOBSTER projects the PAW wavefunctions onto a minimal basis of atomic-like orbitals fitted for that purpose (for example the `pbeVaspFit2015` set), and computes the "projected COHP" from the projected Hamiltonian <Cite id="S-129" />. The charge spilling measures how much of the occupied density is lost in that projection.
+
+</Level>
+
+<Level min="pro">
+
+The COHP depends on the basis, so ICOHP values are not observables and are not unique. They are useful as trends within one study <Cite id="S-129" />. Newer LOBSTER versions add further bond indicators: pymatgen's interface, for example, has switches for crystal orbital bond indices (COBI) marked as LOBSTER 4.1.0 features <Cite id="S-034" />. Their definitions are in the LOBSTER documentation, which this page does not cover.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+LOBSTER runs after a VASP static calculation and reads its `WAVECAR`. The VASP run needs <Cite id="S-129" /> <Cite id="S-034" />:
+
+- **No ionic steps:** `NSW = 0` on the relaxed structure.
+- **Symmetry off:** `ISYM = 0` (time-reversal symmetry kept) or `ISYM = -1` (none). LOBSTER needs the k-points the symmetry would otherwise fold away. pymatgen's LOBSTER input writer accepts only these two values; check the manual of your LOBSTER version for which it supports.
+- **Wavefunctions written:** `LWAVE = .TRUE.`
+- **Enough bands:** `NBANDS` at least the number of local basis functions in the cell (each s orbital counts 1, p 3, d 5, f 7, per atom). pymatgen sets it to exactly that number.
+- **PAW potentials only.** LOBSTER works with PAW, which is what VASP `POTCAR`s are; other potential types are rejected.
+- A uniform k-mesh, as for a DOS run.
+
+For diamond-structure Si (two atoms, basis 3s 3p, so 2 x 4 = 8 basis functions):
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM = Si for LOBSTER
+NSW    = 0
+ISYM   = 0
+LWAVE  = .TRUE.
+NBANDS = 8
+ISMEAR = 0
+SIGMA  = 0.05
+ENCUT  = 520
+EDIFF  = 1E-6`}
+  annotations={{
+    2: 'static run on the relaxed structure',
+    3: 'time-reversal symmetry only',
+    4: 'LOBSTER reads the WAVECAR',
+    5: 'two Si atoms times (one s + three p) basis functions',
+    6: 'Gaussian smearing; give LOBSTER the same width',
+  }}
+/>
+
+And a matching `lobsterin` (keywords as pymatgen writes them <Cite id="S-034" />):
+
+```text
+COHPstartEnergy   -15.0
+COHPendEnergy       5.0
+basisSet          pbeVaspFit2015
+basisfunctions    Si 3s 3p
+gaussianSmearingWidth 0.05
+cohpGenerator     from 0.1 to 3.0
+```
+
+The energy window (relative to the Fermi level) and the 3.0 Å distance range are illustrative; choose them to cover the bands and pairs you care about. LOBSTER writes `COHPCAR.lobster` (the curves), `ICOHPLIST.lobster` (one ICOHP per pair) and `lobsterout`, where you read the charge spilling first.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...              | ...what happens                                                              |
+| ----------------------------- | ---------------------------------------------------------------------------- |
+| `ISYM` left at its default    | LOBSTER cannot use the symmetry-reduced k-points; the run stops or is wrong  |
+| `NBANDS` below the basis size | The projection has fewer bands than orbitals; LOBSTER refuses or misprojects |
+| A smaller basis               | Larger charge spilling; COHP misses part of the bonding                      |
+| Plot COHP instead of −COHP    | Bonding and antibonding swap sides; easy to misread                          |
+
+These rows follow from the requirements above; they are reasoning, not quoted values.
+
+Why COHP: it says which states bond, not just where they are. Why these settings: LOBSTER needs every k-point and enough bands to project. What happens if you skip the spilling check: a confident bonding story from a projection that missed part of the density.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Reading the sign the wrong way round">
+
+COHP is negative for bonding; −COHP is positive for bonding. Check which one your plotting tool shows before calling a peak antibonding <Cite id="S-128" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Running LOBSTER on a symmetry-reduced run">
+
+A standard SCF uses `ISYM` symmetry and writes only the irreducible k-points. Redo the static run with `ISYM = 0` or `-1` and `LWAVE = .TRUE.` <Cite id="S-034" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Too few bands">
+
+The default `NBANDS` can be smaller than the number of basis functions, especially with d or f orbitals in the basis. Count them and set `NBANDS` explicitly.
+
+</Callout>
+
+<Callout variant="mistake" title="Comparing ICOHP across different bases">
+
+ICOHP depends on the basis and settings. Compare bonds within one consistent set of calculations, not with a number from another paper <Cite id="S-129" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m9-cohp-1', 'q-m9-cohp-2', 'q-m9-cohp-3', 'q-m9-cohp-4']} />
+
+<GoDeeper>
+
+- Dronskowski and Blochl, the original COHP paper; Hughbanks and Hoffmann for COOP <Cite id="S-128" />.
+- Deringer, Tchougreeff, Maintz and Dronskowski on projected COHP and LOBSTER <Cite id="S-129" />.
+- The [density of states](/handbook/09-analysis/density-of-states/) page for the projected DOS that COHP refines.
+- pymatgen's LOBSTER input and output classes <Cite id="S-034" />.
+
+</GoDeeper>

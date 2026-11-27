@@ -637,6 +637,35 @@
     ]
   },
   {
+    "id": "convex-hull",
+    "label": "Convex hull",
+    "short": "The lowest convex envelope of formation energy plotted against composition. A phase on it is stable at 0 K against every mixture of the other phases.",
+    "level": "intermediate",
+    "sources": [
+      "S-034",
+      "S-080"
+    ]
+  },
+  {
+    "id": "energy-above-hull",
+    "label": "Energy above the hull",
+    "short": "How far, in energy per atom, a phase sits above the convex hull. Zero means stable; a positive value is the energy it would release by splitting into the hull phases below it.",
+    "level": "intermediate",
+    "sources": [
+      "S-034",
+      "S-042"
+    ]
+  },
+  {
+    "id": "metastable",
+    "label": "Metastable",
+    "short": "Higher in energy than the most stable arrangement, but held in place by a barrier, so it can still be made and can last.",
+    "level": "beginner",
+    "sources": [
+      "S-120"
+    ]
+  },
+  {
     "id": "stress-tensor",
     "label": "Stress tensor",
     "short": "Nine numbers (six independent) that say how the energy of a cell changes when it is stretched or sheared; its average diagonal value gives the pressure.",
@@ -1514,6 +1543,207 @@
     "level": "intermediate",
     "sources": [
       "S-111"
+    ]
+  },
+  {
+    "id": "minimum-energy-path",
+    "label": "Minimum energy path",
+    "short": "The lowest-energy route between two minima of the energy surface. At every point on it the force points along the path.",
+    "level": "intermediate",
+    "sources": [
+      "S-121"
+    ]
+  },
+  {
+    "id": "saddle-point",
+    "label": "Saddle point",
+    "short": "A point on the energy surface that is a maximum along the reaction path and a minimum in every other direction. It is the transition state.",
+    "level": "intermediate",
+    "sources": [
+      "S-121"
+    ]
+  },
+  {
+    "id": "activation-energy",
+    "label": "Activation energy",
+    "short": "The energy of the saddle point minus the energy of the starting minimum: the barrier a process has to cross.",
+    "level": "beginner",
+    "sources": [
+      "S-122"
+    ]
+  },
+  {
+    "id": "nudged-elastic-band",
+    "label": "Nudged elastic band",
+    "short": "A method that finds a minimum energy path by relaxing a chain of images joined by springs, keeping only the perpendicular part of the true force and the parallel part of the spring force.",
+    "level": "intermediate",
+    "sources": [
+      "S-121"
+    ]
+  },
+  {
+    "id": "climbing-image",
+    "label": "Climbing image",
+    "short": "The highest image of a nudged elastic band, freed from the springs and pushed uphill along the path so that it ends exactly on the saddle point.",
+    "level": "pro",
+    "sources": [
+      "S-121"
+    ]
+  },
+  {
+    "id": "molecular-dynamics",
+    "label": "Molecular dynamics",
+    "short": "Moving the atoms forward in time step by step with Newton's equations, using forces from a model or from DFT.",
+    "level": "beginner",
+    "sources": [
+      "S-125"
+    ]
+  },
+  {
+    "id": "thermostat",
+    "label": "Thermostat",
+    "short": "An algorithm that adds or removes kinetic energy during a simulation so that the temperature fluctuates around a target value.",
+    "level": "intermediate",
+    "sources": [
+      "S-125",
+      "S-126"
+    ]
+  },
+  {
+    "id": "statistical-ensemble",
+    "label": "Ensemble",
+    "short": "The set of quantities a simulation holds fixed, such as particle number, volume and energy (NVE) or particle number, volume and temperature (NVT).",
+    "level": "intermediate",
+    "sources": [
+      "S-125"
+    ]
+  },
+  {
+    "id": "mean-squared-displacement",
+    "label": "Mean squared displacement",
+    "short": "The average of the squared distance the atoms have moved after a time t. Its slope at long times gives the diffusion coefficient.",
+    "level": "intermediate",
+    "sources": [
+      "S-125"
+    ]
+  },
+  {
+    "id": "radial-distribution-function",
+    "label": "Radial distribution function",
+    "short": "How the density of neighbours changes with distance from an atom, relative to a uniform gas. Its peaks mark the coordination shells.",
+    "level": "intermediate",
+    "sources": [
+      "S-125"
+    ]
+  },
+  {
+    "id": "machine-learned-force-field",
+    "label": "Machine-learned force field",
+    "short": "A force field fitted to DFT energies, forces and stresses that predicts them for new structures far faster than DFT, within the range of structures it was trained on.",
+    "level": "intermediate",
+    "sources": [
+      "S-127"
+    ]
+  },
+  {
+    "id": "cohp",
+    "label": "COHP",
+    "short": "Crystal orbital Hamilton population: the density of states of an atom pair split into bonding and antibonding parts by weighting it with their Hamiltonian matrix element.",
+    "level": "pro",
+    "sources": [
+      "S-128"
+    ]
+  },
+  {
+    "id": "icohp",
+    "label": "ICOHP",
+    "short": "The COHP integrated up to the Fermi level. Its size is a relative measure of how strongly two atoms bond covalently.",
+    "level": "pro",
+    "sources": [
+      "S-128",
+      "S-129"
+    ]
+  },
+  {
+    "id": "charge-spilling",
+    "label": "Charge spilling",
+    "short": "The fraction of the electron density that a projection onto local orbitals fails to reproduce. LOBSTER prints it as a quality check of the projection.",
+    "level": "pro",
+    "sources": [
+      "S-129"
+    ]
+  },
+  {
+    "id": "quasiparticle",
+    "label": "Quasiparticle",
+    "short": "An added electron or hole together with the response of the electrons around it. Its energy is what photoemission and inverse photoemission measure.",
+    "level": "pro",
+    "sources": [
+      "S-130"
+    ]
+  },
+  {
+    "id": "gw-approximation",
+    "label": "GW approximation",
+    "short": "A many-body method that computes quasiparticle energies from the one-electron Green's function G and the screened Coulomb interaction W.",
+    "level": "pro",
+    "sources": [
+      "S-130",
+      "S-131"
+    ]
+  },
+  {
+    "id": "exciton",
+    "label": "Exciton",
+    "short": "A bound pair of an excited electron and the hole it left behind. Excitons pull optical absorption below the quasiparticle gap.",
+    "level": "intermediate",
+    "sources": [
+      "S-132"
+    ]
+  },
+  {
+    "id": "bethe-salpeter-equation",
+    "label": "Bethe-Salpeter equation",
+    "short": "An equation for electron-hole pairs built on quasiparticle energies, used to compute optical spectra that include excitons.",
+    "level": "pro",
+    "sources": [
+      "S-132"
+    ]
+  },
+  {
+    "id": "dmft",
+    "label": "DMFT",
+    "short": "Dynamical mean-field theory: treats strong local correlation by mapping each correlated site onto an impurity problem that is solved self-consistently.",
+    "level": "pro",
+    "sources": [
+      "S-132"
+    ]
+  },
+  {
+    "id": "wannier-function",
+    "label": "Wannier function",
+    "short": "A localized orbital made by Fourier transforming the Bloch states of a group of bands. There is one per band and lattice cell.",
+    "level": "pro",
+    "sources": [
+      "S-133"
+    ]
+  },
+  {
+    "id": "berry-phase",
+    "label": "Berry phase",
+    "short": "A geometric phase that Bloch states pick up around a closed loop in k-space. It gives the electric polarization and the topological invariants of the bands.",
+    "level": "pro",
+    "sources": [
+      "S-133"
+    ]
+  },
+  {
+    "id": "topological-invariant",
+    "label": "Topological invariant",
+    "short": "An integer, such as a Chern number or a Z2 index, that describes a set of bands as a whole and cannot change unless the gap closes.",
+    "level": "pro",
+    "sources": [
+      "S-133"
     ]
   },
   {

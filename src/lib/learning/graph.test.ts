@@ -130,6 +130,11 @@ describe('shipped concept graph', () => {
       'surface-slabs',
       'point-defects',
       'property-catalogue',
+      'formation-energy-hull',
+      'transition-states',
+      'molecular-dynamics',
+      'bonding-analysis',
+      'wannier-functions',
     ]);
     for (const x of g.filter((y) => y.module >= 6))
       expect(x.status, x.id).toBe(m73.has(x.id) ? 'published' : 'planned');

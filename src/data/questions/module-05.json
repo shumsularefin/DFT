@@ -2469,7 +2469,7 @@
       "Which tags each add an attraction between distant atoms?",
       "A nonlocal functional and a pairwise correction are two ways to do the same job."
     ],
-    "difficulty": 1.0,
+    "difficulty": 1,
     "level": "intermediate",
     "sources": [
       "S-019",
@@ -2509,7 +2509,7 @@
       "What holds graphite layers together?",
       "Does PBE contain that interaction?"
     ],
-    "difficulty": 0.0,
+    "difficulty": 0,
     "level": "beginner",
     "sources": [
       "S-139",
@@ -2549,7 +2549,7 @@
       "D2 uses a table and D3 counts neighbours.",
       "One method uses a partition of the density into atoms."
     ],
-    "difficulty": 1.0,
+    "difficulty": 1,
     "level": "intermediate",
     "sources": [
       "S-136",
@@ -2590,7 +2590,7 @@
       "An energy difference is only meaningful if each term uses the same model.",
       "Does the molecule have atom pairs of its own?"
     ],
-    "difficulty": 1.0,
+    "difficulty": 1,
     "level": "intermediate",
     "sources": [
       "S-041",
@@ -3496,7 +3496,7 @@
       "Where exactly is the site moment measured?",
       "Does the sphere around an atom capture all of its spin density?"
     ],
-    "difficulty": 0.0,
+    "difficulty": 0,
     "level": "beginner",
     "sources": [
       "S-042",
@@ -3602,6 +3602,223 @@
       },
       "caption": "The anisotropy sequence.",
       "alt": "A four-step flow: a collinear SCF keeping CHGCAR, a non-collinear run along 001, another along 100, then the energy difference."
+    }
+  },
+  {
+    "id": "q-m5-bdft-1",
+    "concepts": [
+      "beyond-dft-methods"
+    ],
+    "type": "single",
+    "prompt": "PBE underestimates the band gap of a semiconductor and Hartree-Fock overestimates it. Why does a hybrid functional often land closer?",
+    "options": [
+      {
+        "text": "It mixes a fraction of exact (Hartree-Fock) exchange into the GGA, landing between the two errors",
+        "correct": true,
+        "why": "Hartree-Fock and semilocal functionals err in opposite directions for gaps; a hybrid interpolates, and HSE06 gaps for sp semiconductors come within about 10 to 20 percent of experiment."
+      },
+      {
+        "text": "It adds correlation that Hartree-Fock has and PBE lacks",
+        "correct": false,
+        "why": "It is the other way round: Hartree-Fock has no correlation at all; PBE has approximate correlation."
+      },
+      {
+        "text": "It uses many more k-points",
+        "correct": false,
+        "why": "The k-mesh is a convergence choice; it does not change the functional's gap error."
+      },
+      {
+        "text": "It is a GW calculation in disguise",
+        "correct": false,
+        "why": "A hybrid is still a ground-state functional; GW computes quasiparticle energies with a self-energy."
+      }
+    ],
+    "hints": [
+      "Which way does each method err?",
+      "What does a hybrid mix?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-048",
+      "S-049"
+    ],
+    "visual": {
+      "plot": "ladder-rungs",
+      "params": {
+        "highlight": 3
+      },
+      "caption": "The five rungs of the functional ladder, cheaper at the bottom.",
+      "alt": "Five stacked boxes named LDA, GGA, Meta-GGA, Hybrid and Beyond from bottom to top, with one box shaded."
+    }
+  },
+  {
+    "id": "q-m5-bdft-2",
+    "concepts": [
+      "beyond-dft-methods"
+    ],
+    "type": "single",
+    "prompt": "You need the optical absorption onset of an insulator with strong excitons. Which method sequence is appropriate?",
+    "options": [
+      {
+        "text": "DFT, then GW for the quasiparticle energies, then BSE for the electron-hole interaction",
+        "correct": true,
+        "why": "GW gives the energies to add and remove electrons; BSE adds the attraction between the electron and the hole, which pulls absorption below the quasiparticle gap."
+      },
+      {
+        "text": "G0W0 alone",
+        "correct": false,
+        "why": "GW gives the quasiparticle gap but no exciton; the optical onset would be too high."
+      },
+      {
+        "text": "PBE with LOPTICS",
+        "correct": false,
+        "why": "An independent-particle spectrum from PBE has both the gap error and no excitons."
+      },
+      {
+        "text": "DMFT",
+        "correct": false,
+        "why": "DMFT targets strong local correlation, not excitons in a band insulator."
+      }
+    ],
+    "hints": [
+      "Which method gives quasiparticle energies?",
+      "Which adds the electron-hole attraction?"
+    ],
+    "difficulty": 0.5,
+    "level": "pro",
+    "sources": [
+      "S-130",
+      "S-132"
+    ],
+    "visual": {
+      "plot": "band-gap",
+      "params": {
+        "labels": false
+      },
+      "caption": "One full band and one empty band, with the space between them. Toy model.",
+      "alt": "Two bands drawn as boxes, the lower one marked full and the upper one marked empty, with empty space between them."
+    }
+  },
+  {
+    "id": "q-m5-bdft-3",
+    "concepts": [
+      "beyond-dft-methods"
+    ],
+    "type": "single",
+    "prompt": "Your G0W0 gap changes by 0.3 eV when you double NBANDS. What does that tell you?",
+    "options": [
+      {
+        "text": "The GW result is not converged in the number of empty bands; converge NBANDS with ENCUTGW and NOMEGA",
+        "correct": true,
+        "why": "GW sums over empty states, so it needs far more bands than an SCF; a gap that moves with NBANDS is not yet a result."
+      },
+      {
+        "text": "GW is unreliable for this material",
+        "correct": false,
+        "why": "The method may be fine; the calculation is simply not converged yet."
+      },
+      {
+        "text": "The k-mesh is too dense",
+        "correct": false,
+        "why": "A denser mesh does not make the band sum converge; the band count does."
+      },
+      {
+        "text": "Nothing; NBANDS does not matter in GW",
+        "correct": false,
+        "why": "It matters a lot, because the self-energy involves a sum over empty bands."
+      }
+    ],
+    "hints": [
+      "Which states does GW sum over?",
+      "Which tags are converged together?"
+    ],
+    "difficulty": 0.5,
+    "level": "pro",
+    "sources": [
+      "S-131"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "DFT ground state"
+          },
+          {
+            "label": "Many empty bands, LOPTICS"
+          },
+          {
+            "label": "GW step"
+          },
+          {
+            "label": "Converge bands and frequencies"
+          }
+        ],
+        "active": 3
+      },
+      "caption": "The GW workflow in VASP.",
+      "alt": "A four-step flow: a DFT ground state, a run with many empty bands that writes WAVEDER, the GW step, then convergence of the band and frequency settings."
+    }
+  },
+  {
+    "id": "q-m5-bdft-4",
+    "concepts": [
+      "beyond-dft-methods"
+    ],
+    "type": "single",
+    "prompt": "How does the formal cost of Hartree-Fock grow with system size compared with semilocal DFT?",
+    "options": [
+      {
+        "text": "About as N to the power 4, against N to the power 3 for DFT",
+        "correct": true,
+        "why": "Exact exchange couples every pair of orbitals, which adds one power of the size over the N cubed of semilocal DFT."
+      },
+      {
+        "text": "The same, N to the power 3",
+        "correct": false,
+        "why": "Exact exchange is the expensive part; it adds a power."
+      },
+      {
+        "text": "Exponentially",
+        "correct": false,
+        "why": "Exponential growth belongs to the exact many-electron solution, not to Hartree-Fock."
+      },
+      {
+        "text": "Linearly",
+        "correct": false,
+        "why": "Linear scaling needs special methods; standard Hartree-Fock is far from it."
+      }
+    ],
+    "hints": [
+      "Exact exchange involves every pair of occupied orbitals.",
+      "Semilocal DFT is usually quoted as N to the power 3."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-048",
+      "S-049"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Kohn-Sham orbitals"
+          },
+          {
+            "label": "Exchange between pairs of orbitals"
+          },
+          {
+            "label": "Cost of one SCF step"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "Where the extra work of exact exchange comes from.",
+      "alt": "A three-step flow: the Kohn-Sham orbitals, the exchange term between pairs of orbitals, the cost of one self-consistent step."
     }
   },
   {

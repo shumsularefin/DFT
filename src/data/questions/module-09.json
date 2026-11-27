@@ -1458,5 +1458,480 @@
       "caption": "Electron density of two electrons in a 5 angstrom box.",
       "alt": "A single hump of electron density across a box, highest in the middle and zero at the walls."
     }
+  },
+  {
+    "id": "q-m9-cohp-1",
+    "concepts": [
+      "bonding-analysis"
+    ],
+    "type": "single",
+    "prompt": "A LOBSTER plot shows -COHP for a metal-oxygen pair, with a large peak on the negative side just below the Fermi level. What does that peak mean?",
+    "options": [
+      {
+        "text": "Filled antibonding states, which weaken that bond",
+        "correct": true,
+        "why": "-COHP is positive for bonding and negative for antibonding, so a negative peak below the Fermi level is occupied antibonding character."
+      },
+      {
+        "text": "Strong bonding states",
+        "correct": false,
+        "why": "Tempting if you read COHP itself, where bonding is negative; the plot shows -COHP, which flips the sign."
+      },
+      {
+        "text": "Empty states that do not matter",
+        "correct": false,
+        "why": "States below the Fermi level are occupied, so they do count."
+      },
+      {
+        "text": "A failed projection",
+        "correct": false,
+        "why": "Antibonding peaks are physical; the projection quality is judged by the charge spilling, not by the sign of a peak."
+      }
+    ],
+    "hints": [
+      "Which sign of -COHP means bonding?",
+      "Are states below the Fermi level filled or empty?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-128",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Static VASP run"
+          },
+          {
+            "label": "LOBSTER projection"
+          },
+          {
+            "label": "Plot -COHP against energy"
+          }
+        ],
+        "active": 2
+      },
+      "caption": "Producing a COHP plot.",
+      "alt": "A three-step flow: a static VASP run, the LOBSTER projection, then a plot of -COHP against energy."
+    }
+  },
+  {
+    "id": "q-m9-cohp-2",
+    "concepts": [
+      "bonding-analysis"
+    ],
+    "type": "single",
+    "prompt": "Which VASP settings does a LOBSTER run need from the static calculation before it?",
+    "options": [
+      {
+        "text": "NSW = 0, ISYM = 0 or -1, LWAVE = .TRUE. and NBANDS at least the number of local basis functions",
+        "correct": true,
+        "why": "LOBSTER reads the WAVECAR, needs the k-points that symmetry would fold away, and needs at least one band per basis orbital to project onto."
+      },
+      {
+        "text": "The default ISYM and LWAVE = .FALSE.",
+        "correct": false,
+        "why": "Without a WAVECAR LOBSTER has nothing to project, and a symmetry-reduced mesh lacks k-points it needs."
+      },
+      {
+        "text": "ISYM = 2 and LORBIT = 11",
+        "correct": false,
+        "why": "LORBIT writes VASP's own projections; LOBSTER does its own projection from the wavefunctions and needs symmetry off."
+      },
+      {
+        "text": "Ultrasoft potentials for speed",
+        "correct": false,
+        "why": "LOBSTER works with PAW potentials only."
+      }
+    ],
+    "hints": [
+      "Which file does LOBSTER read?",
+      "What does symmetry do to the list of k-points?"
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-034",
+      "S-129"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Relax"
+          },
+          {
+            "label": "Static run for LOBSTER"
+          },
+          {
+            "label": "Run LOBSTER"
+          },
+          {
+            "label": "Read lobsterout"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "The LOBSTER workflow.",
+      "alt": "A four-step flow: relax the structure, do a static run prepared for LOBSTER, run LOBSTER, read its output file."
+    }
+  },
+  {
+    "id": "q-m9-cohp-3",
+    "concepts": [
+      "bonding-analysis"
+    ],
+    "type": "single",
+    "prompt": "Two bonds in the same set of LOBSTER runs have ICOHP values of -2.1 eV and -0.6 eV. What can you conclude?",
+    "options": [
+      {
+        "text": "The first is the stronger covalent interaction, as a relative comparison within these runs",
+        "correct": true,
+        "why": "A more negative ICOHP means more net bonding below the Fermi level. Because it depends on the basis, compare it only within one consistent set."
+      },
+      {
+        "text": "The second is stronger because its number is closer to zero",
+        "correct": false,
+        "why": "Bonding COHP is negative, so the more negative integral is the stronger bond."
+      },
+      {
+        "text": "The first bond has a dissociation energy of 2.1 eV",
+        "correct": false,
+        "why": "ICOHP is not a bond energy that can be measured; it is a basis-dependent indicator."
+      },
+      {
+        "text": "Nothing, ICOHP has no meaning",
+        "correct": false,
+        "why": "It is a useful trend indicator, as long as the bonds are compared within one consistent calculation."
+      }
+    ],
+    "hints": [
+      "Is bonding COHP positive or negative?",
+      "Is ICOHP an observable or an indicator?"
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-128",
+      "S-129"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Run LOBSTER"
+          },
+          {
+            "label": "Open ICOHPLIST.lobster"
+          },
+          {
+            "label": "Compare pairs from the same run"
+          }
+        ],
+        "active": 2
+      },
+      "caption": "Comparing bonds.",
+      "alt": "A three-step flow: run LOBSTER, open the list of integrated COHPs, compare pairs from the same calculation."
+    }
+  },
+  {
+    "id": "q-m9-cohp-4",
+    "concepts": [
+      "bonding-analysis"
+    ],
+    "type": "single",
+    "prompt": "lobsterout reports a large charge spilling. What does that tell you?",
+    "options": [
+      {
+        "text": "The local basis misses part of the density, so the COHP picture may be incomplete",
+        "correct": true,
+        "why": "The spilling is the fraction of the density the projection fails to reproduce; a large value means a poor fit of the basis to the states."
+      },
+      {
+        "text": "The SCF did not converge",
+        "correct": false,
+        "why": "The spilling measures the projection, not the VASP electronic loop."
+      },
+      {
+        "text": "The bonds are very ionic",
+        "correct": false,
+        "why": "Ionicity is a property of the material; the spilling is a property of the projection."
+      },
+      {
+        "text": "Too many k-points were used",
+        "correct": false,
+        "why": "More k-points do not cause spilling; the basis does."
+      }
+    ],
+    "hints": [
+      "What is projected onto what?",
+      "Is the spilling about VASP or about LOBSTER?"
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-129"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Plane-wave states from VASP"
+          },
+          {
+            "label": "Projection onto local orbitals"
+          },
+          {
+            "label": "Compare the reconstructed density"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "How LOBSTER projects.",
+      "alt": "A three-step flow: plane-wave states from VASP, projection onto atomic-like orbitals, comparison of the reconstructed density with the original."
+    }
+  },
+  {
+    "id": "q-m9-wan-1",
+    "concepts": [
+      "wannier-functions"
+    ],
+    "type": "single",
+    "prompt": "Why are Wannier functions not unique, and how do maximally localized Wannier functions fix the choice?",
+    "options": [
+      {
+        "text": "Each Bloch state has a free phase (and bands can be mixed); MLWFs pick the mixing that minimizes the total spread",
+        "correct": true,
+        "why": "The gauge leaves every band energy unchanged but reshapes the Wannier functions; Marzari and Vanderbilt choose the gauge with the smallest spread."
+      },
+      {
+        "text": "Because the DFT energies are uncertain",
+        "correct": false,
+        "why": "The ambiguity exists even for exact Bloch states; it is a phase freedom, not a numerical error."
+      },
+      {
+        "text": "They are unique; any code gives the same functions",
+        "correct": false,
+        "why": "Without a localization criterion the functions depend on the arbitrary phases, so they are not unique."
+      },
+      {
+        "text": "MLWFs fix it by choosing the most extended functions",
+        "correct": false,
+        "why": "The criterion is the opposite: the smallest spread."
+      }
+    ],
+    "hints": [
+      "What happens to a Bloch state if you multiply it by a phase?",
+      "What does maximally localized minimize?"
+    ],
+    "difficulty": 0.5,
+    "level": "pro",
+    "sources": [
+      "S-133"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Bloch states from DFT"
+          },
+          {
+            "label": "Choose a gauge"
+          },
+          {
+            "label": "Fourier transform to real space"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "From Bloch states to Wannier functions.",
+      "alt": "A three-step flow: Bloch states from a DFT run, a choice of phases and mixings, a Fourier transform to real space."
+    }
+  },
+  {
+    "id": "q-m9-wan-2",
+    "concepts": [
+      "wannier-functions"
+    ],
+    "type": "single",
+    "prompt": "The d bands you want to wannierize cross several s bands. Which step of Wannier90 handles that?",
+    "options": [
+      {
+        "text": "Disentanglement, with an outer window and a frozen inner window",
+        "correct": true,
+        "why": "Souza, Marzari and Vanderbilt pick the best subspace of the right size from the outer window at each k, keeping the frozen-window states exactly."
+      },
+      {
+        "text": "Raising num_iter",
+        "correct": false,
+        "why": "More iterations help the localization converge, but they do not separate entangled bands."
+      },
+      {
+        "text": "Turning symmetry on",
+        "correct": false,
+        "why": "Symmetry reduces the k-mesh, which Wannier90 cannot use; it does not disentangle bands."
+      },
+      {
+        "text": "Using fewer bands in VASP than Wannier functions",
+        "correct": false,
+        "why": "You need at least as many bands as Wannier functions, and usually more, to disentangle."
+      }
+    ],
+    "hints": [
+      "What is special about bands that cross other bands?",
+      "Which two energy windows does Wannier90 use?"
+    ],
+    "difficulty": 1,
+    "level": "pro",
+    "sources": [
+      "S-133",
+      "S-134"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Outer window"
+          },
+          {
+            "label": "Frozen window"
+          },
+          {
+            "label": "Disentangle"
+          },
+          {
+            "label": "Localize"
+          }
+        ],
+        "active": 2
+      },
+      "caption": "The Wannier90 steps for entangled bands.",
+      "alt": "A four-step flow: set the outer energy window, set the frozen window, disentangle, then localize."
+    }
+  },
+  {
+    "id": "q-m9-wan-3",
+    "concepts": [
+      "wannier-functions"
+    ],
+    "type": "single",
+    "prompt": "After a Wannier90 run, what is the most direct check that the model is right?",
+    "options": [
+      {
+        "text": "The Wannier-interpolated bands lie on the DFT bands inside the frozen window",
+        "correct": true,
+        "why": "The model's job is to reproduce the bands it came from; plotting both together shows any mismatch at once."
+      },
+      {
+        "text": "The spread is smaller than in the last run",
+        "correct": false,
+        "why": "A small spread is good, but a localized model can still reproduce the wrong bands."
+      },
+      {
+        "text": "The run finished without errors",
+        "correct": false,
+        "why": "Finishing says nothing about whether the bands agree."
+      },
+      {
+        "text": "The number of Wannier functions equals the number of atoms",
+        "correct": false,
+        "why": "The count follows the chosen orbitals (for example eight sp3 functions for two Si atoms), not the atoms."
+      }
+    ],
+    "hints": [
+      "What should a tight-binding model reproduce?",
+      "Where must the agreement be exact?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-133"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "DFT band structure"
+          },
+          {
+            "label": "Wannier90 run"
+          },
+          {
+            "label": "Overlay the interpolated bands"
+          }
+        ],
+        "active": 2
+      },
+      "caption": "Checking a Wannier model.",
+      "alt": "A three-step flow: compute the DFT bands, run Wannier90, overlay the interpolated bands on the DFT bands."
+    }
+  },
+  {
+    "id": "q-m9-wan-4",
+    "concepts": [
+      "wannier-functions"
+    ],
+    "type": "single",
+    "prompt": "Why does the VASP run for Wannier90 switch symmetry off?",
+    "options": [
+      {
+        "text": "Wannier90 needs the overlaps between neighbouring points of the full uniform k-mesh",
+        "correct": true,
+        "why": "The spread is computed from overlaps between each k-point and its neighbours on a uniform mesh, which a symmetry-reduced list does not contain."
+      },
+      {
+        "text": "Symmetry makes the bands wrong",
+        "correct": false,
+        "why": "Symmetry does not change the bands; it removes k-points from the list."
+      },
+      {
+        "text": "To make the run faster",
+        "correct": false,
+        "why": "Switching symmetry off makes the run slower, not faster."
+      },
+      {
+        "text": "Because Wannier functions only exist in triclinic cells",
+        "correct": false,
+        "why": "Wannier functions exist for any crystal; the issue is the k-point list."
+      }
+    ],
+    "hints": [
+      "What does Wannier90 compute from neighbouring k-points?",
+      "What does symmetry do to the k-point list?"
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-133",
+      "S-019"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Converged SCF"
+          },
+          {
+            "label": "Non-SCF run with LWANNIER90 and symmetry off"
+          },
+          {
+            "label": "wannier90.x"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "The VASP to Wannier90 sequence.",
+      "alt": "A three-step flow: a converged self-consistent run, a non-self-consistent run that writes the Wannier90 files with symmetry off, then the Wannier90 program."
+    }
   }
 ]

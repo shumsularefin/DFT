@@ -1035,6 +1035,73 @@
     "status": "published"
   },
   {
+    "id": "formation-energy-hull",
+    "label": "Formation energy and the convex hull",
+    "module": 12,
+    "summary": "Formation energies per atom from consistent references and corrections, the convex hull, and the energy above it as a stability measure.",
+    "prerequisites": [
+      "dft-energies-forces"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "transition-states",
+    "label": "Transition states and NEB",
+    "module": 12,
+    "summary": "Minimum energy paths, saddle points and barriers from the nudged elastic band method, checked by a frequency calculation.",
+    "prerequisites": [
+      "relaxation-analysis",
+      "phonons"
+    ],
+    "level": "pro",
+    "status": "published"
+  },
+  {
+    "id": "molecular-dynamics",
+    "label": "Molecular dynamics and MLFF",
+    "module": 12,
+    "summary": "Ab initio MD with thermostats and ensembles, diffusion from the mean squared displacement, and on-the-fly machine-learned force fields.",
+    "prerequisites": [
+      "relaxation-analysis"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "bonding-analysis",
+    "label": "Bonding analysis with COHP",
+    "module": 9,
+    "summary": "Projected crystal orbital Hamilton populations from LOBSTER: bonding and antibonding states, ICOHP and the charge spilling.",
+    "prerequisites": [
+      "dos-analysis"
+    ],
+    "level": "pro",
+    "status": "published"
+  },
+  {
+    "id": "beyond-dft-methods",
+    "label": "Methods beyond DFT",
+    "module": 5,
+    "summary": "When semilocal DFT is not enough: Hartree-Fock, hybrids, GW, BSE, DMFT and RPA, what each fixes and what it costs.",
+    "prerequisites": [
+      "hybrid-functionals"
+    ],
+    "level": "pro",
+    "status": "published"
+  },
+  {
+    "id": "wannier-functions",
+    "label": "Wannier functions",
+    "module": 9,
+    "summary": "Localized orbitals from Bloch states, maximal localization and disentanglement, Wannier90 with VASP, and Berry phase ideas.",
+    "prerequisites": [
+      "band-structure-analysis"
+    ],
+    "level": "pro",
+    "status": "published"
+  },
+  {
     "id": "crystal-symmetry",
     "label": "Crystal structure and symmetry",
     "module": 5,
