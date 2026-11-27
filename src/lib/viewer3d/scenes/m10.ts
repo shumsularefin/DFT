@@ -40,6 +40,7 @@ import {
   sphereLayer,
 } from '../kit';
 import { add, cross, dot, norm, normalize, scale, sub } from '../math';
+import { elementRadius, elementTone } from './bondsTwoTone';
 import type { Color, Layer, MeshLayer, SceneDef, SceneFrame, Vec3 } from '../types';
 
 const v3 = (p: readonly number[]): Vec3 => [p[0]!, p[1]!, p[2]!];
@@ -51,7 +52,11 @@ const E: [Vec3, Vec3, Vec3] = [
   [0, 0, 1],
 ];
 const DIAG: Vec3 = normalize([1, 1, 1]);
-const TONE = { La: 'c0', Cu: 'c1', O: 'c2' } as const satisfies Record<string, Color>;
+/** Element colours (D-122); polyhedra take the colour of their centre atom, as in VESTA. */
+const TONE = { La: elementTone('La'), Cu: elementTone('Cu'), O: elementTone('O') } satisfies Record<
+  string,
+  Color
+>;
 
 function memo<T>(m: Map<string, T>, key: string, make: () => T): T {
   const hit = m.get(key);
@@ -210,12 +215,12 @@ const X_SITE: Occupant[] = [{ el: 'O', ox: -2, cn: 6, fraction: 1 }];
 
 /** The atoms of the cubic POSCAR (with boundary copies) and the CuO6 octahedron around the Cu at the body centre. */
 function cubicCell(o: { highlightFile?: boolean } = {}) {
-  const c = crystalLayers(CUBIC, { boundary: true, radiusScale: 0.4 });
+  const c = crystalLayers(CUBIC, { boundary: true });
   const cu = v3(scale([1, 1, 1], A_CUBIC / 2));
   const ox = c.positions.filter(
     (p, i) => c.species[i] === 'O' && Math.abs(norm(sub(p, cu)) - A_CUBIC / 2) < 1e-6,
   );
-  const oct = hullLayer(ox, { group: 'octahedra', name: 'CuO6 octahedron', color: 'c1', opacity: 0.3 });
+  const oct = hullLayer(ox, { group: 'octahedra', name: 'CuO6 octahedron', color: TONE.Cu, opacity: 0.3 });
   // the five atoms written in the file, as opposed to the copies drawn on the far faces and corners
   const file = CUBIC.frac.map((f) => v3(scale(v3(f), A_CUBIC)));
   const inFile = c.positions
@@ -334,18 +339,21 @@ const tolerance: SceneDef = {
     const layers: Layer[] = [
       mergeMeshes(
         blk.octahedra.map((six) => hullLayer(six)),
-        { group: 'octahedra', name: 'CuO6 octahedra', color: 'c1', opacity: 0.32 },
+        { group: 'octahedra', name: 'CuO6 octahedra', color: TONE.Cu, opacity: 0.32 },
       ),
-      atoms(blk.cu, 0.32, TONE.Cu, 'atoms', {
+      atoms(blk.cu, elementRadius('Cu'), TONE.Cu, 'atoms', {
         name: 'Atoms',
         labels: blk.cu.map((_, i) => `Cu ${i + 1}`),
       }),
-      atoms(blk.oxygen, 0.26, TONE.O, 'atoms', { labels: blk.oxygen.map((_, i) => `O ${i + 1}`) }),
+      atoms(blk.oxygen, elementRadius('O'), TONE.O, 'atoms', {
+        labels: blk.oxygen.map((_, i) => `O ${i + 1}`),
+      }),
       lines(cellEdges(blk.lattice), 'muted', 'cell', { name: 'Cu framework cell' }),
     ];
     if (row.ok && row.rA !== undefined)
       layers.push(
-        atoms([blk.rSite], row.rA, TONE.La, 'r-site', {
+        // drawn at the Shannon radius the tolerance factor uses (a physics size, not the drawing scale)
+        atoms([blk.rSite], row.rA, elementTone(el), 'r-site', {
           name: `${el} at its Shannon radius`,
           labels: [`${el}3+ (${pol.short}), radius ${fmt(row.rA, 3)} Å`],
           opacity: 0.9,
@@ -353,9 +361,11 @@ const tolerance: SceneDef = {
       );
     else
       layers.push(
-        atoms([blk.rSite], 0.3, 'muted', 'r-site', {
+        // no radius: a small faint placeholder in the element colour; the name and label say there is no radius
+        atoms([blk.rSite], 0.3, elementTone(el), 'r-site', {
           name: `${el} (no radius under this policy)`,
           labels: [`${el}3+: no ${pol.short} radius`],
+          opacity: 0.35,
         }),
       );
     if (p.room)
@@ -1077,12 +1087,11 @@ const relaxation: SceneDef = {
     }
     const D = DOUBLED;
     const pos = D.cart.map((x, i) => (D.species[i] === 'O' ? add(x, oxygenSeed(x, amp)) : x));
-    const rad = (s: string) => (s === 'La' ? 0.8 : s === 'Cu' ? 0.5 : 0.35);
     layers.push(
       atoms(
         pos,
-        D.species.map(rad),
-        D.species.map((s) => TONE[s as keyof typeof TONE]),
+        D.species.map((s) => elementRadius(s)),
+        D.species.map((s) => elementTone(s)),
         'atoms',
         {
           name: 'Atoms',
@@ -1106,7 +1115,9 @@ const relaxation: SceneDef = {
         }
       octs.push(hullLayer(six));
     });
-    layers.push(mergeMeshes(octs, { group: 'octahedra', name: 'CuO6 octahedra', color: 'c1', opacity: 0.3 }));
+    layers.push(
+      mergeMeshes(octs, { group: 'octahedra', name: 'CuO6 octahedra', color: TONE.Cu, opacity: 0.3 }),
+    );
     if (amp > 0) {
       const from: Vec3[] = [];
       const vec: Vec3[] = [];
@@ -1305,7 +1316,8 @@ const electronic: SceneDef = {
       const ox: Vec3[] = [];
       for (const e of E) for (const sg of [1, -1]) ox.push(scale(e, sg * d));
       const layers: Layer[] = [
-        hullLayer(ox, { group: 'octahedra', name: 'CuO6 octahedron', color: 'c1', opacity: 0.15 }),
+        hullLayer(ox, { group: 'octahedra', name: 'CuO6 octahedron', color: TONE.Cu, opacity: 0.15 }),
+        // small spheres, so the d and p lobes around them stay visible
         atoms([[0, 0, 0]], 0.3, TONE.Cu, 'atoms', { name: 'Atoms', labels: ['Cu'] }),
         atoms(ox, 0.24, TONE.O, 'atoms', { labels: ox.map((_, i) => `O ${i + 1}`) }),
         lobeMesh(set.cu[0], set.cu[1], [0, 0, 0], 1.35, { group: 'cu-d', name: 'Cu 3d shape' }),
@@ -1536,8 +1548,8 @@ function stationLayers(i: number, active: boolean): Layer[] {
     out.push(
       atoms(
         pos,
-        D.species.map((s) => (s === 'La' ? 0.7 : s === 'Cu' ? 0.45 : 0.3)),
-        D.species.map((s) => TONE[s as keyof typeof TONE]),
+        D.species.map((s) => elementRadius(s)),
+        D.species.map((s) => elementTone(s)),
         g,
         {
           labels: D.species.map((s, k) => `${s} ${k + 1}`),
@@ -1556,7 +1568,6 @@ function stationLayers(i: number, active: boolean): Layer[] {
   }
   const c = crystalLayers(CUBIC, {
     boundary: true,
-    radiusScale: 0.4,
     bonds: false,
     groups: { atoms: g, cell: g },
   });
@@ -1566,7 +1577,7 @@ function stationLayers(i: number, active: boolean): Layer[] {
     const ox = c.positions.filter(
       (q, k) => c.species[k] === 'O' && Math.abs(norm(sub(q, cu)) - A_CUBIC / 2) < 1e-6,
     );
-    out.push(hullLayer(ox, { group: g, color: 'c1', opacity: 0.35 }));
+    out.push(hullLayer(ox, { group: g, color: TONE.Cu, opacity: 0.35 }));
   }
   if (i === 1) out.push(arrows([cu], [[0, 0, 3 * MAGMOM_SCALE]], 'pos', g, { thickness: 0.06 }));
   if (i === 2) {

@@ -41,6 +41,7 @@ import {
   sphereLayer,
   surfaceLayer,
 } from '../kit';
+import { elementRadius, elementTone } from './bondsTwoTone';
 import type { Layer, MeshLayer, SceneDef, Vec3 } from '../types';
 
 const clamp = (x: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, x));
@@ -1411,7 +1412,7 @@ const errorCauses: SceneDef = {
     if (which === 'magmom') {
       const s = ironSupercell();
       const m = clamp(Math.round(Number(p.magmom)), 1, 12);
-      const cr = crystalLayers(s, { radiusScale: 0.45 });
+      const cr = crystalLayers(s);
       const pos = s.frac.map((f) => {
         const L = s.lattice;
         return [0, 1, 2].map((c) => f[0] * L[0][c]! + f[1] * L[1][c]! + f[2] * L[2][c]!) as Vec3;
@@ -1421,7 +1422,7 @@ const errorCauses: SceneDef = {
       const missing = Array.from({ length: nA - given }, (_, i) => given + i);
       const layers: Layer[] = cr.layers.filter((l) => l.kind !== 'atoms');
       layers.push(
-        atoms(pos, 0.55, 'c0', 'atoms', {
+        atoms(pos, elementRadius('Fe'), elementTone('Fe'), 'atoms', {
           name: 'Fe atoms in POSCAR order',
           labels: pos.map((_, i) => `Fe ${i + 1}${i < given ? '' : ' (no value)'}`),
           highlight: missing,
@@ -1470,7 +1471,7 @@ const errorCauses: SceneDef = {
     if (which === 'vacuum') {
       const vac = Number(p.vacuum);
       const s = copperSlab(vac);
-      const cr = crystalLayers(s, { repeat: [2, 2, 2], radiusScale: 0.45 });
+      const cr = crystalLayers(s, { repeat: [2, 2, 2] });
       const d = FCC.lattice[0]![0]! / 2;
       const thick = 3 * d;
       const c = s.lattice[2][2];

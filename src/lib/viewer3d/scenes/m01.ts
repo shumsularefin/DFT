@@ -25,6 +25,7 @@ import {
   sliceLayer,
 } from '../kit';
 import { add, norm, scale, sub } from '../math';
+import { elementRadius, elementTone, twoToneBonds } from './bondsTwoTone';
 import type { AtomsLayer, Color, Layer, MeshLayer, SceneDef, Vec3 } from '../types';
 
 const ROCKSALT = lookupStructure('rocksalt')!;
@@ -257,17 +258,16 @@ const scales: SceneDef = {
       ];
       count = 7;
       across = 0.8 * a;
-      const rNa = covalentRadius('Na').radius;
-      const rCl = covalentRadius('Cl').radius;
       if (!dft) {
         layers.push(
-          atoms([c], rCl * 0.45, 'c1', 'atoms', { name: 'Ions', labels: ['Cl'] }),
-          atoms(nb, rNa * 0.45, 'c0', 'atoms', { labels: nb.map((_, i) => `Na ${i + 1}`) }),
-          lines(
-            nb.map((q) => [c, q] as [Vec3, Vec3]),
-            'muted',
+          atoms([c], elementRadius('Cl'), elementTone('Cl'), 'atoms', { name: 'Ions', labels: ['Cl'] }),
+          atoms(nb, elementRadius('Na'), elementTone('Na'), 'atoms', {
+            labels: nb.map((_, i) => `Na ${i + 1}`),
+          }),
+          ...twoToneBonds(
+            nb.map((q) => ({ a: c, b: q, ea: 'Cl', eb: 'Na' })),
             'bonds',
-            { name: 'Neighbours', tube: 0.06 },
+            'Neighbours',
           ),
         );
         say = `One Cl ion with its six Na neighbours at ${fmt(a / 2, 2)} A. At this scale an experiment gives positions and distances, not the electrons themselves.`;

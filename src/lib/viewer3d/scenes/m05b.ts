@@ -2,7 +2,6 @@
 // libraries, in the style of m02.ts. No three.js here: plain data only.
 // @source S-105, S-036, S-032 (symmetry), S-164, S-068, S-041, S-019 (relaxation), S-131 (GW gaps)
 import { BRAVAIS, buildBravais, type BravaisId } from '../../crystal/bravais';
-import { covalentRadius } from '../../crystal/covalent';
 import { cartToFrac, cellVolume, fracToCart, minimumImageDistance } from '../../crystal/lattice';
 import {
   cellOperations,
@@ -38,6 +37,7 @@ import {
   surfaceLayer,
 } from '../kit';
 import { add, cross, dot, norm, normalize, scale, sub } from '../math';
+import { elementRadius } from './bondsTwoTone';
 import type { Color, Layer, MeshLayer, SceneDef, Vec3 } from '../types';
 
 const v3 = (p: readonly number[]): Vec3 => [p[0]!, p[1]!, p[2]!];
@@ -581,7 +581,7 @@ const symmetry: SceneDef = {
     const conventionalCount = s.frac.length;
     const primitiveCount = Math.round(conventionalCount / d.centring.length);
     const tones = speciesTones(s.species);
-    const rad = (e: string) => (d.c.lattice ? 0.22 : covalentRadius(e).radius * 0.45);
+    const rad = (e: string) => (d.c.lattice ? 0.22 : elementRadius(e));
     const col = (e: string): Color => (d.c.lattice ? 'muted' : tones.get(e)!);
     const layers: Layer[] = [];
     layers.push(lines(cellEdges(conv), 'muted', 'cell', { name: 'Conventional cell', dashed: prim }));
@@ -940,7 +940,7 @@ function relaxCell(p: Record<string, unknown>) {
     lines(cellEdges(LT), 'muted', 'target', { name: 'Where this ISIF can take the cell', dashed: true }),
     atoms(
       pos,
-      s.species.map((e) => covalentRadius(e).radius * 0.45),
+      s.species.map((e) => elementRadius(e)),
       s.species.map((e) => tones.get(e)!),
       'atoms',
       { name: 'Atoms', labels: s.species.map((e, i) => `${e} ${i + 1}`) },
