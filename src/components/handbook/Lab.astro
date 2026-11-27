@@ -1,6 +1,6 @@
 ---
 import Section from './Section.astro';
-import Badge from '../ui/Badge.astro';
+import { REGISTERED_LABS } from '../../lib/topic';
 import CostOfExactness from '../labs/CostOfExactness';
 import BoxLab from '../labs/BoxLab';
 import OrbitalsLab from '../labs/OrbitalsLab';
@@ -19,12 +19,18 @@ import SpinLab from '../labs/SpinLab';
 import StonerLab from '../labs/StonerLab';
 import OutputReaderLab from '../labs/OutputReaderLab';
 import { RelaxationViewer, DosViewer, BandViewer, DensityViewer } from '../labs/AnalysisViewers';
-// Labs are registered by id. An id with no component yet shows the placeholder, so topics can be written ahead of their labs.
+// Labs are registered by id. An unknown id fails the build (D-125), so no reader meets an empty lab slot.
+// A topic written before its lab sets `noLab: true` in its front matter and leaves the <Lab> out.
 interface Props {
   id: string;
   title?: string;
 }
-const { id, title } = Astro.props;
+const { id } = Astro.props;
+if (!(REGISTERED_LABS as readonly string[]).includes(id)) {
+  throw new Error(
+    `<Lab id="${id}">: no lab is registered under this id. Register it in Lab.astro or set noLab: true.`,
+  );
+}
 ---
 
 <Section id="lab" heading="Lab">
@@ -112,24 +118,10 @@ const { id, title } = Astro.props;
     <div data-lab-id={id}>
       <UnitCellLab client:visible />
     </div>
-  ) : (
-    <div class="lab-placeholder" data-lab-id={id}>
-      <p>
-        <Badge variant="draft" /> <strong>{title ?? id}</strong>
-      </p>
-      <p>The interactive lab for this topic is not built yet. It arrives in a later stage.</p>
-      <slot />
-    </div>
-  )}
+  ) : null}
 </Section>
 
 <style is:global>
-  .lab-placeholder {
-    border: 2px dashed var(--border-strong);
-    border-radius: var(--radius-lg);
-    padding: var(--space-4) var(--space-5);
-    background: var(--surface);
-  }
   .costlab-methods {
     border: 1px solid var(--border);
     border-radius: var(--radius);

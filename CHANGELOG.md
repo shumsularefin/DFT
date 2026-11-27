@@ -7,6 +7,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- Input Builder tag cards link to the handbook topics that cover each tag (D-125).
 - Input Builder climbing-image NEB preset, from the VTST documentation and Henkelman et al. 2000, with a plain VASP NEB variant, the tags IMAGES, SPRING, LCLIMB and IOPT, and NEB rules V036 to V041 (D-111).
 - Materials Project U values and starting moments as labelled, editable fills in the Input Builder and the Magnetic tool, with their sources and the fits that disagree (D-111).
 - Selective-dynamics rules V042 and V043: flags that cannot act, every coordinate fixed, and a slab relaxation with no fixed layers (D-111).
@@ -17,6 +18,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Changed
 
+- No page calls finished work a draft or coming soon: the Draft badge is gone, How to use this site shows the real ENCUT lab, and an unknown lab id now fails the build (D-125).
 - Values aligned with the author's Workflow Handbook: EDIFFG -0.005 with EDIFF 1E-6, no LMAXMIX in the band INCAR, elastic as protocol step 4 (NFREE 4, EDIFF 1E-8, ±1 kB), optics (about 3× NBANDS, ALGO Normal, NEDOS 2001), E-V points as fixed-volume relaxations, TIME 0.4 and 0.2, ALGO Fast as a Sub-Space-Matrix cause (D-110).
 
 - Molecule mode editing tools: a common-element row, a searchable periodic table tinted by element category, ring templates (benzene, pyridine, cyclohexane, cyclopentane, pyrrole, furan, thiophene) and groups (CH3, OH, NH2, COOH, CHO) that bond in place of a hydrogen, single, double, triple and aromatic bonds (drawn in the viewer and counted when hydrogens are added), set a distance, move, select linked atoms or hydrogens, remove hydrogens, undo and redo, live distance, angle and dihedral read-out, and a "Crystal or Molecule?" explainer by the mode switch (D-109).

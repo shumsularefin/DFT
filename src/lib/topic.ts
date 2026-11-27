@@ -54,20 +54,29 @@ export function levelNotes(body: string): string {
   return parts.length ? `Has ${parts.join(' and ')} notes` : '';
 }
 
-/** Lab ids that have a React island. Topics using one are built as "island" pages (size budget 200 KB). */
+/** Lab ids that have a React island in Lab.astro, which refuses any other id (D-125). Topics using one are built as "island" pages (size budget 200 KB). */
 export const REGISTERED_LABS = [
   'cost-of-exactness',
   'particle-in-a-box',
   'orbitals',
   'exponential-wall',
   'density-as-a-map',
+  'encut-sphere',
+  'kpoint-mesh',
+  'brillouin-zone',
   'scf-loop',
   'smearing',
   'dft-plus-u',
   'paw-picture',
   'functional-ladder',
   'spin-cartoon',
+  'stoner-toy',
   'output-reader',
+  'relaxation-viewer',
+  'dos-viewer',
+  'band-viewer',
+  'density-viewer',
+  'unit-cell',
 ] as const;
 
 /** Page class for a topic: "island" if its body embeds a registered lab, a `<Scene>` or the `<Check>` questions (React islands), else "content". */
