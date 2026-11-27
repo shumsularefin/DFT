@@ -1,4 +1,4 @@
-// Free-moving camera for every 3D view (M16.1, D-108). The camera is a quaternion, a distance and a target, like the builder's
+// Free-moving camera for every 3D view (M16.1, D-113). The camera is a quaternion, a distance and a target, like the builder's
 // VESTA-style viewer (prior art: `vesta.js` camState on the layout branch), so it turns to ANY orientation: there is no polar
 // angle and no pole clamp, which is what made OrbitControls feel stuck. Pure and immutable: every function returns a new state.
 // Camera frame: the camera looks along its local -z, its local +y is "up" on screen, its local +x is "right".

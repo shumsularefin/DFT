@@ -1,4 +1,4 @@
-// Which stage state follows the reader (M16.2, D-110). Pure: the caller measures where each section heading sits.
+// Which stage state follows the reader (M16.2, D-115). Pure: the caller measures where each section heading sits.
 // The active section is the last one whose heading has scrolled above the line at `line` (0.4 = 40% down the viewport);
 // the state is the first one tied to that section. Sections without a state keep the state of the section before them.
 

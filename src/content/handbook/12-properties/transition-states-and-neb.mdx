@@ -140,7 +140,7 @@ ENCUT   = 520`}
   }}
 />
 
-The values follow the VTST documentation as cited from memory (Q-070); check the page for your version. `IBRION = 3` with `POTIM = 0` switches the VASP optimizer off so that the VTST optimizer chosen by `IOPT` moves the images <Cite id="S-124" /> <Cite id="S-034" />. Force criteria for NEB are normally `EDIFFG` from -0.01 to -0.05 eV/Å; -0.001 is rarely reachable on a band of images <Cite id="S-041" />. A common strategy is to converge loosely without the climbing image, then restart with `LCLIMB = .TRUE.`.
+The values follow the VTST documentation as cited from memory (Q-065); check the page for your version. `IBRION = 3` with `POTIM = 0` switches the VASP optimizer off so that the VTST optimizer chosen by `IOPT` moves the images <Cite id="S-124" /> <Cite id="S-034" />. Force criteria for NEB are normally `EDIFFG` from -0.01 to -0.05 eV/Å; -0.001 is rarely reachable on a band of images <Cite id="S-041" />. A common strategy is to converge loosely without the climbing image, then restart with `LCLIMB = .TRUE.`.
 
 **5. Read the barrier.** `nebbarrier.pl` (VTST) or pymatgen's `NEBAnalysis.from_dir` collect the image energies and fit a spline through energies and forces along the path <Cite id="S-124" /> <Cite id="S-034" />. The barrier is the climbing image's energy minus the initial state's, using `energy(sigma->0)` for both.
 

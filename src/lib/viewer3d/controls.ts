@@ -1,4 +1,4 @@
-// Pointer and wheel input for a three camera through the pure arcball (M16.1, D-108). It replaces OrbitControls everywhere:
+// Pointer and wheel input for a three camera through the pure arcball (M16.1, D-113). It replaces OrbitControls everywhere:
 // OrbitControls keeps a polar angle and clamps it at the poles, so a crystal could not be turned over. Here every drag turns
 // the camera's quaternion about a screen axis, so any orientation is reachable and nothing sticks.
 // Stateless about the pose: every event reads the camera and the target as they are now, so code that moves the camera

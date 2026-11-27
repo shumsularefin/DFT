@@ -885,7 +885,7 @@
     "usedFor": "How far above the convex hull known metastable compounds sit; context for hull-distance heuristics (formation energy and hull page)",
     "access": "open access",
     "status": "cited-from-memory",
-    "notes": "The median of about 15 meV/atom and the 90th percentile of about 67 meV/atom are quoted from memory of the abstract and were not re-read (Q-070)"
+    "notes": "The median of about 15 meV/atom and the 90th percentile of about 67 meV/atom are quoted from memory of the abstract and were not re-read (Q-065)"
   },
   {
     "id": "S-121",
@@ -917,7 +917,7 @@
     "usedFor": "VTST tags for VASP (IMAGES, SPRING, LCLIMB, IOPT with IBRION = 3 and POTIM = 0), the 00 to N+1 folder layout, the nebmake and nebbarrier scripts, the dimer method (transition states page)",
     "access": "open web; not reachable from the builder session on 2026-11-27",
     "status": "cited-from-memory",
-    "notes": "IMAGES, IBRION = 3, POTIM = 0, IOPT = 1 and the numbered image folders agree with pymatgen 2026.10.31 NEBSet (S-034); the other tags are from memory (Q-070)"
+    "notes": "IMAGES, IBRION = 3, POTIM = 0, IOPT = 1 and the numbered image folders agree with pymatgen 2026.10.31 NEBSet (S-034); the other tags are from memory (Q-065)"
   },
   {
     "id": "S-125",
@@ -957,7 +957,7 @@
     "usedFor": "Projected COHP, the LOBSTER program and the charge spilling (bonding analysis page)",
     "access": "paywalled",
     "status": "cited-from-memory",
-    "notes": "The VASP settings LOBSTER needs (ISYM = 0 or -1, NSW = 0, LWAVE = .TRUE., NBANDS at least the number of local basis functions, PAW potentials only) and the lobsterin keywords agree with pymatgen 2026.10.31 Lobsterin (S-034); the LOBSTER manual was not reachable (Q-070)"
+    "notes": "The VASP settings LOBSTER needs (ISYM = 0 or -1, NSW = 0, LWAVE = .TRUE., NBANDS at least the number of local basis functions, PAW potentials only) and the lobsterin keywords agree with pymatgen 2026.10.31 Lobsterin (S-034); the LOBSTER manual was not reachable (Q-065)"
   },
   {
     "id": "S-130",

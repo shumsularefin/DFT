@@ -1,4 +1,4 @@
-// The build-time poster of a stage (M16.2, D-111): the same layers as the live view, projected orthographically from the
+// The build-time poster of a stage (M16.2, D-116): the same layers as the live view, projected orthographically from the
 // state's camera and painted far to near as one small SVG. It is what the reader sees before the engine loads, without
 // JavaScript and without WebGL, so it must be honest: same geometry, same colours, the badge and the description beside it.
 // Pure and deterministic (no randomness), so pages do not churn between builds. Sizes are capped so a poster stays small.

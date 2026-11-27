@@ -1,4 +1,4 @@
-/* The side-by-side topic stage (M16.2, D-109): text on the left, a sticky live 3D view on the right on wide screens,
+/* The side-by-side topic stage (M16.2, D-114): text on the left, a sticky live 3D view on the right on wide screens,
    the view above the text on narrow ones. Focus 3D fills the window; Text only hides the view. In the template layout
    (DS.1 to DS.3) the row sits in .handbook-main beside the 18.75rem rail, so it goes side by side from 80rem, and the
    sticky view clears the fixed top bar and status line (--topbar-h, --statusbar-h; both 0 where a layout has none). */

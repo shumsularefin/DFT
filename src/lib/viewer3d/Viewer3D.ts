@@ -1,4 +1,4 @@
-// The shared 3D engine (M16.1, D-108): one renderer, one scene, the plain-data layers of `types.ts`, a free arcball camera
+// The shared 3D engine (M16.1, D-113): one renderer, one scene, the plain-data layers of `types.ts`, a free arcball camera
 // (perspective or orthographic), render on demand, picking, HTML labels, theme colours, context-loss recovery and a full
 // dispose(). Used by the topic stage, the learn path and the Scene island. Physics coordinates, z up.
 import {

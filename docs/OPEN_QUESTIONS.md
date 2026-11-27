@@ -63,7 +63,7 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-057 | open | builder |
 | Q-058 | open | author |
 | Q-069 | open | builder (needs vasp.at) or author |
-| Q-070 | open | builder (needs the LOBSTER, VTST and Science Advances pages) |
+| Q-065 | open | builder (needs the LOBSTER, VTST and Science Advances pages) |
 | Q-064 | open | builder |
 
 ## Release triage (M11.3)
@@ -301,11 +301,11 @@ The merged Studio (`public/dft-studio/js/`, D-103) computes several things the s
 ## Q-069. VASP tag details in the new module 5, 9 and 12 topics (M16)
 The pages on molecular dynamics and MLFF, beyond DFT and Wannier functions name VASP tags that were written from memory because vasp.at was not reachable from the builder session on 2026-11-27: the VASP version that introduced `ML_MODE` (believed 6.4, with `ML_ISTART` in 6.3) and the meaning of `ML_CTIFOR`; the VASP 6 GW tags (`ALGO = EVGW0` with `NELMGW = 1` for G0W0; pymatgen MVLGWSet writes the 5.4 form `ALGO = GW0`, `NELM = 1`); the NVE settings (`MDALGO = 1` with `ANDERSEN_PROB = 0`); the meaning of the `E=` column of an MD line in `OSZICAR`; and the `LWANNIER90` page (files written, `NUM_WANN`, `LWANNIER90_RUN`, and whether `ISYM = -1` is required). Each page states these with "check the VASP wiki page" wording. **Close:** read the VASP wiki pages ML_MODE, ML_CTIFOR, ALGO, NELMGW, MDALGO, OSZICAR and LWANNIER90 for VASP 6.4 and correct the pages where they differ. Owner: builder with web access, or the author.
 
-## Q-070. Non-VASP documentation behind the new module 9 and 12 topics (M16)
+## Q-065. Non-VASP documentation behind the new module 9 and 12 topics (M16; number 070 in PR #77)
 Three outside sources were cited from memory: the LOBSTER manual (the exact ISYM rule; the page follows pymatgen Lobsterin, which writes ISYM = 0 or -1), the VTST Tools pages (default `SPRING = -5`, `LCLIMB`, the `IOPT` numbering with 1 = LBFGS, 2 = CG, 3 = quick-min, 7 = FIRE, and the script names `nebmake.pl`, `nebbarrier.pl`), and the abstract of Sun et al. 2016 (S-120: median metastability of about 15 meV/atom, 90th percentile about 67 meV/atom). **Close:** read the three pages and upgrade S-120, S-124 and S-129 to `read`, or correct the topics. Owner: builder with web access.
 
 ## Q-064. What VASP does with a MAGMOM list of the wrong length
 `06-vasp-files/incar.mdx` said that VASP pads a short `MAGMOM` list, citing S-041, which does not say so; `05-practical-choices/spin-and-magnetism.mdx` says the count must equal the number of atoms and that a wrong count is an error. S-042 supports the second reading (the count must equal NIONS, and its error index lists the message that the MAGMOM count does not match NIONS), so both pages now say that, citing S-042. The VASP wiki page MAGMOM (S-065) could not be reached from the builder session (M16, 2026-11-27) to check whether some versions or input forms behave differently. **Close:** a builder reads the VASP wiki page MAGMOM and confirms the behaviour for a list that is too short and one that is too long, or the author confirms it from a run. **Owner: builder.**
 
-## Q-071. Sources added for the M16 scenes, cited from memory
+## Q-066. Sources added for the M16 scenes, cited from memory (number 071 in PR #77)
 The M16 scenes cite four new sources that were not read in the builder session: S-161 (Su, Schrieffer and Heeger 1979: only the SSH two-site Hamiltonian is used, and its gap and Wannier centres are checked in `sshchain.test.ts`), S-164 (Muller and Brown 1979: the model potential parameters, whose minima and saddles the tests recompute), S-165 (Amdahl 1967: only the closed form) and S-170 (Unsold 1927: a full shell is spherical, checked numerically with `realYlm`). No number on a page depends on reading them beyond what the tests recompute. S-131 (Shishkin and Kresse 2007) was checked against its Table I on 2026-11-27. **Close:** a builder reads the four papers and marks them `read`, or corrects the scenes. **Owner: builder.**

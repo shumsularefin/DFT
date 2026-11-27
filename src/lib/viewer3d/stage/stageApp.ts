@@ -1,6 +1,6 @@
 // The live topic stage (M16.2): the server-rendered stage (poster, captions, descriptions, state list) comes alive here.
 // It loads the scene module, builds frames on every control change, draws them with Viewer3D, follows the reader's
-// section, and keeps the text equivalents (description, readouts, live caption) in step. Vanilla DOM, no framework (D-111).
+// section, and keeps the text equivalents (description, readouts, live caption) in step. Vanilla DOM, no framework (D-116).
 // Loaded lazily by the boot script; three.js arrives with it, never with the page.
 import { loadScene } from '../scenes/index';
 import {

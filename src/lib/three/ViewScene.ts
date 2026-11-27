@@ -1,5 +1,5 @@
 // Shared view behaviour of the Brillouin-zone and unit-cell scenes (M5.5): turn, zoom and pan with the pointer (the free arcball
-// of M16, D-108:
+// of M16, D-113:
 // drag turns, wheel or pinch zooms, right-drag or Shift-drag moves), preset views, and the keyboard (arrow keys rotate, + and -
 // zoom, W A S D move, R resets). Rotation and zoom are about the orbit target, so they keep working after a pan; reset and the
 // preset views bring the target back to the origin. The canvas is hidden from assistive technology (it is a picture), so the
@@ -167,7 +167,7 @@ export class ViewScene extends SceneController {
 
   /**
    * Turn the view by degrees: `dAzimuthDeg` about the screen's vertical axis, `dElevationDeg` about its horizontal axis,
-   * both through the target. Nothing is clamped (M16, D-108): repeated presses carry the view over the pole and on, the way
+   * both through the target. Nothing is clamped (M16, D-113): repeated presses carry the view over the pole and on, the way
    * the pointer does, so a crystal can be turned to any orientation.
    */
   rotateView(dAzimuthDeg: number, dElevationDeg: number): void {
