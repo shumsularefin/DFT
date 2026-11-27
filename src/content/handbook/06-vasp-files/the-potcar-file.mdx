@@ -1,5 +1,24 @@
 ---
 id: the-potcar-file
+stage:
+  scene: m06-potcar
+  states:
+    - id: dataset
+      section: why
+      params: { rc: 1.8, show: both }
+      caption: 'A PAW dataset in one picture: the smooth function (solid) and the all-electron-like one (wire), revolved around the nucleus. They differ only inside the sphere of radius rc.'
+    - id: smooth
+      section: intuition
+      params: { rc: 1.8, show: pseudo }
+      caption: 'The smooth part is what the plane waves describe: no wiggles near the nucleus. Turn the surface to look along it from the side.'
+    - id: augmentation
+      section: math
+      params: { rc: 1.8, show: aug }
+      caption: 'What the augmentation adds back: zero outside rc, all the wiggles inside. Move rc to move the boundary of the sphere.'
+    - id: small-rc
+      section: what-changes
+      params: { rc: 1.2, show: both }
+      caption: 'A smaller core radius shrinks the region where the two functions differ. In real datasets a smaller radius makes a harder potential that needs a larger cutoff.'
 title: POTCAR, the pseudopotential file
 module: 6
 order: 4
