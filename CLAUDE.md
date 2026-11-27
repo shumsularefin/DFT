@@ -23,7 +23,7 @@ Read this file at the start of every session. It is short on purpose.
 - **Do not change the pinned stack** (`docs/DECISIONS.md` D-002). Add a dependency only if the stage needs it, at the exact version listed in `docs/verified-stack/package.json.reference`. Check its gzipped size first.
 - **Keep context lean.** Reuse components, edit files in place, do not rewrite whole files, do not paste large files into the conversation.
 - **Content you write teaches.** Follow `docs/CONTENT_GUIDE.md`: plain language first, then depth by level, always answer "why am I doing this, why this value, what happens if I skip it".
-- **Accessibility and performance are not a later phase.** Every interactive component is keyboard operable, has labels, honours `prefers-reduced-motion`, and works at 360 px wide. 3D and WebAssembly load lazily.
+- **Accessibility and performance are not a later phase.** Every interactive component is keyboard operable, has labels, honours `prefers-reduced-motion`, and works at desktop widths (1024 px and up; the site is desktop only, D-105). 3D and WebAssembly load lazily.
 
 ## Environment notes (cloud sessions)
 

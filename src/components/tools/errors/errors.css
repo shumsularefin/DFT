@@ -58,8 +58,7 @@
 }
 .ef-card {
   border: 1px solid var(--border);
-  border-left: 6px solid var(--accent);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   padding: var(--space-3) var(--space-4);
   margin-top: var(--space-3);
   background: var(--surface);

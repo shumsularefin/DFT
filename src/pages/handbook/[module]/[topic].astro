@@ -80,7 +80,7 @@ const statusLabel = { draft: 'Draft', review: 'Awaiting verification', verified:
     <span hidden data-pagefind-meta={`levels:${levelNotes(body)}`}></span>
     <h1>{entry.data.title}</h1>
     <p class="topic-summary">{entry.data.summary}</p>
-    <p>
+    <p class="topic-meta">
       <Badge variant={entry.data.status === 'verified' ? 'verified' : 'draft'} />
       <span class="topic-status">
         {statusLabel}. Updated {entry.data.updated}.
@@ -107,15 +107,30 @@ const statusLabel = { draft: 'Draft', review: 'Awaiting verification', verified:
   .topic-summary {
     color: var(--text-muted);
   }
+  .topic-summary {
+    margin-bottom: var(--space-2);
+  }
+  .topic-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-5);
+    font-size: var(--step--1);
+  }
   .toc {
-    margin: var(--space-5) 0;
+    margin: 0 0 var(--space-5);
     padding: var(--space-3) var(--space-4);
-    border-left: 3px solid var(--border-strong);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
     max-width: var(--measure);
+    font-size: var(--step--1);
   }
   .toc-title {
-    margin: 0 0 var(--space-2);
+    margin: 0 0 var(--space-1);
     font-weight: 600;
+    color: var(--text-muted);
   }
   .toc ul {
     margin: 0;

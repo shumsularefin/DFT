@@ -1,8 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Card from '../../components/ui/Card.astro';
-import Badge from '../../components/ui/Badge.astro';
 import { MODULES } from '../../lib/site';
 
 const entries = (await getCollection('handbook')).sort(
@@ -13,6 +11,24 @@ const modules = MODULES.map((title, i) => ({
   title,
   topics: entries.filter((e) => e.data.module === i + 1),
 }));
+const unreviewed = entries.filter((e) => e.data.status !== 'verified').length;
+const quick = [
+  {
+    href: '/reference/units/',
+    title: 'Units and conversions',
+    text: 'Conversions computed from CODATA constants.',
+  },
+  {
+    href: '/reference/where-to-read/',
+    title: 'Where to read each number',
+    text: 'Which output file holds each result.',
+  },
+  {
+    href: '/reference/checklist/',
+    title: 'Pre-submit checklist',
+    text: 'What each kind of run needs before you submit.',
+  },
+];
 ---
 
 <BaseLayout
@@ -20,53 +36,61 @@ const modules = MODULES.map((title, i) => ({
   description="The twelve handbook modules, from why DFT exists to lattice response and properties."
 >
   <div class="container">
-    <h1>Handbook</h1>
-    <p>
-      Twelve modules, meant to be read in order. Each topic starts with plain language and adds depth when you
-      switch to Intermediate or Pro. Modules without topics are still being written.
-    </p>
+    <div class="page-head">
+      <h1>Handbook</h1>
+      <p>
+        Twelve modules, meant to be read in order. Each topic starts with plain language and adds depth when
+        you switch to Intermediate or Pro.
+      </p>
+    </div>
+    {unreviewed > 0 && (
+      <p class="notice">
+        {unreviewed === entries.length ? 'Topics are' : `${unreviewed} of ${entries.length} topics are`} first
+        editions awaiting expert review. If something looks wrong, trust the cited source and tell us (see{' '}
+        <a href="/about/">About</a>).
+      </p>
+    )}
     <nav aria-labelledby="quick-ref">
-      <h2 id="quick-ref">Quick reference</h2>
-      <ul>
-        <li>
-          <a href="/reference/units/">Units and conversions</a>
-        </li>
-        <li>
-          <a href="/reference/where-to-read/">Where to read each number</a>
-        </li>
-        <li>
-          <a href="/reference/checklist/">Pre-submit checklist</a>
-        </li>
+      <h2 id="quick-ref" class="section-label">
+        Quick reference
+      </h2>
+      <ul class="card-grid quick-ref">
+        {quick.map((q) => (
+          <li>
+            <a class="feature" href={q.href}>
+              <span class="feature-title">{q.title}</span>
+              <span class="feature-meta">{q.text}</span>
+            </a>
+          </li>
+        ))}
       </ul>
     </nav>
+    <h2 class="section-label">Modules</h2>
     <ol class="module-map">
       {modules.map((m) => (
         <li>
-          <Card as="section">
-            <h2 class="card-title" id={`module-${m.number}`}>
-              <span class="module-no">Module {m.number}</span>
+          <section class="card module-card" aria-labelledby={`module-${m.number}`}>
+            <p class="module-no">Module {m.number}</p>
+            <h3 class="card-title" id={`module-${m.number}`}>
               {m.title}
-            </h2>
+            </h3>
             {m.topics.length === 0 ? (
-              <p class="muted">
-                <Badge variant="draft" /> Not written yet.
-              </p>
+              <p class="module-count">Coming soon</p>
             ) : (
               <>
-                <p class="muted">
+                <p class="module-count">
                   {m.topics.length} {m.topics.length === 1 ? 'topic' : 'topics'}
                 </p>
-                <ul>
+                <ul class="module-topics">
                   {m.topics.map((t) => (
                     <li>
-                      <a href={`/handbook/${t.id}/`}>{t.data.title}</a>{' '}
-                      <Badge variant={t.data.status === 'verified' ? 'verified' : 'draft'} />
+                      <a href={`/handbook/${t.id}/`}>{t.data.title}</a>
                     </li>
                   ))}
                 </ul>
               </>
             )}
-          </Card>
+          </section>
         </li>
       ))}
     </ol>
@@ -74,22 +98,49 @@ const modules = MODULES.map((title, i) => ({
 </BaseLayout>
 
 <style is:global>
+  .quick-ref .feature {
+    gap: 0;
+  }
   .module-map {
     display: grid;
     gap: var(--space-4);
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
     list-style: none;
-    margin: var(--space-5) 0 0;
+    margin: 0;
     padding: 0;
     max-width: none;
   }
-  .module-no {
-    display: block;
-    font-size: var(--step--1);
-    color: var(--text-muted);
-    font-weight: 400;
+  .module-map > li {
+    margin: 0;
   }
-  .muted {
+  .module-card {
+    height: 100%;
+  }
+  .module-no,
+  .module-count {
+    margin: 0;
+    font-size: 0.8rem;
     color: var(--text-muted);
+  }
+  .module-card .card-title {
+    margin: var(--space-1) 0 var(--space-1);
+  }
+  .module-topics {
+    list-style: none;
+    margin: var(--space-3) 0 0;
+    padding: var(--space-3) 0 0;
+    border-top: 1px solid var(--border);
+    font-size: var(--step--1);
+  }
+  .module-topics li {
+    margin: 0;
+  }
+  .module-topics a {
+    display: block;
+    padding-block: 0.3rem;
+    text-decoration: none;
+  }
+  .module-topics a:hover {
+    text-decoration: underline;
   }
 </style>

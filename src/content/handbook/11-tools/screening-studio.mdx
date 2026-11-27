@@ -1,6 +1,6 @@
 ---
 id: screening-studio
-title: Tour of the Screening Studio
+title: Tour of Materials Screening
 module: 11
 order: 1
 summary: How to filter candidate materials, inspect feasibility and starter INCARs, and understand the synthetic demo banner vs real Materials Project snapshots.
@@ -21,11 +21,14 @@ When exploring a chemical family, filtering a structured catalog by stability, b
 
 <Intuition>
 
-The <a href="/studio/">Screening Studio</a> runs entirely in your browser: it loads a compact columnar dataset, filters tens of thousands of entries in milliseconds, and exports shortlists to CSV. Clicking any candidate opens its <a href="/studio/project/">Project Card</a> with a transparent Green/Yellow/Red feasibility rubric, runtime bucket, and a three-step starter `INCAR` sequence <Cite id="S-042" />.
+<a href="/studio/">Materials Screening</a> runs entirely in your browser: it loads a compact columnar dataset,
+filters tens of thousands of entries in milliseconds, and exports shortlists to CSV. Clicking any candidate
+opens its <a href="/studio/project/">Project Card</a> with a transparent Green/Yellow/Red feasibility rubric,
+runtime bucket, and a three-step starter `INCAR` sequence <Cite id="S-042" />.
 
 <Scene id="perovskite-octahedra" />
 
-Check the banner at the top of the Studio: until the author runs a real Materials Project data pull, the Studio clearly labels its table as synthetic demo data so demonstration numbers are never confused with real materials entries <Cite id="S-024" />.
+Check the banner at the top of Materials Screening: until the author runs a real Materials Project data pull, the page clearly labels its table as synthetic demo data so demonstration numbers are never confused with real materials entries <Cite id="S-024" />.
 
 </Intuition>
 
@@ -37,7 +40,7 @@ Thermodynamic stability against competing phases is tracked by the energy above 
 
 <InVasp>
 
-- Filter by elements, band-gap window, $E_{\mathrm{hull}}$, and atom count in <a href="/studio/">Screening Studio</a>.
+- Filter by elements, band-gap window, $E_{\mathrm{hull}}$, and atom count in <a href="/studio/">Materials Screening</a>.
 - Open a candidate's <a href="/studio/project/">Project Card</a> to inspect its feasibility flags and download starter `INCAR` files.
 - Always confirm magnetic ground states and PAW choices in VASP rather than relying solely on database metadata <Cite id="S-042" />.
 
@@ -45,7 +48,7 @@ Thermodynamic stability against competing phases is tracked by the energy above 
 
 <WhatChanges>
 
-| Studio filter        | What it narrows         | Practical effect                                 |
+| Screening filter     | What it narrows         | Practical effect                                 |
 | -------------------- | ----------------------- | ------------------------------------------------ |
 | `E_hull` max         | Thermodynamic stability | Drops highly unstable polymorphs early           |
 | Max sites (`nsites`) | Supercell cost          | Keeps starter runs within modest HPC wall-time   |
@@ -69,6 +72,6 @@ High-throughput catalogs such as the Materials Project primarily use semi-local 
 
 <GoDeeper>
 
-- Open the <a href="/studio/">Screening Studio</a> and inspect the attribution and data-licence notes on <a href="/about/">About</a> <Cite id="S-024" />.
+- Open <a href="/studio/">Materials Screening</a> and inspect the attribution and data-licence notes on <a href="/about/">About</a> <Cite id="S-024" />.
 
 </GoDeeper>

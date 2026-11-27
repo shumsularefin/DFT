@@ -25,14 +25,6 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'mobile-360',
-      use: {
-        ...devices['Pixel 5'],
-        viewport: { width: 360, height: 740 },
-        launchOptions: { executablePath, args: ['--no-sandbox'] },
-      },
-    },
-    {
       name: 'desktop',
       use: { ...devices['Desktop Chrome'], launchOptions: { executablePath, args: ['--no-sandbox'] } },
     },

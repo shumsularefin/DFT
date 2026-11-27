@@ -148,8 +148,9 @@
 }
 .ib-warn,
 .ib-note {
-  border-left: 4px solid var(--warn);
-  padding-left: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--warn) 45%, var(--border));
+  border-radius: var(--radius);
 }
 .ib-summary {
   font-weight: 600;
@@ -163,20 +164,19 @@
 }
 .ib-issue {
   border: 1px solid var(--border);
-  border-left-width: 6px;
   border-radius: 0.5rem;
   padding: var(--space-3);
   min-width: 0;
   overflow-wrap: anywhere;
 }
 .ib-issue-error {
-  border-left-color: var(--danger);
+  border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
 }
 .ib-issue-warn {
-  border-left-color: var(--warn);
+  border-color: color-mix(in srgb, var(--warn) 45%, var(--border));
 }
 .ib-issue-info {
-  border-left-color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
 }
 .ib-nav {
   display: flex;

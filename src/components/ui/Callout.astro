@@ -20,8 +20,7 @@ const defaults = { note: 'Note', tip: 'Tip', warning: 'Warning', mistake: 'Commo
     padding: var(--space-3) var(--space-4);
     background: var(--surface);
     border: 1px solid var(--border);
-    border-left: 4px solid var(--accent);
-    border-radius: var(--radius);
+    border-radius: var(--radius-lg);
     max-width: var(--measure);
   }
   .callout-title {
@@ -30,19 +29,19 @@ const defaults = { note: 'Note', tip: 'Tip', warning: 'Warning', mistake: 'Commo
     color: var(--accent);
   }
   .callout-tip {
-    border-left-color: var(--ok);
+    border-color: color-mix(in srgb, var(--ok) 45%, var(--border));
   }
   .callout-tip .callout-title {
     color: var(--ok);
   }
   .callout-warning {
-    border-left-color: var(--warn);
+    border-color: color-mix(in srgb, var(--warn) 45%, var(--border));
   }
   .callout-warning .callout-title {
     color: var(--warn);
   }
   .callout-mistake {
-    border-left-color: var(--danger);
+    border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
   }
   .callout-mistake .callout-title {
     color: var(--danger);
