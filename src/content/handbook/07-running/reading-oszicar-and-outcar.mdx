@@ -9,7 +9,7 @@ requires: [vasp-workflow]
 vaspTags: [EDIFF, EDIFFG, NELM]
 sources: [S-019, S-041, S-042]
 status: draft
-updated: 2026-11-19
+updated: 2026-11-27
 ---
 
 <Why>
@@ -35,6 +35,8 @@ Ask three questions in order:
 </Intuition>
 
 <TheMath>
+
+Each ionic step prints a few versions of the same energy: one that includes the smearing and one corrected back to zero smearing. They should be close; the further apart they are, the more the smearing is changing your answer <Cite id="S-041" />.
 
 <Level min="intermediate">
 

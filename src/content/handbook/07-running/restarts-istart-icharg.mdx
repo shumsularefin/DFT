@@ -10,7 +10,7 @@ vaspTags: [ISTART, ICHARG]
 sources: [S-019, S-041, S-042]
 noLab: true
 status: draft
-updated: 2026-11-19
+updated: 2026-11-27
 ---
 
 <Why>
@@ -43,6 +43,8 @@ Both tables are from the Workflow Handbook <Cite id="S-042" />.
 </Intuition>
 
 <TheMath>
+
+A restart reads numbers that an earlier run saved (the orbitals or the density) instead of building them from scratch. That saves time only when the earlier run solved the same problem; a density from a different setup is a starting point that does not fit <Cite id="S-019" />.
 
 <Level min="intermediate">
 

@@ -10,7 +10,7 @@ vaspTags: [NCORE, KPAR]
 sources: [S-019, S-041, S-042]
 noLab: true
 status: draft
-updated: 2026-11-19
+updated: 2026-11-27
 ---
 
 <Why>
@@ -63,6 +63,8 @@ Submit with `sbatch job.sh` or `qsub job.sh`. Use `vasp_std` for general runs, `
 </Intuition>
 
 <TheMath>
+
+A parallel run splits one calculation into pieces that run at the same time on different cores. The pieces have to divide evenly: the number of cores you request must be a whole multiple of `KPAR`, because each k-point group gets the same number of cores <Cite id="S-041" />.
 
 <Level min="intermediate">
 

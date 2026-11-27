@@ -7,10 +7,10 @@ summary: A worked ENCUT test from series to choice, using the input builder to w
 concepts: [cutoff-convergence]
 requires: [convergence-testing]
 vaspTags: [ENCUT, PREC]
-sources: [S-019, S-040, S-041, S-042]
+sources: [S-019, S-040, S-041, S-042, S-049]
 noLab: true
 status: draft
-updated: 2026-11-19
+updated: 2026-11-27
 ---
 
 <Why>
@@ -28,6 +28,8 @@ The scan is the same: raise `ENCUT` in even steps, run the same static calculati
 </Intuition>
 
 <TheMath>
+
+The number of plane waves grows faster than the cutoff: it goes as the cutoff to the power 1.5, so doubling `ENCUT` gives almost three times as many plane waves (2 to the power 1.5 is about 2.8), and the run costs at least that much more <Cite id="S-049" />.
 
 <Level min="intermediate">
 

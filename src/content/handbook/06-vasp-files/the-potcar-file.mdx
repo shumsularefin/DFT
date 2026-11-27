@@ -10,7 +10,7 @@ vaspTags: [ENCUT]
 sources: [S-019, S-041]
 noLab: true
 status: draft
-updated: 2026-11-19
+updated: 2026-11-27
 ---
 
 <Why>
@@ -38,6 +38,8 @@ The header block of each dataset is where you read what you need. The widget bel
 </Intuition>
 
 <TheMath>
+
+The number of electrons in your run is a sum: each atom contributes the valence count `ZVAL` written in its POTCAR. Two silicon atoms with 4 valence electrons each give 8 electrons <Cite id="S-041" />.
 
 <Level min="intermediate">
 

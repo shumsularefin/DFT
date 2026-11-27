@@ -7,10 +7,10 @@ summary: What each of the sixteen files VASP can write contains, which ones you 
 concepts: [output-file-reference]
 requires: [vasp-workflow]
 vaspTags: [LWAVE, LCHARG, LORBIT]
-sources: [S-019, S-041]
+sources: [S-019, S-041, S-042]
 noLab: true
 status: draft
-updated: 2026-11-19
+updated: 2026-11-27
 ---
 
 <Why>
@@ -63,6 +63,8 @@ RMM:   9    -0.108706468020E+02   -0.11384E-04   -0.13017E-05  1021   0.309E-02
 </Intuition>
 
 <TheMath>
+
+Most energies in the output are for the whole cell, in eV. Divide by the number of atoms before you compare cells of different size, and use that per-atom value for the 1 meV rule of thumb <Cite id="S-042" />.
 
 <Level min="intermediate">
 

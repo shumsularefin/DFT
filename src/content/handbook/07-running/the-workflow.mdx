@@ -10,7 +10,7 @@ vaspTags: [ISTART, ICHARG, EDIFF, ENCUT, LORBIT]
 sources: [S-019, S-020, S-042]
 noLab: true
 status: draft
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 <Why>
@@ -50,6 +50,8 @@ Why: optics needs many empty bands, so the author triples `NBANDS` and rounds up
 </Intuition>
 
 <TheMath>
+
+Every step of the workflow solves the same equations for the same material; only the question you ask changes. So the settings that define the energy must stay the same from step to step, or the steps describe different problems <Cite id="S-042" />.
 
 <Level min="intermediate">
 

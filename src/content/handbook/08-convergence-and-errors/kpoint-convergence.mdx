@@ -10,7 +10,7 @@ vaspTags: [KPOINTS, KSPACING, ISMEAR, SIGMA]
 sources: [S-019, S-041, S-042]
 noLab: true
 status: draft
-updated: 2026-11-19
+updated: 2026-11-27
 ---
 
 <Why>
@@ -30,6 +30,8 @@ approximation. It does not rescue a mesh that is too coarse, so test the mesh an
 </Intuition>
 
 <TheMath>
+
+A k-point mesh averages over the crystal by sampling a finite set of points, and more points give a better average. In a metal the quantity being averaged has a sharp edge at the Fermi level, which is why metals need denser meshes and a little smearing <Cite id="S-042" />.
 
 <Level min="intermediate">
 

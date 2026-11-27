@@ -185,6 +185,44 @@
     }
   },
   {
+    "id": "q-cv-5",
+    "concepts": [
+      "convergence-testing"
+    ],
+    "type": "single",
+    "prompt": "How do you check that the vacuum in a slab calculation is thick enough?",
+    "options": [
+      {
+        "text": "Keep the slab fixed and repeat the run with more vacuum until the quantity you report (surface energy, work function) changes by less than your tolerance",
+        "correct": true,
+        "why": "Too little vacuum lets the slab feel its periodic image across the gap. Adding vacuum at fixed slab thickness isolates that one effect, the same one-change-at-a-time rule as for ENCUT and k-points."
+      },
+      {
+        "text": "Raise ENCUT until the energy stops changing",
+        "correct": false,
+        "why": "ENCUT converges the basis, not the separation between periodic images. A slab with too little vacuum stays wrong at any cutoff."
+      },
+      {
+        "text": "Add more k-points along the direction normal to the slab",
+        "correct": false,
+        "why": "Tempting, but with a thick vacuum the cell is long in that direction and one k-point along it is the usual choice; more points there do not separate the images."
+      }
+    ],
+    "hints": [
+      "What does the vacuum separate the slab from?",
+      "Change one thing at a time and watch the quantity you report."
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-064"
+    ],
+    "visual": {
+      "none": "The question is about the procedure of a convergence test, which a crystal picture would not show."
+    }
+  },
+  {
     "id": "q-ec-1",
     "concepts": [
       "cutoff-convergence"
