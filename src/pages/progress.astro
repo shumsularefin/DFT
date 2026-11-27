@@ -7,6 +7,7 @@ import SyncPanel from '../components/practice/SyncPanel';
 import { readConfig } from '../lib/sync/config';
 import { conceptGraph, topicsByConcept } from '../lib/learning/loadBank';
 import { moduleName } from '../lib/site';
+import '../styles/learning.css';
 
 const syncEnabled = readConfig(import.meta.env) !== null;
 const concepts = conceptGraph();
@@ -17,7 +18,9 @@ const links = Object.fromEntries(
 );
 const mods = [...new Set(entries.map((e) => e.data.module))].sort((a, b) => a - b);
 const modules = mods.map((m) => entries.filter((e) => e.data.module === m).map((e) => e.id));
-const moduleNames = Object.fromEntries(Array.from({ length: 12 }, (_, i) => [i, moduleName(i)]));
+const names = mods.map((m) => `${m}. ${moduleName(m)}`);
+const published = concepts.filter((c) => c.status === 'published').map((c) => c.id);
+const moduleNames = Object.fromEntries(Array.from({ length: 13 }, (_, i) => [i, moduleName(i)]));
 ---
 
 <BaseLayout
@@ -25,14 +28,18 @@ const moduleNames = Object.fromEntries(Array.from({ length: 12 }, (_, i) => [i, 
   description="Your mastery map of the handbook's ideas, your practice, and controls to export, import or erase your data. Everything stays in your browser."
   pageClass="island"
 >
-  <div class="container">
-    <h1>Your progress</h1>
-    <p>
-      This page shows what you have practised, on this device only. <a href="/practice/">Practise now</a> or
-      go back to the <a href="/handbook/">handbook</a>.
-    </p>
-    <div class="js-only">
-      <ProgressPanel client:load modules={modules} />
+  <div class="container learn-page">
+    <div class="page-h">
+      <div>
+        <h1>Your progress</h1>
+        <p>
+          What you have read and practised, on this device only. <a href="/practice/">Practise now</a> or go
+          back to the <a href="/handbook/">handbook</a>.
+        </p>
+      </div>
+    </div>
+    <div class="js-only stack">
+      <ProgressPanel client:load modules={modules} names={names} concepts={published} />
       {syncEnabled && <SyncPanel client:visible />}
     </div>
     <MasteryMap concepts={concepts} topics={links} moduleNames={moduleNames} />
