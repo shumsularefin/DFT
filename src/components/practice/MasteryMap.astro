@@ -114,7 +114,7 @@ const modName = (m: number) => moduleNames[m] ?? `Module ${m}`;
     {mods.map((m) => (
       <section class="map-list" data-module-section={m} aria-labelledby={`ml-${m}`}>
         <h3 id={`ml-${m}`}>{`${m}. ${modName(m)}`}</h3>
-        <ul>
+        <ul tabindex="0" aria-labelledby={`ml-${m}`}>
           {inModule(m).map((c) => (
             <li data-concept={c.id} data-state="new" data-module={c.module}>
               {topics[c.id] ? <a href={topics[c.id]!.href}>{c.label}</a> : <span>{c.label}</span>}
@@ -286,18 +286,35 @@ const modName = (m: number) => moduleNames[m] ?? `Module ${m}`;
   .map-list-h {
     margin-top: var(--space-5);
   }
-  /* Masonry by columns: sections of very different lengths pack without the ragged gaps of a grid. */
+  /* Every module box is the same height, as on the Handbook page; a module with many ideas scrolls inside its box. */
   .map-lists {
-    columns: 20rem;
-    column-gap: var(--space-3);
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    gap: var(--space-3);
   }
   .map-list {
-    break-inside: avoid;
-    margin: 0 0 var(--space-3);
+    display: flex;
+    flex-direction: column;
+    height: 21rem;
     padding: var(--space-3);
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: var(--radius);
+  }
+  .map-list[hidden] {
+    display: none;
+  }
+  .map-list ul {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-gutter: stable;
+  }
+  .map-list ul:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
   }
   .map-list h3 {
     margin: 0 0 var(--space-2);
@@ -307,7 +324,7 @@ const modName = (m: number) => moduleNames[m] ?? `Module ${m}`;
   }
   .map-list ul {
     margin: 0;
-    padding: 0;
+    padding: 0 var(--space-2) 0 0;
     list-style: none;
     font-size: var(--step--1);
   }
