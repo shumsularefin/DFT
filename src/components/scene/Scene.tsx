@@ -178,24 +178,48 @@ export default function Scene({ spec, initialLive = false, auto3D = false, onLiv
   };
   const zoom = (f: number) => ctl.current?.zoomView(f);
 
-  // the flat view turns under a drag too, so it never behaves like a still picture
-  const drag = useRef<{ x: number; y: number; cam: Camera } | null>(null);
-  const onFlatDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (e.button !== 0) return;
-    drag.current = { x: e.clientX, y: e.clientY, cam };
-    e.currentTarget.setPointerCapture?.(e.pointerId);
-  };
-  const onFlatMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    const d = drag.current;
-    if (!d) return;
-    const dx = e.clientX - d.x;
-    const dy = e.clientY - d.y;
-    if (Math.abs(dx) + Math.abs(dy) < 2) return;
-    setCamera(rotateCamera(d.cam, lattice, -dx * DRAG_DEG, dy * DRAG_DEG)); // same sense as the 3D drag
-  };
-  const onFlatUp = () => {
-    drag.current = null;
-  };
+  // the flat view turns under a drag too, so it never behaves like a still picture. Native listeners: the move and up
+  // listeners sit on the window while a drag lasts, so the drag keeps going when the SVG under the pointer is redrawn.
+  const flatEl = useRef<HTMLDivElement>(null);
+  const camNow = useRef(cam);
+  camNow.current = cam;
+  const latticeNow = useRef(lattice);
+  latticeNow.current = lattice;
+  useEffect(() => {
+    const el = flatEl.current;
+    if (live || !el) return;
+    let stop: (() => void) | undefined;
+    const down = (e: PointerEvent) => {
+      if (e.button !== 0) return;
+      e.preventDefault(); // no text selection or native drag of the labels
+      el.focus();
+      const x0 = e.clientX;
+      const y0 = e.clientY;
+      const start = camNow.current;
+      const move = (m: PointerEvent) => {
+        const dx = m.clientX - x0;
+        const dy = m.clientY - y0;
+        if (Math.abs(dx) + Math.abs(dy) < 2) return;
+        // same sense as the 3D drag: drag right turns the crystal right
+        setCamera(rotateCamera(start, latticeNow.current, -dx * DRAG_DEG, dy * DRAG_DEG));
+      };
+      const up = () => stop?.();
+      stop = () => {
+        window.removeEventListener('pointermove', move);
+        window.removeEventListener('pointerup', up);
+        window.removeEventListener('pointercancel', up);
+        stop = undefined;
+      };
+      window.addEventListener('pointermove', move);
+      window.addEventListener('pointerup', up);
+      window.addEventListener('pointercancel', up);
+    };
+    el.addEventListener('pointerdown', down);
+    return () => {
+      el.removeEventListener('pointerdown', down);
+      stop?.();
+    };
+  }, [live]);
   const onFlatKey = (e: React.KeyboardEvent) => {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     const d = e.shiftKey ? 15 : 5;
@@ -229,10 +253,7 @@ export default function Scene({ spec, initialLive = false, auto3D = false, onLiv
           aria-label="Flat view. Drag or use the arrow keys to turn the picture, R resets it."
           data-view={typeof cam === 'string' ? cam : `${cam.azimuth} ${cam.elevation}`}
           onKeyDown={onFlatKey}
-          onPointerDown={onFlatDown}
-          onPointerMove={onFlatMove}
-          onPointerUp={onFlatUp}
-          onPointerCancel={onFlatUp}
+          ref={flatEl}
           // generated from numbers and escaped labels by projectionToSvg
           dangerouslySetInnerHTML={{ __html: flat }}
         />
