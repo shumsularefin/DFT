@@ -1,13 +1,6 @@
 ---
 import type { Concept } from '../../lib/learning/graph';
-import {
-  FLOW_NODE_H,
-  FLOW_NODE_W,
-  flowEdgePath,
-  flowLayout,
-  layeredLayout,
-  wrapLabel,
-} from '../../lib/learning/layout';
+import { layeredLayout } from '../../lib/learning/layout';
 
 interface Props {
   concepts: Concept[];
@@ -15,18 +8,17 @@ interface Props {
   moduleNames: Record<number, string>;
 }
 const { concepts, topics, moduleNames } = Astro.props;
+// The layered layout gives every idea its depth in the prerequisite graph. The map shows one row per
+// module and, within a row, the ideas in that build order, so nothing needs lines that cross.
 const layout = layeredLayout(concepts);
-// Laid out for a 1200 px wide map at build time; scripts/mastery-map.ts lays it out again for the width
-// the map really has, so it fits without a sideways scrollbar.
-const flow = flowLayout(layout.nodes, 1200);
+const order = new Map(layout.nodes.map((n) => [n.id, n.layer * 1000 + n.row]));
 const byId = new Map(concepts.map((c) => [c.id, c]));
-const base = new Map(layout.nodes.map((n) => [n.id, n]));
-const pos = new Map(flow.nodes.map((n) => [n.id, n]));
-const mods = [...new Set(concepts.filter((c) => c.status === 'published').map((c) => c.module))].sort(
-  (a, b) => a - b,
-);
 const published = concepts.filter((c) => c.status === 'published');
-const mid = FLOW_NODE_H / 2;
+const ids = new Set(published.map((c) => c.id));
+const mods = [...new Set(published.map((c) => c.module))].sort((a, b) => a - b);
+const inModule = (m: number) =>
+  published.filter((c) => c.module === m).sort((a, b) => order.get(a.id)! - order.get(b.id)!);
+const modName = (m: number) => moduleNames[m] ?? `Module ${m}`;
 ---
 
 <section aria-labelledby="map-h" class="mastery card">
@@ -34,9 +26,11 @@ const mid = FLOW_NODE_H / 2;
     Mastery map
   </h2>
   <p>
-    Each mark is one idea. Ideas to its left are the basics it builds on. Shape and text show your state, not
-    colour alone: an open circle is not started, a hatched diamond is learning, a solid square is mastered.
-    The states are estimates from your answers on this device.
+    One row per module, in reading order. In each row the ideas run in the order they build on each other.
+    Point at an idea, or move to it with the keyboard, to light up the ideas it builds on (solid outline) and
+    the ideas that build on it (dashed outline). Shape and text show your state, not colour alone: an open
+    circle is not started, a hatched diamond is learning, a solid square is mastered. The states are estimates
+    from your answers on this device.
   </p>
   <p data-map-summary class="map-summary">
     {published.length} ideas in total.
@@ -46,105 +40,71 @@ const mid = FLOW_NODE_H / 2;
     <select id="map-module" data-map-filter>
       <option value="all">All modules</option>
       {mods.map((m) => (
-        <option value={m}>{`${m}. ${moduleNames[m] ?? `Module ${m}`}`}</option>
+        <option value={m}>{`${m}. ${modName(m)}`}</option>
       ))}
     </select>
   </div>
-  <div
-    class="map-scroll"
-    tabindex="0"
-    role="region"
-    aria-label="Mastery map. The same information is in the list below."
-    data-map-scroll
-  >
-    <svg
-      class="map-svg"
-      width={flow.width}
-      height={flow.height}
-      viewBox={`0 0 ${flow.width} ${flow.height}`}
-      role="group"
-      aria-label="Concept graph"
-    >
-      <defs>
-        <pattern
-          id="map-hatch"
-          width="6"
-          height="6"
-          patternUnits="userSpaceOnUse"
-          patternTransform="rotate(45)"
-        >
-          <rect width="6" height="6" fill="var(--surface)"></rect>
-          <line x1="0" y1="0" x2="0" y2="6" stroke="var(--accent)" stroke-width="3"></line>
-        </pattern>
-      </defs>
-      <g class="map-edges" aria-hidden="true">
-        {layout.edges.map((e) => (
-          <path
-            d={flowEdgePath(pos.get(e.from)!, pos.get(e.to)!)}
-            data-from={e.from}
-            data-to={e.to}
-            data-from-module={byId.get(e.from)!.module}
-            data-to-module={byId.get(e.to)!.module}
-          />
-        ))}
-      </g>
-      {flow.nodes.map((n) => {
-        const c = byId.get(n.id)!;
-        const t = topics[c.id];
-        const lines = wrapLabel(c.label);
-        // Node content is drawn at the origin; the node's transform places it.
-        const inner = (
-          <>
-            <title>{`${c.label}. ${c.summary}`}</title>
-            <rect class="node-hit" x="0" y="0" width={FLOW_NODE_W} height={FLOW_NODE_H} rx="4"></rect>
-            <circle class="shape shape-new" cx="14" cy={mid} r="7"></circle>
-            <path class="shape shape-learning" d={`M14 ${mid - 8} l8 8 l-8 8 l-8 -8 z`}></path>
-            <rect class="shape shape-mastered" x="7" y={mid - 7} width="14" height="14"></rect>
-            <svg x="30" y="0" width={FLOW_NODE_W - 34} height={FLOW_NODE_H}>
-              <text x="0" y={lines.length === 1 ? mid + 4 : mid - 3} class="node-label">
-                {lines.map((line, i) => (
-                  <tspan x="0" dy={i === 0 ? 0 : 14}>
-                    {/* the trailing space keeps the words apart in the link's visible text (axe label-content-name-mismatch) */}
-                    {i + 1 < lines.length ? `${line} ` : line}
-                  </tspan>
-                ))}
-              </text>
-            </svg>
-          </>
-        );
-        const place = {
-          transform: `translate(${n.x} ${n.y})`,
-          'data-layer': base.get(n.id)!.layer,
-          'data-row': base.get(n.id)!.row,
-        };
-        const label = `${c.label}, module ${c.module}, not started`;
-        return t ? (
-          <a
-            href={t.href}
-            {...place}
-            aria-label={label}
-            data-concept={c.id}
-            data-module={c.module}
-            data-state="new"
-            class="map-node"
-          >
-            {inner}
-          </a>
-        ) : (
-          <g
-            role="img"
-            {...place}
-            aria-label={label}
-            data-concept={c.id}
-            data-module={c.module}
-            data-state="new"
-            class="map-node"
-          >
-            {inner}
-          </g>
-        );
-      })}
-    </svg>
+  <svg class="map-defs" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      <pattern
+        id="map-hatch"
+        width="4"
+        height="4"
+        patternUnits="userSpaceOnUse"
+        patternTransform="rotate(45)"
+      >
+        <rect width="4" height="4" fill="var(--surface)"></rect>
+        <line x1="0" y1="0" x2="0" y2="4" stroke="var(--accent)" stroke-width="2"></line>
+      </pattern>
+    </defs>
+  </svg>
+  <div class="map-lanes" role="region" aria-label="Mastery map, one row per module" data-map-scroll>
+    {mods.map((m) => (
+      <div class="map-lane" data-module-lane={m}>
+        <div class="lane-h">
+          <span class="lane-n" aria-hidden="true">
+            {m}
+          </span>
+          <span class="lane-name">{modName(m)}</span>
+          <span class="lane-count" data-lane-count>
+            {`${inModule(m).length} ideas`}
+          </span>
+        </div>
+        <div class="lane-nodes">
+          {inModule(m).map((c) => {
+            const t = topics[c.id];
+            const attrs = {
+              'aria-label': `${c.label}, module ${c.module}, not started`,
+              title: c.summary,
+              'data-concept': c.id,
+              'data-module': c.module,
+              'data-pre': c.prerequisites.filter((p) => ids.has(p)).join(' '),
+              'data-state': 'new',
+              class: 'map-node',
+            };
+            const inner = (
+              <>
+                <svg class="shape-icon" viewBox="0 0 18 18" width="14" height="14" aria-hidden="true">
+                  <circle class="shape shape-new" cx="9" cy="9" r="6.5" />
+                  <path class="shape shape-learning" d="M9 1.5 L16.5 9 L9 16.5 L1.5 9 Z" />
+                  <rect class="shape shape-mastered" x="2.5" y="2.5" width="13" height="13" />
+                </svg>
+                <span class="node-label">{c.label}</span>
+              </>
+            );
+            return t ? (
+              <a href={t.href} {...attrs}>
+                {inner}
+              </a>
+            ) : (
+              <span role="img" {...attrs}>
+                {inner}
+              </span>
+            );
+          })}
+        </div>
+      </div>
+    ))}
   </div>
 
   <h2 id="list-h" class="card-h map-list-h">
@@ -153,22 +113,20 @@ const mid = FLOW_NODE_H / 2;
   <div class="map-lists">
     {mods.map((m) => (
       <section class="map-list" data-module-section={m} aria-labelledby={`ml-${m}`}>
-        <h3 id={`ml-${m}`}>{`${m}. ${moduleNames[m] ?? `Module ${m}`}`}</h3>
+        <h3 id={`ml-${m}`}>{`${m}. ${modName(m)}`}</h3>
         <ul>
-          {published
-            .filter((c) => c.module === m)
-            .map((c) => (
-              <li data-concept={c.id} data-state="new" data-module={c.module}>
-                {topics[c.id] ? <a href={topics[c.id]!.href}>{c.label}</a> : <span>{c.label}</span>}
-                <span class="map-state"> (not started)</span>
-                {c.prerequisites.length > 0 && (
-                  <span class="map-pre">
-                    {' '}
-                    builds on {c.prerequisites.map((p) => byId.get(p)?.label ?? p).join(', ')}
-                  </span>
-                )}
-              </li>
-            ))}
+          {inModule(m).map((c) => (
+            <li data-concept={c.id} data-state="new" data-module={c.module}>
+              {topics[c.id] ? <a href={topics[c.id]!.href}>{c.label}</a> : <span>{c.label}</span>}
+              <span class="map-state"> (not started)</span>
+              {c.prerequisites.length > 0 && (
+                <span class="map-pre">
+                  {' '}
+                  builds on {c.prerequisites.map((p) => byId.get(p)?.label ?? p).join(', ')}
+                </span>
+              )}
+            </li>
+          ))}
         </ul>
       </section>
     ))}
@@ -176,37 +134,91 @@ const mid = FLOW_NODE_H / 2;
 </section>
 
 <style is:global>
-  .map-scroll {
-    overflow-x: auto;
-    max-width: 100%;
+  .map-defs {
+    position: absolute;
+  }
+  .map-lanes {
+    display: flex;
+    flex-direction: column;
     border: 1px solid var(--border);
     border-radius: var(--radius);
     background: var(--bg);
   }
-  .map-svg {
-    display: block;
+  .map-lane {
+    display: grid;
+    grid-template-columns: minmax(11rem, 16rem) minmax(0, 1fr);
+    gap: var(--space-3);
+    align-items: start;
+    padding: var(--space-3);
   }
-  .map-edges path {
-    fill: none;
-    stroke: var(--border-strong);
-    stroke-width: 1;
-    opacity: 0.55;
+  .map-lane + .map-lane {
+    border-top: 1px solid var(--border);
   }
-  .map-node .node-hit {
-    fill: transparent;
+  .map-lane[hidden] {
+    display: none;
   }
-  .map-node:hover .node-hit,
-  a.map-node:focus-visible .node-hit {
-    fill: var(--surface-2);
-    stroke: var(--focus);
-    stroke-width: 2;
+  .lane-h {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: var(--space-2);
+    align-items: baseline;
+    padding-top: 0.25rem;
+  }
+  .lane-n {
+    grid-row: span 2;
+    min-width: 1.75rem;
+    padding: 0.1rem 0.4rem;
+    font: 600 var(--step--1) var(--font-mono);
+    text-align: center;
+    color: var(--accent);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+  }
+  .lane-name {
+    font-weight: 600;
+    font-size: var(--step--1);
+    line-height: 1.3;
+  }
+  .lane-count {
+    grid-column: 2;
+    color: var(--text-muted);
+    font-size: var(--step--1);
+  }
+  .lane-nodes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .map-node {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 2rem;
+    padding: 0.2rem 0.65rem 0.2rem 0.5rem;
+    font-size: var(--step--1);
+    line-height: 1.25;
+    color: var(--text);
+    text-decoration: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    transition:
+      opacity 0.12s,
+      border-color 0.12s;
+  }
+  a.map-node:hover {
+    border-color: var(--accent);
   }
   a.map-node:focus-visible {
-    outline: none;
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
   }
-  .node-label {
-    fill: var(--text);
-    font: 12px var(--font-mono);
+  .map-node[data-state='mastered'] {
+    border-color: var(--accent);
+  }
+  .shape-icon {
+    flex: none;
+    display: block;
   }
   .shape {
     display: none;
@@ -223,10 +235,29 @@ const mid = FLOW_NODE_H / 2;
   .shape-mastered {
     fill: var(--accent);
   }
-  [data-state='new'] > .shape-new,
-  [data-state='learning'] > .shape-learning,
-  [data-state='mastered'] > .shape-mastered {
+  [data-state='new'] .shape-new,
+  [data-state='learning'] .shape-learning,
+  [data-state='mastered'] .shape-mastered {
     display: inline;
+  }
+  /* Hover or focus on an idea: what it builds on gets a solid outline, what builds on it a dashed one. */
+  .map-lanes[data-focus] .map-node:not([data-rel]) {
+    opacity: 0.4;
+  }
+  .map-node[data-rel='self'] {
+    border-color: var(--focus);
+    box-shadow: 0 0 0 1px var(--focus);
+  }
+  .map-node[data-rel='pre'] {
+    border: 2px solid var(--accent);
+  }
+  .map-node[data-rel='post'] {
+    border: 2px dashed var(--accent);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .map-node {
+      transition: none;
+    }
   }
   .map-filter {
     display: flex;
@@ -250,18 +281,19 @@ const mid = FLOW_NODE_H / 2;
     margin-top: var(--space-4);
   }
   .mastery > p {
-    max-width: 90ch;
+    max-width: 100ch;
   }
   .map-list-h {
     margin-top: var(--space-5);
   }
+  /* Masonry by columns: sections of very different lengths pack without the ragged gaps of a grid. */
   .map-lists {
-    display: grid;
-    gap: var(--space-3);
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
-    align-items: start;
+    columns: 20rem;
+    column-gap: var(--space-3);
   }
   .map-list {
+    break-inside: avoid;
+    margin: 0 0 var(--space-3);
     padding: var(--space-3);
     background: var(--bg);
     border: 1px solid var(--border);
@@ -269,20 +301,34 @@ const mid = FLOW_NODE_H / 2;
   }
   .map-list h3 {
     margin: 0 0 var(--space-2);
+    padding-bottom: var(--space-2);
     font-size: var(--step--1);
+    border-bottom: 1px solid var(--border);
   }
   .map-list ul {
     margin: 0;
-    padding-left: var(--space-4);
+    padding: 0;
+    list-style: none;
     font-size: var(--step--1);
   }
   .map-list li {
-    margin: var(--space-1) 0;
+    margin: 0;
+    padding: 0.3rem 0;
+    line-height: 1.4;
+  }
+  .map-list li + li {
+    border-top: 1px dashed var(--border);
+  }
+  .map-list li a {
+    font-weight: 500;
   }
   .map-pre,
   .map-state {
     color: var(--text-muted);
     font-size: var(--step--1);
+  }
+  .map-pre {
+    display: block;
   }
   .map-summary {
     color: var(--text-muted);
