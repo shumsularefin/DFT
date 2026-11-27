@@ -136,9 +136,9 @@ describe('guided path pictures (M16.5)', () => {
     const last = renderPlot('scf-iterations', { Z: 2, alpha: 0.3, tol: 1e-6, step: n }, 'a').svg;
     expect(last.match(/class="vp-bar[^"]*"/g)).toHaveLength(n);
     expect(texts(last).join(' ')).toContain(`Step ${n} of ${n}`);
-    expect(texts(last).join(' ')).toMatch(/settled, the loop stops/);
+    expect(texts(last).join(' ')).toMatch(/Settled, the loop stops/);
     const first = renderPlot('scf-iterations', { Z: 2, alpha: 0.3, tol: 1e-6, step: 1 }, 'a').svg;
-    expect(texts(first).join(' ')).toMatch(/not settled yet/);
+    expect(texts(first).join(' ')).toMatch(/Not settled yet/);
     // the bars still to come are drawn open, the chosen one highlighted
     expect(first.match(/vp-bar vp-later/g)).toHaveLength(n - 1);
     expect(first.match(/vp-bar vp-hot/g)).toHaveLength(1);

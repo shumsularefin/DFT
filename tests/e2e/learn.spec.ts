@@ -112,6 +112,56 @@ test.describe('guided path (M12.4)', () => {
     await expect(page.locator('canvas')).toHaveCount(1);
   });
 
+  // D-124: an option that changes the size of the picture refits the view (same direction, same relative zoom, centred),
+  // so n = 3, nine times wider than n = 1, is not cut off and coming back to n = 1 is not a speck. Reset view is not
+  // pressed anywhere here. Screenshots go to the folder CI prints, so the framing can be checked by eye.
+  test('changing an option keeps the 3D view framed, with no Reset view (D-124)', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const shots = 'test-results/stage-shots';
+    const stage = page.getByTestId('scene-3d');
+    const dist = async () => {
+      const c = ((await stage.getAttribute('data-camera')) ?? '').split(' ').map(Number);
+      const t = ((await stage.getAttribute('data-target')) ?? '').split(' ').map(Number);
+      return Math.hypot(...c.map((x, i) => x - t[i]!));
+    };
+    const settle = async () => {
+      // the refit tweens; wait until the camera stops moving
+      let last = -1;
+      await expect
+        .poll(async () => {
+          const d = await dist();
+          const still = Math.abs(d - last) < 1e-3;
+          last = d;
+          return still;
+        })
+        .toBe(true);
+    };
+
+    await open(page, '#atom-cloud');
+    await expect(stage.locator('canvas')).toHaveCount(1);
+    await expect(stage).toHaveAttribute('data-camera', /\d/);
+    await settle();
+    const d1 = await dist();
+    await page.locator('.lp-visual').screenshot({ path: `${shots}/learn-atom-n1.png` });
+    await page.getByRole('radio', { name: 'n = 3 (3s)' }).check();
+    await expect.poll(dist).toBeGreaterThan(d1 * 2);
+    await settle();
+    await page.locator('.lp-visual').screenshot({ path: `${shots}/learn-atom-n3.png` });
+    await page.getByRole('radio', { name: 'n = 1 (1s)' }).check();
+    await expect.poll(dist).toBeLessThan(d1 * 1.2);
+    await settle();
+    expect(Math.abs((await dist()) / d1 - 1)).toBeLessThan(0.1);
+
+    await page.getByRole('button', { name: 'Station 8: Periodic images' }).click();
+    await expect(stage.locator('canvas')).toHaveCount(1);
+    await settle();
+    const c1 = await dist();
+    await page.getByRole('radio', { name: '2 by 2 by 2 cells' }).check();
+    await expect.poll(dist).toBeGreaterThan(c1 * 1.4);
+    await settle();
+    await page.locator('.lp-visual').screenshot({ path: `${shots}/learn-periodic-2x2x2.png` });
+  });
+
   test('the 3D view turns under a drag, zooms and moves, by pointer and by keyboard', async ({ page }) => {
     await open(page, '#unit-cell');
     const stage = page.getByTestId('scene-3d');

@@ -1282,11 +1282,11 @@ function parallelSplit(p: P): string {
 /* ---- guided path pictures that explain themselves (M16.5) ---- */
 // @source S-048 and S-049 (toy SCF loop, tight-binding bands), S-047 (box), S-049 (plane waves), S-036 and S-050 (reciprocal lattice)
 
+/** A positive number as "1.4 × 10" with a raised power, as SVG markup (the digits come from the number itself). */
 const fmtE = (x: number): string => {
   if (!(x > 0)) return '0';
   const e = Math.floor(Math.log10(x));
-  const m = x / 10 ** e;
-  return `${m.toFixed(1)} x 10^${e}`;
+  return `${(x / 10 ** e).toFixed(1)} × 10<tspan class="vp-sup" dy="-4">${e}</tspan>`;
 };
 
 /**
@@ -1344,18 +1344,14 @@ function scfIterations(p: P): string {
   });
   const yt = by(Math.log10(o.tol!));
   body +=
-    line(x0, yt, x1, yt, 'vp-guide') + text(x1 - 2, yt - 3, 'small enough: stop', 'vp-t vp-small', 'end');
+    line(x0, yt, x1, yt, 'vp-guide') +
+    text(x1 - 2, yt - 3, 'small enough: stop', 'vp-t vp-small vp-halo', 'end');
   body +=
     text(x0, yb0 + 14, 'step 1', 'vp-t vp-small', 'start') +
     text(x1, yb0 + 14, `step ${n}`, 'vp-t vp-small', 'end');
-  body += text(
-    (x0 + x1) / 2,
-    h - 4,
-    step === n
-      ? `Change ${fmtE(its[step - 1]!.residual)}: settled, the loop stops`
-      : `Change at step ${step}: ${fmtE(its[step - 1]!.residual)}, not settled yet`,
-    'vp-t',
-  );
+  const res = fmtE(its[step - 1]!.residual);
+  const verdict = step === n ? 'Settled, the loop stops.' : 'Not settled yet.';
+  body += `<text class="vp-t" x="${r1((x0 + x1) / 2)}" y="${h - 4}" text-anchor="middle">${verdict} Change at step ${step}: ${res}</text>`;
   return wrap(p.alt as string, h, body);
 }
 
@@ -1526,7 +1522,7 @@ function bandsDos(p: P): string {
   // flat band edge: the band is flattest at k = 0 (top of the upper band) and k = pi/a (edges of the gap)
   const yEdge = ey(emax);
   body += line(kx(0), yEdge, dx0 + 8, yEdge, 'vp-curve3');
-  body += text(dx0 + 4, yEdge + 14, 'flat band: tall DOS', 'vp-t vp-small', 'start');
+  body += text(kx(0) + 8, yEdge - 4, 'flat band: tall DOS', 'vp-t vp-small vp-halo', 'start');
   body += text(
     W / 2,
     h - 4,
