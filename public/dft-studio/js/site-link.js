@@ -175,6 +175,14 @@
       };
     });
   }
+  // The Magnetic tab hands the structure to the site's Magnetic tool, which owns FM / AFM orderings (D-108).
+  const magBtn = $('btn-mag-to-tool');
+  if (magBtn) {
+    magBtn.onclick = () => {
+      const mm = V.hasMagnetism() ? V.getMAGMOM().replace(/^\s*MAGMOM\s*=\s*/i, '') : undefined;
+      if (!B.sendTo('magnetic', V.getPOSCAR(), name(), mm)) V.toast('Browser storage is unavailable, so the hand-off could not be made.');
+    };
+  }
   function wrap(stage, extra) {
     const orig = T.stageRenderers[stage];
     if (!orig) return;

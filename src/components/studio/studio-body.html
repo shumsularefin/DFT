@@ -1248,103 +1248,36 @@
           </div>
         </div>
 
-        <!-- Automatic Bond-Graph Magnetic Order Presets -->
-        <div class="space-y-1.5">
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] font-semibold uppercase text-mut">Auto AFM / FM Presets (NN Graph)</span>
-            <button
-              id="btn-afm-theory"
-              class="text-[10px] font-semibold text-blue-500 hover:underline flex items-center gap-0.5 cursor-pointer"
-              title="Wollan–Koehler &amp; Goodenough–Kanamori Theory"
-            >
-              <i data-lucide="book-open" class="w-3 h-3"></i> Theory
-            </button>
-          </div>
-          <div class="grid grid-cols-3 gap-1 items-center">
-            <select
-              id="mag-sublattice"
-              class="v-input col-span-2 text-[10.5px]"
-              title="Choose which magnetic sublattice to order"
-            >
-              <option value="auto3d">Auto (3d metals)</option>
-              <option value="auto3d4f">3d + 4f metals</option>
-            </select>
-            <div class="flex items-center gap-0.5">
-              <input
-                id="mag-preset-val"
-                type="number"
-                step="0.5"
-                min="0.5"
-                max="10"
-                value="3.0"
-                class="v-input w-full text-center font-mono-code text-[10.5px]"
-                title="Moment magnitude (μB)"
-              />
-              <span class="text-[9.5px] text-mut">μB</span>
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-1">
-            <button
-              class="v-btn text-[10.5px] py-1"
-              data-mag-preset="fm"
-              title="All magnetic neighbors parallel"
-            >
-              FM (Parallel)
-            </button>
-            <button
-              class="v-btn text-[10.5px] py-1"
-              data-mag-preset="afm-a"
-              title="FM in-plane (ab), AFM between layers (c)"
-            >
-              AFM-A (Layered)
-            </button>
-            <button
-              class="v-btn text-[10.5px] py-1"
-              data-mag-preset="afm-c"
-              title="AFM in-plane (ab), FM along columns (c)"
-            >
-              AFM-C (Chain/Col)
-            </button>
-            <button
-              class="v-btn text-[10.5px] py-1"
-              data-mag-preset="afm-g"
-              title="3D nearest-neighbor checkerboard AFM"
-            >
-              AFM-G (3D Néel)
-            </button>
-            <button
-              class="v-btn text-[10.5px] py-1"
-              data-mag-preset="afm-ii"
-              title="FM {111} planes, AFM along [111] (Rocksalt 2nd-NN)"
-            >
-              AFM-II (Rocksalt)
-            </button>
-            <button
-              class="v-btn text-[10.5px] py-1"
-              data-mag-preset="spiral"
-              title="120° non-collinear in-plane spin texture"
-            >
-              120° Non-Collinear
-            </button>
-            <button class="v-btn text-[10.5px] py-1 col-span-2 text-red-500" data-mag-preset="clear">
-              Zero All Moments
-            </button>
-          </div>
-          <!-- Auto NN Graph Diagnostics & Supercell Suggestion -->
-          <div
-            id="afm-diagnostics"
-            class="rounded border border-subtle p-1.5 text-[10px] leading-snug space-y-1"
-            style="background: var(--st-console-bg)"
+        <!-- Orderings (FM, AFM-A/C/G and others) are built and compared in the site's Magnetic tool (D-108) -->
+        <div class="space-y-1">
+          <p class="text-[10px] leading-snug text-sub">
+            To try FM and AFM orderings, open this structure in the Magnetic tool. It builds every ordering in
+            the supercell you choose and compares their energies once the runs are done.
+          </p>
+          <button
+            type="button"
+            id="btn-mag-to-tool"
+            class="v-btn w-full text-[10.5px] py-1"
+            title="Open this structure in the Magnetic configuration tool"
           >
-            <div class="flex items-center justify-between">
-              <span class="font-semibold text-main" id="afm-diag-title">NN Spin-Coupling Analysis</span>
-              <span class="font-mono-code text-mut" id="afm-diag-dnn">d_NN: -</span>
-            </div>
-            <div id="afm-diag-body" class="text-sub font-mono-code">
-              Click any FM/AFM preset to auto-solve from PBC bond distances.
-            </div>
-            <button id="btn-afm-auto-sc" class="v-btn v-btn-primary w-full py-0.5 text-[10px] hidden">
-              Auto-Expand Supercell &amp; Apply
+            Make orderings in the Magnetic tool
+          </button>
+          <a
+            class="block text-[10px] text-blue-500 hover:underline"
+            href="/handbook/05-practical-choices/magnetic-orderings/"
+            >What FM, A, C, G and type-II orderings mean (handbook)</a
+          >
+          <div class="grid grid-cols-2 gap-1 pt-1">
+            <button
+              type="button"
+              id="btn-mag-120"
+              class="v-btn text-[10.5px] py-1"
+              title="Heuristic: rotates the moments of the magnetic atoms by 0, 120 and 240 degrees in the xy plane, in atom order. Uses the length of the vector below."
+            >
+              120° in-plane start
+            </button>
+            <button type="button" id="btn-mag-zero" class="v-btn text-[10.5px] py-1 text-red-500">
+              Zero all moments
             </button>
           </div>
         </div>
@@ -1662,118 +1595,6 @@
       <div id="rep-tab-econ" class="space-y-3 hidden"></div>
       <div id="rep-tab-xrd" class="space-y-3 hidden"></div>
       <div id="rep-tab-symops" class="space-y-2 hidden"></div>
-    </div>
-  </div>
-</div>
-
-<!-- AFM THEORY & LITERATURE REFERENCE MODAL -->
-<div
-  id="afm-theory-modal"
-  class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4"
->
-  <div
-    class="card-bg border border-theme rounded-lg shadow-2xl w-full max-w-2xl max-h-[86vh] flex flex-col overflow-hidden"
-  >
-    <div class="header-bg border-b border-theme px-4 py-2.5 flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <i data-lucide="book-open" class="w-4 h-4 text-blue-500"></i>
-        <span class="font-bold text-xs text-main"
-          >Antiferromagnetic Ordering Theory &amp; Automatic NN Logic (VASP)</span
-        >
-      </div>
-      <button id="btn-close-theory" class="v-btn px-1.5 py-0.5">
-        <i data-lucide="x" class="w-3.5 h-3.5"></i>
-      </button>
-    </div>
-    <div class="p-4 overflow-y-auto space-y-3 text-[11.5px] leading-relaxed selectable-text">
-      <p class="text-sub">
-        Magnetic ground-state screening in DFT/VASP compares total energies across the canonical
-        <b>Wollan–Koehler (1955)</b> spin configurations and
-        <b>Goodenough–Kanamori–Anderson (GKA)</b> superexchange rules. This studio automatically inspects the
-        periodic nearest-neighbor (NN) bond graph of magnetic ions to assign each ordering without manual
-        index calculation.
-      </p>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-        <div class="border border-subtle rounded-md p-2.5 space-y-1" style="background: var(--st-console-bg)">
-          <div class="font-bold text-main flex justify-between">
-            <span>FM: Ferromagnetic</span
-            ><span class="font-mono-code text-rose-500">J∥ &gt; 0, J⊥ &gt; 0</span>
-          </div>
-          <p class="text-[11px] text-sub">
-            All magnetic ions align parallel (↑↑) both in-plane and out-of-plane. Typical in metallic
-            ferromagnets (BCC Fe, Co, Ni) or double-exchange perovskites
-            (La<sub>1−x</sub>Sr<sub>x</sub>MnO<sub>3</sub>).
-          </p>
-          <div class="text-[10px] font-mono-code text-mut">Logic: All magnetic sites → +m</div>
-        </div>
-
-        <div class="border border-subtle rounded-md p-2.5 space-y-1" style="background: var(--st-console-bg)">
-          <div class="font-bold text-main flex justify-between">
-            <span>AFM-A: Layered A-Type</span
-            ><span class="font-mono-code text-blue-500">J∥ &gt; 0, J⊥ &lt; 0</span>
-          </div>
-          <p class="text-[11px] text-sub">
-            Ferromagnetic within each basal <i>ab</i>-plane, antiferromagnetic between adjacent planes along
-            <i>c</i>. Classic in Jahn–Teller LaMnO<sub>3</sub> and layered vdW magnets
-            (MnBi<sub>2</sub>Te<sub>4</sub>, CrI<sub>3</sub> bilayer).
-          </p>
-          <div class="text-[10px] font-mono-code text-mut">
-            Logic: Cluster z-planes → alternate (+, −) along c
-          </div>
-        </div>
-
-        <div class="border border-subtle rounded-md p-2.5 space-y-1" style="background: var(--st-console-bg)">
-          <div class="font-bold text-main flex justify-between">
-            <span>AFM-C: Chain / Columnar C-Type</span
-            ><span class="font-mono-code text-blue-500">J∥ &lt; 0, J⊥ &gt; 0</span>
-          </div>
-          <p class="text-[11px] text-sub">
-            Antiferromagnetic checkerboard within each <i>ab</i>-plane, ferromagnetic along chains parallel to
-            <i>c</i>. Observed in orbital-ordered vanadates/chromates (LaVO<sub>3</sub>, CaCrO<sub>3</sub>,
-            Sr<sub>1−x</sub>Ca<sub>x</sub>MnO<sub>3</sub>).
-          </p>
-          <div class="text-[10px] font-mono-code text-mut">
-            Logic: 2D BFS 2-coloring on in-plane NN graph; same spin along c-columns
-          </div>
-        </div>
-
-        <div class="border border-subtle rounded-md p-2.5 space-y-1" style="background: var(--st-console-bg)">
-          <div class="font-bold text-main flex justify-between">
-            <span>AFM-G: 3D Néel G-Type</span
-            ><span class="font-mono-code text-blue-500">J∥ &lt; 0, J⊥ &lt; 0</span>
-          </div>
-          <p class="text-[11px] text-sub">
-            Every 3D nearest-neighbor magnetic pair is antiparallel (↑↓ in both <i>ab</i> and <i>c</i>).
-            Driven by strong 180° M–O–M superexchange in half-filled shells (LaFeO<sub>3</sub>,
-            BiFeO<sub>3</sub>, CaMnO<sub>3</sub>, LaCrO<sub>3</sub>).
-          </p>
-          <div class="text-[10px] font-mono-code text-mut">
-            Logic: Full 3D BFS bipartite 2-coloring on PBC 1st-NN shell (d_NN)
-          </div>
-        </div>
-      </div>
-
-      <div class="border border-subtle rounded-md p-2.5 space-y-1" style="background: var(--st-console-bg)">
-        <div class="font-bold text-main flex justify-between">
-          <span>AFM-II: Type-II Rocksalt (180° 2nd-NN Superexchange)</span
-          ><span class="font-mono-code text-amber-500">J₂ &lt; 0 (FCC)</span>
-        </div>
-        <p class="text-[11px] text-sub">
-          In FCC rocksalt oxides (NiO, MnO, CoO, FeO), the 1st-NN metal sublattice forms edge-sharing
-          triangles (geometrically frustrated for 1st-NN AFM). Instead, 180° M–O–M superexchange couples
-          2nd-NN sites along ⟨100⟩, creating FM {111} sheets stacked antiferromagnetically along [111].
-        </p>
-        <div class="text-[10px] font-mono-code text-mut">
-          Logic: Alternate spin by {111} plane parity / 2nd-NN superexchange shell
-        </div>
-      </div>
-
-      <div class="text-[10.5px] text-mut border-t border-subtle pt-2">
-        <b>Key References:</b> E. O. Wollan &amp; W. C. Koehler, <i>Phys. Rev.</i> <b>100</b>, 545 (1955); J.
-        B. Goodenough, <i>Phys. Rev.</i> <b>100</b>, 564 (1955); J. Kanamori, <i>J. Phys. Chem. Solids</i>
-        <b>10</b>, 87 (1959).
-      </div>
     </div>
   </div>
 </div>

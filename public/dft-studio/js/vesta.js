@@ -420,7 +420,6 @@
     polyOpacity: 0.48,
     vecScale: 0.95,
     vecTiltDeg: 45,
-    pendingAutoSC: null,
     magUpColor: '#e11d48',
     magDnColor: '#0284c7',
     magMode: 'collinear',    // collinear | noncollinear
@@ -2215,21 +2214,12 @@
     const prevTarget = magTarget.value;
     magTarget.innerHTML = '<option value="selected">Selected Atoms</option>';
 
-    const magSub = document.getElementById('mag-sublattice');
-    const prevSub = magSub.value;
-    magSub.innerHTML = '<option value="auto3d">Auto (3d metals)</option><option value="auto3d4f">3d + 4f metals</option>';
-
     for (const [el, list] of spMap.entries()) {
       const cfg = state.speciesConfig[el];
       const opt = document.createElement('option');
       opt.value = `el:${el}`;
       opt.textContent = `All ${el} atoms (${list.length})`;
       magTarget.appendChild(opt);
-
-      const sopt = document.createElement('option');
-      sopt.value = `el:${el}`;
-      sopt.textContent = `${el} only (${list.length} atoms)`;
-      magSub.appendChild(sopt);
 
       const row = document.createElement('div');
       row.className = 'flex items-center justify-between gap-1.5 py-1 px-1.5 rounded border border-subtle';
@@ -2249,7 +2239,6 @@
       spListEl.appendChild(row);
     }
     if ([...magTarget.options].some(o => o.value === prevTarget)) magTarget.value = prevTarget;
-    if ([...magSub.options].some(o => o.value === prevSub)) magSub.value = prevSub;
 
     spListEl.querySelectorAll('.sp-col').forEach(inp => inp.addEventListener('input', e => {
       state.speciesConfig[e.target.dataset.el].color = e.target.value;
@@ -3103,37 +3092,19 @@
   document.getElementById('col-mag-up').addEventListener('input', e => { state.magUpColor = e.target.value; rebuildScene(); });
   document.getElementById('col-mag-dn').addEventListener('input', e => { state.magDnColor = e.target.value; rebuildScene(); });
 
-  // Bind Vector Visual Tilt Slider & Theory Modal
+  // Bind Vector Visual Tilt Slider
   document.getElementById('rng-vec-tilt').addEventListener('input', e => {
     state.vecTiltDeg = parseInt(e.target.value, 10) || 0;
     document.getElementById('val-vec-tilt').textContent = `${state.vecTiltDeg}°`;
     rebuildScene();
   });
 
-  const theoryModal = document.getElementById('afm-theory-modal');
-  const closeTheory = () => { theoryModal.classList.add('hidden'); theoryModal.classList.remove('flex'); };
-  document.getElementById('btn-afm-theory').addEventListener('click', () => {
-    theoryModal.classList.remove('hidden'); theoryModal.classList.add('flex');
-  });
-  document.getElementById('btn-close-theory').addEventListener('click', closeTheory);
-  theoryModal.addEventListener('click', e => { if (e.target === theoryModal) closeTheory(); });
-
-  // Automatic PBC Nearest-Neighbor Graph Builder & Wollan–Koehler AFM Solver
-  function getMagSiteIndices(s) {
-    const mode = document.getElementById('mag-sublattice') ? document.getElementById('mag-sublattice').value : 'auto3d';
-    const idxs = [];
-    if (mode.startsWith('el:')) {
-      const targetEl = mode.slice(3);
-      s.atoms.forEach((a, i) => { if (a.el === targetEl) idxs.push(i); });
-      return idxs;
-    }
-    if (mode === 'auto3d4f') {
-      const hasMag = s.atoms.some(a => getElInfo(a.el).is3d || getElInfo(a.el).is4f);
-      s.atoms.forEach((a, i) => { if (!hasMag || getElInfo(a.el).is3d || getElInfo(a.el).is4f) idxs.push(i); });
-      return idxs;
-    }
+  // FM / AFM orderings live in the site's Magnetic tool (D-108). The Builder keeps per-atom moments, a
+  // non-collinear 120 degree starting texture (the Magnetic tool is collinear only) and a reset.
+  function magSiteIndices(s) {
     const has3d = s.atoms.some(a => getElInfo(a.el).is3d);
     const has4f = s.atoms.some(a => getElInfo(a.el).is4f);
+    const idxs = [];
     s.atoms.forEach((a, i) => {
       if (has3d) { if (getElInfo(a.el).is3d) idxs.push(i); }
       else if (has4f) { if (getElInfo(a.el).is4f) idxs.push(i); }
@@ -3141,247 +3112,29 @@
     });
     return idxs;
   }
-
-  function buildMagNNGraph(s, magIdxs) {
-    const L = s.lattice;
-    const n = magIdxs.length;
-    const pairs = [];
-    let minD = Infinity;
-    for (let u=0; u<n; u++) {
-      const fu = s.atoms[magIdxs[u]].frac;
-      for (let v=u; v<n; v++) {
-        const fv = s.atoms[magIdxs[v]].frac;
-        for (let ix=-1; ix<=1; ix++) for (let iy=-1; iy<=1; iy++) for (let iz=-1; iz<=1; iz++) {
-          if (u === v && ix === 0 && iy === 0 && iz === 0) continue;
-          const df = [fv[0]-fu[0]+ix, fv[1]-fu[1]+iy, fv[2]-fu[2]+iz];
-          const dr = fracToCart(df, L);
-          const d = vNorm(dr);
-          if (d > 0.4) {
-            if (d < minD) minD = d;
-            pairs.push({ u, v, d, dr, isSelfImage: u === v });
-          }
-        }
-      }
-    }
-    const tolD = minD * 1.14;
-    const nnEdges = pairs.filter(p => p.d <= tolD);
-    // Split into in-plane (ab, |dz| < 0.35*d) vs out-of-plane (along c)
-    const inPlaneAdj = Array.from({ length: n }, () => new Set());
-    const fullAdj = Array.from({ length: n }, () => new Set());
-    let hasSelfInPlane = false, hasSelfOutPlane = false;
-    nnEdges.forEach(e => {
-      const isInPlane = Math.abs(e.dr[2]) < 0.35 * e.d;
-      if (e.isSelfImage) {
-        if (isInPlane) hasSelfInPlane = true; else hasSelfOutPlane = true;
-      } else {
-        fullAdj[e.u].add(e.v); fullAdj[e.v].add(e.u);
-        if (isInPlane) { inPlaneAdj[e.u].add(e.v); inPlaneAdj[e.v].add(e.u); }
-      }
-    });
-    return { minD: isFinite(minD) ? minD : 0, nnEdges, inPlaneAdj, fullAdj, hasSelfInPlane, hasSelfOutPlane };
-  }
-
-  function bfs2Color(adj, n) {
-    const color = new Array(n).fill(0);
-    let frustrated = false;
-    for (let start=0; start<n; start++) {
-      if (color[start] !== 0) continue;
-      color[start] = 1;
-      const queue = [start];
-      while (queue.length > 0) {
-        const u = queue.shift();
-        for (const v of adj[u]) {
-          if (color[v] === 0) { color[v] = -color[u]; queue.push(v); }
-          else if (color[v] === color[u]) frustrated = true;
-        }
-      }
-    }
-    return { color, frustrated };
-  }
-
-  function evaluateNNCoupling(s, magIdxs, graph) {
-    let inAnti = 0, inPara = 0, outAnti = 0, outPara = 0;
-    graph.nnEdges.forEach(e => {
-      const mu = s.atoms[magIdxs[e.u]].mag[2];
-      const mv = s.atoms[magIdxs[e.v]].mag[2];
-      const anti = mu * mv < -1e-4;
-      const isInPlane = Math.abs(e.dr[2]) < 0.35 * e.d;
-      if (isInPlane) { if (anti) inAnti++; else inPara++; }
-      else { if (anti) outAnti++; else outPara++; }
-    });
-    return { inAnti, inPara, outAnti, outPara };
-  }
-
-  function applyAutoMagneticPreset(preset) {
-    const s = state.structure;
-    const magIdxs = getMagSiteIndices(s);
-    const diagTitle = document.getElementById('afm-diag-title');
-    const diagDnn = document.getElementById('afm-diag-dnn');
-    const diagBody = document.getElementById('afm-diag-body');
-    const scBtn = document.getElementById('btn-afm-auto-sc');
-    scBtn.classList.add('hidden');
-    state.pendingAutoSC = null;
-
-    if (preset === 'clear') {
-      pushHistory();
-      s.atoms.forEach(a => a.mag = [0,0,0]);
-      diagTitle.textContent = 'Cleared Moments';
-      diagDnn.textContent = '-';
-      diagBody.textContent = 'All atomic magnetic moments reset to 0.0 μB.';
-      updateMagModeBtns();
-      rebuildScene();
-      showToast('Zeroed all magnetic moments');
-      return;
-    }
-
-    const graph = buildMagNNGraph(s, magIdxs);
-    const n = magIdxs.length;
-    const mVal = Math.max(0.1, parseFloat(document.getElementById('mag-preset-val').value) || 3.0);
-    const spins = new Array(n).fill(1);
-    let note = '';
-    let suggestSC = null;
-
-    if (preset === 'fm') {
-      state.magMode = 'collinear';
-      spins.fill(1);
-      note = 'All magnetic sites aligned parallel (+m).';
-    } else if (preset === 'afm-a') {
-      state.magMode = 'collinear';
-      // Cluster sites into distinct z-layers
-      const zVals = magIdxs.map((idx, k) => ({ k, z: wrap01(s.atoms[idx].frac[2]) })).sort((a,b) => a.z - b.z);
-      const layers = [];
-      zVals.forEach(item => {
-        if (layers.length === 0 || Math.abs(item.z - layers[layers.length-1].z) > 0.05) {
-          layers.push({ z: item.z, members: [item.k] });
-        } else {
-          layers[layers.length-1].members.push(item.k);
-        }
-      });
-      if (layers.length < 2) {
-        suggestSC = { P: [[1,0,0],[0,1,0],[0,0,2]], label: '1×1×2 Supercell + AFM-A', preset: 'afm-a' };
-        note = 'Only 1 magnetic layer along c; expand 1×1×2 for layered AFM-A.';
-      } else {
-        layers.forEach((lay, li) => lay.members.forEach(k => spins[k] = (li % 2 === 0 ? 1 : -1)));
-        note = `Clustered ${layers.length} basal z-layers: FM in-plane, AFM along c.`;
-      }
-    } else if (preset === 'afm-c') {
-      state.magMode = 'collinear';
-      if (graph.hasSelfInPlane || n < 2) {
-        suggestSC = { P: [[2,0,0],[0,2,0],[0,0,1]], label: '2×2×1 Supercell + AFM-C', preset: 'afm-c' };
-        note = 'Cell too small for in-plane AFM-C (atoms bond to own periodic image).';
-      } else {
-        // Group atoms by (x, y) column so c-stacked columns stay FM
-        const cols = [];
-        magIdxs.forEach((idx, k) => {
-          const f = s.atoms[idx].frac;
-          let found = cols.find(c => {
-            const dx = Math.abs(f[0]-c.fx), dy = Math.abs(f[1]-c.fy);
-            return Math.min(dx, 1-dx) < 0.05 && Math.min(dy, 1-dy) < 0.05;
-          });
-          if (!found) { found = { fx: f[0], fy: f[1], members: [] }; cols.push(found); }
-          found.members.push(k);
-        });
-        if (cols.length < 2) {
-          suggestSC = { P: [[2,0,0],[0,2,0],[0,0,1]], label: '2×2×1 Supercell + AFM-C', preset: 'afm-c' };
-          note = 'Only 1 magnetic column in ab-plane; expand 2×2×1 for AFM-C.';
-        } else {
-          // Build column adjacency from inPlaneAdj
-          const colOf = new Array(n).fill(0);
-          cols.forEach((c, ci) => c.members.forEach(k => colOf[k] = ci));
-          const colAdj = Array.from({ length: cols.length }, () => new Set());
-          for (let u=0; u<n; u++) for (const v of graph.inPlaneAdj[u]) {
-            if (colOf[u] !== colOf[v]) { colAdj[colOf[u]].add(colOf[v]); colAdj[colOf[v]].add(colOf[u]); }
-          }
-          const { color, frustrated } = bfs2Color(colAdj, cols.length);
-          cols.forEach((c, ci) => c.members.forEach(k => spins[k] = color[ci]));
-          note = frustrated
-            ? `2D NN graph partially frustrated (${cols.length} columns colored, FM along c).`
-            : `Solved 2D bipartite coloring across ${cols.length} columns (AFM ab, FM c).`;
-        }
-      }
-    } else if (preset === 'afm-g') {
-      state.magMode = 'collinear';
-      if (graph.hasSelfInPlane || graph.hasSelfOutPlane || n < 2) {
-        suggestSC = { P: [[2,0,0],[0,2,0],[0,0,2]], label: '2×2×2 Supercell + AFM-G', preset: 'afm-g' };
-        note = 'Unit cell has self-image 1st-NN bonds; expand 2×2×2 for 3D AFM-G.';
-      } else {
-        const { color, frustrated } = bfs2Color(graph.fullAdj, n);
-        for (let k=0; k<n; k++) spins[k] = color[k];
-        note = frustrated
-          ? '1st-NN sublattice is geometrically frustrated (e.g. FCC/triangular). Try AFM-II for rocksalt 2nd-NN superexchange!'
-          : 'Solved exact 3D bipartite Néel coloring (100% 1st-NN antiparallel).';
-      }
-    } else if (preset === 'afm-ii') {
-      state.magMode = 'collinear';
-      // Type-II Rocksalt AFM: alternate {111} planes (f_x + f_y + f_z)
-      const proj = magIdxs.map((idx, k) => {
-        const f = s.atoms[idx].frac;
-        return { k, p: f[0] + f[1] + f[2] };
-      }).sort((a,b) => a.p - b.p);
-      const planes = [];
-      proj.forEach(item => {
-        if (planes.length === 0 || Math.abs(item.p - planes[planes.length-1].p) > 0.06) {
-          planes.push({ p: item.p, members: [item.k] });
-        } else {
-          planes[planes.length-1].members.push(item.k);
-        }
-      });
-      if (planes.length < 2) {
-        suggestSC = { P: [[2,0,0],[0,2,0],[0,0,2]], label: '2×2×2 Supercell + AFM-II', preset: 'afm-ii' };
-        note = 'Need ≥2 {111} magnetic planes; expand 2×2×2 for AFM-II.';
-      } else {
-        planes.forEach((pl, pi) => pl.members.forEach(k => spins[k] = (pi % 2 === 0 ? 1 : -1)));
-        note = `Assigned AFM-II across ${planes.length} {111} planes (180° 2nd-NN superexchange).`;
-      }
-    }
-
+  document.getElementById('btn-mag-zero').addEventListener('click', () => {
     pushHistory();
-    const subMode = document.getElementById('mag-sublattice') ? document.getElementById('mag-sublattice').value : 'auto3d';
-    // Only reset non-target atoms when applying to an automatic group; preserve other species when targeting one species!
-    if (!subMode.startsWith('el:')) {
-      s.atoms.forEach(a => a.mag = [0,0,0]);
-    }
-    if (preset === 'spiral') {
-      state.magMode = 'noncollinear';
-      magIdxs.forEach((idx, k) => {
-        const ang = (k % 3) * (2 * Math.PI / 3);
-        s.atoms[idx].mag = [mVal * Math.cos(ang), mVal * Math.sin(ang), 0];
-      });
-      note = 'Applied 120° non-collinear coplanar spin texture in xy-plane.';
-    } else {
-      magIdxs.forEach((idx, k) => { s.atoms[idx].mag = [0, 0, spins[k] * mVal]; });
-    }
-
-    const stats = evaluateNNCoupling(s, magIdxs, graph);
-    const inTot = stats.inAnti + stats.inPara;
-    const outTot = stats.outAnti + stats.outPara;
-    diagTitle.textContent = `${preset.toUpperCase()} (${n} mag sites)`;
-    diagDnn.textContent = `d_NN = ${graph.minD.toFixed(3)} Å`;
-    diagBody.innerHTML = `
-      <div>${note}</div>
-      <div class="mt-1 text-main">In-plane NN: <b>${stats.inAnti}/${inTot}</b> ↑↓ · Out-of-plane NN: <b>${stats.outAnti}/${outTot}</b> ↑↓</div>
-    `;
-    if (suggestSC) {
-      state.pendingAutoSC = suggestSC;
-      scBtn.textContent = `Auto-Build ${suggestSC.label}`;
-      scBtn.classList.remove('hidden');
-    }
-
+    state.structure.atoms.forEach(a => a.mag = [0, 0, 0]);
     updateMagModeBtns();
     rebuildScene();
-    logConsole(`Auto-${preset.toUpperCase()}: d_NN=${graph.minD.toFixed(3)} Å | in-plane ${stats.inAnti}/${inTot} ↑↓, out-of-plane ${stats.outAnti}/${outTot} ↑↓`, 'accent');
-    showToast(`Applied ${preset.toUpperCase()} magnetic order`);
-  }
-
-  document.querySelectorAll('[data-mag-preset]').forEach(btn => {
-    btn.addEventListener('click', () => applyAutoMagneticPreset(btn.dataset.magPreset));
+    showToast('Zeroed all magnetic moments');
   });
-
-  document.getElementById('btn-afm-auto-sc').addEventListener('click', () => {
-    if (!state.pendingAutoSC) return;
-    const { P, preset } = state.pendingAutoSC;
-    applyTransformationMatrix(P);
-    applyAutoMagneticPreset(preset);
+  document.getElementById('btn-mag-120').addEventListener('click', () => {
+    const s = state.structure;
+    const v = ['mag-mx', 'mag-my', 'mag-mz'].map(id => parseFloat(document.getElementById(id).value) || 0);
+    const m = Math.hypot(v[0], v[1], v[2]) || 3.0;
+    const idxs = magSiteIndices(s);
+    pushHistory();
+    state.magMode = 'noncollinear';
+    s.atoms.forEach(a => a.mag = [0, 0, 0]);
+    idxs.forEach((idx, k) => {
+      const ang = (k % 3) * (2 * Math.PI / 3);
+      s.atoms[idx].mag = [m * Math.cos(ang), m * Math.sin(ang), 0];
+    });
+    updateMagModeBtns();
+    rebuildScene();
+    logConsole(`120° in-plane start on ${idxs.length} atoms (|m| = ${m.toFixed(2)} μB, angles follow atom order)`, 'accent');
+    showToast('Applied a 120° in-plane starting texture');
   });
 
   document.getElementById('btn-assign-mag').addEventListener('click', () => {
