@@ -22,7 +22,12 @@ const TagInfo = z.object({
   related: z.array(z.string()),
   handbook: z.null(),
   sources: z.array(z.string().regex(/^S-\d{3}$/)).min(1),
-  fromHandbook: z.array(z.enum(['field', 'workflow'])).min(1),
+  fromHandbook: z.array(z.enum(['field', 'workflow'])),
+  /** Date a tag that is not in the handbooks was read on its web sources (D-110). */
+  readOn: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
   corrections: z.array(z.object({ was: nonEmpty, now: nonEmpty })).optional(),
   notes: nonEmpty,
 });
@@ -68,6 +73,22 @@ describe('vasp-tags.json', () => {
     for (const t of tags) expect(t.summary.beginner.length).toBeGreaterThan(20);
     expect(JSON.stringify(tagsFile)).not.toContain(String.fromCharCode(0x2014));
   });
+  it('every tag comes from a handbook, or was read on its cited web pages and cites no handbook (D-110)', () => {
+    for (const t of tags) {
+      if (t.fromHandbook.length > 0) continue;
+      expect(t.readOn, t.name).toBeDefined();
+      expect(
+        t.sources.some((s) => s === 'S-041' || s === 'S-042'),
+        t.name,
+      ).toBe(false);
+    }
+    expect(tags.filter((t) => t.fromHandbook.length === 0).map((t) => t.name)).toEqual([
+      'IMAGES',
+      'SPRING',
+      'LCLIMB',
+      'IOPT',
+    ]);
+  });
   it('related tags and sources exist', () => {
     for (const t of tags) {
       for (const r of t.related) expect(names.has(r), `${t.name} -> ${r}`).toBe(true);
@@ -90,11 +111,29 @@ describe('vasp-tags.json', () => {
 });
 
 describe('incar-presets.json', () => {
-  it('has 20 presets with unique ids, including the three carried over from the Material Builder (D-108)', () => {
-    expect(presets).toHaveLength(20);
-    expect(new Set(presets.map((p) => p.id)).size).toBe(20);
+  it('has 21 presets with unique ids, including the three carried over from the Material Builder (D-108) and NEB (D-110)', () => {
+    expect(presets).toHaveLength(21);
+    expect(new Set(presets.map((p) => p.id)).size).toBe(21);
     const ids = presets.map((p) => p.id);
-    for (const id of ['soc', 'dipole', 'phonon-dfpt']) expect(ids).toContain(id);
+    for (const id of ['soc', 'dipole', 'phonon-dfpt', 'neb']) expect(ids).toContain(id);
+  });
+  it('the NEB preset follows the VASP wiki and VTST setup (D-110)', () => {
+    const neb = presets.find((p) => p.id === 'neb')!;
+    const get = (variant: string, name: string) =>
+      neb.variants.find((v) => v.id === variant)!.entries.find((e) => e.name === name);
+    for (const variant of ['vtst-ci', 'plain']) {
+      expect(get(variant, 'IMAGES')?.placeholder).toMatch(/^</);
+      expect(get(variant, 'SPRING')?.value).toBe('-5');
+      expect(get(variant, 'ISIF')?.value).toBe('2');
+      expect(Number(get(variant, 'EDIFFG')?.value)).toBeLessThan(0);
+      expect(get(variant, 'IBRION')?.value).not.toBe('2');
+    }
+    expect(get('vtst-ci', 'IBRION')?.value).toBe('3');
+    expect(get('vtst-ci', 'POTIM')?.value).toBe('0');
+    expect(get('vtst-ci', 'IOPT')?.value).toBe('3');
+    expect(get('vtst-ci', 'LCLIMB')?.value).toBe('.TRUE.');
+    expect(get('plain', 'LCLIMB')).toBeUndefined();
+    expect(get('plain', 'IOPT')).toBeUndefined();
   });
   it('the carried-over presets hold the handbook values (S-042)', () => {
     const entry = (id: string, variant: string, name: string) =>
