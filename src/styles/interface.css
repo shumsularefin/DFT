@@ -97,22 +97,37 @@ table.numeric,
   font-weight: 600;
 }
 
-/* Form controls: crisp macOS rounded inputs and selects */
+/* Form controls (template): 34px fields on the page background, 1px border, accent on focus. */
 input[type='text'],
 input[type='number'],
 input[type='search'],
+input[type='email'],
+input[type='url'],
 select,
 textarea {
+  min-height: 2.125rem;
+  padding: 0 0.625rem;
   font-family: var(--font-sans);
+  font-size: var(--step-0);
   color: var(--text);
-  background: var(--surface);
+  background: var(--bg);
   border: 1px solid var(--border-strong);
-  border-radius: var(--radius-sm);
-  box-shadow: inset 0 1px 1px rgb(15 23 42 / 0.04);
+  border-radius: var(--radius);
+}
+textarea {
+  padding: 0.5rem 0.625rem;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+}
+:is(input, select, textarea):focus {
+  border-color: var(--accent);
 }
 input[type='number'] {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+}
+label {
+  font-size: var(--step-0);
 }
 
 /* Clean scientific data tables */
@@ -127,12 +142,16 @@ table {
 }
 thead th {
   background: var(--surface-2);
-  color: var(--text);
-  font-weight: 600;
+  color: var(--text-muted);
+  font-weight: 500;
   font-size: var(--step--1);
+  text-align: start;
+  padding: 0.5rem 0.75rem;
   border-bottom: 1px solid var(--border);
 }
 tbody td {
+  padding: 0.5rem 0.75rem;
+  font-size: var(--step--1);
   border-bottom: 1px solid var(--border);
 }
 tbody tr:last-child td {
@@ -331,26 +350,22 @@ tbody tr:last-child td {
    Reading pages keep prose at 46rem, left-aligned to the same edge.
    ------------------------------------------------------------------ */
 main .container {
-  width: min(100% - 2rem, 72rem);
-  margin-inline: auto;
-  padding-block: var(--space-5) var(--space-7);
-}
-@media (min-width: 48rem) {
-  main .container {
-    width: min(100% - 3rem, 72rem);
-  }
+  width: auto;
+  max-width: 88rem;
+  margin: 0;
+  padding: var(--space-5) var(--space-5) var(--space-7);
 }
 .prose-page > *,
 .ref-page > :not(.ref-scroll) {
-  max-width: 46rem;
+  max-width: 48rem;
 }
 
 /* Page header: modest h1, one muted lede, 24px before the content. */
 main h1 {
-  font-size: clamp(1.4rem, 1.3rem + 0.4vw, 1.6rem);
+  font-size: 1.375rem;
   font-weight: 600;
   letter-spacing: -0.01em;
-  margin: 0 0 var(--space-2);
+  margin: 0 0 var(--space-1);
 }
 main h1 + p {
   margin-top: 0;
@@ -358,11 +373,16 @@ main h1 + p {
   color: var(--text-muted);
 }
 main h2 {
-  font-size: var(--step-1);
+  font-size: var(--step-2);
   margin: var(--space-6) 0 var(--space-3);
 }
 main h3 {
-  font-size: var(--step-0);
+  font-size: var(--step-1);
+}
+.card h2,
+.card > h3 {
+  font-size: 0.9375rem;
+  margin: 0 0 var(--space-3);
 }
 .page-head {
   margin-bottom: var(--space-5);

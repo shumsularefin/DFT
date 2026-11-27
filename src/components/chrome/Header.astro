@@ -182,8 +182,9 @@ const ICONS: Record<string, string> = {
   }
   .side-label {
     margin: var(--space-4) 0 var(--space-1);
-    padding: 0 var(--space-3);
+    padding: 0 0.625rem;
     font-size: 0.72rem;
+    font-weight: 500;
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -208,10 +209,10 @@ const ICONS: Record<string, string> = {
   .nav-list a {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
+    gap: 0.625rem;
     min-height: var(--target);
-    padding: 0 var(--space-3);
-    font-size: 0.9rem;
+    padding: 0 0.625rem;
+    font-size: var(--step-0);
     color: var(--text-muted);
     text-decoration: none;
     border-radius: var(--radius-sm);
@@ -264,8 +265,26 @@ const ICONS: Record<string, string> = {
     flex: 1 1 10rem;
   }
   .topbar-tools .level-switch button {
-    padding: 0 var(--space-3);
-    font-size: 0.85rem;
+    min-height: 1.625rem;
+    min-width: 0;
+    padding: 0 0.625rem;
+    font-size: var(--step--1);
+  }
+  .topbar-tools .theme-toggle {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    color: var(--text-muted);
+  }
+  .topbar-tools .theme-toggle:hover {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .topbar-search input {
+    background: var(--surface);
+    border-color: var(--border);
+    box-shadow: none;
+    font-size: var(--step--1);
   }
   .side-foot {
     display: flex;
@@ -315,7 +334,7 @@ const ICONS: Record<string, string> = {
     }
     .brand {
       min-height: var(--topbar-h);
-      margin: 0 calc(-1 * var(--space-2));
+      margin: 0 calc(-1 * var(--space-2)) var(--space-1);
       padding: 0 var(--space-4);
       border-bottom: 1px solid var(--border);
       border-radius: 0;
@@ -346,10 +365,10 @@ const ICONS: Record<string, string> = {
       flex-direction: row;
       align-items: center;
       justify-content: space-between;
-      gap: var(--space-4);
       margin: 0;
       padding: 0 var(--space-5);
       background: var(--bg);
+      gap: var(--space-3);
       border-top: 0;
       border-bottom: 1px solid var(--border);
     }
@@ -358,7 +377,7 @@ const ICONS: Record<string, string> = {
       gap: var(--space-2);
       min-width: 0;
       margin: 0;
-      font-size: 0.9rem;
+      font-size: var(--step-0);
       color: var(--text-muted);
       white-space: nowrap;
       overflow: hidden;
@@ -376,7 +395,7 @@ const ICONS: Record<string, string> = {
       flex: none;
     }
     .topbar-search {
-      flex: 0 1 15rem;
+      flex: 0 1 14rem;
     }
     .side-foot {
       border-top: 1px solid var(--border);

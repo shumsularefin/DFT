@@ -14,7 +14,7 @@ export const ATOM_PALETTE: readonly string[] = [
 ];
 
 /** Page backgrounds the colours are drawn against (the `bg` token of each theme, src/styles/tokens.css). */
-export const LIGHT_BG = '#faf9f5';
+export const LIGHT_BG = '#f7f6f2';
 export const DARK_BG = '#1a1917';
 
 export function hexToRgb(hex: string): [number, number, number] {

@@ -4,12 +4,12 @@
    exactly as written and keep the media block identical to the data-theme="dark" block. */
 :root {
   color-scheme: light;
-  --bg: #faf9f5;
+  --bg: #f7f6f2;
   --surface: #ffffff;
-  --surface-2: #f0eee6;
-  --text: #141413;
+  --surface-2: #f1efe8;
+  --text: #1f1e1b;
   --text-muted: #5e5d59;
-  --border: #e3e0d6;
+  --border: #e2dfd5;
   --border-strong: #8a8780;
   --accent: #a3451d;
   --accent-contrast: #ffffff;
@@ -17,7 +17,7 @@
   --warn: #8a4b00;
   --ok: #2e6b3a;
   --focus: #a3451d;
-  --sidebar: #f3f1ea;
+  --sidebar: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -70,19 +70,20 @@
   --danger-soft: color-mix(in srgb, var(--danger) 14%, var(--surface));
   --accent-soft: color-mix(in srgb, var(--accent) 13%, var(--surface));
   --chrome-bg: var(--sidebar);
-  --sidebar-w: 15.5rem;
-  --topbar-h: 3.25rem;
+  --sidebar-w: 14.5rem;
+  --topbar-h: 3rem;
+  --statusbar-h: 1.625rem;
 
   /* Fluid type scale, steps -1 to 5 (viewport 360px to 1200px). */
-  --step--1: clamp(0.8rem, 0.77rem + 0.12vw, 0.875rem);
-  --step-0: clamp(0.95rem, 0.93rem + 0.14vw, 1.05rem);
-  --step-1: clamp(1.15rem, 1.1rem + 0.3vw, 1.32rem);
-  --step-2: clamp(1.38rem, 1.28rem + 0.55vw, 1.65rem);
-  --step-3: clamp(1.65rem, 1.48rem + 0.9vw, 2.05rem);
-  --step-4: clamp(1.95rem, 1.68rem + 1.4vw, 2.55rem);
-  --step-5: clamp(2.35rem, 1.9rem + 2.2vw, 3.2rem);
+  --step--1: 0.78rem;
+  --step-0: 0.875rem;
+  --step-1: 0.9375rem;
+  --step-2: 1.125rem;
+  --step-3: 1.375rem;
+  --step-4: 1.375rem;
+  --step-5: 2.125rem;
   --leading-tight: 1.22;
-  --leading-body: 1.58;
+  --leading-body: 1.5;
   --measure: 68ch;
 
   /* Spacing, 4px base. */
@@ -95,12 +96,12 @@
   --space-7: 3rem;
   --space-8: 4rem;
 
-  --radius-sm: 6px;
-  --radius: 9px;
-  --radius-lg: 14px;
+  --radius-sm: 5px;
+  --radius: 7px;
+  --radius-lg: 10px;
   --shadow-1: 0 1px 2px rgb(20 20 19 / 0.04);
   --shadow-2: 0 6px 24px rgb(20 20 19 / 0.1);
-  --target: 2.75rem; /* 44px touch target */
+  --target: 2rem; /* 32px controls: desktop only (D-105), above the 24px of WCAG 2.5.8 */
 
   /* Motion is off unless the user allows it. */
   --dur-fast: 0ms;

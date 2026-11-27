@@ -194,7 +194,7 @@ test.describe('navigation', () => {
     ).toHaveAttribute('aria-current', 'page');
   });
 
-  test('tap targets in the header are at least 44px', async ({ page }) => {
+  test('controls in the header are at least 24px (WCAG 2.5.8; desktop only, D-105)', async ({ page }) => {
     await page.goto('/');
     await openMenu(page);
     const small = await page.locator('.site-header :is(a, button, input):visible').evaluateAll((els) =>
@@ -203,7 +203,7 @@ test.describe('navigation', () => {
           t: e.textContent?.trim() || e.getAttribute('aria-label'),
           h: e.getBoundingClientRect().height,
         }))
-        .filter((x) => x.h < 43.5),
+        .filter((x) => x.h < 23.5),
     );
     expect(small).toEqual([]);
   });
