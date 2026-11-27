@@ -2,6 +2,7 @@
 // previous and next buttons stand out from the text, and a Workflow step has the handbook's stage beside its text.
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 
 const WIDE = { width: 1650, height: 900 };
@@ -87,6 +88,13 @@ test.describe('text width and rails', () => {
       const broken = await brokenCells(page);
       expect(broken, broken.slice(0, 8).join(', ')).toEqual([]);
     });
+
+  test('a table of formulas that scrolls inside its card passes axe', async ({ page }) => {
+    await page.setViewportSize(WIDE);
+    await page.goto('/handbook/05-practical-choices/smearing/');
+    const results = await new AxeBuilder({ page }).include('main .prose table').analyze();
+    expect(results.violations).toEqual([]);
+  });
 
   for (const url of PAGES)
     test(`${url}: paragraphs and lists fill their card`, async ({ page }) => {

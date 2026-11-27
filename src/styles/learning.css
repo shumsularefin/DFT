@@ -238,6 +238,11 @@ main .topic-section > h2.card-h {
   .prose :is(th, td) code {
     overflow-wrap: anywhere;
   }
+  /* A formula cannot wrap, so a table of formulas that is wider than the column scrolls inside its card. */
+  .prose table:has(math) {
+    display: block;
+    overflow-x: auto;
+  }
 }
 .cite-list {
   padding-left: var(--space-5);
