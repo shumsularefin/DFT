@@ -1,5 +1,28 @@
 ---
 id: molecular-dynamics-and-mlff
+stage:
+  scene: m12b-md
+  states:
+    - id: vibrate
+      section: why
+      params: { frame: 60, temp: 60, dt: 5, thermostat: andersen, trails: true }
+      caption: '108 argon atoms in a periodic box at 60 K. The four orange atoms leave trails as they rattle about their lattice sites. Press play to run the film from the start.'
+    - id: nve
+      section: intuition
+      params: { frame: 60, temp: 60, dt: 5, thermostat: nve }
+      caption: 'NVE: no thermostat, and the total energy stays constant. The temperature falls to about half the start as kinetic energy is shared with the potential energy of the lattice.'
+    - id: long-step
+      section: math
+      params: { frame: 60, temp: 300, dt: 40, thermostat: nve }
+      caption: 'Verlet with a 40 fs step at 300 K: the energy change readout drifts. Drag the time step up and down and watch the drift follow it.'
+    - id: nvt
+      section: in-vasp
+      params: { frame: 60, temp: 300, dt: 5, thermostat: andersen, trails: true }
+      caption: 'NVT at 300 K with an Andersen thermostat: the temperature holds near the target while the atoms wander further, and the mean squared displacement grows.'
+    - id: blow-up
+      section: mistakes
+      params: { frame: 60, temp: 300, dt: 60, thermostat: nve }
+      caption: 'A 60 fs time step at 300 K: atoms overshoot, the energy jumps and the run blows up within a few frames. This is why light atoms need short steps.'
 title: Molecular dynamics and machine-learned force fields
 module: 12
 order: 12

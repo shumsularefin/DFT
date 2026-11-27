@@ -1,5 +1,32 @@
 ---
 id: surfaces-and-slabs
+stage:
+  scene: m12b-slab
+  states:
+    - id: cut
+      section: why
+      params: { crystal: perovskite, hkl: '100', term: cut, periods: 3, vacuum: 12 }
+      camera: b
+      caption: 'A SrTiO3 (100) slab cut from the bulk: SrO and TiO2 layers with vacuum above, and the faded periodic copy across the gap. Turn it to see that the slab is still a crystal in plane.'
+    - id: polar
+      section: intuition
+      params: { crystal: rocksalt, hkl: '111', term: cut, periods: 3, vacuum: 12, dipole: false }
+      camera: b
+      caption: 'NaCl (111) stacks Na and Cl layers: a Tasker type 3 slab with a dipole. The model potential beside it slopes across the vacuum. Add bulk repeats and watch the dipole readout grow with the thickness.'
+    - id: symmetric
+      section: math
+      params: { crystal: perovskite, hkl: '100', term: bottom, periods: 3, vacuum: 12 }
+      camera: b
+      caption: 'Bottom layer on both faces: SrO on top and bottom, so both faces are the same surface and the formula divides by 2A. The slab now has one extra SrO layer, so it is not stoichiometric.'
+    - id: dipole
+      section: in-vasp
+      params: { crystal: rocksalt, hkl: '111', term: cut, periods: 3, vacuum: 12, dipole: true }
+      camera: b
+      caption: 'LDIPOL on: a dipole layer in the middle of the vacuum cancels the artificial field. The potential is flat on both sides and steps at that layer. Toggle it off and on to compare.'
+    - id: converge
+      section: what-changes
+      params: { crystal: perovskite, hkl: '110', term: cut, periods: 1, vacuum: 4 }
+      caption: 'A thin (110) slab with 4 angstrom of vacuum nearly touches its periodic copy. Drag the vacuum and thickness sliders: these are the two lengths you converge.'
 title: Surfaces and slabs
 module: 12
 order: 8
