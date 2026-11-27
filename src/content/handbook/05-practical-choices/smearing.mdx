@@ -1,5 +1,28 @@
 ---
 id: smearing
+stage:
+  scene: m05-smearing
+  states:
+    - id: step
+      section: why
+      params: { scheme: fermi, sigma: 0.05, quantity: occupation, levels: true }
+      caption: 'Occupation of a level against its energy (across) and SIGMA (back) for Fermi-Dirac smearing. Near the front the step at the Fermi level is sharp; further back it softens.'
+    - id: levels
+      section: intuition
+      params: { scheme: gaussian, sigma: 0.1, quantity: occupation, levels: true }
+      caption: 'Gaussian smearing (ISMEAR = 0) at SIGMA = 0.1 eV. The balls are levels every 0.1 eV, each at its occupation; drag SIGMA and watch more levels near E_F share the electrons.'
+    - id: overshoot
+      section: lab
+      params: { scheme: mp1, sigma: 0.2, quantity: occupation, levels: true }
+      caption: 'Methfessel-Paxton (ISMEAR = 1) at SIGMA = 0.2 eV: the occupation dips below 0 and rises above 1 near the Fermi level, by design. Look under the dashed line at f = 1.'
+    - id: delta
+      section: math
+      params: { scheme: gaussian, sigma: 0.2, quantity: delta, levels: false }
+      caption: 'The broadened delta function, minus the slope of the occupation, drawn times SIGMA so its peak keeps one height. Its width grows in proportion to SIGMA.'
+    - id: cold
+      section: what-changes
+      params: { scheme: cold, sigma: 0.2, quantity: occupation, levels: true }
+      caption: 'Marzari-Vanderbilt cold smearing at SIGMA = 0.2 eV is lopsided: it dips below 0 on one side of E_F and never rises above 1. Compare the occupation range readout with Methfessel-Paxton.'
 title: Smearing and the Fermi level
 module: 5
 order: 5
