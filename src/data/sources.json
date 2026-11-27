@@ -973,7 +973,7 @@
     "usedFor": "GW flavours and RPA total energies in VASP (beyond DFT page)",
     "access": "paywalled",
     "status": "cited-from-memory",
-    "notes": "The step order (exact diagonalization with LOPTICS, then a GW step with NOMEGA and ENCUTGW, then ALGO = BSE with NBANDSO and NBANDSV) agrees with pymatgen 2026.10.31 MVLGWSet (S-034), which writes the VASP 5.4 form ALGO = GW0 with NELM = 1; the VASP 6 tag names are from memory (Q-069)"
+    "notes": "The step order (exact diagonalization with LOPTICS, then a GW step with NOMEGA and ENCUTGW, then ALGO = BSE with NBANDSO and NBANDSV) agrees with pymatgen 2026.10.31 MVLGWSet (S-034), which writes the VASP 5.4 form ALGO = GW0 with NELM = 1; the VASP 6 tag names are from memory (Q-069). The band gaps of the M16 beyond-DFT scene (`GW_GAPS` in `src/lib/viewer3d/scenes/m05b.ts`) were checked against Table I of the 2007 paper on 2026-11-27"
   },
   {
     "id": "S-132",
