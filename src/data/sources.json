@@ -705,10 +705,10 @@
   },
   {
     "id": "S-089",
-    "citation": "S. Smidstrup, A. Pedersen, K. Stokbro, H. Jonsson, \"Improved initial guess for minimum energy path calculations\", J. Chem. Phys. (2014), doi:10.1063/1.4878664; arXiv:1406.1512",
+    "citation": "S. Smidstrup, A. Pedersen, K. Stokbro, H. Jonsson, \"Improved initial guess for minimum energy path calculations\", J. Chem. Phys. 140, 214106 (2014), doi:10.1063/1.4878664; arXiv:1406.1512",
     "usedFor": "IDPP interpolation advice in the NEB preset notes (D-111)",
     "access": "open access (arXiv)",
-    "status": "cited-from-memory",
-    "notes": "Abstract read on arXiv 2026-11-27: an image-dependent pair potential built from interpolated interatomic distances gives the starting path without energy evaluations, cutting the DFT effort by half to an order of magnitude in three examples. The journal volume and page were not confirmed on the page read"
+    "status": "read",
+    "notes": "Abstract read on arXiv 2026-11-27: an image-dependent pair potential built from interpolated interatomic distances gives the starting path without energy evaluations, cutting the DFT effort by half to an order of magnitude in three examples. Volume 140, issue 21, article 214106 (June 2014) and the DOI confirmed on 2026-11-27 against a library catalogue record (BVB, record cdi_osti_scitechconnect_22304228), not the publisher page, which was not reachable"
   }
 ]
