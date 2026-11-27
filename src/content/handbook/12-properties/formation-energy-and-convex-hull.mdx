@@ -1,0 +1,193 @@
+---
+id: formation-energy-and-convex-hull
+title: Formation energy and the convex hull
+module: 12
+order: 10
+summary: How to turn total energies into formation energies per atom, why oxygen and mixed GGA and GGA+U energies need fitted corrections, and how the convex hull and the energy above it decide whether a compound is stable.
+concepts: [formation-energy-hull]
+requires: [dft-energies-forces]
+vaspTags: [ENCUT, ISIF, ISPIN, LDAU, NUPDOWN]
+sources: [S-024, S-031, S-034, S-042, S-044, S-080, S-081, S-120]
+noLab: true
+status: draft
+updated: 2026-11-27
+---
+
+<Why>
+
+A total energy from VASP is a large negative number that means nothing on its own: it depends on the `POTCAR`s, the functional and the cutoff. What a materials question needs is a difference. The first difference is the <Term id="formation-energy">formation energy</Term>: is the compound lower in energy than its elements? The second is harder and more useful: is it lower than every mixture of the _other_ compounds it could split into? That second test is the <Term id="convex-hull">convex hull</Term>, and the distance above it, the <Term id="energy-above-hull">energy above the hull</Term>, is the number that large databases such as the Materials Project publish for every entry and that screening studies filter on <Cite id="S-024" /> <Cite id="S-044" />.
+
+Getting it right is mostly bookkeeping: every energy in the comparison must come from the same kind of calculation. Getting it wrong gives a stability verdict that is set by an artefact, not by chemistry.
+
+</Why>
+
+<Intuition>
+
+**Formation energy.** Take one formula unit of the compound, subtract the energies of its atoms in their elemental reference states, and divide by the number of atoms. A negative result means that the elements release energy when they combine <Cite id="S-042" />. The references are the elements as they are found at standard conditions: bcc iron (ferromagnetic), diamond-structure silicon, and so on, each relaxed with the same settings as the compound. For oxygen, nitrogen, fluorine, chlorine and hydrogen the reference is a gas molecule, which causes trouble (below).
+
+**The hull as a rubber band.** For two elements A and B, plot the formation energy per atom of every known compound against the fraction of B, from 0 (pure A) to 1 (pure B). Both ends sit at zero. Now stretch a rubber band underneath all the points and let it snap up. The band touches some points and passes below others. The points it touches are on the hull: they are stable. A point above the band would lower its energy by splitting into the two hull phases at the ends of the segment below it. The vertical gap is its energy above the hull, and those two phases are its decomposition products <Cite id="S-034" />.
+
+With three elements the composition is a point in a triangle, the band becomes a sheet made of flat triangles (facets), and a phase above the sheet decomposes into the three phases at the corners of the facet below it.
+
+**Stable and metastable.** The hull is a zero-kelvin statement about energy alone: no entropy, no zero-point motion, no kinetics. Many useful materials are <Term id="metastable">metastable</Term>: above the hull, but held in place by a barrier. A survey of known inorganic crystals found that a large share of them sit above the computed hull, typically by a few tens of meV per atom or less, with a spread that depends on the chemistry <Cite id="S-120" />. So a small positive energy above the hull is not a death sentence, and a zero is not a recipe.
+
+**Two problems with GGA energies.**
+
+- _The oxygen problem._ PBE overbinds the O₂ molecule, and the electron transfer from metal to oxygen in an oxide is also described with a systematic error. Together they make oxide formation energies come out too weak. Wang, Maxisch and Ceder fitted one constant energy per oxygen atom to experimental oxide formation enthalpies and add it to the compound <Cite id="S-080" />.
+- _Mixing GGA and GGA+U._ Transition-metal oxides need +U, metals do not. But a +U energy contains an extra term, so energies with and without U cannot be subtracted. The Materials Project scheme computes each class with the method that suits it and adds a fitted energy per transition-metal atom to the +U compounds so that both land on one hull <Cite id="S-080" />. The MP2020 scheme refitted all these corrections together and gave each one an uncertainty <Cite id="S-081" />.
+
+</Intuition>
+
+<TheMath>
+
+For a compound $A_xB_y$ with total energy $E(A_xB_y)$ per formula unit, and elemental reference energies $\mu_A^0$ and $\mu_B^0$ per atom:
+
+$$
+\Delta E_f = \frac{E(A_xB_y) - x\,\mu_A^0 - y\,\mu_B^0}{x + y}
+$$
+
+This is the handbook's formation enthalpy per atom at zero temperature and pressure <Cite id="S-042" />. In words: energy of the compound minus energy of the same atoms as pure elements, shared out over the atoms.
+
+**An illustrative example** (made-up numbers, to show the arithmetic). Say $E(AB) = -12.0$ eV per formula unit, $\mu_A^0 = -4.0$ eV and $\mu_B^0 = -6.0$ eV per atom. Then $\Delta E_f = (-12.0 + 4.0 + 6.0)/2 = -1.0$ eV/atom.
+
+Now add a candidate $A_3B$ (fraction of B $= 0.25$) with $\Delta E_f = -0.40$ eV/atom. The hull at $x_B = 0.25$ is the straight line from A at $(0, 0)$ to AB at $(0.5, -1.0)$, so it sits at $-0.50$ eV/atom. The candidate is $0.10$ eV/atom, or 100 meV/atom, above the hull. It would decompose into equal atom fractions of A and AB: $A_3B \to 2A + AB$, which balances the four atoms.
+
+<Level min="intermediate">
+
+**The hull as an optimization.** At a composition $\mathbf{c}$ (atom fractions), the hull energy is the lowest energy any mixture of known phases $i$ can reach:
+
+$$
+E_{\text{hull}}(\mathbf{c}) = \min_{w_i \ge 0} \sum_i w_i\,\Delta E_{f,i} \quad \text{with} \quad \sum_i w_i\,\mathbf{c}_i = \mathbf{c}, \quad \sum_i w_i = 1
+$$
+
+where $w_i$ is the fraction of atoms in phase $i$. The energy above the hull of a phase $p$ is $\Delta E_{f,p} - E_{\text{hull}}(\mathbf{c}_p)$, and the phases with $w_i > 0$ at the minimum are its decomposition products. pymatgen builds the hull with a convex-hull algorithm on the composition and energy points; `get_e_above_hull` returns this distance per atom, and is zero for stable entries <Cite id="S-034" />.
+
+**Corrections, concretely.** In the MP2020 file shipped with pymatgen 2026.10.24, the oxide correction is $-0.687$ eV per oxygen atom (uncertainty 0.002 eV), and an iron oxide or fluoride computed with +U gets $-2.256$ eV per iron atom (uncertainty 0.010 eV) <Cite id="S-081" /> <Cite id="S-034" />. The corrections are added to the compound's energy; the elemental references stay as computed. They are only valid for calculations made with the same settings as the database (functional, `POTCAR`s, U values, cutoff).
+
+**Heuristics on the distance.** The Workflow Handbook reads $E_{\text{hull}} = 0$ as stable and below about 50 meV/atom as possibly synthesizable <Cite id="S-042" />. Another common cut-off is about 25 meV/atom, which is close to the thermal energy at room temperature, $k_BT = 8.617\times10^{-5}\ \text{eV/K} \times 300\ \text{K} \approx 25.9$ meV <Cite id="S-031" />. Both are rules of thumb (heuristics), not laws.
+
+</Level>
+
+<Level min="pro">
+
+**Chemical potential diagrams.** A compound $A_xB_y$ in equilibrium with reservoirs of A and B obeys $x\,\Delta\mu_A + y\,\Delta\mu_B = (x+y)\,\Delta E_f$, with $\Delta\mu_i = \mu_i - \mu_i^0 \le 0$ (no element precipitates) and one inequality per competing phase (none of them forms). The allowed region in $(\Delta\mu_A, \Delta\mu_B)$ is the compound's stability window. It is the dual picture of the hull, and it is what a defect calculation needs for its $\mu_i$ (see [other calculations](/handbook/12-properties/other-calculations/)). pymatgen's `PhaseDiagram.get_chempot_range_map` gives these ranges <Cite id="S-034" />.
+
+**Beyond zero kelvin.** At finite temperature the comparison is between free energies, which adds vibrational terms (see [phonons](/handbook/12-properties/phonons/)) and, for a gas reference, a chemical potential that depends on temperature and pressure. For stable phases pymatgen also reports the equilibrium reaction energy (how far below the hull of the _other_ phases a stable phase sits), a measure of how robustly it is stable <Cite id="S-034" />.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+**One recipe for every phase.** The compound, every competing phase and every elemental reference need the same functional, the same `POTCAR` set, one `ENCUT` (high enough for the hardest `POTCAR` in the set), comparable k-point density and full relaxation (`ISIF = 3` for solids) <Cite id="S-042" />. Magnetic phases are spin-polarized in their magnetic ground state.
+
+**The O₂ reference.** A molecule in a large box with unequal sides, spin-polarized in its triplet state, relaxed with the box fixed. Then apply the correction of the scheme you follow, consistently, to every oxide.
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM  = O2 molecule in a box
+ENCUT   = 520
+ISPIN   = 2
+MAGMOM  = 2*1.0
+NUPDOWN = 2
+ISMEAR  = 0
+SIGMA   = 0.01
+IBRION  = 2
+ISIF    = 2
+NSW     = 50
+EDIFF   = 1E-6
+EDIFFG  = -0.01`}
+  annotations={{
+    2: 'the same ENCUT as every other phase in the hull',
+    4: 'one starting moment per atom, two atoms',
+    5: 'two unpaired electrons: the triplet ground state',
+    7: 'small width for a molecule with discrete levels',
+    9: 'relax the bond length, keep the box fixed',
+  }}
+/>
+
+Use a Γ-only `KPOINTS` for the molecule and a box with unequal sides (the handbook's isolated-atom example is 15 x 15.5 x 16 Å) so that the symmetry of the box does not constrain the electrons <Cite id="S-042" />.
+
+**Building the hull with pymatgen** <Cite id="S-034" />:
+
+```python
+from pymatgen.analysis.phase_diagram import PhaseDiagram
+from pymatgen.entries.computed_entries import ComputedEntry
+
+# one entry per phase: its formula and your total energy for the whole cell, in eV
+entries = [ComputedEntry("Fe", e_fe), ComputedEntry("O2", e_o2), ComputedEntry("Fe2O3", e_fe2o3)]
+candidate = ComputedEntry("Fe3O4", e_fe3o4)
+pd = PhaseDiagram(entries + [candidate])
+decomp, e_hull = pd.get_decomp_and_e_above_hull(candidate)  # products, eV/atom
+print(pd.get_form_energy_per_atom(candidate), e_hull)
+```
+
+The `e_...` names stand for your own energies; the snippet holds no results. To apply the Materials Project corrections, pass the entries through `MaterialsProject2020Compatibility().process_entries` first, and only if your settings match the database's.
+
+**Screening Studio.** The [Screening Studio](/studio/) does not build a hull itself. It reads the `energy_above_hull`, `formation_energy_per_atom` and `is_stable` fields that the Materials Project computes with its own correction scheme <Cite id="S-044" />. You can set a maximum E_hull in eV/atom, tick "On hull (stable)" to keep only `is_stable` entries, and sort by the energy above the hull, which is the default sort. The data pipeline keeps materials from 0 to 0.05 eV/atom above the hull in its index and ships structures only for those from 0 to 0.025 eV/atom with at most 20 sites (`scripts/mp/config.yaml`). Until the author runs a real data pull, the Studio shows synthetic demo values under a banner: every energy there is made up. For your own energies, the formation-enthalpy calculator in the [research planner](/tools/planner/) does the arithmetic of the first formula.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...                               | ...what happens to the verdict                                               |
+| ---------------------------------------------- | ---------------------------------------------------------------------------- |
+| One reference computed with another `ENCUT`    | Every formation energy with that element shifts by the cutoff error          |
+| GGA+U compound against GGA elements, no scheme | The U energy term enters the difference; the formation energy is meaningless |
+| Oxide correction left out                      | Oxide formation energies come out too weak; oxides can drop off the hull     |
+| A competing phase is missing from the list     | The hull is drawn too high; a phase can look stable when it is not           |
+| Threshold raised from 25 to 50 meV/atom        | More candidates pass the screen; more of them may never be made              |
+| Finite temperature considered                  | Entropy can stabilize a phase above the 0 K hull, or destabilize one on it   |
+
+These rows follow from the formulas above; they are reasoning, not quoted values.
+
+Why compute a hull: being lower than the elements is not enough. Why these settings: a difference only cancels errors that are the same on both sides. What happens if you skip the bookkeeping: a hull built from inconsistent energies says more about your settings than about the material.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Using isolated atoms as the reference">
+
+Atoms in a box give the cohesive energy, not the formation energy. The formation energy needs the elements in their solid (or molecular) reference states, relaxed like the compound.
+
+</Callout>
+
+<Callout variant="mistake" title="Mixing your energies with database energies">
+
+Your PBE energy of a new compound cannot go on a hull with Materials Project entries unless your functional, `POTCAR`s, U values and cutoff match theirs and the same corrections are applied. Otherwise recompute the competing phases yourself <Cite id="S-081" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Subtracting GGA+U and GGA energies directly">
+
+A transition-metal oxide at U = 4 eV and the metal at U = 0 do not share an energy zero. Use a mixing scheme with fitted corrections <Cite id="S-080" />, or compute everything at the same level.
+
+</Callout>
+
+<Callout variant="mistake" title="Reading the hull as a synthesis recipe">
+
+Zero above the hull means stable at 0 K against the phases you included, nothing more. A missing competing phase makes the hull too high, and many real compounds are metastable <Cite id="S-120" />. Treat the 25 and 50 meV/atom cut-offs as heuristics.
+
+</Callout>
+
+<Callout variant="mistake" title="Mixing per formula unit and per atom">
+
+Hulls are drawn per atom. An energy per formula unit of AB₂ divided by 2 instead of 3 moves the point, and the verdict with it.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m12-hull-1', 'q-m12-hull-2', 'q-m12-hull-3', 'q-m12-hull-4', 'q-m12-hull-5']} />
+
+<GoDeeper>
+
+- Jain and co-workers on mixing GGA and GGA+U, and Wang, Maxisch and Ceder on the oxide correction <Cite id="S-080" />.
+- Wang and co-workers on the MP2020 corrections and their uncertainties <Cite id="S-081" />.
+- Sun and co-workers on how metastable known crystals are <Cite id="S-120" />.
+- pymatgen's `PhaseDiagram` documentation and the papers it cites <Cite id="S-034" />.
+- The Materials Project documentation on its thermodynamic data <Cite id="S-044" />.
+
+</GoDeeper>

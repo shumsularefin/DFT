@@ -1,0 +1,191 @@
+---
+id: transition-states-and-neb
+title: Transition states and the nudged elastic band
+module: 12
+order: 11
+summary: How to find the barrier between two relaxed structures with the nudged elastic band and its climbing image, how the VTST tools run it in VASP, how to make the first images, and how to confirm the saddle point with a frequency run.
+concepts: [transition-states]
+requires: [relaxation-analysis, phonons]
+vaspTags: [IMAGES, SPRING, LCLIMB, IOPT, IBRION, POTIM, EDIFFG, ICHAIN]
+sources: [S-019, S-031, S-034, S-041, S-121, S-122, S-123, S-124]
+noLab: true
+status: draft
+updated: 2026-11-27
+---
+
+<Why>
+
+A relaxation finds a minimum: a structure where every force is zero and every small push raises the energy. Diffusion, catalysis, phase changes and battery charging are about going _from one minimum to another_. How fast that happens depends on the highest point along the way, and it depends on it exponentially: a barrier that is 0.1 eV lower at room temperature makes the process about 48 times faster (below). So a barrier is often the single number a study is about, and the nudged elastic band (NEB) is the standard way to compute it <Cite id="S-121" />.
+
+</Why>
+
+<Intuition>
+
+Think of the energy of all the atom positions as a mountain landscape. The starting and final structures are two valleys. A hiker walking from one to the other picks the route that climbs least: the <Term id="minimum-energy-path">minimum energy path</Term>. Its highest point is a mountain pass, a <Term id="saddle-point">saddle point</Term>: the top of the path, but the bottom in every direction across it. The height of the pass above the starting valley is the <Term id="activation-energy">activation energy</Term> $E_a$.
+
+**The elastic band.** Put a chain of copies of the system, the _images_, between the two valleys, and join neighbours with springs. Let each image relax. Left alone, the images would all slide down into the valleys, so two forces are filtered <Cite id="S-121" />:
+
+- the true force (minus the energy gradient) acts on each image only _across_ the path, pushing the band down onto the valley floor;
+- the spring force acts only _along_ the path, keeping the images evenly spaced.
+
+This projection is the "nudge" in the <Term id="nudged-elastic-band">nudged elastic band</Term>. When the forces across the path vanish, the band lies on the minimum energy path.
+
+**The climbing image.** With a handful of images, none sits exactly on the pass, so the barrier would be underestimated. In the climbing-image variant the highest image is freed from its springs and the component of the true force along the path is turned around, so it climbs uphill along the band and settles on the saddle point. The other images still map the path on either side <Cite id="S-121" />.
+
+**From barrier to rate.** Harmonic transition state theory gives the rate of crossing as an attempt frequency times a Boltzmann factor, $k = \nu^* e^{-E_a/k_BT}$ <Cite id="S-122" />. The barrier sits in the exponent, which is why it matters so much.
+
+</Intuition>
+
+<TheMath>
+
+**Rate.** With $k_B = 8.617\times10^{-5}$ eV/K, $k_BT = 0.02585$ eV at 300 K <Cite id="S-031" />. Lowering $E_a$ by 0.1 eV multiplies the rate by $e^{0.1/0.02585} = e^{3.87} \approx 48$, whatever $\nu^*$ is. That number is computed from the formula, not quoted.
+
+<Level min="intermediate">
+
+**NEB forces.** For image $i$ at positions $\mathbf{R}_i$ with unit tangent $\hat{\boldsymbol\tau}_i$ along the band and spring constant $k$ <Cite id="S-121" />:
+
+$$
+\mathbf{F}_i = -\nabla E(\mathbf{R}_i) + \big(\nabla E(\mathbf{R}_i)\cdot\hat{\boldsymbol\tau}_i\big)\,\hat{\boldsymbol\tau}_i + k\,\big(\lVert\mathbf{R}_{i+1}-\mathbf{R}_i\rVert - \lVert\mathbf{R}_i-\mathbf{R}_{i-1}\rVert\big)\,\hat{\boldsymbol\tau}_i
+$$
+
+The first two terms are the true force with its component along the band removed; the last is the spring force projected onto the band.
+
+**The improved tangent.** If the tangent is taken from the two neighbours symmetrically, kinks form where the energy changes fast along the path. Henkelman and Jonsson take the tangent towards the higher-energy neighbour, $\boldsymbol\tau_i = \mathbf{R}_{i+1}-\mathbf{R}_i$ when $E_{i+1} > E_i > E_{i-1}$ and $\mathbf{R}_i-\mathbf{R}_{i-1}$ when $E_{i+1} < E_i < E_{i-1}$, with an energy-weighted mix of the two at a local maximum or minimum <Cite id="S-121" />.
+
+**Climbing image.** For the highest image the springs are removed and the parallel force is reversed <Cite id="S-121" />:
+
+$$
+\mathbf{F}_{\text{max}} = -\nabla E + 2\,\big(\nabla E\cdot\hat{\boldsymbol\tau}\big)\,\hat{\boldsymbol\tau}
+$$
+
+</Level>
+
+<Level min="pro">
+
+**Vineyard's prefactor.** In the harmonic approximation, with $\nu_j$ the $3N$ normal-mode frequencies at the initial minimum and $\nu_j^{\ddagger}$ the $3N-1$ real frequencies at the saddle (the unstable mode left out) <Cite id="S-122" />:
+
+$$
+\nu^* = \frac{\prod_{j=1}^{3N} \nu_j}{\prod_{j=1}^{3N-1} \nu_j^{\ddagger}}
+$$
+
+This is classical: tunnelling and zero-point effects, which matter for hydrogen, are not in it.
+
+**Dimer method.** When the final state is unknown, the dimer method starts from one structure, uses two closely spaced images to find the lowest-curvature direction from forces alone, and climbs along it to a saddle <Cite id="S-124" />.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+VASP on its own can run a plain elastic band with `IMAGES` and `SPRING`. The climbing image, the improved tangent and the force-based optimizers used below come from the VTST tools of the Henkelman group, which are compiled into VASP as a patch <Cite id="S-124" />.
+
+**1. Relax the end points.** Relax the initial and final states fully, with the same cell, `ENCUT`, k-mesh and `POTCAR`s, and fixed cell shape (`ISIF = 2`). The atoms must be listed in the same order in both `POSCAR`s: the band connects atom 1 to atom 1.
+
+**2. Make the folders.** For $N$ images, folders `00` to `N+1`: `00` holds the initial `POSCAR`, `N+1` the final one, and `01` to `N` the interpolated images. `INCAR`, `KPOINTS` and `POTCAR` sit in the parent folder; `IMAGES = N`. The number of MPI ranks must be a multiple of `IMAGES`, because each image gets an equal share <Cite id="S-124" /> <Cite id="S-034" />.
+
+**3. Interpolate.** The VTST script `nebmake.pl` makes a linear interpolation. A straight line in Cartesian coordinates can push atoms almost on top of each other along the way; the image-dependent pair potential (IDPP) method instead interpolates the interatomic distances and gives a smoother first guess that often converges in fewer steps <Cite id="S-123" />. Look at the images in a viewer before you submit.
+
+**4. Run.** A climbing-image run with the VTST optimizer <Cite id="S-124" />:
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM  = CI-NEB, 5 images
+IMAGES  = 5
+SPRING  = -5
+LCLIMB  = .TRUE.
+ICHAIN  = 0
+IBRION  = 3
+POTIM   = 0
+IOPT    = 1
+EDIFF   = 1E-6
+EDIFFG  = -0.03
+NSW     = 300
+ISIF    = 2
+ISMEAR  = 0
+SIGMA   = 0.05
+ENCUT   = 520`}
+  annotations={{
+    2: 'images between the two end points: folders 01 to 05',
+    3: 'spring constant in eV per square angstrom; negative means nudged',
+    4: 'turn on the climbing image',
+    5: 'the elastic band method in the VTST code',
+    6: 'VASP optimizer off, so that the VTST optimizer takes over',
+    7: 'zero time step for the VASP optimizer',
+    8: 'VTST optimizer: 1 is LBFGS',
+    10: 'force criterion for every image',
+  }}
+/>
+
+The values follow the VTST documentation as cited from memory (Q-070); check the page for your version. `IBRION = 3` with `POTIM = 0` switches the VASP optimizer off so that the VTST optimizer chosen by `IOPT` moves the images <Cite id="S-124" /> <Cite id="S-034" />. Force criteria for NEB are normally `EDIFFG` from -0.01 to -0.05 eV/Å; -0.001 is rarely reachable on a band of images <Cite id="S-041" />. A common strategy is to converge loosely without the climbing image, then restart with `LCLIMB = .TRUE.`.
+
+**5. Read the barrier.** `nebbarrier.pl` (VTST) or pymatgen's `NEBAnalysis.from_dir` collect the image energies and fit a spline through energies and forces along the path <Cite id="S-124" /> <Cite id="S-034" />. The barrier is the climbing image's energy minus the initial state's, using `energy(sigma->0)` for both.
+
+**How many images.** Enough that the path is resolved. Five, as in the example, is a usual start for a single short hop; a long or curved path needs more. This is a rule of thumb, not a sourced value: test it by adding images and checking that the barrier does not move. Every image is a full DFT calculation, so the cost grows linearly with their number.
+
+**6. Check the saddle.** Run a frequency calculation on the climbing image (`IBRION = 5` with only the moving atoms and their neighbours free, see [phonons](/handbook/12-properties/phonons/)). A true first-order saddle point has exactly one <Term id="imaginary-mode">imaginary mode</Term>, and it points along the path. None means you are at a minimum; two or more mean a higher-order saddle, and the path should be rethought.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...                       | ...what happens                                                               |
+| -------------------------------------- | ----------------------------------------------------------------------------- |
+| More images                            | Smoother path, more cost (one DFT run per image)                              |
+| Climbing image off                     | The barrier is underestimated unless an image happens to sit on the saddle    |
+| Linear instead of IDPP start           | Atoms can come too close in the middle images; slower or failed convergence   |
+| End points not fully relaxed           | The barrier is measured from the wrong energy; images drift to relax the ends |
+| Tighter `EDIFFG`                       | Better saddle, many more ionic steps; very tight values may never converge    |
+| Different atom order in the end points | The band connects the wrong atoms; the path is nonsense                       |
+
+These rows follow from the method as described above; they are reasoning, not quoted values.
+
+Why NEB: a relaxation cannot find a maximum. Why the climbing image: so that the barrier is a saddle, not an image near it. What happens if you skip the frequency check: you may report a minimum or a higher-order saddle as a transition state.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="End points with different atom order">
+
+If atom 7 is the moving Li in the initial `POSCAR` and atom 12 in the final one, the interpolation drags every atom across the cell. Keep the order identical and check the middle image by eye.
+
+</Callout>
+
+<Callout variant="mistake" title="An atom crossing the periodic boundary">
+
+An atom at fractional coordinate 0.98 in one end point and 0.02 in the other is close in space, but a linear interpolation sends it through the whole cell. Unwrap the coordinates before interpolating (pymatgen's `NEBSet` does this) <Cite id="S-034" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Leaving the VASP optimizer on">
+
+With the VTST optimizers, set `IBRION = 3` and `POTIM = 0`. Otherwise VASP's own optimizer also moves the images and the run behaves erratically <Cite id="S-124" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Using the highest plain NEB image as the barrier">
+
+Without the climbing image the highest image only brackets the saddle, so the barrier is too low. Turn on `LCLIMB` for the final run <Cite id="S-121" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Skipping the frequency check">
+
+An NEB that converged is a path, not a proof. One imaginary mode along the path confirms a first-order saddle point.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m12-neb-1', 'q-m12-neb-2', 'q-m12-neb-3', 'q-m12-neb-4', 'q-m12-neb-5']} />
+
+<GoDeeper>
+
+- Henkelman, Uberuaga and Jonsson on the climbing image, and Henkelman and Jonsson on the improved tangent <Cite id="S-121" />.
+- Vineyard on harmonic transition state theory <Cite id="S-122" />.
+- Smidstrup and co-workers on the IDPP initial path <Cite id="S-123" />.
+- The VTST Tools pages on NEB, the optimizers and the dimer method <Cite id="S-124" />.
+- VASP wiki page IBRION, by page name <Cite id="S-019" />.
+
+</GoDeeper>
