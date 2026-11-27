@@ -1,5 +1,32 @@
 ---
 id: wannier-functions-and-topology
+stage:
+  scene: m09-wannier
+  states:
+    - id: bloch-to-wannier
+      section: why
+      params: { smooth: 1, dimer: 0.4, nk: 10 }
+      layers: [bloch, wannier]
+      camera: iso
+      caption: 'The Bloch states of the lower band of a dimerized chain (back) spread over every cell. Added with smoothly chosen phases they give one Wannier function (front) that sits on a single bond.'
+    - id: random-gauge
+      section: intuition
+      params: { smooth: 0, dimer: 0.4, nk: 10 }
+      layers: [wannier, bloch]
+      camera: iso
+      caption: 'The same Bloch states added with random phases: still a valid Wannier function of the band, but spread over the chain, 8.6 instead of 0.09 cells squared. Maximal localization is the choice of these phases.'
+    - id: centre-jump
+      section: math
+      params: { smooth: 1, dimer: -0.4, nk: 10 }
+      layers: [centre, bonds]
+      camera: iso
+      caption: 'With the strong bond between cells (w > v) the centre moves from +1/4 to -1/4 of a cell. The half-cell jump is set by the Berry (Zak) phase of the band, 0 in one case and pi in the other.'
+    - id: small-gap
+      section: what-changes
+      params: { smooth: 1, dimer: 0.1, nk: 16 }
+      layers: [wannier, centre]
+      camera: iso
+      caption: 'A weak dimerization shrinks the gap to 0.4 and the Wannier function spreads to 0.28 cells squared, three times wider. A small gap means slowly decaying Wannier functions.'
 title: Wannier functions and a first look at topology
 module: 9
 order: 7

@@ -1,5 +1,38 @@
 ---
 id: energies-and-forces
+stage:
+  scene: m09-forces
+  states:
+    - id: restoring-force
+      section: why
+      params: { disp: 0.15, dir: x, strain: 0, kind: iso }
+      layers: [forces, atoms]
+      camera: iso
+      caption: 'One atom of a Lennard-Jones crystal moved 0.15 Å along [100]. The forces, minus the gradient of the energy, pull it back with 0.52 eV/Å and push its neighbours away; over the whole cell they add to zero.'
+    - id: larger-move
+      section: intuition
+      params: { disp: 0.3, dir: xyz, strain: 0, kind: iso }
+      layers: [forces, labels]
+      camera: iso
+      caption: 'Moved 0.30 Å along [111], the atom feels 1.47 eV/Å. At this size forces are no longer proportional to the displacement, one reason a relaxation needs several steps.'
+    - id: squeezed
+      section: in-vasp
+      params: { disp: 0, strain: -2, kind: iso }
+      layers: [stress, reference]
+      camera: iso
+      caption: 'The cell squeezed by 2 percent with every atom on its site: no atom feels a force, but the walls push outward. VASP prints this as a positive pressure, here about 35 kB, in the stress lines of the OUTCAR.'
+    - id: shear
+      section: what-changes
+      params: { disp: 0, strain: 2, kind: shear }
+      layers: [stress, reference]
+      camera: iso
+      caption: 'A 2 percent xy shear barely changes the volume, so the pressure stays near 0.4 kB, while the xy stress is about -7 kB. A small pressure alone does not show that the cell shape is relaxed.'
+    - id: stretched
+      section: mistakes
+      params: { disp: 0, strain: 2, kind: uniaxial }
+      layers: [stress, cell]
+      camera: iso
+      caption: 'Stretched 2 percent along z, the pressure is negative (about -8 kB) and zz is the most negative component. In VASP a negative pressure means the cell wants to shrink, not grow.'
 title: Reading energies and forces
 module: 9
 order: 1
