@@ -880,5 +880,254 @@
       "caption": "The INCAR you run is the one you checked.",
       "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
     }
+  },
+  {
+    "id": "q-perf-1",
+    "concepts": [
+      "parallel-performance"
+    ],
+    "type": "single",
+    "prompt": "A run uses 48 MPI ranks. Which KPAR value makes VASP stop?",
+    "options": [
+      {
+        "text": "KPAR = 5",
+        "correct": true,
+        "why": "48 is not divisible by 5, and the number of ranks must be divisible by KPAR."
+      },
+      {
+        "text": "KPAR = 2",
+        "correct": false,
+        "why": "48 divides into 2 groups of 24 ranks."
+      },
+      {
+        "text": "KPAR = 3",
+        "correct": false,
+        "why": "48 divides into 3 groups of 16 ranks; the k-points need not divide evenly."
+      },
+      {
+        "text": "KPAR = 4",
+        "correct": false,
+        "why": "48 divides into 4 groups of 12 ranks."
+      }
+    ],
+    "hints": [
+      "What must the number of ranks be divisible by?",
+      "Check 48 against each value."
+    ],
+    "difficulty": -0.5,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "parallel-split",
+      "params": {
+        "ranks": 48,
+        "kpar": 4,
+        "ncore": 4
+      },
+      "caption": "One way to split 48 ranks into k-point groups and band groups.",
+      "alt": "Four k-point groups of twelve ranks each, the ranks of each group gathered by fours into band groups."
+    }
+  },
+  {
+    "id": "q-perf-2",
+    "concepts": [
+      "parallel-performance"
+    ],
+    "type": "single",
+    "prompt": "For a large supercell, which part of each electronic step grows fastest with the number of atoms N?",
+    "options": [
+      {
+        "text": "Orthogonalising and diagonalising the bands, which grows about as N cubed",
+        "correct": true,
+        "why": "Bands and plane waves both grow in proportion to N, so work that pairs every band with every other band over all plane waves grows as N cubed."
+      },
+      {
+        "text": "The FFTs, which grow as N cubed",
+        "correct": false,
+        "why": "Tempting because FFTs are a big share of the time, but per step they grow as bands times grid points times a logarithm, about N squared log N."
+      },
+      {
+        "text": "Reading the POTCAR",
+        "correct": false,
+        "why": "The POTCAR is read once at the start, and its size does not depend on N."
+      },
+      {
+        "text": "Writing OUTCAR",
+        "correct": false,
+        "why": "Output is a tiny part of the time."
+      }
+    ],
+    "hints": [
+      "How do the number of bands and the number of plane waves grow with N?",
+      "Which operation pairs every band with every other band?"
+    ],
+    "difficulty": 0.8,
+    "level": "intermediate",
+    "sources": [
+      "S-113",
+      "S-010"
+    ],
+    "visual": {
+      "plot": "cost-scaling",
+      "params": {
+        "methods": [
+          "dft"
+        ]
+      },
+      "caption": "Relative cost of semilocal DFT against system size, on log axes.",
+      "alt": "A straight line on logarithmic axes for the cost of DFT against system size."
+    }
+  },
+  {
+    "id": "q-perf-3",
+    "concepts": [
+      "parallel-performance"
+    ],
+    "type": "single",
+    "prompt": "Which of these runs should keep LREAL = .FALSE.?",
+    "options": [
+      {
+        "text": "A phonon calculation on a 4-atom cell",
+        "correct": true,
+        "why": "Real-space projection is meant for large cells; for small cells, phonons and linear response the Field Handbook keeps reciprocal space."
+      },
+      {
+        "text": "A relaxation of a 200-atom supercell",
+        "correct": false,
+        "why": "Above roughly 20 atoms LREAL = Auto is recommended and much faster."
+      },
+      {
+        "text": "A 120-atom slab relaxation",
+        "correct": false,
+        "why": "A large cell, where real-space projection saves a lot of time."
+      },
+      {
+        "text": "A 256-atom molecular dynamics run with vasp_gam",
+        "correct": false,
+        "why": "The Field Handbook MD recipe uses LREAL = Auto for large cells."
+      }
+    ],
+    "hints": [
+      "How many atoms make a cell large for LREAL?",
+      "Which kinds of run are named as sensitive to projection errors?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Count the atoms in the cell"
+          },
+          {
+            "label": "Check the kind of run"
+          },
+          {
+            "label": "Choose LREAL"
+          }
+        ],
+        "active": -1
+      },
+      "caption": "The two questions that decide LREAL.",
+      "alt": "A three-step flow: count the atoms, check the kind of run, then choose LREAL."
+    }
+  },
+  {
+    "id": "q-perf-4",
+    "concepts": [
+      "parallel-performance"
+    ],
+    "type": "single",
+    "prompt": "When is the Gamma-only build vasp_gam the right choice?",
+    "options": [
+      {
+        "text": "When the k-mesh contains only the Gamma point, such as a large supercell or an MD cell",
+        "correct": true,
+        "why": "At Gamma the wavefunctions can be taken real, so the build stores half the coefficients and runs faster; it works only for a Gamma-only mesh."
+      },
+      {
+        "text": "For any run with fewer than 10 k-points",
+        "correct": false,
+        "why": "The build can only treat the Gamma point; any other k-point needs vasp_std."
+      },
+      {
+        "text": "For spin-orbit coupling",
+        "correct": false,
+        "why": "Spin-orbit coupling needs the noncollinear build, vasp_ncl."
+      },
+      {
+        "text": "To read a WAVECAR from vasp_std faster",
+        "correct": false,
+        "why": "The builds write incompatible WAVECAR files."
+      }
+    ],
+    "hints": [
+      "What is special about the wavefunctions at the Gamma point?",
+      "Which build handles spin-orbit coupling?"
+    ],
+    "difficulty": -0.3,
+    "level": "beginner",
+    "sources": [
+      "S-041",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "kmesh-grid",
+      "params": {
+        "n": 4,
+        "m": 4,
+        "gamma": true
+      },
+      "caption": "A general 4 by 4 mesh in a square reciprocal cell.",
+      "alt": "Sixteen k-points on a square grid in a reciprocal cell, the centre point circled."
+    }
+  },
+  {
+    "id": "q-perf-5",
+    "concepts": [
+      "parallel-performance"
+    ],
+    "type": "numeric",
+    "prompt": "Illustrative timings from a scaling test: 1000 s for ten electronic steps on one node and 400 s on four nodes. What is the parallel efficiency on four nodes, in percent?",
+    "answer": 62.5,
+    "tolerance": 1,
+    "unit": "%",
+    "hints": [
+      "The speed-up is the one-node time divided by the four-node time.",
+      "The efficiency is the speed-up divided by the number of nodes."
+    ],
+    "difficulty": 0.3,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Time a short run on one node"
+          },
+          {
+            "label": "Time the same run on p nodes"
+          },
+          {
+            "label": "Speed-up = one-node time / p-node time"
+          },
+          {
+            "label": "Efficiency = speed-up / p"
+          }
+        ],
+        "active": -1
+      },
+      "caption": "How a scaling test is turned into an efficiency.",
+      "alt": "A four-step flow from two timings to the speed-up and then the parallel efficiency."
+    }
   }
 ]

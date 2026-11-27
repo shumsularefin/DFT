@@ -1,0 +1,175 @@
+---
+id: surfaces-and-slabs
+title: Surfaces and slabs
+module: 12
+order: 8
+summary: How to cut a slab by Miller indices, choose a termination, converge vacuum and thickness, fix the bottom layers, apply the dipole correction, and compute surface energies and work functions.
+concepts: [surface-slabs]
+requires: [geometry-relaxation, k-points]
+vaspTags: [LDIPOL, IDIPOL, DIPOL, LVHAR, LVTOT, ISIF]
+sources: [S-018, S-019, S-036, S-041, S-042, S-063, S-064, S-065, S-066, S-109, S-110]
+noLab: true
+status: draft
+updated: 2026-11-27
+---
+
+<Why>
+
+Catalysis, corrosion, crystal growth, contacts in devices and adsorption all happen at surfaces. A plane-wave code needs a periodic cell, so a surface is modeled as a <Term id="slab-model">slab</Term>: a few layers of crystal with empty space above and below, repeated in all three directions. Every choice in that model (which plane, which termination, how thick, how much vacuum, which atoms to freeze) changes the numbers you get, and some choices give a result that is mostly an artifact <Cite id="S-018" />.
+
+</Why>
+
+<Intuition>
+
+**Cutting the crystal.** A plane is named by its <Term id="miller-indices">Miller indices</Term> $(hkl)$: take where the plane crosses the three cell axes, in units of the cell edges, invert the three numbers and clear the fractions <Cite id="S-036" />. (100) is a cube face, (110) cuts diagonally across two axes, (111) crosses all three at equal distance. The slab is made of layers parallel to that plane.
+
+**Where to cut: the termination.** Most crystals have more than one kind of layer along a direction. SrTiO3 along (001) alternates SrO and TiO2 layers, so the slab can end on either one. Each choice is a different <Term id="surface-termination">termination</Term> with its own energy and chemistry <Cite id="S-064" />.
+
+**Stoichiometry and polarity.** Tasker sorted ionic surfaces into three types <Cite id="S-063" />: neutral layers with the bulk composition (type 1, such as rock-salt NaCl(100)); charged layers stacked so that the repeat unit has no dipole (type 2); and charged layers that alternate in sign, so that the repeat unit carries a dipole (type 3, such as NaCl(111), alternate Na and Cl layers). A type 3 slab builds up a potential across its thickness and is unstable unless the surface reconstructs or changes its composition.
+
+**Symmetric and asymmetric slabs.** In a symmetric slab the top and bottom are the same surface, related by a symmetry of the slab. Their dipoles cancel and both faces count in the surface energy. In an asymmetric slab the faces differ (a different termination, an adsorbate on one side, or bottom layers frozen at bulk positions), and the slab carries a net dipole.
+
+**Vacuum and thickness.** The vacuum must be thick enough that the slab does not feel its own periodic copy across the gap, and the slab thick enough that its middle looks like bulk. Both are convergence parameters: increase them until the quantity you want stops changing <Cite id="S-018" />.
+
+**Freezing the bottom.** To make one face stand for the bulk below it, fix the bottom layers at bulk positions with <Term id="selective-dynamics">selective dynamics</Term> and relax only the top <Cite id="S-042" />.
+
+**The dipole correction.** An asymmetric slab in a periodic cell sets up an artificial electric field across the vacuum. The <Term id="dipole-correction">dipole correction</Term> adds a compensating dipole layer in the vacuum, so the potential is flat on both sides of the slab and the two vacuum levels differ by the slab's own dipole step <Cite id="S-066" /> <Cite id="S-109" />.
+
+</Intuition>
+
+<TheMath>
+
+The <Term id="surface-energy">surface energy</Term> is the cost of making surface, per area. For a symmetric, stoichiometric slab of $n$ bulk formula units with total energy $E_{\text{slab}}$, bulk energy per formula unit $E_{\text{bulk}}$ and surface area $A$ of one face <Cite id="S-018" />:
+
+$$\gamma = \frac{E_{\text{slab}} - n\,E_{\text{bulk}}}{2A}.$$
+
+The 2 counts the two faces. Multiply eV per square angstrom by 16.02 to get J per square meter.
+
+<Level min="intermediate">
+
+**The asymmetric variant.** When the bottom is frozen at bulk positions and only the top relaxes, first compute the unrelaxed slab (both faces bulk-terminated): $\gamma_{\text{unrel}} = (E_{\text{slab}}^{\text{unrel}} - nE_{\text{bulk}})/(2A)$. The relaxed top face then has <Cite id="S-018" />
+
+$$\gamma_{\text{top}} = \frac{E_{\text{slab}}^{\text{rel}} - nE_{\text{bulk}}}{A} - \gamma_{\text{unrel}}.$$
+
+**A bulk reference that matches.** $E_{\text{bulk}}$ must come from the same `ENCUT`, functional and PAW set, and ideally the same in-plane k-mesh. A small error in $E_{\text{bulk}}$ is multiplied by $n$, so $\gamma$ drifts as the slab grows. Fiorentini and Methfessel fit $E_{\text{slab}}$ against $n$ for several thicknesses: the slope is a consistent bulk energy and the intercept gives $2A\gamma$ <Cite id="S-110" />.
+
+**The work function.** The <Term id="planar-average">planar average</Term> of the electrostatic potential is $\bar V(z) = \frac{1}{A}\iint V(x,y,z)\,dx\,dy$. In the middle of the vacuum it reaches a flat value $V_{\text{vac}}$, the vacuum level. The <Term id="work-function">work function</Term> is the energy to take an electron from the Fermi level to that vacuum level <Cite id="S-042" />:
+
+$$\Phi = V_{\text{vac}} - E_F.$$
+
+</Level>
+
+<Level min="pro">
+
+**Nonstoichiometric slabs.** If the slab does not hold whole bulk formula units (a symmetric slab of SrTiO3(001) ending on TiO2 on both sides has one extra TiO2 layer), $\gamma$ depends on the chemical potentials of the elements: write $E_{\text{slab}} - \sum_i N_i \mu_i$ in place of $E_{\text{slab}} - nE_{\text{bulk}}$, with the $\mu_i$ bounded by the stability of the bulk, as for defect formation energies ([point and charged defects](/handbook/12-properties/point-and-charged-defects/)) <Cite id="S-018" />.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+- **Build it.** This site's slab code (`src/lib/crystal/slab.ts`) follows the method of Sun and Ceder that pymatgen also uses <Cite id="S-064" />: the in-plane lattice is reduced to its shortest pair, atoms are grouped into layers (closer than 0.1 angstrom along the normal counts as one layer), every gap between layers is a possible cut, and cuts related by a bulk symmetry give the same termination. The thickness is rounded up to whole repeats of the (hkl) spacing; the defaults are 10 angstrom of slab and 15 angstrom of vacuum, which are conventions, not converged values. It flags a polar slab with a heuristic based on Tasker's rule <Cite id="S-063" />, reports whether the slab is symmetric, and can fix the bottom layers with selective dynamics.
+- **Keep the cell fixed.** `ISIF = 2`. `ISIF = 3` would collapse the vacuum <Cite id="S-041" />. The in-plane lattice comes from your relaxed bulk.
+- **k-points.** Sample in plane as densely as the bulk along the same directions, and use 1 point along the vacuum: the bands do not disperse across empty space. A Gamma-centred `N x N x 1` mesh is the usual choice.
+- **Selective dynamics.** In `POSCAR`, a `Selective dynamics` line before `Direct`, then `T T T` (free) or `F F F` (fixed) after each atom <Cite id="S-041" />.
+- **Dipole correction.** `LDIPOL = .TRUE.` and `IDIPOL = 3` (along the third lattice vector) for asymmetric slabs and adsorbates; `DIPOL` gives the center of the slab in fractional coordinates <Cite id="S-042" /> <Cite id="S-065" />.
+- **Potential for the work function.** `LVHAR = .TRUE.` writes the electrostatic potential to `LOCPOT`; the Workflow Handbook prefers it over `LVTOT` (which adds exchange-correlation), because the electrostatic part reaches the vacuum level faster. Use at least 15 angstrom of vacuum <Cite id="S-042" />.
+- **Charge sloshing.** Slabs are prone to it; lower `AMIX` and `BMIX` if the SCF loop oscillates (see [the SCF topic](/handbook/08-convergence-and-errors/scf-trouble/)) <Cite id="S-042" />.
+
+An asymmetric slab, relaxed with the dipole correction and writing the potential:
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM = asymmetric slab, top relaxed
+PREC   = Accurate
+ENCUT  = 520
+EDIFF  = 1E-6
+ISMEAR = 0
+SIGMA  = 0.05
+IBRION = 2
+ISIF   = 2
+NSW    = 150
+EDIFFG = -0.02
+LDIPOL = .TRUE.
+IDIPOL = 3
+DIPOL  = 0.5 0.5 0.5
+LVHAR  = .TRUE.
+LREAL  = Auto
+LWAVE  = .FALSE.
+LCHARG = .TRUE.`}
+  annotations={{
+    3: 'the same cutoff as the bulk reference',
+    8: 'fixed cell: the vacuum must not shrink',
+    12: 'correct along the third lattice vector',
+    13: 'the slab center, here placed in the middle of the cell',
+    14: 'electrostatic potential to LOCPOT',
+  }}
+/>
+
+**Reading the work function.** Load `LOCPOT` and `OUTCAR` into the [work function tool](/tools/work-function/). It averages the potential over the plane, takes the vacuum level as the mean of the slices within 0.05 eV of the highest value, reads `E-fermi` from `OUTCAR`, and warns when fewer than a tenth of the slices lie on that plateau (too little vacuum, or a missing dipole correction). On a dipole-corrected asymmetric slab the two vacuum regions have different levels and the tool reads the higher one, so check which face that belongs to. VASPKIT task 426 prints the same planar average; the Workflow Handbook's example, Au(111), gives 6.695 - 1.520 = 5.18 eV <Cite id="S-042" />.
+
+**Convergence.** Increase the vacuum until $V_{\text{vac}}$ and $\gamma$ stop changing; increase the number of layers until $\gamma$ stops changing and the middle layers keep bulk spacings <Cite id="S-018" /> <Cite id="S-042" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...                   | ...the slab...                  | ...and the result                                    |
+| ---------------------------------- | ------------------------------- | ---------------------------------------------------- |
+| More vacuum                        | Feels less of its periodic copy | A flat vacuum level; more plane waves                |
+| More layers                        | A more bulk-like middle         | A converged surface energy; more cost                |
+| Another termination                | Different surface chemistry     | A different surface energy and work function         |
+| Bottom layers fixed                | One face stands for bulk        | Use the asymmetric formula and the dipole correction |
+| `LDIPOL` on for an asymmetric slab | Field across the vacuum removed | Flat vacuum potential on both sides                  |
+| `ISIF = 3`                         | The vacuum collapses            | A meaningless cell                                   |
+
+Why converge both thicknesses: the vacuum controls the coupling between copies, the slab thickness controls how bulk-like the middle is. What happens if you skip it: a surface energy or work function that reflects your box, not the material.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="The symmetric formula on an asymmetric slab">
+
+With the bottom frozen, the two faces differ, so dividing by $2A$ mixes a relaxed and an unrelaxed surface. Use the two-step formula above <Cite id="S-018" />.
+
+</Callout>
+
+<Callout variant="mistake" title="A bulk energy from different settings">
+
+Any mismatch in cutoff, k-mesh or PAW set is multiplied by the number of formula units and makes the surface energy drift with thickness. Use matching settings, or fit against thickness <Cite id="S-110" />.
+
+</Callout>
+
+<Callout variant="mistake" title="An asymmetric slab without the dipole correction">
+
+The potential slopes across the vacuum, there is no flat vacuum level, and the work function is wrong. Set `LDIPOL` and `IDIPOL = 3` <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="More than one k-point along the vacuum">
+
+The vacuum direction has no dispersion to sample. Extra points there cost time and change nothing physical; use 1.
+
+</Callout>
+
+<Callout variant="mistake" title="Ignoring a polar termination">
+
+A type 3 slab carries a growing dipole and its energy does not converge with thickness. Choose a nonpolar termination, or treat the reconstruction or compensation explicitly <Cite id="S-063" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-slab-1', 'q-slab-2', 'q-slab-3', 'q-slab-4', 'q-slab-5']} />
+
+<GoDeeper>
+
+- Sholl and Steckel, chapter 4, on slab models and surface energies <Cite id="S-018" />.
+- Tasker on the stability of ionic surfaces <Cite id="S-063" />; Sun and Ceder on building and converging slabs <Cite id="S-064" />.
+- Neugebauer and Scheffler, and Bengtsson, on the dipole correction <Cite id="S-066" /> <Cite id="S-109" />.
+- Fiorentini and Methfessel on convergent surface energies <Cite id="S-110" />.
+- VASP wiki pages LDIPOL, IDIPOL, DIPOL, LVHAR and LVTOT (by page name) <Cite id="S-019" />.
+
+</GoDeeper>

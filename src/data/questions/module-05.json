@@ -3603,5 +3603,470 @@
       "caption": "The anisotropy sequence.",
       "alt": "A four-step flow: a collinear SCF keeping CHGCAR, a non-collinear run along 001, another along 100, then the energy difference."
     }
+  },
+  {
+    "id": "q-xsym-1",
+    "concepts": [
+      "crystal-symmetry"
+    ],
+    "type": "single",
+    "prompt": "Rock salt (NaCl) is a face-centred cubic lattice with a basis of one Na and one Cl. How many atoms are in its primitive cell?",
+    "options": [
+      {
+        "text": "2",
+        "correct": true,
+        "why": "The primitive cell holds one lattice point, and each lattice point carries the basis of one Na and one Cl."
+      },
+      {
+        "text": "8",
+        "correct": false,
+        "why": "Tempting because the familiar cube holds 8 atoms, but that is the conventional cell with 4 lattice points."
+      },
+      {
+        "text": "4",
+        "correct": false,
+        "why": "Four is the number of lattice points in the conventional cube, not the number of atoms in the primitive cell."
+      },
+      {
+        "text": "1",
+        "correct": false,
+        "why": "One lattice point, yes, but the basis attached to it has two atoms."
+      }
+    ],
+    "hints": [
+      "A primitive cell contains exactly one lattice point.",
+      "Count the atoms in the basis attached to each point."
+    ],
+    "difficulty": -1,
+    "level": "beginner",
+    "sources": [
+      "S-036"
+    ],
+    "visual": {
+      "scene": "rocksalt",
+      "caption": "Rock-salt NaCl drawn in its cubic conventional cell.",
+      "alt": "Sodium and chlorine atoms alternating on a cubic grid inside a cube, with an octahedron of Cl around one Na."
+    }
+  },
+  {
+    "id": "q-xsym-2",
+    "concepts": [
+      "crystal-symmetry"
+    ],
+    "type": "single",
+    "prompt": "Why can a periodic crystal have a four-fold rotation axis but not a five-fold one?",
+    "options": [
+      {
+        "text": "A rotation must map lattice points onto lattice points, which forces 2 cos(theta) to be a whole number, and 72 degrees fails",
+        "correct": true,
+        "why": "In lattice coordinates the rotation matrix has whole-number entries, so its trace 1 + 2 cos(theta) is a whole number; that allows only 1, 2, 3, 4 and 6-fold axes."
+      },
+      {
+        "text": "Five-fold axes are allowed, but VASP cannot handle them",
+        "correct": false,
+        "why": "Tempting because it sounds like a code limit, but the restriction comes from periodicity itself; quasicrystals show five-fold patterns precisely because they are not periodic."
+      },
+      {
+        "text": "Five atoms cannot be arranged symmetrically around one point",
+        "correct": false,
+        "why": "Molecules such as a planar five-membered ring do have five-fold symmetry; the problem is filling space with translations."
+      },
+      {
+        "text": "Only even orders are allowed",
+        "correct": false,
+        "why": "Three-fold axes exist in every cubic crystal, along the body diagonals."
+      }
+    ],
+    "hints": [
+      "Think about what a rotation must do to the grid of lattice points.",
+      "The trace of a rotation by theta is 1 + 2 cos(theta)."
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-036"
+    ],
+    "visual": {
+      "scene": "sc",
+      "caption": "A simple cubic cell, one lattice point per cell.",
+      "alt": "Simple cubic cell with one atom at each of the eight corners of a cube."
+    }
+  },
+  {
+    "id": "q-xsym-3",
+    "concepts": [
+      "crystal-symmetry"
+    ],
+    "type": "single",
+    "prompt": "Cubic SrTiO3 has the space group Pm-3m. What does the first letter, P, tell you?",
+    "options": [
+      {
+        "text": "The lattice is primitive: there are no extra centring points",
+        "correct": true,
+        "why": "The first letter of a Hermann-Mauguin symbol is the centring type, and P means primitive."
+      },
+      {
+        "text": "The structure is a perovskite",
+        "correct": false,
+        "why": "Tempting for SrTiO3, but the letter describes the lattice centring, and many non-perovskites have P groups."
+      },
+      {
+        "text": "The group contains a mirror plane",
+        "correct": false,
+        "why": "Mirrors are the m symbols that follow the letter."
+      },
+      {
+        "text": "The lattice is face-centred",
+        "correct": false,
+        "why": "Face-centred is F, as in Fm-3m for rock salt."
+      }
+    ],
+    "hints": [
+      "The symbol starts with one capital letter followed by symmetry elements.",
+      "Compare Pm-3m with Fm-3m for NaCl."
+    ],
+    "difficulty": -0.5,
+    "level": "beginner",
+    "sources": [
+      "S-105"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "Cubic perovskite SrTiO3 in its cubic cell.",
+      "alt": "Strontium at the corners of a cube and titanium at the centre inside an octahedron of six oxygen atoms."
+    }
+  },
+  {
+    "id": "q-xsym-4",
+    "concepts": [
+      "crystal-symmetry"
+    ],
+    "type": "numeric",
+    "prompt": "A 4 by 4 by 4 Gamma-centred mesh is used on a simple cubic crystal with the full cubic point group (48 operations: every sign change and every swap of the axes). How many irreducible k-points remain?",
+    "answer": 10,
+    "tolerance": 0.5,
+    "hints": [
+      "Along each axis the coordinates are 0, 1/4, 1/2 and -1/4, and a sign change maps -1/4 onto 1/4.",
+      "Swaps of the axes mean only the unordered set of three values from 0, 1/4 and 1/2 matters."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-007",
+      "S-036"
+    ],
+    "visual": {
+      "plot": "kmesh-grid",
+      "params": {
+        "n": 4,
+        "m": 4,
+        "gamma": true
+      },
+      "caption": "A 4 by 4 Gamma-centred mesh in one plane of a square reciprocal cell.",
+      "alt": "Sixteen k-points on a square grid that includes the centre of the reciprocal cell."
+    }
+  },
+  {
+    "id": "q-xsym-5",
+    "concepts": [
+      "crystal-symmetry"
+    ],
+    "type": "single",
+    "prompt": "VASP stops with \"inverse of rotation matrix was not found (increase SYMPREC)\" on a cubic structure taken from an earlier relaxation. What is the likely cause and the first fix?",
+    "options": [
+      {
+        "text": "The positions are slightly off their symmetric sites; symmetrize the structure or raise SYMPREC to about 1E-4",
+        "correct": true,
+        "why": "The Workflow Handbook names this message for positions that are nearly, but not exactly, symmetric; a symmetrized file or a looser tolerance lets the search succeed."
+      },
+      {
+        "text": "The POTCAR does not match the POSCAR",
+        "correct": false,
+        "why": "A wrong POTCAR causes other trouble; the symmetry search only uses the lattice, the positions and MAGMOM."
+      },
+      {
+        "text": "Every cubic crystal needs ISYM = -1",
+        "correct": false,
+        "why": "Switching off symmetry hides the message but costs the full k-mesh and leaves the noisy structure as it is."
+      },
+      {
+        "text": "The k-mesh is too coarse",
+        "correct": false,
+        "why": "The mesh is reduced after the symmetry search; this error comes from the search itself."
+      }
+    ],
+    "hints": [
+      "The message names a tolerance.",
+      "What can be slightly wrong about a structure that came out of a relaxation?"
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-019"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "POSCAR: lattice, positions and MAGMOM"
+          },
+          {
+            "label": "Symmetry search with the tolerance SYMPREC"
+          },
+          {
+            "label": "Irreducible k-points written to IBZKPT"
+          },
+          {
+            "label": "Electronic loop"
+          }
+        ],
+        "active": 1
+      },
+      "caption": "Where the symmetry search sits in a VASP run.",
+      "alt": "A four-step flow from POSCAR through the symmetry search and the k-point reduction to the electronic loop, with the symmetry search highlighted."
+    }
+  },
+  {
+    "id": "q-relx-1",
+    "concepts": [
+      "geometry-relaxation"
+    ],
+    "type": "single",
+    "prompt": "You relax a six-layer slab with 15 angstrom of vacuum. Which ISIF should you use?",
+    "options": [
+      {
+        "text": "ISIF = 2: the ions relax and the cell stays fixed",
+        "correct": true,
+        "why": "The in-plane lattice comes from the bulk and the vacuum must keep its size, so only the ions should move."
+      },
+      {
+        "text": "ISIF = 3: ions, shape and volume",
+        "correct": false,
+        "why": "Tempting because it is the full relaxation, but vacuum has nothing to push back, so the cell collapses along the normal."
+      },
+      {
+        "text": "ISIF = 4: ions and shape at fixed volume",
+        "correct": false,
+        "why": "The shape may then change, so the vacuum can shrink while the in-plane lattice stretches."
+      },
+      {
+        "text": "ISIF = 7: volume only",
+        "correct": false,
+        "why": "Changing the volume scales the vacuum and the in-plane lattice together, which is not wanted for a slab."
+      }
+    ],
+    "hints": [
+      "What resists a change of cell size along the vacuum direction?",
+      "Which ISIF keeps the cell exactly as built?"
+    ],
+    "difficulty": -0.5,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "dof-cell",
+      "params": {},
+      "caption": "A cell with its atoms before a relaxation.",
+      "alt": "A parallelogram cell with atoms inside, drawn before any change of atoms, shape or volume."
+    }
+  },
+  {
+    "id": "q-relx-2",
+    "concepts": [
+      "geometry-relaxation"
+    ],
+    "type": "single",
+    "prompt": "Why does a tight force criterion such as EDIFFG = -0.001 need a tight EDIFF such as 1E-7 or 1E-8?",
+    "options": [
+      {
+        "text": "Forces from a loosely converged density are noisy, so the ions chatter around the minimum and never meet the criterion",
+        "correct": true,
+        "why": "Forces are derivatives that depend on the converged density; noise in them larger than the criterion keeps the relaxation from stopping."
+      },
+      {
+        "text": "EDIFFG is measured in units of EDIFF",
+        "correct": false,
+        "why": "A negative EDIFFG is a force in eV per angstrom; it has its own units."
+      },
+      {
+        "text": "A tight EDIFF makes each ionic step longer",
+        "correct": false,
+        "why": "The step length is set by the algorithm and POTIM, not by EDIFF."
+      },
+      {
+        "text": "VASP refuses to start otherwise",
+        "correct": false,
+        "why": "VASP starts, but the relaxation may run to NSW without converging."
+      }
+    ],
+    "hints": [
+      "Where do the forces come from?",
+      "What happens to a stopping test when the quantity it tests is noisy?"
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-041",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "force-band",
+      "params": {
+        "tol": 0.001
+      },
+      "caption": "The largest force at each ionic step, with the stop line of the force criterion.",
+      "alt": "Falling points of the largest force on a logarithmic axis, crossing a horizontal stop line."
+    }
+  },
+  {
+    "id": "q-relx-3",
+    "concepts": [
+      "geometry-relaxation"
+    ],
+    "type": "single",
+    "prompt": "An ISIF = 3 relaxation reports \"reached required accuracy\", but the volume changed by several percent. Why copy CONTCAR to POSCAR and run again?",
+    "options": [
+      {
+        "text": "VASP kept the plane-wave basis of the starting volume, so the new cell carries Pulay stress; rerun until it converges in 1 to 3 steps",
+        "correct": true,
+        "why": "The basis is set up at the start of a run; after a large volume change it no longer matches the cutoff, and the rerun rebuilds it."
+      },
+      {
+        "text": "CONTCAR only becomes a valid structure after a rerun",
+        "correct": false,
+        "why": "CONTCAR is a valid POSCAR at every step; the issue is the basis, not the file."
+      },
+      {
+        "text": "The first run did not compute forces on its last step",
+        "correct": false,
+        "why": "Forces and stress are computed at every ionic step."
+      },
+      {
+        "text": "A rerun refines the k-mesh automatically",
+        "correct": false,
+        "why": "The k-mesh comes from KPOINTS or KSPACING and does not change between runs on its own."
+      }
+    ],
+    "hints": [
+      "What stays fixed in VASP during one run while the cell changes?",
+      "What is Pulay stress caused by?"
+    ],
+    "difficulty": 0.3,
+    "level": "intermediate",
+    "sources": [
+      "S-040",
+      "S-041",
+      "S-042",
+      "S-019"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Relax with ISIF = 3"
+          },
+          {
+            "label": "Copy CONTCAR to POSCAR"
+          },
+          {
+            "label": "Relax again"
+          },
+          {
+            "label": "Static run on the final structure"
+          }
+        ],
+        "active": 2
+      },
+      "caption": "The relax and rerun loop of the Workflow Handbook.",
+      "alt": "A four-step flow: relax the cell, copy CONTCAR to POSCAR, relax again, then a static run; the second relaxation is highlighted."
+    }
+  },
+  {
+    "id": "q-relx-4",
+    "concepts": [
+      "geometry-relaxation"
+    ],
+    "type": "single",
+    "prompt": "You relax a perfectly cubic perovskite whose true ground state has tilted octahedra. The run ends with near-zero forces and a cubic cell. What happened?",
+    "options": [
+      {
+        "text": "By symmetry the forces that would tilt the octahedra are exactly zero, so it stopped on a saddle point; rattle the atoms or lower the symmetry and relax again",
+        "correct": true,
+        "why": "VASP keeps the starting space group, and in a symmetric structure every force that would break the symmetry vanishes, even on top of an energy ridge."
+      },
+      {
+        "text": "Zero forces prove that the cubic structure is the ground state",
+        "correct": false,
+        "why": "Forces vanish at every stationary point: minima, maxima and saddle points alike."
+      },
+      {
+        "text": "EDIFFG was too tight",
+        "correct": false,
+        "why": "A tighter criterion only stops closer to the stationary point; it does not create symmetry."
+      },
+      {
+        "text": "ISIF = 3 forbids tilts",
+        "correct": false,
+        "why": "ISIF chooses whether the cell may change; it does not remove degrees of freedom of the ions."
+      }
+    ],
+    "hints": [
+      "Can a force that breaks a symmetry appear in a perfectly symmetric structure?",
+      "Are minima the only places where forces vanish?"
+    ],
+    "difficulty": 0.8,
+    "level": "intermediate",
+    "sources": [
+      "S-041",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "A cubic perovskite cell with its TiO6 octahedron.",
+      "alt": "Strontium at the cube corners and a titanium atom at the centre inside an untilted octahedron of six oxygen atoms."
+    }
+  },
+  {
+    "id": "q-relx-5",
+    "concepts": [
+      "geometry-relaxation"
+    ],
+    "type": "numeric",
+    "prompt": "Moving one atom by +0.01 angstrom along x, with every other atom fixed, raises the total energy by 0.02 eV. What is the x-component of the force on that atom, in eV per angstrom?",
+    "answer": -2,
+    "tolerance": 0.1,
+    "unit": "eV/A",
+    "hints": [
+      "The force is minus the slope of the energy.",
+      "The slope is the energy change divided by the displacement."
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-049"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Move one atom a small distance along x"
+          },
+          {
+            "label": "Record the change in total energy"
+          },
+          {
+            "label": "Turn the change into a force"
+          }
+        ],
+        "active": -1
+      },
+      "caption": "Estimating a force from two energies.",
+      "alt": "A three-step flow: move one atom, record the energy change, turn it into a force."
+    }
   }
 ]

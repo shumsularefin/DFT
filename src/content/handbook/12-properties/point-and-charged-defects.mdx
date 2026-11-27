@@ -1,0 +1,171 @@
+---
+id: point-and-charged-defects
+title: Point and charged defects
+module: 12
+order: 9
+summary: Vacancies, interstitials, substitutions and antisites in a supercell, the formation energy with chemical potentials and the Fermi level, charge states through NELECT, finite-size corrections, transition levels and the formation-energy diagram.
+concepts: [point-defects]
+requires: [geometry-relaxation, fermi-level]
+vaspTags: [NELECT, ISPIN, ISIF, LVHAR]
+sources: [S-019, S-025, S-041, S-042, S-067, S-106, S-107, S-108, S-111, S-114, S-115]
+noLab: true
+status: draft
+updated: 2026-11-27
+---
+
+<Why>
+
+Real crystals are never perfect. A missing atom, an extra one squeezed in or a wrong atom on a site can decide whether a semiconductor conducts, whether an oxide catalyses a reaction, or whether a battery material lets ions through. These <Term id="point-defect">point defects</Term> are often charged, and their concentration depends on the growth conditions and on the position of the Fermi level. DFT gives their formation energies and the Fermi levels at which they change charge, but only if the supercell, the reference energies and the electrostatics are handled with care. Defect calculations are where small bookkeeping errors become errors of an eV <Cite id="S-067" />.
+
+</Why>
+
+<Intuition>
+
+**The kinds of defect.** A <Term id="vacancy">vacancy</Term> is a missing atom. An <Term id="interstitial">interstitial</Term> is an extra atom between the regular sites. A substitution puts a foreign atom on a host site (a dopant). An <Term id="antisite-defect">antisite</Term> swaps the two kinds of host atom, such as Ga on an As site in GaAs <Cite id="S-067" />.
+
+**One defect in a big box.** A plane-wave code needs periodicity, so the defect sits in a <Term id="supercell">supercell</Term>, a block of several bulk cells, and is repeated with it. Each defect then sees copies of itself: their strain fields overlap, their wavefunctions can overlap and, if the defect is charged, their charges interact. Bigger supercells reduce all three, at a steep price in cost. For a neutral defect the error falls quickly with size; for a charged one the electrostatic part falls only as one over the supercell size, which is why charged defects need corrections <Cite id="S-106" />.
+
+**Where the atoms go.** Creating a vacancy removes an atom; it goes to a reservoir, such as a gas of O2 or a piece of the pure metal. How costly that is depends on the reservoir's <Term id="chemical-potential">chemical potential</Term>: removing oxygen is cheap when the surroundings are oxygen-poor and expensive when they are oxygen-rich <Cite id="S-111" />.
+
+**Where the electrons go.** A <Term id="charge-state">charged defect</Term> has given electrons to, or taken them from, a reservoir at the Fermi level. A donor that gives away two electrons costs less the lower the Fermi level sits, because the electrons drop further. So the formation energy of a charged defect is a straight line against the Fermi level, with a slope equal to its charge.
+
+**Transition levels.** At each Fermi level the stable charge state is the one with the lowest formation energy. Where two lines cross is a <Term id="charge-transition-level">charge transition level</Term>: the Fermi level at which the defect changes charge. Deep levels in the middle of the gap trap carriers; shallow levels near the band edges make a material conduct <Cite id="S-115" />.
+
+</Intuition>
+
+<TheMath>
+
+The <Term id="defect-formation-energy">formation energy</Term> of defect $X$ in charge state $q$ is <Cite id="S-067" />:
+
+$$E_f[X^q] = E_{\text{tot}}[X^q] - E_{\text{tot}}[\text{bulk}] - \sum_i n_i\,\mu_i + q\,(E_F + E_{\text{VBM}}) + E_{\text{corr}}.$$
+
+Read it term by term: the energy of the supercell with the defect, minus the perfect supercell; minus the energy of the atoms added ($n_i > 0$) or plus the energy of the atoms removed ($n_i < 0$), each at its chemical potential $\mu_i$; plus the energy of the $q$ electrons moved to the Fermi level $E_F$, measured from the valence band maximum $E_{\text{VBM}}$; plus a correction for the finite supercell.
+
+<Level min="intermediate">
+
+**Chemical-potential limits.** Write $\mu_i = \mu_i^0 + \Delta\mu_i$, with $\mu_i^0$ the energy per atom of the element in its standard phase. Three conditions bound the $\Delta\mu_i$ <Cite id="S-111" /> <Cite id="S-115" />: $\Delta\mu_i \le 0$ (otherwise the pure element would precipitate); for a host such as an oxide MO, $\Delta\mu_{\text{M}} + \Delta\mu_{\text{O}} = \Delta H_f(\text{MO})$ (the host is in equilibrium with the reservoirs); and no competing phase may become more stable. For MO this gives the O-rich limit $\Delta\mu_{\text{O}} = 0$ and the O-poor limit $\Delta\mu_{\text{O}} = \Delta H_f(\text{MO})$. Report formation energies at both limits.
+
+**Transition levels.** With $E_f(q; E_F)$ the formation energy at Fermi level $E_F$, the level between charges $q$ and $q'$ is the Fermi level at which they are equal <Cite id="S-115" />:
+
+$$\varepsilon(q/q') = \frac{E_f(q; E_F = 0) - E_f(q'; E_F = 0)}{q' - q}.$$
+
+**Potential alignment.** In a periodic cell the average electrostatic potential is set to zero by convention. A charged defect shifts the potential of the whole cell, so the band edges of the defect cell are not on the same scale as those of the bulk. Comparing the potential far from the defect with the same region in bulk gives the shift $\Delta V$, and the term $q\,\Delta V$ goes into $E_{\text{corr}}$ <Cite id="S-114" /> <Cite id="S-067" />.
+
+</Level>
+
+<Level min="pro">
+
+**Finite-size corrections.** Makov and Payne showed that a point charge $q$ in a cubic supercell of edge $L$, embedded in a medium of dielectric constant $\varepsilon$ with a neutralizing background, has a spurious energy whose leading term is <Cite id="S-106" />
+
+$$E_{\text{MP}} = \frac{q^2 \alpha_M}{2\varepsilon L}\cdot\frac{e^2}{4\pi\varepsilon_0},$$
+
+with $\alpha_M$ the Madelung constant of the supercell lattice (about 2.84 for simple cubic) and $e^2/4\pi\varepsilon_0 = 14.40$ eV angstrom. The next term falls as $1/L^3$. Freysoldt, Neugebauer and Van de Walle replace the point charge with a model charge, compute its periodic energy exactly and add the potential alignment from the planar-averaged potential <Cite id="S-107" />. Kumagai and Oba extend this to anisotropic dielectric tensors and take the alignment from the potentials at atomic sites far from the defect <Cite id="S-108" />. Use the dielectric constant that includes the ionic response when the ions are allowed to relax.
+
+**The band gap.** Semilocal functionals underestimate the gap, so transition levels close to the conduction band can fall outside the computed gap. Hybrid functionals are the usual remedy for defect levels <Cite id="S-025" /> <Cite id="S-042" />.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+- **Build the supercell first.** Relax the bulk, then build the supercell from it and keep its lattice fixed. This site's Material Builder makes a defect supercell whose images are at least 10 angstrom apart, a convention and a starting point, not a converged size; it also makes a vacancy or a substitution on any site you pick. The defect code (`src/lib/crystal/defects.ts`) computes the neutral formation energy $E_{\text{defect}} - E_{\text{bulk}} - \sum_i n_i\mu_i$ and says in every result that the charge and correction terms are not included <Cite id="S-067" />.
+- **Same settings everywhere.** The bulk supercell and every defect supercell need the same `ENCUT`, k-mesh, PAW set and functional; otherwise the subtraction is meaningless <Cite id="S-042" />.
+- **Relax the defect.** `ISIF = 2`: the atoms move, the host cell stays at the bulk lattice <Cite id="S-042" />. The neighbors of a vacancy can move noticeably, and the energy gained by that relaxation is part of the formation energy.
+- **Charge states.** Set `NELECT` to the neutral electron count minus $q$. Read the neutral value from the `OUTCAR` of a neutral run (`grep NELECT OUTCAR`); a $+2$ defect has two electrons fewer <Cite id="S-042" /> <Cite id="S-019" />. VASP adds a uniform compensating background for a charged cell.
+- **Spin.** A defect with an odd number of electrons, or with partly filled localized levels, needs `ISPIN = 2` and a starting moment. Check the final magnetization; a moment of zero may also be right <Cite id="S-041" />.
+- **Symmetry breaking.** Defects often distort below the symmetry of the site (Jahn-Teller and similar). Rattle the neighbors slightly or set `ISYM = 0` so the relaxation can find the distortion <Cite id="S-041" />.
+- **Potentials for the alignment.** `LVHAR = .TRUE.` writes the electrostatic potential to `LOCPOT` for the bulk and every charged cell; correction codes read these files <Cite id="S-019" />.
+
+A charged vacancy in a supercell, relaxed in a fixed cell (the electron count is an example; take yours from the neutral run):
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM = vacancy 2+ in supercell
+PREC   = Accurate
+ENCUT  = 520
+EDIFF  = 1E-6
+ISMEAR = 0
+SIGMA  = 0.05
+ISPIN  = 2
+NELECT = 862
+IBRION = 2
+ISIF   = 2
+NSW    = 150
+EDIFFG = -0.02
+LREAL  = Auto
+LVHAR  = .TRUE.
+LORBIT = 11`}
+  annotations={{
+    3: 'identical to the bulk supercell run',
+    7: 'check whether the defect keeps a moment',
+    8: 'neutral value 864 minus q = 2',
+    10: 'atoms relax, the host cell stays fixed',
+    14: 'electrostatic potential for the alignment',
+  }}
+/>
+
+**The workflow.** (1) Relax the bulk and compute the bulk supercell. (2) For each defect and each plausible charge, relax and compute the total energy. (3) Compute the reference energies $\mu_i^0$ and $\Delta H_f$ with the same settings. (4) Apply the finite-size correction and alignment. (5) Plot $E_f$ against $E_F$ from the VBM to the CBM at each chemical-potential limit. (6) Repeat in a larger supercell to check convergence <Cite id="S-067" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...          | ...the formation energy...              | ...and why                                  |
+| ------------------------- | --------------------------------------- | ------------------------------------------- |
+| O-rich to O-poor          | Of an O vacancy goes down               | Removed O goes to a cheaper reservoir       |
+| $E_F$ up by 1 eV          | Changes by $q$ eV                       | The $q E_F$ term                            |
+| Supercell edge doubled    | Leading charged error halves            | It falls as $1/L$                           |
+| No finite-size correction | Charged states come out too high or low | Image interaction and alignment are missing |
+| No relaxation             | Too high                                | The lattice cannot respond to the defect    |
+| A semilocal functional    | Levels squeezed in a too-small gap      | The band-gap problem                        |
+
+Why each term: every term is an energy that really changes when the defect forms. What happens if you skip one: an error of tenths of an eV to more than an eV, enough to swap which defect dominates.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Forgetting the chemical potentials">
+
+$E_{\text{defect}} - E_{\text{bulk}}$ alone is not a formation energy: the removed or added atoms must go somewhere. State the conditions (rich or poor) for every number you report <Cite id="S-111" />.
+
+</Callout>
+
+<Callout variant="mistake" title="The wrong sign or count in NELECT">
+
+A positive charge means fewer electrons. Read the neutral `NELECT` from `OUTCAR` and subtract $q$; never guess it from the valence count of the free atoms.
+
+</Callout>
+
+<Callout variant="mistake" title="Charged energies without a correction or alignment">
+
+The image interaction and the potential offset can each reach tenths of an eV in a small cell (put numbers into the Makov-Payne term to see). Apply a correction and test it in a larger supercell <Cite id="S-107" /> <Cite id="S-114" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Different settings for bulk and defect">
+
+A different k-mesh, cutoff or PAW set between the two supercells puts a constant error into every formation energy <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Keeping the perfect-site symmetry">
+
+A vacancy relaxed in full symmetry can miss a lower, distorted state. Break the symmetry and compare <Cite id="S-041" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-pdef-1', 'q-pdef-2', 'q-pdef-3', 'q-pdef-4', 'q-pdef-5']} />
+
+<GoDeeper>
+
+- Freysoldt and co-workers, the standard review of defect calculations <Cite id="S-067" />.
+- Van de Walle and Neugebauer on formation energies and transition levels <Cite id="S-115" />; Zhang and Northrup on chemical potentials <Cite id="S-111" />.
+- Makov and Payne <Cite id="S-106" />, Freysoldt, Neugebauer and Van de Walle <Cite id="S-107" />, Kumagai and Oba <Cite id="S-108" />, and Lany and Zunger <Cite id="S-114" /> on finite-size corrections.
+- VASP wiki pages NELECT and LVHAR (by page name) <Cite id="S-019" />.
+- The [surfaces and slabs topic](/handbook/12-properties/surfaces-and-slabs/) for chemical potentials in surface energies.
+
+</GoDeeper>

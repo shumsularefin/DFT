@@ -1,0 +1,173 @@
+---
+id: crystal-structure-and-symmetry
+title: Crystal structure and symmetry
+module: 5
+order: 0
+summary: Lattice and basis, primitive and conventional cells, the 14 Bravais lattices, fractional coordinates, symmetry operations and space groups, and why symmetry cuts the number of k-points VASP has to compute.
+concepts: [crystal-symmetry]
+requires: [materials-from-atoms]
+vaspTags: [ISYM, SYMPREC]
+sources: [S-007, S-019, S-032, S-036, S-041, S-042, S-050, S-105]
+noLab: true
+status: draft
+updated: 2026-11-27
+---
+
+<Why>
+
+Every periodic DFT calculation starts from three lattice vectors and a list of atoms. Before VASP solves a single equation it works out the symmetry of that description, and the symmetry decides how many k-points are computed, which atoms count as equivalent and which distortions a relaxation can find. A structure a thousandth of an angstrom off its ideal positions can make VASP see a lower symmetry, compute far more k-points, or stop with a symmetry error <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+**Lattice plus basis.** A crystal is a <Term id="bravais-lattice">lattice</Term> (an endless grid of points from which the view is identical) plus a <Term id="crystal-basis">basis</Term> (the atoms attached to every point). Rock salt is a face-centred cubic lattice with a basis of one Na and one Cl. Silicon is the same face-centred cubic lattice with a basis of two Si atoms <Cite id="S-036" />.
+
+**Three kinds of cell.** A <Term id="unit-cell">unit cell</Term> is any box that fills space when copied by the lattice translations. The <Term id="primitive-cell">primitive cell</Term> is the smallest one, with exactly one lattice point; for rock salt it holds 2 atoms. The <Term id="conventional-cell">conventional cell</Term> is a larger box chosen so that its edges follow the symmetry axes; for face-centred cubic it is the familiar cube, with 4 lattice points and 8 atoms of rock salt <Cite id="S-036" />. VASP accepts either, but four times the atoms means four times the bands in a cell four times as large, so the primitive cell is much cheaper <Cite id="S-042" />.
+
+**Seven systems, fourteen lattices.** Sort lattices by the shape of the cell and you get seven crystal systems. Add the ways to centre extra points (on the body, on all faces, on one pair of faces) and you get the 14 Bravais lattices <Cite id="S-036" /> <Cite id="S-050" />:
+
+| Crystal system | Cell shape                                               | Bravais lattices                         |
+| -------------- | -------------------------------------------------------- | ---------------------------------------- |
+| Triclinic      | No conditions on edges or angles                         | Primitive                                |
+| Monoclinic     | One angle not 90 degrees                                 | Primitive, base-centred                  |
+| Orthorhombic   | Three unequal edges, all angles 90 degrees               | Primitive, base-, body- and face-centred |
+| Tetragonal     | Two equal edges, all angles 90 degrees                   | Primitive, body-centred                  |
+| Trigonal       | Three-fold axis (rhombohedral cell)                      | Rhombohedral                             |
+| Hexagonal      | Two equal edges at 120 degrees, third edge at 90 degrees | Primitive                                |
+| Cubic          | Three equal edges, all angles 90 degrees                 | Primitive, body-centred, face-centred    |
+
+That is 1 + 2 + 4 + 2 + 1 + 1 + 3 = 14. (Some trigonal crystals sit on the hexagonal lattice, which is why the two systems are often discussed together.)
+
+**Fractional and Cartesian coordinates.** <Term id="fractional-coordinates">Fractional coordinates</Term> say where an atom sits as fractions of the three lattice vectors: (0.5, 0.5, 0.5) is the middle of the cell, whatever its shape. Cartesian coordinates are plain angstroms along x, y and z. POSCAR calls them `Direct` and `Cartesian` <Cite id="S-041" />. Symmetric positions are simple fractions.
+
+**Symmetry operations.** A <Term id="symmetry-operation">symmetry operation</Term> moves the crystal onto itself: rotations by 360/n degrees (n = 2, 3, 4 or 6, never 5), mirror planes, inversion through a point, rotoinversions (rotate, then invert), screw axes (rotate, then slide along the axis by a fraction of a lattice vector) and glide planes (mirror, then slide parallel to the plane) <Cite id="S-105" />.
+
+**Point groups, space groups, Wyckoff positions.** The rotations, mirrors and inversions that leave one point fixed form a <Term id="point-group">point group</Term>; crystals have 32 of them. Add the translations, screws and glides and you get the <Term id="space-group">space group</Term>; there are 230 <Cite id="S-105" />. A <Term id="wyckoff-position">Wyckoff position</Term> is a set of sites that the space group maps onto each other, labelled by a multiplicity and a letter.
+
+**Reading a symbol.** The Hermann-Mauguin symbol starts with the centring letter (P primitive, I body-centred, F face-centred, C base-centred, R rhombohedral) and then lists the symmetry along the main directions <Cite id="S-105" />:
+
+- Cubic SrTiO3 is $Pm\bar{3}m$ (number 221), written `Pm-3m`: primitive, mirrors normal to the cube axes, a three-fold rotoinversion along the body diagonals, mirrors normal to the face diagonals. With Sr at the corner, Sr sits on Wyckoff 1a (0, 0, 0), Ti on 1b (1/2, 1/2, 1/2) and the three O on 3c, the face centres.
+- Rock salt NaCl is $Fm\bar{3}m$ (number 225), `Fm-3m`: the same point symmetry on a face-centred lattice. Na is on 4a (0, 0, 0) and Cl on 4b (1/2, 1/2, 1/2) of the conventional cube.
+- Silicon is $Fd\bar{3}m$ (number 227): the d is a diamond glide.
+
+</Intuition>
+
+<TheMath>
+
+An atom with fractional coordinates $(f_1, f_2, f_3)$ sits at the Cartesian position $\mathbf{r} = f_1\mathbf{a}_1 + f_2\mathbf{a}_2 + f_3\mathbf{a}_3$, where $\mathbf{a}_1, \mathbf{a}_2, \mathbf{a}_3$ are the lattice vectors. The cell volume is $V = \mathbf{a}_1 \cdot (\mathbf{a}_2 \times \mathbf{a}_3)$. Every lattice point is $\mathbf{R} = n_1\mathbf{a}_1 + n_2\mathbf{a}_2 + n_3\mathbf{a}_3$ with whole numbers $n_i$ <Cite id="S-036" />.
+
+For face-centred cubic with cube edge $a$, the primitive vectors are $\tfrac{a}{2}(0,1,1)$, $\tfrac{a}{2}(1,0,1)$ and $\tfrac{a}{2}(1,1,0)$, and the primitive volume is $a^3/4$: one quarter of the cube, as four lattice points share the cube <Cite id="S-036" />.
+
+<Level min="intermediate">
+
+**Operations as matrices.** In fractional coordinates a space-group operation is a pair $(W, \mathbf{w})$ that sends $\mathbf{f} \to W\mathbf{f} + \mathbf{w}$. $W$ is a 3 by 3 matrix of whole numbers (it must map lattice points to lattice points) and $\mathbf{w}$ is a translation: zero or a whole lattice vector for a plain rotation, a fraction such as 1/2 or 1/4 for a screw or a glide <Cite id="S-105" />.
+
+**Why only 1, 2, 3, 4 and 6-fold axes.** The trace of a matrix does not depend on the basis. In fractional coordinates the trace of $W$ is a whole number; in Cartesian coordinates a rotation by $\theta$ has trace $1 + 2\cos\theta$. So $2\cos\theta$ must be a whole number, which allows only $\theta$ = 360, 180, 120, 90 and 60 degrees. A five-fold axis would need $2\cos 72^\circ \approx 0.618$ <Cite id="S-036" />.
+
+**Bloch periodicity and the k-point saving.** Bloch's theorem says each Kohn-Sham state obeys $\psi_{n\mathbf{k}}(\mathbf{r} + \mathbf{R}) = e^{i\mathbf{k}\cdot\mathbf{R}}\psi_{n\mathbf{k}}(\mathbf{r})$. If $R$ is a rotation of the point group, the band energies obey $\varepsilon_n(R\mathbf{k}) = \varepsilon_n(\mathbf{k})$, and time reversal adds $\varepsilon_n(-\mathbf{k}) = \varepsilon_n(\mathbf{k})$ when there is no magnetism and no spin-orbit coupling <Cite id="S-036" />. So VASP keeps only one point from each set of equivalent points, the <Term id="irreducible-brillouin-zone">irreducible</Term> ones, and gives each a weight equal to the size of its set divided by the total <Cite id="S-007" />.
+
+A count you can check by hand: a 4 by 4 by 4 Gamma-centred mesh on a simple cubic cell has 64 points, with coordinates 0, 1/4, 1/2 and -1/4 along each axis. The 48 operations of the full cubic group include every sign change and every swap of the axes, so a point is fixed by the unordered triple of values taken from 0, 1/4 and 1/2. There are 10 such triples, so 64 points become 10.
+
+</Level>
+
+<Level min="pro">
+
+**Origin choices.** Some groups are tabulated with two origins. For $Fd\bar{3}m$, Si is on 8a at (0, 0, 0) in origin choice 1 and at (1/8, 1/8, 1/8) in origin choice 2. Both describe the same crystal; mixing them in one file does not <Cite id="S-105" />.
+
+**Tolerances.** Symmetry finders compare positions within a distance tolerance. VASP's `SYMPREC` is that tolerance in angstrom, default 1E-5 <Cite id="S-019" />. This site's analysis uses moyo, the successor of spglib, with a default of 1E-4 angstrom <Cite id="S-032" />. Two codes with different tolerances can report different groups for the same slightly noisy file.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+- **What VASP does with your POSCAR.** It finds the space group from the lattice, the positions and `MAGMOM`, and writes the irreducible k-points with their weights to `IBZKPT`. `OUTCAR` lists the groups it found (`grep -i symmetry OUTCAR | head`): compare them with what you built, and if it found less, look for a distorted file, a `MAGMOM` pattern or the wrong cell <Cite id="S-041" />.
+- **`ISYM`.** `2` is the default with PAW (`3` with hybrids): full symmetry, k-points reduced, densities symmetrised. `0` drops the space-group symmetry but keeps time reversal, so k and -k are still merged. `-1` switches off all symmetry and uses the full mesh <Cite id="S-041" />.
+- **`SYMPREC`.** The position tolerance, default 1E-5 angstrom <Cite id="S-019" />. Raise it to 1E-4 or 1E-3 only to fix a symmetry error <Cite id="S-042" />.
+- **Symmetry errors.** The Workflow Handbook lists three messages <Cite id="S-042" />: `inverse of rotation matrix was not found (increase SYMPREC)` and `internal error in subroutine SGRCON` mean the positions are slightly off symmetric sites, so symmetrise the structure or raise `SYMPREC`; `PRICEL: found a more primitive cell` means your cell is a supercell of a smaller one, so use the primitive cell unless the supercell is deliberate.
+- **Tools.** This site's symmetry readout uses moyo <Cite id="S-032" />; VASPKIT task 608 summarises the symmetry of a `CONTCAR` <Cite id="S-042" />.
+
+A static run on the primitive rock-salt cell, with the symmetry tags written out so that you can see them:
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM  = NaCl primitive cell, static
+PREC    = Accurate
+ENCUT   = 520
+EDIFF   = 1E-6
+ISMEAR  = 0
+SIGMA   = 0.05
+NSW     = 0
+IBRION  = -1
+ISYM    = 2
+SYMPREC = 1E-5
+LWAVE   = .FALSE.
+LCHARG  = .TRUE.`}
+  annotations={{
+    3: 'use the value from your own cutoff test',
+    5: 'Gaussian smearing with a small width suits an insulator',
+    9: 'the default with PAW, written out',
+    10: 'the default tolerance in angstrom',
+  }}
+/>
+
+Use a Gamma-centred mesh for hexagonal and trigonal cells so it keeps their symmetry (see [k-points and the Brillouin zone](/handbook/05-practical-choices/kpoints-and-the-brillouin-zone/)) <Cite id="S-041" />.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...                           | ...VASP sees...                   | ...and the run                                            |
+| ------------------------------------------ | --------------------------------- | --------------------------------------------------------- |
+| Conventional cell instead of primitive     | The same space group, more atoms  | More bands and a bigger basis: several times slower       |
+| Atoms moved 0.001 angstrom off their sites | A lower symmetry, or an error     | More k-points, or a stop at the symmetry search           |
+| `ISYM = 0`                                 | Only time reversal                | About half the full mesh; symmetry can break freely       |
+| `ISYM = -1`                                | No symmetry at all                | The full mesh; the slowest choice                         |
+| An antiferromagnetic `MAGMOM`              | A lower symmetry                  | More k-points, as expected for the magnetic cell          |
+| `SYMPREC` from 1E-5 to 1E-3                | Near-symmetric positions as exact | The search succeeds; check the group is the one you meant |
+
+Why care: symmetry is free speed when it is right and a silent error when it is wrong. What happens if you skip the check: you compute a lower-symmetry crystal than you think, or stop on an avoidable error.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Running the conventional cell when the primitive one would do">
+
+The face-centred cube holds four primitive cells. Unless the task needs the larger cell (a defect or a magnetic order), use the primitive one <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Positions that are almost symmetric">
+
+Noise in the fifth decimal makes VASP find a lower group or stop with a symmetry error. Symmetrise the structure first <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Thinking ISYM = 0 switches off all symmetry">
+
+`ISYM = 0` still merges k and -k. Only `ISYM = -1` gives the full, unreduced mesh <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Mixing origin choices">
+
+A position copied from one origin setting of $Fd\bar{3}m$ into a file written in the other puts the atom in the wrong place. Check which origin a table or CIF uses <Cite id="S-105" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-xsym-1', 'q-xsym-2', 'q-xsym-3', 'q-xsym-4', 'q-xsym-5']} />
+
+<GoDeeper>
+
+- International Tables for Crystallography, Volume A, for every space group, its symbol, its Wyckoff positions and its origin choices <Cite id="S-105" />.
+- Ashcroft and Mermin, chapters 4 and 7, on Bravais lattices and their classification <Cite id="S-036" />; Kittel, chapter 1 <Cite id="S-050" />.
+- Togo and co-workers on spglib, and moyo, the code this site uses <Cite id="S-032" />.
+- VASP wiki pages ISYM and SYMPREC (by page name) <Cite id="S-019" />.
+- The [POSCAR topic](/handbook/06-vasp-files/poscar/) for how the lattice and positions are written.
+
+</GoDeeper>
