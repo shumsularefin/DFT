@@ -9,7 +9,7 @@
   "scripts": {
     "predev": "node scripts/build/build-commands.mjs",
     "dev": "astro dev",
-    "build": "node scripts/build/sources-to-json.mjs && node scripts/build/build-commands.mjs && astro build && node scripts/build/postbuild.mjs",
+    "build": "node scripts/build/sources-to-json.mjs && node scripts/build/build-tag-pages.mjs && node scripts/build/build-commands.mjs && astro build && node scripts/build/postbuild.mjs",
     "preview": "astro preview",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
