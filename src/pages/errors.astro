@@ -8,13 +8,78 @@ import ErrorFinder from '../components/tools/errors/ErrorFinder';
   description="Paste a VASP error message or describe a symptom and see likely causes and fixes. Runs in your browser; nothing is uploaded."
   pageClass="tool"
 >
-  <div class="container">
-    <h1>Error finder</h1>
-    <p>
-      Paste the last lines of your VASP screen log, or describe the problem in a few words. You get the likely
-      causes and the fixes to try, in order. The entries come from the author's Field Handbook and Workflow
-      Handbook.
-    </p>
+  <div class="container ef-page">
+    <header class="page-h tool-head">
+      <div>
+        <h1>Error finder</h1>
+        <p>
+          Paste the last lines of your VASP screen log, or describe the problem in a few words. You get the
+          likely causes and the fixes to try, in order. The entries come from the author's Field Handbook and
+          Workflow Handbook.
+        </p>
+      </div>
+    </header>
     <ErrorFinder headingLevel={2} client:load />
   </div>
 </BaseLayout>
+
+<style is:global>
+  /* Template tool view for the standalone page only: the input card on the left, matches and the browse
+     list on the right. The embedded finder in the handbook keeps its single column. */
+  .ef-page .ef {
+    grid-template-columns: 18.75rem minmax(0, 1fr);
+    align-items: start;
+  }
+  .ef-page .ef-input {
+    grid-row: span 2;
+    padding: var(--space-4);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
+  .ef-page .ef-input textarea {
+    background: var(--bg);
+  }
+  .ef-page .ef-results:empty {
+    display: none;
+  }
+  .ef-page .ef-results > .ef-card:first-of-type,
+  .ef-page .ef-results > .ef-count + .ef-card {
+    margin-top: var(--space-2);
+  }
+  .ef-page .ef-chip {
+    min-height: 1.75rem;
+    font-size: var(--step--1);
+    color: var(--text-muted);
+    border-color: var(--border);
+    border-radius: 999px;
+  }
+  .ef-page .ef-chip:hover {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+  .ef-page .ef-browse {
+    padding: var(--space-4);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
+  .ef-page .ef-browse > summary {
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .ef-page .ef-browse {
+    grid-column: 2;
+  }
+  @media (max-width: 70rem) {
+    .ef-page .ef {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .ef-page .ef-input {
+      grid-row: auto;
+    }
+    .ef-page .ef-browse {
+      grid-column: auto;
+    }
+  }
+</style>

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import Badge from '../../ui/Badge';
+import '../../../styles/tools.css';
 import { RECIPES, buildPlanZip, buildStepIncar, type Recipe } from '../../../lib/planner/plan';
 import { energyPerFormulaUnit, neutralFormationEnergy, surfaceEnergy } from '../../../lib/physics/surface';
 import { readStructure } from '../../../lib/crystal/io';
@@ -87,54 +88,31 @@ export default function PlannerTool() {
   }
 
   return (
-    <div
-      style={{ display: 'grid', gap: 'var(--space-5)', minWidth: 0, maxWidth: '100%' }}
-      data-tool-id="research-planner"
-    >
-      <div
-        role="note"
-        style={{
-          padding: 'var(--space-3)',
-          border: '1px solid var(--border-strong)',
-          borderRadius: 'var(--radius)',
-          background: 'var(--surface)',
-        }}
-      >
-        <strong>Starting protocol, not a guarantee:</strong> Every step below is traced to a registered source
-        in <a href="/references/">References</a>. This planner does not choose exchange-correlation
-        functionals or Hubbard U values for you; review{' '}
-        <a href="/handbook/05-practical-choices/functionals/">Functionals</a> and{' '}
-        <a href="/handbook/05-practical-choices/dft-plus-u/">DFT+U</a> before running production jobs.
-      </div>
-
-      <section
-        style={{
-          display: 'grid',
-          gap: 'var(--space-3)',
-          padding: 'var(--space-4)',
-          minWidth: 0,
-          maxWidth: '100%',
-          overflowX: 'auto',
-          border: '1px solid var(--border-strong)',
-          borderRadius: 'var(--radius)',
-          background: 'var(--surface)',
-        }}
-      >
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-4)', alignItems: 'end' }}>
-          <label style={{ display: 'grid', gap: '0.25rem' }}>
+    <div className="pl" data-tool-id="research-planner">
+      <header className="page-h tool-head">
+        <div>
+          <h1>Research Planner</h1>
+          <p>
+            Choose a calculation goal to generate a sourced, step-by-step VASP workflow with starter INCAR
+            files, carried-file instructions, a methods checklist, and a downloadable zip archive.
+          </p>
+        </div>
+        <div className="row">
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => downloadBytes(buildPlanZip(recipe, structure, enmax), `${recipe.id}-plan.zip`)}
+          >
+            Download workflow zip (PLAN.md + INCARs)
+          </button>
+        </div>
+      </header>
+      <div className="split left">
+        <div className="card tool-inputs pl-inputs">
+          <h2 className="card-h">Inputs</h2>
+          <label>
             <span>Research goal</span>
-            <select
-              style={{ maxWidth: '100%' }}
-              value={goalId}
-              onChange={(e) => setGoalId(e.target.value)}
-              style={{
-                padding: '0.45rem 0.65rem',
-                border: '1px solid var(--border-strong)',
-                borderRadius: 'var(--radius)',
-                background: 'var(--bg)',
-                color: 'var(--text)',
-              }}
-            >
+            <select value={goalId} onChange={(e) => setGoalId(e.target.value)}>
               {RECIPES.map((r) => (
                 <option key={r.id} value={r.id}>
                   {r.title}
@@ -142,8 +120,7 @@ export default function PlannerTool() {
               ))}
             </select>
           </label>
-
-          <label style={{ display: 'grid', gap: '0.25rem' }}>
+          <label>
             <span>Max POTCAR ENMAX (eV; 400 is a placeholder, read the largest ENMAX in your POTCAR)</span>
             <input
               type="number"
@@ -152,18 +129,9 @@ export default function PlannerTool() {
               step={10}
               value={enmax}
               onChange={(e) => setEnmax(Math.max(150, Number(e.target.value) || 400))}
-              style={{
-                width: '7rem',
-                padding: '0.45rem 0.65rem',
-                border: '1px solid var(--border-strong)',
-                borderRadius: 'var(--radius)',
-                background: 'var(--bg)',
-                color: 'var(--text)',
-              }}
             />
           </label>
-
-          <label style={{ display: 'grid', gap: '0.25rem' }}>
+          <label>
             <span>Optional POSCAR / CIF</span>
             <input
               type="file"
@@ -171,289 +139,296 @@ export default function PlannerTool() {
               onChange={(e) => void onUpload(e.target.files?.[0])}
             />
           </label>
-
-          <button
-            type="button"
-            onClick={() => downloadBytes(buildPlanZip(recipe, structure, enmax), `${recipe.id}-plan.zip`)}
-            style={{
-              padding: '0.5rem 0.9rem',
-              border: '1px solid var(--border-strong)',
-              borderRadius: 'var(--radius)',
-              background: 'var(--accent)',
-              color: 'var(--accent-contrast)',
-              cursor: 'pointer',
-              fontWeight: 600,
-            }}
-          >
-            Download workflow zip (PLAN.md + INCARs)
-          </button>
+          <p>
+            Structure: {structLabel} | Sources: {recipe.sources.join(', ')}
+          </p>
+          <div role="note" className="notice pl-note">
+            <strong>Starting protocol, not a guarantee:</strong> Every step below is traced to a registered
+            source in <a href="/references/">References</a>. This planner does not choose exchange-correlation
+            functionals or Hubbard U values for you; review{' '}
+            <a href="/handbook/05-practical-choices/functionals/">Functionals</a> and{' '}
+            <a href="/handbook/05-practical-choices/dft-plus-u/">DFT+U</a> before running production jobs.
+          </div>
         </div>
 
-        <p style={{ margin: 0, fontSize: 'var(--step--1)', color: 'var(--text-muted)' }}>
-          Structure: {structLabel} | Sources: {recipe.sources.join(', ')}
-        </p>
-        <p style={{ margin: 0 }}>{recipe.summary}</p>
-      </section>
+        <div className="stack tool-results">
+          <div className="grid g3 tool-tiles">
+            <div className="tile">
+              <div className="k">Workflow steps</div>
+              <div className="v">{recipe.steps.length}</div>
+              <div className="tile-sub">{recipe.title}</div>
+            </div>
+            <div className="tile">
+              <div className="k">Registered sources</div>
+              <div className="v">{recipe.sources.length}</div>
+              <div className="tile-sub">{recipe.sources.join(', ')}</div>
+            </div>
+            <div className="tile">
+              <div className="k">Max POTCAR ENMAX</div>
+              <div className="v">{enmax}</div>
+              <div className="tile-sub">eV, as entered (placeholder until you set it)</div>
+            </div>
+          </div>
 
-      <ol style={{ display: 'grid', gap: 'var(--space-3)', paddingLeft: '1.25rem', margin: 0 }}>
-        {recipe.steps.map((step) => {
-          const incar = buildStepIncar(step, enmax);
-          return (
-            <li
-              key={step.id}
+          <section className="card tool-card" aria-labelledby="pl-wf">
+            <h2 id="pl-wf" className="card-h">
+              Workflow
+            </h2>
+            <p>{recipe.summary}</p>
+            <ol className="pl-steps">
+              {recipe.steps.map((step) => {
+                const incar = buildStepIncar(step, enmax);
+                return (
+                  <li key={step.id} className="pl-step">
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: 'var(--space-2)',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <strong>{step.title}</strong>
+                      <Badge variant="verified" />
+                      <span style={{ fontSize: 'var(--step--1)', color: 'var(--text-muted)' }}>
+                        Preset: <code>{step.preset}</code> | Sources: {step.sources.join(', ')}
+                      </span>
+                    </div>
+                    {step.carries.length > 0 && (
+                      <p style={{ margin: '0.35rem 0 0', fontSize: 'var(--step--1)' }}>
+                        <strong>Carries forward:</strong> {step.carries.join(', ')}
+                      </p>
+                    )}
+                    <details style={{ marginTop: '0.5rem' }}>
+                      <summary style={{ cursor: 'pointer', fontWeight: 600 }}>
+                        Why this step, values, checks, pitfalls, and starter INCAR
+                      </summary>
+                      <div
+                        style={{
+                          display: 'grid',
+                          gap: '0.5rem',
+                          marginTop: '0.5rem',
+                          fontSize: 'var(--step--1)',
+                        }}
+                      >
+                        <p style={{ margin: 0 }}>
+                          <strong>Why this step:</strong> {step.whyStep}
+                        </p>
+                        <p style={{ margin: 0 }}>
+                          <strong>Why these values:</strong> {step.whyValues}
+                        </p>
+                        <p style={{ margin: 0 }}>
+                          <strong>What happens if you skip it:</strong> {step.ifSkipped}
+                        </p>
+                        <div>
+                          <strong>Checks:</strong>
+                          <ul style={{ margin: '0.25rem 0 0' }}>
+                            {step.checks.map((c, i) => (
+                              <li key={i}>{c}</li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div>
+                          <strong>Methods section checklist:</strong>
+                          <ul style={{ margin: '0.25rem 0 0' }}>
+                            {step.report.map((r, i) => (
+                              <li key={i}>{r}</li>
+                            ))}
+                          </ul>
+                        </div>
+                        {step.pitfalls.length > 0 && (
+                          <p style={{ margin: 0 }}>
+                            <strong>Pitfalls:</strong>{' '}
+                            {step.pitfalls.map((p, i) => (
+                              <span key={p}>
+                                {i > 0 ? ', ' : ''}
+                                <a href={`/errors/?q=${encodeURIComponent(p)}`}>{p}</a>
+                              </span>
+                            ))}
+                          </p>
+                        )}
+                        <pre
+                          style={{
+                            margin: 0,
+                            padding: '0.65rem',
+                            background: 'var(--bg)',
+                            border: '1px solid var(--border)',
+                            borderRadius: 'var(--radius)',
+                            overflowX: 'auto',
+                          }}
+                        >
+                          {incar.text}
+                        </pre>
+                      </div>
+                    </details>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
+
+          <section className="card tool-card pl-calc">
+            <h2 className="card-h">
+              Recipe calculators <Badge variant="computed" />
+            </h2>
+            <div
               style={{
-                padding: 'var(--space-3)',
-                border: '1px solid var(--border-strong)',
-                borderRadius: 'var(--radius)',
-                background: 'var(--surface)',
+                display: 'grid',
+                gap: 'var(--space-4)',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
               }}
             >
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', alignItems: 'center' }}>
-                <strong>{step.title}</strong>
-                <Badge variant="verified" />
-                <span style={{ fontSize: 'var(--step--1)', color: 'var(--text-muted)' }}>
-                  Preset: <code>{step.preset}</code> | Sources: {step.sources.join(', ')}
-                </span>
-              </div>
-              {step.carries.length > 0 && (
-                <p style={{ margin: '0.35rem 0 0', fontSize: 'var(--step--1)' }}>
-                  <strong>Carries forward:</strong> {step.carries.join(', ')}
-                </p>
-              )}
-              <details style={{ marginTop: '0.5rem' }}>
-                <summary style={{ cursor: 'pointer', fontWeight: 600 }}>
-                  Why this step, values, checks, pitfalls, and starter INCAR
-                </summary>
-                <div
-                  style={{ display: 'grid', gap: '0.5rem', marginTop: '0.5rem', fontSize: 'var(--step--1)' }}
-                >
-                  <p style={{ margin: 0 }}>
-                    <strong>Why this step:</strong> {step.whyStep}
-                  </p>
-                  <p style={{ margin: 0 }}>
-                    <strong>Why these values:</strong> {step.whyValues}
-                  </p>
-                  <p style={{ margin: 0 }}>
-                    <strong>What happens if you skip it:</strong> {step.ifSkipped}
-                  </p>
-                  <div>
-                    <strong>Checks:</strong>
-                    <ul style={{ margin: '0.25rem 0 0' }}>
-                      {step.checks.map((c, i) => (
-                        <li key={i}>{c}</li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <strong>Methods section checklist:</strong>
-                    <ul style={{ margin: '0.25rem 0 0' }}>
-                      {step.report.map((r, i) => (
-                        <li key={i}>{r}</li>
-                      ))}
-                    </ul>
-                  </div>
-                  {step.pitfalls.length > 0 && (
-                    <p style={{ margin: 0 }}>
-                      <strong>Pitfalls:</strong>{' '}
-                      {step.pitfalls.map((p, i) => (
-                        <span key={p}>
-                          {i > 0 ? ', ' : ''}
-                          <a href={`/errors/?q=${encodeURIComponent(p)}`}>{p}</a>
-                        </span>
-                      ))}
+              <div>
+                <h3 style={{ margin: '0 0 0.5rem', fontSize: 'var(--step-0)' }}>
+                  Symmetric slab surface energy (S-065)
+                </h3>
+                <div style={{ display: 'grid', gap: '0.35rem', fontSize: 'var(--step--1)' }}>
+                  <label>
+                    E_slab (eV):{' '}
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={eSlab}
+                      onChange={(e) => setESlab(Number(e.target.value))}
+                      style={{ width: '6rem' }}
+                    />
+                  </label>
+                  <label>
+                    E_bulk / unit (eV):{' '}
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={eBulk}
+                      onChange={(e) => setEBulk(Number(e.target.value))}
+                      style={{ width: '6rem' }}
+                    />
+                  </label>
+                  <label>
+                    N bulk units:{' '}
+                    <input
+                      type="number"
+                      min={1}
+                      step={1}
+                      value={nUnits}
+                      onChange={(e) => setNUnits(Number(e.target.value))}
+                      style={{ width: '5rem' }}
+                    />
+                  </label>
+                  <label>
+                    Area A (A^2):{' '}
+                    <input
+                      type="number"
+                      min={0.1}
+                      step="0.5"
+                      value={areaA2}
+                      onChange={(e) => setAreaA2(Number(e.target.value))}
+                      style={{ width: '6rem' }}
+                    />
+                  </label>
+                  {surfRes && (
+                    <p style={{ margin: '0.25rem 0 0', fontFamily: 'var(--font-mono)' }}>
+                      gamma = {surfRes.gammaEvPerA2.toFixed(4)} eV/A^2 ={' '}
+                      <strong>{surfRes.gammaJPerM2.toFixed(4)} J/m^2</strong>
                     </p>
                   )}
-                  <pre
-                    style={{
-                      margin: 0,
-                      padding: '0.65rem',
-                      background: 'var(--bg)',
-                      border: '1px solid var(--border-strong)',
-                      borderRadius: 'var(--radius)',
-                      overflowX: 'auto',
-                    }}
-                  >
-                    {incar.text}
-                  </pre>
                 </div>
-              </details>
-            </li>
-          );
-        })}
-      </ol>
+              </div>
 
-      <section
-        style={{
-          display: 'grid',
-          gap: 'var(--space-3)',
-          padding: 'var(--space-4)',
-          minWidth: 0,
-          maxWidth: '100%',
-          overflowX: 'auto',
-          border: '1px solid var(--border-strong)',
-          borderRadius: 'var(--radius)',
-          background: 'var(--surface)',
-        }}
-      >
-        <h2 style={{ margin: 0, fontSize: 'var(--step-1)' }}>
-          Recipe calculators <Badge variant="computed" />
-        </h2>
-        <div
-          style={{
-            display: 'grid',
-            gap: 'var(--space-4)',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          }}
-        >
-          <div>
-            <h3 style={{ margin: '0 0 0.5rem', fontSize: 'var(--step-0)' }}>
-              Symmetric slab surface energy (S-065)
-            </h3>
-            <div style={{ display: 'grid', gap: '0.35rem', fontSize: 'var(--step--1)' }}>
-              <label>
-                E_slab (eV):{' '}
-                <input
-                  type="number"
-                  step="0.1"
-                  value={eSlab}
-                  onChange={(e) => setESlab(Number(e.target.value))}
-                  style={{ width: '6rem' }}
-                />
-              </label>
-              <label>
-                E_bulk / unit (eV):{' '}
-                <input
-                  type="number"
-                  step="0.1"
-                  value={eBulk}
-                  onChange={(e) => setEBulk(Number(e.target.value))}
-                  style={{ width: '6rem' }}
-                />
-              </label>
-              <label>
-                N bulk units:{' '}
-                <input
-                  type="number"
-                  min={1}
-                  step={1}
-                  value={nUnits}
-                  onChange={(e) => setNUnits(Number(e.target.value))}
-                  style={{ width: '5rem' }}
-                />
-              </label>
-              <label>
-                Area A (A^2):{' '}
-                <input
-                  type="number"
-                  min={0.1}
-                  step="0.5"
-                  value={areaA2}
-                  onChange={(e) => setAreaA2(Number(e.target.value))}
-                  style={{ width: '6rem' }}
-                />
-              </label>
-              {surfRes && (
-                <p style={{ margin: '0.25rem 0 0', fontFamily: 'var(--font-mono)' }}>
-                  gamma = {surfRes.gammaEvPerA2.toFixed(4)} eV/A^2 ={' '}
-                  <strong>{surfRes.gammaJPerM2.toFixed(4)} J/m^2</strong>
-                </p>
-              )}
-            </div>
-          </div>
+              <div>
+                <h3 style={{ margin: '0 0 0.5rem', fontSize: 'var(--step-0)' }}>
+                  Formation enthalpy from elemental references (S-042)
+                </h3>
+                <div style={{ display: 'grid', gap: '0.35rem', fontSize: 'var(--step--1)' }}>
+                  <label>
+                    E_compound (eV):{' '}
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={eComp}
+                      onChange={(e) => setEComp(Number(e.target.value))}
+                      style={{ width: '6rem' }}
+                    />
+                  </label>
+                  <label>
+                    n_A / mu_A (eV):{' '}
+                    <input
+                      type="number"
+                      min={0}
+                      step={1}
+                      value={nA}
+                      onChange={(e) => setNA(Number(e.target.value))}
+                      style={{ width: '3.5rem' }}
+                    />{' '}
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={muA}
+                      onChange={(e) => setMuA(Number(e.target.value))}
+                      style={{ width: '5rem' }}
+                    />
+                  </label>
+                  <label>
+                    n_B / mu_B (eV):{' '}
+                    <input
+                      type="number"
+                      min={0}
+                      step={1}
+                      value={nB}
+                      onChange={(e) => setNB(Number(e.target.value))}
+                      style={{ width: '3.5rem' }}
+                    />{' '}
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={muB}
+                      onChange={(e) => setMuB(Number(e.target.value))}
+                      style={{ width: '5rem' }}
+                    />
+                  </label>
+                  <p style={{ margin: '0.25rem 0 0', fontFamily: 'var(--font-mono)' }}>
+                    E_f = {formRes.totalEv.toFixed(4)} eV (
+                    <strong>{formRes.perAtomEv.toFixed(4)} eV/atom</strong>)
+                  </p>
+                </div>
+              </div>
 
-          <div>
-            <h3 style={{ margin: '0 0 0.5rem', fontSize: 'var(--step-0)' }}>
-              Formation enthalpy from elemental references (S-042)
-            </h3>
-            <div style={{ display: 'grid', gap: '0.35rem', fontSize: 'var(--step--1)' }}>
-              <label>
-                E_compound (eV):{' '}
-                <input
-                  type="number"
-                  step="0.1"
-                  value={eComp}
-                  onChange={(e) => setEComp(Number(e.target.value))}
-                  style={{ width: '6rem' }}
-                />
-              </label>
-              <label>
-                n_A / mu_A (eV):{' '}
-                <input
-                  type="number"
-                  min={0}
-                  step={1}
-                  value={nA}
-                  onChange={(e) => setNA(Number(e.target.value))}
-                  style={{ width: '3.5rem' }}
-                />{' '}
-                <input
-                  type="number"
-                  step="0.1"
-                  value={muA}
-                  onChange={(e) => setMuA(Number(e.target.value))}
-                  style={{ width: '5rem' }}
-                />
-              </label>
-              <label>
-                n_B / mu_B (eV):{' '}
-                <input
-                  type="number"
-                  min={0}
-                  step={1}
-                  value={nB}
-                  onChange={(e) => setNB(Number(e.target.value))}
-                  style={{ width: '3.5rem' }}
-                />{' '}
-                <input
-                  type="number"
-                  step="0.1"
-                  value={muB}
-                  onChange={(e) => setMuB(Number(e.target.value))}
-                  style={{ width: '5rem' }}
-                />
-              </label>
-              <p style={{ margin: '0.25rem 0 0', fontFamily: 'var(--font-mono)' }}>
-                E_f = {formRes.totalEv.toFixed(4)} eV (<strong>{formRes.perAtomEv.toFixed(4)} eV/atom</strong>
-                )
-              </p>
+              <div>
+                <h3 style={{ margin: '0 0 0.5rem', fontSize: 'var(--step-0)' }}>
+                  Energy per formula unit (S-042)
+                </h3>
+                <div style={{ display: 'grid', gap: '0.35rem', fontSize: 'var(--step--1)' }}>
+                  <label>
+                    E_total (eV):{' '}
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={eTotalFu}
+                      onChange={(e) => setETotalFu(Number(e.target.value))}
+                      style={{ width: '6rem' }}
+                    />
+                  </label>
+                  <label>
+                    Z (formula units):{' '}
+                    <input
+                      type="number"
+                      min={1}
+                      step={1}
+                      value={zFu}
+                      onChange={(e) => setZFu(Number(e.target.value))}
+                      style={{ width: '5rem' }}
+                    />
+                  </label>
+                  {fuRes !== null && (
+                    <p style={{ margin: '0.25rem 0 0', fontFamily: 'var(--font-mono)' }}>
+                      E / Z = <strong>{fuRes.toFixed(4)} eV/f.u.</strong>
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
-
-          <div>
-            <h3 style={{ margin: '0 0 0.5rem', fontSize: 'var(--step-0)' }}>
-              Energy per formula unit (S-042)
-            </h3>
-            <div style={{ display: 'grid', gap: '0.35rem', fontSize: 'var(--step--1)' }}>
-              <label>
-                E_total (eV):{' '}
-                <input
-                  type="number"
-                  step="0.1"
-                  value={eTotalFu}
-                  onChange={(e) => setETotalFu(Number(e.target.value))}
-                  style={{ width: '6rem' }}
-                />
-              </label>
-              <label>
-                Z (formula units):{' '}
-                <input
-                  type="number"
-                  min={1}
-                  step={1}
-                  value={zFu}
-                  onChange={(e) => setZFu(Number(e.target.value))}
-                  style={{ width: '5rem' }}
-                />
-              </label>
-              {fuRes !== null && (
-                <p style={{ margin: '0.25rem 0 0', fontFamily: 'var(--font-mono)' }}>
-                  E / Z = <strong>{fuRes.toFixed(4)} eV/f.u.</strong>
-                </p>
-              )}
-            </div>
-          </div>
+          </section>
         </div>
-      </section>
+      </div>
     </div>
   );
 }

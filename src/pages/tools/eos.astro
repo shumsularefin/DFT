@@ -10,41 +10,49 @@ import EosTool from '../../components/tools/eos/EosTool';
   pageClass="tool"
 >
   <div class="container">
-    <h1>Equation of state fit</h1>
-    <p>
-      Squeeze and stretch a crystal, compute the energy at each volume, and fit a smooth curve through the
-      points. The bottom of the curve is the equilibrium volume. How sharply it curves tells you how hard the
-      crystal is to compress: the bulk modulus.
-    </p>
-    <details>
-      <summary>Why fit a curve instead of relaxing the cell?</summary>
-      <p>
-        A cell relaxation (ISIF = 3) follows the stress, and at a fixed plane-wave cutoff the stress carries
-        an error called Pulay stress, so it needs about 30 % more cutoff to converge. Each point of an
-        energy-volume curve is a run at one fixed volume, so the curve does not depend on the stress at all.
-        Use the same ENCUT and k-mesh at every volume, and relax ions (ISIF = 2 for cubic cells) or ions and
-        shape (ISIF = 4) at each one. The Input Builder's series step writes these folders for you.
-      </p>
-      <p>
-        Take 7 to 11 volumes spread over 5 to 10 % on both sides of the minimum. Too few points or a narrow
-        range make B0' unreliable; a minimum at the edge of the range means the scan has to be extended.
-      </p>
-    </details>
-    <details>
-      <summary>What the two forms are</summary>
-      <p>
-        Both forms describe E(V) with four numbers: the minimum energy E0, the equilibrium volume V0, the bulk
-        modulus B0 and its pressure derivative B0'. Third-order Birch-Murnaghan expands the energy in a finite
-        strain and is the usual default for solids. Murnaghan assumes B0' is constant with pressure; it works
-        well close to V0 and less well far from it. Both forms share E0, V0, B0 and B0' at the minimum and
-        differ only further away, so a large difference between the two fits means the scan reaches far from
-        V0.
-      </p>
-      <p>
-        The fit uses Levenberg-Marquardt least squares from a parabola start, the same recipe as pymatgen. The
-        units are converted with 1 eV/Å³ = 160.21766 GPa.
-      </p>
-    </details>
     <EosTool client:load />
+    <section class="card tool-background" aria-labelledby="eos-bg">
+      <h2 id="eos-bg" class="card-h">
+        Background
+      </h2>
+      <details>
+        <summary>Why fit a curve instead of relaxing the cell?</summary>
+        <p>
+          A cell relaxation (ISIF = 3) follows the stress, and at a fixed plane-wave cutoff the stress carries
+          an error called Pulay stress, so it needs about 30 % more cutoff to converge. Each point of an
+          energy-volume curve is a run at one fixed volume, so the curve does not depend on the stress at all.
+          Use the same ENCUT and k-mesh at every volume, and relax ions (ISIF = 2 for cubic cells) or ions and
+          shape (ISIF = 4) at each one. The Input Builder's series step writes these folders for you.
+        </p>
+        <p>
+          Take 7 to 11 volumes spread over 5 to 10 % on both sides of the minimum. Too few points or a narrow
+          range make B0' unreliable; a minimum at the edge of the range means the scan has to be extended.
+        </p>
+      </details>
+      <details>
+        <summary>What the two forms are</summary>
+        <p>
+          Both forms describe E(V) with four numbers: the minimum energy E0, the equilibrium volume V0, the
+          bulk modulus B0 and its pressure derivative B0'. Third-order Birch-Murnaghan expands the energy in a
+          finite strain and is the usual default for solids. Murnaghan assumes B0' is constant with pressure;
+          it works well close to V0 and less well far from it. Both forms share E0, V0, B0 and B0' at the
+          minimum and differ only further away, so a large difference between the two fits means the scan
+          reaches far from V0.
+        </p>
+        <p>
+          The fit uses Levenberg-Marquardt least squares from a parabola start, the same recipe as pymatgen.
+          The units are converted with 1 eV/Å³ = 160.21766 GPa.
+        </p>
+      </details>
+    </section>
   </div>
 </BaseLayout>
+
+<style>
+  .tool-background {
+    margin-top: var(--space-4);
+  }
+  .tool-background details + details {
+    margin-top: var(--space-2);
+  }
+</style>

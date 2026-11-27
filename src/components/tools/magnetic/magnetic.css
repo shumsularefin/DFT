@@ -1,24 +1,16 @@
 .mg {
-  display: grid;
-  gap: var(--space-4);
-  grid-template-columns: minmax(0, 1fr);
-}
-@media (min-width: 70rem) {
-  .mg {
-    grid-template-columns: minmax(16rem, 1fr) minmax(0, 1.6fr) minmax(16rem, 1fr);
-    align-items: start;
-  }
-}
-.mg-card {
-  border: 1px solid var(--border-strong);
-  border-radius: 0.5rem;
-  padding: var(--space-3);
-  background: var(--surface);
   min-width: 0;
 }
+.mg-card {
+  min-width: 0;
+}
+.mg-left > h2:not(.card-h) {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+}
 .mg-row,
-.mg-toggles,
-.mg-tabs {
+.mg-toggles {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
@@ -75,14 +67,6 @@
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-}
-.mg-tabs button {
-  min-height: 2.75rem;
-  padding-inline: var(--space-3);
-}
-.mg-tabs button[aria-selected='true'] {
-  font-weight: 700;
-  border-bottom: 3px solid var(--accent, currentColor);
 }
 .mg-table {
   width: 100%;
@@ -212,10 +196,17 @@
   cursor: not-allowed;
 }
 
-.mg-tabs button[aria-selected='true'] {
-  color: var(--accent-contrast);
-  background: var(--accent);
+/* The ordering tabs use the shared .tabbar underline look; undo the generic button box here. */
+.mg-tabs > button {
+  min-height: 0;
+  border-radius: 0;
+  border-width: 0 0 2px;
+  border-color: transparent;
+  background: none;
+}
+.mg-tabs > button[aria-selected='true'] {
   border-color: var(--accent);
+  font-weight: 600;
 }
 
 /* The card's own padding is the top space; a heading's margin on top of it left a gap. */
