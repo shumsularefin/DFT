@@ -1,5 +1,24 @@
 ---
 id: when-scf-goes-wrong
+stage:
+  scene: m04-scf-path
+  states:
+    - id: good-path
+      section: why
+      params: { Z: '2', alpha: 0.3, step: 64 }
+      caption: 'Each SCF iteration is a point: across, how the density differs from the self-consistent one; up, log10 of the residual. With mixing 0.3 the path falls straight onto the fixed point.'
+    - id: thrown-off
+      section: intuition
+      params: { Z: '1', alpha: 1, step: 260 }
+      caption: 'Full mixing for Z = 1: the path first dives to a residual near 1e-10, then is thrown off and ends jumping between two densities at one height. Step back through the iterations to watch it leave.'
+    - id: too-gentle
+      section: mistakes
+      params: { Z: '2', alpha: 0.05, step: 260 }
+      caption: 'Too gentle: mixing 0.05 never swings, but after 260 steps the residual has still not reached the stopping rule.'
+    - id: the-cure
+      section: check
+      params: { Z: '1', alpha: 0.6, step: 27 }
+      caption: 'The cure is gentler mixing: at 0.6 the same Z = 1 loop lands on the fixed point in 27 steps.'
 title: When the SCF loop goes wrong
 module: 4
 order: 5

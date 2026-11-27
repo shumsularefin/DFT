@@ -1,5 +1,31 @@
 ---
 id: how-to-use-this-site
+stage:
+  scene: m00-tour
+  states:
+    - id: rotate
+      section: why
+      params: {}
+      camera: iso
+      caption: 'A small rock-salt crystal on the stage. Drag to turn it any way you like, scroll to zoom, Shift and drag to pan, and press 0 to come back to this view.'
+    - id: along-c
+      section: intuition
+      params: { repeat: 2 }
+      camera: c
+      caption: 'Two by two by two cells seen straight along c, as VESTA would show them. Press 1, 2 or 3 to look along a, b or c, and P to switch between flat and perspective views.'
+    - id: pick
+      section: lab
+      params: { pick: true }
+      caption: 'The Cl at the centre and its six Na neighbours are outlined. Click any atom to read its name and number.'
+    - id: slider
+      section: math
+      params: { a: 6.2, pick: true }
+      caption: 'The lattice constant slider is at 6.20 A, so every distance grows and Na to Cl is now a/2 = 3.10 A. Drag the slider and watch the readouts follow.'
+    - id: layers
+      section: in-vasp
+      params: { bonds: false, repeat: 3 }
+      layers: [atoms, cell, axes, labels]
+      caption: 'Bonds hidden and three cells per axis, chosen from the controls and the Layers menu (press L). Every stage on the site has the same controls.'
 title: How to use this site
 module: 1
 order: 0

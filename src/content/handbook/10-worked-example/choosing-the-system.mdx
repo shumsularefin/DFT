@@ -1,21 +1,46 @@
 ---
 id: choosing-the-system
+stage:
+  scene: m10-tolerance
+  states:
+    - id: overview
+      section: why
+      params: { r: La, policy: cn12, tilt: 0 }
+      caption: 'LaCuO3 as the stage builds it: eight corner-sharing CuO6 octahedra with La in the cavity between them, drawn at its Shannon radius. The wire sphere is the room the cavity offers. Turn the block over to see La fill it.'
+    - id: contraction
+      section: intuition
+      params: { r: Lu, policy: cn9, tilt: 0 }
+      caption: 'Lu under the uniform CN 9 policy: the ion is much smaller than the room around it, so t falls well below 1. Step R from La to Lu and watch the gap open along the lanthanide contraction.'
+    - id: policy
+      section: math
+      params: { r: La, policy: cn9, tilt: 0 }
+      caption: 't compares the R ion with the room in its cavity: at t = 1 the ion just touches its twelve oxygens. Switch the policy between CN 12, 9 and 8 and watch the La radius, and t, shift by a few hundredths.'
+    - id: tilting
+      section: what-changes
+      params: { r: Sm, policy: cn9, tilt: 10 }
+      caption: 'A picture of a-a-a- tilting: neighbouring octahedra turn in opposite senses about the body diagonal, the Cu-O-Cu angle bends and the cavity closes around the small R. Drag the tilt slider; the angle is your choice, not a prediction.'
+    - id: missing
+      section: mistakes
+      params: { r: Gd, policy: cn12, tilt: 0 }
+      caption: 'Gd has no CN 12 radius, so the strict policy gives no t at all. Taking a CN 9 value for Gd beside CN 12 for La would exaggerate the trend; switch the policy for the whole series instead.'
 title: Choosing the RCuO3 system
 module: 10
 order: 1
-summary: Why the rare-earth cuprate perovskite family RCuO3 is a clean testbed for tolerance-factor screening and DFT workflow design.
+summary: Why the rare-earth cuprate perovskites RCuO3 make a demanding first project, what the site's tolerance-factor library says across the lanthanide series, and why trivalent copper is unusual.
 concepts: [perovskite-structure, tolerance-factor, ionic-radii]
 requires: [lattice-vectors]
 vaspTags: []
-sources: [S-001, S-002, S-003, S-042]
+sources: [S-001, S-002, S-003, S-022, S-051, S-096, S-097, S-098, S-099, S-100, S-101]
 noLab: true
 status: draft
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 <Why>
 
-Before spending computer time on a family of oxides, geometric descriptors help you decide which compositions can plausibly adopt the perovskite framework and how much octahedral tilting to expect <Cite id="S-001" /> <Cite id="S-002" />.
+A worked example is only useful if the system is real enough to go wrong in interesting ways. The rare-earth cuprates $R\mathrm{CuO}_3$ (with $R$ a trivalent rare earth such as La, Nd or Sm) are a good choice for three reasons. They are <Term id="perovskite">perovskites</Term>, the structure family that the tools on this site are built around. Their size trend across the lanthanide row is a clean test of the <Term id="tolerance-factor">tolerance-factor</Term> ideas. And they contain copper in the rare $+3$ state, which forces every decision that makes transition-metal oxides hard in DFT: spin, magnetism, a possible Hubbard $U$ and strong copper-oxygen mixing.
+
+This page decides which member of the family to calculate first and what to expect before any VASP run. Nothing on it is a result of the author's calculations.
 
 </Why>
 
@@ -27,58 +52,119 @@ This worked example documents the complete `RCuO3` workflow and input protocol. 
 
 </Callout>
 
-An $AB\mathrm{O}_3$ perovskite consists of a three-dimensional network of corner-sharing $B\mathrm{O}_6$ octahedra with larger $A$-site cations sitting in the 12-coordinated cavities between them <Cite id="S-001" />. In the $R\mathrm{CuO}_3$ series, stepping across the lanthanide row $R^{3+}$ systematically shrinks the $A$-site Shannon ionic radius, driving progressive octahedral tilting while keeping the formal copper oxidation state fixed <Cite id="S-003" />.
+**The structure in one picture.** In an $AB\mathrm{O}_3$ perovskite, each small $B$ cation (here Cu) sits at the centre of an octahedron of six oxygen atoms. The octahedra share corners and form a three-dimensional framework. The large $A$ cation (here the rare earth $R$) sits in the cavity between eight octahedra, where it has twelve oxygen neighbours in the ideal cubic structure <Cite id="S-002" />. The ideal cubic cell holds one formula unit: one $R$, one Cu and three O, five atoms in all.
 
-<Scene id="perovskite-octahedra" />
+**Why the size of $R$ matters.** If the $A$ cation is a little too small for its cavity, the framework does not stay straight. The octahedra rotate together to close the gap around $A$, a cooperative <Term id="octahedral-tilting">octahedral tilting</Term> <Cite id="S-101" />. Tilting lowers the symmetry and makes the repeating cell two or four times larger. Across the lanthanide row the $R^{3+}$ ion shrinks steadily (the lanthanide contraction), so the family runs from nearly cubic towards strongly tilted while the copper site stays chemically the same.
 
-Use the <a href="/tools/tolerance-factor/">Tolerance-factor explorer</a> to compare Goldschmidt $t$, the octahedral factor $\mu$, and Bartel's $\tau$ across the $R\mathrm{CuO}_3$ series. Remember that Shannon ionic radii depend on both oxidation state and coordination number (12-fold for $A$, 6-fold for $B$ and $\mathrm{O}^{2-}$), and missing CN entries are reported honestly as gaps rather than guessed <Cite id="S-003" />.
+**Why trivalent copper is unusual.** Copper in oxides is almost always $+1$ or $+2$. In the oxidation-state counts that the site's checks use, copper carries $+3$ in 325 entries, about 3 percent of the copper entries with a non-zero state <Cite id="S-051" />. The tolerance-factor explorer therefore flags $\mathrm{Cu}^{3+}$ as "known but uncommon". Chemically, $\mathrm{Cu}^{3+}$ is $3d^8$: removing three electrons from $[\mathrm{Ar}]\,3d^{10}4s^1$ leaves eight $d$ electrons <Cite id="S-100" />. Such a highly charged copper ion pulls electrons from its oxygen neighbours so strongly that the holes sit partly on oxygen rather than purely on copper. In the language of the Zaanen-Sawatzky-Allen scheme the <Term id="charge-transfer-energy">charge-transfer energy</Term> is small or even negative <Cite id="S-098" />, as photoemission found for the formally $\mathrm{Cu}^{3+}$ compound $\mathrm{NaCuO}_2$ <Cite id="S-099" />. For a DFT calculation this means strong Cu 3d and O 2p mixing, which is exactly where semilocal functionals and DFT+U need care.
+
+**What the literature says (literature, not this project).** $\mathrm{LaCuO}_3$, the largest-$R$ member, was first made under high oxygen pressure <Cite id="S-097" />. Later work reported the fully oxidized compound as rhombohedral, oxygen-deficient forms with lower symmetry, and metallic behaviour with a weak, nearly temperature-independent magnetic susceptibility <Cite id="S-096" />. That gives the calculation a qualitative target: a model that predicts a wide-gap magnetic insulator for fully oxidized $\mathrm{LaCuO}_3$ disagrees with these measurements, and the disagreement must be explained, not ignored.
+
+**The choice.** The worked example starts with $\mathrm{LaCuO}_3$: it has the largest tolerance factor in the family, a measured structure to compare against, and the plainest rare-earth potential (lanthanum has an empty $4f$ shell). Smaller $R$ come later, once the protocol works.
 
 </Intuition>
 
 <TheMath>
 
-Goldschmidt's tolerance factor and the octahedral factor are defined from the Shannon radii $r_A$, $r_B$, and $r_X$ <Cite id="S-001" /> <Cite id="S-002" />:
+The <Term id="ionic-radius">ionic radii</Term> $r_A$, $r_B$ and $r_X$ are Shannon's effective ionic radii, looked up for the right oxidation state and coordination number <Cite id="S-001" />. Goldschmidt's tolerance factor compares two ways of measuring the ideal cubic cell edge: along the $B$-O-$B$ line, $a = 2(r_B + r_X)$, and along the face diagonal through $A$, $a\sqrt{2} = 2(r_A + r_X)$ <Cite id="S-002" />. Their ratio is
 
-$$t = \frac{r_A + r_X}{\sqrt{2}\,(r_B + r_X)}, \qquad \mu = \frac{r_B}{r_X}$$
+$$t = \frac{r_A + r_X}{\sqrt{2}\,(r_B + r_X)} .$$
 
-Values of $t$ near unity favor cubic symmetry, while smaller $t$ indicates stronger tilting of the $B\mathrm{O}_6$ octahedra. Because tolerance factors are empirical heuristics, they guide candidate selection but never replace a full DFT stability check <Cite id="S-002" />.
+At $t = 1$ both fit exactly. Below 1 the $A$ cation is too small and the octahedra tilt. The octahedral factor $\mu = r_B / r_X$ checks the $B$ site on its own: by the radius-ratio rule a $B\mathrm{X}_6$ octahedron is geometrically comfortable for $\sqrt{2} - 1 \le \mu \le \sqrt{3} - 1$ <Cite id="S-022" />. Bartel and co-workers proposed a second descriptor that uses the oxidation state $n_A$ of the $A$ cation <Cite id="S-003" />:
+
+$$\tau = \frac{r_X}{r_B} - n_A\left(n_A - \frac{r_A/r_B}{\ln(r_A/r_B)}\right), \qquad \tau < 4.18 \text{ suggests a perovskite.}$$
+
+**What the site's library computes for RCuO3.** With $\mathrm{Cu}^{3+}$ six-coordinated (Shannon lists it with the label LS, 0.54 Å) and $\mathrm{O}^{2-}$ six-coordinated (1.40 Å), the octahedral factor is $\mu = 0.54/1.40 \approx 0.386$, below $\sqrt 2 - 1 \approx 0.414$ <Cite id="S-001" />. The explorer therefore warns that Cu looks too small for its octahedron by the radius-ratio rule. Real $\mathrm{Cu}^{3+}$ perovskites exist <Cite id="S-096" />, so this is a reminder that the rule is a heuristic, not a verdict.
+
+Shannon lists twelve-coordinated radii for only a few trivalent rare earths, so the $A$ site needs an explicit coordination policy. The table below is the output of the explorer's "Lanthanide sweep" (Cu as $B$, O as $X$) under three policies. These are numbers from the site's own code applied to Shannon's radii, not results of a DFT calculation and not measurements.
+
+| $R$ | $t$, strict CN 12 | $t$, CN 9 for all | $t$, CN 8 for all | $\tau$, CN 9 for all |
+| --- | ----------------- | ----------------- | ----------------- | -------------------- |
+| La  | 1.006             | 0.954             | 0.933             | 1.92                 |
+| Ce  | 0.999             | 0.946             | 0.927             | 1.95                 |
+| Pr  | no CN 12 entry    | 0.940             | 0.921             | 1.98                 |
+| Nd  | 0.973             | 0.934             | 0.915             | 2.01                 |
+| Sm  | 0.962             | 0.923             | 0.904             | 2.09                 |
+| Gd  | no CN 12 entry    | 0.914             | 0.894             | 2.16                 |
+| Dy  | no CN 12 entry    | 0.905             | 0.885             | 2.24                 |
+| Lu  | no CN 12 entry    | 0.886             | 0.866             | 2.45                 |
+
+<Level min="intermediate">
+
+Three things to read from it. First, the trend is the same under every policy: $t$ falls steadily from La to Lu, so tilting should grow along the series. Second, the absolute values depend on the policy by about 0.05, which is larger than the differences between neighbouring rare earths, so never compare a CN 12 value with a CN 9 value. Third, every $\tau$ is well below 4.18, so the descriptor does not rule out any member. Bartel and co-workers take the $A$ radius at the coordination closest to 12, so the strict CN 12 column follows their convention and the other columns do not <Cite id="S-003" />.
+
+</Level>
+
+<Level min="pro">
+
+The descriptors are geometric. They know nothing about the competing phases (other copper oxides, rare-earth cuprates with copper in the $+2$ state, and oxygen gas) that decide whether $R\mathrm{CuO}_3$ is stable, and the need for high oxygen pressure in the synthesis <Cite id="S-097" /> says that the oxygen chemical potential matters. A convex-hull analysis with an oxygen reference is the DFT test that the tolerance factor cannot replace.
+
+</Level>
 
 </TheMath>
 
 <InVasp>
 
-- Screen candidate $R^{3+}$ ions in the <a href="/tools/tolerance-factor/">Tolerance-factor explorer</a> before building supercells.
-- Record the exact oxidation states and coordination numbers used for every radius lookup <Cite id="S-003" />.
-- Carry the selected composition directly into the <a href="/builder/">Material Builder</a> or <a href="/tools/input-builder/">Input Builder</a>.
+Nothing here is a VASP run yet; this is the screening step that comes before one. Step by step:
+
+1. Open the <a href="/tools/tolerance-factor/">tolerance-factor explorer</a>. Set $A$ to La (+3, CN 12), $B$ to Cu (+3, CN 6, spin LS), $X$ to O (−2, CN 6). Read $t$, $\mu$ and $\tau$ and every warning in the list: the octahedral-factor warning and the uncommon-oxidation-state warning both appear.
+2. Open "Maps, family trend and exports", choose "Lanthanide sweep", and switch the coordination policy between strict CN XII, uniform CN IX and uniform CN VIII. Export the CSV for your notes.
+3. Record in your notebook the oxidation states, coordination numbers and policy you used <Cite id="S-001" />. Without them nobody can reproduce your $t$.
+4. Pick the first compound. Here it is $\mathrm{LaCuO}_3$, for the reasons above. The next page builds its input files.
+
+The magnetism question (does $3d^8$ copper carry a moment here?) cannot be answered by screening. It is the first thing the VASP runs have to settle, and the next page explains how.
 
 </InVasp>
 
 <WhatChanges>
 
-| $A$-site radius trend               | Geometric effect on $B\mathrm{O}_6$ network        | Impact on DFT setup                                                      |
-| ----------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------ |
-| Smaller $R^{3+}$ across lanthanides | Lower Goldschmidt $t$, stronger octahedral tilting | Orthorhombic supercell (e.g. $Pnma$) needed instead of 5-atom cubic cell |
-| Fixed $\mathrm{Cu}^{3+}$ $B$-site   | Constant octahedral factor $\mu$                   | Same $B$-site PAW potential and $d$-orbital considerations               |
+| If you change...                         | ...then the descriptors                        | ...and the DFT setup                                              |
+| ---------------------------------------- | ---------------------------------------------- | ----------------------------------------------------------------- |
+| $R$ from La towards Lu                   | $t$ falls; tilting is expected to grow         | Larger cells (10 or 20 atoms) are needed to hold the tilts        |
+| The A-site coordination policy           | Every $t$ shifts by a few hundredths           | Nothing in VASP; only comparisons across policies break           |
+| $\mathrm{Cu}^{3+}$ to $\mathrm{Cu}^{2+}$ | $\mu$ grows; charge balance fails for $R^{3+}$ | A different compound with less oxygen                             |
+| La to a rare earth with $4f$ electrons   | Radius changes only                            | A different PAW choice ($4f$ in the core) and more care with spin |
 
-Why screen first: geometric screening narrows a large rare-earth series to a prioritized shortlist before burning cluster hours.
+Why screen first: the descriptors cost nothing and tell you which cell sizes and symmetries to prepare. Why this value of $t$ matters: it sets whether a 5-atom cubic cell is a reasonable start. What happens if you skip it: you may relax a structure in a cell too small to hold the distortion it wants.
 
 </WhatChanges>
 
 <Mistakes>
 
-<Callout variant="mistake" title="Treating tolerance factors as proof of thermodynamic stability">
+<Callout variant="mistake" title="Treating a tolerance factor as proof of stability">
 
-A favorable Goldschmidt $t$ or Bartel $\tau$ only indicates geometric compatibility with the perovskite framework. Decomposition into competing binary oxides must still be tested with DFT total energies.
+A $t$ near 1 or a $\tau$ below 4.18 says the ions fit together, not that the compound is stable against its competing oxides. Fix: treat the descriptors as a filter and test stability with DFT energies and a convex hull.
+
+</Callout>
+
+<Callout variant="mistake" title="Mixing coordination policies in one comparison">
+
+Taking a CN 12 radius for La and a CN 9 radius for Gd because CN 12 is missing makes Gd look far more tilted than it is. Fix: use one policy for the whole series and state it, as the explorer's sweep does.
+
+</Callout>
+
+<Callout variant="mistake" title="Ignoring the warnings because the compound exists">
+
+The octahedral-factor warning for $\mathrm{Cu}^{3+}$ is not a reason to stop, but it is a reason to expect short, strained Cu-O bonds and strong covalency. Fix: write the warning into your notes and check the Cu-O distances after relaxation.
+
+</Callout>
+
+<Callout variant="mistake" title="Assuming the formal d8 count tells you the spin state">
+
+The formal count says nothing about how much of the hole sits on oxygen, or whether the compound is metallic. Fix: compute non-magnetic and magnetic starts and compare their energies, as the next pages do.
 
 </Callout>
 
 </Mistakes>
 
-<Check ids={['q-m10-1', 'q-m10-2', 'q-m10-3', 'q-m10-4']} />
+<Check ids={['q-m10-1', 'q-m10-3', 'q-m10-5', 'q-m10-6', 'q-m10-7', 'q-m10-10']} />
 
 <GoDeeper>
 
-- Goldschmidt (1926) and Bartel et al. (2019) on perovskite stability descriptors <Cite id="S-001" /> <Cite id="S-002" />.
-- Shannon (1976) effective ionic radii tables <Cite id="S-003" />.
+- Goldschmidt on the tolerance factor <Cite id="S-002" /> and Bartel and co-workers on $\tau$ <Cite id="S-003" />.
+- Shannon's effective ionic radii <Cite id="S-001" /> and Pauling's radius-ratio rule <Cite id="S-022" />.
+- Glazer's classification of octahedral tilts <Cite id="S-101" />.
+- On $\mathrm{Cu}^{3+}$ and charge transfer: Zaanen, Sawatzky and Allen <Cite id="S-098" />, Mizokawa and co-workers on $\mathrm{NaCuO}_2$ <Cite id="S-099" />, and Khomskii's book <Cite id="S-100" />.
+- On $\mathrm{LaCuO}_3$ itself: Demazeau and co-workers <Cite id="S-097" /> and Bringley and co-workers <Cite id="S-096" />.
 
 </GoDeeper>

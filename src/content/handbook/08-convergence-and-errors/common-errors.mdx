@@ -1,5 +1,29 @@
 ---
 id: common-errors
+stage:
+  scene: m08-error-causes
+  states:
+    - id: overlap
+      section: why
+      params: { case: overlap, scale: 0.45 }
+      caption: 'Diamond silicon with a mistyped POSCAR scale factor of 0.45: spheres of the full covalent radius sink into each other. Slide the factor back toward 1.0 and the overlap and the warning go away.'
+    - id: magmom
+      section: intuition
+      params: { case: magmom, magmom: 2 }
+      caption: 'Eight iron atoms but only two values in MAGMOM: atoms 3 to 8 get no moment and are outlined. Slide the count to 8, one value per atom in POSCAR order.'
+    - id: ibzkpt
+      section: math
+      params: { case: kmesh, kmesh: 4 }
+      camera: top
+      caption: 'A 4 x 4 x 2 Monkhorst-Pack mesh in the hexagonal zone of hcp Mg is shifted off Gamma, and rotations of the lattice send its points off the mesh (orange). Try an odd n: the mesh holds Gamma and every rotation keeps it.'
+    - id: vacuum
+      section: in-vasp
+      params: { case: vacuum, vacuum: 2 }
+      caption: 'A copper slab with only 2 Å of vacuum faces its own periodic image. No message warns you about this one; raise the vacuum toward 15 Å and the two surfaces separate.'
+    - id: short-contact
+      section: what-changes
+      params: { case: overlap, scale: 0.6 }
+      caption: 'A milder scale error of 0.6: the atoms no longer overlap, but every contact is short (rule B002), so the first forces of a run would be huge. Check the scale and the coordinate mode before anything else.'
 title: Common errors and how to read them
 module: 8
 order: 6
@@ -10,7 +34,7 @@ vaspTags: [ISYM, SYMPREC, ALGO, ISTART]
 sources: [S-019, S-041, S-042]
 noLab: true
 status: draft
-updated: 2026-11-19
+updated: 2026-11-27
 ---
 
 <Why>
@@ -33,6 +57,8 @@ Check them in that order <Cite id="S-041" />.
 </Intuition>
 
 <TheMath>
+
+Most error messages come from one of three places: input files that disagree with each other, a structure that is not physical, or a crystal symmetry and a k-point mesh that do not match <Cite id="S-042" />.
 
 <Level min="intermediate">
 

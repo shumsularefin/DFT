@@ -25,7 +25,8 @@
   color: var(--warn);
 }
 .badge-illustrative,
-.badge-toy-model {
+.badge-toy-model,
+.badge-sample {
   background: var(--accent-soft);
   border-color: color-mix(in srgb, var(--accent) 28%, transparent);
   color: var(--accent);

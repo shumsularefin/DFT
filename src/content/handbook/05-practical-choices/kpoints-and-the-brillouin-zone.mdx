@@ -1,5 +1,31 @@
 ---
 id: kpoints-and-the-brillouin-zone
+stage:
+  scene: m05-kmesh
+  states:
+    - id: zone
+      section: why
+      params: { lattice: fcc, n: 4, centering: monkhorst-pack, reduce: false, path: true }
+      camera: iso
+      caption: 'The first Brillouin zone of fcc copper in 1/Angstrom, with the high-symmetry path in orange. Turn it over: every wavevector the crystal can carry has a copy inside this zone.'
+    - id: mesh
+      section: intuition
+      params: { lattice: fcc, n: 4, centering: gamma, reduce: true, path: false }
+      caption: 'A 4 x 4 x 4 Gamma-centred mesh folded into the zone. The large balls are the 8 points that symmetry leaves to compute; drag the divisions slider and watch the total grow as n cubed.'
+    - id: lattices
+      section: lab
+      params: { lattice: hcp, n: 6, centering: gamma, reduce: true, path: true }
+      camera: c
+      caption: 'Switch the lattice. Here hcp magnesium seen along c shows the hexagonal face, and the mesh is 6 x 6 x 3 because the zone is shorter along c. Try bcc and simple cubic too.'
+    - id: shift
+      section: in-vasp
+      params: { lattice: hcp, n: 4, centering: monkhorst-pack, reduce: true, path: false }
+      camera: c
+      caption: 'An even Monkhorst-Pack mesh on hcp is shifted off Gamma and no longer has the hexagonal symmetry; the description says so. Switch to Gamma-centred to keep it.'
+    - id: dense
+      section: what-changes
+      params: { lattice: fcc, n: 8, centering: monkhorst-pack, reduce: true, path: false }
+      caption: 'An 8 x 8 x 8 mesh: 512 points but only 60 irreducible ones. The largest spacing readout is the number KSPACING controls; a metal needs it small.'
 title: k-points and the Brillouin zone
 module: 5
 order: 2

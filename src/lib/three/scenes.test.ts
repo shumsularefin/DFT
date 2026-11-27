@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { VESTA_LIGHTS } from './vestaStyle';
 import { brillouinZone } from '../crystal/brillouin';
 import { reciprocalLattice } from '../crystal/lattice';
 import { readStructure } from '../crystal/io';
@@ -108,6 +109,30 @@ describe('BzScene', () => {
     expect(f.key('q').preventDefault).not.toHaveBeenCalled();
     expect(f.key('ArrowLeft', { ctrlKey: true }).preventDefault).not.toHaveBeenCalled();
   });
+  it('W A S D move the view; turning and zooming then work about the moved target; R brings it home', () => {
+    const f = fakes();
+    const s = new BzScene(f.container, f.opts);
+    s.start();
+    s.setZone(brillouinZone(b), b);
+    const home = cam(f.attrs);
+    const tgt = () => f.attrs.get('data-target')!.split(' ').map(Number);
+    expect(tgt()).toEqual([0, 0, 0]);
+    expect(f.key('d').preventDefault).toHaveBeenCalled();
+    f.key('w');
+    const moved = tgt();
+    expect(Math.hypot(...moved)).toBeGreaterThan(0);
+    const dist = () => Math.hypot(...cam(f.attrs).map((x, i) => x - tgt()[i]!));
+    const d0 = dist();
+    f.key('ArrowRight');
+    expect(tgt()).toEqual(moved);
+    expect(dist()).toBeCloseTo(d0, 2);
+    f.key('+');
+    expect(dist()).toBeLessThan(d0);
+    expect(tgt()).toEqual(moved);
+    f.key('R');
+    expect(cam(f.attrs)).toEqual(home);
+    expect(tgt()).toEqual([0, 0, 0]);
+  });
   it('preset view along b1 puts the camera on the +b1 side', () => {
     const f = fakes();
     const s = new BzScene(f.container, f.opts);
@@ -156,6 +181,19 @@ describe('CellScene', () => {
     expect(bonded.bonds).toBeGreaterThan(0);
     expect(bonded.legend).toEqual([{ symbol: 'Cu', color: expect.any(String), tabulated: true }]);
     expect(s.setStructure(cu, { repeat: [2, 1, 1] }).drawn).toBe(23);
+    s.dispose();
+  });
+  it('lights its atoms with the Studio rig (D-122): an ambient light and a key and a fill light fixed in the scene', () => {
+    const f = fakes();
+    const s = new CellScene(f.container, f.opts);
+    const kinds = new Set<string>();
+    s.scene.traverse((o) => kinds.add(o.type));
+    expect(kinds.has('AmbientLight')).toBe(true);
+    const fixed = s.scene.children.filter((c) => c.type === 'DirectionalLight');
+    expect(fixed.map((l) => (l as unknown as { intensity: number }).intensity).sort()).toEqual(
+      [VESTA_LIGHTS.fill.intensity, VESTA_LIGHTS.key.intensity].sort(),
+    );
+    expect(s.camera.children.some((c) => c.type === 'DirectionalLight')).toBe(false);
     s.dispose();
   });
   it('skips bonds for very large blocks and says so', () => {

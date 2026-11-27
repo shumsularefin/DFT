@@ -1,5 +1,28 @@
 ---
 id: restarts-istart-icharg
+stage:
+  scene: m07-restarts
+  states:
+    - id: scratch
+      section: why
+      params: { icharg: '2', iteration: 40 }
+      caption: 'From scratch: the density starts from the atoms and needs many iterations to reach the converged density at the back. Step back through them with the step bar.'
+    - id: read
+      section: intuition
+      params: { icharg: '1', iteration: 40 }
+      caption: 'Reading the converged CHGCAR of the same system (ICHARG = 1): the first density is already the answer, so one iteration is enough.'
+    - id: fixed-wrong
+      section: math
+      params: { icharg: 11-other, iteration: 1 }
+      caption: 'ICHARG = 11 with a CHGCAR from other settings: the density is never updated, and the orbital energy comes out wrong by the amount in the readouts. Compare ICHARG = 11 from this system.'
+    - id: recover
+      section: what-changes
+      params: { icharg: 1-other, iteration: 40 }
+      caption: 'ICHARG = 1 with a mismatched CHGCAR: the density is read and then iterated, so the run still reaches the right answer.'
+    - id: fixed-right
+      section: mistakes
+      params: { icharg: '11', iteration: 1 }
+      caption: 'ICHARG = 11 from the right CHGCAR: the eigenvalue matches the SCF, but the density never moves, so the total energy of such a run is not one to compare.'
 title: Restarts with ISTART and ICHARG
 module: 7
 order: 3
@@ -10,7 +33,7 @@ vaspTags: [ISTART, ICHARG]
 sources: [S-019, S-041, S-042]
 noLab: true
 status: draft
-updated: 2026-11-19
+updated: 2026-11-27
 ---
 
 <Why>
@@ -43,6 +66,8 @@ Both tables are from the Workflow Handbook <Cite id="S-042" />.
 </Intuition>
 
 <TheMath>
+
+A restart reads numbers that an earlier run saved (the orbitals or the density) instead of building them from scratch. That saves time only when the earlier run solved the same problem; a density from a different setup is a starting point that does not fit <Cite id="S-019" />.
 
 <Level min="intermediate">
 

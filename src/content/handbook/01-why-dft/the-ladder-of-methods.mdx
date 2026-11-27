@@ -1,5 +1,29 @@
 ---
 id: the-ladder-of-methods
+stage:
+  scene: m01-ladder
+  states:
+    - id: rungs
+      section: why
+      params: { size: 0, budget: 6 }
+      caption: 'Each rung is a method, from force fields at the front to the exact solution at the back, with cost growing upward. At the smallest size every method is affordable. Drag the size slider.'
+    - id: scaling
+      section: intuition
+      params: { size: 1, budget: 6 }
+      caption: 'At ten times the size DFT costs a thousand times more and CCSD(T) ten million times more. Only rungs whose marker stays under the budget plane are still affordable.'
+    - id: shapes
+      section: lab
+      params: { size: 1.3, budget: 6, qualitative: true }
+      caption: 'The dashed curves for force fields and the exact solution are shapes only, with no marker. The exact curve climbs past every power law at large sizes.'
+    - id: slopes
+      section: math
+      params: { size: 2, budget: 10 }
+      camera: front
+      caption: 'Seen from the front, each curve is a straight line on these log axes and its slope is the exponent p. Compare slopes, not heights: all prefactors are set equal.'
+    - id: budget
+      section: what-changes
+      params: { size: 1.5, budget: 8 }
+      caption: 'Move the budget plane and see which methods drop out first at this size: the steepest ones. Doubling the size multiplies a cost by 2 to the power p.'
 title: The ladder of methods
 module: 1
 order: 2

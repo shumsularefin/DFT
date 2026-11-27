@@ -1,5 +1,28 @@
 ---
 id: what-dft-can-and-cannot-tell-you
+stage:
+  scene: m01-probes
+  states:
+    - id: forces
+      section: why
+      params: { probe: forces, shift: 0.4 }
+      caption: 'Push the centre Cl with the slider and DFT returns the force pulling it back. Energies and forces of the ground state are what DFT does best.'
+    - id: density
+      section: intuition
+      params: { probe: density }
+      caption: 'The electron cloud of the cell, drawn here as a simple sum of atom-like clouds. The density is the central quantity of DFT and comes out reliably.'
+    - id: gap
+      section: math
+      params: { probe: gap }
+      caption: 'The band gap from a common functional (solid arrow) is smaller than the measured one (dashed). Read DFT gaps as trends, and compare functionals when the gap matters.'
+    - id: magnetism
+      section: in-vasp
+      params: { probe: magnetism }
+      caption: 'Spins up (solid heads) and down (open heads) in alternating planes, the order of NiO. DFT finds such orders, but these oxides usually need a correction such as DFT+U.'
+    - id: light
+      section: mistakes
+      params: { probe: light }
+      caption: 'Absorbing light lifts an electron into an empty state: an excited state, outside the ground-state theory. Try the vibration and layer questions in the menu too.'
 title: What DFT can and cannot tell you
 module: 1
 order: 3

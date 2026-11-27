@@ -1,5 +1,28 @@
 ---
 id: scf-trouble
+stage:
+  scene: m08-charge-sloshing
+  states:
+    - id: sloshing
+      section: why
+      params: { mixer: linear, amix: 0.4, bmix: 0, length: 40, iter: 3 }
+      caption: 'A 40 Å metallic cell with plain mixing at AMIX 0.4. The slab is the error in the input density. Step through the iterations: the extra charge jumps from one end of the cell to the other and grows. That is charge sloshing.'
+    - id: damped
+      section: intuition
+      params: { mixer: linear, amix: 0.02, bmix: 0, length: 40, iter: 12 }
+      caption: 'With AMIX 0.02 the slosh still swaps ends every step but shrinks a little each time. The waterfall behind the slab shows the swing, and the residual path at the right end creeps down.'
+    - id: kerker
+      section: math
+      params: { mixer: linear, amix: 0.4, bmix: 1, length: 40, iter: 6 }
+      caption: 'Kerker mixing with BMIX 1.0 mixes long waves gently and short waves fully, so the longest wave is now multiplied by 0.11 per step instead of about -36. The slab flattens within a few iterations.'
+    - id: pulay
+      section: in-vasp
+      params: { mixer: pulay, amix: 0.1, bmix: 0, length: 40, iter: 10 }
+      caption: 'The recovery settings AMIX 0.1 and BMIX near zero. Simple mixing would still run away here, but VASP mixes with a history of earlier steps (Pulay), and that history removes the slosh in about ten iterations.'
+    - id: short-cell
+      section: what-changes
+      params: { mixer: linear, amix: 0.4, bmix: 0, length: 10, iter: 4 }
+      caption: 'Shorten the cell to 10 Å: the longest wave is four times shorter, the safe AMIX is more than ten times larger, and the slosh grows far more slowly. Long cells and slabs are where sloshing bites.'
 title: When the electronic loop will not converge
 module: 8
 order: 4
@@ -10,7 +33,7 @@ vaspTags: [ALGO, NELM, AMIX, BMIX, NBANDS, EDIFF, NELMDL, NUPDOWN]
 sources: [S-019, S-041, S-042]
 noLab: true
 status: draft
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 <Why>
@@ -29,6 +52,8 @@ Read `OSZICAR` first. A healthy run shows the change in energy falling by orders
 
 <TheMath>
 
+Each SCF step mixes a fraction of the new density into the old one. A small fraction means small, safe steps that take longer; a large fraction means big steps that can overshoot and swing back and forth <Cite id="S-019" />.
+
 <Level min="intermediate">
 
 The mixing step builds the next input density from the previous output densities, with weights set by `AMIX` (the fraction of the new density that is mixed in, default 0.4 with PAW) and `BMIX` (a cutoff wave vector for the Kerker term, default 1.0) <Cite id="S-019" />. A smaller `AMIX` takes smaller steps and damps oscillation, at the price of more steps. For metals, values much smaller than the default are sometimes needed <Cite id="S-019" />.
@@ -42,7 +67,7 @@ The mixing step builds the next input density from the previous output densities
 Work down this list in order. Stop as soon as the run converges <Cite id="S-041" />.
 
 1. **Check the structure first.** Overlapping atoms or a broken geometry cause most "unconvergeable" runs. Look at it in a viewer.
-2. **Change the algorithm and allow more steps.** `ALGO = All` (or `Damped`) and `NELM = 150` to 200.
+2. **Change the algorithm and allow more steps.** Move through `ALGO` in one order, `Normal`, then `All`, then `Damped` (the reason is under rung 3 of the fuller ladder below), and set `NELM = 150` to 200.
 3. **Reduce the mixing.** `AMIX = 0.1`, `BMIX = 0.0001` (linear mixing, for slabs and charge sloshing). For magnets also `AMIX_MAG = 0.4`, `BMIX_MAG = 0.0001`.
 4. **Add a little smearing in metals** during the hard phase: `SIGMA` 0.1 to 0.2.
 5. **Check the number of bands.** Raise `NBANDS` by about 20 percent when the highest bands are occupied.
@@ -57,7 +82,7 @@ BMIX   = 0.0001
 ISMEAR = 0
 SIGMA  = 0.1`}
   annotations={{
-    1: 'a more robust algorithm',
+    1: 'the next solver once ALGO = Normal has stalled',
     2: 'room for more electronic steps',
     3: 'smaller fraction of the new density per step',
     4: 'nearly linear mixing',
@@ -72,7 +97,7 @@ This is a recovery INCAR for a hard case, not a starting point. Restore the norm
 
 1. **Check the input.** Atoms too close, a `POSCAR` and `POTCAR` species order mismatch, a `MAGMOM` with the wrong count, an unreasonable starting moment. Why: no setting can rescue a wrong input.
 2. **Tighten `EDIFF` in stages.** Run with `EDIFF = 1E-4` until stable, then restart from that result (`ISTART = 1`, `ICHARG = 1`) with `1E-5`, then `1E-6` (and `1E-8` for response calculations). Why: each stage starts closer to the solution, so the tight stage takes a few steps instead of wandering from random wavefunctions.
-3. **Change the algorithm.** `ALGO = Normal` (the most robust Davidson), then `All`, then `Damped` with `TIME = 0.4`. Avoid `Fast` and `VeryFast` for magnetic or +U systems. Why: the handbook calls `Normal` the most robust; `All` and `Damped` are the next solvers to try when it stalls.
+3. **Change the algorithm.** `ALGO = Normal` (the most robust Davidson), then `All`, then `Damped` with `TIME = 0.4`. Avoid `Fast` and `VeryFast` for magnetic or +U systems. Why this order: the Workflow Handbook calls `Normal` (blocked Davidson) the most robust, so leaving `Fast` or `VeryFast` for `Normal` is the cheapest fix and comes first; `All` updates all bands together and `Damped` damps the update, and both handbooks name them for hard metals, magnets, +U and hybrids, so they come next. The Field Handbook's advice to use `All` or `Damped` is this second step, for a run where `Normal` has already stalled <Cite id="S-041" /> <Cite id="S-042" />.
 4. **Damp the mixing.** `AMIX = 0.1`, `BMIX = 0.0001`, `AMIX_MAG = 0.4`, `BMIX_MAG = 0.0001` (linear mixing). For charge sloshing in metals and slabs reduce `AMIX` and `BMIX` gradually. Why: smaller steps stop the density from overshooting.
 5. **More steps and a warm-up.** `NELM = 200` to 300, `NELMDL = -12`. Why: `NELMDL` sets the number of non-self-consistent steps at the start, so the wavefunctions settle before the density is updated <Cite id="S-019" />.
 6. **Smearing.** A larger `SIGMA` (0.1 to 0.2) for a while, for metals or near-degenerate states, then reduce it and restart from `CHGCAR`. Why: smearing makes occupations change smoothly, so the loop stops flipping between states.

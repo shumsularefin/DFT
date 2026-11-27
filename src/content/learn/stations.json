@@ -3,117 +3,149 @@
     "id": "atom-cloud",
     "title": "An atom and its electron cloud",
     "badge": "computed",
-    "alt": "Curve of the probability of finding the electron of a hydrogen atom at each distance from the nucleus, with the most probable distance marked.",
+    "alt": "A live 3D view of the electron of a hydrogen atom in an s state: a cloud of dots where it is likely to be found, the surface where its wavefunction has one fixed size and, from n = 2 on, the spherical radial node shells where it is never found. Beside it, the curve of the probability of finding the electron at each distance from the nucleus, with the most probable distance marked.",
     "sentences": [
       "An atom is a nucleus with electrons around it, but an electron is not a tiny ball on an orbit.",
-      "Quantum mechanics gives a cloud of probability instead: the curve shows how likely the electron is to be found at each distance from the nucleus.",
+      "Quantum mechanics gives a cloud of probability instead: the 3D view shows that cloud around the nucleus, and the curve beside it shows how likely the electron is to be found at each distance.",
       "Everything later in DFT is about these clouds, and about how they overlap and rearrange when atoms meet."
     ],
     "visual": {
-      "kind": "plot",
-      "plot": "hydrogen-radial",
+      "kind": "stage",
+      "scene": "m02-orbital",
       "params": {
-        "n": 1,
-        "l": 0
+        "orbital": "1s",
+        "cloud": true,
+        "nodes": true,
+        "clip": false
+      },
+      "camera": "iso",
+      "panel": {
+        "plot": "hydrogen-radial",
+        "params": {
+          "n": 1,
+          "l": 0
+        }
       }
     },
     "try": {
-      "kind": "slider",
+      "kind": "choice",
       "label": "Shell number n (hydrogen, s state)",
-      "param": "n",
-      "min": 1,
-      "max": 3,
-      "step": 1,
-      "value": 1
+      "initial": 0,
+      "options": [
+        {
+          "label": "n = 1 (1s)",
+          "params": {
+            "orbital": "1s"
+          },
+          "panel": {
+            "n": 1
+          }
+        },
+        {
+          "label": "n = 2 (2s)",
+          "params": {
+            "orbital": "2s"
+          },
+          "panel": {
+            "n": 2
+          }
+        },
+        {
+          "label": "n = 3 (3s)",
+          "params": {
+            "orbital": "3s"
+          },
+          "panel": {
+            "n": 3
+          }
+        }
+      ]
     },
     "topic": "02-quantum-basics/the-wavefunction",
-    "sources": ["S-047"]
+    "sources": ["S-047", "S-031"]
   },
   {
     "id": "orbital",
     "title": "A wavefunction and an orbital",
     "badge": "computed",
-    "alt": "Slices through the electron clouds of hydrogen s, p and d orbitals, showing a round s cloud and clouds with lobes for p and d.",
+    "alt": "A live 3D view of one hydrogen orbital as the surface where its wavefunction has one fixed size, orange where it is positive and blue where it is negative: a round s orbital, a p orbital with two lobes, or a d orbital (3d z2) with two lobes and a ring. Beside it, a slice through the same kind of orbital's cloud.",
     "sentences": [
       "The wavefunction is the quantity that holds everything about one electron, and an orbital is the shape of one allowed wavefunction.",
       "The s cloud is a ball, the p clouds have two lobes, and the d clouds are more complex still.",
       "These shapes decide which neighbouring atoms an electron can bond with, which is why they matter for materials."
     ],
     "visual": {
-      "kind": "plot",
-      "plot": "orbital-slice",
+      "kind": "stage",
+      "scene": "m02-orbital",
       "params": {
-        "orbitals": [
-          {
-            "l": 0,
-            "m": 0,
-            "label": "s"
-          },
-          {
-            "l": 1,
-            "m": 0,
-            "plane": "xz",
-            "label": "p"
-          },
-          {
-            "l": 2,
-            "m": 0,
-            "plane": "xz",
-            "label": "d"
-          }
-        ]
+        "orbital": "2p_z",
+        "cloud": false,
+        "nodes": true,
+        "clip": false
+      },
+      "camera": "iso",
+      "panel": {
+        "plot": "orbital-slice",
+        "params": {
+          "orbitals": [
+            {
+              "l": 1,
+              "m": 0,
+              "plane": "xz",
+              "label": "p"
+            }
+          ]
+        }
       }
     },
     "try": {
       "kind": "choice",
       "label": "Show",
-      "initial": 0,
+      "initial": 1,
       "options": [
         {
-          "label": "s, p and d",
+          "label": "s orbital (1s)",
           "params": {
+            "orbital": "1s"
+          },
+          "panel": {
             "orbitals": [
               {
                 "l": 0,
                 "m": 0,
                 "label": "s"
-              },
+              }
+            ]
+          }
+        },
+        {
+          "label": "p orbital (2p z)",
+          "params": {
+            "orbital": "2p_z"
+          },
+          "panel": {
+            "orbitals": [
               {
                 "l": 1,
                 "m": 0,
                 "plane": "xz",
                 "label": "p"
-              },
+              }
+            ]
+          }
+        },
+        {
+          "label": "d orbital (3d z2)",
+          "params": {
+            "orbital": "3d_z2"
+          },
+          "panel": {
+            "orbitals": [
               {
                 "l": 2,
                 "m": 0,
                 "plane": "xz",
                 "label": "d"
-              }
-            ]
-          }
-        },
-        {
-          "label": "s only",
-          "params": {
-            "orbitals": [
-              {
-                "l": 0,
-                "m": 0,
-                "label": "s"
-              }
-            ]
-          }
-        },
-        {
-          "label": "p only",
-          "params": {
-            "orbitals": [
-              {
-                "l": 1,
-                "m": 0,
-                "plane": "xz",
-                "label": "p"
               }
             ]
           }
@@ -404,20 +436,31 @@
     "id": "kpoint-mesh",
     "title": "k-points: sampling the zone",
     "badge": "computed",
-    "alt": "A grid of k-points laid over a square Brillouin zone, with the number of points along each direction set by the slider.",
+    "alt": "A live 3D view of a regular grid of k-points filling the cubic Brillouin zone of a simple cubic crystal, with the points that symmetry makes different marked larger; beside it, the same kind of grid laid over a square zone. The slider sets the number of points along each direction.",
     "sentences": [
       "VASP cannot visit every k-point, so it samples the zone on a regular grid, the mesh you write in KPOINTS.",
       "A finer mesh samples the zone better and costs more time, because each k-point is a separate calculation.",
       "How fine is fine enough is found by testing, not by a fixed rule."
     ],
     "visual": {
-      "kind": "plot",
-      "plot": "kmesh-grid",
+      "kind": "stage",
+      "scene": "m05-kmesh",
       "params": {
+        "lattice": "sc",
         "n": 4,
-        "gamma": true,
-        "angle": 90,
-        "ratio": 1
+        "centering": "gamma",
+        "reduce": true,
+        "path": false
+      },
+      "camera": "iso",
+      "panel": {
+        "plot": "kmesh-grid",
+        "params": {
+          "n": 4,
+          "gamma": true,
+          "angle": 90,
+          "ratio": 1
+        }
       }
     },
     "try": {
@@ -425,12 +468,12 @@
       "label": "Points along each direction",
       "param": "n",
       "min": 1,
-      "max": 12,
+      "max": 8,
       "step": 1,
       "value": 4
     },
     "topic": "05-practical-choices/kpoints-and-the-brillouin-zone",
-    "sources": ["S-007", "S-019", "S-036", "S-041", "S-042", "S-049", "S-050"]
+    "sources": ["S-007", "S-019", "S-036", "S-041", "S-042", "S-049", "S-050", "S-005", "S-032"]
   },
   {
     "id": "bands-dos",

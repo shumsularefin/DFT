@@ -1,5 +1,24 @@
 ---
 id: hohenberg-kohn-theorems
+stage:
+  scene: m04-hohenberg-kohn
+  states:
+    - id: landscape
+      section: why
+      params: { depth: 2, pos: 1, shift: 0, invert: false }
+      caption: 'A potential landscape of two wells (below) and the density of one electron in it (above). The electron shares itself between the wells.'
+    - id: deeper-well
+      section: intuition
+      params: { depth: 2.4, pos: 1, shift: 0, invert: false }
+      caption: 'Deepen the second well a little and the electron moves over: a different potential gives a different density. Drag the depth and the position and watch the density follow.'
+    - id: constant
+      section: math
+      params: { depth: 2, pos: 1, shift: 0.8, invert: false }
+      caption: 'Adding a constant lifts the whole landscape but leaves the density exactly as it was. That is the one freedom the theorem allows: the potential is fixed up to a constant.'
+    - id: read-back
+      section: check
+      params: { depth: 2, pos: 1, shift: 0, invert: true }
+      caption: 'Read the potential back from the density alone (wire mesh). Wherever there is electron, it lands on the original landscape: the density fixed the potential.'
 title: The Hohenberg-Kohn theorems
 module: 4
 order: 1

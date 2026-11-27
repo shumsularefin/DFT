@@ -1,5 +1,30 @@
 ---
 id: magnetic-orderings
+stage:
+  scene: m05s-orderings
+  states:
+    - id: one-cell-fm
+      section: why
+      params: { order: FM, cell: minimal }
+      caption: 'One Mn per cell can only be ferromagnetic, because every copy of the cell repeats the same arrow. Switch the ordering and watch the cell grow to fit the pattern.'
+    - id: a-type
+      section: intuition
+      params: { order: A, cell: 2x2x2, axis: c, planes: true }
+      camera: a
+      caption: 'A-type: ferromagnetic Mn planes, stacked with opposite spins along c. Seen along a the planes are edge on; set the axis to a or b to stack them another way.'
+    - id: c-type
+      section: math
+      params: { order: C, cell: 2x2x2, axis: c, planes: true }
+      camera: c
+      caption: 'C-type seen down c: ferromagnetic chains along c in a checkerboard. Each Mn has 2 parallel and 4 antiparallel nearest neighbours.'
+    - id: g-minimal
+      section: in-vasp
+      params: { order: G, cell: minimal }
+      caption: 'G-type in its smallest cell, 2 formula units and 10 atoms. The MAGMOM readout is the line VASP needs, in POSCAR order, for the moment you set.'
+    - id: common-cell
+      section: mistakes
+      params: { order: A, cell: common, planes: true }
+      caption: 'The smallest cell that holds FM, A, C and G at once. Switch the ordering: the cell stays the same, which is what a fair energy comparison needs.'
 title: Magnetic orderings
 module: 5
 order: 8
@@ -10,7 +35,7 @@ vaspTags: [ISPIN, MAGMOM]
 sources: [S-042, S-058, S-059, S-065]
 noLab: true
 status: draft
-updated: 2026-11-24
+updated: 2026-11-27
 ---
 
 <Why>
@@ -105,7 +130,7 @@ VASP groups atoms by species in `POSCAR`. If your `POSCAR` lists 4 Sr, 4 Mn, 12 
 
 </Mistakes>
 
-<Check ids={['q-mag-8', 'q-mag-9', 'q-mag-10']} />
+<Check ids={['q-mag-8', 'q-mag-9', 'q-mag-10', 'q-mag-23']} />
 
 <GoDeeper>
 

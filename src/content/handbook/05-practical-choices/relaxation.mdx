@@ -1,0 +1,197 @@
+---
+id: geometry-relaxation
+stage:
+  scene: m05b-relaxation
+  states:
+    - id: landscape
+      section: why
+      params: { view: landscape, ibrion: cg, potim: 1, start: upper, step: 0 }
+      camera: iso
+      caption: 'The ball is the starting structure on a model energy landscape; the arrow is the force. Step the ionic steps forward and watch it roll downhill until the force falls below the stopping value.'
+    - id: local
+      section: intuition
+      params: { view: landscape, ibrion: cg, potim: 1, start: middle, step: 60 }
+      caption: 'Started on the middle slope, the ball stops in the shallowest valley, not in the deepest one. A relaxation finds the nearest minimum; try the other starting geometries.'
+    - id: optimisers
+      section: math
+      params: { view: landscape, ibrion: sd, potim: 1, start: upper, step: 60 }
+      caption: 'Steepest descent takes many short steps down the narrow valley. Switch to conjugate gradients (trial and corrector points along each line) or quasi-Newton and compare the step count.'
+    - id: isif
+      section: in-vasp
+      params: { view: cell, isif: '3', step: 0 }
+      camera: iso
+      caption: 'A strained SrTiO3 cell with Ti off centre. Solid arrows are what ISIF = 3 lets the run remove: the force on Ti, the volume and the shape stress. Step forward, then try ISIF = 2, which leaves the cell as it is.'
+    - id: saddle
+      section: mistakes
+      params: { view: landscape, ibrion: cg, potim: 1, start: saddle, step: 60 }
+      caption: 'Started next to a saddle point, the ball rolls off into a nearby valley. A perfectly symmetric start could sit on the ridge with zero force, which is why a small rattle helps.'
+title: Geometry relaxation
+module: 5
+order: 14
+summary: What a relaxation searches for, how forces and stress steer it, what IBRION, ISIF, EDIFFG and NSW control, when to let the cell change, and why Pulay stress, local minima and symmetry can fool you.
+concepts: [geometry-relaxation]
+requires: [scf-loop]
+vaspTags: [IBRION, ISIF, EDIFFG, NSW, POTIM, ENCUT]
+sources: [S-019, S-040, S-041, S-042, S-049, S-068, S-092]
+noLab: true
+status: draft
+updated: 2026-11-27
+---
+
+<Why>
+
+The structure you start from is a guess: taken from a database, built by hand or copied from a related compound. Almost every property you will compute (band gap, magnetic moment, elastic constants, phonons, defect energies) is meant for the structure the functional itself prefers. A <Term id="geometry-relaxation">geometry relaxation</Term> finds that structure by moving the atoms, and if you ask for it the cell, until the forces and the stress are small. Skip it and you report the properties of a strained crystal; do it carelessly and you report the properties of the nearest saddle point or of a cell distorted by a too-low cutoff <Cite id="S-042" />.
+
+</Why>
+
+<Intuition>
+
+**A ball on a landscape.** Under the <Term id="born-oppenheimer-approximation">Born-Oppenheimer approximation</Term> the electrons follow the nuclei instantly, so for every arrangement of the atoms there is one ground-state energy. All these energies together form the <Term id="potential-energy-surface">potential energy surface</Term>. A relaxation is a ball rolling downhill on it, stopping in the bottom of a valley.
+
+**Forces point downhill.** The force on an atom is the slope of the energy with a minus sign: if moving an atom to the right raises the energy, the force pushes it left. Once the electronic loop has converged, VASP gets the forces at little extra cost <Cite id="S-049" />. When every force is close to zero, the atoms are in a valley.
+
+**Stress does the same for the cell.** The <Term id="stress-tensor">stress tensor</Term> says how the energy changes when the cell is stretched, squeezed or sheared. A cell under stress wants to change shape or volume; a relaxed cell has a stress close to zero (for bulk, a pressure within about plus or minus 1 to 2 kB is the target in the Workflow Handbook) <Cite id="S-042" />.
+
+**Valleys are local.** The ball stops in the valley it starts in. It does not know whether a deeper valley lies over the hill. A relaxation finds a local minimum; finding the lowest one (another crystal structure, another magnetic order, a tilted perovskite) needs several starting points or a deliberate search.
+
+**Symmetry keeps the ball on a ridge.** If the start is perfectly symmetric, a force that would break the symmetry is exactly zero by symmetry, so the ball can sit forever on top of a ridge. VASP keeps the space group of the starting structure during a relaxation, so a cubic start stays cubic <Cite id="S-041" />. Rattling the atoms by 0.01 to 0.05 angstrom, or setting `ISYM = 0`, lets it fall off <Cite id="S-042" />.
+
+**Each ionic step is a full SCF.** VASP converges the electrons, computes forces and stress, moves the atoms, and repeats. One move is an <Term id="ionic-step">ionic step</Term>. Forces from a loosely converged density are noisy, so the ionic loop can only be as good as the electronic loop under it <Cite id="S-042" />.
+
+</Intuition>
+
+<TheMath>
+
+The force on atom $I$ at position $\mathbf{R}_I$ is minus the gradient of the total energy $E$:
+
+$$\mathbf{F}_I = -\frac{\partial E}{\partial \mathbf{R}_I}.$$
+
+In words: the energy change per angstrom of movement, with the sign flipped. A relaxation stops when the largest force is small, which in VASP's units means a few hundredths of an eV per angstrom or less <Cite id="S-041" />.
+
+<Level min="intermediate">
+
+**Stress.** With $\varepsilon_{ij}$ a small strain of the cell and $V$ its volume, the stress is, up to a sign convention, $\sigma_{ij} = \frac{1}{V}\,\frac{\partial E}{\partial \varepsilon_{ij}}$ <Cite id="S-092" />. It is a 3 by 3 symmetric tensor; VASP prints its six independent parts in kB (1 kB = 0.1 GPa) and their average as the pressure. Sign conventions differ between codes and books, so read the sign from the code you use.
+
+**How the ions move.** Conjugate gradients (`IBRION = 2`) picks a search direction from the current forces and the previous direction, then minimizes the energy along that line with a trial step and a correction; `ZBRENT` is the line search that brackets the minimum <Cite id="S-068" /> <Cite id="S-041" />. The quasi-Newton scheme (`IBRION = 1`, RMM-DIIS) builds an estimate of the curvature of the surface from the history of forces and positions and jumps towards the predicted minimum, which is fast when the surface is close to a parabola and can go astray far from it. Damped dynamics (`IBRION = 3`) moves the atoms like particles with friction, which is slow but survives rough landscapes <Cite id="S-041" />. `POTIM` scales the trial step of all three.
+
+**Pulay stress.** At a fixed `ENCUT` the number of plane waves changes with the cell volume, so the basis is not equally complete at every volume. The energy then carries an error that depends on volume, which shows up as an artificial stress, the <Term id="pulay-stress">Pulay stress</Term> <Cite id="S-040" />. Stress converges more slowly with the cutoff than energy does, so cell relaxations use about 1.3 times the largest `ENMAX` <Cite id="S-042" />. VASP also keeps the plane-wave set it started with for the whole run <Cite id="S-019" />, so after a large volume change the run should be repeated from `CONTCAR` until the cell no longer changes <Cite id="S-041" />.
+
+</Level>
+
+<Level min="pro">
+
+Near a minimum the energy is close to a quadratic form, $E \approx E_0 + \tfrac12 \Delta\mathbf{R}^{\mathsf T} H \Delta\mathbf{R}$, with $H$ the Hessian (the matrix of second derivatives). Conjugate gradients reaches the minimum of an exact quadratic in at most as many line searches as there are degrees of freedom; a quasi-Newton update approximates $H^{-1}$ from successive force differences <Cite id="S-068" />. A soft mode (a small eigenvalue of $H$) makes both slow, which is why floppy molecules on surfaces and tilting octahedra take many steps.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+<TagVisual tag="ISIF" />
+
+- **`IBRION`** chooses the algorithm: `2` (conjugate gradients) is the robust choice from a rough start, `1` (RMM-DIIS) is efficient close to the minimum, `3` (damped MD) for poor starting geometries <Cite id="S-041" />. Always set it: with `NSW` above 1 and no `IBRION`, VASP runs molecular dynamics <Cite id="S-041" />.
+- **`ISIF`** chooses what may change <Cite id="S-041" />: `2` ions only, at a fixed cell (defects, surfaces, slabs); `3` ions, cell shape and volume (bulk equilibrium); `4` ions and shape at fixed volume (points of an energy-volume curve). `5` to `7` move the cell with the ions fixed and are rarely used.
+- **`EDIFFG`** is the stopping rule. Negative: stop when every force is below its absolute value, in eV per angstrom. Positive: stop when the energy change between ionic steps is below it, in eV. The default is 10 times `EDIFF`. The force criterion ignores the stress, so check the pressure separately in `ISIF = 3` runs <Cite id="S-041" />.
+- **`NSW`** is the upper limit on ionic steps, typically 100 to 300. Reaching it is not convergence: look for "reached required accuracy" in `OUTCAR` <Cite id="S-042" />.
+- **`EDIFF`** must be tighter than the force target needs: 1E-6, or 1E-7 to 1E-8 with `EDIFFG = -0.001` <Cite id="S-042" />.
+
+The author's bulk relaxation, from the Workflow Handbook, trimmed to a non-magnetic case <Cite id="S-042" />:
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM = bulk relaxation
+PREC   = Accurate
+ENCUT  = 520
+EDIFF  = 1E-6
+ALGO   = Normal
+NELMIN = 6
+ISMEAR = 0
+SIGMA  = 0.05
+LREAL  = .FALSE.
+IBRION = 2
+ISIF   = 3
+NSW    = 200
+EDIFFG = -0.005
+POTIM  = 0.3
+LWAVE  = .TRUE.
+LCHARG = .TRUE.`}
+  annotations={{
+    3: '1.3 times the largest ENMAX (grep ENMAX POTCAR)',
+    6: 'at least a few electronic steps per ionic step',
+    10: 'conjugate gradients; switch to 1 near the minimum',
+    11: 'ions, cell shape and volume: bulk only',
+    13: 'stop when every force is below 0.005 eV per angstrom',
+  }}
+/>
+
+**When to relax the cell.** Relax it (`ISIF = 3`) for a bulk crystal whose lattice constant you want from the functional. Keep it fixed (`ISIF = 2`) when the cell stands for something else: the bulk host of a defect, the in-plane lattice of a slab, a molecule in a box. A slab under `ISIF = 3` loses its vacuum, because the vacuum has nothing to push back <Cite id="S-041" />.
+
+**Stages and reruns.** Relax the ions first (`ISIF = 2`), then the cell (`ISIF = 3`) from that `CONTCAR`; start with a loose `EDIFFG` and tighten it; copy `CONTCAR` to `POSCAR` and rerun until the run converges in 1 to 3 steps, then do a static run for the final energy <Cite id="S-042" />.
+
+**Fixing atoms.** Selective dynamics in `POSCAR` freezes chosen atoms or directions, for example the bottom layers of a slab ([surfaces and slabs](/handbook/12-properties/surfaces-and-slabs/)) <Cite id="S-042" />.
+
+For reading the output see [judging a geometry relaxation](/handbook/09-analysis/relaxations/); for failures see [when a relaxation misbehaves](/handbook/08-convergence-and-errors/relaxation-trouble/).
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...                | ...the relaxation...               | ...and the risk                                 |
+| ------------------------------- | ---------------------------------- | ----------------------------------------------- |
+| `ISIF` 2 to 3                   | Also finds the lattice constants   | Needs a higher `ENCUT`; ruins slabs and defects |
+| `EDIFFG` -0.05 to -0.005        | Stops much closer to the minimum   | More steps; needs a tighter `EDIFF`             |
+| `IBRION` 2 to 1                 | Converges faster near the minimum  | Can diverge from a rough start                  |
+| `POTIM` smaller                 | Takes shorter trial steps          | More steps, fewer overshoots                    |
+| `ENCUT` below 1.3 `ENMAX`       | Feels a larger Pulay stress        | A cell that is too small and keeps changing     |
+| A rattled, lower-symmetry start | Can leave a symmetric saddle point | Lower symmetry costs more k-points              |
+
+Why relax: properties belong to the functional's own structure. Why these values: the force target sets how flat the valley floor must be, and the cutoff margin keeps the cell honest. What happens if you skip the rerun: the cell carries the basis of the starting volume and its Pulay stress.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Taking NSW reached for converged">
+
+The run stops at `NSW` whether or not the forces are small. Only "reached required accuracy" in `OUTCAR` means the criterion was met <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="A tight EDIFFG on a loose EDIFF">
+
+Forces from a poorly converged density are noisy, and the ions chatter around the minimum without meeting the criterion. Tighten `EDIFF` with `EDIFFG` <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Relaxing the cell at the default cutoff">
+
+Pulay stress makes the cell come out wrong and drift on every rerun. Use about 1.3 times the largest `ENMAX` for `ISIF = 3` and rerun from `CONTCAR` <Cite id="S-042" /> <Cite id="S-040" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Trusting a symmetric minimum">
+
+A cubic start stays cubic. If the real structure is distorted, the relaxation sits on a saddle point with zero forces. Rattle the start or lower the symmetry, and compare the energies <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Reporting a local minimum as the ground state">
+
+A relaxation finds the nearest valley. Compare candidate structures and magnetic orders explicitly before you call one the ground state.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-relx-1', 'q-relx-2', 'q-relx-3', 'q-relx-4', 'q-relx-5']} />
+
+<GoDeeper>
+
+- Nielsen and Martin on the quantum-mechanical theory of stress and force <Cite id="S-092" />; Martin's book on forces in electronic structure <Cite id="S-049" />.
+- Francis and Payne on finite-basis corrections and Pulay stress <Cite id="S-040" />.
+- Numerical Recipes on conjugate gradients and quasi-Newton minimization <Cite id="S-068" />.
+- VASP wiki pages IBRION, ISIF, EDIFFG, NSW and POTIM (by page name) <Cite id="S-019" />.
+- The Field Handbook ionic entries and the Workflow Handbook relaxation section <Cite id="S-041" /> <Cite id="S-042" />.
+
+</GoDeeper>

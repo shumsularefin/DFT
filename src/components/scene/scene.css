@@ -20,6 +20,10 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
+.scene-host {
+  position: absolute;
+  inset: 0;
+}
 .scene-stage canvas {
   display: block;
   width: 100%;
@@ -115,4 +119,26 @@
 }
 .sc-text.sc-accent {
   fill: var(--accent);
+}
+/* the flat view turns under a drag, like the 3D one; a vertical swipe still scrolls the page on a phone */
+.scene-flat {
+  cursor: grab;
+  touch-action: pan-y;
+}
+.scene-flat:active {
+  cursor: grabbing;
+}
+.scene-stage[data-testid='scene-3d'] {
+  cursor: grab;
+}
+.scene-help {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--step--1);
+}
+.scene-pick {
+  margin: 0;
+  min-height: 1.4em;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
 }

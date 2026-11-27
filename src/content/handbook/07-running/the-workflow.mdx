@@ -1,5 +1,28 @@
 ---
 id: the-workflow
+stage:
+  scene: m07-workflow
+  states:
+    - id: relax
+      section: why
+      params: { step: 1 }
+      caption: 'Step 1, the relaxation, starts from the four input files. The ghost boxes are the runs still to come; play the step bar to grow the tree.'
+    - id: scf
+      section: intuition
+      params: { step: 2 }
+      caption: 'Step 2, the SCF in the same folder, reads the CONTCAR and WAVECAR the relaxation left behind.'
+    - id: spine
+      section: math
+      params: { step: 5, spine: true }
+      caption: 'All five runs. The dashed spine joins runs that must share ENCUT, ISPIN, MAGMOM, LMAXMIX, the functional and the cell.'
+    - id: bands
+      section: in-vasp
+      params: { step: 3 }
+      caption: 'Step 3, the band run, reads the SCF CHGCAR with ICHARG = 11 and the path in KPATH.in.'
+    - id: broken
+      section: what-changes
+      params: { step: 5, mismatch: true }
+      caption: 'ENCUT changed after the relaxation: every link out of step 1 breaks (dashed), so the later numbers no longer belong to the relaxed structure.'
 title: The five-step protocol and the project folder
 module: 7
 order: 1
@@ -10,7 +33,7 @@ vaspTags: [ISTART, ICHARG, EDIFF, ENCUT, LORBIT]
 sources: [S-019, S-020, S-042]
 noLab: true
 status: draft
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 <Why>
@@ -50,6 +73,8 @@ Why: optics needs many empty bands, so the author triples `NBANDS` and rounds up
 </Intuition>
 
 <TheMath>
+
+Every step of the workflow solves the same equations for the same material; only the question you ask changes. So the settings that define the energy must stay the same from step to step, or the steps describe different problems <Cite id="S-042" />.
 
 <Level min="intermediate">
 

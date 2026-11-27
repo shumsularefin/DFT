@@ -1,5 +1,24 @@
 ---
 id: the-many-electron-problem
+stage:
+  scene: m03-two-electron
+  states:
+    - id: one-surface
+      section: why
+      params: { Z: '2', lambda: 1 }
+      caption: 'Two electrons have one wavefunction over both positions, x1 and x2, drawn as a single surface. Turn it to look along the orange diagonal x1 = x2, where both electrons would sit at the same point.'
+    - id: no-repulsion
+      section: intuition
+      params: { Z: '2', lambda: 0, landscape: true }
+      caption: 'With the repulsion switched off the surface is a plain product of two one-electron shapes, and the landscape below has no ridge. Slide the repulsion up and watch a ridge rise along x1 = x2.'
+    - id: valley
+      section: math
+      params: { Z: '1', lambda: 1, landscape: true }
+      caption: 'For the weakly bound Z = 1 atom the repulsion ridge cuts a valley into the surface along the diagonal: the electrons avoid each other, so the wavefunction cannot be split into one picture per electron.'
+    - id: unbound
+      section: what-changes
+      params: { Z: '1', lambda: 2 }
+      caption: 'Double the repulsion and the energy rises above that of one electron alone: the second electron is no longer bound and leaves for the edge of the box. The repulsion is real and large.'
 title: The many-electron problem
 module: 3
 order: 1

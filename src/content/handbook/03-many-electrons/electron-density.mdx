@@ -1,5 +1,25 @@
 ---
 id: electron-density
+stage:
+  scene: m03-density
+  states:
+    - id: one-shell
+      section: why
+      params: { electrons: 2, level: -2, slice: false }
+      caption: 'The density of two electrons in the 1s level: one number at every point in space, here a smooth ball. However many electrons there are, the density stays a function of three coordinates.'
+    - id: two-shells
+      section: intuition
+      params: { electrons: 4, level: -2.5, slice: true, cut: 0 }
+      caption: 'Fill the 2s level too and an outer shell appears. The slice is coloured by log10 of the density; drag its height and lower the surface level to find the shell.'
+    - id: p-electron
+      section: lab
+      params: { electrons: 5, level: -2.5, slice: false }
+      camera: front
+      caption: 'A single 2p_z electron makes the density longer along z. Add electrons one at a time up to 10 and the full shell turns round again.'
+    - id: full-shell
+      section: in-vasp
+      params: { electrons: 10, level: -3, slice: true, cut: 2 }
+      caption: 'Ten electrons fill 1s, 2s and 2p. Summed over the grid the density holds about 10 electrons, the same check you can make by integrating a CHGCAR.'
 title: Electron density
 module: 3
 order: 3

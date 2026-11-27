@@ -1,31 +1,80 @@
 ---
 id: relaxations
+stage:
+  scene: m09-relax
+  states:
+    - id: start
+      section: why
+      params: { step: 0, method: sd, potim: 0.5, ediffg: 0.02 }
+      layers: [forces, vacancy]
+      camera: iso
+      caption: 'A 31-atom cell with a vacancy, started from rattled positions. Every atom feels a force, the largest 1.32 eV/Å; a relaxation moves the atoms downhill until the largest force falls below |EDIFFG|.'
+    - id: steepest-descent
+      section: intuition
+      params: { step: 10, method: sd, potim: 0.5, ediffg: 0.02 }
+      layers: [trails, trace]
+      camera: iso
+      caption: 'After 10 steepest descent steps the trails show each atom sliding toward its new site. The log10 Fmax trace falls steadily and crosses |EDIFFG| = 0.02 eV/Å at step 9.'
+    - id: bfgs
+      section: lab
+      params: { step: 10, method: bfgs, potim: 0.5, ediffg: 0.02 }
+      layers: [trace, atoms]
+      camera: iso
+      caption: 'BFGS (like IBRION = 1) learns the curvature from the force history and meets the same criterion at step 6, with the energy already within 0.1 meV of the lowest one reached.'
+    - id: energy-before-forces
+      section: in-vasp
+      params: { step: 40, method: damped, potim: 1, ediffg: 0.02 }
+      layers: [trace, forces]
+      camera: iso
+      caption: 'Damped dynamics (like IBRION = 3) with POTIM = 1 after 40 steps: the energy is within 0.1 meV of its lowest value, yet the largest force is still 0.08 eV/Å. The energy settles before the forces do, so a force criterion (EDIFFG < 0) is the safer stop.'
+    - id: overshoot
+      section: mistakes
+      params: { step: 20, method: sd, potim: 2, ediffg: 0.02 }
+      layers: [trace, forces]
+      camera: iso
+      caption: 'Steepest descent with POTIM = 2: every step overshoots, the atoms rattle back and forth, and the largest force never falls below 0.02 eV/Å in 40 steps. A run that stops at NSW like this is not relaxed.'
 title: Judging a geometry relaxation
 module: 9
 order: 2
-summary: How to inspect XDATCAR trajectories, confirm ionic convergence in OSZICAR and OUTCAR, and know when a large volume change requires a restart from CONTCAR.
+summary: How to choose IBRION, POTIM and ISIF, freeze atoms with selective dynamics, set EDIFFG, restart from CONTCAR, handle the Pulay stress of volume relaxations, and check that a relaxation really converged.
 concepts: [relaxation-analysis]
 requires: [dft-energies-forces]
-vaspTags: [IBRION, ISIF, EDIFFG, NSW]
-sources: [S-019, S-042]
+vaspTags: [IBRION, POTIM, ISIF, EDIFFG, NSW, ENCUT, NFREE, SMASS]
+sources: [S-019, S-040, S-041, S-042, S-092]
 status: draft
-updated: 2026-11-24
+updated: 2026-11-27
 ---
 
 <Why>
 
-A relaxation job that exits cleanly without an error message has not necessarily converged: it may simply have hit `NSW` steps while forces are still large, or relaxed into a much larger volume where the fixed plane-wave basis is no longer accurate <Cite id="S-042" />.
+Almost every project starts with a relaxation: move the atoms (and perhaps the cell) until the forces vanish, then compute everything else on that structure. A wrong geometry spoils every later number, from the band gap to the formation energy.
+
+The trap is that a relaxation can finish without an error and still be unfinished. It may have stopped because it ran out of steps (`NSW`), because a loose energy criterion was met while the forces were still large, or because the cell grew and the fixed plane-wave basis no longer describes it well <Cite id="S-041" />. Judging a relaxation means checking each of these.
 
 </Why>
 
 <Intuition>
 
-Before accepting `CONTCAR` as your relaxed structure, check four items:
+A relaxation is a ball rolling downhill on the energy landscape. Three choices shape the walk.
 
-1. `OUTCAR` contains `reached required accuracy` (meaning every ionic force fell below `|EDIFFG|`).
-2. Every electronic loop along the way converged before hitting `NELM`.
-3. The trajectory in `XDATCAR` settled smoothly rather than oscillating back and forth.
-4. If `ISIF = 3` changed the cell volume by more than a few percent, copy `CONTCAR` to `POSCAR` and run a second relaxation so VASP rebuilds the plane-wave basis at the new cell volume <Cite id="S-042" />.
+**How the ball moves (`IBRION`).** VASP offers three optimizers <Cite id="S-041" />:
+
+- `IBRION = 2`, **conjugate gradient**: robust, the standard for a rough starting structure. It searches along a direction until the energy stops falling, then picks a new direction.
+- `IBRION = 1`, **RMM-DIIS quasi-Newton**: fast close to the minimum, because it learns the shape of the valley from previous steps. Far from the minimum, where the forces are large, it can be unstable.
+- `IBRION = 3`, **damped molecular dynamics**: the atoms move as if under friction. Slow but forgiving, for poor starting geometries and soft landscapes.
+
+A common pattern for a hard case is conjugate gradient for the first steps, then RMM-DIIS to finish <Cite id="S-041" />.
+
+**What may move (`ISIF`).** Positions only, or also the cell shape and the volume. A slab or a defect in a fixed host cell moves ions only; a bulk crystal whose lattice constant you want relaxes all three <Cite id="S-041" />. Individual atoms can also be frozen with <Term id="selective-dynamics">selective dynamics</Term> in `POSCAR`.
+
+**When to stop (`EDIFFG`).** A negative value is a force criterion: stop when every force is below its absolute value, in eV per angstrom. A positive value stops when the energy change between ionic steps is small, which can happen while forces are still large. The default is positive (`EDIFF` times 10), so set a negative value on purpose <Cite id="S-041" />.
+
+**Before you trust `CONTCAR`**, check four things <Cite id="S-042" />:
+
+1. `OUTCAR` contains `reached required accuracy`.
+2. Every ionic step converged electronically in fewer than `NELM` steps.
+3. The forces fell steadily rather than oscillating.
+4. If the cell changed, a second run from `CONTCAR` changes it no further (see the Pulay stress below).
 
 </Intuition>
 
@@ -33,48 +82,170 @@ Before accepting `CONTCAR` as your relaxed structure, check four items:
 
 <TheMath>
 
-The maximum ionic force is the largest Euclidean norm across all $N$ atoms:
+The quantity a force criterion tests is the largest force magnitude over all $N$ atoms:
 
-$$F_{\max} = \max_{1 \le i \le N} \|\mathbf F_i\|_2$$
+$$F_{\max} = \max_{1 \le i \le N} \lVert\mathbf F_i\rVert$$
 
-Setting a negative `EDIFFG` (for example `EDIFFG = -0.02`) stops ionic relaxation only when $F_{\max} < |\text{EDIFFG}|$ in eV/A <Cite id="S-019" />.
+With `EDIFFG` negative, the relaxation stops when $F_{\max}$ falls below the absolute value of `EDIFFG`. With `EDIFFG` positive, it stops when $\lvert E_{n} - E_{n-1}\rvert$ between successive ionic steps falls below `EDIFFG` in eV <Cite id="S-019" /> <Cite id="S-041" />.
+
+<Level min="intermediate">
+
+**What each optimizer does with `POTIM`** <Cite id="S-041" /> <Cite id="S-019" />:
+
+- **Quasi-Newton** (`IBRION = 1`) steps $\Delta\mathbf R = \mathbf H^{-1}\mathbf F$, where $\mathbf H^{-1}$ is an estimate of the inverse curvature built from the history of forces and positions (`NFREE` sets how many past steps are kept). `POTIM` scales the steps. It needs accurate forces, so pair it with a tight `EDIFF`.
+- **Conjugate gradient** (`IBRION = 2`) makes a trial step along a search direction, scaled by `POTIM`, then a line minimization along it; each new direction is chosen conjugate to the previous ones. A `ZBRENT` error means the line search could not bracket a minimum, usually because forces or energies were noisy.
+- **Damped dynamics** (`IBRION = 3`) integrates a damped equation of motion of the form $m\ddot{\mathbf R} = \mathbf F - \gamma\dot{\mathbf R}$: `POTIM` acts as the time step and `SMASS` sets the damping. Too large a `POTIM` and the atoms fly past the minimum.
+
+For all three the default `POTIM` is 0.5; reduce it (to about 0.1) when a relaxation oscillates. For molecular dynamics (`IBRION = 0`) `POTIM` is the time step in fs and has no default <Cite id="S-041" />.
+
+</Level>
+
+<Level min="pro">
+
+**Why volume relaxations need care.** During a run VASP keeps the set of plane waves chosen for the starting cell. When the cell expands, the same plane waves correspond to a lower effective cutoff, and the incomplete basis adds a spurious, nearly isotropic term to the diagonal of the stress, the <Term id="pulay-stress">Pulay stress</Term> <Cite id="S-040" />. The stress is the strain derivative of the energy <Cite id="S-092" /> and converges with the cutoff much more slowly than the energy itself, so cell relaxations use `ENCUT` of about 1.3 times the largest `ENMAX` (the VASP wiki notes the default often has to be raised by about 30 percent for the stress) <Cite id="S-042" />. Restarting from `CONTCAR` builds a new basis for the new cell, so repeated runs converge to the right volume, normally within 2 to 3 rounds <Cite id="S-041" />. An energy-volume curve from fixed-volume runs avoids the problem altogether; see [the equation of state topic](/handbook/12-properties/equation-of-state/).
+
+</Level>
 
 </TheMath>
 
 <InVasp>
 
-- Always inspect `CONTCAR` (not `POSCAR`) for the final relaxed coordinates <Cite id="S-042" />.
-- After an `ISIF = 3` relaxation, run a final static calculation (`NSW = 0`, `IBRION = -1`) on `CONTCAR` to get a clean total energy without Pulay stress drift.
+<TagVisual tag="ISIF" />
+
+**What each `ISIF` moves**, from the Field Handbook table <Cite id="S-041" />:
+
+| `ISIF` | Stress computed | Ions | Cell shape | Cell volume | Typical use                                     |
+| ------ | --------------- | ---- | ---------- | ----------- | ----------------------------------------------- |
+| 0      | no              | yes  | no         | no          | MD without stress (fastest)                     |
+| 1      | trace only      | yes  | no         | no          | Rarely used                                     |
+| 2      | yes             | yes  | no         | no          | Fixed-cell relaxation: defects, surfaces, slabs |
+| 3      | yes             | yes  | yes        | yes         | Full relaxation of a bulk crystal               |
+| 4      | yes             | yes  | yes        | no          | Relax at fixed volume, energy-volume curves     |
+| 5      | yes             | no   | yes        | no          | Cell shape only                                 |
+| 6      | yes             | no   | yes        | yes         | Cell shape and volume, ions fixed               |
+| 7      | yes             | no   | no         | yes         | Isotropic volume change only                    |
+| 8      | yes             | yes  | no         | yes         | Ions and volume (VASP 6)                        |
+
+The default is `ISIF = 2` for relaxations and `0` for MD. Nothing moves unless `IBRION` is above 0 and `NSW` is above 0. `ISIF = 3` keeps the starting space group unless the input breaks it <Cite id="S-041" />.
+
+**A bulk relaxation INCAR**, the Field Handbook recipe <Cite id="S-041" />:
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM = bulk relaxation
+PREC   = Accurate
+ENCUT  = 520
+EDIFF  = 1E-6
+EDIFFG = -0.01
+NSW    = 100
+IBRION = 2
+ISIF   = 3
+ISMEAR = 0
+SIGMA  = 0.05
+LREAL  = .FALSE.
+LWAVE  = .FALSE.
+LCHARG = .FALSE.`}
+  annotations={{
+    3: 'about 1.3 times the largest ENMAX, for the stress',
+    4: 'tight enough that the forces are not noisy',
+    5: 'negative: force criterion, eV per angstrom',
+    6: 'upper limit on ionic steps',
+    7: 'always set it; without it NSW above 1 means MD',
+    8: 'ions, shape and volume: bulk only',
+  }}
+/>
+
+<TagVisual tag="EDIFFG" />
+
+- **`EDIFFG` by purpose** <Cite id="S-041" />: about -0.03 to -0.05 for screening, -0.01 to -0.02 for publication structures, -0.001 to -0.005 before phonons and finite differences. A tight `EDIFFG` needs a tight `EDIFF`, or the forces stay noisy and the ions chatter around the minimum.
+- **Selective dynamics.** Add a line starting with `S` after the atom counts, then three flags per atom: `T` may move, `F` is frozen. The usual use is the bottom layers of a slab, which stand for the bulk. `CONTCAR` keeps the flags <Cite id="S-041" />.
+
+<VaspFile
+  name="POSCAR"
+  code={`slab, bottom two layers frozen (illustrative geometry)
+1.0
+2.80 0.00 0.00
+0.00 2.80 0.00
+0.00 0.00 20.00
+Pt
+4
+Selective dynamics
+Direct
+0.0 0.0 0.0  F F F
+0.5 0.5 0.1  F F F
+0.0 0.0 0.2  T T T
+0.5 0.5 0.3  T T T`}
+  annotations={{
+    8: 'only the first letter is read',
+    10: 'frozen in all three directions',
+    12: 'free to relax',
+  }}
+/>
+
+- **Restarting.** If the run stopped at `NSW` or ran out of time, look at `CONTCAR` (a killed job can leave it empty), then `cp CONTCAR POSCAR` and run again <Cite id="S-041" />.
+- **After `ISIF = 3`**, repeat from `CONTCAR` until the volume stops changing, then do a static run (`NSW = 0`, `IBRION = -1`) on the final structure for the energy <Cite id="S-041" /> <Cite id="S-042" />.
+- **Read the stress separately.** The force criterion ignores the stress; in `ISIF = 3` runs check the `in kB` line of `OUTCAR` as well <Cite id="S-041" />.
+- **When it will not converge**, work through [the relaxation trouble topic](/handbook/08-convergence-and-errors/relaxation-trouble/): staged relaxation, smaller `POTIM`, a change of optimizer.
 
 </InVasp>
 
 <WhatChanges>
 
-| Observation in output       | Likely meaning            | Action                                               |
-| --------------------------- | ------------------------- | ---------------------------------------------------- | --- | ----------------------------------------------------- |
-| `reached required accuracy` | Forces converged below `  | EDIFFG                                               | `   | Check volume change, then run static SCF on `CONTCAR` |
-| Stopped at step `NSW`       | Relaxation unfinished     | Copy `CONTCAR` to `POSCAR` and continue              |
-| Volume changed by > 10 %    | Plane-wave basis is stale | Re-run relaxation from `CONTCAR` <Cite id="S-042" /> |
+| Observation in the output                  | Likely meaning                              | Action                                                                      |
+| ------------------------------------------ | ------------------------------------------- | --------------------------------------------------------------------------- |
+| `reached required accuracy`                | Forces below the absolute value of `EDIFFG` | Check the volume change and the stress, then a static run                   |
+| The run stopped at step `NSW`              | Relaxation unfinished                       | `cp CONTCAR POSCAR` and continue                                            |
+| Steps that use all `NELM` electronic steps | Forces from unconverged densities           | Fix the SCF first (see SCF trouble)                                         |
+| Forces oscillate up and down               | Steps too large                             | Reduce `POTIM`; switch `IBRION = 1` to `2` or `3`                           |
+| A second `ISIF = 3` run changes the volume | Pulay stress from the old basis             | Raise `ENCUT` to about 1.3 `ENMAX`; repeat until stable <Cite id="S-042" /> |
+| `ZBRENT: fatal error in bracketing`        | Conjugate-gradient line search failed       | Restart from `CONTCAR`, tighten `EDIFF`, or use `IBRION = 1`                |
+| Temperatures appear in `OSZICAR`           | `IBRION` was not set, so VASP ran MD        | Set `IBRION = 2` explicitly                                                 |
 
-Why restart after a large volume change: VASP fixes the set of plane waves at the initial cell volume.
+Why judge each run: a clean exit is not a converged structure. Why a force criterion: forces measure distance from the minimum directly. What happens if you skip the checks: every later property is computed on the wrong structure <Cite id="S-041" />.
 
 </WhatChanges>
 
 <Mistakes>
 
-<Callout variant="mistake" title="Using a positive EDIFFG without realising it stops on energy, not force">
+<Callout variant="mistake" title="A positive EDIFFG, often by default">
 
-A positive `EDIFFG` (e.g. `1E-4`) stops when the energy difference between ionic steps drops below that value, even if individual atomic forces are still large. Use negative `EDIFFG` for force convergence <Cite id="S-019" />.
+Cause: `EDIFFG` left out, so the default energy criterion (`EDIFF` times 10) stops the run once steps change the energy little, even with large forces. Fix: a negative `EDIFFG` such as -0.01 or -0.02 <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Leaving IBRION out">
+
+Cause: `NSW` above 1 with no `IBRION` defaults to molecular dynamics. Fix: set `IBRION = 2` (or 1, or 3) in every relaxation INCAR <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Using ISIF = 3 for a slab or a molecule in a box">
+
+Cause: vacuum has no stress to resist, so the cell shrinks into it. Fix: `ISIF = 2`, and selective dynamics for the layers that stand for the bulk <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Trusting one cell relaxation at a low cutoff">
+
+Cause: Pulay stress from a basis fixed at the starting cell. Fix: `ENCUT` about 1.3 times the largest `ENMAX`, and repeat from `CONTCAR` until the cell is stable <Cite id="S-041" /> <Cite id="S-040" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Reading the final structure from POSCAR">
+
+Cause: `POSCAR` is the input and is never updated. Fix: the relaxed structure is in `CONTCAR`; the whole path is in `XDATCAR` <Cite id="S-041" />.
 
 </Callout>
 
 </Mistakes>
 
-<Check ids={['q-m9-5', 'q-m9-6', 'q-m9-7', 'q-m9-8']} />
+<Check ids={['q-m9-5', 'q-m9-6', 'q-m9-7', 'q-m9-8', 'q-m9-29', 'q-m9-30']} />
 
 <GoDeeper>
 
-- VASP wiki pages `XDATCAR`, `CONTCAR`, `EDIFFG`, and `ISIF` <Cite id="S-019" />.
-- The author's VASP Field Handbook on relaxation checks <Cite id="S-042" />.
+- VASP wiki pages IBRION, POTIM, ISIF, EDIFFG, NFREE, SMASS, POSCAR and CONTCAR, by page name <Cite id="S-019" />.
+- [The relaxation trouble topic](/handbook/08-convergence-and-errors/relaxation-trouble/) for runs that will not converge.
+- Francis and Payne on Pulay stress <Cite id="S-040" />; Nielsen and Martin on stress in DFT <Cite id="S-092" />.
+- The Field Handbook entries IBRION, POTIM, ISIF, EDIFFG and CONTCAR <Cite id="S-041" />.
 
 </GoDeeper>

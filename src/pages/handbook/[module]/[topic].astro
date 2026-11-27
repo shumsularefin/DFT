@@ -20,6 +20,7 @@ import PseudopotentialHeader from '../../../components/handbook/PseudopotentialH
 import Callout from '../../../components/ui/Callout.astro';
 import ErrorFinder from '../../../components/handbook/ErrorFinder.astro';
 import Scene from '../../../components/scene/Scene.astro';
+import TopicStage from '../../../components/stage/TopicStage.astro';
 import { citeOrder, levelNotes, presentSections, splitId, topicPageClass } from '../../../lib/topic';
 import { moduleName } from '../../../lib/site';
 
@@ -37,6 +38,7 @@ const body = entry.body ?? '';
 Astro.locals.cites = citeOrder(body);
 Astro.locals.topic = { id: entry.id, concepts: entry.data.concepts };
 const sections = presentSections(body);
+const stage = entry.data.stage;
 const components = {
   Why,
   Intuition,
@@ -83,33 +85,64 @@ const statusLabel = { draft: 'First edition', review: 'Awaiting verification', v
     </ol>
   </nav>
   <div
-    class="topic"
-    data-pagefind-body
-    data-pagefind-meta={`module:${entry.data.module}. ${moduleName(entry.data.module)}`}
+    class="topic-row"
+    data-stage-row={stage ? '' : undefined}
+    data-stage-mode={stage ? 'split' : undefined}
   >
-    <span hidden data-pagefind-meta={`levels:${levelNotes(body)}`}></span>
-    <header class="topic-head">
-      <div class="page-h">
-        <div>
-          <h1>{entry.data.title}</h1>
-          <p class="topic-summary">{entry.data.summary}</p>
-          <p class="topic-meta">
-            {statusLabel}, updated <time datetime={entry.data.updated}>{entry.data.updated}</time>.
-          </p>
+    <div
+      class:list={['topic', stage && 'topic-text']}
+      data-pagefind-body
+      data-pagefind-meta={`module:${entry.data.module}. ${moduleName(entry.data.module)}`}
+    >
+      <span hidden data-pagefind-meta={`levels:${levelNotes(body)}`}></span>
+      <header class="topic-head">
+        <div class="page-h">
+          <div>
+            <h1>{entry.data.title}</h1>
+            <p class="topic-summary">{entry.data.summary}</p>
+            <p class="topic-meta">
+              {statusLabel}, updated <time datetime={entry.data.updated}>{entry.data.updated}</time>.
+            </p>
+          </div>
+          <button
+            type="button"
+            class="btn js-only"
+            aria-pressed="false"
+            data-mark-complete
+            data-pagefind-ignore
+          >
+            Mark complete
+          </button>
         </div>
-        <button
-          type="button"
-          class="btn js-only"
-          aria-pressed="false"
-          data-mark-complete
-          data-pagefind-ignore
-        >
-          Mark complete
-        </button>
+      </header>
+      {stage && (
+        <p class="stage-show">
+          <button type="button" class="btn btn-small" data-stage-show hidden>
+            Show the 3D view
+          </button>
+        </p>
+      )}
+      <article class="prose">
+        <Content components={components} />
+      </article>
+    </div>
+    {stage && (
+      <div
+        class="stage-splitter"
+        data-stage-splitter
+        role="separator"
+        tabindex="0"
+        aria-orientation="vertical"
+        aria-label="Width of the 3D view"
+        aria-valuemin="28"
+        aria-valuemax="66"
+        aria-valuenow="42"
+      />
+    )}
+    {stage && (
+      <div class="stage-col">
+        <TopicStage stage={stage} topicId={entry.id} />
       </div>
-    </header>
-    <article class="prose">
-      <Content components={components} />
-    </article>
+    )}
   </div>
 </HandbookLayout>

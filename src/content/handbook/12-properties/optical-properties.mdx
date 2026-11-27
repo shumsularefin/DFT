@@ -1,5 +1,29 @@
 ---
 id: optical-properties
+stage:
+  scene: m12-optics
+  states:
+    - id: absorption
+      section: why
+      params: { sweep: broadening, quantity: alpha, energy: 3.2 }
+      camera: iso
+      caption: 'Absorption of a model crystal as a surface over photon energy and broadening, on a log scale. The dark line is the spectrum at the chosen broadening; slide the energy cursor across the peaks.'
+    - id: eps2
+      section: intuition
+      params: { sweep: broadening, quantity: eps2, energy: 3.2 }
+      caption: 'The imaginary part eps2 on the same axes. Each ridge is one oscillator, and wider broadening lowers and spreads it.'
+    - id: reflectivity
+      section: math
+      params: { sweep: broadening, quantity: reflectivity, energy: 5 }
+      caption: 'Reflectivity derived from eps1 and eps2 with the formulas of the math section. It is high just above each resonance, where eps1 dips.'
+    - id: cshift
+      section: in-vasp
+      params: { sweep: broadening, quantity: eps2, gamma: 0.1 }
+      caption: 'CSHIFT is the broadening of a LOPTICS spectrum, much as gamma is here: a small value gives tall, sharp peaks and a large one smears neighboring peaks together. It never moves the gap.'
+    - id: polarization
+      section: what-changes
+      params: { sweep: polarization, quantity: alpha, angle: 45 }
+      caption: 'Now the second axis is the field direction. Turning the field from x to z hands the absorption from the x oscillators to the z ones, which is why xx, yy and zz are reported separately.'
 title: Optical properties
 module: 12
 order: 5

@@ -1,61 +1,119 @@
 ---
 id: reading-magnetic-output
+stage:
+  scene: m05s-site-moments
+  states:
+    - id: final-table
+      section: why
+      params: { table: 2, column: tot, magmom: afm }
+      caption: 'The final table of a sample OUTCAR: ion 1 at +3.41, ion 2 at -3.41 and ion 3 nearly zero. Dashed lines show the starting MAGMOM beside each arrow.'
+    - id: first-table
+      section: intuition
+      params: { table: 1, column: tot, magmom: afm }
+      caption: 'The first table belongs to an early step and differs: ion 2 is below half its start. Step to table 2, the last one, which is the result.'
+    - id: d-column
+      section: math
+      params: { table: 2, column: d, magmom: afm }
+      caption: 'The d column carries almost all of the moment; s and p are tiny. Switch columns to compare the orbital parts.'
+    - id: flipped
+      section: mistakes
+      params: { table: 2, column: tot, magmom: fm }
+      caption: 'Started ferromagnetic, the same output means ion 2 flipped. The run found an antiferromagnetic state, not the one you asked for.'
 title: Reading magnetic output
 module: 5
 order: 10
-summary: How to read total moments in OSZICAR, per-site moments in OUTCAR, and mirrored spin-polarized densities of states.
+summary: How to read the total moment in OSZICAR, the per-site moments in OUTCAR and the spin-resolved density of states, and how to tell an antiferromagnet from a collapsed non-magnetic run.
 concepts: [magnetic-output]
 requires: [spin-polarized-dft]
-vaspTags: [ISPIN, LORBIT, MAGMOM]
+vaspTags: [ISPIN, LORBIT, MAGMOM, NEDOS]
 sources: [S-019, S-041, S-042, S-059, S-065]
 noLab: true
 status: draft
-updated: 2026-11-24
+updated: 2026-11-27
 ---
 
 <Why>
 
-After a spin-polarized VASP job finishes, the total energy alone does not tell you what magnetic state the calculation actually found. You have to read three pieces of output: the total cell moment in `OSZICAR`, the atom-by-atom moment table in `OUTCAR`, and (for electronic structure) the up-spin and down-spin densities of states in `DOSCAR` <Cite id="S-041" />.
+After a spin-polarized job finishes, the total energy alone does not tell you which magnetic state the calculation found. A G-type antiferromagnet, a state that collapsed to zero moment and a ferromagnet that the run flipped into can all finish without a warning. You have to read three pieces of output: the total cell moment in `OSZICAR`, the atom-by-atom moments in `OUTCAR`, and, for the electronic structure, the up-spin and down-spin densities of states in `DOSCAR` <Cite id="S-041" /> <Cite id="S-042" />. Each answers a different question, and only together do they tell you what you have.
 
 </Why>
 
 <Intuition>
 
-1. **`OSZICAR` (`mag=`):** At the end of each ionic step, `OSZICAR` prints `mag=` followed by the net magnetic moment of the whole simulation cell in $\mu_B$. For a ferromagnet, `mag` is roughly the sum of the site moments. For a clean antiferromagnet, `mag` is close to `0.000`, which by itself cannot distinguish an antiferromagnet from a collapsed non-magnetic state!
-2. **`OUTCAR` (`magnetization (x)`):** When `LORBIT = 11` is set, `OUTCAR` prints a table listing the $s, p, d, f$ and total local magnetic moment inside each atom's PAW projection sphere <Cite id="S-041" />. Always read the **last** occurrence of this table (the converged ionic step). Here an antiferromagnet shows large opposite-sign moments on its magnetic sites (for example, `+3.8` and `-3.8`), whereas a collapsed non-magnetic run shows zeros everywhere.
-3. **Spin-polarized DOS (`DOSCAR`):** With `ISPIN = 2`, the density of states is split into up-spin and down-spin channels. Plotting up-spin positive and down-spin negative (mirrored across zero) makes spin splitting visible at a glance: symmetric mirrors mean zero net polarization, while shifted peaks reveal exchange splitting <Cite id="S-059" />.
+Think of a building with many flats. The total moment is the building's bill: it tells you how much was used in total, but not by whom. The per-site table is the meter in each flat. Two buildings can have the same total bill (zero) for very different reasons: every flat used nothing, or half the flats produced exactly what the other half used.
+
+1. **`OSZICAR` (`mag=`).** At the end of each ionic step `OSZICAR` prints `mag=` followed by the net <Term id="magnetic-moment">magnetic moment</Term> of the whole cell in Bohr magnetons. For a ferromagnet it is roughly the sum of the site moments. For a clean antiferromagnet it is close to `0.000`, which by itself cannot tell an antiferromagnet from a collapsed non-magnetic state.
+2. **`OUTCAR` (`magnetization (x)`).** With `LORBIT = 11`, `OUTCAR` prints a table with the s, p, d (and f) and total moment inside a sphere around each atom, in `POSCAR` order <Cite id="S-041" /> <Cite id="S-042" />. Read the **last** occurrence: a relaxation prints one table per ionic step. An antiferromagnet shows large moments of opposite sign on its magnetic sites (for example `+3.8` and `-3.8`); a collapsed run shows zeros everywhere.
+3. **Spin-resolved DOS (`DOSCAR`).** With `ISPIN = 2` the density of states comes in two channels. Plotted with up-spin positive and down-spin negative, a mirror-symmetric picture means zero net polarization, and peaks shifted between the two halves show the exchange splitting <Cite id="S-059" />.
 
 <Scene id="fm-cubic" />
 
-Note that the sum of atomic moments in `OUTCAR` rarely equals `OSZICAR` `mag=` exactly: the `OUTCAR` numbers only integrate inside atomic projection spheres, leaving out the interstitial space between atoms <Cite id="S-065" />.
+Three facts keep you from misreading the numbers:
+
+- **Site moments are smaller than the formal value.** They are integrated inside spheres around each atom, so part of the moment lies outside. High-spin Fe3+ shows about 4.2 to 4.3 Bohr magnetons, not 5 <Cite id="S-042" />.
+- **The site moments do not add up to `mag=`.** The spheres do not fill the cell, so the space between them (the interstitial) carries the rest <Cite id="S-065" />.
+- **An integer total moment is a clue.** For an insulator or a half-metal the total cell moment is an integer <Cite id="S-042" />. A half-metal shows a gap at the Fermi level in one spin channel only.
+
+Small moments on non-magnetic atoms (oxygen next to a magnetic ion, say a few hundredths) are induced by their neighbours and are expected.
 
 </Intuition>
 
 <TheMath>
 
-The total cell moment reported in `OSZICAR` is the exact integral over the entire unit cell $\Omega$:
+The moment is a count: the number of up-spin electrons minus the number of down-spin electrons, in units of the Bohr magneton. Ten up and eight down give a moment of 2.
 
-$$M_{\text{tot}} = \int_\Omega \bigl(n_\uparrow(\mathbf r) - n_\downarrow(\mathbf r)\bigr)\,d^3r$$
+<Level min="intermediate">
 
-Each atomic moment $m_i$ in the `OUTCAR` `magnetization (x)` table is the projection inside a sphere of radius $R_i$ centred on ion $i$:
+The total cell moment in `OSZICAR` is the integral over the whole cell $\Omega$ of the spin density, the difference of the up and down densities $n_\uparrow$ and $n_\downarrow$:
 
-$$m_i = \int_{|\mathbf r - \mathbf R_i| \le R_i} \bigl(n_\uparrow(\mathbf r) - n_\downarrow(\mathbf r)\bigr)\,d^3r$$
+$$M_{\text{tot}} = \int_\Omega \bigl(n_\uparrow(\mathbf r) - n_\downarrow(\mathbf r)\bigr)\,d^3r = N_\uparrow - N_\downarrow$$
 
-Because the spheres do not fill all of $\Omega$, $M_{\text{tot}} - \sum_i m_i = M_{\text{interstitial}}$ is generally non-zero <Cite id="S-065" />.
+Each site moment $m_i$ in the `OUTCAR` table is the same integral, restricted to a sphere of radius $R_i$ around ion $i$ at position $\mathbf R_i$:
+
+$$m_i = \int_{\text{sphere } i} \bigl(n_\uparrow(\mathbf r) - n_\downarrow(\mathbf r)\bigr)\,d^3r$$
+
+Because the spheres do not fill $\Omega$, the difference $M_{\text{tot}} - \sum_i m_i = M_{\text{interstitial}}$ is in general not zero <Cite id="S-065" />. In an insulator every band is full or empty in each spin channel, so $N_\uparrow$ and $N_\downarrow$ are both integers and so is $M_{\text{tot}}$; the site moments, being partial integrals, need not be.
+
+</Level>
 
 </TheMath>
 
 <InVasp>
 
-```incar
-ISPIN = 2
-MAGMOM = 2*4.0 2*-4.0 16*0.0
-LORBIT = 11
+A static SCF on the relaxed structure that writes everything you need to read the magnetism:
+
+<VaspFile
+  name="INCAR"
+  code={`ISTART  = 1
+NSW     = 0
+ISPIN   = 2
+MAGMOM  = 4.0 -4.0 -4.0 4.0 8*0.0
+LORBIT  = 11
+NEDOS   = 3001
+LMAXMIX = 4
+ISMEAR  = 0
+SIGMA   = 0.05
+EDIFF   = 1E-6`}
+  annotations={{
+    1: 'start from the relaxation WAVECAR',
+    4: 'the same pattern the relaxation used; one value per atom',
+    5: 'writes the per-site table and the projected DOS',
+    6: 'a fine energy grid for a clean spin-resolved DOS',
+  }}
+/>
+
+The handbook's commands for a cell of `N` atoms <Cite id="S-042" />:
+
+```text
+grep "mag=" OSZICAR | tail -1                       # total cell moment
+grep -A $((N+6)) "magnetization (x)" OUTCAR | tail -$((N+6))   # last per-site table
+grep "number of electron" OUTCAR | tail -1          # electrons and total magnetization
 ```
 
-- Check `OSZICAR` first to confirm electronic convergence and inspect the net `mag=` value <Cite id="S-041" />.
-- Search `OUTCAR` for the final `magnetization (x)` block to verify every magnetic site's sign and magnitude <Cite id="S-041" />.
-- Drop your `OUTCAR` and `OSZICAR` files into the Analyse tab of the [Magnetic configuration tool](/tools/magnetic/) to parse the table and check automatically whether each run kept its intended pattern.
+- Check `OSZICAR` first: every ionic step must have converged electronically before any moment means anything <Cite id="S-041" />.
+- In the per-site table, compare the sign and size on each magnetic site with the pattern you seeded. Match rows to atoms by `POSCAR` order.
+- For the DOS, VASPkit tasks 111 and 113 read `DOSCAR` and write the total and projected DOS per spin <Cite id="S-042" />. Plot the down channel as negative.
+- Drop your `OUTCAR` and `OSZICAR` into the Analyse tab of the [Magnetic configuration tool](/tools/magnetic/) to parse the table and check whether each run kept its intended pattern.
 
 </InVasp>
 
@@ -66,33 +124,54 @@ LORBIT = 11
 | `OSZICAR` `mag=`      | Large non-zero total            | Near `0.000`                         | `0.000`                    |
 | `OUTCAR` site moments | All magnetic sites same sign    | Equal and opposite signs on sites    | All sites near `0.000`     |
 | Mirrored DOS          | Up and down shifted differently | Total DOS symmetric, site PDOS split | Up and down identical      |
+| Energy vs NM run      | Lower                           | Lower                                | Equal                      |
 
-Why check `OUTCAR` and not just `OSZICAR`: `OSZICAR` `mag = 0` looks identical for an antiferromagnet and a collapsed non-magnetic state.
+Why read `OUTCAR` and not only `OSZICAR`: `mag=` is zero for an antiferromagnet and for a collapsed state alike. Why `LORBIT = 11`: without it there is no per-site table. What happens if you skip these checks: an energy from the wrong state enters your comparison.
 
 </WhatChanges>
 
 <Mistakes>
 
+<Callout variant="mistake" title="Taking mag = 0 as proof of antiferromagnetism">
+
+Cause: the total moment of an antiferromagnet and of a non-magnetic state are both zero. Fix: read the per-site table; an antiferromagnet has large opposite moments, a collapsed run has none.
+
+</Callout>
+
 <Callout variant="mistake" title="Reading the first magnetization table in OUTCAR">
 
-During a geometry relaxation, `OUTCAR` prints a `magnetization (x)` block at every ionic step. Always inspect the last block in the file.
+Cause: a relaxation writes a `magnetization (x)` block at every ionic step, and `grep` without `tail` shows the first one. Fix: always take the last block, which belongs to the final structure.
 
 </Callout>
 
 <Callout variant="mistake" title="Forgetting LORBIT = 11">
 
-Without `LORBIT = 11` (or `10`), VASP does not write the per-site magnetization table to `OUTCAR`, leaving you unable to confirm an antiferromagnetic pattern.
+Cause: the tag was left out of the SCF. Without it VASP does not write the per-site table the handbook uses, so you cannot confirm the pattern <Cite id="S-042" />. Fix: add `LORBIT = 11` and rerun the static step from the `WAVECAR`.
+
+</Callout>
+
+<Callout variant="mistake" title="Expecting site moments to equal the formal moment">
+
+Cause: Fe3+ is "five unpaired electrons", so 4.2 looks like a failure. The sphere misses part of the moment, so a value somewhat below the formal one is normal <Cite id="S-042" />. Fix: compare with the same quantity in other runs or papers that used the same method, not with the ionic count.
+
+</Callout>
+
+<Callout variant="mistake" title="Matching the table to the wrong atoms">
+
+Cause: the table follows `POSCAR` order, and a structure tool reordered the species. Fix: check the species line of the `POSCAR` you actually ran, and match `MAGMOM`, the table and the atoms in that order.
 
 </Callout>
 
 </Mistakes>
 
-<Check ids={['q-mag-14', 'q-mag-15', 'q-mag-18']} />
+<Check ids={['q-mag-14', 'q-mag-15', 'q-mag-18', 'q-mag-25', 'q-mout-1']} />
 
 <GoDeeper>
 
-- VASP wiki pages LORBIT and OUTCAR <Cite id="S-019" /> <Cite id="S-065" />.
-- The author's VASP Workflow Handbook on reading `OSZICAR` and `OUTCAR` <Cite id="S-041" />.
+- VASP wiki pages LORBIT, MAGMOM and ISPIN (by page name) <Cite id="S-065" /> and DOSCAR <Cite id="S-019" />.
+- The Field Handbook entries on `OUTCAR` and `OSZICAR` <Cite id="S-041" />.
+- The Workflow Handbook section on reading moments <Cite id="S-042" />.
+- Blundell, Magnetism in Condensed Matter, on exchange splitting <Cite id="S-059" />.
 - Analyse tab of the [Magnetic configuration tool](/tools/magnetic/).
 
 </GoDeeper>

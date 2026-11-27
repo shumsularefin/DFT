@@ -1,82 +1,216 @@
 ---
 id: vdw-corrections
+stage:
+  scene: m05-vdw
+  states:
+    - id: bilayer
+      section: why
+      params: { spacing: 3.35, slide: 1, correction: d2, damping: true }
+      caption: 'Two graphene layers 3.35 Angstrom apart in AB stacking, and beside them the DFT-D2 correction energy over sliding (across) and spacing (back). The black curve is the energy against spacing here.'
+    - id: no-correction
+      section: intuition
+      params: { spacing: 3.35, slide: 1, correction: none, damping: true }
+      caption: 'Switch the correction off and the landscape is flat at zero: the attraction between neutral layers is not in the semilocal functional and has to be added.'
+    - id: damping
+      section: math
+      params: { spacing: 2.8, slide: 1, correction: d2, damping: false }
+      caption: 'Each pair adds -C6/r^6 times a damping function that removes it at short range. Toggle damping at 2.8 Angstrom: without it the attraction grows by about 10 meV per atom.'
+    - id: sliding
+      section: what-changes
+      params: { spacing: 3.35, slide: 0, correction: d2, damping: true }
+      caption: 'Slide from AB to AA: at this spacing the correction changes by far less than 1 meV per atom. The stacking preference comes mostly from the functional, so relax with the correction on.'
 title: van der Waals corrections
 module: 5
 order: 13
-summary: Why common functionals miss the weak attraction between layers and molecules, what a dispersion correction adds, and the IVDW values to use.
+summary: Why common functionals miss the weak attraction between layers and molecules, how pairwise (D2, D3, D4, TS, MBD) and nonlocal (vdW-DF, rVV10) corrections add it back, and which IVDW or GGA tags to set.
 concepts: [van-der-waals]
 requires: [functionals]
-vaspTags: [IVDW]
-sources: [S-019, S-028, S-041, S-042]
+vaspTags: [IVDW, LUSE_VDW, GGA, AGGAC, PARAM1, PARAM2, BPARAM, CPARAM, METAGGA]
+sources: [S-019, S-026, S-028, S-041, S-042, S-135, S-136, S-137, S-138, S-139]
 noLab: true
 status: draft
-updated: 2026-11-19
+updated: 2026-11-27
 ---
 
 <Why>
 
-Two neutral layers of graphite, or two molecules in a crystal, attract each other even though neither has a net charge. That weak attraction (van der Waals or dispersion) comes from correlated fluctuations of the electrons, and common semilocal functionals such as PBE barely describe it. Without a correction, layered and molecular crystals and molecules on surfaces come out too loosely bound, with the layers too far apart <Cite id="S-042" />.
+Two neutral layers of graphite, or two molecules in a crystal, attract each other even though neither carries a net charge. That weak attraction (van der Waals or dispersion) comes from correlated fluctuations of the electrons: a passing dipole on one side induces a dipole on the other, and the two attract. Semilocal functionals such as PBE look only at the density and its gradient at each point, so they cannot see two fluctuations that are several angstrom apart. Without a correction, layered and molecular crystals and molecules on surfaces come out too loosely bound, with layers too far apart, and some do not bind at all <Cite id="S-042" /> <Cite id="S-139" />.
+
+The handbook marks a correction as essential for layered (c-axis) and molecular crystals <Cite id="S-042" />. For most other systems it is a choice you should make on purpose and report.
 
 </Why>
 
 <Intuition>
 
-A dispersion correction is a patch added to the energy afterwards. For every pair of atoms it adds a small attractive term that falls off with distance, switched off at short range where the functional already handles the interaction. It is cheap, because it does not change the electrons at all; it adds to the energy and forces <Cite id="S-028" />.
+There are two families of fixes.
 
-When to use it: whenever weak, non-bonded contacts matter, such as layered materials (the stacking direction), molecular crystals and adsorption. For a dense ionic or metallic solid, bonding is dominated by other terms and the correction is usually a small change; the handbook marks it essential for layered (c-axis) and molecular crystals <Cite id="S-042" />.
+**Pairwise corrections** add a <Term id="dispersion-correction">dispersion correction</Term> on top of the DFT energy. For every pair of atoms they add a small attraction that falls off with distance, and a <Term id="damping-function">damping function</Term> switches it off at short range, where the functional already describes the bonding. The electrons are not changed: only the energy, the forces and the stress get an extra term <Cite id="S-028" />. The members differ in where the strength of each pair (its C6 coefficient) comes from:
 
-A practical point: the value of the correction depends on its damping scheme, and the choice of functional and correction go together, so report both. You cannot judge it from the energy of a single run: compare structures (interlayer distance) before and after.
+- **D2** uses one fixed number per element from a table <Cite id="S-135" />. Simple, but blind to bonding: a carbon atom in graphite and in diamond gets the same value.
+- **D3** makes the coefficient depend on how many neighbours each atom has, so the same element behaves differently in different environments. It comes with two damping choices: zero damping, which drives the correction to zero at short range, and Becke-Johnson damping, D3(BJ), which lets it level off to a finite value instead <Cite id="S-028" />.
+- **D4** adds a dependence on the partial charge of each atom <Cite id="S-135" />.
+- **Tkatchenko-Scheffler (TS)** takes free-atom reference values and scales them by how much each atom's share of the density is squeezed in the solid, so the coefficients follow the computed density <Cite id="S-136" />.
+- **Many-body dispersion (MBD)** goes beyond pairs: it treats each atom as a small oscillator that screens and couples to all the others at once. This matters for large, polarizable systems where pair sums overbind <Cite id="S-136" />.
+
+**Nonlocal functionals** (the vdW-DF family and rVV10) build the attraction into the functional itself, through a correlation term that couples the density at two distant points <Cite id="S-137" /> <Cite id="S-138" />. They change the electrons self-consistently and cost more than a pairwise sum, but they need no table of atomic coefficients.
+
+**When it matters.** Layered crystals (graphite, MoS2, h-BN) along the stacking axis, molecular crystals, and molecules on surfaces: here the correction decides the answer. Dense covalent, metallic and ionic solids are held together mostly by other terms, so the correction moves the lattice constant only a little (it usually shrinks it). It is not zero there, so if you use it for one structure, use it for all of them.
 
 </Intuition>
 
 <TheMath>
 
-The pairwise form of the correction is a sum over atom pairs of an attractive term proportional to $-C_6^{ij}/r_{ij}^6$ times a damping function that removes it at short distance. D3 computes the coefficients from the local environment of each atom, and the Becke-Johnson damping variant (D3(BJ)) uses a different short-range form <Cite id="S-028" />. This page gives the structure only: the coefficients and damping parameters are tabulated in the cited papers and are not reproduced or invented here.
+A pairwise correction is a sum over atom pairs: each pair adds an attraction that weakens with the sixth power of their distance (doubling the distance cuts it by a factor of 64), and a damping factor removes it when the atoms are close.
+
+<Level min="intermediate">
+
+Written out, with $r_{ij}$ the distance between atoms $i$ and $j$:
+
+$$E_{\text{disp}} = -\sum_{i<j} \sum_{n=6,8} s_n \frac{C_n^{ij}}{r_{ij}^{\,n}}\, f_{\text{damp},n}(r_{ij})$$
+
+$C_n^{ij}$ is the dispersion coefficient of the pair, $s_n$ a global scaling fitted per functional and $f_{\text{damp}}$ the damping function. D2 keeps only $n = 6$ with fixed $C_6$, a Fermi-type damping and $s_6 = 0.75$ for PBE <Cite id="S-135" />. D3 adds the $n = 8$ term. Zero damping multiplies each term by $1/\big(1 + 6\,(r_{ij}/(s_{r,n} R_0^{ij}))^{-\alpha_n}\big)$, which goes to 0 as $r \to 0$; Becke-Johnson damping replaces $r^n$ in the denominator by $r^n + (a_1 R_0^{ij} + a_2)^n$ with $R_0^{ij} = \sqrt{C_8^{ij}/C_6^{ij}}$, so the term stays finite <Cite id="S-028" />. The parameters ($s_n$, $s_{r,n}$, $a_1$, $a_2$) are fitted for each functional and are tabulated in the papers; they are not reproduced here.
+
+The nonlocal family writes the exchange-correlation energy as
+
+$$E_{xc} = E_x^{\text{GGA}} + E_c^{\text{LDA}} + \frac{1}{2}\iint n(\mathbf r)\,\phi(\mathbf r, \mathbf r')\,n(\mathbf r')\,d^3r\,d^3r'$$
+
+where $n$ is the density and $\phi$ a kernel that depends on the density and its gradient at both points <Cite id="S-137" />. The members differ in the exchange part and the kernel. Because the correlation is LDA plus the nonlocal term, the gradient correction to correlation of the parent GGA must be switched off; that is what `AGGAC = 0.0000` does below <Cite id="S-019" />.
+
+</Level>
+
+<Level min="pro">
+
+MBD couples the atomic polarizabilities through the dipole interaction and solves for the coupled oscillator modes, which includes screening and many-body terms that a pair sum misses <Cite id="S-136" />. rVV10 is a revised form of the Vydrov-Van Voorhis kernel that can be evaluated with fast Fourier transforms; its parameter $b$ sets the short-range damping and is refitted when it is paired with another functional, which is why SCAN+rVV10 uses $b = 15.7$ <Cite id="S-138" /> <Cite id="S-042" />.
+
+</Level>
 
 </TheMath>
 
 <InVasp>
 
-- `IVDW = 11` is DFT-D3 (zero damping), `IVDW = 12` is D3 with Becke-Johnson damping, `IVDW = 20` is Tkatchenko-Scheffler <Cite id="S-042" />.
-- Use it in the relaxation, not only in a final single-point run, because the correction changes the forces and so the structure. VASPkit task 101 with the code `D3` adds it (zero damping) to the template INCAR <Cite id="S-042" />.
-- The default of `IVDW` is not stated in the handbooks: see the VASP wiki page IVDW <Cite id="S-019" />.
-- Keep the setting the same for every calculation you compare <Cite id="S-041" />.
+**Pairwise corrections: one tag.** `IVDW` selects the method (VASP wiki page IVDW, VASP 6.x) <Cite id="S-019" /> <Cite id="S-042" />:
+
+| `IVDW`  | Method                                                 |
+| ------- | ------------------------------------------------------ |
+| 0       | None (the default)                                     |
+| 1 or 10 | DFT-D2                                                 |
+| 11      | DFT-D3, zero damping                                   |
+| 12      | DFT-D3(BJ), Becke-Johnson damping                      |
+| 13      | DFT-D4 (needs a VASP 6 build linked to the D4 library) |
+| 2 or 20 | Tkatchenko-Scheffler                                   |
+| 21      | Tkatchenko-Scheffler with iterative Hirshfeld (ionic)  |
+| 202     | Many-body dispersion (MBD)                             |
+
+The author's dictionary lists 11, 12 and 20 as the everyday choices, and VASPkit task 101 with the code `D3` adds `IVDW = 11` to the template INCAR <Cite id="S-042" />. A relaxation of graphite with D3(BJ):
+
+<VaspFile
+  name="INCAR"
+  code={`PREC   = Accurate
+ENCUT  = 520
+IBRION = 2
+ISIF   = 3
+NSW    = 100
+EDIFF  = 1E-6
+EDIFFG = -0.01
+ISMEAR = 0
+SIGMA  = 0.05
+IVDW   = 12`}
+  annotations={{
+    2: '1.3 times the carbon ENMAX (400 eV), because the cell shape changes',
+    4: 'relax the cell: the c axis is exactly what the correction changes',
+    10: 'D3 with Becke-Johnson damping; 11 for zero damping',
+  }}
+/>
+
+**Nonlocal functionals: several tags.** These replace the functional, so they go with the PBE POTCARs and a changed `GGA` tag. Every member below also needs `LUSE_VDW = .TRUE.` and `AGGAC = 0.0000`. The values are those on the VASP wiki page "Nonlocal vdW-DF functionals" <Cite id="S-019" /> <Cite id="S-137" />:
+
+| Functional  | Exchange tags                                        | Extra               |
+| ----------- | ---------------------------------------------------- | ------------------- |
+| vdW-DF      | `GGA = RE`                                           |                     |
+| vdW-DF2     | `GGA = ML`                                           | `Zab_vdW = -1.8867` |
+| optB88-vdW  | `GGA = BO`, `PARAM1 = 0.1833333333`, `PARAM2 = 0.22` |                     |
+| optB86b-vdW | `GGA = MK`, `PARAM1 = 0.1234`, `PARAM2 = 1.0`        |                     |
+
+<VaspFile
+  name="INCAR"
+  code={`GGA      = MK
+PARAM1   = 0.1234
+PARAM2   = 1.0000
+LUSE_VDW = .TRUE.
+AGGAC    = 0.0000
+ISMEAR   = 0
+SIGMA    = 0.05`}
+  annotations={{
+    1: 'optB86b exchange',
+    4: 'switch on the nonlocal correlation',
+    5: 'remove the gradient correction to correlation',
+  }}
+/>
+
+VASP reads the kernel from a file `vdw_kernel.bindat` in the run folder; check the wiki page for whether your VASP version needs you to supply it. **SCAN+rVV10** is `METAGGA = SCAN`, `LUSE_VDW = .TRUE.`, `BPARAM = 15.7`, `CPARAM = 0.0093` and `LASPH = .TRUE.`; for r2SCAN+rVV10 the handbook gives `BPARAM = 11.95` <Cite id="S-042" /> <Cite id="S-138" /> <Cite id="S-026" />.
+
+**Worked example (literature values, not a calculation on this site).** The measured interlayer spacing of graphite is about 3.35 angstrom, half of the c lattice parameter of about 6.71 angstrom <Cite id="S-139" />. In the benchmark of Bjorkman and co-workers over many layered compounds, plain PBE gives little or no interlayer binding, so a PBE relaxation lets the layers drift far apart, while the dispersion-aware methods bind them; their reference calculations put the binding energy of most layered compounds near 20 meV per square angstrom of layer <Cite id="S-139" />. The lesson for your own run: relax with the correction switched on, then compare c/2 with 3.35 angstrom before trusting anything that depends on the stacking.
 
 </InVasp>
 
 <WhatChanges>
 
-| If you change...                   | ...in the structure and energy                     | ...in VASP                                                  |
-| ---------------------------------- | -------------------------------------------------- | ----------------------------------------------------------- |
-| Add a correction                   | Layers or molecules come closer, binding increases | `IVDW = 11` or `12` in the relaxation                       |
-| D3 to D3(BJ)                       | Different short-range damping, similar trend       | `IVDW = 12` instead of `11`                                 |
-| Leave it off for a layered crystal | Layers too far apart                               | The handbook marks it essential for c-axis layered crystals |
+| If you change...                    | ...in the structure and energy                         | ...in VASP                                        |
+| ----------------------------------- | ------------------------------------------------------ | ------------------------------------------------- |
+| Add a correction to a layered solid | Layers come closer, interlayer binding appears         | `IVDW = 11` or `12` in the relaxation             |
+| D3 zero damping to D3(BJ)           | Different short-range behaviour, similar overall trend | `IVDW = 12` instead of `11`                       |
+| Pairwise to TS                      | Coefficients follow the computed density               | `IVDW = 20`; slightly more work per step          |
+| Pairwise to vdW-DF                  | Electrons change too; no atomic coefficient table      | `GGA`, `LUSE_VDW`, `AGGAC` instead of `IVDW`      |
+| Add a correction to an ionic solid  | Lattice constant shrinks a little                      | Use the same setting for every structure compared |
 
-Why: weak contacts are missing otherwise. Why this value: 11 or 12 are the common choices; say which. What happens if you get it wrong: a layer spacing and binding energy that depend on a setting you did not choose.
+Why: weak, non-bonded contacts are missing otherwise. Why this value: D3 or D3(BJ) is cheap and widely used; a nonlocal functional when you want the attraction in the density itself. What happens if you get it wrong: a layer spacing and a binding energy that depend on a setting you did not choose.
 
 </WhatChanges>
 
 <Mistakes>
 
-<Callout variant="mistake" title="Adding the correction only at the end">
+<Callout variant="mistake" title="Adding the correction only in the final single-point run">
 
-Apply it in the relaxation, so the structure sees it.
+Cause: the correction is seen as an energy patch. But it changes the forces and the stress, so a structure relaxed without it is the wrong structure. Fix: switch it on in the relaxation (with `ISIF = 3` for layered crystals) and keep it on in every later step <Cite id="S-042" />.
 
 </Callout>
 
-<Callout variant="mistake" title="Mixing results with and without the correction">
+<Callout variant="mistake" title="Comparing energies with different corrections">
 
-Compare only runs with the same `IVDW`.
+Cause: an adsorption or formation energy subtracts several total energies, and one of them (the bare slab, the gas molecule, the bulk reference) was run with a different `IVDW` or none. The difference then contains part of the correction. Fix: the same correction in every run that enters the same difference <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Counting dispersion twice">
+
+Cause: `IVDW = 12` left in an INCAR that also sets `LUSE_VDW = .TRUE.`. The nonlocal functional already contains the attraction, so the pairwise term adds it again and overbinds. Fix: one method only, either an `IVDW` value or a nonlocal functional.
+
+</Callout>
+
+<Callout variant="mistake" title="A vdW-DF run with the wrong correlation">
+
+Cause: `LUSE_VDW = .TRUE.` without `AGGAC = 0.0000`, or without the `GGA` and `PARAM` values of the chosen member. The run finishes, but with a functional nobody has tested. Fix: copy the full tag set for the member you want from the wiki page and name the member in your report <Cite id="S-019" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Expecting the correction to change the electronic structure">
+
+Cause: D2, D3 and D4 depend only on the positions of the atoms. At a fixed geometry the bands and the DOS are the same as without them; any change you see comes through the new structure. Fix: judge the correction by the geometry (interlayer distance, adsorption height), not by the bands <Cite id="S-028" />.
 
 </Callout>
 
 </Mistakes>
 
-<Check ids={['q-vdw-1', 'q-vdw-2', 'q-vdw-3', 'q-vdw-4']} />
+<Check ids={['q-vdw-1', 'q-vdw-3', 'q-vdw-5', 'q-vdw-6', 'q-vdw-7', 'q-vdw-8']} />
 
 <GoDeeper>
 
+- Grimme on DFT-D2, and Caldeweyher, Bannwarth and Grimme on D4 <Cite id="S-135" />.
 - Grimme and co-workers on DFT-D3 and the Becke-Johnson damping <Cite id="S-028" />.
-- VASP wiki page IVDW (by page name) <Cite id="S-019" />.
+- Tkatchenko and Scheffler on density-dependent coefficients, and the many-body dispersion method <Cite id="S-136" />.
+- Dion and co-workers on vdW-DF, and Klimes, Bowler and Michaelides on the opt variants in VASP <Cite id="S-137" />.
+- Sabatini and co-workers on rVV10, and Peng and co-workers on SCAN+rVV10 <Cite id="S-138" />.
+- Bjorkman and co-workers on van der Waals bonding in layered compounds, and Baskin and Meyer on the lattice constants of graphite <Cite id="S-139" />.
+- VASP wiki pages IVDW, DFT-D3, Tkatchenko-Scheffler method and Nonlocal vdW-DF functionals (by page name) <Cite id="S-019" />.
 
 </GoDeeper>

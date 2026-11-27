@@ -1,5 +1,24 @@
 ---
 id: why-energy-levels-matter-for-materials
+stage:
+  scene: m02-chain
+  states:
+    - id: two-atoms
+      section: why
+      params: { atoms: 2, distance: 2.5 }
+      caption: 'Two atoms: one level splits into a bonding level (lower) and an antibonding level (upper). Drag the distance and the split grows as the atoms come closer.'
+    - id: band
+      section: intuition
+      params: { atoms: 20 }
+      caption: 'Twenty atoms: the levels crowd into a band. The curves on the left show how every level spreads further as the distance shrinks.'
+    - id: gap
+      section: math
+      params: { atoms: 20, delta: 0.6 }
+      caption: 'Make the atoms alternate, A and B, and a gap opens in the middle of the band. With one electron per atom the lower band is full: an insulator.'
+    - id: metal
+      section: what-changes
+      params: { atoms: 20, delta: 0 }
+      caption: 'With equal atoms the filled and empty levels almost touch in the middle of one band, and the gap closes as the chain grows, so the chain behaves like a metal.'
 title: Why energy levels matter for materials
 module: 2
 order: 6
@@ -25,7 +44,7 @@ One atom has separate energy levels, like the steps in the box. Bring two atoms 
 
 Between bands there may be a range of energies with no allowed states: a <Term id="band-gap">band gap</Term>. Electrons fill levels from the bottom, two per level, as the last page described. If the top filled band is completely full and a gap lies above it, small pushes cannot move electrons, and the material is an insulator or a semiconductor. If a band is partly filled, electrons move easily, and the material is a metal <Cite id="S-036" />.
 
-How many states sit at each energy is called the <Term id="density-of-states">density of states</Term>. You will meet bands, the gap and the density of states in modules 4 and 5, and they are among the main things a DFT calculation reports.
+How many states sit at each energy is called the <Term id="density-of-states">density of states</Term>. You will compute and read bands, the gap and the density of states in module 9, and they are among the main things a DFT calculation reports.
 
 <Level min="intermediate">
 

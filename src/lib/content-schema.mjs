@@ -11,6 +11,49 @@ const date = z.preprocess(
 export const SOURCE_ID = /^S-\d{3}$/;
 export const STATUSES = ['draft', 'review', 'verified'];
 
+const vec3 = z.tuple([z.number(), z.number(), z.number()]);
+/** Section ids a stage state can follow (the anatomy of SECTIONS below). */
+export const STAGE_SECTIONS = [
+  'why',
+  'intuition',
+  'lab',
+  'math',
+  'in-vasp',
+  'what-changes',
+  'mistakes',
+  'check',
+  'go-deeper',
+];
+export const STAGE_CAMERAS = ['iso', 'a', 'b', 'c', 'a*', 'b*', 'c*', 'top', 'front', 'side'];
+
+/**
+ * The live 3D stage beside a topic's text (M16 section 5). `scene` names a generator in src/lib/viewer3d/scenes; the badge,
+ * sources and controls come from the generator itself, so a page cannot claim more than the scene computes. Each state is
+ * a set of parameter values, visible layer groups and a camera, chosen by the section the reader is in.
+ */
+export const stageSchema = z.object({
+  scene: z.string().regex(/^m\d\d[a-z]?-[a-z0-9]+(-[a-z0-9]+)*$/, 'must be a scene id like m02-orbital'),
+  states: z
+    .array(
+      z.object({
+        id: kebab,
+        section: z.enum(STAGE_SECTIONS).optional(),
+        params: z.record(z.string(), z.union([z.number(), z.string(), z.boolean()])).default({}),
+        /** Visible layer groups; all groups when absent. */
+        layers: z.array(kebab).optional(),
+        camera: z
+          .union([
+            z.enum(STAGE_CAMERAS),
+            z.object({ eye: vec3, up: vec3.optional(), zoom: z.number().positive().optional() }),
+          ])
+          .optional(),
+        /** One or two sentences under the stage: what to look at in this state. */
+        caption: z.string().min(10).max(320),
+      }),
+    )
+    .min(1),
+});
+
 export const handbookSchema = z.object({
   id: kebab,
   title: z.string().min(3),
@@ -25,6 +68,8 @@ export const handbookSchema = z.object({
   updated: date,
   /** Set only when the stage's work order says the topic has no lab. */
   noLab: z.boolean().default(false),
+  /** The live 3D stage (M16). Optional until M16.15 makes check-3d-stages fail on a topic without one. */
+  stage: stageSchema.optional(),
 });
 
 export const LEVELS = ['beginner', 'intermediate', 'pro'];
