@@ -216,9 +216,9 @@ export function meshFor(c: LatticeCase, n: number, centering: Centering): MeshRe
   const b = rec as unknown as readonly [Vec3, Vec3, Vec3];
   const pts: Vec3[] = [];
   for (let i = 0; i < m.count; i++)
-    pts.push(
-      foldToZone(qToCartesian([m.coords[3 * i]!, m.coords[3 * i + 1]!, m.coords[3 * i + 2]!], b), rec),
-    );
+    pts.push([
+      ...foldToZone([...qToCartesian([m.coords[3 * i]!, m.coords[3 * i + 1]!, m.coords[3 * i + 2]!], b)] as Vec3, rec),
+    ] as Vec3);
   const group = pointGroup(c);
   const red = irreducibleCount(div, centering, group);
   const out: MeshResult = {
@@ -304,7 +304,7 @@ const kmesh: SceneDef = {
         ),
       );
     const pt = (lab: string): Vec3 =>
-      qToCartesian(c.points[lab]!, rec as unknown as readonly [Vec3, Vec3, Vec3]);
+      [...qToCartesian(c.points[lab]!, rec as unknown as readonly [Vec3, Vec3, Vec3])] as Vec3;
     if (p.path) {
       for (const seg of c.path)
         layers.push(curve(seg.map(pt), 'pos', 'path', { name: 'High-symmetry path', tube: bmax * 0.008 }));
@@ -406,8 +406,8 @@ export function sharpestBump(c: LatticeCase, encut: number, n: number): Float64A
     const k = idx[3 * v + 2]! + m;
     const base = (a * span + b) * n;
     for (let g = 0; g < n; g++) {
-      A_re[base + g] += cosT[k * n + g]!;
-      A_im[base + g] += sinT[k * n + g]!;
+      A_re[base + g] = A_re[base + g]! + cosT[k * n + g]!;
+      A_im[base + g] = A_im[base + g]! + sinT[k * n + g]!;
     }
   }
   // B[k1][g2][g3] = sum_{k2} A e2
@@ -426,8 +426,8 @@ export function sharpestBump(c: LatticeCase, encut: number, n: number): Float64A
         for (let g3 = 0; g3 < n; g3++) {
           const ar = A_re[base + g3]!;
           const ai = A_im[base + g3]!;
-          B_re[out + g3] += ar * c2 - ai * s2;
-          B_im[out + g3] += ar * s2 + ai * c2;
+          B_re[out + g3] = B_re[out + g3]! + ar * c2 - ai * s2;
+          B_im[out + g3] = B_im[out + g3]! + ar * s2 + ai * c2;
         }
       }
     }
@@ -440,7 +440,7 @@ export function sharpestBump(c: LatticeCase, encut: number, n: number): Float64A
       for (let g2 = 0; g2 < n; g2++)
         for (let g3 = 0; g3 < n; g3++) {
           const bi = (a * n + g2) * n + g3;
-          f[g1 + n * (g2 + n * g3)] += (B_re[bi]! * c1 - B_im[bi]! * s1) / N;
+          f[g1 + n * (g2 + n * g3)] = f[g1 + n * (g2 + n * g3)]! + (B_re[bi]! * c1 - B_im[bi]! * s1) / N;
         }
     }
   return f;
