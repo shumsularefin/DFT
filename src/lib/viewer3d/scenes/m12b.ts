@@ -2,7 +2,6 @@
 // molecular dynamics. Pure generators on tested libraries: crystal/slab (with the cubic symmetry provider), crystal/
 // defects and supercell, physics/slabPotential, physics/lennardJones, physics/hull and physics/neb.
 // @source S-064 S-063 S-066 S-109 S-067 S-125 S-126 S-036 S-044 S-034 S-120 S-164 S-121 S-124
-import { covalentRadius } from '../../crystal/covalent';
 import { cubicMoyo } from '../../crystal/cubicSymmetry';
 import { shortestLatticeVector, vacancy } from '../../crystal/defects';
 import { buildSlab, type Hkl, type SlabResult } from '../../crystal/slab';
@@ -51,6 +50,7 @@ import {
   sphereLayer,
   surfaceLayer,
 } from '../kit';
+import { elementRadius, elementTone } from './bondsTwoTone';
 import type { Color, Layer, Readout, SceneDef, Vec3 } from '../types';
 
 const v3 = (p: readonly number[]): Vec3 => [p[0]!, p[1]!, p[2]!];
@@ -339,8 +339,8 @@ const slabScene: SceneDef = {
     layers.push(
       atoms(
         m.positions.map((q) => [q[0], q[1], q[2] + m.c]),
-        m.species.map((e) => covalentRadius(e).radius * 0.45),
-        m.species.map((e) => tones.get(e) ?? 'c0'),
+        m.species.map((e) => elementRadius(e)),
+        m.species.map((e) => tones.get(e) ?? elementTone(e)),
         'images',
         { name: 'Periodic copy', opacity: 0.25 },
       ),
@@ -621,7 +621,7 @@ const defectScene: SceneDef = {
       atoms(
         hostIdx.map((i) => pos[i]!),
         0.75,
-        'c0',
+        elementTone('Ar'),
         'atoms',
         {
           name: 'Ar atoms',
@@ -651,6 +651,7 @@ const defectScene: SceneDef = {
       );
     else
       layers.push(
+        // the defect keeps the accent colour against the host on purpose; its outline and label say what it is
         atoms([defectAt], kind === 'substitution' ? 0.86 : 0.75, 'pos', 'defect', {
           name: 'Defect',
           labels: [kind === 'substitution' ? 'X' : 'Ar interstitial'],
@@ -1226,11 +1227,13 @@ const mdScene: SceneDef = {
       atoms(
         pos,
         1.0,
-        pos.map((_, i) => (tracked.has(i) ? 'pos' : 'c0')),
+        // argon in its element colour; the four tracked atoms stay orange (the stage caption names them so),
+        // and carry an outline, a label and a trajectory as well
+        pos.map((_, i) => (tracked.has(i) ? 'pos' : elementTone('Ar'))),
         'atoms',
         {
           name: 'Ar atoms',
-          labels: pos.map((_, i) => `Ar ${i + 1}`),
+          labels: pos.map((_, i) => `Ar ${i + 1}${tracked.has(i) ? ' (tracked)' : ''}`),
           highlight: TRACKED,
         },
       ),

@@ -60,6 +60,7 @@ import {
   quadLayer,
   sliceLayer,
 } from '../kit';
+import { elementTone } from './bondsTwoTone';
 import type { Color, Layer, MeshLayer, SceneDef, Vec3 } from '../types';
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -1018,7 +1019,7 @@ const density: SceneDef = {
           [R / 2, 0, 0],
         ],
         0.18,
-        ['c0', 'c0'],
+        elementTone('H'),
         'atoms',
         { name: 'Nuclei', labels: ['H A', 'H B'] },
       ),

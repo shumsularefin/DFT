@@ -31,6 +31,7 @@ import { solveStoner, stonerEnergy, type StonerParams } from '../../physics/ston
 import { stonerDescent } from '../../physics/stonerPath';
 import { lookupStructure } from '../../scene/library';
 import { parseOutcar, type MagnetizationTable } from '../../vasp/outcar';
+import { UNKNOWN_ELEMENT_COLOR, VESTA_SIZES } from '../../three/vestaStyle';
 import {
   arrows,
   atoms,
@@ -197,7 +198,11 @@ function configLayers(
         species: c.magneticSites.map((j) => c.structure.species[j]!),
         frac: c.magneticSites.map((j) => c.structure.frac[j]!),
       };
-  const { layers, positions } = crystalLayers(s, { bonds: ligands, radiusScale: ligands ? 0.4 : 0.3 });
+  const { layers, positions } = crystalLayers(s, {
+    bonds: ligands,
+    // magnetic sites alone are drawn smaller, so the spin arrows through them stay readable
+    radiusScale: ligands ? VESTA_SIZES.atomScale : 0.3,
+  });
   const mnPos = ligands ? c.magneticSites.map((j) => positions[j]!) : positions;
   const mn = mnPos.map(shift);
   const signs = c.magneticSites.map((j) => c.signs[j]!);
@@ -940,7 +945,9 @@ const siteMoments: SceneDef = {
     const at: Vec3[] = table.sites.map((_, i) => [i * spacing, 0, 0]);
     const perMu = 0.8;
     const layers: Layer[] = [
-      atoms(at, 0.45, table.sites.map((s) => (Math.abs(s.tot) > 0.1 ? 'c0' : 'c2')) as Color[], 'atoms', {
+      // the table names no species, so the ions take the Studio viewer's grey for an unknown element (D-122);
+      // the moment is carried by the arrows (length, solid or open head) and the labels, not by the ion colour
+      atoms(at, 0.45, UNKNOWN_ELEMENT_COLOR as Color, 'atoms', {
         name: 'Ions',
         labels: table.sites.map((s) => `ion ${s.ion}: ${fmt(s.tot, 3)} ${MU}`),
       }),

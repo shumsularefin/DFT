@@ -718,7 +718,7 @@ const eos: SceneDef = {
         [0, 0, a],
       ] as const,
     };
-    const crystal = crystalLayers(scaled, { boundary: true, bonds: false, radiusScale: 0.35 });
+    const crystal = crystalLayers(scaled, { boundary: true, bonds: false });
     const off = sub(EOS_CELL, [a / 2, a / 2, 0]);
     layers.push(
       ...shift(crystal.layers, off),

@@ -266,7 +266,7 @@ const builder: SceneDef = {
 
     if (step <= 1) {
       const s = scaledStructure(step === 0 ? TEMPLATE : LACUO3, f);
-      const cr = crystalLayers(s, { boundary: true, radiusScale: 0.45 });
+      const cr = crystalLayers(s, { boundary: true });
       const at = cr.layers[0]!;
       if (step === 1 && at.kind === 'atoms')
         at.highlight = cr.species.flatMap((e, i) => (e === 'La' || e === 'Cu' ? [i] : []));
@@ -306,7 +306,7 @@ const builder: SceneDef = {
       const dmin = vectorMemo(fk, () => shortestLatticeVector(s.lattice));
       layers.push(lines(cellEdges(parent), 'muted', 'parent-cell', { name: 'Template cell', dashed: true }));
       if (step === 2 || step === 3) {
-        const cr = crystalLayers(s, { radiusScale: 0.42, groups: { cell: 'supercell' } });
+        const cr = crystalLayers(s, { groups: { cell: 'supercell' } });
         layers.push(...cr.layers);
         if (step === 2) {
           const L = s.lattice.map(v3) as Vec3[];
@@ -814,6 +814,7 @@ function magneticFrame(kind: 'FM' | 'A' | 'C' | 'G', a: number): SceneFrame {
     }),
   );
   const s = c.structure;
+  // atoms drawn smaller than the usual scale, so the spin arrows through the Cu sites stay readable
   const cr = crystalLayers(s, { bonds: false, radiusScale: 0.32 });
   const pos = cartesian(s);
   const ids = c.magneticSites;

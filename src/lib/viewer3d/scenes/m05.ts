@@ -46,6 +46,7 @@ import {
   surfaceLayer,
 } from '../kit';
 import { norm, sub, type Vec3 } from '../math';
+import { elementRadius, elementTone, twoToneBonds } from './bondsTwoTone';
 import type { Color, Layer, MeshLayer, SceneDef } from '../types';
 
 const v3 = (p: readonly number[]): Vec3 => [p[0]!, p[1]!, p[2]!];
@@ -556,7 +557,8 @@ const encutScene: SceneDef = {
         iso.bump,
         iso.ripples,
         lines(cellEdges(lattice, origin), 'muted', 'cell', { name: 'Primitive cell' }),
-        atoms([[0, 0, 0]], 0.12, 'c0', 'atoms', { name: 'Atom', labels: [element] }),
+        // small on purpose, so the half-height surface around the site stays visible
+        atoms([[0, 0, 0]], 0.12, elementTone(element), 'atoms', { name: 'Atom', labels: [element] }),
         labels([{ text: `${element} site`, at: [0, 0, -0.35] }], 'atoms'),
       ];
       return {
@@ -1459,16 +1461,17 @@ const vdw: SceneDef = {
     const here: Vec3 = [LX(sb), LY(d), LZ(eHere)];
     const stack = stackingName(slide) ?? `slid ${fmt(sb, 2)} bond lengths`;
     const layers: Layer[] = [
-      atoms(bottom, 0.32, 'c0', 'bottom', {
+      // both layers are carbon, in the carbon colour (D-122); the top layer is told apart by its outline and labels
+      atoms(bottom, elementRadius('C'), elementTone('C'), 'bottom', {
         name: 'Bottom layer',
         labels: bottom.map((_, i) => `C bottom ${i + 1}`),
       }),
-      atoms(top, 0.32, 'c1', 'top', {
+      atoms(top, elementRadius('C'), elementTone('C'), 'top', {
         name: 'Top layer (outlined)',
         labels: top.map((_, i) => `C top ${i + 1}`),
         highlight: top.map((_, i) => i),
       }),
-      lines([...bonds(bottom), ...bonds(top)], 'muted', 'bonds', { name: 'Bonds', tube: 0.06 }),
+      ...twoToneBonds([...bonds(bottom), ...bonds(top)].map(([a, b]) => ({ a, b, ea: 'C', eb: 'C' }))),
       arrows([[VDW.patch + 0.8, 0, 0]], [[0, 0, d]], 'ink', 'gap', { name: 'Spacing', thickness: 0.02 }),
       labels([{ text: `d = ${fmt(d, 2)} Å`, at: [VDW.patch + 1.2, 0, d / 2] }], 'gap'),
       surf,
