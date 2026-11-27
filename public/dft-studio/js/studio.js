@@ -895,11 +895,17 @@ ${c.length ? c.map((x) => `- [${x.level}] ${x.msg}`).join('\n') : '- none'}
     return COMMANDS.filter((c) => !q || `${c.code} ${c.name} ${c.cat}`.toLowerCase().includes(q)).slice(0, 14);
   }
   // A target with send opens the structure in a site tool (k-path, Magnetic, Input Builder); others are Builder steps.
+  // What the POTCAR step knows travels with the structure (D-108): the largest ENMAX and the variants, POSCAR order.
+  function potcarHandoff() {
+    ensurePotSelection();
+    const enmax = maxEnmax();
+    return { enmax: enmax > 0 ? enmax : undefined, potcar: elements().map((el) => S.potSel[el] || el).join(' ') };
+  }
   function sendSite(tool) {
     const B = window.SiteBridge;
     if (!B) return;
     const mm = V().hasMagnetism() ? V().getMAGMOM().replace(/^\s*MAGMOM\s*=\s*/i, '') : undefined;
-    if (!B.sendTo(tool, V().getPOSCAR(), (V().getStructure() && V().getStructure().name) || 'structure', mm)) V().toast('Browser storage is unavailable, so the hand-off could not be made.');
+    if (!B.sendTo(tool, V().getPOSCAR(), (V().getStructure() && V().getStructure().name) || 'structure', mm, potcarHandoff())) V().toast('Browser storage is unavailable, so the hand-off could not be made.');
   }
   function runCmd(c) { closeModal('cmd-modal'); if (c.target.send) { sendSite(c.target.send); return; } go(c.target.stage, c.target); }
   function renderCmd() {
@@ -960,6 +966,6 @@ ${c.length ? c.map((x) => `- [${x.level}] ${x.msg}`).join('\n') : '- none'}
   }
 
   window.Studio = { getIncar, getKpoints, go, setMesh: (m) => { S.kpt.mode = 'manual'; S.kpt.manual = m.slice(); S.visited.add('kpoints'); } };
-  window.StudioKit = { importPotcarFiles, maxEnmax, S, V, $, esc, helpBtn, filePreview, bindFileButtons, downloadText, downloadBlob, readFileText, plot, plotLayout, getIncar, getKpoints, currentMesh, go, rerenderBody, renderStepbar, stageRenderers, updateWasmPill, copyText, elements };
+  window.StudioKit = { importPotcarFiles, maxEnmax, potcarHandoff, sendSite, S, V, $, esc, helpBtn, filePreview, bindFileButtons, downloadText, downloadBlob, readFileText, plot, plotLayout, getIncar, getKpoints, currentMesh, go, rerenderBody, renderStepbar, stageRenderers, updateWasmPill, copyText, elements };
   setTimeout(init, 0);
 })();

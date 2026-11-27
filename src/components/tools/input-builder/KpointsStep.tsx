@@ -1,7 +1,7 @@
 import { reciprocalLengths, kpointCount } from '../../../lib/vasp/kpoints';
 import type { RoundingRule } from '../../../lib/vasp/kpoints';
 import { sendHandoff } from '../../../lib/handoff';
-import { centeringOf, kpointsOf, useBuilder, type KpMode } from './store';
+import { bandOptPath, centeringOf, kpointsOf, useBuilder, type KpMode } from './store';
 
 export default function KpointsStep() {
   const s = useBuilder();
@@ -22,7 +22,7 @@ export default function KpointsStep() {
             ['gamma', 'Gamma-centred mesh (KPOINTS file)'],
             ['monkhorst-pack', 'Monkhorst-Pack mesh (KPOINTS file)'],
             ['kspacing', 'KSPACING in the INCAR (no KPOINTS file)'],
-            ['line', 'Line mode for a band path (placeholder)'],
+            ['line', 'Line mode for a band path (from the k-path tool)'],
           ] as [KpMode, string][]
         ).map(([m, label]) => (
           <label key={m} className="ib-radio">
@@ -31,7 +31,20 @@ export default function KpointsStep() {
           </label>
         ))}
       </fieldset>
-      {s.kpMode === 'line' ? (
+      {s.lineKpoints && (
+        <div className="ib-note">
+          <p>
+            The band path from the k-path tool came with this structure.{' '}
+            {bandOptPath(s)
+              ? 'Band route A: it is written as KPOINTS_OPT, next to the uniform mesh below.'
+              : s.kpMode === 'line'
+                ? 'It is written as KPOINTS.'
+                : 'Choose the Band structure task (route A writes it as KPOINTS_OPT) or line mode (route B) to use it.'}
+          </p>
+          <pre className="ib-pre">{s.lineKpoints}</pre>
+        </div>
+      )}
+      {s.kpMode === 'line' && s.lineKpoints ? null : s.kpMode === 'line' ? (
         <p className="ib-note">
           Line-mode paths come from the <a href="/tools/kpath/">k-path tool</a>. No KPOINTS file is written
           here.{' '}

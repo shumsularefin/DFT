@@ -152,7 +152,7 @@
       const b = e.target.closest('[data-tool]');
       if (!b) return;
       const mm = V.hasMagnetism() ? V.getMAGMOM().replace(/^\s*MAGMOM\s*=\s*/i, '') : undefined;
-      if (!B.sendTo(b.dataset.tool, V.getPOSCAR(), name(), mm)) V.toast('Browser storage is unavailable, so the hand-off could not be made.');
+      if (!B.sendTo(b.dataset.tool, V.getPOSCAR(), name(), mm, T.potcarHandoff())) V.toast('Browser storage is unavailable, so the hand-off could not be made.');
     };
     menu.onkeydown = (e) => {
       const its = [...menu.querySelectorAll('[role="menuitem"]')];
@@ -171,7 +171,7 @@
     root.querySelectorAll('[data-send]').forEach((b) => {
       b.onclick = () => {
         const mm = V.hasMagnetism() ? V.getMAGMOM().replace(/^\s*MAGMOM\s*=\s*/i, '') : undefined;
-        B.sendTo(b.dataset.send, V.getPOSCAR(), name(), mm);
+        B.sendTo(b.dataset.send, V.getPOSCAR(), name(), mm, T.potcarHandoff());
       };
     });
   }
@@ -182,7 +182,7 @@
     if (!b) return;
     b.onclick = () => {
       const mm = V.hasMagnetism() ? V.getMAGMOM().replace(/^\s*MAGMOM\s*=\s*/i, '') : undefined;
-      if (!B.sendTo(tool, V.getPOSCAR(), name(), mm)) V.toast('Browser storage is unavailable, so the hand-off could not be made.');
+      if (!B.sendTo(tool, V.getPOSCAR(), name(), mm, T.potcarHandoff())) V.toast('Browser storage is unavailable, so the hand-off could not be made.');
     };
   });
   function wrap(stage, extra) {

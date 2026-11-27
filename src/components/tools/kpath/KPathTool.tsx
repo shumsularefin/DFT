@@ -27,7 +27,7 @@ import { describeStandardization } from '../../../lib/crystal/standardize';
 import { SymmetryClient } from '../../../lib/crystal/symmetry-client';
 import type { SymmetryResult } from '../../../lib/crystal/symmetry';
 import type { Structure } from '../../../lib/crystal/types';
-import { takeHandoff } from '../../../lib/handoff';
+import { sendHandoff, takeHandoff } from '../../../lib/handoff';
 import {
   MAX_POINTS,
   MIN_POINTS,
@@ -732,6 +732,32 @@ export default function KPathTool() {
                     </button>
                   ),
                 )}
+              </div>
+              <div className="next-step">
+                <p>
+                  <b>Next step:</b> make the band-structure input files with this standardized cell and path,
+                  without copying anything.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!sym) return;
+                    sendHandoff(
+                      {
+                        v: 1,
+                        kind: 'structure',
+                        from: 'kpath',
+                        structure: sym.primStdCell,
+                        label: `Standardized primitive cell, ${header.spacegroup}`,
+                        kpoints: files.kpoints.text,
+                        task: 'band',
+                      },
+                      '/tools/input-builder/',
+                    );
+                  }}
+                >
+                  Make the band-structure inputs in the Input Builder
+                </button>
               </div>
               <div className="kp-field">
                 <label htmlFor="kp-prev">Preview</label>

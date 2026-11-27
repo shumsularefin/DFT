@@ -53,6 +53,24 @@ describe('handoff', () => {
     expect(takeHandoff(['structure'], s)).toEqual(h);
     expect(validateHandoff({ ...h, magmom: 4 })).toBeNull();
   });
+  it('carries ENMAX, POTCAR variants, a line-mode KPOINTS and a task to the Input Builder (D-108)', () => {
+    const s = mem();
+    const h = {
+      ...struct,
+      from: 'builder' as const,
+      enmax: 400,
+      potcar: 'Fe_pv O',
+      kpoints: 'path\n20\nLine-mode\nReciprocal\n',
+      task: 'band',
+    };
+    sendHandoff(h, '/tools/input-builder/', s, () => {});
+    expect(takeHandoff(['structure'], s)).toEqual(h);
+    expect(validateHandoff({ ...h, enmax: -1 })).toBeNull();
+    expect(validateHandoff({ ...h, enmax: '400' })).toBeNull();
+    expect(validateHandoff({ ...h, potcar: 7 })).toBeNull();
+    expect(validateHandoff({ ...h, kpoints: 'x'.repeat(200_001) })).toBeNull();
+    expect(validateHandoff({ ...h, task: 'Band Structure!' })).toBeNull();
+  });
   it('series hand-off needs a string CSV of bounded size', () => {
     expect(validateHandoff({ ...series, csv: 5 })).toBeNull();
     expect(validateHandoff({ ...series, csv: 'x'.repeat(1_000_001) })).toBeNull();

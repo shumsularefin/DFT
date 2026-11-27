@@ -3,7 +3,7 @@ import { latticeParameters, cellVolume, guessCellType } from '../../../lib/cryst
 import { reducedFormula, speciesCounts } from '../../../lib/crystal/structure';
 import { takeHandoff } from '../../../lib/handoff';
 import StructureView from '../../structure/StructureView';
-import { MAX_POSCAR_BYTES, useBuilder } from './store';
+import { MAX_POSCAR_BYTES, PRESETS, useBuilder } from './store';
 import { useEffect } from 'react';
 
 export default function StructureStep() {
@@ -15,6 +15,14 @@ export default function StructureStep() {
     const h = takeHandoff(['structure']);
     if (h && h.kind === 'structure') {
       setStructure(h.structure, h.label);
+      const st = useBuilder.getState();
+      // What the previous tool already knows comes with the structure (D-108): ENMAX and the POTCAR variants from
+      // the Material Builder, the band path from the k-path tool, and the task to open with.
+      if (h.enmax) st.set('enmax', String(h.enmax));
+      if (h.potcar) st.set('potcarLabels', h.potcar.split(/\s+/).filter(Boolean));
+      if (h.task && PRESETS.some((p) => p.id === h.task)) st.choosePreset(h.task);
+      else if (h.enmax) st.resetToPreset();
+      if (h.kpoints) st.set('lineKpoints', h.kpoints);
       if (h.magmom) {
         // from the magnetic tool: MAGMOM refers to this POSCAR's atom order
         useBuilder.getState().setEntry('ISPIN', '2');

@@ -235,12 +235,30 @@ export const SiteBridge = {
    * Hand the structure to a site tool and go there. The Studio runs in the builder page itself (D-105),
    * so this window navigates. MAGMOM is passed only if it matches the atom count.
    */
-  sendTo(tool: SiteToolId, poscar: string, label: string, magmom?: string): boolean {
+  sendTo(
+    tool: SiteToolId,
+    poscar: string,
+    label: string,
+    magmom?: string,
+    extra?: { enmax?: number; potcar?: string },
+  ): boolean {
     const t = SITE_TOOLS.find((x) => x.id === tool);
     if (!t) return false;
     const structure = readAny(poscar);
     const mm = magmom && expandRepeats(magmom).length === structure.species.length ? magmom : undefined;
-    const ok = stashHandoff({ v: 1, kind: 'structure', from: 'dft-studio', structure, label, magmom: mm });
+    // The POTCAR choices from the Builder's POTCAR step go with the structure, so ENCUT needs no retyping (D-108).
+    const enmax = extra?.enmax && Number.isFinite(extra.enmax) && extra.enmax > 0 ? extra.enmax : undefined;
+    const potcar = extra?.potcar?.trim() || undefined;
+    const ok = stashHandoff({
+      v: 1,
+      kind: 'structure',
+      from: 'dft-studio',
+      structure,
+      label,
+      ...(mm ? { magmom: mm } : {}),
+      ...(enmax ? { enmax } : {}),
+      ...(potcar ? { potcar } : {}),
+    });
     if (ok) window.location.assign(t.url);
     return ok;
   },
