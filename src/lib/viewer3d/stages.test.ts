@@ -74,7 +74,7 @@ describe('topic stages', () => {
       const groups = new Set(frame.layers.map((l) => l.group));
       for (const g of st.layers ?? [])
         expect(groups.has(g), `state ${st.id}: layer group "${g}" is not drawn`).toBe(true);
-      expect(st.caption).not.toMatch(/—/);
+      expect(st.caption).not.toMatch(/\u2014/);
     }
   });
 });

@@ -61,7 +61,7 @@ describe.each(defs.map((d) => [d.id, d] as const))('scene %s', (_id, def) => {
       }
       if (p.kind === 'select') expect(p.options.map((o) => o.value)).toContain(p.value);
     }
-    expect(def.title).not.toMatch(/—/);
+    expect(def.title).not.toMatch(/\u2014/);
   });
 
   it('builds a valid, bounded frame for every parameter setting tried', { timeout: 60_000 }, () => {

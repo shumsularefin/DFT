@@ -587,7 +587,7 @@ export function validateFrame(f: SceneFrame): string[] {
     if (!p.every(Number.isFinite)) errs.push(`${what}: non-finite number`);
   };
   if (!f.describe || f.describe.trim().length < 20) errs.push('describe: missing or too short');
-  if (/—/.test(f.describe)) errs.push('describe: em dash');
+  if (/\u2014/.test(f.describe)) errs.push('describe: em dash');
   f.layers.forEach((l, k) => {
     const w = `layer ${k} (${l.kind}, ${l.group})`;
     switch (l.kind) {
