@@ -1,10 +1,11 @@
-// Shared view behaviour of the Brillouin-zone and unit-cell scenes (M5.5): orbit, zoom and pan with the pointer (OrbitControls:
+// Shared view behaviour of the Brillouin-zone and unit-cell scenes (M5.5): turn, zoom and pan with the pointer (the free arcball
+// of M16, D-108:
 // drag turns, wheel or pinch zooms, right-drag or Shift-drag moves), preset views, and the keyboard (arrow keys rotate, + and -
 // zoom, W A S D move, R resets). Rotation and zoom are about the orbit target, so they keep working after a pan; reset and the
 // preset views bring the target back to the origin. The canvas is hidden from assistive technology (it is a picture), so the
 // focusable container carries the instructions, and the labels and readouts carry the content.
 // Nothing animates by itself: views change instantly, so reduced motion needs no special case.
-import { Vector3 } from 'three';
+import { Quaternion, Vector3 } from 'three';
 import { SceneController, type ControllerOptions } from './SceneController';
 
 const STEP_DEG = 5;
@@ -13,7 +14,7 @@ const ZOOM_STEP = 1.15;
 const PAN_STEP = 0.05;
 const ORIGIN = new Vector3(0, 0, 0);
 
-/** The part of OrbitControls this class steers (the test fakes have none of it). */
+/** The part of the controls this class steers (the test fakes have none of it). */
 interface OrbitLike {
   target?: Vector3;
   minDistance?: number;
@@ -36,7 +37,7 @@ export class ViewScene extends SceneController {
     super.start();
     if (first && this.isRunning) {
       this.attachKeyboard();
-      // a pointer drag moves the camera through OrbitControls; keep the readout in step with it
+      // a pointer drag moves the camera through the controls; keep the readout in step with it
       this.orbitHandler = () => this.writeCamera();
       this.controls?.addEventListener('change', this.orbitHandler);
     }
@@ -135,7 +136,7 @@ export class ViewScene extends SceneController {
   private moveCamera(p: Vector3, target: Vector3 = this.target): void {
     const t = target.clone();
     const c = this.controls;
-    // a drag or wheel leaves damping inertia in OrbitControls; spend it now so it cannot nudge the view after a reset
+    // a drag leaves inertia in the controls; spend it now so it cannot nudge the view after a reset
     const damp = c?.enableDamping ?? false;
     if (c) {
       c.enableDamping = false;
@@ -160,24 +161,28 @@ export class ViewScene extends SceneController {
   }
 
   resetView(): void {
+    this.camera.up.set(0, 1, 0);
     this.moveCamera(this.home, ORIGIN);
   }
 
-  /** Turn about the vertical axis (azimuth) and the horizontal one (elevation) through the target, in degrees. Elevation stops short of the poles. */
+  /**
+   * Turn the view by degrees: `dAzimuthDeg` about the screen's vertical axis, `dElevationDeg` about its horizontal axis,
+   * both through the target. Nothing is clamped (M16, D-108): repeated presses carry the view over the pole and on, the way
+   * the pointer does, so a crystal can be turned to any orientation.
+   */
   rotateView(dAzimuthDeg: number, dElevationDeg: number): void {
     const t = this.target.clone();
-    const p = this.camera.position.clone().sub(t);
-    const r = p.length() || 1;
-    let az = Math.atan2(p.x, p.z) + (dAzimuthDeg * Math.PI) / 180;
-    let el = Math.asin(Math.max(-1, Math.min(1, p.y / r))) + (dElevationDeg * Math.PI) / 180;
-    const limit = (89 * Math.PI) / 180;
-    el = Math.max(-limit, Math.min(limit, el));
-    az = Math.atan2(Math.sin(az), Math.cos(az));
-    const offset = new Vector3(
-      r * Math.cos(el) * Math.sin(az),
-      r * Math.sin(el),
-      r * Math.cos(el) * Math.cos(az),
-    );
+    const offset = this.camera.position.clone().sub(t);
+    const back = offset.clone().normalize();
+    const up = this.camera.up.clone().sub(back.clone().multiplyScalar(this.camera.up.dot(back)));
+    if (up.lengthSq() < 1e-12) up.set(0, 0, 1).sub(back.clone().multiplyScalar(back.z));
+    up.normalize();
+    const right = up.clone().cross(back).normalize();
+    const turn = new Quaternion()
+      .setFromAxisAngle(up, (-dAzimuthDeg * Math.PI) / 180)
+      .multiply(new Quaternion().setFromAxisAngle(right, (-dElevationDeg * Math.PI) / 180));
+    offset.applyQuaternion(turn);
+    this.camera.up.copy(up.applyQuaternion(turn));
     this.moveCamera(offset.add(t), t);
   }
 
@@ -206,8 +211,10 @@ export class ViewScene extends SceneController {
   viewAlong(direction: readonly [number, number, number]): void {
     const d = new Vector3(...direction);
     if (d.lengthSq() === 0) return;
-    // looking straight along the vertical would make "up" undefined; stay a hair off the pole
-    if (Math.abs(d.clone().normalize().y) > 0.9999) d.add(new Vector3(0, 0, 1e-3 * Math.sign(d.y || 1)));
+    d.normalize();
+    // scene y is physics z (toScene): keep it up unless we look straight along it, then use the scene -z (physics y)
+    const up = Math.abs(d.y) > 0.999 ? new Vector3(0, 0, -1) : new Vector3(0, 1, 0);
+    this.camera.up.copy(up);
     const r = this.camera.position.distanceTo(this.target) || this.home.length();
     this.moveCamera(d.setLength(r), ORIGIN);
   }

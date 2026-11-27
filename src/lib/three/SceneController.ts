@@ -22,7 +22,7 @@ import {
   type Material,
   type Texture,
 } from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { ArcballControls } from '../viewer3d/controls';
 import { placeLabels } from './labelPlacement';
 
 export interface RendererLike {
@@ -144,7 +144,7 @@ export class SceneController {
 
     this.controls = this.options.createControls
       ? this.options.createControls(this.camera, this.renderer.domElement)
-      : (new OrbitControls(this.camera, this.renderer.domElement) as unknown as ControlsLike);
+      : (new ArcballControls(this.camera, this.renderer.domElement, () => new Vector3()) as unknown as ControlsLike);
     this.controls.enableDamping = !this.reducedMotion;
     const onChange = () => this.requestRender();
     const onStart = () => (this.interacting = true);

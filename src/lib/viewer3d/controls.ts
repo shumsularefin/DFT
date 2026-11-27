@@ -6,7 +6,7 @@
 // ('start', 'change', 'end'), so SceneController and ViewScene keep working unchanged.
 import type { Camera, Vector3 } from 'three';
 import { coast, drag, pan, roll, zoom, DRAG_RAD_PER_PX, type CameraState } from './arcball';
-import type { Quat, Vec3 } from './math';
+import { rotate, type Quat, type Vec3 } from './math';
 
 export interface CameraLike {
   position: Vector3;
@@ -85,19 +85,9 @@ export class ArcballControls {
     const [x, y, z, w] = s.q as Quat;
     this.camera.quaternion.set(x, y, z, w);
     this.target.set(...s.target);
-    // position = target + q (0, 0, dist); up = q (0, 1, 0)
-    const ix = w * 0 + y * s.dist - z * 0;
-    const iy = w * 0 + z * 0 - x * s.dist;
-    const iz = w * s.dist + x * 0 - y * 0;
-    const iw = -x * 0 - y * 0 - z * s.dist;
-    const px = ix * w + iw * -x + iy * -z - iz * -y;
-    const py = iy * w + iw * -y + iz * -x - ix * -z;
-    const pz = iz * w + iw * -z + ix * -y - iy * -x;
-    this.camera.position.set(s.target[0] + px, s.target[1] + py, s.target[2] + pz);
-    const ux = 2 * (x * y - w * z);
-    const uy = 1 - 2 * (x * x + z * z);
-    const uz = 2 * (y * z + w * x);
-    this.camera.up.set(ux, uy, uz);
+    const off = rotate(s.q, [0, 0, s.dist]);
+    this.camera.position.set(s.target[0] + off[0], s.target[1] + off[1], s.target[2] + off[2]);
+    this.camera.up.set(...rotate(s.q, [0, 1, 0]));
     this.camera.updateMatrixWorld?.(true);
     this.emit('change');
   }
