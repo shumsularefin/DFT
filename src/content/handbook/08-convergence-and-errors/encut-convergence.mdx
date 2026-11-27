@@ -1,5 +1,28 @@
 ---
 id: encut-convergence
+stage:
+  scene: m08-cutoff-sphere
+  states:
+    - id: sphere
+      section: why
+      params: { encut: 150, strain: 0 }
+      caption: 'Each dot is one plane wave of silicon, a reciprocal lattice vector inside the cutoff sphere. On the wall, a toy crystal shows the energy error at the same radius. Raise ENCUT and watch the sphere take in more dots while the error falls.'
+    - id: plateau
+      section: intuition
+      params: { encut: 400, strain: 0 }
+      caption: 'At 400 eV the sphere holds about three times as many plane waves as at 200 eV, and the curve on the wall has flattened: each extra shell of dots now buys very little energy.'
+    - id: shells
+      section: math
+      params: { encut: 400, strain: 0, outside: true }
+      caption: 'The count grows like ENCUT to the power 3/2, because the sphere volume grows like its radius cubed. The grey dots are the next shell, the vectors a 25 percent higher cutoff would add.'
+    - id: scan
+      section: in-vasp
+      params: { encut: 520, strain: 0 }
+      caption: 'A scan from about ENMAX upward moves along the flat end of the curve. Compare the plane-wave count in the readouts with the 150 eV state: the cost rises steeply while the error barely moves.'
+    - id: pulay
+      section: what-changes
+      params: { encut: 400, strain: -4 }
+      caption: 'Strain the cell at fixed ENCUT: the reciprocal lattice stretches, whole shells of dots cross the sphere at once and the basis jumps. That jump is behind Pulay stress, and a higher cutoff makes it smaller.'
 title: Convergence of the cutoff energy
 module: 8
 order: 2
