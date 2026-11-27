@@ -269,7 +269,7 @@
     "usedFor": "Setyawan-Curtarolo reference, data, golden files",
     "access": "open source",
     "status": "cross-checked",
-    "notes": "pymatgen 2026.10.24 used for golden data"
+    "notes": "pymatgen 2026.10.24 used for golden data. D-110: the Materials Project U and MAGMOM defaults are read from pymatgen-core 2026.10.31 (`io/vasp/MPRelaxSet.yaml`, `io/vasp/VASPIncarBase.yaml`; `io/vasp/sets.py` starts unlisted elements at 0.6) by `scripts/reference/gen_mp_defaults_reference.py`. pymatgen disagrees with itself on Co: `VASPIncarBase.yaml` starts Co at 0.6 (low spin, with a warning in `sets.py`), while `analysis/magnetism/default_magmoms.yaml` (pymatgen 2026.10.24), headed \"MPRelaxSet defaults\", lists Co 5; the site uses the input-set file"
   },
   {
     "id": "S-035",
@@ -633,11 +633,11 @@
   },
   {
     "id": "S-080",
-    "citation": "A. Jain, G. Hautier, S. P. Ong, C. J. Moore, C. C. Fischer, K. A. Persson, G. Ceder, \"Formation enthalpies by mixing GGA and GGA+U calculations\", Phys. Rev. B 84, 045115 (2011); L. Wang, T. Maxisch, G. Ceder, Phys. Rev. B 73, 195107 (2006)",
-    "usedFor": "Origin of the Materials Project U values (fit to oxide formation enthalpies) (M15.8, Q-051)",
-    "access": "paywalled",
-    "status": "cited-from-memory",
-    "notes": "The values themselves are checked against pymatgen's MPRelaxSet.yaml (S-034)"
+    "citation": "A. Jain, G. Hautier, S. P. Ong, C. J. Moore, C. C. Fischer, K. A. Persson, G. Ceder, \"Formation enthalpies by mixing GGA and GGA+U calculations\", Phys. Rev. B 84, 045115 (2011); L. Wang, T. Maxisch, G. Ceder, \"Oxidation energies of transition metal oxides within the GGA+U framework\", Phys. Rev. B 73, 195107 (2006)",
+    "usedFor": "Origin of the Materials Project U values (fit to oxide formation enthalpies) (M15.8, Q-051); the U suggestion in the Input Builder and Magnetic tool (D-110, Q-072)",
+    "access": "paywalled; author copies on perssongroup.lbl.gov and scispace.com",
+    "status": "read",
+    "notes": "The values themselves are checked against pymatgen's MPRelaxSet.yaml (S-034). Read 2026-11-27 for D-110: Jain 2011 Table I gives U (eV) V 3.1, Cr 3.5, Mn 3.9, Fe 4.0, Co 3.4, Ni 6.0, Cu 4.0, Mo 3.5, fitted to binary oxide formation enthalpies with Wang's method, and uses the oxide values for fluorides. Wang 2006 fits U to oxidation energies of V, Cr, Mn, Fe, Co, Ni and Cu oxides (Co 3.3, Ni 6.4, Cu 4.0, Cr 3.5; the V, Mn and Fe values were read from a badly scanned table and are not relied on). The current database values (S-034, S-085) differ from Jain's table, most for Fe (5.3 against 4.0) and Mo (4.38 against 3.5)"
   },
   {
     "id": "S-081",
@@ -670,5 +670,13 @@
     "access": "paywalled",
     "status": "cited-from-memory",
     "notes": "The commands, the AECCAR reference and the checks on the page come from S-042. Not read for this stage"
+  },
+  {
+    "id": "S-085",
+    "citation": "Materials Project documentation, \"Hubbard U values\", https://docs.materialsproject.org/methodology/materials-methodology/calculation-details/gga+u-calculations/hubbard-u-values",
+    "usedFor": "Which U the database uses and when (D-110, Q-072)",
+    "access": "web",
+    "status": "read",
+    "notes": "Read 2026-11-27: U (eV) Co 3.32, Cr 3.7, Fe 5.3, Mn 3.9, Mo 4.38, Ni 6.2, V 3.25, W 6.2 for oxides, fitted to experimental binary formation enthalpies as in Wang et al. (S-080); fluorides use the oxide values; Ni is fitted to a ternary (LiNiO2) reaction for lack of binary data; the page says U should be site specific but is applied to every site of an element, d orbitals only. The values equal pymatgen-core 2026.10.31 MPRelaxSet.yaml (S-034, `tests/reference/mp_defaults_reference.json`)"
   }
 ]

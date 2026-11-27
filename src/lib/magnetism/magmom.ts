@@ -10,8 +10,9 @@ import type { MagneticConfiguration } from './orderings';
 import { MagneticError } from './sublattice';
 
 /**
- * What the sources say about starting magnitudes. There is deliberately no per-element table: the handbook gives a
- * range for 3d ions and the VASP wiki a rule relative to the experimental moment, so the user enters the numbers.
+ * What the sources say about starting magnitudes: the handbook gives a range for 3d ions and the VASP wiki a rule
+ * relative to the experimental moment. The only per-element table is the Materials Project one in
+ * `../vasp/mpDefaults.ts`, offered as a labelled fill the user can change (D-110), never applied silently.
  */
 export const STARTING_MOMENT_GUIDANCE = [
   { text: 'Start above the expected moment (3 to 5 for 3d ions).', source: 'S-042' },
