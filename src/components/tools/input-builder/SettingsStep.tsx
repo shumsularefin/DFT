@@ -119,9 +119,7 @@ export default function SettingsStep() {
       </div>
       <div className="ib-row">
         <div className="ib-field">
-          <label htmlFor="ib-custom">
-            Or type a tag the database does not list (for example IMAGES for NEB)
-          </label>
+          <label htmlFor="ib-custom">Or type a tag the database does not list</label>
           <input
             id="ib-custom"
             value={custom}
@@ -151,7 +149,7 @@ export default function SettingsStep() {
         <fieldset className="ib-fieldset">
           <legend>MAGMOM helper: one starting moment per species</legend>
           <p className="ib-small">Species order is the POSCAR order: {order.join(', ')}.</p>
-          <p className="ib-row">
+          <p>
             <button
               type="button"
               onClick={() => {
@@ -237,41 +235,42 @@ function MpLdauButton({ order }: { order: string[] }) {
   const mp = mpLdau(order);
   const [msg, setMsg] = useState('');
   return (
-    <p className="ib-row">
-      <button
-        type="button"
-        onClick={() => {
-          if (!mp.applies) {
+    <>
+      <p>
+        <button
+          type="button"
+          onClick={() => {
+            if (!mp.applies) {
+              setMsg(
+                'The Materials Project uses +U only in oxides and fluorides; this structure has neither O nor F, so no value was filled.',
+              );
+              return;
+            }
+            s.set('ldau', mp.rows);
             setMsg(
-              'The Materials Project uses +U only in oxides and fluorides; this structure has neither O nor F, so no value was filled.',
+              mp.withU.length
+                ? `Filled U for ${mp.withU.join(', ')}; the other species get LDAUL = -1 and U = 0. Press Write to put them in the INCAR.`
+                : 'No species here is in the Materials Project U table (Co, Cr, Fe, Mn, Mo, Ni, V, W), so every U is 0.',
             );
-            return;
-          }
-          s.set('ldau', mp.rows);
-          setMsg(
-            mp.withU.length
-              ? `Filled U for ${mp.withU.join(', ')}; the other species get LDAUL = -1 and U = 0. Press Write to put them in the INCAR.`
-              : 'No species here is in the Materials Project U table (Co, Cr, Fe, Mn, Mo, Ni, V, W), so every U is 0.',
-          );
-        }}
-      >
-        Fill Materials Project U values
-      </button>
+          }}
+        >
+          Fill Materials Project U values
+        </button>
+      </p>
       {msg && (
-        <span className="ib-small" role="status">
-          {' '}
+        <p className="ib-small" role="status">
           {msg}
-        </span>
+        </p>
       )}
-    </p>
+    </>
   );
 }
 
 function SuggestionNotes({ notes }: { notes: readonly { text: string; source: string }[] }) {
   return (
-    <details className="ib-small">
+    <details>
       <summary>Where these values come from</summary>
-      <ul>
+      <ul className="ib-small">
         {notes.map((n) => (
           <li key={n.text}>
             {n.text} ({n.source})
