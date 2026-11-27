@@ -1,6 +1,6 @@
 // Only the three.js classes DFT Studio's viewer uses, as named re-exports so the bundler can tree-shake the rest.
 export {
-  AmbientLight,
+  Box3,
   BufferGeometry,
   Color,
   ConeGeometry,
@@ -9,6 +9,7 @@ export {
   DoubleSide,
   Float32BufferAttribute,
   Group,
+  HemisphereLight,
   Line,
   LineBasicMaterial,
   LineSegments,
@@ -17,9 +18,11 @@ export {
   MeshBasicMaterial,
   MeshStandardMaterial,
   OrthographicCamera,
+  PCFShadowMap,
   PerspectiveCamera,
   Quaternion,
   Raycaster,
+  Sphere,
   Scene,
   SphereGeometry,
   Vector2,

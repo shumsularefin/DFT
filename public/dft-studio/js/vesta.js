@@ -1447,6 +1447,10 @@
   const container = document.getElementById('three-container');
   const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  // Soft shadows give the atoms depth. The shadow map is drawn only with a frame, and frames are drawn on
+  // demand (see invalidate), so an idle viewer still costs nothing.
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
   container.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
@@ -1457,14 +1461,51 @@
   const orthoCam = new THREE.OrthographicCamera(-10, 10, 10, -10, -200, 500);
   let activeCam = orthoCam;
 
-  // Publication-grade VESTA lighting
-  scene.add(new THREE.AmbientLight(0xffffff, 0.58));
-  const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.72);
-  dirLight1.position.set(12, 18, 22);
+  // VESTA-style lighting with depth: a sky/ground fill so no side is black, a key light from the upper
+  // left of the view that casts soft shadows, and a weak cool rim light from behind. Both directional
+  // lights follow the camera (placeLights), so the lit side stays the same as the structure turns.
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x6b7280, 0.85));
+  const dirLight1 = new THREE.DirectionalLight(0xffffff, 2.1);
+  dirLight1.castShadow = true;
+  dirLight1.shadow.mapSize.set(2048, 2048);
+  dirLight1.shadow.bias = -0.0004;
+  dirLight1.shadow.normalBias = 0.03;
+  dirLight1.shadow.radius = 3;
   scene.add(dirLight1);
-  const dirLight2 = new THREE.DirectionalLight(0xdbeafe, 0.35);
-  dirLight2.position.set(-16, -10, -14);
+  scene.add(dirLight1.target);
+  const dirLight2 = new THREE.DirectionalLight(0xdbeafe, 0.45);
   scene.add(dirLight2);
+  scene.add(dirLight2.target);
+  const KEY_DIR = new THREE.Vector3(-0.45, 0.75, 0.6).normalize();
+  const RIM_DIR = new THREE.Vector3(0.5, -0.35, -0.8).normalize();
+  const sceneSphere = new THREE.Sphere(new THREE.Vector3(), 8);
+  const _lightDir = new THREE.Vector3();
+  function placeLights() {
+    const c = sceneSphere.center;
+    const r = Math.max(1, sceneSphere.radius);
+    _lightDir.copy(KEY_DIR).applyQuaternion(activeCam.quaternion);
+    dirLight1.position.copy(c).addScaledVector(_lightDir, r * 3);
+    dirLight1.target.position.copy(c);
+    const sc = dirLight1.shadow.camera;
+    sc.left = -r; sc.right = r; sc.top = r; sc.bottom = -r;
+    sc.near = r * 0.5; sc.far = r * 5.5;
+    sc.updateProjectionMatrix();
+    _lightDir.copy(RIM_DIR).applyQuaternion(activeCam.quaternion);
+    dirLight2.position.copy(c).addScaledVector(_lightDir, r * 3);
+    dirLight2.target.position.copy(c);
+  }
+  // Opaque atoms, bonds and arrows cast and receive shadows; see-through polyhedra only receive them.
+  // Very large scenes skip shadows, so the extra shadow pass never doubles a heavy draw.
+  const MAX_SHADOW_MESHES = 3000;
+  function updateShadows() {
+    const lit = rootGroup.children.length <= MAX_SHADOW_MESHES;
+    rootGroup.traverse(function (o) {
+      if (!o.isMesh || !o.material || !o.material.isMeshStandardMaterial) return;
+      o.receiveShadow = lit;
+      o.castShadow = lit && !o.material.transparent;
+    });
+    if (rootGroup.children.length) new THREE.Box3().setFromObject(rootGroup).getBoundingSphere(sceneSphere);
+  }
 
   // Custom Smooth Trackball / Orbit Camera State
   const camState = {
@@ -1804,6 +1845,7 @@
       });
     });
 
+    updateShadows();
     updateProjectedLabels();
   }
 
@@ -1919,6 +1961,7 @@
       if (shadersPending) return;
     }
     dirtyFrames--;
+    placeLights();
     renderer.render(scene, activeCam);
   }
   var shadersReady = false, shadersPending = false;
