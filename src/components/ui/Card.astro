@@ -16,12 +16,12 @@ const { title, as: Tag = 'div' } = Astro.props;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    padding: var(--space-4) var(--space-5);
-    box-shadow: var(--shadow-1);
+    padding: var(--space-4);
   }
   .card-title {
     margin: 0 0 var(--space-2);
-    font-size: var(--step-1);
+    font-size: 1rem;
+    font-weight: 600;
   }
   .card > :last-child {
     margin-bottom: 0;

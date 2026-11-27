@@ -2,15 +2,15 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35em;
-  padding: 0.12rem 0.65rem;
-  font-size: var(--step--1);
+  padding: 0.05rem 0.5rem;
+  font-size: 0.75rem;
   font-family: var(--font-sans);
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.45;
   border-radius: 999px;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  color: var(--text);
+  color: var(--text-muted);
   white-space: nowrap;
 }
 .badge-verified,

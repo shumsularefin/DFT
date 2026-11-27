@@ -1,182 +1,79 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Card from '../components/ui/Card.astro';
-import Badge from '../components/ui/Badge.astro';
-
-const tools = [
-  {
-    id: 'tolerance',
-    title: 'Tolerance-factor explorer',
-    text: 'Check whether a chosen set of ions is likely to form a perovskite, with the radii and the formula shown.',
-  },
-  {
-    id: 'input-builder',
-    title: 'Input builder',
-    text: 'Prepare POSCAR, KPOINTS and INCAR files with plain-language explanations and warnings for risky combinations.',
-  },
-  {
-    id: 'convergence',
-    title: 'Convergence plotter',
-    text: 'Paste results from a series of runs and see whether the energy has settled.',
-  },
-  {
-    id: 'errors',
-    title: 'Error finder',
-    text: 'Paste a VASP error message or describe a symptom and see likely causes and fixes, in order.',
-  },
-  {
-    id: 'kpath',
-    title: 'Brillouin zone and k-path viewer',
-    text: 'See the Brillouin zone of your structure in 3D and export a k-path for a band-structure run.',
-  },
-  {
-    id: 'magnetic',
-    title: 'Magnetic configuration tool',
-    text: 'Build ferromagnetic and antiferromagnetic orderings for your cell and download POSCAR, MAGMOM and INCAR files.',
-  },
-  {
-    id: 'eos',
-    title: 'Equation of state fit',
-    text: 'Fit energy-volume points to Birch-Murnaghan or Murnaghan and read V0, the bulk modulus and the lattice constant.',
-  },
-  {
-    id: 'review',
-    title: 'Calculation review',
-    text: 'Drop VASP inputs and outputs (or a zip) for sourced pre-flight and post-flight checks.',
-  },
-  {
-    id: 'planner',
-    title: 'Research planner',
-    text: 'Pick a calculation goal to generate a sourced, step-by-step VASP workflow, starter INCARs, methods checklist, and zip.',
-  },
-  {
-    id: 'work-function',
-    title: 'Work function and charge difference',
-    text: 'Planar and macroscopic averages of LOCPOT, work function Phi = V_vac - E_F, and CHGCAR differences.',
-  },
-];
-const more = [
-  {
-    id: 'studio',
-    title: 'Screening Studio',
-    text: 'Explore a table of candidate materials and turn a shortlist into a first project.',
-  },
-  {
-    id: 'builder',
-    title: 'Material Builder',
-    text: 'Edit a crystal or molecule and export a structure file.',
-  },
-  {
-    id: 'practice',
-    title: 'Practice',
-    text: 'Short questions that adapt to what you already know and bring topics back at spaced intervals.',
-  },
-];
+import { STAGES } from '../lib/workspace';
 ---
 
 <BaseLayout
   title="Tools"
-  description="Research tools for the DFT Handbook. The input builder, convergence plotter, error finder, k-path tool, magnetic configuration tool, equation-of-state fit and practice are available; the others are planned."
+  description="Every browser tool of the DFT Handbook in the order of a calculation: structure, inputs, convergence, run and review, properties."
 >
   <div class="container">
-    <h1>Tools</h1>
-    <p>
-      These tools run entirely in your browser. The input builder, the convergence plotter, the error finder,
-      the k-path tool, the magnetic configuration tool and the equation-of-state fit are available now, and so
-      is practice. All research tools, Screening Studio, Material Builder, and Practice are available locally
-      in your browser.
+    <div class="page-head">
+      <h1>Tools</h1>
+      <p>
+        One workspace, in the order you meet it in a calculation. Every tool runs entirely in your browser,
+        and nothing you open or paste is uploaded.
+      </p>
+    </div>
+    {STAGES.map((stage, i) => (
+      <section class="tool-stage" aria-labelledby={stage.id}>
+        <h2 class="tool-stage-title" id={stage.id}>
+          <span class="tool-stage-no" aria-hidden="true">
+            {i + 1}
+          </span>
+          {stage.title}
+        </h2>
+        <p class="tool-stage-text">{stage.text}</p>
+        <ul class="card-grid">
+          {stage.tools.map((t) => (
+            <li>
+              <a class="feature" href={t.href} id={t.id}>
+                <span class="feature-title">{t.title}</span>
+                <span class="feature-text">{t.text}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+    <p class="tools-study">
+      Learning alongside the tools: <a href="/practice/">Practice</a> brings questions back at spaced
+      intervals, and <a href="/progress/">Progress</a> shows what you have mastered.
     </p>
-    <h2>Research tools</h2>
-    <div class="tool-grid">
-      {tools.map((t) => (
-        <Card as="section">
-          <h3 class="card-title" id={t.id}>
-            {t.title}
-          </h3>
-          <p>{t.text}</p>
-          {t.id === 'tolerance' ? (
-            <p>
-              <a href="/tools/tolerance-factor/">Open the tolerance-factor explorer</a>
-            </p>
-          ) : t.id === 'input-builder' ? (
-            <p>
-              <a href="/tools/input-builder/">Open the input builder</a>
-            </p>
-          ) : t.id === 'convergence' ? (
-            <p>
-              <a href="/tools/convergence/">Open the convergence plotter</a>
-            </p>
-          ) : t.id === 'errors' ? (
-            <p>
-              <a href="/errors/">Open the error finder</a>
-            </p>
-          ) : t.id === 'kpath' ? (
-            <p>
-              <a href="/tools/kpath/">Open the k-path tool</a>
-            </p>
-          ) : t.id === 'magnetic' ? (
-            <p>
-              <a href="/tools/magnetic/">Open the magnetic tool</a>
-            </p>
-          ) : t.id === 'eos' ? (
-            <p>
-              <a href="/tools/eos/">Open the equation-of-state fit</a>
-            </p>
-          ) : t.id === 'planner' ? (
-            <p>
-              <a href="/tools/planner/">Open the research planner</a>
-            </p>
-          ) : t.id === 'review' ? (
-            <p>
-              <a href="/tools/review/">Open the calculation review</a>
-            </p>
-          ) : t.id === 'work-function' ? (
-            <p>
-              <a href="/tools/work-function/">Open the work-function tool</a>
-            </p>
-          ) : (
-            <p>
-              <Badge variant="draft" /> Coming soon
-            </p>
-          )}
-        </Card>
-      ))}
-    </div>
-    <h2>Also planned</h2>
-    <div class="tool-grid">
-      {more.map((t) => (
-        <Card as="section">
-          <h3 class="card-title" id={t.id}>
-            {t.title}
-          </h3>
-          <p>{t.text}</p>
-          {t.id === 'studio' ? (
-            <p>
-              <a href="/studio/">Open Screening Studio</a>
-            </p>
-          ) : t.id === 'builder' ? (
-            <p>
-              <a href="/builder/">Open Material Builder</a>
-            </p>
-          ) : t.id === 'practice' ? (
-            <p>
-              <a href="/practice/">Open practice</a> or see <a href="/progress/">your progress</a>
-            </p>
-          ) : (
-            <p>
-              <Badge variant="draft" /> Coming soon
-            </p>
-          )}
-        </Card>
-      ))}
-    </div>
   </div>
 </BaseLayout>
 
 <style is:global>
-  .tool-grid {
-    display: grid;
-    gap: var(--space-4);
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  .tool-stage + .tool-stage {
+    margin-top: var(--space-6);
+  }
+  .tool-stage-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    font-size: var(--step-0);
+  }
+  .tool-stage-no {
+    display: inline-grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+  }
+  .tool-stage-text {
+    margin: var(--space-1) 0 var(--space-3);
+    font-size: var(--step--1);
+    color: var(--text-muted);
+  }
+  .tools-study {
+    margin-top: var(--space-6);
+    color: var(--text-muted);
+    font-size: var(--step--1);
   }
 </style>
