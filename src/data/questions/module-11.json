@@ -84,7 +84,7 @@
       "screening"
     ],
     "type": "single",
-    "prompt": "Why does the Screening Studio display a prominent synthetic-data banner when running on sample fixtures?",
+    "prompt": "Why does Materials Screening display a prominent synthetic-data banner when running on sample fixtures?",
     "options": [
       {
         "text": "So demonstration rows are never mistaken for real Materials Project entries before an author data pull",
@@ -113,7 +113,7 @@
     ],
     "visual": {
       "scene": "perovskite-octahedra",
-      "caption": "Provenance transparency in the Screening Studio.",
+      "caption": "Provenance transparency in Materials Screening.",
       "alt": "Perovskite candidate visual."
     }
   },
