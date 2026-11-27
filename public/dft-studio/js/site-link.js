@@ -151,8 +151,7 @@
     menu.onclick = (e) => {
       const b = e.target.closest('[data-tool]');
       if (!b) return;
-      const mm = V.hasMagnetism() ? V.getMAGMOM().replace(/^\s*MAGMOM\s*=\s*/i, '') : undefined;
-      if (!B.sendTo(b.dataset.tool, V.getPOSCAR(), name(), mm)) V.toast('Browser storage is unavailable, so the hand-off could not be made.');
+      T.sendSite(b.dataset.tool);
     };
     menu.onkeydown = (e) => {
       const its = [...menu.querySelectorAll('[role="menuitem"]')];
@@ -169,12 +168,16 @@
   const toolBtn = (id, label, why) => `<button type="button" class="site-link" data-send="${id}"><b>${esc(label)}</b><span>${esc(why)}</span></button>`;
   function bindSend(root) {
     root.querySelectorAll('[data-send]').forEach((b) => {
-      b.onclick = () => {
-        const mm = V.hasMagnetism() ? V.getMAGMOM().replace(/^\s*MAGMOM\s*=\s*/i, '') : undefined;
-        B.sendTo(b.dataset.send, V.getPOSCAR(), name(), mm);
-      };
+      b.onclick = () => T.sendSite(b.dataset.send);
     });
   }
+  // The Magnetic tab hands the structure to the site's Magnetic tool, which owns FM / AFM orderings (D-108).
+  // The Symmetry tab hands the structure to the k-path tool, which owns band paths (D-108).
+  [['btn-mag-to-tool', 'magnetic'], ['btn-send-kpath', 'kpath']].forEach(([id, tool]) => {
+    const b = $(id);
+    if (!b) return;
+    b.onclick = () => T.sendSite(tool);
+  });
   function wrap(stage, extra) {
     const orig = T.stageRenderers[stage];
     if (!orig) return;
@@ -189,15 +192,7 @@
   }
   const tool = (id) => B.tools.find((t) => t.id === id);
 
-  wrap('incar', () => {
-    let rows = [];
-    try { rows = B.validateIncar(T.getIncar(), V.getPOSCAR(), T.maxEnmax() || undefined); } catch (e) { rows = []; }
-    const list = rows.length
-      ? `<ul class="checks-list">${rows.map((r) => `<li class="check-item sev-${r.severity === 'warn' ? 'warning' : r.severity}"><div class="check-head"><b class="font-mono-code">${esc(r.rule)}</b> <span>${esc(r.title)}</span></div><p>${esc(r.why)}</p></li>`).join('')}</ul>`
-      : '<p class="sp-note">No problems found by the site rules.</p>';
-    return card('Handbook validation rules (V001 and up)', `<p class="sp-note">The handbook's INCAR engine checked this INCAR against the structure: each rule is sourced and unit tested. Studio presets are VASPKIT-style starting points; these rules are the cross-check.</p>${list}<div class="site-links">${toolBtn('input-builder', 'Continue in the Input Builder', tool('input-builder').why)}</div>`);
-  });
-  wrap('kpoints', () => card('Verified k-path', `<p class="sp-note">The built-in paths here are quick look-ups. The handbook k-path tool computes HPKOT or Setyawan-Curtarolo paths with golden tests on 39 structures and shows the exact Brillouin zone.</p><div class="site-links">${toolBtn('kpath', 'Open this structure in the k-path tool', tool('kpath').why)}${link('/handbook/', 'Why the mesh and path matter', 'Handbook modules on k-points and band structures.')}</div>`));
+  wrap('inputs', () => card('Other next steps', `<p class="sp-note">The Input Builder is where the input files are made. These tools take the same structure, with its spins and POTCAR choices, for the jobs they own.</p><div class="site-links">${toolBtn('kpath', 'Band path for a band structure', tool('kpath').why)}${toolBtn('magnetic', 'FM and AFM orderings', tool('magnetic').why)}${toolBtn('planner', 'Plan the study and its cost', tool('planner').why)}</div><p class="sp-note">After the run: read the outputs here in step 5, or with the checked site tools: ${B.analyzers.map((x) => `<a href="${x.url}">${esc(x.label)}</a>`).join(', ')}, and the <a href="/errors/">Error finder</a> for a failed run.</p>`));
   wrap('kconv', () => card('Plot the series on the site', `<p class="sp-note">After the run, load kpoint_convergence.csv above, then send the rows to the convergence plotter for the energy and pressure plots with a threshold you choose.</p><div class="site-links"><button type="button" class="site-link" id="kc-send-plot"><b>Send results to the convergence plotter</b><span>Needs the CSV loaded above.</span></button>${link('/tools/convergence/', 'Open the convergence plotter', 'Drop OSZICAR or OUTCAR files from any series.')}</div><p id="kc-send-st" class="sp-note" role="status"></p>`));
   function bindKconv(root) {
     const b = root.querySelector('#kc-send-plot');
@@ -216,7 +211,6 @@
       if (!B.sendSeries(csv, `k-point series of ${name()}`)) st.textContent = 'Browser storage is unavailable.';
     };
   }
-  wrap('bundle', () => card('Before you submit', `<p class="sp-note">The Input Builder adds sourced job-script templates, a share link and the full rule check; the planner estimates the cost.</p><div class="site-links">${toolBtn('input-builder', 'Build the inputs in the Input Builder', tool('input-builder').why)}${toolBtn('planner', 'Estimate cost in the planner', tool('planner').why)}${toolBtn('magnetic', 'Enumerate magnetic orderings', tool('magnetic').why)}</div>`));
   wrap('analyze', () => card('Verified analysis on the site', `<p class="sp-note">These analyzers are quick looks, not yet checked against golden references (marked Heuristic). The tools below read the same files with parsers tested against pymatgen or numpy.</p><div class="site-links">${B.analyzers.map((a) => link(a.url, a.label, a.why)).join('')}</div>`));
 
   // Label Studio's own analyzers honestly.

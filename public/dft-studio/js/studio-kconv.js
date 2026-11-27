@@ -1,7 +1,7 @@
-/* DFT Studio step 5: k-point convergence test.
+/* DFT Studio step 3: k-point convergence test (optional).
  * Uses the unchanged logic of the k-point convergence kit (window.KConv) and feeds it the live structure
- * (POSCAR from the 3D model) and the INCAR from step 3. Reads the kpoint_convergence.csv back and turns the
- * converged mesh into KPOINTS with one click.
+ * (POSCAR from the 3D model) and the Input Builder's convergence INCAR (S-042, D-108). Reads the
+ * kpoint_convergence.csv back; the chosen mesh travels to the Input Builder with the structure.
  */
 (() => {
   'use strict';
@@ -17,7 +17,7 @@
 
   function sources() {
     const poscarText = C.poscarUpload ? C.poscarUpload.text : V().getPOSCAR();
-    const incarText = C.incarUpload ? C.incarUpload.text : T.getIncar();
+    const incarText = C.incarUpload ? C.incarUpload.text : T.baseIncar();
     let poscar = null, perr = null;
     try { poscar = K.parsePoscar(poscarText); } catch (e) { perr = e.message; }
     return { poscarText, incarText, poscar, perr };
@@ -36,21 +36,13 @@
       poscar: src.poscar, incarTags, cmd: C.cmd, meshes, ediff: ed.nums, tries: tr.nums,
       invalidCustom: series.invalidCustom, invalidTol: tol.invalid, invalidEdiff: ed.invalid, invalidTries: tr.invalid,
     });
-    if (S.kpt.mode === 'line') w.infos.push('KPOINTS (step 4) is in band-path mode: the convergence test always writes its own Gamma-centred meshes.');
-    if (/ICHARG\s*=\s*11/.test(src.incarText)) w.warnings.push('INCAR is a non-SCF (ICHARG = 11) run: use an SCF preset (for example ST or MG) in step 3 for the convergence test.');
+    if (/ICHARG\s*=\s*11/.test(src.incarText)) w.warnings.push('INCAR is a non-SCF (ICHARG = 11) run: use a self-consistent INCAR (the Input Builder convergence or static task) for the convergence test.');
     const opts = { meshes, cmd: C.cmd.trim() || 'mpirun -np 12 vasp', tol: tol.nums.length ? tol.nums : [1, 0.1], ed: ed.nums.length ? ed.nums : [1e-4, 1e-6, 1e-8], tr: tr.nums.length ? tr.nums : [2, 3, 5] };
     let script = K.buildScript(opts);
     const cellNote = src.poscar.len.map((x) => x.toFixed(3)).join(' x ');
     script = script.replace(/# \(L in Angstrom, mesh\) for the [^\n]*/, `# (L in Angstrom, mesh) for the ${cellNote} A cell: N_i = max(1, int(L/a_i + 0.5))`);
     const readme = K.buildReadme(Object.assign({}, opts, { nat: src.poscar.nat, len: src.poscar.len }));
     return { src, all, meshes, script, incar: cleaned.text, removed: cleaned.removed, readme, warnings: w.warnings, infos: w.infos };
-  }
-
-  function outputs() {
-    if (!S.visited.has('kconv')) return null;
-    const r = compute();
-    if (r.err || !r.meshes.length) return null;
-    return { meshes: r.meshes, script: r.script, incar: r.incar, readme: r.readme, poscarText: r.src.poscarText };
   }
 
   // ----------------------------------------------------------------- CSV results reader
@@ -90,7 +82,7 @@
     body.innerHTML = `
       <div class="sp-card">
         <div class="sp-card-title">What this step does ${helpBtn('k-point convergence test', { meaning: 'A Gamma-centred mesh series is built from a real-space length L: N_i = max(1, floor(L / a_i + 0.5)). A Python driver runs one static VASP calculation per mesh with an EDIFF ladder, restarts from the previous charge density, and writes a table, a CSV and a plot.', when: 'Run it once per material (and again if you change the cell shape a lot, the smearing, or go from insulator to metal). Load the CSV back here to pick the mesh.' })}</div>
-        <div class="sp-note">Inputs come from steps 1 to 3: <b>${esc(V().getStructure().name)}</b>, ${p.nat} atoms, a, b, c = ${p.len.map((x) => x.toFixed(3)).join(', ')} A, and the INCAR of step 3 with relaxation and output tags removed. You can override either file below.</div>
+        <div class="sp-note">Inputs come from steps 1 and 2: <b>${esc(V().getStructure().name)}</b>, ${p.nat} atoms, a, b, c = ${p.len.map((x) => x.toFixed(3)).join(', ')} A, and the Input Builder's convergence INCAR (ENCUT from the POTCAR ENMAX), with relaxation and output tags removed. You can override either file below. For a plain folder series with collect.sh instead of a driver, use the convergence series in the Input Builder.</div>
         <div class="sp-row wrap">
           <label class="v-btn cursor-pointer">Override POSCAR<input id="kc-up-pos" type="file" class="hidden"/></label>
           <label class="v-btn cursor-pointer">Override INCAR<input id="kc-up-inc" type="file" class="hidden"/></label>
@@ -109,7 +101,7 @@
           <label class="sp-field" style="grid-column:1/-1"><span>Extra meshes (e.g. 4x4x2 12x12x6)</span><input id="kc-custom" class="v-input font-mono-code" value="${esc(C.custom)}"/></label>
         </div>
         <div class="kc-table-wrap"><table class="kc-table"><thead><tr><th><span class="sr-only">Include</span></th><th>Mesh</th><th>L (A)</th><th>Grid points</th><th>kpts x atoms</th><th><span class="sr-only">Action</span></th></tr></thead><tbody>
-          ${r.all.map((x) => { const n = K.meshName(x.m); const g = x.m[0] * x.m[1] * x.m[2]; return `<tr><td><input type="checkbox" data-mesh="${n}" aria-label="Include mesh ${n}" ${C.unchecked.has(n) ? '' : 'checked'}/></td><td class="font-mono-code">${n}</td><td>${x.L === null ? 'custom' : x.L}</td><td>${g}</td><td>${g * p.nat}</td><td><button class="sp-link" data-use="${n}">use in KPOINTS</button></td></tr>`; }).join('')}
+          ${r.all.map((x) => { const n = K.meshName(x.m); const g = x.m[0] * x.m[1] * x.m[2]; return `<tr><td><input type="checkbox" data-mesh="${n}" aria-label="Include mesh ${n}" ${C.unchecked.has(n) ? '' : 'checked'}/></td><td class="font-mono-code">${n}</td><td>${x.L === null ? 'custom' : x.L}</td><td>${g}</td><td>${g * p.nat}</td><td><button class="sp-link" data-use="${n}">use this mesh</button></td></tr>`; }).join('')}
         </tbody></table></div>
       </div>
       <div class="sp-card">
@@ -126,7 +118,7 @@
       ${r.removed.length ? `<div class="sp-note">Removed from the test INCAR: <span class="font-mono-code">${esc(r.removed.join(', '))}</span> (the script sets NSW, IBRION, EDIFF, ISTART, ICHARG itself).</div>` : ''}
       <div class="sp-card">
         <div class="sp-row" style="justify-content:space-between"><div class="seg">${Object.keys(file).map((n) => `<button class="${C.tab === n ? 'on' : ''}" data-kctab="${n}">${n}</button>`).join('')}</div>
-          <button id="kc-to-bundle" class="v-btn v-btn-primary">Add to run bundle</button></div>
+          <button id="kc-to-bundle" class="v-btn v-btn-primary">Next: input files</button></div>
         ${filePreview(C.tab, file[C.tab])}
       </div>
       <div class="sp-card">
@@ -148,7 +140,7 @@
     $('kc-up-inc').onchange = async (e) => { C.incarUpload = await readFileText(e.target); T.rerenderBody(); };
     const cp = $('kc-clr-pos'); if (cp) cp.onclick = () => { C.poscarUpload = null; T.rerenderBody(); };
     const ci = $('kc-clr-inc'); if (ci) ci.onclick = () => { C.incarUpload = null; T.rerenderBody(); };
-    $('kc-to-bundle').onclick = () => T.go('bundle');
+    $('kc-to-bundle').onclick = () => T.go('inputs');
     $('kc-csv').onchange = async (e) => { const f = await readFileText(e.target); if (f) { C.csv = f; showResults(tols); } };
     if (C.csv) showResults(tols);
   }
@@ -156,8 +148,7 @@
   function useMesh(name) {
     const m = name.split('x').map(Number);
     window.Studio.setMesh(m);
-    S.kpt.scheme = 'Gamma';
-    V().toast(`KPOINTS set to ${name} (Gamma)`);
+    V().toast(`Mesh ${name} (Gamma) goes to the Input Builder with the structure`);
     T.renderStepbar();
   }
 
@@ -168,7 +159,7 @@
     const v = verdicts(rows, tols.length ? tols : [1, 0.1]);
     const bad = rows.filter((r) => !r.ok).map((r) => r.mesh);
     box.innerHTML = `
-      <div class="sp-checks">${v.map(({ tol, pick }) => `<div class="sp-check ${pick ? 'ok' : 'warn'}"><span>${pick ? '&#10003;' : '!'}</span><div>${tol} meV/atom: ${pick ? `<b class="font-mono-code">${esc(pick.mesh)}</b> (${pick.irreducible_kpoints || '?'} irreducible k-points) <button class="sp-link" data-use="${esc(pick.mesh)}">use in KPOINTS</button>` : 'not reached: add denser meshes'}</div></div>`).join('')}
+      <div class="sp-checks">${v.map(({ tol, pick }) => `<div class="sp-check ${pick ? 'ok' : 'warn'}"><span>${pick ? '&#10003;' : '!'}</span><div>${tol} meV/atom: ${pick ? `<b class="font-mono-code">${esc(pick.mesh)}</b> (${pick.irreducible_kpoints || '?'} irreducible k-points) <button class="sp-link" data-use="${esc(pick.mesh)}">use this mesh</button>` : 'not reached: add denser meshes'}</div></div>`).join('')}
         ${bad.length ? `<div class="sp-check warn"><span>!</span><div>Unfinished or electronically unconverged runs, excluded: ${esc(bad.join(', '))}</div></div>` : ''}</div>
       <div id="kc-plot-e" class="sp-plot"></div><div id="kc-plot-d" class="sp-plot"></div>`;
     box.querySelectorAll('[data-use]').forEach((b) => { b.onclick = () => useMesh(b.dataset.use); });
@@ -185,5 +176,5 @@
   T.stageRenderers.kconv = render;
   T.kconvCsv = () => C.csv;
   T.kconvParse = parseCsv;
-  window.StudioKConv = { outputs, parseCsv, verdicts };
+  window.StudioKConv = { parseCsv, verdicts };
 })();

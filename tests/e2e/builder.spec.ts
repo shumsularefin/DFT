@@ -97,7 +97,8 @@ test.describe('material builder: molecule mode', () => {
     await expect(page.locator('#mol-formula')).toHaveText('C2H6O, 9 atoms');
     await expect.poll(() => atomCount(page)).toBe(9);
 
-    // Any element from the periodic table, added with the keyboard; then undo with the shortcut.
+    // Any element from the periodic table (behind "All elements"), added with the keyboard; then undo.
+    await page.locator('#mol-all-elements > summary').click();
     await page.locator('#mol-pt-grid [data-el="Si"]').focus();
     await page.keyboard.press('Enter');
     await expect(page.locator('#mol-add')).toHaveText('Add Si');
@@ -108,8 +109,8 @@ test.describe('material builder: molecule mode', () => {
     await page.keyboard.press('Control+z');
     await expect.poll(() => atomCount(page)).toBe(9);
 
-    // One carbon, then hydrogens: methane.
-    await page.locator('#mol-pt-grid [data-el="C"]').focus();
+    // One carbon (a common-element chip), then hydrogens: methane.
+    await page.locator('#mol-common [data-el="C"]').focus();
     await page.keyboard.press('Enter');
     await page.locator('#mol-single').focus();
     await page.keyboard.press('Enter');
@@ -125,6 +126,86 @@ test.describe('material builder: molecule mode', () => {
     await expect(page.locator('#mol-formula')).toHaveText('C24H12, 36 atoms');
 
     expect(await overflow(page)).toBeLessThanOrEqual(0);
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  });
+
+  test('editing tools: element search, a flat benzene, a methyl on it, measuring, hydrogens off and on (DS.5)', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    await page.goto('/builder/molecule/');
+    await page.locator('html[data-studio-ready="true"]').waitFor({ timeout: 30_000 });
+    if (!(await page.locator('#right-workbench').isVisible())) {
+      await page.locator('#btn-toggle-right').focus();
+      await page.keyboard.press('Enter');
+    }
+    // The search picks the element it narrows to.
+    await page.locator('#mol-all-elements > summary').click();
+    await page.locator('#mol-el-search').fill('iron');
+    await expect(page.locator('#mol-add')).toHaveText('Add Fe');
+    await expect(page.locator('#mol-el-card')).toContainText('Iron (Z = 26)');
+
+    // Benzene: six hydrogens, all outside the ring and in its plane.
+    await page
+      .getByRole('group', { name: 'Starting molecules' })
+      .getByRole('button', { name: 'Benzene' })
+      .click();
+    await expect(page.locator('#mol-formula')).toHaveText('C6H6, 12 atoms');
+    const ring = await page.evaluate(() => {
+      const V = (
+        window as unknown as {
+          VESTA: { getStructure(): { lattice: number[][]; atoms: { el: string; frac: number[] }[] } };
+        }
+      ).VESTA;
+      const s = V.getStructure();
+      const cart = s.atoms.map((a) =>
+        [0, 1, 2].map((j) => a.frac.reduce((t, f, i) => t + f * s.lattice[i]![j]!, 0)),
+      );
+      const c = s.atoms.map((a, i) => (a.el === 'C' ? cart[i]! : null)).filter((x): x is number[] => !!x);
+      const mid = [0, 1, 2].map((j) => c.reduce((t, p) => t + p[j]!, 0) / c.length);
+      const r = (p: number[]) => Math.hypot(p[0]! - mid[0]!, p[1]! - mid[1]!, p[2]! - mid[2]!);
+      const hs = s.atoms
+        .map((a, i) => (a.el === 'H' ? r(cart[i]!) : null))
+        .filter((x): x is number => x !== null);
+      return { cMax: Math.max(...c.map(r)), hMin: Math.min(...hs) };
+    });
+    expect(ring.hMin).toBeGreaterThan(ring.cMax + 0.9);
+
+    // A methyl on the selected hydrogen's place: toluene.
+    const hIndex = await page.evaluate(() => {
+      const V = (
+        window as unknown as {
+          VESTA: { getStructure(): { atoms: { el: string }[] }; selectAtoms(i: number[]): void };
+        }
+      ).VESTA;
+      const i = V.getStructure().atoms.findIndex((a) => a.el === 'H');
+      V.selectAtoms([i]);
+      return i;
+    });
+    expect(hIndex).toBeGreaterThanOrEqual(0);
+    await page
+      .getByRole('group', { name: 'Rings and groups' })
+      .getByRole('button', { name: 'CH3 (methyl)' })
+      .click();
+    await expect(page.locator('#mol-formula')).toHaveText('C7H8, 15 atoms');
+
+    // Two atoms selected: their distance.
+    await page.evaluate(() =>
+      (window as unknown as { VESTA: { selectAtoms(i: number[]): void } }).VESTA.selectAtoms([0, 1]),
+    );
+    await expect(page.locator('#mol-measure')).toContainText('distance');
+
+    // Hydrogens off, then back on, counting the aromatic ring bonds: toluene again.
+    await page.locator('#mol-strip-h').click();
+    await expect(page.locator('#mol-formula')).toHaveText('C7, 7 atoms');
+    await page.locator('#mol-hydrogens').click();
+    await expect(page.locator('#mol-formula')).toHaveText('C7H8, 15 atoms');
+    await page.locator('#mol-undo').click();
+    await expect(page.locator('#mol-formula')).toHaveText('C7, 7 atoms');
+
+    // The Crystal or Molecule explainer opens from the toolbar.
+    await page.locator('.mode-help > summary').click();
+    await expect(page.locator('.mode-help-pop')).toContainText('graphene flake');
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   });
 

@@ -58,6 +58,12 @@ export interface BuilderState {
   spacing: number;
   rule: RoundingRule;
   job: JobOptions;
+  /** A line-mode KPOINTS handed over by the k-path tool for this structure (D-108). */
+  /** An explicit N1 x N2 x N3 mesh in place of the KSPACING one (a slab's N3 = 1, a converged mesh), D-108. */
+  meshOverride: readonly [number, number, number] | null;
+  lineKpoints: string;
+  /** POTCAR directory names chosen in the Material Builder, POSCAR species order (D-108). */
+  potcarLabels: string[];
   ack: boolean;
   selectedTag: string | null;
 }
@@ -101,6 +107,9 @@ const initial = (): BuilderState => ({
   spacing: 0.3,
   rule: 'ceil',
   job: DEFAULT_JOB,
+  lineKpoints: '',
+  meshOverride: null,
+  potcarLabels: [],
   ack: false,
   selectedTag: null,
 });
@@ -137,6 +146,9 @@ export const useBuilder = create<BuilderState & BuilderActions>((set, get) => {
           parseWarnings: r.warnings,
           magmom: {},
           ldau: {},
+          lineKpoints: '',
+          meshOverride: null,
+          potcarLabels: [],
         });
       } catch (e) {
         const msg =
@@ -146,7 +158,17 @@ export const useBuilder = create<BuilderState & BuilderActions>((set, get) => {
         set({ poscarText: text, structure: null, parseError: msg, parseWarnings: [] });
       }
     },
-    setStructure: (s) => set({ structure: s, parseError: null, parseWarnings: [], magmom: {}, ldau: {} }),
+    setStructure: (s) =>
+      set({
+        structure: s,
+        parseError: null,
+        parseWarnings: [],
+        magmom: {},
+        ldau: {},
+        lineKpoints: '',
+        meshOverride: null,
+        potcarLabels: [],
+      }),
     choosePreset: (presetId, variantId) => {
       const p = presetOf(presetId);
       const v = variantId ?? p.variants[0]!.id;
@@ -215,6 +237,15 @@ export function kpointsOf(s: BuilderState): {
   mesh: readonly [number, number, number] | null;
   rule: RoundingRule;
 } {
+  if (s.kpMode === 'line' && s.lineKpoints) {
+    let parsed: ParsedKpoints | null;
+    try {
+      parsed = parseKpoints(s.lineKpoints);
+    } catch {
+      parsed = null;
+    }
+    return { text: s.lineKpoints, parsed, mesh: null, rule: s.rule };
+  }
   if (s.kpMode === 'line') {
     return {
       text: null,
@@ -226,6 +257,10 @@ export function kpointsOf(s: BuilderState): {
   if (!s.structure) return { text: null, parsed: null, mesh: null, rule: s.rule };
   const r = meshFromKspacing(s.structure.lattice, s.spacing, s.rule);
   if (s.kpMode === 'kspacing') return { text: null, parsed: null, mesh: r.mesh, rule: r.rule };
+  if (s.meshOverride) {
+    const text = writeMeshKpoints(s.meshOverride, s.kpMode, [0, 0, 0], 'Explicit mesh');
+    return { text, parsed: parseKpoints(text), mesh: s.meshOverride, rule: s.rule };
+  }
   const text = writeMeshKpoints(
     r.mesh,
     s.kpMode,
@@ -294,12 +329,20 @@ export function filesOf(s: BuilderState): BuiltFile[] {
       { name: 'job.sh', text: jobScript(s.job) },
     ];
   }
-  return buildFiles({
+  const files = buildFiles({
     structure: s.structure,
     entries: s.entries,
     kpoints,
     job: s.job,
     presetTitle: presetOf(s.presetId).title,
     vaspVersion: s.version,
+    ...(s.potcarLabels.length ? { potcarLabels: s.potcarLabels } : {}),
   });
+  // Band route A reads the path from KPOINTS_OPT next to the uniform-mesh KPOINTS (the band preset's own requires).
+  if (bandOptPath(s)) files.splice(1, 0, { name: 'KPOINTS_OPT', text: s.lineKpoints });
+  return files;
 }
+
+/** True when the k-path tool's path goes into KPOINTS_OPT: band route A with a mesh KPOINTS (D-108). */
+export const bandOptPath = (s: BuilderState): boolean =>
+  !!s.lineKpoints && s.presetId === 'band' && s.variantId === 'route-a' && s.kpMode !== 'line';

@@ -94,3 +94,20 @@ describe('grapheneFlake', () => {
     for (const d of nearest) expect(d).toBeCloseTo(1.42, 6);
   });
 });
+
+describe('benzene preset', () => {
+  it('is a flat regular ring with every hydrogen pointing out of the ring', () => {
+    const p = MOLECULE_PRESETS.find((x) => x.id === 'benzene')!;
+    const r = geometry3d(p.graph);
+    const c = r.positions.slice(0, 6);
+    const ringR = c.map((q) => Math.hypot(q[0], q[1]));
+    for (const x of ringR) expect(x).toBeCloseTo(ringR[0]!, 2);
+    for (let i = 0; i < 6; i++) {
+      const h = r.positions[6 + i]!;
+      // The hydrogen bonded to carbon i is outside the ring, on the line from the centre through that carbon.
+      expect(Math.hypot(h[0], h[1])).toBeGreaterThan(ringR[i]! + 0.9);
+      expect(dist(h, c[i]!)).toBeCloseTo(radiusOf('C') + radiusOf('H'), 1);
+      expect(Math.abs(h[2])).toBeLessThan(0.05);
+    }
+  });
+});

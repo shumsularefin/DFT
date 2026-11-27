@@ -118,11 +118,23 @@ export function placeBonded(
   return add(p0, scale(best, length));
 }
 
+/** Bond orders set by the user, keyed by `orderKey` (atom indices, smaller first); unset bonds are single. */
+export type BondOrders = ReadonlyMap<string, number>;
+export const orderKey = (i: number, j: number): string => (i < j ? `${i}-${j}` : `${j}-${i}`);
+/** The order of the bond between i and j: 1, 1.5 (aromatic), 2 or 3. */
+export const orderOf = (orders: BondOrders | undefined, i: number, j: number): number =>
+  orders?.get(orderKey(i, j)) ?? 1;
+
 /**
- * Add hydrogens until every atom with a typical valence has that many neighbours (single bonds assumed,
- * so a C=O carbon gets one hydrogen too many). Returns the new hydrogen positions, in the order added.
+ * Add hydrogens until every atom with a typical valence has that many bonds, counting each bond by its order
+ * (`orders`; without it every bond is single, so a C=O carbon gets one hydrogen too many). Returns the new
+ * hydrogen positions, in the order added.
  */
-export function fillHydrogens(species: readonly string[], positions: readonly Vec3[]): Vec3[] {
+export function fillHydrogens(
+  species: readonly string[],
+  positions: readonly Vec3[],
+  orders?: BondOrders,
+): Vec3[] {
   const sp = [...species];
   const pos = [...positions];
   const added: Vec3[] = [];
@@ -130,10 +142,14 @@ export function fillHydrogens(species: readonly string[], positions: readonly Ve
   for (let i = 0; i < heavy; i++) {
     const v = typicalValence(sp[i]!);
     if (v === null || sp[i] === 'H') continue;
-    const have = neighbours(sp, pos, i).length;
-    const open = v - have;
+    const nb = neighbours(sp, pos, i);
+    const used = nb.reduce((t, j) => t + (j < heavy ? orderOf(orders, i, j) : 1), 0);
+    const open = Math.floor(v - used + 1e-9);
     if (open <= 0) continue;
-    const domains = Math.max(have + open, DOMAINS[sp[i]!] ?? have + open);
+    // Electron domains: one per neighbour (a double bond is one domain), plus the new hydrogens.
+    const have = nb.length;
+    const multiple = nb.some((j) => j < heavy && orderOf(orders, i, j) > 1);
+    const domains = multiple ? have + open : Math.max(have + open, DOMAINS[sp[i]!] ?? have + open);
     for (let k = 0; k < open; k++) {
       const p = placeBonded(sp, pos, i, 'H', domains);
       sp.push('H');
@@ -144,11 +160,20 @@ export function fillHydrogens(species: readonly string[], positions: readonly Ve
   return added;
 }
 
-/** A graph with a single bond between every pair of atoms that counts as bonded (for a MOL block). */
-export function graphFromDistances(species: readonly string[], positions: readonly Vec3[]): MolGraph {
+/** A graph with a bond between every pair of atoms that counts as bonded (for a MOL block), single unless
+ * `orders` says otherwise. */
+export function graphFromDistances(
+  species: readonly string[],
+  positions: readonly Vec3[],
+  orders?: BondOrders,
+): MolGraph {
   const bonds: MolGraph['bonds'] = [];
   for (let i = 0; i < species.length; i++)
-    for (const j of neighbours(species, positions, i)) if (j > i) bonds.push({ a: i, b: j, order: 1 });
+    for (const j of neighbours(species, positions, i))
+      if (j > i) {
+        const o = orderOf(orders, i, j);
+        bonds.push({ a: i, b: j, order: o === 1.5 ? 'aromatic' : o === 2 ? 2 : o === 3 ? 3 : 1 });
+      }
   return { atoms: species.map((el) => ({ el, charge: 0, hCount: 0 })), bonds };
 }
 

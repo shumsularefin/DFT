@@ -298,6 +298,18 @@ The merged Studio (`public/dft-studio/js/`, D-103) computes several things the s
 ## Q-061. Source of the DFT Studio crystal library
 `public/dft-studio/data/crystals/` holds 350 structures from the VASPKIT Studio lab tool. Their origin (Materials Project, COD, ICSD, hand-built) and licence are not recorded, and the site's attribution rules (Q-009) may apply. **Close:** the author records the source of each family and any attribution needed, or the library is regenerated from a source with a known licence. **Owner: author.**
 
+## Q-070. Source for a CI-NEB INCAR preset
+The Material Builder had a CI-NEB INCAR preset (IMAGES, LCLIMB, SPRING, IBRION 3 with POTIM 0, IOPT for the VTST optimisers). D-108 removed the Builder's INCAR writer, and the Input Builder has no NEB preset because no registered source covers these tags: the VTST pages that define LCLIMB and IOPT were not reachable from the builder session, and S-042 does not list a NEB recipe. Until then a user types the NEB tags in the Input Builder's custom tag field. **Close:** register the VTST tools documentation (or the VASP wiki NEB page) as a source and add a sourced `neb` preset with its validation rules. **Owner: author.**
+
+## Q-071. Selective dynamics with a task that does not move the ions
+The Builder warned when POSCAR used selective dynamics but the INCAR did not move ions (IBRION -1 or NSW 0), since the flags then do nothing. The hint had no source and was not ported to the Input Builder rules in D-108. **Close:** find a source that states the behaviour (VASP wiki POSCAR or IBRION page) and add it as a rule, or record that the hint is not wanted. **Owner: author.**
+
+## Q-072. Default U values and starting moments removed from the Builder
+The Builder filled DFT+U with a per-element U table and FM starting moments from a per-element table, neither with a source. D-108 removed both, in line with the site policy in `src/lib/magnetism/magmom.ts` (no per-element table). The Input Builder asks for U per species and the Magnetic tool gives the sourced starting-moment guidance. **Close:** if a sourced table of typical U values (for example the Materials Project values with their paper) is wanted, register it and add it to the Input Builder as a labelled suggestion, never a silent default. **Owner: author.**
+
+## Q-073. Explicit k-mesh is not in the Input Builder share link
+The Input Builder's typed mesh (`meshOverride`, D-108) is not written to the share link, so a shared link falls back to the k-spacing mesh. **Close:** add the mesh to the share fragment with a round-trip test, or record that typed meshes are local only. **Owner: builder.**
+
 ## Q-069. VASP tag details in the new module 5, 9 and 12 topics (M16)
 The pages on molecular dynamics and MLFF, beyond DFT and Wannier functions name VASP tags that were written from memory because vasp.at was not reachable from the builder session on 2026-11-27: the VASP version that introduced `ML_MODE` (believed 6.4, with `ML_ISTART` in 6.3) and the meaning of `ML_CTIFOR`; the VASP 6 GW tags (`ALGO = EVGW0` with `NELMGW = 1` for G0W0; pymatgen MVLGWSet writes the 5.4 form `ALGO = GW0`, `NELM = 1`); the NVE settings (`MDALGO = 1` with `ANDERSEN_PROB = 0`); the meaning of the `E=` column of an MD line in `OSZICAR`; and the `LWANNIER90` page (files written, `NUM_WANN`, `LWANNIER90_RUN`, and whether `ISYM = -1` is required). Each page states these with "check the VASP wiki page" wording. **Close:** read the VASP wiki pages ML_MODE, ML_CTIFOR, ALGO, NELMGW, MDALGO, OSZICAR and LWANNIER90 for VASP 6.4 and correct the pages where they differ. Owner: builder with web access, or the author.
 

@@ -6,6 +6,7 @@ import { ionicRules } from './ionic';
 import { magnetismRules } from './magnetism';
 import { parallelRules } from './parallel';
 import { restartRules } from './restart';
+import { slabRules } from './slab';
 import { smearingRules } from './smearing';
 import type { Rule } from './types';
 
@@ -20,4 +21,5 @@ export const ALL_RULES: readonly Rule[] = [
   ...restartRules,
   ...bandRules,
   ...parallelRules,
+  ...slabRules,
 ].sort((a, b) => a.id.localeCompare(b.id));

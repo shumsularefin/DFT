@@ -19,6 +19,25 @@
       <a class="builder-mode-link" href="/builder/" aria-current="page">Crystal</a>
       <a class="builder-mode-link" href="/builder/molecule/">Molecule</a>
     </nav>
+    <details class="mode-help">
+      <summary title="Crystal or Molecule: which one?" aria-label="Crystal or Molecule: which one?">
+        ?
+      </summary>
+      <div class="mode-help-pop">
+        <p>
+          <b>Crystal</b> is a solid that repeats forever in every direction: a metal, an oxide, a 2D sheet or
+          a surface slab. You pick k-points. The periodic graphene sheet lives here.
+        </p>
+        <p>
+          <b>Molecule</b> is one molecule on its own, in a box of empty space so its copies do not touch. It
+          uses Gamma-only k-points. The graphene flake (coronene, C24H12) lives here.
+        </p>
+        <p>
+          Both use the same VASP steps. Not sure? If the material goes on forever, choose Crystal; if you can
+          count all its atoms, choose Molecule.
+        </p>
+      </div>
+    </details>
 
     <div class="h-5 w-px bg-[var(--st-border)] mx-1 hidden sm:block"></div>
 
@@ -145,8 +164,8 @@
     id="check-pill"
     class="check-pill"
     type="button"
-    onclick="window.Studio && window.Studio.go('bundle')"
-    title="Open the pre-flight checks"
+    onclick="window.Studio && window.Studio.go('inputs')"
+    title="Open the checks before the hand-off"
   >
     Checks
   </button>
@@ -612,41 +631,144 @@
           <span id="mol-formula" class="text-[10.5px] font-mono-code text-blue-500"></span>
         </div>
         <div id="mol-presets" class="mol-presets" role="group" aria-label="Starting molecules"></div>
+        <p class="text-[10.5px] text-sub leading-snug m-0">
+          The graphene flake is a molecule (C24H12, edges capped with hydrogen). For the endless, periodic
+          graphene sheet, switch to Crystal mode and pick "Graphene (2D Sheet + Vacuum)".
+        </p>
       </div>
 
       <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
         <div class="flex items-center justify-between gap-2">
-          <span class="text-[11px] font-bold text-main">Build with any element</span>
+          <span class="text-[11px] font-bold text-main">1. Pick an element</span>
           <span class="heur-badge">Heuristic</span>
         </div>
-        <div
-          id="mol-pt-grid"
-          class="pt-grid"
-          role="group"
-          aria-label="Periodic table: the element to add"
-        ></div>
+        <div id="mol-common" class="mol-common" role="group" aria-label="Common elements"></div>
+        <div id="mol-el-card" class="mol-el-card" aria-live="polite"></div>
+        <details id="mol-all-elements" class="mol-all">
+          <summary>All elements (periodic table)</summary>
+          <input
+            id="mol-el-search"
+            class="v-input w-full mt-1.5"
+            type="search"
+            placeholder="Find by symbol or name, for example Fe or iron"
+            aria-label="Find an element"
+          />
+          <div
+            id="mol-pt-grid"
+            class="pt-grid mol-pt mt-1.5"
+            role="group"
+            aria-label="Periodic table: the element to add"
+          ></div>
+          <div id="mol-pt-legend" class="mol-legend" aria-hidden="true"></div>
+        </details>
+      </div>
+
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
+        <span class="text-[11px] font-bold text-main block">2. Build</span>
         <p class="text-[10.5px] text-sub m-0">
-          Element: <b id="mol-picked" class="font-mono-code">C</b>.
           <span id="mol-selected">Pick an atom with the Select tool to build on it.</span>
         </p>
         <div class="grid grid-cols-2 gap-1.5">
           <button id="mol-add" class="v-btn v-btn-primary justify-center" type="button">Add atom</button>
           <button id="mol-swap" class="v-btn justify-center" type="button">Change element</button>
           <button id="mol-hydrogens" class="v-btn justify-center" type="button">Add hydrogens</button>
-          <button id="mol-delete" class="v-btn justify-center" type="button">Delete atom</button>
-          <button id="mol-single" class="v-btn justify-center col-span-2" type="button">
-            Start again from one atom of this element
+          <button id="mol-strip-h" class="v-btn justify-center" type="button">Remove hydrogens</button>
+          <button id="mol-delete" class="v-btn justify-center" type="button">Delete selected</button>
+          <button id="mol-single" class="v-btn justify-center" type="button">Start from one atom</button>
+        </div>
+        <div class="grid grid-cols-2 gap-1.5">
+          <button id="mol-undo" class="v-btn justify-center" type="button" title="Undo (Ctrl+Z)">Undo</button>
+          <button id="mol-redo" class="v-btn justify-center" type="button" title="Redo (Ctrl+Shift+Z)">
+            Redo
           </button>
         </div>
         <p class="text-[10.5px] text-sub leading-snug m-0">
           A new atom bonds to the selected atom (or, with none selected, the last atom that is not a hydrogen)
           at the sum of covalent radii, at the ideal angle to its other bonds. Hydrogens fill the usual
-          valence and assume single bonds. The geometry is a starting point: relax it in VASP with ISIF = 2.
+          valence, counting double and triple bonds you set below. The geometry is a starting point: relax it
+          in VASP with ISIF = 2.
         </p>
       </div>
 
       <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
-        <span class="text-[11px] font-bold text-main block">Vacuum box</span>
+        <span class="text-[11px] font-bold text-main block">3. Add a ring or a group</span>
+        <div id="mol-fragments" class="mol-frags" role="group" aria-label="Rings and groups"></div>
+        <p class="text-[10.5px] text-sub leading-snug m-0">
+          The ring or group bonds to the selected atom, taking the place of one of its hydrogens (or of the
+          selected hydrogen). With nothing on screen it starts a new molecule.
+        </p>
+      </div>
+
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
+        <span class="text-[11px] font-bold text-main block">4. Bonds</span>
+        <p id="mol-bond-info" class="text-[10.5px] text-sub m-0">
+          Select two bonded atoms to change their bond.
+        </p>
+        <div class="grid grid-cols-4 gap-1" role="group" aria-label="Bond order">
+          <button class="v-btn justify-center" type="button" data-bond-order="1">Single</button>
+          <button class="v-btn justify-center" type="button" data-bond-order="2">Double</button>
+          <button class="v-btn justify-center" type="button" data-bond-order="3">Triple</button>
+          <button class="v-btn justify-center" type="button" data-bond-order="1.5" title="Aromatic">
+            Arom.
+          </button>
+        </div>
+        <div class="flex items-end gap-2">
+          <div class="flex-1">
+            <label for="mol-bond-length" class="text-[10px] text-mut block mb-0.5"
+              >Distance between the two atoms (Å)</label
+            >
+            <input
+              id="mol-bond-length"
+              type="number"
+              min="0.5"
+              max="6"
+              step="0.01"
+              class="v-input w-full font-mono-code"
+            />
+          </div>
+          <button id="mol-set-length" class="v-btn" type="button">Set</button>
+        </div>
+        <p class="text-[10.5px] text-sub leading-snug m-0">
+          Setting a distance moves the second atom you picked, with everything bonded on its side. The bond
+          order sets how many hydrogens fit and what the MOL file says; bond lengths stay at the single-bond
+          covalent radii, so relax the molecule before you trust them.
+        </p>
+      </div>
+
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
+        <span class="text-[11px] font-bold text-main block">5. Select, move and measure</span>
+        <div class="grid grid-cols-4 gap-1" role="group" aria-label="Select">
+          <button id="mol-sel-all" class="v-btn justify-center" type="button">All</button>
+          <button
+            id="mol-sel-frag"
+            class="v-btn justify-center"
+            type="button"
+            title="Everything bonded to the selection"
+          >
+            Linked
+          </button>
+          <button id="mol-sel-h" class="v-btn justify-center" type="button">H only</button>
+          <button id="mol-sel-none" class="v-btn justify-center" type="button">None</button>
+        </div>
+        <div class="flex items-end gap-1.5">
+          <label class="flex-1 text-[10px] text-mut"
+            >x (Å)<input id="mol-dx" type="number" step="0.1" value="0" class="v-input w-full font-mono-code"
+          /></label>
+          <label class="flex-1 text-[10px] text-mut"
+            >y (Å)<input id="mol-dy" type="number" step="0.1" value="0" class="v-input w-full font-mono-code"
+          /></label>
+          <label class="flex-1 text-[10px] text-mut"
+            >z (Å)<input id="mol-dz" type="number" step="0.1" value="0" class="v-input w-full font-mono-code"
+          /></label>
+          <button id="mol-move" class="v-btn" type="button">Move</button>
+        </div>
+        <p id="mol-measure" class="mol-measure m-0" aria-live="polite">
+          Select 2 atoms for a distance, 3 for an angle, 4 for a dihedral (click them in order).
+        </p>
+      </div>
+
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
+        <span class="text-[11px] font-bold text-main block">6. Vacuum box</span>
         <div class="flex items-end gap-2">
           <div class="flex-1">
             <label for="mol-vacuum" class="text-[10px] text-mut block mb-0.5"
@@ -662,7 +784,7 @@
               class="v-input w-full font-mono-code"
             />
           </div>
-          <button id="mol-box" class="v-btn" type="button">Fit the box</button>
+          <button id="mol-box" class="v-btn" type="button">Centre in the box</button>
         </div>
         <p id="mol-box-info" class="text-[10.5px] text-sub m-0"></p>
       </div>
@@ -677,8 +799,8 @@
           </button>
         </div>
         <p class="text-[10.5px] text-sub leading-snug m-0">
-          POSCAR (the toolbar button) writes the molecule in its box. A periodic graphene sheet is a crystal:
-          pick it from the structure menu in Crystal mode. The graphene flake here is a molecule.
+          POSCAR (the toolbar button) writes the molecule in its box. Next step: the VASP steps above take it
+          to POTCAR and the Input Builder, with Gamma-only k-points.
         </p>
       </div>
       <p id="mol-status" class="text-[10.5px] text-sub m-0" role="status"></p>
@@ -1214,19 +1336,17 @@
         ></div>
       </div>
 
-      <!-- High-Symmetry k-Path -->
+      <!-- Band k-path: computed by the site's k-path tool on the standardized cell (D-108) -->
       <div class="card-bg border border-subtle rounded-md p-2.5 space-y-1.5">
-        <div class="flex items-center justify-between">
-          <span class="text-[11px] font-bold text-main">Recommended Band k-Path</span>
-          <button id="btn-send-kpath" class="text-[10.5px] text-blue-500 font-semibold hover:underline">
-            Use in KPOINTS →
-          </button>
-        </div>
-        <div id="sym-kpath-str" class="font-mono-code text-[10.5px] font-semibold text-blue-500"></div>
-        <div
-          id="sym-kpoints-table"
-          class="font-mono-code text-[10px] text-sub space-y-0.5 max-h-24 overflow-y-auto"
-        ></div>
+        <span class="text-[11px] font-bold text-main">Band structure k-path</span>
+        <p class="text-[10px] leading-snug text-sub">
+          A band path is only right for the standardized cell it was made for. The k-path tool standardizes
+          this structure, gives the HPKOT or Setyawan-Curtarolo path (tested on 39 structures) and writes the
+          matching POSCAR and KPOINTS.
+        </p>
+        <button type="button" id="btn-send-kpath" class="v-btn w-full text-[10.5px] py-1">
+          Get the band path in the k-path tool
+        </button>
       </div>
     </div>
 
@@ -1248,103 +1368,36 @@
           </div>
         </div>
 
-        <!-- Automatic Bond-Graph Magnetic Order Presets -->
-        <div class="space-y-1.5">
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] font-semibold uppercase text-mut">Auto AFM / FM Presets (NN Graph)</span>
-            <button
-              id="btn-afm-theory"
-              class="text-[10px] font-semibold text-blue-500 hover:underline flex items-center gap-0.5 cursor-pointer"
-              title="Wollan–Koehler &amp; Goodenough–Kanamori Theory"
-            >
-              <i data-lucide="book-open" class="w-3 h-3"></i> Theory
-            </button>
-          </div>
-          <div class="grid grid-cols-3 gap-1 items-center">
-            <select
-              id="mag-sublattice"
-              class="v-input col-span-2 text-[10.5px]"
-              title="Choose which magnetic sublattice to order"
-            >
-              <option value="auto3d">Auto (3d metals)</option>
-              <option value="auto3d4f">3d + 4f metals</option>
-            </select>
-            <div class="flex items-center gap-0.5">
-              <input
-                id="mag-preset-val"
-                type="number"
-                step="0.5"
-                min="0.5"
-                max="10"
-                value="3.0"
-                class="v-input w-full text-center font-mono-code text-[10.5px]"
-                title="Moment magnitude (μB)"
-              />
-              <span class="text-[9.5px] text-mut">μB</span>
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-1">
-            <button
-              class="v-btn text-[10.5px] py-1"
-              data-mag-preset="fm"
-              title="All magnetic neighbors parallel"
-            >
-              FM (Parallel)
-            </button>
-            <button
-              class="v-btn text-[10.5px] py-1"
-              data-mag-preset="afm-a"
-              title="FM in-plane (ab), AFM between layers (c)"
-            >
-              AFM-A (Layered)
-            </button>
-            <button
-              class="v-btn text-[10.5px] py-1"
-              data-mag-preset="afm-c"
-              title="AFM in-plane (ab), FM along columns (c)"
-            >
-              AFM-C (Chain/Col)
-            </button>
-            <button
-              class="v-btn text-[10.5px] py-1"
-              data-mag-preset="afm-g"
-              title="3D nearest-neighbor checkerboard AFM"
-            >
-              AFM-G (3D Néel)
-            </button>
-            <button
-              class="v-btn text-[10.5px] py-1"
-              data-mag-preset="afm-ii"
-              title="FM {111} planes, AFM along [111] (Rocksalt 2nd-NN)"
-            >
-              AFM-II (Rocksalt)
-            </button>
-            <button
-              class="v-btn text-[10.5px] py-1"
-              data-mag-preset="spiral"
-              title="120° non-collinear in-plane spin texture"
-            >
-              120° Non-Collinear
-            </button>
-            <button class="v-btn text-[10.5px] py-1 col-span-2 text-red-500" data-mag-preset="clear">
-              Zero All Moments
-            </button>
-          </div>
-          <!-- Auto NN Graph Diagnostics & Supercell Suggestion -->
-          <div
-            id="afm-diagnostics"
-            class="rounded border border-subtle p-1.5 text-[10px] leading-snug space-y-1"
-            style="background: var(--st-console-bg)"
+        <!-- Orderings (FM, AFM-A/C/G and others) are built and compared in the site's Magnetic tool (D-108) -->
+        <div class="space-y-1">
+          <p class="text-[10px] leading-snug text-sub">
+            To try FM and AFM orderings, open this structure in the Magnetic tool. It builds every ordering in
+            the supercell you choose and compares their energies once the runs are done.
+          </p>
+          <button
+            type="button"
+            id="btn-mag-to-tool"
+            class="v-btn w-full text-[10.5px] py-1"
+            title="Open this structure in the Magnetic configuration tool"
           >
-            <div class="flex items-center justify-between">
-              <span class="font-semibold text-main" id="afm-diag-title">NN Spin-Coupling Analysis</span>
-              <span class="font-mono-code text-mut" id="afm-diag-dnn">d_NN: -</span>
-            </div>
-            <div id="afm-diag-body" class="text-sub font-mono-code">
-              Click any FM/AFM preset to auto-solve from PBC bond distances.
-            </div>
-            <button id="btn-afm-auto-sc" class="v-btn v-btn-primary w-full py-0.5 text-[10px] hidden">
-              Auto-Expand Supercell &amp; Apply
+            Make orderings in the Magnetic tool
+          </button>
+          <a
+            class="block text-[10px] text-blue-500 hover:underline"
+            href="/handbook/05-practical-choices/magnetic-orderings/"
+            >What FM, A, C, G and type-II orderings mean (handbook)</a
+          >
+          <div class="grid grid-cols-2 gap-1 pt-1">
+            <button
+              type="button"
+              id="btn-mag-120"
+              class="v-btn text-[10.5px] py-1"
+              title="Heuristic: rotates the moments of the magnetic atoms by 0, 120 and 240 degrees in the xy plane, in atom order. Uses the length of the vector below."
+            >
+              120° in-plane start
+            </button>
+            <button type="button" id="btn-mag-zero" class="v-btn text-[10.5px] py-1 text-red-500">
+              Zero all moments
             </button>
           </div>
         </div>
@@ -1554,8 +1607,6 @@
     <div id="right-tab-vasp" class="p-2.5 overflow-y-auto flex-1 space-y-2.5 hidden">
       <div class="flex gap-1">
         <button class="v-btn v-btn-active flex-1 text-[11px]" data-vasp-file="POSCAR">POSCAR</button>
-        <button class="v-btn flex-1 text-[11px]" data-vasp-file="KPOINTS">KPOINTS</button>
-        <button class="v-btn flex-1 text-[11px]" data-vasp-file="INCAR">INCAR</button>
       </div>
 
       <!-- POSCAR Options -->
@@ -1573,30 +1624,14 @@
         <button id="btn-export-cif" class="v-btn text-[10.5px] py-0.5">Export .CIF</button>
       </div>
 
-      <!-- KPOINTS Options -->
-      <div id="vasp-opt-KPOINTS" class="card-bg border border-subtle rounded-md p-2 space-y-1.5 hidden">
-        <div class="route-card">
-          <span
-            >KPOINTS is built in <b>step 4</b> (mesh from k-spacing, explicit mesh, or band path) and can come
-            from the k-point convergence test (step 5).</span
-          >
-          <button class="v-btn v-btn-primary text-[11px]" onclick="window.Studio.go('kpoints')">
-            Edit KPOINTS in step 4
-          </button>
-        </div>
-      </div>
-
-      <!-- INCAR Options -->
-      <div id="vasp-opt-INCAR" class="card-bg border border-subtle rounded-md p-2 space-y-1.5 hidden">
-        <div class="route-card">
-          <span
-            >INCAR is built in <b>step 3</b> from a preset, the POTCAR ENMAX (step 2) and the spins you set in
-            the Magnetic tab.</span
-          >
-          <button class="v-btn v-btn-primary text-[11px]" onclick="window.Studio.go('incar')">
-            Edit INCAR in step 3
-          </button>
-        </div>
+      <div class="route-card">
+        <span
+          >INCAR, KPOINTS and the job script are made in the <b>Input Builder</b> (step 4), with this
+          structure, its spins and your POTCAR choices.</span
+        >
+        <button class="v-btn v-btn-primary text-[11px]" onclick="window.Studio.go('inputs')">
+          Go to step 4: Input files
+        </button>
       </div>
 
       <!-- Live File Preview -->
@@ -1662,118 +1697,6 @@
       <div id="rep-tab-econ" class="space-y-3 hidden"></div>
       <div id="rep-tab-xrd" class="space-y-3 hidden"></div>
       <div id="rep-tab-symops" class="space-y-2 hidden"></div>
-    </div>
-  </div>
-</div>
-
-<!-- AFM THEORY & LITERATURE REFERENCE MODAL -->
-<div
-  id="afm-theory-modal"
-  class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4"
->
-  <div
-    class="card-bg border border-theme rounded-lg shadow-2xl w-full max-w-2xl max-h-[86vh] flex flex-col overflow-hidden"
-  >
-    <div class="header-bg border-b border-theme px-4 py-2.5 flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <i data-lucide="book-open" class="w-4 h-4 text-blue-500"></i>
-        <span class="font-bold text-xs text-main"
-          >Antiferromagnetic Ordering Theory &amp; Automatic NN Logic (VASP)</span
-        >
-      </div>
-      <button id="btn-close-theory" class="v-btn px-1.5 py-0.5">
-        <i data-lucide="x" class="w-3.5 h-3.5"></i>
-      </button>
-    </div>
-    <div class="p-4 overflow-y-auto space-y-3 text-[11.5px] leading-relaxed selectable-text">
-      <p class="text-sub">
-        Magnetic ground-state screening in DFT/VASP compares total energies across the canonical
-        <b>Wollan–Koehler (1955)</b> spin configurations and
-        <b>Goodenough–Kanamori–Anderson (GKA)</b> superexchange rules. This studio automatically inspects the
-        periodic nearest-neighbor (NN) bond graph of magnetic ions to assign each ordering without manual
-        index calculation.
-      </p>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-        <div class="border border-subtle rounded-md p-2.5 space-y-1" style="background: var(--st-console-bg)">
-          <div class="font-bold text-main flex justify-between">
-            <span>FM: Ferromagnetic</span
-            ><span class="font-mono-code text-rose-500">J∥ &gt; 0, J⊥ &gt; 0</span>
-          </div>
-          <p class="text-[11px] text-sub">
-            All magnetic ions align parallel (↑↑) both in-plane and out-of-plane. Typical in metallic
-            ferromagnets (BCC Fe, Co, Ni) or double-exchange perovskites
-            (La<sub>1−x</sub>Sr<sub>x</sub>MnO<sub>3</sub>).
-          </p>
-          <div class="text-[10px] font-mono-code text-mut">Logic: All magnetic sites → +m</div>
-        </div>
-
-        <div class="border border-subtle rounded-md p-2.5 space-y-1" style="background: var(--st-console-bg)">
-          <div class="font-bold text-main flex justify-between">
-            <span>AFM-A: Layered A-Type</span
-            ><span class="font-mono-code text-blue-500">J∥ &gt; 0, J⊥ &lt; 0</span>
-          </div>
-          <p class="text-[11px] text-sub">
-            Ferromagnetic within each basal <i>ab</i>-plane, antiferromagnetic between adjacent planes along
-            <i>c</i>. Classic in Jahn–Teller LaMnO<sub>3</sub> and layered vdW magnets
-            (MnBi<sub>2</sub>Te<sub>4</sub>, CrI<sub>3</sub> bilayer).
-          </p>
-          <div class="text-[10px] font-mono-code text-mut">
-            Logic: Cluster z-planes → alternate (+, −) along c
-          </div>
-        </div>
-
-        <div class="border border-subtle rounded-md p-2.5 space-y-1" style="background: var(--st-console-bg)">
-          <div class="font-bold text-main flex justify-between">
-            <span>AFM-C: Chain / Columnar C-Type</span
-            ><span class="font-mono-code text-blue-500">J∥ &lt; 0, J⊥ &gt; 0</span>
-          </div>
-          <p class="text-[11px] text-sub">
-            Antiferromagnetic checkerboard within each <i>ab</i>-plane, ferromagnetic along chains parallel to
-            <i>c</i>. Observed in orbital-ordered vanadates/chromates (LaVO<sub>3</sub>, CaCrO<sub>3</sub>,
-            Sr<sub>1−x</sub>Ca<sub>x</sub>MnO<sub>3</sub>).
-          </p>
-          <div class="text-[10px] font-mono-code text-mut">
-            Logic: 2D BFS 2-coloring on in-plane NN graph; same spin along c-columns
-          </div>
-        </div>
-
-        <div class="border border-subtle rounded-md p-2.5 space-y-1" style="background: var(--st-console-bg)">
-          <div class="font-bold text-main flex justify-between">
-            <span>AFM-G: 3D Néel G-Type</span
-            ><span class="font-mono-code text-blue-500">J∥ &lt; 0, J⊥ &lt; 0</span>
-          </div>
-          <p class="text-[11px] text-sub">
-            Every 3D nearest-neighbor magnetic pair is antiparallel (↑↓ in both <i>ab</i> and <i>c</i>).
-            Driven by strong 180° M–O–M superexchange in half-filled shells (LaFeO<sub>3</sub>,
-            BiFeO<sub>3</sub>, CaMnO<sub>3</sub>, LaCrO<sub>3</sub>).
-          </p>
-          <div class="text-[10px] font-mono-code text-mut">
-            Logic: Full 3D BFS bipartite 2-coloring on PBC 1st-NN shell (d_NN)
-          </div>
-        </div>
-      </div>
-
-      <div class="border border-subtle rounded-md p-2.5 space-y-1" style="background: var(--st-console-bg)">
-        <div class="font-bold text-main flex justify-between">
-          <span>AFM-II: Type-II Rocksalt (180° 2nd-NN Superexchange)</span
-          ><span class="font-mono-code text-amber-500">J₂ &lt; 0 (FCC)</span>
-        </div>
-        <p class="text-[11px] text-sub">
-          In FCC rocksalt oxides (NiO, MnO, CoO, FeO), the 1st-NN metal sublattice forms edge-sharing
-          triangles (geometrically frustrated for 1st-NN AFM). Instead, 180° M–O–M superexchange couples
-          2nd-NN sites along ⟨100⟩, creating FM {111} sheets stacked antiferromagnetically along [111].
-        </p>
-        <div class="text-[10px] font-mono-code text-mut">
-          Logic: Alternate spin by {111} plane parity / 2nd-NN superexchange shell
-        </div>
-      </div>
-
-      <div class="text-[10.5px] text-mut border-t border-subtle pt-2">
-        <b>Key References:</b> E. O. Wollan &amp; W. C. Koehler, <i>Phys. Rev.</i> <b>100</b>, 545 (1955); J.
-        B. Goodenough, <i>Phys. Rev.</i> <b>100</b>, 564 (1955); J. Kanamori, <i>J. Phys. Chem. Solids</i>
-        <b>10</b>, 87 (1959).
-      </div>
     </div>
   </div>
 </div>

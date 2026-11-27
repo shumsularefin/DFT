@@ -121,7 +121,7 @@
   R.elec = () => `
     <div class="sp-card"><div class="sp-card-title">Density of states (DOSCAR) ${helpBtn('DOSCAR', 'Total DOS from DOSCAR, shifted so E_F = 0. Spin-polarized runs show spin down as negative values. Projected DOS needs LORBIT = 11 and is not parsed here.')}</div>
       <div class="sp-row wrap">${upBtn('an-dos', 'Open DOSCAR', true)}</div><div id="res-dos"></div></div>
-    <div class="sp-card"><div class="sp-card-title">Band structure and gap (EIGENVAL) ${helpBtn('EIGENVAL', 'Bands from a line-mode run (step 4, band path). The k-axis uses the reciprocal lattice of the structure currently in the viewer, so load the same structure first. The gap comes from the occupations in EIGENVAL: highest occupied (occupation above 0.5) and lowest empty level.')}</div>
+    <div class="sp-card"><div class="sp-card-title">Band structure and gap (EIGENVAL) ${helpBtn('EIGENVAL', 'Bands from a line-mode run (the band path comes from the k-path tool). The k-axis uses the reciprocal lattice of the structure currently in the viewer, so load the same structure first. The gap comes from the occupations in EIGENVAL: highest occupied (occupation above 0.5) and lowest empty level.')}</div>
       <div class="sp-row wrap">${upBtn('an-eig', 'Open EIGENVAL', true)}<label class="sp-inline">E_F (eV, optional) <input id="an-ef" class="v-input w-24 font-mono-code" value="${esc(A.ef)}" placeholder="from DOSCAR"/></label></div><div id="res-eig"></div></div>
     <div class="sp-card"><div class="sp-card-title">Energy convergence (OSZICAR or OUTCAR)</div>
       <div class="sp-row wrap">${upBtn('an-osz', 'Open OSZICAR / OUTCAR')}</div><div id="res-osz"></div></div>
@@ -136,7 +136,7 @@
 for f in POSCAR-0*; do d=disp-\${f#POSCAR-}; mkdir -p $d; cp $f $d/POSCAR; cp INCAR KPOINTS POTCAR $d/; done
 # run VASP in every disp-XXX folder (static forces, INCAR below)
 phonopy -f disp-*/vasprun.xml                 # writes FORCE_SETS</pre>
-      <div class="sp-row wrap"><button id="an-ph-pos" class="v-btn">Download unit cell POSCAR</button><button id="an-ph-inc" class="v-btn">Download force INCAR</button></div>
+      <div class="sp-row wrap"><button id="an-ph-pos" class="v-btn">Download unit cell POSCAR</button><button id="an-ph-inc" class="v-btn">Make the force INCAR in the Input Builder</button></div>
       <div class="sp-note">KPOINTS for the supercell: scale the converged unit-cell mesh down by DIM in each direction.</div></div>
     <div class="sp-card"><div class="sp-card-title">2. Dispersion and thermal properties (WebAssembly phonopy)</div>
       <div class="sp-row wrap">${upBtn('an-fs', 'Open FORCE_SETS', true)}<span class="text-mut text-[10.5px]">Uses the structure in the viewer as the unit cell and DIM above.</span></div>
@@ -220,10 +220,8 @@ phonopy -f disp-*/vasprun.xml                 # writes FORCE_SETS</pre>
   bind.phonon = () => {
     $('an-phdim').onchange = (e) => { A.phDim = e.target.value; T.rerenderBody(); };
     $('an-ph-pos').onclick = () => downloadText('POSCAR', V().getPOSCAR());
-    $('an-ph-inc').onclick = () => {
-      const base = T.getIncar().split('\n').filter((l) => !/^\s*(NSW|IBRION|ISIF|EDIFFG|POTIM|EDIFF|LWAVE|LCHARG|ISYM|PREC|ADDGRID|LREAL)\s*=/i.test(l));
-      downloadText('INCAR', base.join('\n').trimEnd() + '\n\n# phonopy finite-displacement forces\nIBRION = -1\nNSW    = 0\nEDIFF  = 1E-8\nPREC   = Accurate\nADDGRID = .TRUE.\nLREAL  = .FALSE.\nISYM   = 0\nLWAVE  = .FALSE.\nLCHARG = .FALSE.\n');
-    };
+    // The force INCAR for each displacement comes from the Input Builder's phonon task (S-042, D-108).
+    $('an-ph-inc').onclick = () => T.sendSite('input-builder', { task: 'phonon-finite-displacement' });
     onFile('an-fs', 'ph', async (text) => {
       const dim = A.phDim.trim().split(/\s+/).map(Number);
       if (dim.length !== 3 || dim.some((n) => !(n >= 1))) throw new Error('DIM must be three positive integers, for example 2 2 2');

@@ -154,49 +154,6 @@
     return ELEMENTS[el] || { z:0, mass:50.0, r:1.2, color:'#94a3b8' };
   }
 
-  // Standard High-Symmetry k-Paths (Setyawan & Curtarolo 2010)
-  const KPATHS = {
-    'Cubic-P': {
-      path: 'Γ → X → M → Γ → R → X | M → R',
-      segments: [['G','X'],['X','M'],['M','G'],['G','R'],['R','X'],['M','R']],
-      pts: { G:[0,0,0], X:[0,0.5,0], M:[0.5,0.5,0], R:[0.5,0.5,0.5] }
-    },
-    'Cubic-F': {
-      path: 'Γ → X → W → K → Γ → L → U → W → L → K',
-      segments: [['G','X'],['X','W'],['W','K'],['K','G'],['G','L'],['L','U'],['U','W'],['W','L'],['L','K']],
-      pts: { G:[0,0,0], X:[0.5,0,0.5], W:[0.5,0.25,0.75], K:[0.375,0.375,0.75], L:[0.5,0.5,0.5], U:[0.625,0.25,0.625] }
-    },
-    'Cubic-I': {
-      path: 'Γ → H → N → Γ → P → H | P → N',
-      segments: [['G','H'],['H','N'],['N','G'],['G','P'],['P','H'],['P','N']],
-      pts: { G:[0,0,0], H:[0.5,-0.5,0.5], N:[0,0,0.5], P:[0.25,0.25,0.25] }
-    },
-    'Tetragonal': {
-      path: 'Γ → X → M → Γ → Z → R → A → Z',
-      segments: [['G','X'],['X','M'],['M','G'],['G','Z'],['Z','R'],['R','A'],['A','Z']],
-      pts: { G:[0,0,0], X:[0,0.5,0], M:[0.5,0.5,0], Z:[0,0,0.5], R:[0,0.5,0.5], A:[0.5,0.5,0.5] }
-    },
-    'Hexagonal': {
-      path: 'Γ → M → K → Γ → A → L → H → A',
-      segments: [['G','M'],['M','K'],['K','G'],['G','A'],['A','L'],['L','H'],['H','A']],
-      pts: { G:[0,0,0], M:[0.5,0,0], K:[0.333333,0.333333,0], A:[0,0,0.5], L:[0.5,0,0.5], H:[0.333333,0.333333,0.5] }
-    },
-    'Orthorhombic': {
-      path: 'Γ → X → S → Y → Γ → Z → U → R → T → Z',
-      segments: [['G','X'],['X','S'],['S','Y'],['Y','G'],['G','Z'],['Z','U'],['U','R'],['R','T'],['T','Z']],
-      pts: { G:[0,0,0], X:[0.5,0,0], S:[0.5,0.5,0], Y:[0,0.5,0], Z:[0,0,0.5], U:[0.5,0,0.5], R:[0.5,0.5,0.5], T:[0,0.5,0.5] }
-    },
-    'Monoclinic': {
-      path: 'Γ → Y → H → C → E → M1 → A → X → Γ',
-      segments: [['G','Y'],['Y','C'],['C','E'],['E','A'],['A','X'],['X','G']],
-      pts: { G:[0,0,0], Y:[0,0.5,0], C:[0,0.5,0.5], E:[-0.5,0.5,0.5], A:[-0.5,0,0], X:[0.5,0,0] }
-    },
-    'Triclinic': {
-      path: 'Γ → X → Y → Γ → Z → R',
-      segments: [['G','X'],['X','Y'],['Y','G'],['G','Z'],['Z','R']],
-      pts: { G:[0,0,0], X:[0.5,0,0], Y:[0,0.5,0], Z:[0,0,0.5], R:[0.5,0.5,0.5] }
-    }
-  };
 
   // =========================================================================
   // 2. BUILT-IN VASP SAMPLE STRUCTURES
@@ -420,7 +377,6 @@
     polyOpacity: 0.48,
     vecScale: 0.95,
     vecTiltDeg: 45,
-    pendingAutoSC: null,
     magUpColor: '#e11d48',
     magDnColor: '#0284c7',
     magMode: 'collinear',    // collinear | noncollinear
@@ -433,7 +389,6 @@
     activeVaspFile: 'POSCAR',
     kptsMode: 'Gamma',
     kptsSpacing: 0.04,
-    kptsNseg: 25,
     poscarCoord: 'Direct',
     incarPreset: 'scf',
     incarEncut: 520,
@@ -448,6 +403,7 @@
       lattice: s.lattice.map(r => [...r]),
       selectiveDynamics: !!s.selectiveDynamics,
       polyCenters: [...(s.polyCenters || [])],
+      bondOrders: { ...(s.bondOrders || {}) },
       atoms: s.atoms.map(a => ({
         el: a.el,
         frac: [...a.frac],
@@ -796,103 +752,6 @@
       }
     }
     return 'MAGMOM = ' + blocks.join('   ');
-  }
-
-  function computeAutoKMesh() {
-    const B = getReciprocalLattice(state.structure.lattice);
-    const dk = Math.max(0.005, state.kptsSpacing) * 2 * Math.PI;
-    return B.map(b => Math.max(1, Math.round(vNorm(b) / dk)));
-  }
-
-  function generateKPOINTS() {
-    if (state.kptsMode === 'Line-mode') {
-      const kkey = state.symmetryResult ? state.symmetryResult.kpathKey : 'Cubic-P';
-      const kp = KPATHS[kkey] || KPATHS['Cubic-P'];
-      const lines = [
-        `High-symmetry k-path (${kkey})`,
-        `${state.kptsNseg}`,
-        'Line-mode',
-        'Reciprocal'
-      ];
-      kp.segments.forEach(([a, b]) => {
-        const pa = kp.pts[a], pb = kp.pts[b];
-        const la = a === 'G' ? 'Gamma' : a;
-        const lb = b === 'G' ? 'Gamma' : b;
-        lines.push(`  ${pa[0].toFixed(5)}  ${pa[1].toFixed(5)}  ${pa[2].toFixed(5)}  ! ${la}`);
-        lines.push(`  ${pb[0].toFixed(5)}  ${pb[1].toFixed(5)}  ${pb[2].toFixed(5)}  ! ${lb}`);
-        lines.push('');
-      });
-      return lines.join('\n');
-    } else {
-      const [kx, ky, kz] = computeAutoKMesh();
-      const kb = document.getElementById('kpts-grid-badge'); if (kb) kb.textContent = `${kx}×${ky}×${kz}`;
-      return [
-        `Automatic mesh (k-spacing = ${state.kptsSpacing} 2pi/A)`,
-        '0',
-        state.kptsMode,
-        `  ${kx}  ${ky}  ${kz}`,
-        '  0  0  0'
-      ].join('\n') + '\n';
-    }
-  }
-
-  function generateINCAR() {
-    const s = state.structure;
-    const hasMag = s.atoms.some(a => vNorm(a.mag) > 1e-3);
-    const magLine = generateMAGMOMString();
-    const lines = [
-      `SYSTEM = ${s.name}`,
-      'PREC   = Accurate',
-      `ENCUT  = ${state.incarEncut}`,
-      'EDIFF  = 1E-8',
-      'NELM   = 150',
-      'ALGO   = Normal',
-      'LREAL  = .FALSE.',
-      'ADDGRID = .TRUE.',
-      'LWAVE  = .FALSE.',
-      'LCHARG = .TRUE.'
-    ];
-    if (state.incarPreset === 'relax') {
-      lines.push('', '# Ionic & Cell Relaxation', 'IBRION = 2', 'ISIF   = 3', 'NSW    = 100', 'EDIFFG = -0.01', 'ISMEAR = 0', 'SIGMA  = 0.05');
-    } else if (state.incarPreset === 'dos') {
-      lines.push('', '# Density of States', 'ICHARG = 11', 'ISMEAR = -5', 'LORBIT = 11', 'NEDOS  = 2001');
-    } else if (state.incarPreset === 'bands') {
-      lines.push('', '# Band Structure (Line-Mode KPOINTS)', 'ICHARG = 11', 'ISMEAR = 0', 'SIGMA  = 0.05', 'LORBIT = 11');
-    } else if (state.incarPreset === 'soc') {
-      lines.push('', '# Spin-Orbit Coupling + Non-Collinear Magnetism', 'ISMEAR = 0', 'SIGMA  = 0.05', 'LSORBIT = .TRUE.', 'LNONCOLLINEAR = .TRUE.', 'SAXIS  = 0 0 1', 'ISYM   = 0', 'LORBIT = 11');
-    } else {
-      lines.push('', '# Static SCF', 'ISMEAR = 0', 'SIGMA  = 0.05', 'LORBIT = 11');
-    }
-
-    if (state.incarPreset !== 'soc') {
-      if (state.magMode === 'noncollinear') {
-        lines.push('', '# Non-Collinear Magnetism', 'LNONCOLLINEAR = .TRUE.', 'ISYM   = 0', magLine);
-      } else if (hasMag) {
-        lines.push('', '# Collinear Spin Polarization', 'ISPIN  = 2', magLine);
-      } else {
-        lines.push('', '# Non-Spin-Polarized', 'ISPIN  = 1');
-      }
-    } else {
-      lines.push(magLine);
-    }
-
-    if (state.incarLdau) {
-      const spList = Array.from(getSpeciesOrder(s.atoms).keys());
-      const ldauL = spList.map(el => getElInfo(el).is3d ? 2 : -1).join(' ');
-      const ldauU = spList.map(el => getElInfo(el).is3d ? (getElInfo(el).defU || 4.0).toFixed(1) : '0.0').join(' ');
-      const ldauJ = spList.map(() => '0.0').join(' ');
-      lines.push(
-        '',
-        '# DFT+U (Dudarev)',
-        'LDAU      = .TRUE.',
-        'LDAUTYPE  = 2',
-        `LDAUL     = ${ldauL}   # ${spList.join(' ')}`,
-        `LDAUU     = ${ldauU}`,
-        `LDAUJ     = ${ldauJ}`,
-        'LMAXMIX   = 4'
-      );
-    }
-    return lines.join('\n') + '\n';
   }
 
   // =========================================================================
@@ -1693,10 +1552,28 @@
               const m = new THREE.LineBasicMaterial({ color: state.dark ? 0x94a3b8 : 0x475569 });
               rootGroup.add(new THREE.Line(g, m));
             } else {
-              // Two-tone half-bonds like VESTA!
-              const mid = p1.clone().lerp(p2, 0.5);
-              addCylinderSegment(p1, mid, state.bondRadius, ai.cfg.color);
-              addCylinderSegment(mid, p2, state.bondRadius, aj.cfg.color);
+              // Two-tone half-bonds like VESTA! Molecule mode can set a bond order (molecule.ts): a double
+              // bond is drawn as two thinner cylinders, a triple as three, an aromatic one as a full bond
+              // with a thin second line beside it.
+              const order = bondOrderOf(ai.origIdx, aj.origIdx);
+              if (order === 1) {
+                const mid = p1.clone().lerp(p2, 0.5);
+                addCylinderSegment(p1, mid, state.bondRadius, ai.cfg.color);
+                addCylinderSegment(mid, p2, state.bondRadius, aj.cfg.color);
+              } else {
+                const off = bondOffsetDir(dv, i, displayedAtoms);
+                const lines = order === 3 ? [-1, 0, 1] : order === 2 ? [-0.5, 0.5] : [0, 1];
+                const gap = state.bondRadius * (order === 3 ? 1.6 : 1.4);
+                lines.forEach((k, li) => {
+                  const r = order === 1.5 && li === 1 ? state.bondRadius * 0.35 : state.bondRadius * (order === 3 ? 0.5 : 0.62);
+                  const o = off.clone().multiplyScalar(k * gap);
+                  const a1 = p1.clone().add(o);
+                  const a2 = p2.clone().add(o);
+                  const mid = a1.clone().lerp(a2, 0.5);
+                  addCylinderSegment(a1, mid, r, ai.cfg.color);
+                  addCylinderSegment(mid, a2, r, aj.cfg.color);
+                });
+              }
             }
           }
         }
@@ -1825,6 +1702,37 @@
     });
 
     updateProjectedLabels();
+  }
+
+  // Bond orders set by molecule mode, keyed "i-j" (i < j, atom indices); every other bond is single.
+  function bondOrderOf(i, j) {
+    const k = i < j ? `${i}-${j}` : `${j}-${i}`;
+    const bo = state.structure && state.structure.bondOrders;
+    const o = bo ? bo[k] : undefined;
+    return o === 2 || o === 3 || o === 1.5 ? o : 1;
+  }
+  // The side a double bond's second line goes: in the plane of a neighbouring bond (so a ring's double bonds
+  // lie in the ring plane), else perpendicular to the bond and the z axis.
+  function bondOffsetDir(dv, i, atoms) {
+    const b = new THREE.Vector3(...dv).normalize();
+    const ai = atoms[i];
+    let ref = null;
+    for (const aj of atoms) {
+      if (aj === ai) continue;
+      const w = vSub(aj.cart, ai.cart);
+      const d = vNorm(w);
+      if (d < 0.35 || d > (getElInfo(ai.el).r + getElInfo(aj.el).r) * state.bondCutoff) continue;
+      const u = new THREE.Vector3(...w).normalize();
+      if (Math.abs(u.dot(b)) < 0.95) { ref = u; break; }
+    }
+    if (!ref) ref = Math.abs(b.z) < 0.9 ? new THREE.Vector3(0, 0, 1) : new THREE.Vector3(0, 1, 0);
+    const n = new THREE.Vector3().crossVectors(b, ref);
+    const off = new THREE.Vector3().crossVectors(n, b);
+    if (off.lengthSq() < 1e-10) return new THREE.Vector3(1, 0, 0);
+    off.normalize();
+    // Point toward the neighbour, so a ring's inner line sits inside the ring.
+    if (off.dot(ref) < 0) off.negate();
+    return off;
   }
 
   function addCylinderSegment(p1, p2, radius, colorHex) {
@@ -2215,21 +2123,12 @@
     const prevTarget = magTarget.value;
     magTarget.innerHTML = '<option value="selected">Selected Atoms</option>';
 
-    const magSub = document.getElementById('mag-sublattice');
-    const prevSub = magSub.value;
-    magSub.innerHTML = '<option value="auto3d">Auto (3d metals)</option><option value="auto3d4f">3d + 4f metals</option>';
-
     for (const [el, list] of spMap.entries()) {
       const cfg = state.speciesConfig[el];
       const opt = document.createElement('option');
       opt.value = `el:${el}`;
       opt.textContent = `All ${el} atoms (${list.length})`;
       magTarget.appendChild(opt);
-
-      const sopt = document.createElement('option');
-      sopt.value = `el:${el}`;
-      sopt.textContent = `${el} only (${list.length} atoms)`;
-      magSub.appendChild(sopt);
 
       const row = document.createElement('div');
       row.className = 'flex items-center justify-between gap-1.5 py-1 px-1.5 rounded border border-subtle';
@@ -2249,7 +2148,6 @@
       spListEl.appendChild(row);
     }
     if ([...magTarget.options].some(o => o.value === prevTarget)) magTarget.value = prevTarget;
-    if ([...magSub.options].some(o => o.value === prevSub)) magSub.value = prevSub;
 
     spListEl.querySelectorAll('.sp-col').forEach(inp => inp.addEventListener('input', e => {
       state.speciesConfig[e.target.dataset.el].color = e.target.value;
@@ -2409,12 +2307,6 @@
       brkBox.classList.add('hidden');
     }
 
-    const kp = KPATHS[sym.kpathKey] || KPATHS['Cubic-P'];
-    document.getElementById('sym-kpath-str').textContent = kp.path;
-    const kt = document.getElementById('sym-kpoints-table');
-    kt.innerHTML = Object.entries(kp.pts).map(([k, v]) =>
-      `<div class="flex justify-between"><span>${k === 'G' ? 'Γ (Gamma)' : k}</span><span>(${v.map(x=>x.toFixed(3)).join(', ')})</span></div>`
-    ).join('');
   }
 
   function renderMagneticUI() {
@@ -2488,10 +2380,8 @@
     const label = document.getElementById('vasp-file-label');
     const ta = document.getElementById('vasp-file-preview');
     label.textContent = state.activeVaspFile;
-    const S = window.Studio;
-    if (state.activeVaspFile === 'POSCAR') ta.value = generatePOSCAR();
-    else if (state.activeVaspFile === 'KPOINTS') ta.value = S ? S.getKpoints() : generateKPOINTS();
-    else ta.value = S ? S.getIncar() : generateINCAR();
+    // INCAR and KPOINTS are made in the Input Builder (D-108); this tab previews POSCAR.
+    ta.value = generatePOSCAR();
     notifyStudio();
   }
 
@@ -3084,10 +2974,6 @@
     downloadTextFile(fn, buildFullContcarReportText('md'));
   });
 
-  document.getElementById('btn-send-kpath').addEventListener('click', () => {
-    if (window.Studio) window.Studio.useBandPath();
-    showToast('High-symmetry k-path sent to step 4 (KPOINTS)');
-  });
 
   // Magnetic Controls
   const updateMagModeBtns = () => {
@@ -3103,37 +2989,19 @@
   document.getElementById('col-mag-up').addEventListener('input', e => { state.magUpColor = e.target.value; rebuildScene(); });
   document.getElementById('col-mag-dn').addEventListener('input', e => { state.magDnColor = e.target.value; rebuildScene(); });
 
-  // Bind Vector Visual Tilt Slider & Theory Modal
+  // Bind Vector Visual Tilt Slider
   document.getElementById('rng-vec-tilt').addEventListener('input', e => {
     state.vecTiltDeg = parseInt(e.target.value, 10) || 0;
     document.getElementById('val-vec-tilt').textContent = `${state.vecTiltDeg}°`;
     rebuildScene();
   });
 
-  const theoryModal = document.getElementById('afm-theory-modal');
-  const closeTheory = () => { theoryModal.classList.add('hidden'); theoryModal.classList.remove('flex'); };
-  document.getElementById('btn-afm-theory').addEventListener('click', () => {
-    theoryModal.classList.remove('hidden'); theoryModal.classList.add('flex');
-  });
-  document.getElementById('btn-close-theory').addEventListener('click', closeTheory);
-  theoryModal.addEventListener('click', e => { if (e.target === theoryModal) closeTheory(); });
-
-  // Automatic PBC Nearest-Neighbor Graph Builder & Wollan–Koehler AFM Solver
-  function getMagSiteIndices(s) {
-    const mode = document.getElementById('mag-sublattice') ? document.getElementById('mag-sublattice').value : 'auto3d';
-    const idxs = [];
-    if (mode.startsWith('el:')) {
-      const targetEl = mode.slice(3);
-      s.atoms.forEach((a, i) => { if (a.el === targetEl) idxs.push(i); });
-      return idxs;
-    }
-    if (mode === 'auto3d4f') {
-      const hasMag = s.atoms.some(a => getElInfo(a.el).is3d || getElInfo(a.el).is4f);
-      s.atoms.forEach((a, i) => { if (!hasMag || getElInfo(a.el).is3d || getElInfo(a.el).is4f) idxs.push(i); });
-      return idxs;
-    }
+  // FM / AFM orderings live in the site's Magnetic tool (D-108). The Builder keeps per-atom moments, a
+  // non-collinear 120 degree starting texture (the Magnetic tool is collinear only) and a reset.
+  function magSiteIndices(s) {
     const has3d = s.atoms.some(a => getElInfo(a.el).is3d);
     const has4f = s.atoms.some(a => getElInfo(a.el).is4f);
+    const idxs = [];
     s.atoms.forEach((a, i) => {
       if (has3d) { if (getElInfo(a.el).is3d) idxs.push(i); }
       else if (has4f) { if (getElInfo(a.el).is4f) idxs.push(i); }
@@ -3141,247 +3009,29 @@
     });
     return idxs;
   }
-
-  function buildMagNNGraph(s, magIdxs) {
-    const L = s.lattice;
-    const n = magIdxs.length;
-    const pairs = [];
-    let minD = Infinity;
-    for (let u=0; u<n; u++) {
-      const fu = s.atoms[magIdxs[u]].frac;
-      for (let v=u; v<n; v++) {
-        const fv = s.atoms[magIdxs[v]].frac;
-        for (let ix=-1; ix<=1; ix++) for (let iy=-1; iy<=1; iy++) for (let iz=-1; iz<=1; iz++) {
-          if (u === v && ix === 0 && iy === 0 && iz === 0) continue;
-          const df = [fv[0]-fu[0]+ix, fv[1]-fu[1]+iy, fv[2]-fu[2]+iz];
-          const dr = fracToCart(df, L);
-          const d = vNorm(dr);
-          if (d > 0.4) {
-            if (d < minD) minD = d;
-            pairs.push({ u, v, d, dr, isSelfImage: u === v });
-          }
-        }
-      }
-    }
-    const tolD = minD * 1.14;
-    const nnEdges = pairs.filter(p => p.d <= tolD);
-    // Split into in-plane (ab, |dz| < 0.35*d) vs out-of-plane (along c)
-    const inPlaneAdj = Array.from({ length: n }, () => new Set());
-    const fullAdj = Array.from({ length: n }, () => new Set());
-    let hasSelfInPlane = false, hasSelfOutPlane = false;
-    nnEdges.forEach(e => {
-      const isInPlane = Math.abs(e.dr[2]) < 0.35 * e.d;
-      if (e.isSelfImage) {
-        if (isInPlane) hasSelfInPlane = true; else hasSelfOutPlane = true;
-      } else {
-        fullAdj[e.u].add(e.v); fullAdj[e.v].add(e.u);
-        if (isInPlane) { inPlaneAdj[e.u].add(e.v); inPlaneAdj[e.v].add(e.u); }
-      }
-    });
-    return { minD: isFinite(minD) ? minD : 0, nnEdges, inPlaneAdj, fullAdj, hasSelfInPlane, hasSelfOutPlane };
-  }
-
-  function bfs2Color(adj, n) {
-    const color = new Array(n).fill(0);
-    let frustrated = false;
-    for (let start=0; start<n; start++) {
-      if (color[start] !== 0) continue;
-      color[start] = 1;
-      const queue = [start];
-      while (queue.length > 0) {
-        const u = queue.shift();
-        for (const v of adj[u]) {
-          if (color[v] === 0) { color[v] = -color[u]; queue.push(v); }
-          else if (color[v] === color[u]) frustrated = true;
-        }
-      }
-    }
-    return { color, frustrated };
-  }
-
-  function evaluateNNCoupling(s, magIdxs, graph) {
-    let inAnti = 0, inPara = 0, outAnti = 0, outPara = 0;
-    graph.nnEdges.forEach(e => {
-      const mu = s.atoms[magIdxs[e.u]].mag[2];
-      const mv = s.atoms[magIdxs[e.v]].mag[2];
-      const anti = mu * mv < -1e-4;
-      const isInPlane = Math.abs(e.dr[2]) < 0.35 * e.d;
-      if (isInPlane) { if (anti) inAnti++; else inPara++; }
-      else { if (anti) outAnti++; else outPara++; }
-    });
-    return { inAnti, inPara, outAnti, outPara };
-  }
-
-  function applyAutoMagneticPreset(preset) {
-    const s = state.structure;
-    const magIdxs = getMagSiteIndices(s);
-    const diagTitle = document.getElementById('afm-diag-title');
-    const diagDnn = document.getElementById('afm-diag-dnn');
-    const diagBody = document.getElementById('afm-diag-body');
-    const scBtn = document.getElementById('btn-afm-auto-sc');
-    scBtn.classList.add('hidden');
-    state.pendingAutoSC = null;
-
-    if (preset === 'clear') {
-      pushHistory();
-      s.atoms.forEach(a => a.mag = [0,0,0]);
-      diagTitle.textContent = 'Cleared Moments';
-      diagDnn.textContent = '-';
-      diagBody.textContent = 'All atomic magnetic moments reset to 0.0 μB.';
-      updateMagModeBtns();
-      rebuildScene();
-      showToast('Zeroed all magnetic moments');
-      return;
-    }
-
-    const graph = buildMagNNGraph(s, magIdxs);
-    const n = magIdxs.length;
-    const mVal = Math.max(0.1, parseFloat(document.getElementById('mag-preset-val').value) || 3.0);
-    const spins = new Array(n).fill(1);
-    let note = '';
-    let suggestSC = null;
-
-    if (preset === 'fm') {
-      state.magMode = 'collinear';
-      spins.fill(1);
-      note = 'All magnetic sites aligned parallel (+m).';
-    } else if (preset === 'afm-a') {
-      state.magMode = 'collinear';
-      // Cluster sites into distinct z-layers
-      const zVals = magIdxs.map((idx, k) => ({ k, z: wrap01(s.atoms[idx].frac[2]) })).sort((a,b) => a.z - b.z);
-      const layers = [];
-      zVals.forEach(item => {
-        if (layers.length === 0 || Math.abs(item.z - layers[layers.length-1].z) > 0.05) {
-          layers.push({ z: item.z, members: [item.k] });
-        } else {
-          layers[layers.length-1].members.push(item.k);
-        }
-      });
-      if (layers.length < 2) {
-        suggestSC = { P: [[1,0,0],[0,1,0],[0,0,2]], label: '1×1×2 Supercell + AFM-A', preset: 'afm-a' };
-        note = 'Only 1 magnetic layer along c; expand 1×1×2 for layered AFM-A.';
-      } else {
-        layers.forEach((lay, li) => lay.members.forEach(k => spins[k] = (li % 2 === 0 ? 1 : -1)));
-        note = `Clustered ${layers.length} basal z-layers: FM in-plane, AFM along c.`;
-      }
-    } else if (preset === 'afm-c') {
-      state.magMode = 'collinear';
-      if (graph.hasSelfInPlane || n < 2) {
-        suggestSC = { P: [[2,0,0],[0,2,0],[0,0,1]], label: '2×2×1 Supercell + AFM-C', preset: 'afm-c' };
-        note = 'Cell too small for in-plane AFM-C (atoms bond to own periodic image).';
-      } else {
-        // Group atoms by (x, y) column so c-stacked columns stay FM
-        const cols = [];
-        magIdxs.forEach((idx, k) => {
-          const f = s.atoms[idx].frac;
-          let found = cols.find(c => {
-            const dx = Math.abs(f[0]-c.fx), dy = Math.abs(f[1]-c.fy);
-            return Math.min(dx, 1-dx) < 0.05 && Math.min(dy, 1-dy) < 0.05;
-          });
-          if (!found) { found = { fx: f[0], fy: f[1], members: [] }; cols.push(found); }
-          found.members.push(k);
-        });
-        if (cols.length < 2) {
-          suggestSC = { P: [[2,0,0],[0,2,0],[0,0,1]], label: '2×2×1 Supercell + AFM-C', preset: 'afm-c' };
-          note = 'Only 1 magnetic column in ab-plane; expand 2×2×1 for AFM-C.';
-        } else {
-          // Build column adjacency from inPlaneAdj
-          const colOf = new Array(n).fill(0);
-          cols.forEach((c, ci) => c.members.forEach(k => colOf[k] = ci));
-          const colAdj = Array.from({ length: cols.length }, () => new Set());
-          for (let u=0; u<n; u++) for (const v of graph.inPlaneAdj[u]) {
-            if (colOf[u] !== colOf[v]) { colAdj[colOf[u]].add(colOf[v]); colAdj[colOf[v]].add(colOf[u]); }
-          }
-          const { color, frustrated } = bfs2Color(colAdj, cols.length);
-          cols.forEach((c, ci) => c.members.forEach(k => spins[k] = color[ci]));
-          note = frustrated
-            ? `2D NN graph partially frustrated (${cols.length} columns colored, FM along c).`
-            : `Solved 2D bipartite coloring across ${cols.length} columns (AFM ab, FM c).`;
-        }
-      }
-    } else if (preset === 'afm-g') {
-      state.magMode = 'collinear';
-      if (graph.hasSelfInPlane || graph.hasSelfOutPlane || n < 2) {
-        suggestSC = { P: [[2,0,0],[0,2,0],[0,0,2]], label: '2×2×2 Supercell + AFM-G', preset: 'afm-g' };
-        note = 'Unit cell has self-image 1st-NN bonds; expand 2×2×2 for 3D AFM-G.';
-      } else {
-        const { color, frustrated } = bfs2Color(graph.fullAdj, n);
-        for (let k=0; k<n; k++) spins[k] = color[k];
-        note = frustrated
-          ? '1st-NN sublattice is geometrically frustrated (e.g. FCC/triangular). Try AFM-II for rocksalt 2nd-NN superexchange!'
-          : 'Solved exact 3D bipartite Néel coloring (100% 1st-NN antiparallel).';
-      }
-    } else if (preset === 'afm-ii') {
-      state.magMode = 'collinear';
-      // Type-II Rocksalt AFM: alternate {111} planes (f_x + f_y + f_z)
-      const proj = magIdxs.map((idx, k) => {
-        const f = s.atoms[idx].frac;
-        return { k, p: f[0] + f[1] + f[2] };
-      }).sort((a,b) => a.p - b.p);
-      const planes = [];
-      proj.forEach(item => {
-        if (planes.length === 0 || Math.abs(item.p - planes[planes.length-1].p) > 0.06) {
-          planes.push({ p: item.p, members: [item.k] });
-        } else {
-          planes[planes.length-1].members.push(item.k);
-        }
-      });
-      if (planes.length < 2) {
-        suggestSC = { P: [[2,0,0],[0,2,0],[0,0,2]], label: '2×2×2 Supercell + AFM-II', preset: 'afm-ii' };
-        note = 'Need ≥2 {111} magnetic planes; expand 2×2×2 for AFM-II.';
-      } else {
-        planes.forEach((pl, pi) => pl.members.forEach(k => spins[k] = (pi % 2 === 0 ? 1 : -1)));
-        note = `Assigned AFM-II across ${planes.length} {111} planes (180° 2nd-NN superexchange).`;
-      }
-    }
-
+  document.getElementById('btn-mag-zero').addEventListener('click', () => {
     pushHistory();
-    const subMode = document.getElementById('mag-sublattice') ? document.getElementById('mag-sublattice').value : 'auto3d';
-    // Only reset non-target atoms when applying to an automatic group; preserve other species when targeting one species!
-    if (!subMode.startsWith('el:')) {
-      s.atoms.forEach(a => a.mag = [0,0,0]);
-    }
-    if (preset === 'spiral') {
-      state.magMode = 'noncollinear';
-      magIdxs.forEach((idx, k) => {
-        const ang = (k % 3) * (2 * Math.PI / 3);
-        s.atoms[idx].mag = [mVal * Math.cos(ang), mVal * Math.sin(ang), 0];
-      });
-      note = 'Applied 120° non-collinear coplanar spin texture in xy-plane.';
-    } else {
-      magIdxs.forEach((idx, k) => { s.atoms[idx].mag = [0, 0, spins[k] * mVal]; });
-    }
-
-    const stats = evaluateNNCoupling(s, magIdxs, graph);
-    const inTot = stats.inAnti + stats.inPara;
-    const outTot = stats.outAnti + stats.outPara;
-    diagTitle.textContent = `${preset.toUpperCase()} (${n} mag sites)`;
-    diagDnn.textContent = `d_NN = ${graph.minD.toFixed(3)} Å`;
-    diagBody.innerHTML = `
-      <div>${note}</div>
-      <div class="mt-1 text-main">In-plane NN: <b>${stats.inAnti}/${inTot}</b> ↑↓ · Out-of-plane NN: <b>${stats.outAnti}/${outTot}</b> ↑↓</div>
-    `;
-    if (suggestSC) {
-      state.pendingAutoSC = suggestSC;
-      scBtn.textContent = `Auto-Build ${suggestSC.label}`;
-      scBtn.classList.remove('hidden');
-    }
-
+    state.structure.atoms.forEach(a => a.mag = [0, 0, 0]);
     updateMagModeBtns();
     rebuildScene();
-    logConsole(`Auto-${preset.toUpperCase()}: d_NN=${graph.minD.toFixed(3)} Å | in-plane ${stats.inAnti}/${inTot} ↑↓, out-of-plane ${stats.outAnti}/${outTot} ↑↓`, 'accent');
-    showToast(`Applied ${preset.toUpperCase()} magnetic order`);
-  }
-
-  document.querySelectorAll('[data-mag-preset]').forEach(btn => {
-    btn.addEventListener('click', () => applyAutoMagneticPreset(btn.dataset.magPreset));
+    showToast('Zeroed all magnetic moments');
   });
-
-  document.getElementById('btn-afm-auto-sc').addEventListener('click', () => {
-    if (!state.pendingAutoSC) return;
-    const { P, preset } = state.pendingAutoSC;
-    applyTransformationMatrix(P);
-    applyAutoMagneticPreset(preset);
+  document.getElementById('btn-mag-120').addEventListener('click', () => {
+    const s = state.structure;
+    const v = ['mag-mx', 'mag-my', 'mag-mz'].map(id => parseFloat(document.getElementById(id).value) || 0);
+    const m = Math.hypot(v[0], v[1], v[2]) || 3.0;
+    const idxs = magSiteIndices(s);
+    pushHistory();
+    state.magMode = 'noncollinear';
+    s.atoms.forEach(a => a.mag = [0, 0, 0]);
+    idxs.forEach((idx, k) => {
+      const ang = (k % 3) * (2 * Math.PI / 3);
+      s.atoms[idx].mag = [m * Math.cos(ang), m * Math.sin(ang), 0];
+    });
+    updateMagModeBtns();
+    rebuildScene();
+    logConsole(`120° in-plane start on ${idxs.length} atoms (|m| = ${m.toFixed(2)} μB, angles follow atom order)`, 'accent');
+    showToast('Applied a 120° in-plane starting texture');
   });
 
   document.getElementById('btn-assign-mag').addEventListener('click', () => {
@@ -3466,7 +3116,7 @@
     btn.addEventListener('click', () => {
       state.activeVaspFile = btn.dataset.vaspFile;
       document.querySelectorAll('[data-vasp-file]').forEach(b => b.classList.toggle('v-btn-active', b === btn));
-      ['POSCAR','KPOINTS','INCAR'].forEach(f => {
+      ['POSCAR'].forEach(f => {
         document.getElementById(`vasp-opt-${f}`).classList.toggle('hidden', f !== state.activeVaspFile);
       });
       refreshVaspPreview();
@@ -3807,8 +3457,6 @@
     getReciprocal: () => getReciprocalLattice(state.structure.lattice),
     getSymmetry: () => state.symmetryResult,
     getElementInfo: el => getElInfo(el),
-    bandPathKPOINTS: nseg => { const m = state.kptsMode, n = state.kptsNseg; state.kptsMode = 'Line-mode'; state.kptsNseg = nseg; const t = generateKPOINTS(); state.kptsMode = m; state.kptsNseg = n; return t; },
-    bandPathLabel: () => { const k = state.symmetryResult ? state.symmetryResult.kpathKey : 'Cubic-P'; const kp = KPATHS[k] || KPATHS['Cubic-P']; return { key: k, path: kp.segments.map(([x, y]) => x + '-' + y).join(' | ') }; },
     loadText: loadStructureText,
     // Replace the structure with edited POSCAR text (site checks and operations). Undo-able; keeps the
     // species colours, and keeps the moments when the atom count is unchanged.
@@ -3833,6 +3481,10 @@
     },
     poscarToAtomIndex: (idxs) => { const o = poscarOrder(state.structure.atoms); return idxs.map(i => o[i]).filter(i => i !== undefined); },
     selectAtoms: (idxs) => { state.selectedAtomIndices = idxs.slice(); syncSelectionUI(); rebuildScene(); },
+    // Molecule mode: bond orders to draw, keyed "i-j" with i < j (atom indices). They live on the structure,
+    // so undo and redo bring them back; a new load or a rewritten POSCAR starts with none.
+    setBondOrders: (map, undoable) => { if (!state.structure) return; if (undoable) pushHistory(); state.structure.bondOrders = map && typeof map === 'object' ? { ...map } : {}; rebuildScene(); },
+    getBondOrders: () => ({ ...((state.structure && state.structure.bondOrders) || {}) }),
     undo: undoStep,
     redo: redoStep,
     loadSampleKey: loadSample,

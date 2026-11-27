@@ -1,7 +1,7 @@
 import { reciprocalLengths, kpointCount } from '../../../lib/vasp/kpoints';
 import type { RoundingRule } from '../../../lib/vasp/kpoints';
 import { sendHandoff } from '../../../lib/handoff';
-import { centeringOf, kpointsOf, useBuilder, type KpMode } from './store';
+import { bandOptPath, centeringOf, kpointsOf, useBuilder, type KpMode } from './store';
 
 export default function KpointsStep() {
   const s = useBuilder();
@@ -22,7 +22,7 @@ export default function KpointsStep() {
             ['gamma', 'Gamma-centred mesh (KPOINTS file)'],
             ['monkhorst-pack', 'Monkhorst-Pack mesh (KPOINTS file)'],
             ['kspacing', 'KSPACING in the INCAR (no KPOINTS file)'],
-            ['line', 'Line mode for a band path (placeholder)'],
+            ['line', 'Line mode for a band path (from the k-path tool)'],
           ] as [KpMode, string][]
         ).map(([m, label]) => (
           <label key={m} className="ib-radio">
@@ -31,7 +31,20 @@ export default function KpointsStep() {
           </label>
         ))}
       </fieldset>
-      {s.kpMode === 'line' ? (
+      {s.lineKpoints && (
+        <div className="ib-note">
+          <p>
+            The band path from the k-path tool came with this structure.{' '}
+            {bandOptPath(s)
+              ? 'Band route A: it is written as KPOINTS_OPT, next to the uniform mesh below.'
+              : s.kpMode === 'line'
+                ? 'It is written as KPOINTS.'
+                : 'Choose the Band structure task (route A writes it as KPOINTS_OPT) or line mode (route B) to use it.'}
+          </p>
+          <pre className="ib-pre">{s.lineKpoints}</pre>
+        </div>
+      )}
+      {s.kpMode === 'line' && s.lineKpoints ? null : s.kpMode === 'line' ? (
         <p className="ib-note">
           Line-mode paths come from the <a href="/tools/kpath/">k-path tool</a>. No KPOINTS file is written
           here.{' '}
@@ -101,6 +114,43 @@ export default function KpointsStep() {
               Centring advice:{' '}
               <strong>{rec.centering === 'gamma' ? 'Gamma-centred' : 'either centring'}</strong>. {rec.reason}
             </p>
+          )}
+          {s.kpMode !== 'kspacing' && s.structure && (
+            <div className="ib-field">
+              <label className="ib-radio">
+                <input
+                  type="checkbox"
+                  checked={!!s.meshOverride}
+                  onChange={(e) => s.set('meshOverride', e.target.checked ? (kp.mesh ?? [1, 1, 1]) : null)}
+                />
+                Type the mesh yourself (N1 x N2 x N3), for example a converged mesh or a slab
+              </label>
+              {s.meshOverride && (
+                <div className="ib-row">
+                  {[0, 1, 2].map((i) => (
+                    <input
+                      key={i}
+                      aria-label={`N${i + 1}`}
+                      inputMode="numeric"
+                      value={s.meshOverride![i]}
+                      onChange={(e) => {
+                        const m = [...s.meshOverride!] as [number, number, number];
+                        m[i] = Math.max(1, Math.floor(Number(e.target.value) || 1));
+                        s.set('meshOverride', m);
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+              {s.systemType === 'slab' && kp.mesh && kp.mesh[2] > 1 && (
+                <p className="ib-note">
+                  A slab needs one k-point along the vacuum.{' '}
+                  <button type="button" onClick={() => s.set('meshOverride', [kp.mesh![0], kp.mesh![1], 1])}>
+                    Use {kp.mesh[0]} x {kp.mesh[1]} x 1
+                  </button>
+                </p>
+              )}
+            </div>
           )}
           {kp.text && (
             <>

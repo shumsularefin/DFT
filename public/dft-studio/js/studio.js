@@ -52,7 +52,7 @@
     // Only lab installs that copy the licensed library into data/potcars/ set this flag (data/pp_local.js).
     if (window.PP_LOCAL_LIBRARY !== true) { S.ppLibrary = false; return; }
     const t = setTimeout(() => { if (S.ppLibrary === null) S.ppLibrary = false; }, 4000);
-    loadPotcarText('PAW_PBE_64', 'O').then(() => { S.ppLibrary = true; clearTimeout(t); renderStepbar(); if (S.stage === 'potcar' || S.stage === 'bundle') renderStage(); })
+    loadPotcarText('PAW_PBE_64', 'O').then(() => { S.ppLibrary = true; clearTimeout(t); renderStepbar(); if (S.stage === 'potcar' || S.stage === 'inputs') renderStage(); })
       .catch(() => { if (S.ppLibrary !== true) S.ppLibrary = false; clearTimeout(t); });
   }
 
@@ -237,12 +237,10 @@
   // ---------------------------------------------------------------------------
   const STEPS = [
     { id: 'structure', n: 1, label: 'Structure', sub: 'Build, inspect, magnetize' },
-    { id: 'potcar', n: 2, label: 'POTCAR', sub: 'Pseudopotentials, ENCUT' },
-    { id: 'incar', n: 3, label: 'INCAR', sub: 'Calculation settings' },
-    { id: 'kpoints', n: 4, label: 'KPOINTS', sub: 'Mesh or band path' },
-    { id: 'kconv', n: 5, label: 'k-Convergence', sub: 'Optional test', optional: true },
-    { id: 'bundle', n: 6, label: 'Run bundle', sub: 'Check and download' },
-    { id: 'analyze', n: 7, label: 'Analyze', sub: 'Plots and post-processing', optional: true },
+    { id: 'potcar', n: 2, label: 'POTCAR', sub: 'Pseudopotentials and ENMAX' },
+    { id: 'kconv', n: 3, label: 'k-point test', sub: 'Optional convergence driver', optional: true },
+    { id: 'inputs', n: 4, label: 'Input files', sub: 'INCAR, KPOINTS and job script in the Input Builder' },
+    { id: 'analyze', n: 5, label: 'Analyze', sub: 'Plots and post-processing', optional: true },
   ];
   const S = {
     stage: 'structure',
@@ -250,13 +248,8 @@
     ppLibrary: null,
     potFunc: 'PAW_PBE_64',
     potSel: {},
-    encut: 520, encutAuto: true,
-    preset: 'ST',
-    ldau: false, uMap: {},
-    soc: false, vdw: 0, dipole: false,
-    tagEdits: {}, extraTags: '', incarManual: null,
-    kpt: { mode: 'spacing', spacing: 0.03, manual: [4, 4, 4], scheme: 'Gamma', nseg: 30, force2D: false, lineOverride: null, lineNote: '' },
-    bundleDone: false,
+    task: 'relax',
+    kmesh: null,
     analyzeTab: 'elec',
   };
 
@@ -282,7 +275,6 @@
     return m;
   }
   function recommendedEncut() { const m = maxEnmax(); return m > 0 ? Math.ceil((1.3 * m) / 10) * 10 : 520; }
-  function syncEncut() { if (S.encutAuto) S.encut = recommendedEncut(); }
   function nelect() {
     let n = 0, ok = true;
     V().getSpecies().forEach(({ el, count }) => { const p = selectedPP(el); if (p && p.zval) n += p.zval * count; else ok = false; });
@@ -315,145 +307,49 @@ echo "POTCAR written:"; grep TITEL POTCAR
   }
 
   // ---------------------------------------------------------------------------
-  // INCAR
+  // INCAR, KPOINTS and the job script are the Input Builder's (D-108)
   // ---------------------------------------------------------------------------
-  function defaultU(el) {
-    const d = D.MAGNETIC_DEFAULTS[el];
-    if (d) return d.u;
-    const info = V().getElementInfo(el);
-    return info.defU || 0;
-  }
-  function uOrbital(el) {
-    const d = D.MAGNETIC_DEFAULTS[el];
-    if (d) return d.orbital;
-    if (D.F_BLOCK.has(el)) return 3;
-    if (D.D_BLOCK.has(el)) return 2;
-    return -1;
-  }
-  function needsNoncollinear() { return S.soc || S.preset === 'SO' || V().getMagMode() === 'noncollinear'; }
-  function magmomValue() {
-    const st = V().getStructure();
-    if (!V().hasMagnetism()) return null;
-    if (needsNoncollinear() && V().getMagMode() !== 'noncollinear') {
-      // SOC with collinear moments in the viewer: write each moment along z.
-      const groups = new Map();
-      st.atoms.forEach((a) => { if (!groups.has(a.el)) groups.set(a.el, []); groups.get(a.el).push(a); });
-      const f = (x) => (Math.abs(x) < 1e-4 ? '0' : String(+x.toFixed(3)));
-      return Array.from(groups.values()).map((list) => list.map((a) => `0 0 ${f(a.mag[2])}`).join('  ')).join('   ');
-    }
-    return V().getMAGMOM().replace(/^MAGMOM\s*=\s*/, '');
-  }
-  function buildIncarTags() {
-    syncEncut();
-    const preset = D.INCAR_PRESETS[S.preset] || D.INCAR_PRESETS.ST;
-    const tags = Object.assign({}, preset.tags, { ENCUT: S.encut });
-    const els = elements();
-    const hasF = els.some((e) => D.F_BLOCK.has(e)), hasD = els.some((e) => D.D_BLOCK.has(e));
-    if (hasD || hasF) { tags.LASPH = '.TRUE.'; tags.LMAXMIX = hasF ? 6 : 4; }
-    const mm = magmomValue();
-    if (needsNoncollinear()) {
-      tags.LNONCOLLINEAR = '.TRUE.';
-      delete tags.ISPIN; delete tags.VOSKOWN;
-      if (S.soc || S.preset === 'SO') { tags.LSORBIT = '.TRUE.'; tags.SAXIS = tags.SAXIS || '0 0 1'; }
-      if (mm) tags.MAGMOM = mm;
-    } else if (mm || ['MG', 'PU'].includes(S.preset)) {
-      tags.ISPIN = 2;
-      if (mm) tags.MAGMOM = mm;
-    }
-    if (S.ldau || S.preset === 'PU') {
-      const l = [], u = [], j = [];
-      els.forEach((el) => {
-        const uv = S.uMap[el] ?? defaultU(el), orb = uOrbital(el);
-        if (uv > 0 && orb > 0) { l.push(orb); u.push(uv); } else { l.push(-1); u.push(0); }
-        j.push(0);
-      });
-      Object.assign(tags, { LDAU: '.TRUE.', LDAUTYPE: 2, LDAUL: l.join(' '), LDAUU: u.join(' '), LDAUJ: j.join(' '), LDAUPRINT: 1 });
-      if (!tags.LMAXMIX) tags.LMAXMIX = l.includes(3) ? 6 : 4;
-    }
-    if (S.vdw) tags.IVDW = S.vdw;
-    if (S.dipole) { tags.LDIPOL = '.TRUE.'; tags.IDIPOL = 3; }
-    Object.entries(S.tagEdits).forEach(([k, v]) => { if (v === '' || v === null) delete tags[k]; else tags[k] = v; });
-    S.extraTags.split('\n').forEach((line) => {
-      const code = line.split(/[#!]/)[0];
-      const eq = code.indexOf('=');
-      if (eq > 0) { const k = code.slice(0, eq).trim().toUpperCase(), v = code.slice(eq + 1).trim(); if (k) tags[k] = v; }
-    });
-    return tags;
-  }
-  function getIncar() {
-    if (S.incarManual !== null) return S.incarManual;
-    const preset = D.INCAR_PRESETS[S.preset] || D.INCAR_PRESETS.ST;
-    const st = V().getStructure();
-    const tags = buildIncarTags();
-    const lines = [`# Material Builder INCAR: ${preset.name}`, `SYSTEM = ${(st && st.name) || 'VASP_job'}`, ''];
-    Object.entries(tags).forEach(([k, v]) => lines.push(`${k.padEnd(13)} = ${String(v)}`));
-    return lines.join('\n') + '\n';
-  }
-
-  // ---------------------------------------------------------------------------
-  // KPOINTS
-  // ---------------------------------------------------------------------------
-  function recipLengths() { return V().getReciprocal().map((b) => Math.hypot(b[0], b[1], b[2])); } // includes 2 pi
+  // The Builder keeps what only it knows (the structure, the spins, the POTCAR choices, whether the cell is a slab or a
+  // molecule, a mesh from the k-point test) and hands all of it to the Input Builder, so nothing is typed twice.
   function looks2D() {
     const st = V().getStructure();
-    if (!st) return false;
+    if (!st || !st.atoms.length) return false;
     const c = Math.hypot(...st.lattice[2]);
     const zs = st.atoms.map((a) => a.frac[2]);
     const span = Math.max(...zs) - Math.min(...zs);
     return c > 12 && (1 - span) * c > 8;
   }
-  function currentMesh() {
-    let m;
-    if (S.kpt.mode === 'manual') m = S.kpt.manual.slice();
-    else {
-      const sp = Math.max(0.005, Number(S.kpt.spacing) || 0.03);
-      m = recipLengths().map((b) => Math.max(1, Math.ceil(b / (2 * Math.PI * sp))));
-    }
-    if (S.kpt.force2D) m[2] = 1;
-    return m;
+  function systemHint() {
+    const root = document.getElementById('studio-root');
+    if (root && root.dataset.mode === 'molecule') return 'molecule';
+    return looks2D() ? 'slab' : undefined;
   }
-  function getKpoints() {
-    if (S.kpt.mode === 'line') {
-      if (S.kpt.lineOverride) return S.kpt.lineOverride;
-      return V().bandPathKPOINTS(S.kpt.nseg);
-    }
-    const m = currentMesh();
-    const why = S.kpt.mode === 'manual' ? 'explicit mesh' : `k-spacing ${S.kpt.spacing} x 2pi/A`;
-    return `Material Builder ${S.kpt.scheme} mesh (${why})\n0\n${S.kpt.scheme}\n  ${m.join('  ')}\n  0  0  0\n`;
+  function magmomText() { return V().hasMagnetism() ? V().getMAGMOM().replace(/^\s*MAGMOM\s*=\s*/i, '') : undefined; }
+  // The test INCAR of the k-point convergence step: the Input Builder's convergence preset (S-042), ENCUT from ENMAX.
+  function baseIncar() {
+    const B = window.SiteBridge;
+    if (!B || !B.presetIncar) return '';
+    const me = maxEnmax();
+    return B.presetIncar('convergence', me > 0 ? me : undefined, V().getMagMode() === 'noncollinear' ? undefined : magmomText());
+  }
+  function kmeshText() {
+    const m = S.kmesh;
+    return m ? `Mesh chosen in the Material Builder k-point test\n0\nGamma\n  ${m.join('  ')}\n  0  0  0\n` : undefined;
   }
 
   // ---------------------------------------------------------------------------
-  // Consistency checks across all steps (shown in the run bundle and the stepper)
+  // Checks the Builder can make before the hand-off (the INCAR and KPOINTS checks run in the Input Builder)
   // ---------------------------------------------------------------------------
   function checks() {
     const out = [];
     const add = (level, msg, stage) => out.push({ level, msg, stage });
-    const tags = buildIncarTags();
-    const st = V().getStructure();
-    const nat = st ? st.atoms.length : 0;
-    const isTrue = (v) => /^\.?t/i.test(String(v || ''));
-    if (S.incarManual !== null) add('info', 'INCAR was edited by hand, so automatic settings are not applied until you regenerate it.', 'incar');
     const ppMissing = elements().filter((el) => !selectedPP(el));
     if (ppMissing.length) add('warn', `No POTCAR entry in ${S.potFunc} for: ${ppMissing.join(', ')}.`, 'potcar');
-    const me = maxEnmax();
-    if (me && Number(tags.ENCUT) < 1.3 * me - 1) add('warn', `ENCUT = ${tags.ENCUT} eV is below 1.3 x max(ENMAX) = ${Math.round(1.3 * me)} eV. Fine for quick tests, too low for cell relaxations and stresses.`, 'incar');
-    if (String(tags.ISPIN) === '2' && !tags.MAGMOM) add('warn', 'ISPIN = 2 without MAGMOM: VASP starts every atom at 1 muB. Set moments in Structure > Magnetic.', 'structure');
-    if (tags.MAGMOM && !tags.ISPIN && !isTrue(tags.LNONCOLLINEAR)) add('warn', 'MAGMOM set but ISPIN is not 2.', 'incar');
-    if (isTrue(tags.LDAU) && !tags.LMAXMIX) add('warn', 'DFT+U without LMAXMIX.', 'incar');
-    if (String(tags.ICHARG) === '11' && elements().some((e) => D.D_BLOCK.has(e) || D.F_BLOCK.has(e)) && !tags.LMAXMIX) add('warn', 'ICHARG = 11 on a d/f system needs LMAXMIX (4 or 6) to reproduce the SCF density.', 'incar');
-    const line = S.kpt.mode === 'line';
-    if (S.preset === 'BS' && !line) add('warn', 'Band-structure preset but KPOINTS is a mesh. Switch KPOINTS to the band path.', 'kpoints');
-    if (line && S.preset !== 'BS' && S.preset !== 'SO') add('warn', 'Line-mode KPOINTS is only meant for non-SCF band runs (ICHARG = 11).', 'kpoints');
-    if (String(tags.ISMEAR) === '-5' && !line && currentMesh().reduce((a, b) => a * b, 1) < 4) add('warn', 'ISMEAR = -5 (tetrahedron) needs at least 4 k-points.', 'kpoints');
-    if (String(tags.ISIF) === '3' && looks2D()) add('warn', 'ISIF = 3 on a cell with vacuum will shrink the vacuum. Use ISIF = 2 (or ISIF = 4 with care) for slabs.', 'incar');
-    if (looks2D() && !line && currentMesh()[2] > 1) add('info', 'Cell looks like a slab or 2D layer: consider forcing N3 = 1 in KPOINTS.', 'kpoints');
-    if (looks2D() && !S.dipole) add('info', 'Slab detected: consider the dipole correction (LDIPOL, IDIPOL = 3) for polar or adsorbate-covered surfaces.', 'incar');
-    if (V().isSelective() && !['SR', 'LR', 'NE', 'MD'].includes(S.preset)) add('info', 'POSCAR has selective dynamics but the preset does not move ions.', 'incar');
-    if (nat > 40 && String(tags.LREAL).toUpperCase() === '.FALSE.') add('info', `${nat} atoms with LREAL = .FALSE.: LREAL = Auto is usually much faster at this size.`, 'incar');
-    const lp = V().getLatticeParams();
-    if (!line && S.kpt.scheme === 'Monkhorst-Pack' && Math.abs(lp.gamma - 120) < 1 && currentMesh().slice(0, 2).some((n) => n % 2 === 0)) add('warn', 'Hexagonal cell with an even Monkhorst-Pack mesh breaks the hexagonal symmetry. Use a Gamma-centred mesh.', 'kpoints');
-    if (needsNoncollinear()) add('info', 'Non-collinear / SOC run: use the vasp_ncl executable.', 'bundle');
-    if (S.ppLibrary !== true) add('info', 'No POTCAR library loaded yet. Load it in the POTCAR step to generate POTCAR here; otherwise make_potcar.sh builds it on your cluster.', 'potcar');
+    if (S.ppLibrary !== true) add('info', 'No POTCAR library loaded yet. Load it in the POTCAR step to download POTCAR here; otherwise make_potcar.sh builds it on your cluster.', 'potcar');
+    const sys = systemHint();
+    if (sys === 'slab') add('info', 'The cell has more than 8 A of vacuum along c, so it is handed over as a slab: the Input Builder then checks ISIF, the k-mesh (one k-point along the vacuum) and the dipole correction.', 'inputs');
+    if (sys === 'molecule') add('info', 'Molecule mode: the Input Builder is told this is an isolated molecule in a box, so it checks for a cell relaxation (ISIF = 3) that would shrink the box.', 'inputs');
+    if (V().getMagMode() === 'noncollinear') add('info', 'Non-collinear moments go over as three numbers per atom with LNONCOLLINEAR. Choose the Spin-orbit coupling task for SOC; the job script then uses vasp_ncl.', 'inputs');
     return out;
   }
 
@@ -462,7 +358,6 @@ echo "POTCAR written:"; grep TITEL POTCAR
   // ---------------------------------------------------------------------------
   function stepDone(id) {
     if (id === 'structure') return !!V().getStructure();
-    if (id === 'bundle') return S.bundleDone;
     return S.visited.has(id);
   }
   function renderStepbar() {
@@ -491,11 +386,10 @@ echo "POTCAR written:"; grep TITEL POTCAR
     if (!STEPS.some((s) => s.id === stage)) return;
     S.stage = stage;
     S.visited.add(stage);
-    if (stage === 'potcar' || stage === 'incar') ensurePotSelection();
+    if (stage === 'potcar' || stage === 'inputs') ensurePotSelection();
     stageRoot().dataset.stage = stage;
     if (opts.tab && stage === 'structure') V().openRightTab(opts.tab);
     if (opts.tab && stage === 'analyze') S.analyzeTab = opts.tab;
-    if (opts.kmode) S.kpt.mode = opts.kmode;
     renderStepbar();
     renderStage();
     V().resize();
@@ -602,292 +496,44 @@ echo "POTCAR written:"; grep TITEL POTCAR
   };
 
   // ---------------------------------------------------------------------------
-  // Step 3: INCAR
+  // Step 4: Input files, made in the Input Builder (D-108)
   // ---------------------------------------------------------------------------
-  stageRenderers.incar = (body) => {
+  stageRenderers.inputs = (body) => {
     ensurePotSelection();
-    const species = V().getSpecies();
-    const tags = buildIncarTags();
-    const mm = magmomValue();
-    const magMode = V().getMagMode();
-    const showU = S.ldau || S.preset === 'PU';
-    body.innerHTML = `
-      <div class="sp-card">
-        <div class="sp-card-title">Calculation type ${helpBtn('Presets', 'Each preset is a VASPKIT-style starting point. Magnetism, DFT+U, SOC, van der Waals and the dipole correction are layered on top, and you can still edit any tag below.')}</div>
-        <div class="sp-grid2">
-          <label class="sp-field"><span>Preset</span><select id="in-preset" class="v-input">${Object.entries(D.INCAR_PRESETS).map(([id, p]) => `<option value="${id}" ${S.preset === id ? 'selected' : ''}>${id}: ${esc(p.name)}</option>`).join('')}</select></label>
-          <label class="sp-field"><span>ENCUT (eV) <label class="sp-inline"><input id="in-encut-auto" type="checkbox" ${S.encutAuto ? 'checked' : ''}/> auto 1.3 x ENMAX</label></span>
-            <input id="in-encut" type="number" step="10" class="v-input font-mono-code" value="${S.encut}" ${S.encutAuto ? 'disabled' : ''}/></label>
-        </div>
-      </div>
-
-      <div class="sp-card">
-        <div class="sp-card-title">Magnetism <span class="sp-badge">${mm ? (needsNoncollinear() ? 'non-collinear' : 'collinear, ISPIN = 2') : 'none set'}</span></div>
-        <div class="sp-note">Moments come from the 3D model (Structure > Magnetic tab), so INCAR always matches the spins you see. ${mm ? '' : 'No atom carries a moment yet.'}</div>
-        ${mm ? `<pre class="code-area sp-pre">MAGMOM = ${esc(mm)}</pre>` : ''}
-        <div class="sp-row wrap">
-          <button id="in-open-mag" class="v-btn">Edit spins in 3D (FM / AFM presets)</button>
-          <button id="in-default-mag" class="v-btn">Apply default FM moments</button>
-          <span class="text-mut text-[10.5px]">Viewer mode: ${esc(magMode)}</span>
-        </div>
-        <div class="sp-row wrap" style="margin-top:8px">
-          <label class="sp-inline"><input id="in-soc" type="checkbox" ${S.soc ? 'checked' : ''}/> Spin-orbit coupling (LSORBIT)</label>
-          <label class="sp-inline"><input id="in-ldau" type="checkbox" ${S.ldau ? 'checked' : ''}/> DFT+U (Dudarev)</label>
-          <label class="sp-inline"><input id="in-dipole" type="checkbox" ${S.dipole ? 'checked' : ''}/> Slab dipole correction</label>
-          <label class="sp-inline">vdW <select id="in-vdw" class="v-input py-0.5">
-            ${[[0, 'none'], [11, 'D3 zero (11)'], [12, 'D3-BJ (12)'], [20, 'TS (20)']].map(([v, l]) => `<option value="${v}" ${Number(S.vdw) === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
-        </div>
-        ${showU ? `<div class="sp-u-grid">${species.map(({ el }) => `<label class="sp-field"><span>U(${esc(el)}) eV ${uOrbital(el) > 0 ? `<i class="text-mut">l=${uOrbital(el)}</i>` : '<i class="text-mut">no d/f</i>'}</span>
-          <input data-u="${esc(el)}" type="number" step="0.1" class="v-input font-mono-code" value="${S.uMap[el] ?? defaultU(el)}"/></label>`).join('')}</div>
-          <div class="sp-note">Default U values are common literature choices (Dudarev, U_eff = U - J). They are starting points, not universal constants: use the values your project protocol fixes.</div>` : ''}
-      </div>
-
-      <div class="sp-card">
-        <div class="sp-card-title">Tags <span class="text-mut font-normal">edit a value; clear it to remove the tag</span></div>
-        <div class="tag-grid">${Object.entries(tags).map(([k, v]) => `<span class="font-mono-code tag-k">${esc(k)}</span><input class="v-input font-mono-code" data-tk="${esc(k)}" aria-label="INCAR tag ${esc(k)}" value="${esc(v)}"/>${helpBtn(k, D.INCAR_TAGS_HELP[k] || `VASP INCAR tag ${k}. See the VASP wiki.`)}`).join('')}</div>
-        <label class="sp-field" style="margin-top:8px"><span>Extra tags (one KEY = value per line)</span><textarea id="in-extra" class="code-area w-full" rows="3" placeholder="KPAR = 4&#10;NCORE = 8">${esc(S.extraTags)}</textarea></label>
-      </div>
-      ${checkList('incar')}
-      ${filePreview('INCAR', getIncar(), S.incarManual !== null ? '<button id="in-regen" class="v-btn py-0.5 px-2 text-[10.5px] text-amber-600">Regenerate (discard hand edits)</button>' : '<button id="in-hand" class="v-btn py-0.5 px-2 text-[10.5px]">Edit by hand</button>')}
-    `;
-    $('in-preset').onchange = (e) => { S.preset = e.target.value; S.tagEdits = {}; rerenderBody(); };
-    $('in-encut-auto').onchange = (e) => { S.encutAuto = e.target.checked; rerenderBody(); };
-    $('in-encut').onchange = (e) => { S.encut = Number(e.target.value) || 520; rerenderBody(); };
-    $('in-soc').onchange = (e) => { S.soc = e.target.checked; rerenderBody(); };
-    $('in-ldau').onchange = (e) => { S.ldau = e.target.checked; rerenderBody(); };
-    $('in-dipole').onchange = (e) => { S.dipole = e.target.checked; rerenderBody(); };
-    $('in-vdw').onchange = (e) => { S.vdw = Number(e.target.value); rerenderBody(); };
-    $('in-open-mag').onclick = () => go('structure', { tab: 'magnetic' });
-    $('in-default-mag').onclick = () => {
-      const map = {};
-      elements().forEach((el) => { const d = D.MAGNETIC_DEFAULTS[el]; if (d) map[el] = d.magmom; });
-      if (!Object.keys(map).length) { V().toast('No species with a default moment (3d/4d/5d/4f)'); return; }
-      V().setMomentsByElement(map);
-      V().toast('Applied default ferromagnetic moments');
-    };
-    body.querySelectorAll('[data-u]').forEach((i) => { i.onchange = () => { S.uMap[i.dataset.u] = Number(i.value); rerenderBody(); }; });
-    body.querySelectorAll('[data-tk]').forEach((i) => { i.onchange = () => { S.tagEdits[i.dataset.tk] = i.value.trim(); rerenderBody(); }; });
-    $('in-extra').onchange = (e) => { S.extraTags = e.target.value; rerenderBody(); };
-    const ta = body.querySelector('textarea[data-file="INCAR"]');
-    const hand = $('in-hand');
-    if (hand) hand.onclick = () => { S.incarManual = getIncar(); rerenderBody(); };
-    const regen = $('in-regen');
-    if (regen) regen.onclick = () => { S.incarManual = null; rerenderBody(); };
-    if (S.incarManual !== null) { ta.readOnly = false; ta.oninput = () => { S.incarManual = ta.value; }; ta.onchange = () => renderStepbar(); }
-    bindFileButtons(body, () => getIncar());
-  };
-
-  // ---------------------------------------------------------------------------
-  // Step 4: KPOINTS
-  // ---------------------------------------------------------------------------
-  stageRenderers.kpoints = (body) => {
-    const k = S.kpt;
-    const B = recipLengths();
-    const m = currentMesh();
-    const lp = V().getLatticeParams();
-    const bp = V().bandPathLabel();
-    const sym = V().getSymmetry();
-    body.innerHTML = `
-      <div class="sp-card">
-        <div class="sp-card-title">KPOINTS type</div>
-        <div class="seg">${[['spacing', 'Mesh from k-spacing'], ['manual', 'Explicit N1 x N2 x N3'], ['line', 'Band path (line mode)']].map(([v, l]) => `<button class="${k.mode === v ? 'on' : ''}" data-kmode="${v}">${l}</button>`).join('')}</div>
-      </div>
-      ${k.mode !== 'line' ? `
-      <div class="sp-card">
-        <div class="sp-grid2">
-          ${k.mode === 'spacing' ? `<label class="sp-field"><span>k-spacing (2pi/A) ${helpBtn('k-spacing', 'VASPKIT convention: N_i = max(1, ceil(|b_i| / (2 pi x spacing))), with |b_i| including the 2 pi factor. 0.04 is a quick test, 0.03 is accurate, 0.02 is very accurate. Confirm with the k-convergence test (step 5).')}</span>
-            <input id="kp-spc" type="number" step="0.005" min="0.005" class="v-input font-mono-code" value="${k.spacing}"/></label>`
-          : `<label class="sp-field"><span>N1 x N2 x N3</span><span class="sp-row">${[0, 1, 2].map((i) => `<input data-kn="${i}" type="number" min="1" class="v-input font-mono-code w-16 text-center" value="${k.manual[i]}"/>`).join('<span>x</span>')}</span></label>`}
-          <label class="sp-field"><span>Centring ${helpBtn('Gamma or Monkhorst-Pack', 'Gamma-centred meshes keep the full symmetry of hexagonal cells and always include Gamma. Monkhorst-Pack with even N shifts the grid off Gamma.')}</span>
-            <select id="kp-scheme" class="v-input">${['Gamma', 'Monkhorst-Pack'].map((s) => `<option ${k.scheme === s ? 'selected' : ''}>${s}</option>`).join('')}</select></label>
-        </div>
-        <label class="sp-inline" style="margin-top:8px"><input id="kp-2d" type="checkbox" ${k.force2D ? 'checked' : ''}/> Force N3 = 1 (slab / 2D layer)${looks2D() ? ' <span class="sp-badge">vacuum detected</span>' : ''}</label>
-        <div class="sp-stats">
-          <div><span>Mesh</span><b class="font-mono-code text-blue-500">${m.join(' x ')}</b></div>
-          <div><span>Grid points</span><b class="font-mono-code">${m[0] * m[1] * m[2]}</b></div>
-          <div><span>|b1|, |b2|, |b3| (1/A)</span><b class="font-mono-code">${B.map((x) => x.toFixed(3)).join(', ')}</b></div>
-          <div><span>a, b, c (A) | gamma</span><b class="font-mono-code">${[lp.a, lp.b, lp.c].map((x) => x.toFixed(3)).join(', ')} | ${lp.gamma.toFixed(1)}</b></div>
-        </div>
-        <div class="sp-row wrap"><button id="kp-to-conv" class="v-btn">Not sure? Run a k-convergence test (step 5)</button></div>
-      </div>` : `
-      <div class="sp-card">
-        <div class="sp-card-title">High-symmetry path ${helpBtn('Band path', 'The path follows Setyawan and Curtarolo (2010) for the Bravais lattice found by the Symmetry tab. For publication-quality paths on low-symmetry cells you can run SeekPath (HPKOT convention, same as VASPKIT 303) in the browser.')}</div>
-        <div class="sp-stats">
-          <div><span>Lattice key</span><b class="font-mono-code">${esc(bp.key)}</b></div>
-          <div><span>Space group</span><b class="font-mono-code">${sym && sym.estSG ? esc(sym.estSG) + ' (estimate)' : 'run Symmetry'}</b></div>
-        </div>
-        <div class="font-mono-code text-[11px] text-blue-500" style="margin:6px 0">${esc(S.kpt.lineOverride ? S.kpt.lineNote : bp.path)}</div>
-        <div class="sp-row wrap">
-          <label class="sp-inline">Points per segment <input id="kp-nseg" type="number" min="5" step="5" class="v-input w-16 font-mono-code text-center" value="${k.nseg}"/></label>
-          <button id="kp-seek" class="v-btn">SeekPath (WebAssembly)</button>
-          ${S.kpt.lineOverride ? '<button id="kp-seek-clear" class="v-btn">Use built-in path</button>' : ''}
-          <button id="kp-sym" class="v-btn">Open Symmetry tab</button>
-        </div>
-        ${!S.kpt.lineOverride && /-(F|I|C|A)\b|^(FCC|BCC|ORC[FIC]|BCT|MCLC)/i.test(bp.key) ? '<div class="sp-note warn">Centred lattice: these path coordinates are for the primitive cell. If the viewer shows the conventional cell, convert it first (Structure &gt; Cell &gt; Conv to Prim) or use SeekPath.</div>' : ''}
-        <div id="kp-msg" class="sp-note"></div>
-        ${S.preset !== 'BS' && S.preset !== 'SO' ? '<div class="sp-note warn">A band path needs a non-SCF run. <button id="kp-set-bs" class="sp-link">Switch INCAR to the band-structure preset</button></div>' : ''}
-      </div>`}
-      ${checkList('kpoints')}
-      ${filePreview('KPOINTS', getKpoints())}
-    `;
-    body.querySelectorAll('[data-kmode]').forEach((b) => { b.onclick = () => { S.kpt.mode = b.dataset.kmode; rerenderBody(); }; });
-    const spc = $('kp-spc'); if (spc) spc.onchange = () => { S.kpt.spacing = Number(spc.value) || 0.03; rerenderBody(); };
-    body.querySelectorAll('[data-kn]').forEach((i) => { i.onchange = () => { S.kpt.manual[Number(i.dataset.kn)] = Math.max(1, parseInt(i.value, 10) || 1); rerenderBody(); }; });
-    const sch = $('kp-scheme'); if (sch) sch.onchange = () => { S.kpt.scheme = sch.value; rerenderBody(); };
-    const d2 = $('kp-2d'); if (d2) d2.onchange = () => { S.kpt.force2D = d2.checked; rerenderBody(); };
-    const tc = $('kp-to-conv'); if (tc) tc.onclick = () => go('kconv');
-    const ns = $('kp-nseg'); if (ns) ns.onchange = () => { S.kpt.nseg = Math.max(5, parseInt(ns.value, 10) || 30); rerenderBody(); };
-    const sy = $('kp-sym'); if (sy) sy.onclick = () => go('structure', { tab: 'symmetry' });
-    const bs = $('kp-set-bs'); if (bs) bs.onclick = () => { S.preset = 'BS'; S.tagEdits = {}; rerenderBody(); V().toast('INCAR preset set to band structure'); };
-    const sc = $('kp-seek-clear'); if (sc) sc.onclick = () => { S.kpt.lineOverride = null; rerenderBody(); };
-    const sk = $('kp-seek');
-    if (sk) sk.onclick = async () => {
-      const msg = $('kp-msg');
-      msg.textContent = 'Loading Python (Pyodide) and SeekPath in the browser. The first run downloads about 30 MB...';
-      try {
-        await window.WasmEngine.ensureReady(updateWasmPill);
-        const res = await window.WasmEngine.seekpath(V().getPOSCAR(), S.kpt.nseg);
-        S.kpt.lineOverride = res.kpoints_text;
-        S.kpt.lineNote = `SeekPath ${res.bravais} (SG #${res.spacegroup_number}): ${res.path_string}. Note: SeekPath may standardize the cell; use its primitive cell for the band run.`;
-        rerenderBody();
-      } catch (e) { msg.textContent = 'SeekPath failed: ' + e.message; }
-    };
-    const ta = body.querySelector('textarea[data-file="KPOINTS"]');
-    bindFileButtons(body, () => ta.value);
-  };
-
-  // ---------------------------------------------------------------------------
-  // Step 6: Run bundle
-  // ---------------------------------------------------------------------------
-  const B = { name: 'vasp_job', sched: 'slurm', cores: 32, nodes: 1, walltime: '24:00:00', exe: 'auto', sweep: false, sweepVals: '400 450 500 550 600', kconv: true, potMode: 'real', tab: 'POSCAR' };
-  function vaspExe() {
-    if (B.exe !== 'auto') return B.exe;
-    if (needsNoncollinear()) return 'vasp_ncl';
-    if (S.kpt.mode !== 'line' && currentMesh().every((n) => n === 1) && S.kpt.scheme === 'Gamma') return 'vasp_gam';
-    return 'vasp_std';
-  }
-  function jobScript() {
-    const run = `mpirun -np ${B.cores * B.nodes} ${vaspExe()} > vasp.out 2>&1`;
-    const body = B.sweep
-      ? `for d in ENCUT_*/; do\n  (\n    cd "$d" || exit 1\n    [ -f POTCAR ] || bash ../make_potcar.sh || exit 1\n    ${run}\n  )\ndone\n# Summary: last TOTEN of every ENCUT folder\nfor d in ENCUT_*/; do echo "$d $(grep TOTEN "$d"OUTCAR | tail -n 1)"; done`
-      : `[ -f POTCAR ] || bash make_potcar.sh || exit 1\n${run}`;
-    if (B.sched === 'slurm') return `#!/bin/bash\n#SBATCH -J ${B.name}\n#SBATCH -N ${B.nodes}\n#SBATCH --ntasks-per-node=${B.cores}\n#SBATCH -t ${B.walltime}\n#SBATCH -o slurm.%j.out\n# module load vasp   (adapt to your cluster)\ncd "$SLURM_SUBMIT_DIR"\n${body}\n`;
-    if (B.sched === 'pbs') return `#!/bin/bash\n#PBS -N ${B.name}\n#PBS -l nodes=${B.nodes}:ppn=${B.cores}\n#PBS -l walltime=${B.walltime}\n#PBS -j oe\n# module load vasp   (adapt to your cluster)\ncd "$PBS_O_WORKDIR"\n${body}\n`;
-    return `#!/bin/bash\n# Local run\n${body}\n`;
-  }
-  function jobName() { return B.sched === 'slurm' ? 'job.slurm' : B.sched === 'pbs' ? 'job.pbs' : 'run.sh'; }
-  function bundleFiles() {
-    const f = { POSCAR: V().getPOSCAR(), INCAR: getIncar(), KPOINTS: getKpoints(), 'make_potcar.sh': makePotcarScript() };
-    f[jobName()] = jobScript();
-    f['README.txt'] = readmeText();
-    return f;
-  }
-  function readmeText() {
     const st = V().getStructure();
-    const c = checks();
-    return `Material Builder job bundle: ${B.name}
-Structure : ${st.name} (${st.atoms.length} atoms)
-POTCAR    : ${S.potFunc}: ${elements().map((el) => S.potSel[el]).join(' ')}
-INCAR     : ${(D.INCAR_PRESETS[S.preset] || {}).name}, ENCUT = ${buildIncarTags().ENCUT} eV
-KPOINTS   : ${S.kpt.mode === 'line' ? 'band path (line mode)' : currentMesh().join('x') + ' ' + S.kpt.scheme}
-Executable: ${vaspExe()}
-
-How to run
-1. Copy this folder to the cluster.
-2. ${S.ppLibrary === true && B.potMode === 'real' ? 'POTCAR is included.' : 'export VASP_PP_PATH=/path/to/your/pp/library, then bash make_potcar.sh (the job script also does this if POTCAR is missing).'}
-3. Submit ${jobName()}.
-${B.sweep ? `\nENCUT sweep folders: ${B.sweepVals}. Compare TOTEN per atom; pick the lowest ENCUT within 1 meV/atom of the highest.\n` : ''}${B.kconv ? '\nkpoint_convergence/ holds the k-point convergence test (see its README.md).\n' : ''}
-Checks at export
-${c.length ? c.map((x) => `- [${x.level}] ${x.msg}`).join('\n') : '- none'}
-`;
-  }
-  stageRenderers.bundle = (body) => {
-    const files = bundleFiles();
-    if (!files[B.tab]) B.tab = 'POSCAR';
-    const c = checks();
-    const kc = window.StudioKConv && window.StudioKConv.outputs();
+    const tasks = (window.SiteBridge && window.SiteBridge.tasks) || [];
+    if (!tasks.some((t) => t.id === S.task)) S.task = tasks.length ? tasks[0].id : 'relax';
+    const mm = magmomText();
+    const me = maxEnmax();
+    const sys = systemHint();
+    const rows = [
+      ['structure', '', 'Structure', st ? `${st.name}, ${st.atoms.length} atoms` : 'none yet'],
+      ['potcar', '', 'POTCAR', `${S.potFunc}: ${elements().map((el) => S.potSel[el] || el).join(' ')}`],
+      ['potcar', '', 'Largest ENMAX', me ? `${me.toFixed(1)} eV, so ENCUT is filled in` : 'not known (load a POTCAR library or type ENMAX there)'],
+      ['structure', 'magnetic', 'MAGMOM', mm ? mm : 'none (set spins in Structure > Magnetic)'],
+      ['structure', '', 'System', sys === 'slab' ? 'slab (vacuum along c)' : sys === 'molecule' ? 'molecule in a box' : 'bulk crystal'],
+      ['kconv', '', 'k-mesh', S.kmesh ? `${S.kmesh.join(' x ')} from the k-point test` : 'chosen in the Input Builder (or run the optional k-point test)'],
+    ];
     body.innerHTML = `
       <div class="sp-card">
-        <div class="sp-card-title">Pre-flight checks <span class="sp-badge ${c.some((x) => x.level === 'warn') ? 'warn' : 'ok'}">${c.filter((x) => x.level === 'warn').length} warnings</span></div>
-        <div class="sp-summary">
-          ${[['structure', 'POSCAR', `${V().getStructure().name}, ${V().getStructure().atoms.length} atoms${V().isSelective() ? ', selective dynamics' : ''}`],
-             ['potcar', 'POTCAR', `${S.potFunc}: ${elements().map((el) => S.potSel[el]).join(' ')}`],
-             ['incar', 'INCAR', `${(D.INCAR_PRESETS[S.preset] || {}).name}, ENCUT ${buildIncarTags().ENCUT} eV`],
-             ['kpoints', 'KPOINTS', S.kpt.mode === 'line' ? 'band path' : `${currentMesh().join('x')} ${S.kpt.scheme}`],
-             ['kconv', 'k-convergence', kc ? `${kc.meshes.length} meshes ready` : 'not set up (optional)']]
-            .map(([st, l, v]) => `<button class="sp-sum-row" data-goto="${st}"><span>${l}</span><b>${esc(v)}</b><i>edit</i></button>`).join('')}
+        <div class="sp-card-title">Make INCAR, KPOINTS and the job script ${helpBtn('Why the Input Builder?', 'The Input Builder is the one place on the site that writes VASP inputs. It opens with this structure and everything listed here already filled in, checks the INCAR with the sourced validation rules, and writes the job script and a zip.')}</div>
+        <label class="sp-field"><span>What do you want to calculate?</span><select id="in-task" class="v-input">${tasks.map((t) => `<option value="${esc(t.id)}" ${S.task === t.id ? 'selected' : ''}>${esc(t.title)}</option>`).join('')}</select></label>
+        <div class="sp-summary" style="margin-top:8px">
+          ${rows.map(([stage, tab, l, v]) => `<button class="sp-sum-row" data-goto="${stage}" data-tab="${tab}"><span>${esc(l)}</span><b>${esc(v)}</b><i>edit</i></button>`).join('')}
         </div>
-        ${c.length ? `<div class="sp-checks">${c.map((x) => `<div class="sp-check ${x.level}"><span>${x.level === 'warn' ? '!' : 'i'}</span><div>${esc(x.msg)}${x.level === 'warn' ? ` <button class="sp-link" data-goto="${x.stage}">fix</button>` : ''}</div></div>`).join('')}</div>` : ''}
-      </div>
-      <div class="sp-card">
-        <div class="sp-card-title">Job settings</div>
-        <div class="sp-grid3">
-          <label class="sp-field"><span>Job name</span><input id="bn-name" class="v-input" value="${esc(B.name)}"/></label>
-          <label class="sp-field"><span>Scheduler</span><select id="bn-sched" class="v-input">${[['slurm', 'Slurm'], ['pbs', 'PBS'], ['local', 'Local shell']].map(([v, l]) => `<option value="${v}" ${B.sched === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
-          <label class="sp-field"><span>Executable</span><select id="bn-exe" class="v-input">${['auto', 'vasp_std', 'vasp_gam', 'vasp_ncl'].map((v) => `<option ${B.exe === v ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
-          <label class="sp-field"><span>Nodes</span><input id="bn-nodes" type="number" min="1" class="v-input" value="${B.nodes}"/></label>
-          <label class="sp-field"><span>Cores per node</span><input id="bn-cores" type="number" min="1" class="v-input" value="${B.cores}"/></label>
-          <label class="sp-field"><span>Wall time</span><input id="bn-wall" class="v-input font-mono-code" value="${esc(B.walltime)}"/></label>
+        <div class="sp-row wrap" style="margin-top:10px">
+          <button id="in-send" class="v-btn v-btn-primary">Open in the Input Builder</button>
+          ${S.ppLibrary === true ? '<button id="in-potcar" class="v-btn">Download POTCAR</button>' : ''}
         </div>
-        <label class="sp-inline"><input id="bn-sweep" type="checkbox" ${B.sweep ? 'checked' : ''}/> ENCUT convergence sweep:</label>
-        <input id="bn-sweep-v" class="v-input font-mono-code" aria-label="ENCUT values for the sweep (eV)" value="${esc(B.sweepVals)}" ${B.sweep ? '' : 'disabled'}/>
-        <label class="sp-inline" style="margin-top:6px"><input id="bn-kconv" type="checkbox" ${B.kconv && kc ? 'checked' : ''} ${kc ? '' : 'disabled'}/> Include kpoint_convergence/ folder ${kc ? '' : '(set up step 5 first)'}</label>
-        <label class="sp-inline" style="margin-top:6px"><input id="bn-realpot" type="checkbox" ${B.potMode === 'real' ? 'checked' : ''} ${S.ppLibrary === true ? '' : 'disabled'}/> Include real POTCAR ${S.ppLibrary === true ? '' : '(load the POTCAR library in step 2 first; make_potcar.sh is used until then)'}</label>
-        <div class="sp-row" style="margin-top:10px"><button id="bn-zip" class="v-btn v-btn-primary">Download ${esc(B.name)}.zip</button><span id="bn-st" class="text-[11px] text-mut"></span></div>
+        <div class="sp-note">Everything above travels with the structure. POTCAR stays here: ${S.ppLibrary === true ? 'download it with the button above and put it next to the other files.' : 'load your library in step 2 to download it, or run make_potcar.sh on your cluster.'}</div>
       </div>
-      <div class="sp-card">
-        <div class="seg">${Object.keys(files).map((n) => `<button class="${B.tab === n ? 'on' : ''}" data-btab="${esc(n)}">${esc(n)}</button>`).join('')}</div>
-        ${filePreview(B.tab, files[B.tab])}
-      </div>`;
-    body.querySelectorAll('[data-goto]').forEach((b) => { b.onclick = () => go(b.dataset.goto); });
-    body.querySelectorAll('[data-btab]').forEach((b) => { b.onclick = () => { B.tab = b.dataset.btab; rerenderBody(); }; });
-    const bind = (id, key, num) => { $(id).onchange = (e) => { B[key] = num ? Math.max(1, parseInt(e.target.value, 10) || 1) : e.target.value; rerenderBody(); }; };
-    bind('bn-name', 'name'); bind('bn-sched', 'sched'); bind('bn-exe', 'exe'); bind('bn-nodes', 'nodes', true); bind('bn-cores', 'cores', true); bind('bn-wall', 'walltime'); bind('bn-sweep-v', 'sweepVals');
-    $('bn-sweep').onchange = (e) => { B.sweep = e.target.checked; rerenderBody(); };
-    $('bn-kconv').onchange = (e) => { B.kconv = e.target.checked; rerenderBody(); };
-    $('bn-realpot').onchange = (e) => { B.potMode = e.target.checked ? 'real' : 'script'; rerenderBody(); };
-    bindFileButtons(body, (n) => bundleFiles()[n]);
-    $('bn-zip').onclick = async () => {
-      if (!window.JSZip) { V().toast('JSZip could not load (offline?)'); return; }
-      const st = $('bn-st');
-      st.textContent = 'Packing...';
-      try {
-        const zip = new JSZip();
-        const root = zip.folder(B.name);
-        const f = bundleFiles();
-        let potcar = null;
-        if (B.potMode === 'real' && S.ppLibrary === true) potcar = await realPotcar();
-        const put = (dir, extraIncar) => {
-          dir.file('POSCAR', f.POSCAR);
-          dir.file('INCAR', extraIncar || f.INCAR);
-          dir.file('KPOINTS', f.KPOINTS);
-          if (potcar) dir.file('POTCAR', potcar);
-        };
-        if (B.sweep) {
-          B.sweepVals.split(/[\s,]+/).filter(Boolean).forEach((ec) => {
-            const inc = /^\s*ENCUT\s*=.*$/m.test(f.INCAR) ? f.INCAR.replace(/^\s*ENCUT\s*=.*$/m, `ENCUT         = ${ec}`) : f.INCAR + `ENCUT = ${ec}\n`;
-            put(root.folder(`ENCUT_${ec}`), inc);
-          });
-        } else put(root);
-        root.file('make_potcar.sh', f['make_potcar.sh'], { unixPermissions: '755' });
-        root.file(jobName(), f[jobName()], { unixPermissions: '755' });
-        root.file('README.txt', f['README.txt']);
-        if (B.kconv && kc) {
-          const kd = root.folder('kpoint_convergence');
-          kd.file('kpoint_convergence.py', kc.script, { unixPermissions: '755' });
-          kd.file('INCAR', kc.incar);
-          kd.file('README.md', kc.readme);
-          kd.file('POSCAR', kc.poscarText);
-          kd.file('make_potcar.sh', f['make_potcar.sh'], { unixPermissions: '755' });
-          if (potcar) kd.file('POTCAR', potcar);
-        }
-        const blob = await zip.generateAsync({ type: 'blob', platform: 'UNIX' });
-        downloadBlob(`${B.name}.zip`, blob);
-        S.bundleDone = true;
-        st.textContent = `Downloaded ${B.name}.zip`;
-        renderStepbar();
-      } catch (e) { st.textContent = 'Failed: ' + e.message; }
-    };
+      ${checkList()}
+    `;
+    $('in-task').onchange = (e) => { S.task = e.target.value; };
+    body.querySelectorAll('[data-goto]').forEach((b) => { b.onclick = () => go(b.dataset.goto, b.dataset.tab ? { tab: b.dataset.tab } : {}); });
+    $('in-send').onclick = () => { S.visited.add('inputs'); sendSite('input-builder', { task: S.task }); };
+    const pot = $('in-potcar');
+    if (pot) pot.onclick = async () => { try { downloadText('POTCAR', await realPotcar()); } catch (e) { V().toast(`${e.message}. Load the folder that contains it.`); } };
   };
 
   // ---------------------------------------------------------------------------
@@ -927,7 +573,7 @@ ${c.length ? c.map((x) => `- [${x.level}] ${x.msg}`).join('\n') : '- none'}
   const COMMANDS = [
     ...STEPS.map((s) => ({ code: String(s.n), name: `Step ${s.n}: ${s.label}`, cat: s.sub, target: { stage: s.id } })),
     ...D.CATALOG.flatMap((g) => g.items.map(([code, name, target]) => ({ code, name, cat: g.cat, target }))),
-    { code: '-', name: 'Download run bundle (.zip)', cat: 'Run', target: { stage: 'bundle' } },
+    { code: '-', name: 'Make INCAR, KPOINTS and the job script (Input Builder)', cat: 'Run', target: { stage: 'inputs' } },
     { code: '-', name: 'Full structural report (CONTCAR)', cat: 'Structure', target: { stage: 'structure', tab: 'symmetry' } },
   ];
   let cmdSel = 0;
@@ -936,7 +582,26 @@ ${c.length ? c.map((x) => `- [${x.level}] ${x.msg}`).join('\n') : '- none'}
     const q = $('cmd-input').value.trim().toLowerCase();
     return COMMANDS.filter((c) => !q || `${c.code} ${c.name} ${c.cat}`.toLowerCase().includes(q)).slice(0, 14);
   }
-  function runCmd(c) { closeModal('cmd-modal'); go(c.target.stage, c.target); }
+  // A target with send opens the structure in a site tool (k-path, Magnetic, Input Builder); others are Builder steps.
+  // What the Builder knows travels with the structure (D-108): the largest ENMAX and the POTCAR variants in POSCAR order,
+  // whether the cell is a slab or a molecule, and a mesh chosen in the k-point test.
+  function potcarHandoff() {
+    ensurePotSelection();
+    const enmax = maxEnmax();
+    return {
+      enmax: enmax > 0 ? enmax : undefined,
+      potcar: elements().map((el) => S.potSel[el] || el).join(' '),
+      system: systemHint(),
+      kpoints: kmeshText(),
+    };
+  }
+  function sendSite(tool, more) {
+    const B = window.SiteBridge;
+    if (!B) return;
+    const extra = Object.assign(potcarHandoff(), more || {});
+    if (!B.sendTo(tool, V().getPOSCAR(), (V().getStructure() && V().getStructure().name) || 'structure', magmomText(), extra)) V().toast('Browser storage is unavailable, so the hand-off could not be made.');
+  }
+  function runCmd(c) { closeModal('cmd-modal'); if (c.target.send) { sendSite(c.target.send, c.target.task ? { task: c.target.task } : undefined); return; } go(c.target.stage, c.target); }
   function renderCmd() {
     const hits = cmdHits();
     cmdSel = Math.min(cmdSel, Math.max(0, hits.length - 1));
@@ -985,16 +650,16 @@ ${c.length ? c.map((x) => `- [${x.level}] ${x.msg}`).join('\n') : '- none'}
       if (e.key === 'Escape') ['cmd-modal', 'lib-modal', 'help-modal'].forEach(closeModal);
     });
     $('wasm-pill').onclick = () => window.WasmEngine.ensureReady(updateWasmPill).catch((e) => V().toast(e.message));
-    $('btn-guide').onclick = () => showHelp('How the Material Builder works', { meaning: 'Work left to right along the steps at the top. 1 Structure: load a sample, the 350-crystal library, or your own POSCAR/CIF; build supercells, slabs and defects; set spins in the Magnetic tab. 2 POTCAR: pick variants, ENCUT follows. 3 INCAR: choose a preset, add magnetism, DFT+U, SOC. 4 KPOINTS: mesh or band path. 5 (optional) k-point convergence test. 6 Run bundle: checks plus a ready-to-submit .zip. 7 Analyze: plot DOS, bands, EOS, phonons and MD.', when: 'Every step reads the live 3D structure, so going back and editing the structure updates all files. Use Find a tool in the toolbar to jump to any VASPKIT function by number or name.' });
+    $('btn-guide').onclick = () => showHelp('How the Material Builder works', { meaning: 'Work left to right along the steps at the top. 1 Structure: load a sample, the 350-crystal library, or your own POSCAR or CIF; build supercells, slabs and defects; set spins in the Magnetic tab. 2 POTCAR: pick variants; the largest ENMAX sets ENCUT later. 3 (optional) k-point test: a driver script that runs a mesh series. 4 Input files: the Input Builder opens with the structure, spins, POTCAR choices and mesh filled in, and writes INCAR, KPOINTS and the job script. 5 Analyze: plot DOS, bands, EOS, phonons and MD from your outputs.', when: 'Band paths come from the k-path tool and FM or AFM orderings from the Magnetic tool: the Symmetry and Magnetic tabs send the structure there. Use Find a tool in the toolbar to jump to any VASPKIT function by number or name.' });
     ppRestore().then((n) => {
-      if (n) { S.ppLibrary = true; renderStepbar(); if (S.stage === 'potcar' || S.stage === 'bundle') renderStage(); }
+      if (n) { S.ppLibrary = true; renderStepbar(); if (S.stage === 'potcar' || S.stage === 'inputs') renderStage(); }
       else probeLocalLibrary();
     });
     renderStepbar();
     V().refresh();
   }
 
-  window.Studio = { getIncar, getKpoints, useBandPath: () => { S.kpt.mode = 'line'; go('kpoints'); }, go, setMesh: (m) => { S.kpt.mode = 'manual'; S.kpt.manual = m.slice(); S.visited.add('kpoints'); } };
-  window.StudioKit = { importPotcarFiles, maxEnmax, S, V, $, esc, helpBtn, filePreview, bindFileButtons, downloadText, downloadBlob, readFileText, plot, plotLayout, getIncar, getKpoints, currentMesh, go, rerenderBody, renderStepbar, stageRenderers, updateWasmPill, copyText, elements };
+  window.Studio = { go, setMesh: (m) => { S.kmesh = m.slice(); } };
+  window.StudioKit = { importPotcarFiles, maxEnmax, potcarHandoff, sendSite, S, V, $, esc, helpBtn, filePreview, bindFileButtons, downloadText, downloadBlob, readFileText, plot, plotLayout, baseIncar, go, rerenderBody, renderStepbar, stageRenderers, updateWasmPill, copyText, elements };
   setTimeout(init, 0);
 })();

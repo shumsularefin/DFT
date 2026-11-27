@@ -8,6 +8,9 @@ export default function SettingsStep() {
   const [query, setQuery] = useState('');
   const [group, setGroup] = useState('');
   const [toAdd, setToAdd] = useState('');
+  const [custom, setCustom] = useState('');
+  const customName = custom.trim().toUpperCase();
+  const customOk = /^[A-Z][A-Z0-9_]{0,31}$/.test(customName) && !s.entries.some((e) => e.name === customName);
 
   const rows = useMemo(
     () =>
@@ -113,6 +116,35 @@ export default function SettingsStep() {
           Reset to preset
         </button>
       </div>
+      <div className="ib-row">
+        <div className="ib-field">
+          <label htmlFor="ib-custom">
+            Or type a tag the database does not list (for example IMAGES for NEB)
+          </label>
+          <input
+            id="ib-custom"
+            value={custom}
+            spellCheck={false}
+            onChange={(e) => setCustom(e.target.value)}
+            placeholder="TAG"
+          />
+        </div>
+        <button
+          type="button"
+          disabled={!customOk}
+          onClick={() => {
+            s.setEntry(customName, '<enter a value>');
+            s.set('selectedTag', customName);
+            setCustom('');
+          }}
+        >
+          Add this tag
+        </button>
+      </div>
+      <p className="ib-small">
+        A tag that is not in the database has no explanation or rule check here. Look it up in the VASP wiki
+        before you run.
+      </p>
 
       {s.structure && hasMag && (
         <fieldset className="ib-fieldset">
