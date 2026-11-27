@@ -201,7 +201,7 @@ export default function QuestionCard({ question: q, figure, onResult, startHints
           </button>
           <button
             type="button"
-            className="btn"
+            className="btn btn-ghost"
             onClick={() => setHints((h) => h + 1)}
             disabled={hints >= q.hints.length}
           >
@@ -211,7 +211,7 @@ export default function QuestionCard({ question: q, figure, onResult, startHints
                 ? 'No more hints'
                 : `Show a hint (${hints + 1} of ${q.hints.length})`}
           </button>
-          <button type="button" className="btn" onClick={unsure}>
+          <button type="button" className="btn btn-ghost" onClick={unsure}>
             I am not sure
           </button>
         </div>

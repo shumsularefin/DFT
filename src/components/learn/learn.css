@@ -2,42 +2,120 @@
 .lp {
   display: grid;
   gap: var(--space-4);
-  margin-block: var(--space-4);
+  align-items: start;
+  margin-block: 0;
+}
+@media (min-width: 64rem) {
+  .lp {
+    grid-template-columns: 18.75rem minmax(0, 1fr);
+  }
+  .lp-jump {
+    position: sticky;
+    top: calc(var(--topbar-h) + var(--space-5));
+  }
+}
+.lp-main {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+.lp-main p {
+  max-width: none;
+}
+/* Station list (template #path): one row per station, a tag, the title */
+.lp-jump .card-h {
+  margin-bottom: var(--space-2);
+}
+.lp-seen {
+  font-size: var(--step--1);
+  font-weight: 400;
+  color: var(--text-muted);
 }
 .lp-jump ol {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+  display: grid;
+  gap: 2px;
   list-style: none;
   margin: 0;
   padding: 0;
+  max-width: none;
+}
+.lp-jump li {
+  margin: 0;
 }
 .lp-dot {
-  min-width: 2.75rem;
-  min-height: 2.75rem;
-  border: 1px solid var(--border-strong);
-  border-radius: 999px;
-  background: var(--bg);
-  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: 2rem;
+  padding: 0.3rem 0.5rem;
   font: inherit;
+  font-size: var(--step--1);
+  text-align: start;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius);
   cursor: pointer;
 }
+.lp-dot:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+}
 .lp-dot[aria-current='step'] {
-  background: var(--accent);
-  color: var(--bg);
-  border-color: var(--accent);
+  color: var(--text);
+  background: var(--accent-soft);
+}
+.lp-tag {
+  flex: none;
+  min-width: 5.75rem;
+  padding: 0.05rem 0.5rem;
+  white-space: nowrap;
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-align: center;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+.lp-tag.is-seen {
+  color: var(--ok);
+  background: var(--ok-soft);
+  border-color: color-mix(in srgb, var(--ok) 30%, transparent);
+}
+/* Part of the button's accessible name ("Station 7: ..."), invisible in the pill. Inline, so no space is added before it. */
+.lp-colon {
+  opacity: 0;
+  margin-inline-end: -0.3em;
+}
+.lp-name {
+  min-width: 0;
+  line-height: 1.35;
 }
 .lp-dot:focus-visible,
 .lp-title:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
+.lp-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
 .lp-count {
   margin: 0;
+  font-size: var(--step--1);
   color: var(--text-muted);
 }
-.lp-title {
-  margin: 0;
+main .lp-title {
+  margin: var(--space-1) 0 0;
+  font-size: var(--step-2);
+}
+.lp-bar {
+  margin-top: calc(-1 * var(--space-1));
 }
 .lp-body {
   display: grid;
@@ -82,6 +160,7 @@
   border-radius: var(--radius);
   padding: var(--space-3);
   margin: var(--space-4) 0;
+  background: var(--bg);
 }
 .lp-try-head {
   font-weight: 600;
@@ -97,7 +176,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  min-height: 2.75rem;
+  min-height: var(--target);
   padding: 0 var(--space-3);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius);
@@ -114,7 +193,7 @@
 .lp-nav {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 .lp-hint,
 .lp-sources {
@@ -130,4 +209,12 @@
     transition: none !important;
     animation: none !important;
   }
+}
+.lp-hint {
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+}
+.lp-main .lp-hint,
+.lp-main .lp-sources {
+  font-size: var(--step--1);
 }

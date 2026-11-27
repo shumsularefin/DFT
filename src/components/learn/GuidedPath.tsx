@@ -1,8 +1,8 @@
 // Guided path (M12.4): one station at a time. A station is one picture (a scene preset or a plot), three short sentences,
 // one thing to try and a link to the full topic. One Scene island is reused for every scene station, so at most one WebGL
 // canvas exists on the page (D-058), and it exists only after the reader presses "View in 3D".
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { markComplete, markVisited } from '../../stores/progress';
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { markComplete, markVisited, progressServerSnapshot, progressStore } from '../../stores/progress';
 import { resolveStation, topicHref, type Station } from '../../lib/learn/stations';
 import type { SceneSpec } from '../../lib/scene/spec';
 import Badge from '../ui/Badge';
@@ -40,6 +40,11 @@ export default function GuidedPath({ stations, scenes }: Props) {
   const moved = useRef(false);
   const st = stations[index]!;
   const last = index === stations.length - 1;
+  const progress = useSyncExternalStore(
+    progressStore.subscribe,
+    progressStore.getState,
+    progressServerSnapshot,
+  );
 
   useEffect(() => setIndex(fromHash(stations)), [stations]);
 
@@ -118,125 +123,149 @@ export default function GuidedPath({ stations, scenes }: Props) {
       data-station={st.id}
       data-index={index + 1}
     >
-      <nav className="lp-jump" aria-label="Stations">
+      <nav className="lp-jump card" aria-label="Stations">
+        <p className="card-h">
+          Stations
+          <span className="right lp-seen">
+            {stations.filter((s) => progress.visited.includes(stationKey(s.id))).length} of {stations.length}{' '}
+            seen
+          </span>
+        </p>
         <ol>
-          {stations.map((s, i) => (
-            <li key={s.id}>
-              <button
-                type="button"
-                className="lp-dot"
-                aria-label={`Station ${i + 1}: ${s.title}`}
-                aria-current={i === index ? 'step' : undefined}
-                onClick={() => go(i)}
-              >
-                {i + 1}
-              </button>
-            </li>
-          ))}
+          {stations.map((s, i) => {
+            const seen = progress.visited.includes(stationKey(s.id));
+            return (
+              <li key={s.id}>
+                <button
+                  type="button"
+                  className="lp-dot"
+                  aria-current={i === index ? 'step' : undefined}
+                  onClick={() => go(i)}
+                >
+                  <span className={`lp-tag${seen ? ' is-seen' : ''}`}>
+                    {seen && <span aria-hidden="true">{'\u2713 '}</span>}
+                    Station {i + 1}
+                    <span className="lp-colon">:</span>
+                  </span>{' '}
+                  <span className="lp-name">{s.title}</span>
+                  {seen && <span className="sr-only">, seen</span>}
+                </button>
+              </li>
+            );
+          })}
         </ol>
       </nav>
 
-      <p className="lp-count" role="status" aria-live="polite">
-        Station {index + 1} of {stations.length}
-      </p>
-      <h2 className="lp-title" tabIndex={-1} ref={heading}>
-        {st.title}
-      </h2>
-
-      <div className="lp-body">
-        <div className="lp-visual" data-testid="lp-visual" data-kind={shown.kind}>
-          {scene ? (
-            <Scene key="lp-scene" spec={scene} initialLive={want3D} onLiveChange={setWant3D} />
-          ) : (
-            <figure className="lp-plot">
-              <div className="lp-plot-head">
-                <Badge variant={st.badge} />
-              </div>
-              {svg ? (
-                // markup produced by plots.ts from numbers and escaped labels
-                <div className="lp-plot-svg" dangerouslySetInnerHTML={{ __html: svg }} />
-              ) : (
-                <p className="lp-wait" role="status">
-                  {failed
-                    ? 'The picture could not load. The text below still explains the idea.'
-                    : 'Drawing the picture...'}
-                </p>
-              )}
-              <details className="scene-alt">
-                <summary>Text description</summary>
-                <p>{st.alt}</p>
-              </details>
-            </figure>
-          )}
+      <div className="lp-main card">
+        <div className="lp-head">
+          <div>
+            <p className="lp-count" role="status" aria-live="polite">
+              Station {index + 1} of {stations.length}
+            </p>
+            <h2 className="lp-title" tabIndex={-1} ref={heading}>
+              {st.title}
+            </h2>
+          </div>
+          <div className="lp-nav">
+            <button type="button" className="btn" disabled={index === 0} onClick={() => go(index - 1)}>
+              Previous station
+            </button>
+            <button type="button" className="btn btn-primary" disabled={last} onClick={() => go(index + 1)}>
+              Next station
+            </button>
+          </div>
+        </div>
+        <div className="bar lp-bar" aria-hidden="true">
+          <span style={{ width: `${Math.round(((index + 1) / stations.length) * 100)}%` }} />
         </div>
 
-        <div className="lp-text">
-          {st.sentences.map((x, i) => (
-            <p key={i}>{x}</p>
-          ))}
-
-          {tr.kind === 'slider' ? (
-            <div className="lp-try">
-              <p className="lp-try-head">Try this</p>
-              <Slider
-                label={tr.label}
-                min={tr.min}
-                max={tr.max}
-                step={tr.step}
-                value={sliderValue}
-                onChange={set}
-              />
-            </div>
-          ) : (
-            <fieldset className="lp-try">
-              <legend className="lp-try-head">Try this: {tr.label}</legend>
-              <div role="radiogroup" aria-label={tr.label} className="lp-choices">
-                {tr.options.map((o, i) => (
-                  <label key={o.label} className={`lp-choice${i === choice ? ' is-on' : ''}`}>
-                    <input
-                      type="radio"
-                      name={`try-${st.id}`}
-                      checked={i === choice}
-                      onChange={() => set(i)}
-                    />
-                    <span>{o.label}</span>
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-          )}
-
-          <p className="lp-links">
-            <a href={topicHref(st.topic)}>Go deeper: read the full topic</a>
-            {st.tool && (
-              <>
-                {' '}
-                <a href={st.tool.href}>{st.tool.label}</a>
-              </>
+        <div className="lp-body">
+          <div className="lp-visual" data-testid="lp-visual" data-kind={shown.kind}>
+            {scene ? (
+              <Scene key="lp-scene" spec={scene} initialLive={want3D} onLiveChange={setWant3D} />
+            ) : (
+              <figure className="lp-plot">
+                <div className="lp-plot-head">
+                  <Badge variant={st.badge} />
+                </div>
+                {svg ? (
+                  // markup produced by plots.ts from numbers and escaped labels
+                  <div className="lp-plot-svg" dangerouslySetInnerHTML={{ __html: svg }} />
+                ) : (
+                  <p className="lp-wait" role="status">
+                    {failed
+                      ? 'The picture could not load. The text below still explains the idea.'
+                      : 'Drawing the picture...'}
+                  </p>
+                )}
+                <details className="scene-alt">
+                  <summary>Text description</summary>
+                  <p>{st.alt}</p>
+                </details>
+              </figure>
             )}
-          </p>
-        </div>
-      </div>
+          </div>
 
-      <div className="lp-nav">
-        <button type="button" className="btn" disabled={index === 0} onClick={() => go(index - 1)}>
-          Previous station
-        </button>
-        <button type="button" className="btn btn-primary" disabled={last} onClick={() => go(index + 1)}>
-          Next station
-        </button>
-      </div>
-      {last && (
-        <p className="lp-done" role="status">
-          That is the whole route. Pick any station above to go back, or open the{' '}
-          <a href="/handbook/">handbook</a> to learn each part properly.
+          <div className="lp-text">
+            {st.sentences.map((x, i) => (
+              <p key={i}>{x}</p>
+            ))}
+
+            {tr.kind === 'slider' ? (
+              <div className="lp-try">
+                <p className="lp-try-head">Try this</p>
+                <Slider
+                  label={tr.label}
+                  min={tr.min}
+                  max={tr.max}
+                  step={tr.step}
+                  value={sliderValue}
+                  onChange={set}
+                />
+              </div>
+            ) : (
+              <fieldset className="lp-try">
+                <legend className="lp-try-head">Try this: {tr.label}</legend>
+                <div role="radiogroup" aria-label={tr.label} className="lp-choices">
+                  {tr.options.map((o, i) => (
+                    <label key={o.label} className={`lp-choice${i === choice ? ' is-on' : ''}`}>
+                      <input
+                        type="radio"
+                        name={`try-${st.id}`}
+                        checked={i === choice}
+                        onChange={() => set(i)}
+                      />
+                      <span>{o.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            )}
+
+            <p className="lp-links">
+              <a href={topicHref(st.topic)}>Go deeper: read the full topic</a>
+              {st.tool && (
+                <>
+                  {' '}
+                  <a href={st.tool.href}>{st.tool.label}</a>
+                </>
+              )}
+            </p>
+          </div>
+        </div>
+
+        {last && (
+          <p className="lp-done" role="status">
+            That is the whole route. Pick any station in the list to go back, or open the{' '}
+            <a href="/handbook/">handbook</a> to learn each part properly.
+          </p>
+        )}
+        <p className="lp-hint">
+          Keys: Left and Right arrows (or Page Up and Page Down) move between stations when focus is on the
+          text or the buttons. Home and End jump to the first and last.
         </p>
-      )}
-      <p className="lp-hint">
-        Keys: Left and Right arrows (or Page Up and Page Down) move between stations when focus is on the text
-        or the buttons. Home and End jump to the first and last.
-      </p>
-      <p className="lp-sources">Sources: {st.sources.join(', ')}</p>
+        <p className="lp-sources">Sources: {st.sources.join(', ')}</p>
+      </div>
     </section>
   );
 }

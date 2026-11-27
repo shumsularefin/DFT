@@ -13,7 +13,8 @@
   min-width: 0;
 }
 .qc-stem {
-  font-size: var(--step-1);
+  font-size: 1rem;
+  font-weight: 600;
   line-height: var(--leading-tight);
   padding: 0;
   margin-bottom: var(--space-3);
@@ -36,31 +37,79 @@
 .qc-order-key {
   list-style: decimal inside;
 }
+/* Options look like the template's .opt rows: a letter, the text, an accent fill when chosen.
+   The native input still does the work: it covers the row, invisible, so clicks, keys and screen
+   readers all reach it. */
+.qc-options {
+  counter-reset: qc-opt;
+  max-width: none;
+}
 .qc-opt {
+  position: relative;
+  counter-increment: qc-opt;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: var(--space-2) var(--space-3);
-  background: var(--surface);
+  background: var(--bg);
+}
+.qc-opt:hover {
+  border-color: var(--border-strong);
 }
 .qc-opt label {
+  position: relative;
   display: flex;
-  gap: var(--space-3);
+  gap: 0.75rem;
   align-items: flex-start;
   min-height: var(--target);
-  align-items: center;
+  padding: 0.75rem 0.875rem;
   cursor: pointer;
 }
+.qc-opt label::before {
+  content: counter(qc-opt, upper-alpha) / '';
+  min-width: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.qc-opt input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.qc-opt:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.qc-opt:has(input:checked) label::before {
+  color: var(--accent);
+}
+.qc-opt:has(input:focus-visible) {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.qc-set:disabled .qc-opt :is(label, input) {
+  cursor: default;
+}
 .qc-opt.is-right {
-  border-color: color-mix(in srgb, var(--ok) 45%, var(--border));
+  border-color: var(--ok);
   background: var(--ok-soft);
 }
-.qc-opt.is-wrong {
+.qc-opt.is-wrong:has(input:checked) {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+}
+.qc-opt.is-wrong:not(:has(input:checked)) {
   border-style: dashed;
-  border-color: var(--border-strong);
 }
 .qc-why {
   margin: var(--space-2) 0 0;
   font-size: var(--step--1);
+}
+.qc-opt .qc-why {
+  margin: 0;
+  padding: 0 0.875rem 0.75rem 2.5rem;
 }
 .qc-num {
   display: grid;
@@ -94,11 +143,11 @@
 .pr .btn,
 .ck .btn {
   min-height: var(--target);
-  padding: 0 var(--space-4);
+  padding: 0 0.75rem;
   font: inherit;
   color: var(--text);
-  background: var(--bg);
-  border: 1px solid var(--border-strong);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   cursor: pointer;
 }
@@ -108,6 +157,19 @@
   color: var(--accent-contrast);
   background: var(--accent);
   border-color: var(--accent);
+}
+.qc .btn-ghost,
+.pr .btn-ghost,
+.ck .btn-ghost {
+  color: var(--text-muted);
+  background: transparent;
+  border-color: transparent;
+}
+.qc .btn-ghost:hover:not(:disabled),
+.pr .btn-ghost:hover:not(:disabled),
+.ck .btn-ghost:hover:not(:disabled) {
+  color: var(--text);
+  background: color-mix(in srgb, var(--text) 7%, transparent);
 }
 .qc button:disabled,
 .pr button:disabled,
@@ -201,6 +263,10 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
+.ck-bar,
+.pr-bar {
+  margin: calc(-1 * var(--space-2)) 0 var(--space-4);
+}
 .ck-next {
   margin-top: var(--space-3);
   display: flex;
@@ -246,4 +312,126 @@
 .tv > summary {
   cursor: pointer;
   font-weight: 600;
+}
+
+/* Practice page (template #practice): the question card and the mastery card side by side */
+.pr-layout {
+  margin: 0;
+}
+.pr-layout > .pr {
+  margin: 0;
+}
+.pr .card-h,
+.pr-mastery .card-h {
+  margin-top: 0;
+}
+.pr p,
+.pr ul,
+.pr-mastery p {
+  max-width: none;
+}
+.pr-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+.pr-muted,
+.pp-muted {
+  font-size: var(--step--1);
+  font-weight: 400;
+  color: var(--text-muted);
+}
+.pr-tiles,
+.pr-grid,
+.pp-tiles,
+.pp-marks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+}
+.pr-tiles {
+  margin-bottom: var(--space-4);
+}
+.pr-tiles .tile,
+.pp-tiles .tile {
+  margin: 0;
+}
+.pr-tiles .tile p,
+.pp-tiles .tile p {
+  margin: 0;
+}
+.pr-grid {
+  display: grid;
+  gap: 0.3125rem;
+  font-size: var(--step--1);
+}
+.pr-grid li {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  align-items: center;
+  margin: 0;
+}
+.pr-grid-label {
+  color: var(--text-muted);
+}
+.pr-cells {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3125rem;
+}
+/* Fill and pattern both carry the state, so it never rests on colour alone. */
+.pr-mastery i[data-l] {
+  display: inline-block;
+  width: 1.125rem;
+  height: 1.125rem;
+  vertical-align: -0.2em;
+  border-radius: 4px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+.pr-mastery i[data-l='1'] {
+  border-color: var(--accent);
+  background: repeating-linear-gradient(
+    45deg,
+    color-mix(in srgb, var(--accent) 55%, transparent) 0 2px,
+    transparent 2px 5px
+  );
+}
+.pr-mastery i[data-l='3'] {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.pr-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  margin: var(--space-4) 0 0;
+  font-size: var(--step--1);
+  color: var(--text-muted);
+}
+.pr-legend a {
+  margin-inline-start: auto;
+}
+.pr-mastery .pr-note {
+  margin: var(--space-2) 0 0;
+}
+
+/* Progress page (template #progress) */
+.pp .pp-sub {
+  margin: var(--space-4) 0 var(--space-2);
+  font-size: var(--step-0);
+}
+.pp-marks {
+  display: grid;
+  gap: var(--space-2);
+}
+.pp-marks li {
+  margin: 0;
+  flex-wrap: nowrap;
+}
+.pp .card-h .btn {
+  min-height: 1.75rem;
+  font-size: var(--step--1);
 }

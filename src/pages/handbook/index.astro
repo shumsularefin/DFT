@@ -70,7 +70,16 @@ const quick = [
       {modules.map((m) => (
         <li>
           <section class="card module-card" aria-labelledby={`module-${m.number}`}>
-            <p class="module-no">Module {m.number}</p>
+            <p class="module-no">
+              <span>Module {m.number}</span>
+              {m.topics.length > 0 && (
+                <span
+                  class="module-pct"
+                  data-module-pct={m.number}
+                  data-module-ids={m.topics.map((t) => t.id).join(',')}
+                />
+              )}
+            </p>
             <h3 class="card-title" id={`module-${m.number}`}>
               {m.title}
             </h3>
@@ -83,8 +92,12 @@ const quick = [
                 </p>
                 <ul class="module-topics">
                   {m.topics.map((t) => (
-                    <li>
+                    <li data-topic-item={t.id}>
                       <a href={`/handbook/${t.id}/`}>{t.data.title}</a>
+                      <span class="tick" hidden>
+                        <span aria-hidden="true">✓</span>
+                        <span class="sr-only">completed</span>
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -115,6 +128,28 @@ const quick = [
   }
   .module-card {
     height: 100%;
+  }
+  .module-no {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-2);
+    max-width: none;
+  }
+  .module-pct {
+    font-family: var(--font-mono);
+  }
+  .module-pct[data-done],
+  .module-topics .tick {
+    color: var(--ok);
+  }
+  .module-topics li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .module-topics li a {
+    flex: 1;
+    min-width: 0;
   }
   .module-no,
   .module-count {

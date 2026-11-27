@@ -55,6 +55,9 @@ export default function Check({ questions, topicId, topicConcepts = [], labels =
           <p className="ck-count">
             Question {i + 1} of {questions.length}. Your answers stay in this browser.
           </p>
+          <div className="bar ck-bar" aria-hidden="true">
+            <span style={{ width: `${Math.round(((i + 1) / questions.length) * 100)}%` }} />
+          </div>
           <QuestionCard key={q.id} question={q} figure={figures[q.id]} onResult={onResult}>
             <div className="ck-next">
               <button

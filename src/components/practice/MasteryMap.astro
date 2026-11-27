@@ -18,8 +18,10 @@ const published = concepts.filter((c) => c.status === 'published');
 const mid = ROW_H / 2;
 ---
 
-<section aria-labelledby="map-h" class="mastery">
-  <h2 id="map-h">Mastery map</h2>
+<section aria-labelledby="map-h" class="mastery card">
+  <h2 id="map-h" class="card-h">
+    Mastery map
+  </h2>
   <p>
     Each mark is one idea. Ideas to its left are the basics it builds on. Shape and text show your state, not
     colour alone: an open circle is not started, a hatched diamond is learning, a solid square is mastered.
@@ -129,28 +131,32 @@ const mid = ROW_H / 2;
     </svg>
   </div>
 
-  <h2 id="list-h">The same map as a list</h2>
-  {mods.map((m) => (
-    <section class="map-list" data-module-section={m} aria-labelledby={`ml-${m}`}>
-      <h3 id={`ml-${m}`}>{`${m}. ${moduleNames[m] ?? `Module ${m}`}`}</h3>
-      <ul>
-        {published
-          .filter((c) => c.module === m)
-          .map((c) => (
-            <li data-concept={c.id} data-state="new" data-module={c.module}>
-              {topics[c.id] ? <a href={topics[c.id]!.href}>{c.label}</a> : <span>{c.label}</span>}
-              <span class="map-state"> (not started)</span>
-              {c.prerequisites.length > 0 && (
-                <span class="map-pre">
-                  {' '}
-                  builds on {c.prerequisites.map((p) => byId.get(p)?.label ?? p).join(', ')}
-                </span>
-              )}
-            </li>
-          ))}
-      </ul>
-    </section>
-  ))}
+  <h2 id="list-h" class="card-h map-list-h">
+    The same map as a list
+  </h2>
+  <div class="map-lists">
+    {mods.map((m) => (
+      <section class="map-list" data-module-section={m} aria-labelledby={`ml-${m}`}>
+        <h3 id={`ml-${m}`}>{`${m}. ${moduleNames[m] ?? `Module ${m}`}`}</h3>
+        <ul>
+          {published
+            .filter((c) => c.module === m)
+            .map((c) => (
+              <li data-concept={c.id} data-state="new" data-module={c.module}>
+                {topics[c.id] ? <a href={topics[c.id]!.href}>{c.label}</a> : <span>{c.label}</span>}
+                <span class="map-state"> (not started)</span>
+                {c.prerequisites.length > 0 && (
+                  <span class="map-pre">
+                    {' '}
+                    builds on {c.prerequisites.map((p) => byId.get(p)?.label ?? p).join(', ')}
+                  </span>
+                )}
+              </li>
+            ))}
+        </ul>
+      </section>
+    ))}
+  </div>
 </section>
 
 <style is:global>
@@ -160,7 +166,7 @@ const mid = ROW_H / 2;
     max-height: 70vh;
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    background: var(--surface);
+    background: var(--bg);
   }
   .map-svg {
     display: block;
@@ -225,8 +231,35 @@ const mid = ROW_H / 2;
     border-radius: var(--radius);
     padding: 0 var(--space-3);
   }
+  .mastery {
+    margin-top: var(--space-4);
+  }
+  .mastery > p {
+    max-width: 90ch;
+  }
+  .map-list-h {
+    margin-top: var(--space-5);
+  }
+  .map-lists {
+    display: grid;
+    gap: var(--space-3);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    align-items: start;
+  }
+  .map-list {
+    padding: var(--space-3);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .map-list h3 {
+    margin: 0 0 var(--space-2);
+    font-size: var(--step--1);
+  }
   .map-list ul {
+    margin: 0;
     padding-left: var(--space-4);
+    font-size: var(--step--1);
   }
   .map-list li {
     margin: var(--space-1) 0;

@@ -69,7 +69,18 @@ function renderProgress() {
   }
   for (const el of $$<HTMLElement>('[data-module-pct]')) {
     const ids = (el.dataset.moduleIds ?? '').split(',').filter(Boolean);
-    el.textContent = ids.length ? `${modulePercent(p, ids)}%` : '';
+    const pct = ids.length ? modulePercent(p, ids) : 0;
+    // A finished module shows a tick (with words for screen readers); an unstarted one shows nothing.
+    el.toggleAttribute('data-done', pct === 100);
+    if (pct === 100) {
+      const tick = document.createElement('span');
+      tick.setAttribute('aria-hidden', 'true');
+      tick.textContent = '✓';
+      const words = document.createElement('span');
+      words.className = 'sr-only';
+      words.textContent = 'completed';
+      el.replaceChildren(tick, words);
+    } else el.textContent = pct > 0 ? `${pct}%` : '';
   }
   const mark = $<HTMLButtonElement>('[data-mark-complete]');
   if (mark && topicId) {
