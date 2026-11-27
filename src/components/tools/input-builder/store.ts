@@ -59,6 +59,8 @@ export interface BuilderState {
   rule: RoundingRule;
   job: JobOptions;
   /** A line-mode KPOINTS handed over by the k-path tool for this structure (D-108). */
+  /** An explicit N1 x N2 x N3 mesh in place of the KSPACING one (a slab's N3 = 1, a converged mesh), D-108. */
+  meshOverride: readonly [number, number, number] | null;
   lineKpoints: string;
   /** POTCAR directory names chosen in the Material Builder, POSCAR species order (D-108). */
   potcarLabels: string[];
@@ -106,6 +108,7 @@ const initial = (): BuilderState => ({
   rule: 'ceil',
   job: DEFAULT_JOB,
   lineKpoints: '',
+  meshOverride: null,
   potcarLabels: [],
   ack: false,
   selectedTag: null,
@@ -144,6 +147,7 @@ export const useBuilder = create<BuilderState & BuilderActions>((set, get) => {
           magmom: {},
           ldau: {},
           lineKpoints: '',
+          meshOverride: null,
           potcarLabels: [],
         });
       } catch (e) {
@@ -162,6 +166,7 @@ export const useBuilder = create<BuilderState & BuilderActions>((set, get) => {
         magmom: {},
         ldau: {},
         lineKpoints: '',
+        meshOverride: null,
         potcarLabels: [],
       }),
     choosePreset: (presetId, variantId) => {
@@ -252,6 +257,10 @@ export function kpointsOf(s: BuilderState): {
   if (!s.structure) return { text: null, parsed: null, mesh: null, rule: s.rule };
   const r = meshFromKspacing(s.structure.lattice, s.spacing, s.rule);
   if (s.kpMode === 'kspacing') return { text: null, parsed: null, mesh: r.mesh, rule: r.rule };
+  if (s.meshOverride) {
+    const text = writeMeshKpoints(s.meshOverride, s.kpMode, [0, 0, 0], 'Explicit mesh');
+    return { text, parsed: parseKpoints(text), mesh: s.meshOverride, rule: s.rule };
+  }
   const text = writeMeshKpoints(
     r.mesh,
     s.kpMode,

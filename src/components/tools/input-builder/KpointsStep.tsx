@@ -115,6 +115,43 @@ export default function KpointsStep() {
               <strong>{rec.centering === 'gamma' ? 'Gamma-centred' : 'either centring'}</strong>. {rec.reason}
             </p>
           )}
+          {s.kpMode !== 'kspacing' && s.structure && (
+            <div className="ib-field">
+              <label className="ib-radio">
+                <input
+                  type="checkbox"
+                  checked={!!s.meshOverride}
+                  onChange={(e) => s.set('meshOverride', e.target.checked ? (kp.mesh ?? [1, 1, 1]) : null)}
+                />
+                Type the mesh yourself (N1 x N2 x N3), for example a converged mesh or a slab
+              </label>
+              {s.meshOverride && (
+                <div className="ib-row">
+                  {[0, 1, 2].map((i) => (
+                    <input
+                      key={i}
+                      aria-label={`N${i + 1}`}
+                      inputMode="numeric"
+                      value={s.meshOverride![i]}
+                      onChange={(e) => {
+                        const m = [...s.meshOverride!] as [number, number, number];
+                        m[i] = Math.max(1, Math.floor(Number(e.target.value) || 1));
+                        s.set('meshOverride', m);
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+              {s.systemType === 'slab' && kp.mesh && kp.mesh[2] > 1 && (
+                <p className="ib-note">
+                  A slab needs one k-point along the vacuum.{' '}
+                  <button type="button" onClick={() => s.set('meshOverride', [kp.mesh![0], kp.mesh![1], 1])}>
+                    Use {kp.mesh[0]} x {kp.mesh[1]} x 1
+                  </button>
+                </p>
+              )}
+            </div>
+          )}
           {kp.text && (
             <>
               <h3>KPOINTS</h3>
