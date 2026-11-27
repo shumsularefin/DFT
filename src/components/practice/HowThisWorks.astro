@@ -6,39 +6,46 @@ import { HOW_THIS_WORKS } from '../../lib/learning/policy';
   <h2 id="how-it-works" class="card-h">
     How this works
   </h2>
-  {HOW_THIS_WORKS.map((p) => (
-    <p>{p}</p>
-  ))}
-  <h3>The three pieces, in plain words</h3>
-  <dl>
-    <dt>Knowledge tracing (BKT)</dt>
-    <dd>
-      For each idea the site keeps one number: how likely it is that you know it. A correct answer nudges the
-      number up, a wrong answer nudges it down, and a lucky guess or a slip is allowed for. An idea counts as
-      mastered when that number reaches 95%. The starting guesses (30% known, 10% chance to learn at each
-      step, 10% slip, 20% guess) are common defaults, not measurements of you. Source:
-      <a href="/references/#S-037">Corbett and Anderson (1994)</a>.
-    </dd>
-    <dt>Spaced review (SM-2)</dt>
-    <dd>
-      After you answer, each question gets a date to come back: tomorrow, then in 6 days, then each gap about
-      2.5 times longer while you keep getting it right. A wrong answer, or "I am not sure", brings it back
-      tomorrow. Source: <a href="/references/#S-038">Wozniak (1990)</a>.
-    </dd>
-    <dt>Choosing the next item (Thompson sampling)</dt>
-    <dd>
-      The site tries six kinds of action and slowly favours the ones that seem to help you, with a little
-      randomness so it keeps checking the others. Source: <a href="/references/#S-039">Thompson (1933)</a>.
-    </dd>
-  </dl>
-  <p>
-    <strong>Heuristic, not a test.</strong> None of this is a grade or a measurement of ability. It is a coach
-    that makes suggestions, and you can ignore it.
-  </p>
-  <p>
-    <strong>It stays on your device.</strong> Your answers, estimates and streak are saved in this browser
-    only. Nothing is uploaded, and there is no account, unless you switch on optional sync, which exists only
-    on builds that have it configured and is described on the <a href="/privacy/">privacy page</a>. You can
-    export, import or erase everything on the <a href="/progress/">progress page</a>.
-  </p>
+  <div class="hw-cols">
+    <div class="hw-col">
+      {HOW_THIS_WORKS.map((p) => (
+        <p>{p}</p>
+      ))}
+    </div>
+    <div class="hw-col">
+      <h3>The three pieces, in plain words</h3>
+      <dl>
+        <dt>Knowledge tracing (BKT)</dt>
+        <dd>
+          For each idea the site keeps one number: how likely it is that you know it. A correct answer nudges
+          the number up, a wrong answer nudges it down, and a lucky guess or a slip is allowed for. An idea
+          counts as mastered when that number reaches 95%. The starting guesses (30% known, 10% chance to
+          learn at each step, 10% slip, 20% guess) are common defaults, not measurements of you. Source:
+          <a href="/references/#S-037">Corbett and Anderson (1994)</a>.
+        </dd>
+        <dt>Spaced review (SM-2)</dt>
+        <dd>
+          After you answer, each question gets a date to come back: tomorrow, then in 6 days, then each gap
+          about 2.5 times longer while you keep getting it right. A wrong answer, or "I am not sure", brings
+          it back tomorrow. Source: <a href="/references/#S-038">Wozniak (1990)</a>.
+        </dd>
+        <dt>Choosing the next item (Thompson sampling)</dt>
+        <dd>
+          The site tries six kinds of action and slowly favours the ones that seem to help you, with a little
+          randomness so it keeps checking the others. Source: <a href="/references/#S-039">Thompson (1933)</a>
+          .
+        </dd>
+      </dl>
+      <p>
+        <strong>Heuristic, not a test.</strong> None of this is a grade or a measurement of ability. It is a
+        coach that makes suggestions, and you can ignore it.
+      </p>
+      <p>
+        <strong>It stays on your device.</strong> Your answers, estimates and streak are saved in this browser
+        only. Nothing is uploaded, and there is no account, unless you switch on optional sync, which exists
+        only on builds that have it configured and is described on the <a href="/privacy/">privacy page</a>.
+        You can export, import or erase everything on the <a href="/progress/">progress page</a>.
+      </p>
+    </div>
+  </div>
 </section>
