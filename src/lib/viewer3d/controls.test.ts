@@ -16,7 +16,16 @@ function fakeDom() {
   return t as unknown as HTMLElement;
 }
 const pe = (type: string, x: number, y: number, extra: Record<string, unknown> = {}) =>
-  Object.assign(new Event(type), { pointerId: 1, button: 0, clientX: x, clientY: y, shiftKey: false, altKey: false, ctrlKey: false, ...extra });
+  Object.assign(new Event(type), {
+    pointerId: 1,
+    button: 0,
+    clientX: x,
+    clientY: y,
+    shiftKey: false,
+    altKey: false,
+    ctrlKey: false,
+    ...extra,
+  });
 
 describe('ArcballControls on a three camera', () => {
   it('state and apply round trip', () => {
@@ -60,11 +69,28 @@ describe('ArcballControls on a three camera', () => {
     c.apply(cameraFrom([0, -1, 0], [0, 0, 0], 10));
     let changes = 0;
     c.addEventListener('change', () => changes++);
-    for (let i = 0; i < 50; i++) dom.dispatchEvent(Object.assign(new Event('wheel'), { deltaY: -100, deltaMode: 0, clientX: 300, clientY: 200, preventDefault() {} }));
+    for (let i = 0; i < 50; i++)
+      dom.dispatchEvent(
+        Object.assign(new Event('wheel'), {
+          deltaY: -100,
+          deltaMode: 0,
+          clientX: 300,
+          clientY: 200,
+          preventDefault() {},
+        }),
+      );
     expect(c.state.dist).toBeCloseTo(2, 6);
     expect(changes).toBe(50);
     c.dispose();
-    dom.dispatchEvent(Object.assign(new Event('wheel'), { deltaY: 100, deltaMode: 0, clientX: 300, clientY: 200, preventDefault() {} }));
+    dom.dispatchEvent(
+      Object.assign(new Event('wheel'), {
+        deltaY: 100,
+        deltaMode: 0,
+        clientX: 300,
+        clientY: 200,
+        preventDefault() {},
+      }),
+    );
     expect(changes).toBe(50);
   });
 });

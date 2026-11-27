@@ -39,7 +39,11 @@ function ramp(stops: readonly string[], t: number): [number, number, number] {
 }
 
 /** Map values onto RGB triples (0..1) packed in one array. Diverging maps are symmetric about zero unless a range is given. */
-export function colormap(values: readonly number[], kind: 'diverging' | 'sequential', range?: [number, number]): Float32Array {
+export function colormap(
+  values: readonly number[],
+  kind: 'diverging' | 'sequential',
+  range?: [number, number],
+): Float32Array {
   let lo = range?.[0] ?? Infinity;
   let hi = range?.[1] ?? -Infinity;
   if (!range)

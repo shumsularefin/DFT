@@ -41,10 +41,13 @@ import { cameraFrom, cameraKey, interpolate, type CameraState } from './arcball'
 import { ArcballControls } from './controls';
 import { frameBounds } from './kit';
 import { RenderLoop } from './loop';
-import { normalize, rotate, type Vec3 } from './math';
+import { rotate, type Vec3 } from './math';
 import { colormap, resolveColor, type Theme } from './palette3d';
 import type { CameraSpec, Color as Tone, Layer, SceneFrame } from './types';
-import { directionView, namedView, planeNormalView, type ViewName } from './views';
+import { cameraForSpec, ISO_EYE } from './viewSpec';
+import { directionView, planeNormalView } from './views';
+
+export { cameraForSpec };
 
 export const FOV = 35;
 const TWEEN_MS = 400;
@@ -81,27 +84,6 @@ function pageTheme(el: HTMLElement): Theme {
   return doc.defaultView?.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
-/** Default direction for "iso" when the frame has no lattice: a three-quarter view from the front right, slightly above. */
-const ISO_EYE: Vec3 = normalize([1, -1.35, 0.85]);
-
-export function cameraForSpec(spec: CameraSpec | undefined, frame: Pick<SceneFrame, 'lattice'>): { eye: Vec3; up: Vec3; zoom: number } {
-  const s = spec ?? 'iso';
-  if (typeof s === 'object') return { eye: normalize(s.eye), up: s.up ?? [0, 0, 1], zoom: s.zoom ?? 1 };
-  switch (s) {
-    case 'top':
-      return { eye: [0, 0, 1], up: [0, 1, 0], zoom: 1 };
-    case 'front':
-      return { eye: [0, -1, 0], up: [0, 0, 1], zoom: 1 };
-    case 'side':
-      return { eye: [1, 0, 0], up: [0, 0, 1], zoom: 1 };
-    default: {
-      if (!frame.lattice) return { eye: ISO_EYE, up: [0, 0, 1], zoom: 1 };
-      const v = namedView(s as ViewName, frame.lattice);
-      return { eye: v.eye, up: v.up, zoom: 1 };
-    }
-  }
-}
-
 interface Built {
   root: Group;
   groups: Map<string, Object3D[]>;
@@ -125,7 +107,8 @@ export class Viewer3D {
   private bounds = { center: [0, 0, 0] as Vec3, radius: 5 };
   private orthoHalf = 5;
   private useOrtho = false;
-  private tween: { from: CameraState; to: CameraState; t0: number; fromHalf: number; toHalf: number } | undefined;
+  private tween:
+    { from: CameraState; to: CameraState; t0: number; fromHalf: number; toHalf: number } | undefined;
   private reducedMotion = false;
   private onScreen = true;
   private cleanups: (() => void)[] = [];
@@ -145,7 +128,10 @@ export class Viewer3D {
     this.env = options.env ?? browserEnvironment();
     this.themeOf = options.theme ?? (() => pageTheme(container));
     this.loop = new RenderLoop(
-      { request: (cb) => this.env.requestAnimationFrame(cb), cancel: (id) => this.env.cancelAnimationFrame(id) },
+      {
+        request: (cb) => this.env.requestAnimationFrame(cb),
+        cancel: (id) => this.env.cancelAnimationFrame(id),
+      },
       (dt) => this.draw(dt),
     );
   }
@@ -171,9 +157,11 @@ export class Viewer3D {
     if (this.renderer || this.disposed) return;
     const r = this.options.createRenderer
       ? this.options.createRenderer()
-      : (new WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' }) as unknown as NonNullable<
-          ReturnType<NonNullable<Viewer3DOptions['createRenderer']>>
-        >);
+      : (new WebGLRenderer({
+          antialias: true,
+          alpha: true,
+          powerPreference: 'low-power',
+        }) as unknown as NonNullable<ReturnType<NonNullable<Viewer3DOptions['createRenderer']>>>);
     this.renderer = r;
     const canvas = r.domElement;
     canvas.setAttribute('aria-hidden', 'true');
@@ -327,12 +315,17 @@ export class Viewer3D {
       this.useOrtho = true;
       if (this.controls)
         this.controls.onOrthoZoom = (f, ndc) => {
-          const half = Math.max(this.bounds.radius * 0.02, Math.min(this.bounds.radius * 30, this.orthoHalf * f));
+          const half = Math.max(
+            this.bounds.radius * 0.02,
+            Math.min(this.bounds.radius * 30, this.orthoHalf * f),
+          );
           const k = half / this.orthoHalf;
           const s = this.state;
           const right = rotate(s.q, [1, 0, 0]);
           const up = rotate(s.q, [0, 1, 0]);
-          const off = [0, 1, 2].map((i) => right[i]! * ndc[0] * this.orthoHalf * this.aspect + up[i]! * ndc[1] * this.orthoHalf);
+          const off = [0, 1, 2].map(
+            (i) => right[i]! * ndc[0] * this.orthoHalf * this.aspect + up[i]! * ndc[1] * this.orthoHalf,
+          );
           this.orthoHalf = half;
           this.controls!.apply({ ...s, target: s.target.map((t, i) => t + off[i]! * (1 - k)) as Vec3 });
           this.updateOrtho();
@@ -353,7 +346,11 @@ export class Viewer3D {
   }
 
   /** Show a frame. `groups` limits the visible layer groups (null: all). `cameraSpec` moves the camera (undefined: keep). */
-  setFrame(frame: SceneFrame, groups: string[] | null = null, resetCamera: boolean | CameraSpec = true): void {
+  setFrame(
+    frame: SceneFrame,
+    groups: string[] | null = null,
+    resetCamera: boolean | CameraSpec = true,
+  ): void {
     if (!this.renderer) this.start();
     const theme = this.themeOf();
     this.lastTheme = theme;
@@ -380,7 +377,7 @@ export class Viewer3D {
   /** The camera a spec asks for, framed on the current bounds. */
   stateFor(spec: CameraSpec | undefined): CameraState {
     const { eye, up, zoom } = cameraForSpec(spec, this.frame ?? {});
-    const dist = (this.bounds.radius / Math.sin((FOV * Math.PI) / 360)) * 1.04 / zoom;
+    const dist = ((this.bounds.radius / Math.sin((FOV * Math.PI) / 360)) * 1.04) / zoom;
     return cameraFrom(eye, this.bounds.center, dist, up);
   }
 
@@ -466,28 +463,55 @@ export class Viewer3D {
   }
 
   private retheme(): void {
-    if (this.frame && this.themeOf() !== this.lastTheme) this.setFrame(this.frame, this.visible ? [...this.visible] : null, false);
+    if (this.frame && this.themeOf() !== this.lastTheme)
+      this.setFrame(this.frame, this.visible ? [...this.visible] : null, false);
   }
 
   /** What is under the screen point (client pixels): an atom, a point, a mesh value. */
   pick(clientX: number, clientY: number): PickResult | null {
     if (!this.built || !this.renderer) return null;
     const rect = this.renderer.domElement.getBoundingClientRect();
-    const ndc = new Vector2(((clientX - rect.left) / rect.width) * 2 - 1, 1 - ((clientY - rect.top) / rect.height) * 2);
+    const ndc = new Vector2(
+      ((clientX - rect.left) / rect.width) * 2 - 1,
+      1 - ((clientY - rect.top) / rect.height) * 2,
+    );
     const ray = new Raycaster();
     ray.setFromCamera(ndc, this.camera);
-    const hits = ray.intersectObjects(this.built.pickables.filter((o) => o.visible && o.parent?.visible !== false), false);
+    const hits = ray.intersectObjects(
+      this.built.pickables.filter((o) => o.visible && o.parent?.visible !== false),
+      false,
+    );
     for (const h of hits) {
-      const info = h.object.userData as { group: string; kind: Layer['kind']; indices?: number[]; labels?: string[]; values?: number[]; positions?: Vec3[] };
+      const info = h.object.userData as {
+        group: string;
+        kind: Layer['kind'];
+        indices?: number[];
+        labels?: string[];
+        values?: number[];
+        positions?: Vec3[];
+      };
       if (h.instanceId !== undefined && info.indices) {
         const index = info.indices[h.instanceId]!;
-        return { group: info.group, kind: info.kind, index, label: info.labels?.[index] ?? `${info.kind} ${index + 1}`, position: info.positions![index]! };
+        return {
+          group: info.group,
+          kind: info.kind,
+          index,
+          label: info.labels?.[index] ?? `${info.kind} ${index + 1}`,
+          position: info.positions![index]!,
+        };
       }
       if (info.kind === 'mesh' && info.values && h.face) {
         const { a, b, c } = h.face;
         const bary = h.barycoord ?? new Vector3(1 / 3, 1 / 3, 1 / 3);
         const value = info.values[a]! * bary.x + info.values[b]! * bary.y + info.values[c]! * bary.z;
-        return { group: info.group, kind: 'mesh', index: h.faceIndex ?? 0, label: '', position: [h.point.x, h.point.y, h.point.z], value };
+        return {
+          group: info.group,
+          kind: 'mesh',
+          index: h.faceIndex ?? 0,
+          label: '',
+          position: [h.point.x, h.point.y, h.point.z],
+          value,
+        };
       }
     }
     return null;
@@ -530,7 +554,8 @@ export class Viewer3D {
       v.copy(l.at).project(this.camera);
       const show = v.z < 1 && v.z > -1 && Math.abs(v.x) < 1.2 && Math.abs(v.y) < 1.2;
       l.el.style.display = show ? '' : 'none';
-      if (show) l.el.style.transform = `translate(-50%, -50%) translate(${((v.x + 1) / 2) * w}px, ${((1 - v.y) / 2) * h}px)`;
+      if (show)
+        l.el.style.transform = `translate(-50%, -50%) translate(${((v.x + 1) / 2) * w}px, ${((1 - v.y) / 2) * h}px)`;
     }
   }
 
@@ -561,7 +586,8 @@ export class Viewer3D {
 
 /* Layer builders. Everything is created inside one Group so dispose is one traversal. */
 
-const sphereGeo = (detail: 'high' | 'low') => (detail === 'high' ? new SphereGeometry(1, 28, 18) : new SphereGeometry(1, 14, 10));
+const sphereGeo = (detail: 'high' | 'low') =>
+  detail === 'high' ? new SphereGeometry(1, 28, 18) : new SphereGeometry(1, 14, 10);
 const Y = new Vector3(0, 1, 0);
 
 function segmentMatrix(a: Vec3, b: Vec3, r: number, m = new Matrix4()): Matrix4 {
@@ -583,7 +609,12 @@ function std(color: string, opacity = 1, extra: Partial<MeshStandardMaterial> = 
   return m;
 }
 
-function byColor<T>(n: number, color: Tone | Tone[], theme: Theme, f: (hex: string, idx: number[]) => T): T[] {
+function byColor<T>(
+  n: number,
+  color: Tone | Tone[],
+  theme: Theme,
+  f: (hex: string, idx: number[]) => T,
+): T[] {
   const groups = new Map<string, number[]>();
   for (let i = 0; i < n; i++) {
     const hex = resolveColor(Array.isArray(color) ? (color[i] ?? color[0]!) : color, theme);
@@ -593,7 +624,12 @@ function byColor<T>(n: number, color: Tone | Tone[], theme: Theme, f: (hex: stri
   return [...groups].map(([hex, idx]) => f(hex, idx));
 }
 
-export function buildLayers(layers: readonly Layer[], theme: Theme, doc: Document, highlighted: Set<string> = new Set()): Built {
+export function buildLayers(
+  layers: readonly Layer[],
+  theme: Theme,
+  doc: Document,
+  highlighted: Set<string> = new Set(),
+): Built {
   const root = new Group();
   const groups = new Map<string, Object3D[]>();
   const labels: Built['labels'] = [];
@@ -615,23 +651,40 @@ export function buildLayers(layers: readonly Layer[], theme: Theme, doc: Documen
           const im = new InstancedMesh(sphereGeo(detail), std(hex, l.opacity ?? 1), idx.length);
           idx.forEach((i, k) => {
             const r = radius(i);
-            im.setMatrixAt(k, m.compose(new Vector3(...l.positions[i]!), new Quaternion(), new Vector3(r, r, r)));
+            im.setMatrixAt(
+              k,
+              m.compose(new Vector3(...l.positions[i]!), new Quaternion(), new Vector3(r, r, r)),
+            );
           });
           im.instanceMatrix.needsUpdate = true;
           im.computeBoundingSphere();
-          im.userData = { group: l.group, kind: 'atoms', indices: idx, labels: l.labels, positions: l.positions };
+          im.userData = {
+            group: l.group,
+            kind: 'atoms',
+            indices: idx,
+            labels: l.labels,
+            positions: l.positions,
+          };
           pickables.push(im);
           return im;
         }))
           add(l.group, mesh);
-        const hi = [...(l.highlight ?? []), ...[...highlighted].filter((k) => k.startsWith(`${l.group}:`)).map((k) => Number(k.split(':')[1]))].filter(
-          (i) => i >= 0 && i < n,
-        );
+        const hi = [
+          ...(l.highlight ?? []),
+          ...[...highlighted].filter((k) => k.startsWith(`${l.group}:`)).map((k) => Number(k.split(':')[1])),
+        ].filter((i) => i >= 0 && i < n);
         if (hi.length) {
-          const shell = new InstancedMesh(sphereGeo('low'), new MeshBasicMaterial({ color: new Color(ink), side: BackSide }), hi.length);
+          const shell = new InstancedMesh(
+            sphereGeo('low'),
+            new MeshBasicMaterial({ color: new Color(ink), side: BackSide }),
+            hi.length,
+          );
           hi.forEach((i, k) => {
             const r = radius(i) * 1.22;
-            shell.setMatrixAt(k, m.compose(new Vector3(...l.positions[i]!), new Quaternion(), new Vector3(r, r, r)));
+            shell.setMatrixAt(
+              k,
+              m.compose(new Vector3(...l.positions[i]!), new Quaternion(), new Vector3(r, r, r)),
+            );
           });
           shell.instanceMatrix.needsUpdate = true;
           add(l.group, shell);
@@ -642,10 +695,25 @@ export function buildLayers(layers: readonly Layer[], theme: Theme, doc: Documen
         const n = l.positions.length;
         for (const mesh of byColor(n, l.color, theme, (hex, idx) => {
           const im = new InstancedMesh(new IcosahedronGeometry(1, n > 1500 ? 0 : 1), std(hex), idx.length);
-          idx.forEach((i, k) => im.setMatrixAt(k, m.compose(new Vector3(...l.positions[i]!), new Quaternion(), new Vector3(l.size, l.size, l.size))));
+          idx.forEach((i, k) =>
+            im.setMatrixAt(
+              k,
+              m.compose(
+                new Vector3(...l.positions[i]!),
+                new Quaternion(),
+                new Vector3(l.size, l.size, l.size),
+              ),
+            ),
+          );
           im.instanceMatrix.needsUpdate = true;
           im.computeBoundingSphere();
-          im.userData = { group: l.group, kind: 'points', indices: idx, labels: l.labels, positions: l.positions };
+          im.userData = {
+            group: l.group,
+            kind: 'points',
+            indices: idx,
+            labels: l.labels,
+            positions: l.positions,
+          };
           if (l.labels) pickables.push(im);
           return im;
         }))
@@ -655,13 +723,23 @@ export function buildLayers(layers: readonly Layer[], theme: Theme, doc: Documen
       case 'lines': {
         const hex = resolveColor(l.color, theme);
         if (l.tube) {
-          const im = new InstancedMesh(new CylinderGeometry(1, 1, 1, 10, 1, true), std(hex), l.segments.length);
+          const im = new InstancedMesh(
+            new CylinderGeometry(1, 1, 1, 10, 1, true),
+            std(hex),
+            l.segments.length,
+          );
           l.segments.forEach(([a, b], k) => im.setMatrixAt(k, segmentMatrix(a, b, l.tube!, m)));
           im.instanceMatrix.needsUpdate = true;
           add(l.group, im);
         } else {
           const g = new BufferGeometry();
-          g.setAttribute('position', new Float32BufferAttribute(l.segments.flatMap(([a, b]) => [...a, ...b]), 3));
+          g.setAttribute(
+            'position',
+            new Float32BufferAttribute(
+              l.segments.flatMap(([a, b]) => [...a, ...b]),
+              3,
+            ),
+          );
           const mat = l.dashed
             ? new LineDashedMaterial({ color: new Color(hex), dashSize: 0.18, gapSize: 0.12 })
             : new LineBasicMaterial({ color: new Color(hex) });
@@ -676,11 +754,17 @@ export function buildLayers(layers: readonly Layer[], theme: Theme, doc: Documen
         const pts = l.closed ? [...l.points, l.points[0]!] : l.points;
         if (l.tube) {
           const im = new InstancedMesh(new CylinderGeometry(1, 1, 1, 8, 1, true), std(hex), pts.length - 1);
-          for (let k = 0; k + 1 < pts.length; k++) im.setMatrixAt(k, segmentMatrix(pts[k]!, pts[k + 1]!, l.tube, m));
+          for (let k = 0; k + 1 < pts.length; k++)
+            im.setMatrixAt(k, segmentMatrix(pts[k]!, pts[k + 1]!, l.tube, m));
           im.instanceMatrix.needsUpdate = true;
           add(l.group, im);
           const joints = new InstancedMesh(new SphereGeometry(1, 8, 6), std(hex), pts.length);
-          pts.forEach((p, k) => joints.setMatrixAt(k, m.compose(new Vector3(...p), new Quaternion(), new Vector3(l.tube!, l.tube!, l.tube!))));
+          pts.forEach((p, k) =>
+            joints.setMatrixAt(
+              k,
+              m.compose(new Vector3(...p), new Quaternion(), new Vector3(l.tube!, l.tube!, l.tube!)),
+            ),
+          );
           joints.instanceMatrix.needsUpdate = true;
           add(l.group, joints);
         } else {
@@ -698,8 +782,16 @@ export function buildLayers(layers: readonly Layer[], theme: Theme, doc: Documen
           const shafts = new InstancedMesh(new CylinderGeometry(1, 1, 1, 10), std(hex), idx.length);
           const solid = idx.filter((i) => heads(i) === 'solid');
           const open = idx.filter((i) => heads(i) === 'open');
-          const solidHeads = new InstancedMesh(new ConeGeometry(1, 1, 16), std(hex), Math.max(1, solid.length));
-          const openHeads = new InstancedMesh(new ConeGeometry(1, 1, 12, 1, true), std(hex, 1, { wireframe: true }), Math.max(1, open.length));
+          const solidHeads = new InstancedMesh(
+            new ConeGeometry(1, 1, 16),
+            std(hex),
+            Math.max(1, solid.length),
+          );
+          const openHeads = new InstancedMesh(
+            new ConeGeometry(1, 1, 12, 1, true),
+            std(hex, 1, { wireframe: true }),
+            Math.max(1, open.length),
+          );
           solidHeads.count = solid.length;
           openHeads.count = open.length;
           let s = 0;
@@ -714,7 +806,11 @@ export function buildLayers(layers: readonly Layer[], theme: Theme, doc: Documen
             }
             const r = th * len;
             const headLen = Math.min(0.35 * len, 6 * r);
-            const tipBase: Vec3 = [a[0] + (v[0] * (len - headLen)) / len, a[1] + (v[1] * (len - headLen)) / len, a[2] + (v[2] * (len - headLen)) / len];
+            const tipBase: Vec3 = [
+              a[0] + (v[0] * (len - headLen)) / len,
+              a[1] + (v[1] * (len - headLen)) / len,
+              a[2] + (v[2] * (len - headLen)) / len,
+            ];
             shafts.setMatrixAt(k, segmentMatrix(a, tipBase, r, m));
             const tip: Vec3 = [a[0] + v[0], a[1] + v[1], a[2] + v[2]];
             const hm = segmentMatrix(tipBase, tip, 2.6 * r, new Matrix4());
@@ -743,7 +839,14 @@ export function buildLayers(layers: readonly Layer[], theme: Theme, doc: Documen
         mesh.userData = { group: l.group, kind: 'mesh', values: l.values };
         if (l.values) pickables.push(mesh);
         add(l.group, mesh);
-        if (l.edges) add(l.group, new LineSegments(new EdgesGeometry(g, 20), new LineBasicMaterial({ color: new Color(resolveColor('muted', theme)) })));
+        if (l.edges)
+          add(
+            l.group,
+            new LineSegments(
+              new EdgesGeometry(g, 20),
+              new LineBasicMaterial({ color: new Color(resolveColor('muted', theme)) }),
+            ),
+          );
         break;
       }
       case 'labels': {
@@ -765,7 +868,11 @@ export function disposeTree(root: Object3D): void {
   root.traverse((obj) => {
     const mesh = obj as Mesh;
     mesh.geometry?.dispose();
-    const mats: Material[] = Array.isArray(mesh.material) ? mesh.material : mesh.material ? [mesh.material] : [];
+    const mats: Material[] = Array.isArray(mesh.material)
+      ? mesh.material
+      : mesh.material
+        ? [mesh.material]
+        : [];
     for (const mat of mats) mat.dispose();
     (obj as InstancedMesh).dispose?.();
   });

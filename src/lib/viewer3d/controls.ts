@@ -10,7 +10,13 @@ import { rotate, type Quat, type Vec3 } from './math';
 
 export interface CameraLike {
   position: Vector3;
-  quaternion: { x: number; y: number; z: number; w: number; set(x: number, y: number, z: number, w: number): unknown };
+  quaternion: {
+    x: number;
+    y: number;
+    z: number;
+    w: number;
+    set(x: number, y: number, z: number, w: number): unknown;
+  };
   up: Vector3;
   /** Perspective cameras have a field of view; orthographic ones use `zoom` (handled by the caller through `onOrthoZoom`). */
   fov?: number;
@@ -48,7 +54,11 @@ export class ArcballControls {
     targetFactory: () => Vector3,
   ) {
     this.target = targetFactory();
-    const on = <K extends keyof HTMLElementEventMap>(type: K, fn: (e: HTMLElementEventMap[K]) => void, opts?: AddEventListenerOptions) => {
+    const on = <K extends keyof HTMLElementEventMap>(
+      type: K,
+      fn: (e: HTMLElementEventMap[K]) => void,
+      opts?: AddEventListenerOptions,
+    ) => {
       dom.addEventListener(type, fn as EventListener, opts);
       this.cleanup.push(() => dom.removeEventListener(type, fn as EventListener, opts));
     };
@@ -77,7 +87,11 @@ export class ArcballControls {
     const p = this.camera.position;
     const t = this.target;
     const q = this.camera.quaternion;
-    return { q: [q.x, q.y, q.z, q.w], dist: Math.max(1e-9, Math.hypot(p.x - t.x, p.y - t.y, p.z - t.z)), target: [t.x, t.y, t.z] };
+    return {
+      q: [q.x, q.y, q.z, q.w],
+      dist: Math.max(1e-9, Math.hypot(p.x - t.x, p.y - t.y, p.z - t.z)),
+      target: [t.x, t.y, t.z],
+    };
   }
 
   /** Put the camera at a pure arcball state. */
@@ -94,7 +108,10 @@ export class ArcballControls {
 
   private size(): { w: number; h: number } {
     const r = this.dom.getBoundingClientRect?.();
-    return { w: Math.max(1, r?.width || this.dom.clientWidth || 1), h: Math.max(1, r?.height || this.dom.clientHeight || 1) };
+    return {
+      w: Math.max(1, r?.width || this.dom.clientWidth || 1),
+      h: Math.max(1, r?.height || this.dom.clientHeight || 1),
+    };
   }
 
   private ndc(e: { clientX: number; clientY: number }): [number, number] {
@@ -125,7 +142,16 @@ export class ArcballControls {
       return;
     }
     const { w, h } = this.size();
-    this.apply(zoom(this.state, factor, this.limits(), this.zoomToCursor ? ndc : undefined, w / h, this.camera.fov ?? 35));
+    this.apply(
+      zoom(
+        this.state,
+        factor,
+        this.limits(),
+        this.zoomToCursor ? ndc : undefined,
+        w / h,
+        this.camera.fov ?? 35,
+      ),
+    );
   }
   panBy(dx: number, dy: number): void {
     const { h } = this.size();
@@ -143,7 +169,8 @@ export class ArcballControls {
       this.pinch = Math.hypot(a!.x - b!.x, a!.y - b!.y);
       this.mode = 'pan';
     } else {
-      this.mode = e.button === 1 || e.shiftKey ? 'pan' : e.button === 2 ? (e.altKey ? 'pan' : 'roll') : 'rotate';
+      this.mode =
+        e.button === 1 || e.shiftKey ? 'pan' : e.button === 2 ? (e.altKey ? 'pan' : 'roll') : 'rotate';
       if (e.button === 2 && !e.altKey && e.ctrlKey) this.mode = 'pan';
     }
     this.last = { x: e.clientX, y: e.clientY, t: performance.now() };
@@ -157,7 +184,8 @@ export class ArcballControls {
     if (this.pointers.size === 2) {
       const [a, b] = [...this.pointers.values()];
       const d = Math.hypot(a!.x - b!.x, a!.y - b!.y);
-      if (this.pinch > 0 && d > 0) this.zoomBy(this.pinch / d, this.ndc({ clientX: (a!.x + b!.x) / 2, clientY: (a!.y + b!.y) / 2 }));
+      if (this.pinch > 0 && d > 0)
+        this.zoomBy(this.pinch / d, this.ndc({ clientX: (a!.x + b!.x) / 2, clientY: (a!.y + b!.y) / 2 }));
       this.pinch = d;
       this.panBy((e.clientX - prev.x) / 2, (e.clientY - prev.y) / 2);
       return;
@@ -193,7 +221,8 @@ export class ArcballControls {
     this.dom.releasePointerCapture?.(e.pointerId);
     if (this.pointers.size === 0) {
       // a pause before release means no throw
-      if (performance.now() - this.last.t > 80 || this.mode !== 'rotate' || !this.enableDamping) this.spin.speed = 0;
+      if (performance.now() - this.last.t > 80 || this.mode !== 'rotate' || !this.enableDamping)
+        this.spin.speed = 0;
       this.mode = null;
       this.pinch = 0;
       this.emit('end');
