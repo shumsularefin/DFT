@@ -1,5 +1,29 @@
 ---
 id: structure-and-inputs
+stage:
+  scene: m10-inputs
+  states:
+    - id: cell
+      section: why
+      params: { input: poscar }
+      camera: iso
+      caption: 'The POSCAR of this page on the stage: La on the corner, Cu at the body centre, O on the face centres. The outlined atoms are the five lines of the file; the others are copies that complete the octahedron.'
+    - id: spin-start
+      section: intuition
+      params: { input: magmom, start: fm-high }
+      caption: 'MAGMOM = 0 3 3*0 gives one value per atom in POSCAR order, so only Cu starts with a moment, above the dashed mark of the nominal high-spin d8 moment. Switch the spin start to compare the three runs.'
+    - id: plus-u
+      section: math
+      params: { input: ldau, eg: true }
+      caption: 'LDAUL = -1 2 -1 puts U on the Cu d shell only, drawn as a sphere, with the two e_g shapes pointing at the oxygens. The LDAUU value on Cu is one point of a scan, not a recommendation.'
+    - id: mesh
+      section: in-vasp
+      params: { input: kpoints }
+      caption: 'The KPOINTS file as points: a Gamma-centred 8 x 8 x 8 mesh in the cubic Brillouin zone. The larger dots are the irreducible points left after the cubic symmetry joins the rest.'
+    - id: low-moment
+      section: mistakes
+      params: { input: magmom, start: fm-low }
+      caption: 'The low-moment start MAGMOM = 0 1 3*0. Writing 3 0 3*0 instead would put the moment on La, so read the list against the species line before you submit.'
 title: Structure and starting inputs
 module: 10
 order: 2

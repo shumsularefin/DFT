@@ -1,5 +1,28 @@
 ---
 id: electronic-structure
+stage:
+  scene: m10-electronic
+  states:
+    - id: eg
+      section: why
+      params: { panel: orbitals, orbital: x2y2 }
+      caption: 'Cu d_x2-y2 and the O 2p orbitals that point back at it: e_g states that mix strongly with oxygen, the mixture the projected DOS will measure. These are shapes, not computed characters.'
+    - id: t2g
+      section: intuition
+      params: { panel: orbitals, orbital: xy }
+      caption: 'A t_2g orbital, d_xy, points between the oxygens and meets them only side on. Switch the orbital pair to compare sigma and pi overlap.'
+    - id: zone
+      section: math
+      params: { panel: zone, segment: 0 }
+      caption: 'The cubic Brillouin zone with the path Gamma-X-M-Gamma-R-X, then M-R. Step through the segments to follow it.'
+    - id: diagonal
+      section: in-vasp
+      params: { panel: zone, segment: 4 }
+      caption: 'Segment 4 runs from Gamma to R along the body diagonal of the zone. The k-path tool writes this path as line-mode KPOINTS or KPOINTS_OPT.'
+    - id: awaiting
+      section: what-changes
+      params: { panel: bands, segment: 0 }
+      caption: 'The panel the bands will fill, spin up and spin down along the unrolled path, with the Fermi level dashed. It is empty on purpose: the band structure is awaiting results.'
 title: Electronic structure of RCuO3
 module: 10
 order: 5
