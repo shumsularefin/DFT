@@ -25,6 +25,26 @@ checklist: []
 sources: [S-042, S-061, S-062, S-020, S-034]
 status: draft
 updated: 2026-11-27
+stage:
+  scene: m12-eos
+  states:
+    - id: curve
+      section: why
+      params: { volume: 1, data: clean7, form: birch_murnaghan }
+      camera: iso
+      caption: 'The fitted energy-volume curve runs along the front edge of the surface, with the cell at V0 beside it. Drag the volume to squeeze or stretch the cell and follow the marker.'
+    - id: wide-scan
+      section: run
+      params: { data: wide11, volume: 1 }
+      caption: 'Eleven fixed-volume points over plus or minus 10 percent. The lowest point lies inside the scanned range, the first check of any fit.'
+    - id: noisy
+      section: check
+      params: { data: noisy11, volume: 1 }
+      caption: 'With 2 meV of noise the points scatter about the curve and the fitted B0 prime drifts, while V0 and B0 barely move. Switch to the Murnaghan form and compare.'
+    - id: valley
+      section: polymorphs
+      params: { volume: 0.95, surface: true }
+      caption: 'The surface is the enthalpy E + PV over volume and pressure. Its valley floor is the equation of state V(P); comparing such curves is how polymorphs are ranked under pressure.'
 ---
 
 <Section id="why" heading="Why fit an energy–volume curve">

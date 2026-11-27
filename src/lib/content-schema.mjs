@@ -31,28 +31,35 @@ export const STAGE_CAMERAS = ['iso', 'a', 'b', 'c', 'a*', 'b*', 'c*', 'top', 'fr
  * sources and controls come from the generator itself, so a page cannot claim more than the scene computes. Each state is
  * a set of parameter values, visible layer groups and a camera, chosen by the section the reader is in.
  */
-export const stageSchema = z.object({
-  scene: z.string().regex(/^m\d\d[a-z]?-[a-z0-9]+(-[a-z0-9]+)*$/, 'must be a scene id like m02-orbital'),
-  states: z
-    .array(
-      z.object({
-        id: kebab,
-        section: z.enum(STAGE_SECTIONS).optional(),
-        params: z.record(z.string(), z.union([z.number(), z.string(), z.boolean()])).default({}),
-        /** Visible layer groups; all groups when absent. */
-        layers: z.array(kebab).optional(),
-        camera: z
-          .union([
-            z.enum(STAGE_CAMERAS),
-            z.object({ eye: vec3, up: vec3.optional(), zoom: z.number().positive().optional() }),
-          ])
-          .optional(),
-        /** One or two sentences under the stage: what to look at in this state. */
-        caption: z.string().min(10).max(320),
-      }),
-    )
-    .min(1),
-});
+const stageOf = (section) =>
+  z.object({
+    scene: z.string().regex(/^m\d\d[a-z]?-[a-z0-9]+(-[a-z0-9]+)*$/, 'must be a scene id like m02-orbital'),
+    states: z
+      .array(
+        z.object({
+          id: kebab,
+          section: section.optional(),
+          params: z.record(z.string(), z.union([z.number(), z.string(), z.boolean()])).default({}),
+          /** Visible layer groups; all groups when absent. */
+          layers: z.array(kebab).optional(),
+          camera: z
+            .union([
+              z.enum(STAGE_CAMERAS),
+              z.object({ eye: vec3, up: vec3.optional(), zoom: z.number().positive().optional() }),
+            ])
+            .optional(),
+          /** One or two sentences under the stage: what to look at in this state. */
+          caption: z.string().min(10).max(320),
+        }),
+      )
+      .min(1),
+  });
+export const stageSchema = stageOf(z.enum(STAGE_SECTIONS));
+/**
+ * The same stage beside a Workflow step (D-125). A step page has its own section ids (the `<Section id>` of its body),
+ * so a state may follow any of them; stages.test.ts checks that each one is on the page.
+ */
+export const workflowStageSchema = stageOf(kebab);
 
 export const handbookSchema = z.object({
   id: kebab,
@@ -124,4 +131,6 @@ export const workflowSchema = z.object({
   sources: z.array(z.string().regex(SOURCE_ID, 'must look like S-012')).min(1),
   status: z.enum(STATUSES),
   updated: date,
+  /** The live 3D stage beside the step (D-125), the same engine and scenes as the handbook topics. */
+  stage: workflowStageSchema.optional(),
 });

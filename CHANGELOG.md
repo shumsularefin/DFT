@@ -7,6 +7,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- Every Workflow step has the handbook's live 3D view beside its text, following the step's sections, and the Workflow index shows the five-step protocol in 3D with an "On this page" list (D-125).
 - Input Builder climbing-image NEB preset, from the VTST documentation and Henkelman et al. 2000, with a plain VASP NEB variant, the tags IMAGES, SPRING, LCLIMB and IOPT, and NEB rules V036 to V041 (D-111).
 - Materials Project U values and starting moments as labelled, editable fills in the Input Builder and the Magnetic tool, with their sources and the fits that disagree (D-111).
 - Selective-dynamics rules V042 and V043: flags that cannot act, every coordinate fixed, and a slab relaxation with no fixed layers (D-111).
@@ -32,6 +33,9 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Fixed
 
+- Paragraphs and lists inside cards, callouts and other panels run to the panel's edge instead of stopping two thirds of the way across; text with no panel around it keeps a readable line length (D-125).
+- The right-hand rail of a Workflow step no longer draws "Learn why" over "On this page" on wide screens (D-125).
+- Previous and next buttons on handbook topics and Workflow steps stand out from the text: next is filled in the accent colour and previous in the grey button colour, as on the guided path (D-125).
 - Guided path and topic stages: changing an option (n = 1 to 3, the orbital, the number of periodic copies, any stage parameter) keeps the 3D view framed on the new picture, so Reset view is no longer needed; the Try this box no longer spills out of its card (D-124).
 - Guided path pictures explain themselves: the self-consistency loop is shown step by step until the density settles, the density map, cutoff sphere and bands beside the DOS are new pictures, each station says how to read its picture, and a new station and handbook subsection compare real space with reciprocal space (D-124).
 - The benzene preset in molecule mode no longer puts its hydrogens inside the ring: the 3D start points every hydrogen away from the atom's neighbours.

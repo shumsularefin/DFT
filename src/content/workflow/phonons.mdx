@@ -29,6 +29,27 @@ checklist: [Phonon]
 sources: [S-042, S-083, S-020]
 status: draft
 updated: 2026-11-27
+stage:
+  scene: m12-phonon-chain
+  states:
+    - id: chain
+      section: why
+      params: { branch: acoustic, q: 0.3, ratio: 2 }
+      camera: iso
+      caption: 'Two kinds of ball joined by springs, vibrating in an acoustic wave. Press play to watch neighbours move together; behind the chain the two surfaces are the branches of frequency over q and the mass ratio.'
+    - id: transverse
+      section: route-a
+      params: { branch: acoustic, q: 0.5, ratio: 1.5, polarization: transverse }
+      caption: 'Displacements across the chain give a transverse branch; a 3D crystal has two of them for each longitudinal one. phonopy finds every branch from the forces in displaced supercells.'
+    - id: optical
+      section: lo-to
+      params: { branch: optical, q: 0, ratio: 2 }
+      caption: 'At q = 0 the optical mode moves the two kinds of atom against each other while the centre of mass stays put. In a polar crystal that motion carries a dipole, which is where LO-TO splitting comes from.'
+    - id: gap
+      section: check
+      params: { branch: acoustic, q: 1, ratio: 3 }
+      camera: front
+      caption: 'Seen from the front the surfaces read as the dispersion along q. Every branch should stay at or above zero; raise the mass ratio and watch the gap between the branches open.'
 ---
 
 <Section id="why" heading="Why compute phonons">

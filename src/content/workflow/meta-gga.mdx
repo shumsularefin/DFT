@@ -25,6 +25,17 @@ tools:
 sources: [S-042, S-026, S-027, S-020]
 status: draft
 updated: 2026-11-27
+stage:
+  scene: m05-functional
+  states:
+    - id: gga
+      section: why
+      params: { form: pbe, rs: 4, s: 1.5, lda: true, cap: false }
+      caption: 'The rungs below a meta-GGA: PBE climbs above LDA (grey wire) as the density gradient grows. A meta-GGA adds one more ingredient, the kinetic-energy density, which this picture does not show.'
+    - id: pbesol
+      section: route-r2scan
+      params: { form: pbesol, rs: 2, s: 2, lda: false, cap: true }
+      caption: 'PBEsol, the GGA tuned for solids, rises more gently than PBE. Both stay under the exchange cap 1 + kappa = 1.804. Compare structures from a meta-GGA with these GGA results.'
 ---
 
 <Section id="why" heading="What a meta-GGA adds">

@@ -6,6 +6,7 @@ import Cite from '../../components/handbook/Cite.astro';
 import VaspFile from '../../components/handbook/VaspFile.astro';
 import Callout from '../../components/ui/Callout.astro';
 import PresetIncar from '../../components/workflow/PresetIncar.astro';
+import TopicStage from '../../components/stage/TopicStage.astro';
 import Protocol from '../../components/workflow/Protocol.astro';
 import sources from '../../data/sources.json';
 import { citeOrder } from '../../lib/topic';
@@ -39,6 +40,10 @@ const sections = [
   ...(rows.length ? [{ id: 'before-you-submit', heading: 'Before you submit' }] : []),
   { id: 'sources', heading: 'Sources' },
 ];
+// The stage beside the step (D-125): its state chips name the step's own sections, shortened to the part before a
+// colon or a bracket ("Route A", "Check before you move on").
+const stage = d.stage;
+const sectionLabels = Object.fromEntries(sections.map((s) => [s.id, s.heading.split(/[:(]/)[0]!.trim()]));
 const statusLabel = { draft: 'First edition', review: 'Awaiting verification', verified: 'Verified' }[
   d.status
 ];
@@ -84,108 +89,143 @@ const components = { Section, Cite, VaspFile, Callout, PresetIncar };
       )}
     </nav>
   )}
-  <div class="topic" data-pagefind-body data-pagefind-meta="module:Workflow">
-    <header class="topic-head">
-      <div class="page-h">
-        <div>
-          <h1>{d.title}</h1>
-          <p class="topic-summary">{d.summary}</p>
-          <p class="topic-meta">
-            {d.protocolStep && <>Protocol step {d.protocolStep} of 5. </>}
-            {statusLabel}, updated <time datetime={d.updated}>{d.updated}</time>. Workflow{' '}
-            <a href="/workflow/#revisions">version {edition.version}</a>.
-          </p>
+  <div
+    class="topic-row"
+    data-stage-row={stage ? '' : undefined}
+    data-stage-mode={stage ? 'split' : undefined}
+  >
+    <div
+      class:list={['topic', stage && 'topic-text']}
+      data-pagefind-body
+      data-pagefind-meta="module:Workflow"
+    >
+      <header class="topic-head">
+        <div class="page-h">
+          <div>
+            <h1>{d.title}</h1>
+            <p class="topic-summary">{d.summary}</p>
+            <p class="topic-meta">
+              {d.protocolStep && <>Protocol step {d.protocolStep} of 5. </>}
+              {statusLabel}, updated <time datetime={d.updated}>{d.updated}</time>. Workflow{' '}
+              <a href="/workflow/#revisions">version {edition.version}</a>.
+            </p>
+          </div>
         </div>
-      </div>
-    </header>
-    <div class="prose">
-      <section class="card wf-stepcard" aria-label="This step at a glance">
-        <dl>
-          <div>
-            <dt>Folder</dt>
-            <dd>
-              <code>{d.folder}</code>
-            </dd>
-          </div>
-          <div>
-            <dt>You need</dt>
-            <dd>
-              <ul>
-                {d.needs.map((n) => (
-                  <li set:html={n} />
-                ))}
-              </ul>
-            </dd>
-          </div>
-          <div>
-            <dt>You run</dt>
-            <dd set:html={d.run} />
-          </div>
-          <div>
-            <dt>It leaves for the next step</dt>
-            <dd>
-              <ul>
-                {d.produces.map((n) => (
-                  <li set:html={n} />
-                ))}
-              </ul>
-            </dd>
-          </div>
-        </dl>
-      </section>
-      {d.protocolStep && <Protocol step={d.protocolStep} />}
-      <Content components={components} />
-      {rows.length > 0 && (
-        <Section id="before-you-submit" heading="Before you submit">
-          <p class="check-lede">
-            The pre-submit checklist of the Workflow Handbook for this step. The full list is on the{' '}
-            <a href="/reference/checklist/">checklist page</a>.
-          </p>
-          {rows.map((r) => (
-            <>
-              {rows.length > 1 && <p class="wf-checkname">{r.calculation}</p>}
-              <div class="wf-check">
-                <div>
-                  <h3>Must have</h3>
-                  <ul>
-                    {r.must.map((i) => (
-                      <li>{i.text}</li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <h3>Must not have</h3>
-                  <ul>
-                    {r.mustNot.map((i) => (
-                      <li>{i.text}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </>
-          ))}
-        </Section>
+      </header>
+      {stage && (
+        <p class="stage-show">
+          <button type="button" class="btn btn-small" data-stage-show hidden>
+            Show the 3D view
+          </button>
+        </p>
       )}
-      <Section id="sources" heading="Sources">
-        {cites.length > 0 && (
-          <ol class="cite-list">
-            {cites.map((id) => (
-              <li id={`ref-${id}`}>
-                {byId.get(id)?.citation} <a href={`/references/#${id}`}>[{id}]</a>
-              </li>
+      <div class="prose">
+        <section class="card wf-stepcard" aria-label="This step at a glance">
+          <dl>
+            <div>
+              <dt>Folder</dt>
+              <dd>
+                <code>{d.folder}</code>
+              </dd>
+            </div>
+            <div>
+              <dt>You need</dt>
+              <dd>
+                <ul>
+                  {d.needs.map((n) => (
+                    <li set:html={n} />
+                  ))}
+                </ul>
+              </dd>
+            </div>
+            <div>
+              <dt>You run</dt>
+              <dd set:html={d.run} />
+            </div>
+            <div>
+              <dt>It leaves for the next step</dt>
+              <dd>
+                <ul>
+                  {d.produces.map((n) => (
+                    <li set:html={n} />
+                  ))}
+                </ul>
+              </dd>
+            </div>
+          </dl>
+        </section>
+        {d.protocolStep && <Protocol step={d.protocolStep} />}
+        <Content components={components} />
+        {rows.length > 0 && (
+          <Section id="before-you-submit" heading="Before you submit">
+            <p class="check-lede">
+              The pre-submit checklist of the Workflow Handbook for this step. The full list is on the{' '}
+              <a href="/reference/checklist/">checklist page</a>.
+            </p>
+            {rows.map((r) => (
+              <>
+                {rows.length > 1 && <p class="wf-checkname">{r.calculation}</p>}
+                <div class="wf-check">
+                  <div>
+                    <h3>Must have</h3>
+                    <ul>
+                      {r.must.map((i) => (
+                        <li>{i.text}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <h3>Must not have</h3>
+                    <ul>
+                      {r.mustNot.map((i) => (
+                        <li>{i.text}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </>
             ))}
-          </ol>
+          </Section>
         )}
-        {others.length > 0 && (
-          <ul>
-            {others.map((id) => (
-              <li>
-                {byId.get(id)?.citation} <a href={`/references/#${id}`}>[{id}]</a>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Section>
+        <Section id="sources" heading="Sources">
+          {cites.length > 0 && (
+            <ol class="cite-list">
+              {cites.map((id) => (
+                <li id={`ref-${id}`}>
+                  {byId.get(id)?.citation} <a href={`/references/#${id}`}>[{id}]</a>
+                </li>
+              ))}
+            </ol>
+          )}
+          {others.length > 0 && (
+            <ul>
+              {others.map((id) => (
+                <li>
+                  {byId.get(id)?.citation} <a href={`/references/#${id}`}>[{id}]</a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Section>
+      </div>
     </div>
+    {stage && (
+      <div
+        class="stage-splitter"
+        data-stage-splitter
+        role="separator"
+        tabindex="0"
+        aria-orientation="vertical"
+        aria-label="Width of the 3D view"
+        aria-valuemin="28"
+        aria-valuemax="66"
+        aria-valuenow="42"
+      />
+    )}
+    {stage && (
+      <div class="stage-col">
+        <TopicStage stage={stage} topicId={`workflow-${entry.id}`} sectionLabels={sectionLabels} />
+      </div>
+    )}
   </div>
 </WorkflowLayout>

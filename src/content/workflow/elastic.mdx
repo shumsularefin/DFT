@@ -23,6 +23,26 @@ checklist: [Elastic]
 sources: [S-042, S-019, S-020, S-072, S-076, S-077, S-078, S-073, S-075, S-079, S-074]
 status: draft
 updated: 2026-11-27
+stage:
+  scene: m12-elastic-strain
+  states:
+    - id: stretch
+      section: why
+      params: { tensor: cubic, strain: e1, amount: 2, show: energy }
+      camera: iso
+      caption: 'A volume element stretched 2 percent along x, drawn ten times larger. Solid arrows are the pull each face needs. Drag the amplitude and watch the marker ride the energy bowl.'
+    - id: low-symmetry
+      section: inputs
+      params: { tensor: triclinic, strain: e3, amount: -1.5, show: energy }
+      caption: 'VASP applies six strains, each plus and minus, and reads the stress of every one (IBRION = 6). In a triclinic crystal a squeeze along z also needs shear stresses, so the arrows tilt.'
+    - id: unstable
+      section: stability
+      params: { tensor: unstable, strain: e1, amount: 2, show: energy }
+      caption: 'With C12 larger than C11 the energy surface turns into a saddle: stretching along x while squeezing along y lowers the energy, so the Born test fails.'
+    - id: young
+      section: indicators
+      params: { tensor: cubic, show: young }
+      caption: 'The directional Young modulus of the cubic example: the distance of the surface from its centre is the stiffness along that direction. Turn it to find the stiff and soft directions.'
 ---
 
 <Section id="why" heading="What VASP does in this step">

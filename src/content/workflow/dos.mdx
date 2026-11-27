@@ -23,6 +23,27 @@ checklist: [DOS]
 sources: [S-042, S-020]
 status: draft
 updated: 2026-11-27
+stage:
+  scene: m09-dos
+  states:
+    - id: bands-and-dos
+      section: why
+      params: { model: fcc-indirect, method: gaussian, sigma: 0.1, kmesh: 12, energy: 0 }
+      layers: [surface, dos]
+      camera: iso
+      caption: 'The density of states counts how many states of the whole zone sit at each energy. Left, two model bands over the kz = 0 plane; right, their DOS from a 12 x 12 x 12 k-mesh.'
+    - id: tetrahedra
+      section: run
+      params: { model: fcc-indirect, method: tetra, nedos: 2001, energy: 0 }
+      layers: [dos]
+      camera: front
+      caption: 'Tetrahedra on a fine energy grid: sharp band edges and no Gaussian tails. A fine NEDOS grid is what makes a clean DOS and PDOS possible.'
+    - id: coarse-mesh
+      section: read
+      params: { model: fcc-indirect, method: gaussian, sigma: 0.02, kmesh: 4, energy: 0 }
+      layers: [dos]
+      camera: front
+      caption: 'A 4 x 4 x 4 mesh with only 0.02 eV of smearing breaks the DOS into spikes. Spikes like these mean the mesh is too coarse for the smearing, not that the material has sharp features.'
 ---
 
 <Section id="why" heading="Where the DOS comes from">

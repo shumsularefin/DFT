@@ -32,6 +32,27 @@ checklist: [Relax]
 sources: [S-042, S-019, S-020]
 status: draft
 updated: 2026-11-27
+stage:
+  scene: m05b-relaxation
+  states:
+    - id: landscape
+      section: why
+      params: { view: landscape, ibrion: cg, potim: 1, start: upper, step: 0 }
+      camera: iso
+      caption: 'The ball is the starting structure on a model energy landscape; the arrow is the force. Step the ionic steps forward and watch it roll downhill until the force falls below the stopping value.'
+    - id: isif
+      section: inputs
+      params: { view: cell, isif: '3', step: 0 }
+      camera: iso
+      caption: 'A strained SrTiO3 cell with Ti off centre. Solid arrows are what ISIF = 3 lets the run remove: the force on Ti, the volume and the shape stress. Step forward, then try ISIF = 2.'
+    - id: optimisers
+      section: run
+      params: { view: landscape, ibrion: cg, potim: 1, start: middle, step: 60 }
+      caption: 'Started on the middle slope, the ball stops in the nearest valley, not the deepest one. A relaxation finds the nearest minimum, and a re-run starts from where the last one stopped.'
+    - id: saddle
+      section: check
+      params: { view: landscape, ibrion: cg, potim: 1, start: saddle, step: 60 }
+      caption: 'Started next to a saddle point, the ball rolls off into a nearby valley. A perfectly symmetric start could sit on the ridge with zero force, so check the forces and the final structure.'
 ---
 
 <Section id="why" heading="Why this step comes first">

@@ -28,6 +28,21 @@ checklist: [SCF]
 sources: [S-042, S-019, S-020]
 status: draft
 updated: 2026-11-27
+stage:
+  scene: m07-restarts
+  states:
+    - id: scratch
+      section: why
+      params: { icharg: '2', iteration: 40 }
+      caption: 'From scratch: the density starts from the atoms and needs many iterations to reach the converged density at the back. Step back through them with the step bar.'
+    - id: read
+      section: converge
+      params: { icharg: '1', iteration: 40 }
+      caption: 'Reading the converged CHGCAR of the same system (ICHARG = 1): the first density is already the answer, so one iteration is enough.'
+    - id: fixed-right
+      section: next
+      params: { icharg: '11', iteration: 1 }
+      caption: 'The CHGCAR this run writes is what the band step reads with ICHARG = 11: the density is held fixed, so the eigenvalues match the SCF, but the total energy of that run is not one to compare.'
 ---
 
 <Section id="why" heading="Why a separate static run">

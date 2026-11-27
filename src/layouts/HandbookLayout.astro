@@ -31,7 +31,11 @@ const { prev, next } = neighbors(ordered, id);
   <div class="container handbook-layout">
     <div class="hb-rail">
       <Sidebar groups={groups} currentId={id} currentModule={module} />
-      <slot name="rail" />
+      {Astro.slots.has('rail') && (
+        <div class="hb-aside">
+          <slot name="rail" />
+        </div>
+      )}
     </div>
     <div class="handbook-main" data-topic-id={id}>
       <Breadcrumbs

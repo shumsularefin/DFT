@@ -29,6 +29,18 @@ checklist: [Hybrid]
 sources: [S-042, S-025, S-020]
 status: draft
 updated: 2026-11-27
+stage:
+  scene: m05b-beyond-dft
+  states:
+    - id: pbe
+      section: why
+      params: { method: pbe, view: gap, material: all }
+      camera: iso
+      caption: 'Measured gaps (flat plates) against PBE gaps (bright bars) for seven solids. PBE falls short for every one; this is the gap error a hybrid functional sets out to reduce.'
+    - id: errors
+      section: check
+      params: { method: pbe, view: error, material: all }
+      caption: 'Height is now computed minus measured gap, so a perfect method would sit at zero. Read your hybrid gap against such data before you trust it; these are literature values, quoted until checked against the paper.'
 ---
 
 <Section id="why" heading="What a hybrid changes, and what it costs">

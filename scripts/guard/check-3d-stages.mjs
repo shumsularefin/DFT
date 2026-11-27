@@ -1,4 +1,4 @@
-// M16 (section 1): every handbook topic carries a live 3D stage whose scene exists.
+// M16 (section 1): every handbook topic carries a live 3D stage whose scene exists; since D-125 every Workflow step does too.
 //  * a topic without a `stage:` block in its front matter is reported;
 //  * a stage whose scene id is not defined in src/lib/viewer3d/scenes/mXX.ts is reported;
 //  * a topic page that still shows a picture in place of the stage (an <img> standing for 3D) is reported.
@@ -21,7 +21,10 @@ export function stageSceneOf(text) {
 
 export function check3dStages(root = ROOT) {
   const problems = [];
-  const topics = walk(path.join(root, 'src/content/handbook'), { exts: ['.mdx'] });
+  const topics = [
+    ...walk(path.join(root, 'src/content/handbook'), { exts: ['.mdx'] }),
+    ...walk(path.join(root, 'src/content/workflow'), { exts: ['.mdx'] }),
+  ];
   const sceneDir = path.join(root, 'src/lib/viewer3d/scenes');
   const sceneText = new Map();
   for (const t of topics) {
