@@ -67,6 +67,13 @@ const jsonLd = JSON.stringify({
       } catch {
         /* storage unavailable: keep the system theme */
       }
+      try {
+        // Desktop sidebar: collapsed to an icon rail, or the full sidebar (the default).
+        const s = JSON.parse(localStorage.getItem('dft:sidebar'));
+        if (s && s.v === 1 && s.data === 'collapsed') document.documentElement.dataset.sidebar = 'collapsed';
+      } catch {
+        /* storage unavailable: full sidebar */
+      }
     </script>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="manifest" href="/manifest.webmanifest" />

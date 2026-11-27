@@ -208,6 +208,28 @@ test.describe('navigation', () => {
     expect(small).toEqual([]);
   });
 
+  test('the sidebar collapses to an icon rail, is remembered, and keeps link names', async ({ page }) => {
+    await page.goto('/handbook/');
+    const toggle = page.getByRole('button', { name: 'Sidebar' });
+    const nav = page.getByRole('navigation', { name: 'Main' });
+    const width = () => page.locator('.site-header').evaluate((e) => e.getBoundingClientRect().width);
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    const wide = await width();
+    await toggle.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('html')).toHaveAttribute('data-sidebar', 'collapsed');
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(await width()).toBeLessThan(wide / 2);
+    await expect(nav.getByRole('link').first()).toHaveAccessibleName('Learn');
+    await page.goto('/glossary/');
+    await expect(page.locator('html')).toHaveAttribute('data-sidebar', 'collapsed');
+    await page.getByRole('button', { name: 'Sidebar' }).click();
+    await expect(page.locator('html')).not.toHaveAttribute('data-sidebar', 'collapsed');
+    await page.reload();
+    await expect(page.locator('html')).not.toHaveAttribute('data-sidebar', 'collapsed');
+    expect(await width()).toBeCloseTo(wide, 0);
+  });
+
   test('topic page has sidebar, breadcrumbs and the module link', async ({ page }) => {
     await page.goto(TOPIC);
     await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toContainText('Why DFT exists');
