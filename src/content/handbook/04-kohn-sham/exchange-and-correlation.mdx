@@ -1,5 +1,24 @@
 ---
 id: exchange-and-correlation
+stage:
+  scene: m04-xc-hole
+  states:
+    - id: the-hole
+      section: why
+      params: { Z: '2', hole: xc, ref: 1 }
+      caption: 'Each electron digs a hole in the density the other electron sees. The surface shows the hole for every position x1 of the first electron; the dark curve is the hole around the electron at 1 bohr.'
+    - id: exchange
+      section: intuition
+      params: { Z: '2', hole: x, ref: 1 }
+      caption: 'The exchange part alone is minus half the density, the same shape wherever the reference electron is. It removes exactly one electron but does not follow the electron.'
+    - id: correlation
+      section: math
+      params: { Z: '2', hole: c, ref: 1 }
+      caption: 'Correlation is the rest: a dip at the electron and a rise further away that add up to zero. It is what makes the hole follow the electron.'
+    - id: sum-rule
+      section: check
+      params: { Z: '1', hole: xc, ref: -3 }
+      caption: 'In the weakly bound Z = 1 atom the hole is deep and wide. Move the reference electron and check in the readouts that the hole always holds minus one electron.'
 title: Exchange and correlation, the one approximation
 module: 4
 order: 3

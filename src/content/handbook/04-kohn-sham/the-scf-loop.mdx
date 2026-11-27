@@ -1,5 +1,24 @@
 ---
 id: the-scf-loop
+stage:
+  scene: m04-scf-loop
+  states:
+    - id: first-step
+      section: why
+      params: { Z: '2', alpha: 0.3, step: 1, potential: true }
+      caption: 'The first SCF step: the input density (blue) builds a potential, and the orbital of that potential gives a new density (orange, dashed). They do not match yet.'
+    - id: settling
+      section: intuition
+      params: { Z: '2', alpha: 0.3, step: 12, potential: true }
+      caption: 'Twelve steps with mixing 0.3: each row of the waterfall is one input density, and the rows settle as input and output come together. Press play to walk the loop.'
+    - id: bold-mixing
+      section: lab
+      params: { Z: '2', alpha: 0.9, step: 11, potential: false }
+      caption: 'Bolder mixing, 0.9: the loop reaches the self-consistent density in 11 steps for this atom. Try 1.0 and 0.05 and count the rows.'
+    - id: timid-mixing
+      section: math
+      params: { Z: '2', alpha: 0.05, step: 40, potential: false }
+      caption: 'Mixing 0.05 takes tiny steps: after 40 rows the density is still creeping toward the answer. The residual readout shrinks, but slowly.'
 title: The self-consistency loop
 module: 4
 order: 4
