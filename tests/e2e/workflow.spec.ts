@@ -64,6 +64,8 @@ test.describe('workflow step', () => {
     const link = page.locator('a[href="/tools/input-builder/?preset=band&variant=route-b"]').first();
     await link.click();
     await expect(page).toHaveURL(/\/tools\/input-builder\/\?preset=band&variant=route-b/);
+    // the builder is a React island: a click before it hydrates does nothing
+    await page.waitForFunction(() => document.querySelectorAll('astro-island[ssr]').length === 0);
     await page.locator('.ib-stepcard button', { hasText: 'Task' }).click();
     await expect(page.locator('#ib-preset')).toHaveValue('band');
     await expect(page.locator('#ib-variant')).toHaveValue('route-b');

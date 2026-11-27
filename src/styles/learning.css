@@ -310,19 +310,13 @@ main .topic-section > h2.card-h {
   font-size: var(--step--1);
 }
 
-/* Previous and next as two quiet cards */
+/* Previous and next: the buttons themselves are styled in PrevNext.astro (D-125); here they only wrap on narrow
+   columns and keep a sensible minimum width. */
 .handbook-main .prev-next {
   flex-wrap: wrap;
-  margin-top: var(--space-4);
 }
 .handbook-main .prev-next a {
   min-width: min(14rem, 100%);
-  color: var(--text);
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-}
-.handbook-main .prev-next a:hover {
-  border-color: var(--accent);
 }
 
 /* ---------- Shared bits for practice, progress and the guided path ---------- */
