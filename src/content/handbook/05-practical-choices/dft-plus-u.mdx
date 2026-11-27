@@ -1,5 +1,28 @@
 ---
 id: dft-plus-u
+stage:
+  scene: m05-dftu
+  states:
+    - id: penalty
+      section: why
+      params: { u: 4, j: 0, n: 0.5, quantity: energy }
+      caption: 'The Dudarev penalty for one orbital over its occupation n (across) and U_eff (back). It is zero for an empty or a full orbital and largest at half filling.'
+    - id: push
+      section: intuition
+      params: { u: 4, j: 0, n: 0.3, quantity: energy }
+      caption: 'At n = 0.3 the arrow shows the penalty pushing the orbital toward empty; above 0.5 it pushes toward full. That is how +U favours integer occupations. Drag n across the middle.'
+    - id: gap
+      section: lab
+      params: { u: 6, j: 0, n: 0.5, quantity: potential }
+      caption: 'The potential shift V = U_eff (1/2 - n): a filled level drops by U_eff/2 and an empty one rises by U_eff/2, so a gap of U_eff opens. Drag U and watch the two arrows grow.'
+    - id: u-minus-j
+      section: in-vasp
+      params: { u: 5, j: 1, n: 0.3, quantity: energy }
+      caption: 'Only U - J enters the Dudarev form (LDAUTYPE = 2): U = 5 eV with J = 1 eV gives the same surface point as U = 4 eV with J = 0.'
+    - id: no-u
+      section: mistakes
+      params: { u: 0, j: 0, n: 0.3, quantity: energy }
+      caption: 'With U = 0 there is no penalty at all. Energies from runs with different U values sit on different surfaces, so compare only runs with the same U.'
 title: DFT+U for localized electrons
 module: 5
 order: 12

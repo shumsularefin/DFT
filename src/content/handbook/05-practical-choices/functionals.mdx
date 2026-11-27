@@ -1,5 +1,28 @@
 ---
 id: functionals
+stage:
+  scene: m05-functional
+  states:
+    - id: surface
+      section: why
+      params: { form: pbe, rs: 2, s: 1, lda: false, cap: false }
+      caption: 'PBE as a surface: the exchange-correlation energy per electron relative to the uniform-gas exchange, over the reduced gradient s (across) and the density as r_s (back). Rotate it to see both trends.'
+    - id: lda
+      section: intuition
+      params: { form: lda, rs: 2, s: 1, lda: false, cap: false }
+      caption: 'LDA uses only the density, so its surface is flat across: the gradient does not matter. It rises toward the back, where correlation weighs more at low density.'
+    - id: gga
+      section: lab
+      params: { form: pbe, rs: 4, s: 1.5, lda: true, cap: false }
+      caption: 'PBE climbs above LDA (grey wire) as the gradient grows: this is the GGA rung. Drag s and r_s to read F_xc at one point of a density.'
+    - id: pbesol
+      section: math
+      params: { form: pbesol, rs: 2, s: 2, lda: false, cap: true }
+      caption: 'PBEsol uses the gradient coefficient mu = 10/81 of the slowly varying gas, so it rises more gently than PBE. Both stay under the exchange cap 1 + kappa = 1.804.'
+    - id: exchange
+      section: what-changes
+      params: { form: pbe-x, rs: 2, s: 1, lda: false, cap: false }
+      caption: 'PBE exchange alone depends on s but not on r_s. The gap between this and the full surface is the correlation part, largest at low density.'
 title: Choosing a functional
 module: 5
 order: 4

@@ -1,5 +1,24 @@
 ---
 id: vdw-corrections
+stage:
+  scene: m05-vdw
+  states:
+    - id: bilayer
+      section: why
+      params: { spacing: 3.35, slide: 1, correction: d2, damping: true }
+      caption: 'Two graphene layers 3.35 Angstrom apart in AB stacking, and beside them the DFT-D2 correction energy over sliding (across) and spacing (back). The black curve is the energy against spacing here.'
+    - id: no-correction
+      section: intuition
+      params: { spacing: 3.35, slide: 1, correction: none, damping: true }
+      caption: 'Switch the correction off and the landscape is flat at zero: the attraction between neutral layers is not in the semilocal functional and has to be added.'
+    - id: damping
+      section: math
+      params: { spacing: 2.8, slide: 1, correction: d2, damping: false }
+      caption: 'Each pair adds -C6/r^6 times a damping function that removes it at short range. Toggle damping at 2.8 Angstrom: without it the attraction grows by about 10 meV per atom.'
+    - id: sliding
+      section: what-changes
+      params: { spacing: 3.35, slide: 0, correction: d2, damping: true }
+      caption: 'Slide from AB to AA: at this spacing the correction changes by far less than 1 meV per atom. The stacking preference comes mostly from the functional, so relax with the correction on.'
 title: van der Waals corrections
 module: 5
 order: 13

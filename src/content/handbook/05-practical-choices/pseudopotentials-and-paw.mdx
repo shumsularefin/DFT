@@ -1,5 +1,24 @@
 ---
 id: pseudopotentials-and-paw
+stage:
+  scene: m05-paw
+  states:
+    - id: both
+      section: why
+      params: { rc: 1.5, show: both, sphere: true, cutaway: true }
+      caption: 'A schematic all-electron function (orange) and its smooth pseudo partner (blue wire), turned into surfaces around the nucleus. Inside the sphere the true one wiggles; outside they are identical.'
+    - id: all-electron
+      section: intuition
+      params: { rc: 1.5, show: all-electron, sphere: true, cutaway: true }
+      caption: 'The all-electron function alone. Its nodes near the nucleus need very short waves, and so very many plane waves. Rotate to see the rings of nodes inside the sphere.'
+    - id: radius
+      section: lab
+      params: { rc: 2.3, show: both, sphere: true, cutaway: true }
+      caption: 'Drag r_c. A larger sphere hands more of the space around the nucleus to the smooth function, so fewer plane waves are needed, but the spheres of neighbouring atoms must not overlap.'
+    - id: augmentation
+      section: math
+      params: { rc: 1.5, show: augmentation, sphere: true, cutaway: false }
+      caption: 'What PAW adds back inside the sphere: the all-electron function minus the pseudo one. It is exactly zero outside r_c, so it can be handled on a radial grid around each atom.'
 title: Pseudopotentials and PAW
 module: 5
 order: 3
