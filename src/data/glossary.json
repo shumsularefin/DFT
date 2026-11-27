@@ -1178,5 +1178,287 @@
     "sources": [
       "S-042"
     ]
+  },
+  {
+    "id": "bravais-lattice",
+    "label": "Bravais lattice",
+    "short": "An infinite grid of points in which every point has the same surroundings; there are 14 kinds in three dimensions.",
+    "level": "intermediate",
+    "sources": [
+      "S-036"
+    ]
+  },
+  {
+    "id": "crystal-basis",
+    "label": "Basis (of a crystal)",
+    "short": "The group of atoms attached to every lattice point; lattice plus basis gives the crystal.",
+    "level": "beginner",
+    "sources": [
+      "S-036"
+    ]
+  },
+  {
+    "id": "primitive-cell",
+    "label": "Primitive cell",
+    "short": "The smallest repeating cell of a crystal, holding exactly one lattice point.",
+    "level": "beginner",
+    "sources": [
+      "S-036"
+    ]
+  },
+  {
+    "id": "conventional-cell",
+    "label": "Conventional cell",
+    "short": "A larger repeating cell chosen so that its edges follow the symmetry axes, such as the cube of face-centred cubic.",
+    "level": "intermediate",
+    "sources": [
+      "S-036"
+    ]
+  },
+  {
+    "id": "fractional-coordinates",
+    "label": "Fractional coordinates",
+    "short": "Atom positions given as fractions of the three lattice vectors; POSCAR calls them Direct.",
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "symmetry-operation",
+    "label": "Symmetry operation",
+    "short": "A rotation, mirror, inversion, screw, glide or translation that maps the crystal onto itself.",
+    "level": "intermediate",
+    "sources": [
+      "S-105"
+    ]
+  },
+  {
+    "id": "point-group",
+    "label": "Point group",
+    "short": "The set of rotations, mirrors and inversions that leave a crystal looking the same about one point; crystals have 32.",
+    "level": "intermediate",
+    "sources": [
+      "S-105"
+    ]
+  },
+  {
+    "id": "space-group",
+    "label": "Space group",
+    "short": "The full set of symmetry operations of a crystal, translations included; there are 230 in three dimensions.",
+    "level": "intermediate",
+    "sources": [
+      "S-105"
+    ]
+  },
+  {
+    "id": "wyckoff-position",
+    "label": "Wyckoff position",
+    "short": "A set of sites that the space group maps onto each other, labelled by a multiplicity and a letter such as 4a.",
+    "level": "pro",
+    "sources": [
+      "S-105"
+    ]
+  },
+  {
+    "id": "irreducible-brillouin-zone",
+    "label": "Irreducible Brillouin zone",
+    "short": "The part of the Brillouin zone left after symmetry-equivalent k-points are merged; VASP computes only these points, with weights.",
+    "level": "intermediate",
+    "sources": [
+      "S-007",
+      "S-041"
+    ]
+  },
+  {
+    "id": "geometry-relaxation",
+    "label": "Geometry relaxation",
+    "short": "A calculation that moves the atoms, and optionally the cell, until the forces and stress are small.",
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "potential-energy-surface",
+    "label": "Potential energy surface",
+    "short": "The ground-state energy as a function of the positions of all nuclei; relaxations roll downhill on it.",
+    "level": "intermediate",
+    "sources": [
+      "S-049"
+    ]
+  },
+  {
+    "id": "stress-tensor",
+    "label": "Stress tensor",
+    "short": "A 3 by 3 table of how the energy changes when the cell is stretched or sheared; VASP prints it in kB.",
+    "level": "intermediate",
+    "sources": [
+      "S-112"
+    ]
+  },
+  {
+    "id": "fft-grid",
+    "label": "FFT grid",
+    "short": "The real-space grid that VASP uses to switch each wavefunction between plane waves and real space with fast Fourier transforms.",
+    "level": "intermediate",
+    "sources": [
+      "S-010",
+      "S-041"
+    ]
+  },
+  {
+    "id": "parallel-efficiency",
+    "label": "Parallel efficiency",
+    "short": "The speed-up from using p times the resources divided by p; 1 means doubling the cores halves the time.",
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "slab-model",
+    "label": "Slab model",
+    "short": "A few layers of crystal with vacuum above and below, repeated periodically, used to model a surface.",
+    "level": "beginner",
+    "sources": [
+      "S-018"
+    ]
+  },
+  {
+    "id": "miller-indices",
+    "label": "Miller indices",
+    "short": "Three whole numbers (hkl) that name a crystal plane through the inverse of its intercepts with the cell axes.",
+    "level": "beginner",
+    "sources": [
+      "S-036"
+    ]
+  },
+  {
+    "id": "surface-termination",
+    "label": "Surface termination",
+    "short": "Which atomic layer a slab ends on, when a crystal has more than one kind of layer along a direction.",
+    "level": "intermediate",
+    "sources": [
+      "S-064"
+    ]
+  },
+  {
+    "id": "selective-dynamics",
+    "label": "Selective dynamics",
+    "short": "A POSCAR option that fixes chosen atoms or directions during a relaxation, with T (free) or F (fixed) after each atom.",
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "dipole-correction",
+    "label": "Dipole correction",
+    "short": "A compensating dipole layer placed in the vacuum of an asymmetric slab so that the potential on both sides is flat.",
+    "level": "intermediate",
+    "sources": [
+      "S-066",
+      "S-109"
+    ]
+  },
+  {
+    "id": "surface-energy",
+    "label": "Surface energy",
+    "short": "The energy needed to make a unit area of surface, from slab and bulk energies.",
+    "level": "intermediate",
+    "sources": [
+      "S-018"
+    ]
+  },
+  {
+    "id": "planar-average",
+    "label": "Planar average",
+    "short": "A quantity averaged over planes parallel to the surface, leaving a curve along the normal.",
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "work-function",
+    "label": "Work function",
+    "short": "The energy needed to take an electron from the Fermi level to the vacuum just outside a surface.",
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "point-defect",
+    "label": "Point defect",
+    "short": "A defect at one site of a crystal: a vacancy, an interstitial, a substitution or an antisite.",
+    "level": "beginner",
+    "sources": [
+      "S-067"
+    ]
+  },
+  {
+    "id": "vacancy",
+    "label": "Vacancy",
+    "short": "A site of the crystal where an atom is missing.",
+    "level": "beginner",
+    "sources": [
+      "S-067"
+    ]
+  },
+  {
+    "id": "interstitial",
+    "label": "Interstitial",
+    "short": "An extra atom placed between the regular sites of a crystal.",
+    "level": "beginner",
+    "sources": [
+      "S-067"
+    ]
+  },
+  {
+    "id": "antisite-defect",
+    "label": "Antisite",
+    "short": "A defect in which a host atom sits on the site of a different host element, such as Ga on an As site.",
+    "level": "intermediate",
+    "sources": [
+      "S-067"
+    ]
+  },
+  {
+    "id": "defect-formation-energy",
+    "label": "Defect formation energy",
+    "short": "The energy to create a defect from the perfect crystal and reservoirs of atoms and electrons.",
+    "level": "intermediate",
+    "sources": [
+      "S-067"
+    ]
+  },
+  {
+    "id": "chemical-potential",
+    "label": "Chemical potential",
+    "short": "The energy per atom of a reservoir that atoms are taken from or given to, set by the growth conditions.",
+    "level": "intermediate",
+    "sources": [
+      "S-111"
+    ]
+  },
+  {
+    "id": "charge-state",
+    "label": "Charge state",
+    "short": "The net charge q of a defect after it has given electrons to, or taken them from, the Fermi level.",
+    "level": "intermediate",
+    "sources": [
+      "S-067"
+    ]
+  },
+  {
+    "id": "charge-transition-level",
+    "label": "Charge transition level",
+    "short": "The Fermi level at which two charge states of a defect have the same formation energy.",
+    "level": "pro",
+    "sources": [
+      "S-115"
+    ]
   }
 ]
