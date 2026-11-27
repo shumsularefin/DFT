@@ -573,6 +573,88 @@
     ]
   },
   {
+    "id": "effective-mass",
+    "label": "Effective mass",
+    "short": "The mass an electron or hole seems to have when it moves through a crystal, set by how sharply its band curves near an extremum: a strongly curved band means a light carrier.",
+    "level": "intermediate",
+    "sources": [
+      "S-036"
+    ]
+  },
+  {
+    "id": "projected-dos",
+    "label": "Projected density of states",
+    "short": "The density of states split into contributions from each atom and orbital (s, p, d, f), found by projecting the states onto spheres around the atoms.",
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "tetrahedron-method",
+    "label": "Tetrahedron method",
+    "short": "A way to integrate over the Brillouin zone that splits it into small tetrahedra and interpolates the bands inside each, giving sharp densities of states from a uniform k-point mesh.",
+    "level": "intermediate",
+    "sources": [
+      "S-017"
+    ]
+  },
+  {
+    "id": "d-band-center",
+    "label": "d-band center",
+    "short": "The average energy of the d states of an atom, the first moment of its d-projected density of states; on transition-metal surfaces it tracks how strongly adsorbates bind.",
+    "level": "pro",
+    "sources": [
+      "S-085"
+    ]
+  },
+  {
+    "id": "charge-density-difference",
+    "label": "Charge density difference",
+    "short": "The density of a combined system minus the densities of its separate parts on the same grid; it shows where bonding moved electrons to and from.",
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "electron-localization-function",
+    "label": "Electron localization function (ELF)",
+    "short": "A number between 0 and 1 at each point in space; values near 1 mark localized electron pairs such as bonds and lone pairs, and 0.5 is the value of a uniform electron gas.",
+    "level": "intermediate",
+    "sources": [
+      "S-086",
+      "S-087"
+    ]
+  },
+  {
+    "id": "formation-energy",
+    "label": "Formation energy",
+    "short": "The energy of a compound minus the energies of its elements in their reference states, usually per atom; a negative value means the compound is lower in energy than the elements.",
+    "level": "beginner",
+    "sources": [
+      "S-080"
+    ]
+  },
+  {
+    "id": "stress-tensor",
+    "label": "Stress tensor",
+    "short": "Nine numbers (six independent) that say how the energy of a cell changes when it is stretched or sheared; its average diagonal value gives the pressure.",
+    "level": "intermediate",
+    "sources": [
+      "S-092"
+    ]
+  },
+  {
+    "id": "selective-dynamics",
+    "label": "Selective dynamics",
+    "short": "A POSCAR option that marks each coordinate of each atom as free to move or frozen during a relaxation or molecular dynamics run.",
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
     "id": "density-of-states",
     "label": "Density of states",
     "short": "How many electron states are available at each energy, per unit energy.",

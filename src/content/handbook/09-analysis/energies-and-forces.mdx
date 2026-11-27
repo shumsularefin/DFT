@@ -3,77 +3,181 @@ id: energies-and-forces
 title: Reading energies and forces
 module: 9
 order: 1
-summary: Which total energy in OUTCAR and OSZICAR to report (energy sigma->0 vs TOTEN), how forces and stress are checked, and why raw DFT energies only have meaning as differences.
+summary: Which of the three energies in OUTCAR to report and why the sigma->0 value is a Gaussian-smearing result, how to build formation energies from matched runs, and how to read forces, the stress tensor, the pressure and the Pulay stress.
 concepts: [dft-energies-forces]
 requires: [output-files]
-vaspTags: [EDIFFG, ISMEAR, SIGMA]
-sources: [S-019, S-042]
+vaspTags: [ISMEAR, SIGMA, EDIFFG, ENCUT, ISIF, PSTRESS]
+sources: [S-015, S-019, S-040, S-041, S-042, S-080, S-090, S-092, S-093]
 noLab: true
 status: draft
-updated: 2026-11-24
+updated: 2026-11-27
 ---
 
 <Why>
 
-A finished VASP calculation prints three different energies at every step (`TOTEN`, `energy without entropy`, and `energy(sigma->0)`). Picking the wrong one or comparing raw energies computed with different `POTCAR` files or `ENCUT` values produces meaningless numbers <Cite id="S-042" />.
+At the end of every ionic step VASP prints three energies, a force on every atom and a stress tensor. Almost every result you publish is built from these numbers: a reaction energy, a <Term id="formation-energy">formation energy</Term>, the energy difference between two magnetic orderings, an equilibrium volume. Pick the wrong energy, compare runs made with different settings, or forget to divide by the number of atoms, and the result is wrong by more than the effect you are trying to measure <Cite id="S-042" />.
+
+The forces and the stress tell you something different: whether the structure is at rest. They decide when a relaxation may stop and whether a cell is under pressure <Cite id="S-041" />.
 
 </Why>
 
 <Intuition>
 
-Total energies in plane-wave DFT are only meaningful as **differences** between calculations that share the same functional, `POTCAR` files, `ENCUT`, and compatible k-point sampling. For finite-temperature smearing (such as Gaussian or Methfessel-Paxton), `energy(sigma->0)` extrapolates out the artificial electronic entropy term and is the standard energy to report for ground-state comparisons <Cite id="S-042" />.
+**A total energy has no absolute meaning.** The energy zero in a plane-wave PAW calculation is set by the potentials and the basis. Change the `POTCAR` (say `Ti` to `Ti_pv`), `ENCUT`, or the functional, and the total energy can move by many eV while the physics is unchanged. Only **differences** between runs with matched settings mean anything <Cite id="S-042" />.
 
-<Scene id="fcc" />
+**Three energies, because of smearing.** Smearing lets levels near the Fermi level be partly filled (see [the smearing topic](/handbook/05-practical-choices/smearing/)). That brings an artificial electronic entropy $S$ into the problem, and VASP reports:
 
-Forces on each atom (printed in `OUTCAR` under `TOTAL-FORCE (eV/Angst)`) tell you whether atoms are at equilibrium. For a converged geometry relaxation, the largest force magnitude should fall below `|EDIFFG|` (typically `0.01` to `0.02` eV/A).
+- `free energy TOTEN`: the free energy $F = E - TS$. This is the quantity VASP minimizes, and the forces are its derivatives.
+- `energy without entropy`: $E$, the same energy without the $-TS$ term.
+- `energy(sigma->0)`: an estimate of the energy at zero smearing, printed as `E0` in `OSZICAR` <Cite id="S-041" />.
+
+For insulators and semiconductors with Gaussian smearing, quote `E0` <Cite id="S-042" />. Whatever the scheme, check the entropy term: `EENTRO` in `OUTCAR`, divided by the number of atoms, should stay below about 1 meV <Cite id="S-042" />.
+
+**Forces are the slope of the energy landscape** under each atom. They are computed directly from the wavefunctions (the Hellmann-Feynman theorem) instead of by moving atoms <Cite id="S-093" />. At a minimum every force is zero; in practice a relaxation stops when every force is below the tolerance set by `EDIFFG`. Because the atoms push on each other in equal and opposite pairs, the forces in a cell add up to zero; `OUTCAR` prints their sum as `total drift`, which should be small next to the forces themselves <Cite id="S-019" />.
+
+**The <Term id="stress-tensor">stress tensor</Term> is the same idea for the cell.** It says how the energy would change if you stretched or sheared the box <Cite id="S-092" />. Its average over the three axes is the pressure. A positive pressure means the cell is squeezed and would expand if allowed.
 
 </Intuition>
 
 <TheMath>
 
-With electronic smearing, the free energy $F = E - T S$ (`TOTEN`) differs from the zero-temperature energy $E$. The extrapolated energy `energy(sigma->0)` is:
+**Free energy and the zero-smearing estimate.** With smearing width $\sigma$:
 
-$$E(\sigma \to 0) = \frac{1}{2}\bigl(F + E_{\text{without entropy}}\bigr)$$
+$$F = E - TS$$
 
-Always check that $|T S| / N_{\text{atoms}} < 1\text{ meV/atom}$ <Cite id="S-042" />.
+For Gaussian smearing, $E(\sigma)$ and $F(\sigma)$ both differ from the zero-smearing energy $E_0$ by terms of order $\sigma^2$ that are equal in size and opposite in sign, $E \approx E_0 + c\sigma^2$ and $F \approx E_0 - c\sigma^2$. Their average cancels the leading error:
+
+$$E_0 \approx \tfrac12\bigl(E + F\bigr) = E - \tfrac12 TS$$
+
+This is how `energy(sigma->0)` is meant to be read, and it is derived for Gaussian smearing; Gillan gave the same argument for a Fermi-Dirac electronic temperature <Cite id="S-090" /> <Cite id="S-019" />. Methfessel-Paxton smearing is built to remove the $\sigma^2$ error in a different way <Cite id="S-015" />, so the average has no such justification there. With `ISMEAR = 1` or `2`, report $F$ (`TOTEN`) at a small `SIGMA`, and check that $TS$ per atom is small.
+
+**Formation energy.** For a compound $A_xB_y$ made from elemental references:
+
+$$\Delta E_f = \frac{E(A_xB_y) - x\,\mu_A - y\,\mu_B}{x + y}$$
+
+where $\mu_A$ and $\mu_B$ are the energies per atom of the elements in their reference states (usually the stable solid, or a molecule such as $\mathrm{O_2}$), all computed with the same settings <Cite id="S-080" />. Dividing by $x + y$ gives eV per atom; leave it out for eV per formula unit.
+
+**Worked example (illustrative numbers).** A cell of compound $\mathrm{AB_2}$ (one formula unit, 3 atoms) has $E = -20.40$ eV; the elements give $\mu_A = -5.00$ and $\mu_B = -6.50$ eV per atom. Then $\Delta E_f = \bigl(-20.40 + 5.00 + 13.00\bigr)/3 = -2.40/3 = -0.80$ eV per atom, or $-2.40$ eV per formula unit. Negative means the compound is lower in energy than the separated elements.
+
+<Level min="intermediate">
+
+**Forces and stress.** The force on atom $I$ is $\mathbf F_I = -\partial F/\partial \mathbf R_I$. The stress is the derivative of the energy with respect to strain, divided by the volume, $\sigma_{\alpha\beta} = \frac{1}{V}\,\partial E/\partial \varepsilon_{\alpha\beta}$, and the pressure is minus a third of its trace, $p = -\tfrac13(\sigma_{xx} + \sigma_{yy} + \sigma_{zz}) = -\partial E/\partial V$ <Cite id="S-092" />. A squeezed cell lowers its energy by expanding, so $\partial E/\partial V$ is negative and $p$ is positive. VASP prints the stress in kB; 1 kB is 0.1 GPa <Cite id="S-041" />.
+
+**Pulay stress.** A plane-wave basis is cut off at a kinetic energy. When the cell changes at a fixed number of plane waves (as during a VASP cell relaxation), or when the cutoff is too low for the basis to be complete, the diagonal of the stress tensor carries an error, the <Term id="pulay-stress">Pulay stress</Term> <Cite id="S-040" />. It is nearly isotropic and usually makes the relaxed cell too small. It shrinks as `ENCUT` grows, which is why cell relaxations use about 1.3 times the largest `ENMAX` <Cite id="S-041" /> <Cite id="S-042" />.
+
+</Level>
+
+<Level min="pro">
+
+The forces are consistent with $F$, not with $E_0$: they are derivatives of the variational free energy. A relaxation therefore minimizes $F$, and for a large `SIGMA` the structure that minimizes $F$ is not the one that minimizes $E_0$. That is one more reason to keep `SIGMA` small enough that $TS$ is negligible. The tetrahedron method (`ISMEAR = -5`) is not variational in this sense, so its forces in metals are unreliable <Cite id="S-041" />.
+
+</Level>
 
 </TheMath>
 
 <InVasp>
 
-- Read `E0` from `OSZICAR` (which equals `energy(sigma->0)` in `OUTCAR`) for energy comparisons <Cite id="S-042" />.
-- Check the final `TOTAL-FORCE (eV/Angst)` block in `OUTCAR` to confirm every force component is below `|EDIFFG|` <Cite id="S-019" />.
-- Normalize energies per atom or per formula unit before comparing cells of different sizes.
+**A static energy run** for comparisons, with every setting you will keep fixed across the series written out <Cite id="S-041" />:
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM = static energy
+PREC   = Accurate
+ENCUT  = 520
+EDIFF  = 1E-6
+ISMEAR = 0
+SIGMA  = 0.05
+NSW    = 0
+IBRION = -1
+LREAL  = .FALSE.
+LWAVE  = .FALSE.
+LCHARG = .FALSE.`}
+  annotations={{
+    3: 'identical in every run you compare',
+    4: 'tight electronic convergence for clean differences',
+    5: 'Gaussian: safe for any system, and E0 is meaningful',
+    6: 'small width; check EENTRO afterwards',
+    7: 'one ionic step, no movement',
+  }}
+/>
+
+**Where to read each number** <Cite id="S-041" />:
+
+```bash
+grep "free  energy   TOTEN" OUTCAR | tail -1   # F
+grep "energy  without entropy" OUTCAR | tail -1 # E and energy(sigma->0)
+grep EENTRO OUTCAR | tail -1                     # -T*S, divide by the number of atoms
+tail -1 OSZICAR                                  # F= and E0= of the last ionic step
+grep "in kB" OUTCAR | tail -1                    # stress tensor
+grep "external pressure" OUTCAR | tail -1        # pressure
+```
+
+- **Forces.** The last `TOTAL-FORCE (eV/Angst)` block in `OUTCAR` lists each atom's position and force; the `total drift` line just below it gives their sum. Take the largest force magnitude and compare it with the absolute value of `EDIFFG` <Cite id="S-041" />.
+- **Stress.** The `in kB` line gives XX, YY, ZZ, XY, YZ, ZX. For a relaxed bulk cell the pressure should be within about plus or minus 1 to 2 kB <Cite id="S-042" />. Stress is computed by default in relaxations (`ISIF = 2`); see [the relaxation topic](/handbook/09-analysis/relaxations/) for which `ISIF` computes what.
+- **Compare like with like.** Same `ENCUT`, same `POTCAR` variants, the same k-point density (meshes scaled to the cell), the same functional, the same `U` values and `LDAU` settings, the same `PREC`, and the same smearing. Energies with different `U`, or GGA mixed with GGA+U, need a correction scheme before they can be combined <Cite id="S-042" /> <Cite id="S-080" />.
+- **Normalize.** Divide by the number of atoms (eV per atom) or by the number of formula units before comparing cells of different size. Say which you used.
+- **References.** Compute each elemental reference in its own stable structure with the same settings. Molecules such as $\mathrm{O_2}$ are a known weak point of GGA, which is one reason correction schemes exist <Cite id="S-080" />.
 
 </InVasp>
 
 <WhatChanges>
 
-| Quantity in `OUTCAR`     | Meaning                                  | When to use                                                    |
-| ------------------------ | ---------------------------------------- | -------------------------------------------------------------- | --- | ---------- |
-| `free energy TOTEN`      | Free energy $F = E - T S$                | Variational quantity used to compute Hellmann-Feynman forces   |
-| `energy without entropy` | $E$ before $\sigma \to 0$ extrapolation  | Compare with `TOTEN` to check $                                | T S | $ per atom |
-| `energy(sigma->0)`       | Extrapolated zero-smearing energy (`E0`) | Report for ground-state energy differences <Cite id="S-042" /> |
+| Quantity in `OUTCAR`         | What it is                                | When to use it                                                          |
+| ---------------------------- | ----------------------------------------- | ----------------------------------------------------------------------- |
+| `free energy TOTEN`          | Free energy $F = E - TS$                  | Metals with Methfessel-Paxton at small `SIGMA`; the forces belong to it |
+| `energy without entropy`     | $E$, without the $-TS$ term               | Compare with `TOTEN`: their gap is $TS$                                 |
+| `energy(sigma->0)`           | $(E + F)/2$, printed as `E0` in `OSZICAR` | Gaussian smearing, insulators and semiconductors <Cite id="S-042" />    |
+| `EENTRO`                     | $-TS$                                     | Check that its absolute value per atom is below about 1 meV             |
+| `TOTAL-FORCE`                | Force on each atom, eV per angstrom       | Compare the largest with the absolute value of `EDIFFG`                 |
+| `in kB`, `external pressure` | Stress tensor and pressure, kB            | Check that a relaxed cell is near zero pressure                         |
 
-Why report `energy(sigma->0)`: removes the artificial smearing entropy offset while keeping forces consistent with `TOTEN`.
+Why choose on purpose: the three energies differ by a smearing error that can be as large as the effect you want. Why matched settings: only then do the arbitrary offsets cancel. What happens if you skip it: energy differences that change sign when you change a technical setting.
 
 </WhatChanges>
 
 <Mistakes>
 
-<Callout variant="mistake" title="Comparing raw energies across different ENCUT or POTCARs">
+<Callout variant="mistake" title="Comparing energies from runs with different settings">
 
-Plane-wave total energies shift by tens of eV if you change `ENCUT`, `POTCAR` variants (for example `Ti` vs `Ti_pv`), or functionals. Only differences with matched settings are physical.
+Cause: a different `ENCUT`, `POTCAR` variant, functional or `U` between runs. Total energies then shift by much more than any chemical difference. Fix: one settings block for the whole project, reused in every run you compare <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Averaging E and F for Methfessel-Paxton smearing">
+
+Cause: treating `energy(sigma->0)` as exact for every scheme. The average is a Gaussian-smearing result. Fix: with `ISMEAR = 1` or `2` use `TOTEN` at a small `SIGMA`, and check `EENTRO` <Cite id="S-090" /> <Cite id="S-015" />.
+
+</Callout>
+
+<Callout variant="mistake" title="A large entropy term left unchecked">
+
+Cause: the default `SIGMA = 0.2` on an insulator, or too wide a width on a metal. Fix: reduce `SIGMA` until the absolute value of `EENTRO` per atom is below about 1 meV <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Forgetting to normalize">
+
+Cause: subtracting the energy of a 2-atom cell from that of a 16-atom supercell. Fix: compare eV per atom or per formula unit, and scale the references by the number of atoms of each element <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Reading the pressure of an under-converged cell relaxation">
+
+Cause: `ENCUT` at the bare `ENMAX`, so the Pulay stress biases the cell. Fix: about 1.3 times the largest `ENMAX` for any run whose stress or volume you use, and a restart from `CONTCAR` <Cite id="S-041" /> <Cite id="S-040" />.
 
 </Callout>
 
 </Mistakes>
 
-<Check ids={['q-m9-1', 'q-m9-2', 'q-m9-3', 'q-m9-4']} />
+<Check ids={['q-m9-1', 'q-m9-2', 'q-m9-3', 'q-m9-4', 'q-m9-27', 'q-m9-28']} />
 
 <GoDeeper>
 
-- VASP wiki pages `OUTCAR`, `OSZICAR`, and `ISMEAR` <Cite id="S-019" />.
-- The author's VASP Field Handbook on energies and forces <Cite id="S-042" />.
+- VASP wiki pages OUTCAR, OSZICAR, ISMEAR, SIGMA, ISIF and PSTRESS, by page name <Cite id="S-019" />.
+- Gillan on extrapolating to zero electronic temperature <Cite id="S-090" />, and Methfessel and Paxton on their smearing <Cite id="S-015" />.
+- Feynman on forces from the wavefunction <Cite id="S-093" />; Nielsen and Martin on the quantum-mechanical stress <Cite id="S-092" />.
+- Francis and Payne on finite-basis corrections and Pulay stress <Cite id="S-040" />.
+- Jain and co-workers on formation energies and mixing GGA with GGA+U <Cite id="S-080" />.
+- [The smearing topic](/handbook/05-practical-choices/smearing/) for the schemes and the entropy term.
 
 </GoDeeper>

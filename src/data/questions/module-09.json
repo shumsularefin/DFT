@@ -5,38 +5,49 @@
       "dft-energies-forces"
     ],
     "type": "single",
-    "prompt": "Which energy in OUTCAR should you report for ground-state energy differences when using finite-temperature smearing?",
+    "prompt": "A semiconductor was run with ISMEAR = 0 and SIGMA = 0.05. Which energy should you use for energy differences?",
     "options": [
       {
-        "text": "energy(sigma->0) (printed as E0 in OSZICAR)",
+        "text": "energy(sigma->0), printed as E0 in OSZICAR",
         "correct": true,
-        "why": "Matches the VASP output conventions and Field Handbook."
+        "why": "With Gaussian smearing the energy and the free energy err by equal and opposite amounts of order sigma squared, so their average, energy(sigma->0), removes the leading smearing error."
       },
       {
-        "text": "Only the first electronic step energy",
+        "text": "free energy TOTEN",
         "correct": false,
-        "why": "Check the exact VASP definition."
+        "why": "Tempting, because the forces belong to it, but it still carries the -T*S term; for Gaussian smearing the sigma->0 value is the better estimate of the zero-smearing energy."
       },
       {
-        "text": "The raw kinetic energy alone",
+        "text": "energy without entropy",
         "correct": false,
-        "why": "This confuses two different quantities."
+        "why": "It has the same size of smearing error as TOTEN with the opposite sign; only the average of the two cancels it."
+      },
+      {
+        "text": "The energy of the first electronic step",
+        "correct": false,
+        "why": "The first electronic step is far from self-consistency; only the converged energy of the last step means anything."
       }
     ],
     "hints": [
-      "Check how VASP defines this quantity in OUTCAR or the output file.",
-      "Review the summary table on the topic page."
+      "Smearing adds an entropy term. Which printed energy tries to remove its effect?",
+      "Which scheme is this run using, and for which scheme is the average of E and F derived?"
     ],
     "difficulty": 0,
     "level": "beginner",
     "sources": [
       "S-019",
-      "S-042"
+      "S-042",
+      "S-090"
     ],
     "visual": {
-      "scene": "fcc",
-      "caption": "Illustrative crystal scene for dft-energies-forces.",
-      "alt": "Crystal structure scene fcc."
+      "plot": "smearing-curves",
+      "params": {
+        "schemes": [
+          "gaussian"
+        ]
+      },
+      "caption": "Gaussian occupation against energy, in units of the width.",
+      "alt": "Curve of the Gaussian occupation falling smoothly from 1 to 0 across the Fermi level."
     }
   },
   {
@@ -45,38 +56,55 @@
       "dft-energies-forces"
     ],
     "type": "single",
-    "prompt": "Why are raw DFT total energies only meaningful as differences between matched calculations?",
+    "prompt": "Why are DFT total energies only meaningful as differences between runs with matched settings?",
     "options": [
       {
-        "text": "Absolute energies depend on POTCAR choice, ENCUT, and functional offsets",
+        "text": "The energy zero depends on the POTCARs, ENCUT and functional, and only cancels when these match",
         "correct": true,
-        "why": "Matches the VASP output conventions and Field Handbook."
+        "why": "Each potential and basis sets its own reference energy; with identical settings the offsets are the same in both runs and drop out of the difference."
       },
       {
-        "text": "Because VASP adds a random constant to every run",
+        "text": "VASP adds a random constant to every run",
         "correct": false,
-        "why": "Check the exact VASP definition."
+        "why": "The offset is not random: the same input gives the same energy. It is a systematic offset set by the potentials and the basis."
       },
       {
-        "text": "Because forces are measured in Kelvin",
+        "text": "Total energies are never converged",
         "correct": false,
-        "why": "This confuses two different quantities."
+        "why": "Convergence matters, but even a fully converged total energy depends on the potentials used; the difference is what is physical."
+      },
+      {
+        "text": "VASP reports energies in arbitrary units",
+        "correct": false,
+        "why": "The energies are in eV; the issue is the reference point, not the unit."
       }
     ],
     "hints": [
-      "Check how VASP defines this quantity in OUTCAR or the output file.",
-      "Review the summary table on the topic page."
+      "What happens to the total energy if you swap Ti for Ti_pv?",
+      "Which part of the energy is the same in two runs with identical settings?"
     ],
-    "difficulty": 0,
+    "difficulty": -1,
     "level": "beginner",
     "sources": [
-      "S-019",
       "S-042"
     ],
     "visual": {
-      "scene": "fcc",
-      "caption": "Illustrative crystal scene for dft-energies-forces.",
-      "alt": "Crystal structure scene fcc."
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Fix one settings block"
+          },
+          {
+            "label": "Run each structure"
+          },
+          {
+            "label": "Compare the energies"
+          }
+        ]
+      },
+      "caption": "A series of runs that will be compared.",
+      "alt": "A three-step flow from fixing one settings block, to running each structure, to comparing the energies."
     }
   },
   {
@@ -84,39 +112,29 @@
     "concepts": [
       "dft-energies-forces"
     ],
-    "type": "single",
-    "prompt": "What is the handbook rule of thumb for the electronic smearing entropy term |T*S| per atom?",
-    "options": [
-      {
-        "text": "Keep |T*S| / atom below 1 meV/atom",
-        "correct": true,
-        "why": "Matches the VASP output conventions and Field Handbook."
-      },
-      {
-        "text": "Keep |T*S| / atom above 100 meV/atom",
-        "correct": false,
-        "why": "Check the exact VASP definition."
-      },
-      {
-        "text": "Entropy per atom does not depend on SIGMA",
-        "correct": false,
-        "why": "This confuses two different quantities."
-      }
-    ],
+    "type": "numeric",
+    "prompt": "A 32-atom metal cell has EENTRO = -0.064 eV in OUTCAR. What is the absolute value of T*S per atom, in meV per atom?",
+    "answer": 2.0,
+    "tolerance": 0.05,
+    "unit": "meV/atom",
     "hints": [
-      "Check how VASP defines this quantity in OUTCAR or the output file.",
-      "Review the summary table on the topic page."
+      "Divide the absolute value of EENTRO by the number of atoms.",
+      "0.002 eV is how many meV? Compare the result with the 1 meV per atom rule of thumb."
     ],
     "difficulty": 0,
     "level": "beginner",
     "sources": [
-      "S-019",
+      "S-041",
       "S-042"
     ],
     "visual": {
-      "scene": "fcc",
-      "caption": "Illustrative crystal scene for dft-energies-forces.",
-      "alt": "Crystal structure scene fcc."
+      "plot": "sigma-width",
+      "params": {
+        "scheme": "mp1",
+        "sigma": 0.2
+      },
+      "caption": "Methfessel-Paxton occupation for one smearing width.",
+      "alt": "Curve of the occupation against energy from the Fermi level in eV, falling from 1 to 0 with a small dip and overshoot."
     }
   },
   {
@@ -125,38 +143,136 @@
       "dft-energies-forces"
     ],
     "type": "single",
-    "prompt": "What unit does VASP use for atomic forces in OUTCAR TOTAL-FORCE?",
+    "prompt": "The last TOTAL-FORCE block of a relaxation shows a largest force of 0.035 eV/Angstrom, and the INCAR has EDIFFG = -0.02. What does this tell you?",
     "options": [
       {
-        "text": "eV / Angstrom",
+        "text": "The relaxation has not met its force criterion yet",
         "correct": true,
-        "why": "Matches the VASP output conventions and Field Handbook."
+        "why": "A negative EDIFFG asks for every force to be below 0.02 eV/Angstrom; 0.035 is above it, so the run would continue, or stopped at NSW."
       },
       {
-        "text": "Joule / meter",
+        "text": "It is converged, because 0.035 is smaller than 1",
         "correct": false,
-        "why": "Check the exact VASP definition."
+        "why": "The criterion is the absolute value of EDIFFG in eV/Angstrom, not 1; the force must be below 0.02."
       },
       {
-        "text": "Rydberg / second",
+        "text": "It is converged, because a negative EDIFFG compares energies",
         "correct": false,
-        "why": "This confuses two different quantities."
+        "why": "It is the other way round: a negative EDIFFG is the force criterion, a positive one compares energies."
+      },
+      {
+        "text": "The units do not match, so nothing can be said",
+        "correct": false,
+        "why": "Both the forces in OUTCAR and a negative EDIFFG are in eV per angstrom, so they compare directly."
       }
     ],
     "hints": [
-      "Check how VASP defines this quantity in OUTCAR or the output file.",
-      "Review the summary table on the topic page."
+      "What does the sign of EDIFFG decide?",
+      "Compare the largest force with the absolute value of EDIFFG."
     ],
-    "difficulty": 0,
+    "difficulty": -0.5,
     "level": "beginner",
     "sources": [
       "S-019",
-      "S-042"
+      "S-041"
     ],
     "visual": {
-      "scene": "fcc",
-      "caption": "Illustrative crystal scene for dft-energies-forces.",
-      "alt": "Crystal structure scene fcc."
+      "plot": "force-band",
+      "params": {
+        "tol": 0.02
+      },
+      "caption": "Largest force at each ionic step of a relaxation (illustrative).",
+      "alt": "Falling curve of the largest force against ionic step on a logarithmic axis, with a dashed tolerance line."
+    }
+  },
+  {
+    "id": "q-m9-27",
+    "concepts": [
+      "dft-energies-forces"
+    ],
+    "type": "single",
+    "prompt": "A metal is relaxed with ISMEAR = 1 (Methfessel-Paxton) and SIGMA = 0.1. Which energy is the safer one to report, and what should you check?",
+    "options": [
+      {
+        "text": "TOTEN, the free energy, after checking that T*S per atom is small",
+        "correct": true,
+        "why": "The (E + F)/2 average is derived for Gaussian smearing, where the errors are equal and opposite. Methfessel-Paxton removes the leading error differently, so use F at a small width and check the entropy term."
+      },
+      {
+        "text": "energy(sigma->0), because the average is exact for every scheme",
+        "correct": false,
+        "why": "Tempting, since VASP prints it for every run, but the average rests on the Gaussian error pattern and has no such justification for Methfessel-Paxton."
+      },
+      {
+        "text": "energy without entropy, because it has no smearing in it",
+        "correct": false,
+        "why": "It still comes from smeared occupations; dropping the -T*S term does not remove the smearing error."
+      },
+      {
+        "text": "Any of them, because smearing never changes the energy",
+        "correct": false,
+        "why": "Smearing does change the energy, by an amount that grows with SIGMA; that is why the entropy term is checked."
+      }
+    ],
+    "hints": [
+      "For which smearing scheme is the sigma->0 average derived?",
+      "Which printed energy belongs to the forces?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-015",
+      "S-019",
+      "S-090"
+    ],
+    "visual": {
+      "plot": "smearing-curves",
+      "params": {
+        "schemes": [
+          "gaussian",
+          "mp1"
+        ]
+      },
+      "caption": "Occupation for two smearing schemes, in units of the width.",
+      "alt": "Two occupation curves against energy in units of the width: a smooth Gaussian one and a Methfessel-Paxton one with a small dip and overshoot."
+    }
+  },
+  {
+    "id": "q-m9-28",
+    "concepts": [
+      "dft-energies-forces"
+    ],
+    "type": "numeric",
+    "prompt": "A cell of compound AB2 holds 2 formula units (6 atoms) and has E = -42.00 eV. The element references give -5.20 eV per A atom and -6.40 eV per B atom. What is the formation energy in eV per atom? (Illustrative numbers.)",
+    "answer": -1.0,
+    "tolerance": 0.01,
+    "unit": "eV/atom",
+    "hints": [
+      "Subtract 2 A atoms and 4 B atoms at their reference energies from the cell energy.",
+      "Divide what is left by the 6 atoms in the cell."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-080"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Cell energy"
+          },
+          {
+            "label": "Subtract the element references"
+          },
+          {
+            "label": "Divide by the number of atoms"
+          }
+        ]
+      },
+      "caption": "Building a formation energy from three runs.",
+      "alt": "A three-step flow: take the cell energy, subtract the element reference energies, divide by the number of atoms."
     }
   },
   {
@@ -165,38 +281,46 @@
       "relaxation-analysis"
     ],
     "type": "single",
-    "prompt": "What does a negative EDIFFG (for example EDIFFG = -0.02) tell VASP to check?",
+    "prompt": "What does a negative EDIFFG, for example EDIFFG = -0.02, tell VASP to check?",
     "options": [
       {
-        "text": "Stop ionic relaxation when the maximum force norm on any atom is below 0.02 eV/A",
+        "text": "That the force on every atom is below 0.02 eV/Angstrom",
         "correct": true,
-        "why": "Matches the VASP output conventions and Field Handbook."
+        "why": "A negative value switches EDIFFG to a force criterion: the run stops when the largest force magnitude falls below its absolute value."
       },
       {
-        "text": "Stop after 2 ionic steps regardless of forces",
+        "text": "That the energy change between ionic steps is below 0.02 eV",
         "correct": false,
-        "why": "Check the exact VASP definition."
+        "why": "That is what a positive EDIFFG does; it can stop while forces are still large."
       },
       {
-        "text": "Allow forces to grow up to 0.02 eV/A",
+        "text": "That the pressure is below 0.02 kB",
         "correct": false,
-        "why": "This confuses two different quantities."
+        "why": "The force criterion ignores the stress; in cell relaxations you check the stress separately."
+      },
+      {
+        "text": "That the electronic loop converged to 0.02 eV",
+        "correct": false,
+        "why": "The electronic loop is controlled by EDIFF, not EDIFFG."
       }
     ],
     "hints": [
-      "Check how VASP defines this quantity in OUTCAR or the output file.",
-      "Review the summary table on the topic page."
+      "The sign of EDIFFG picks between two kinds of criterion.",
+      "Which quantity is in eV per angstrom?"
     ],
-    "difficulty": 0,
+    "difficulty": -1,
     "level": "beginner",
     "sources": [
       "S-019",
-      "S-042"
+      "S-041"
     ],
     "visual": {
-      "scene": "diamond",
-      "caption": "Illustrative crystal scene for relaxation-analysis.",
-      "alt": "Crystal structure scene diamond."
+      "plot": "force-band",
+      "params": {
+        "tol": 0.02
+      },
+      "caption": "Largest force at each ionic step of a relaxation (illustrative).",
+      "alt": "Falling curve of the largest force against ionic step on a logarithmic axis, with a dashed tolerance line."
     }
   },
   {
@@ -205,38 +329,49 @@
       "relaxation-analysis"
     ],
     "type": "single",
-    "prompt": "If an ISIF = 3 relaxation changes the cell volume by more than 10 %, what should you do?",
+    "prompt": "An ISIF = 3 relaxation of a bulk crystal finished, but a second run from its CONTCAR changes the volume again. What is the best next step?",
     "options": [
       {
-        "text": "Copy CONTCAR to POSCAR and re-run relaxation so VASP rebuilds the plane-wave basis",
+        "text": "Raise ENCUT to about 1.3 times the largest ENMAX and repeat from CONTCAR until the volume stops changing",
         "correct": true,
-        "why": "Matches the VASP output conventions and Field Handbook."
+        "why": "VASP keeps the plane-wave basis of the starting cell, so the stress carries a Pulay error. A higher cutoff shrinks it and each restart builds a basis for the new cell."
       },
       {
-        "text": "Keep the first run without restarting because the basis updates every step",
+        "text": "Accept the first result, since the first run reached required accuracy",
         "correct": false,
-        "why": "Check the exact VASP definition."
+        "why": "Reaching the force criterion does not remove the Pulay stress; the volume can still be biased."
       },
       {
-        "text": "Switch to ISIF = 0",
+        "text": "Lower ENCUT so the run is faster and repeat",
         "correct": false,
-        "why": "This confuses two different quantities."
+        "why": "A lower cutoff makes the Pulay stress larger, not smaller."
+      },
+      {
+        "text": "Switch to ISIF = 2 and report that volume",
+        "correct": false,
+        "why": "ISIF = 2 freezes the cell at whatever volume it has, which does not fix the bias."
       }
     ],
     "hints": [
-      "Check how VASP defines this quantity in OUTCAR or the output file.",
-      "Review the summary table on the topic page."
+      "Why might the stress of a cell relaxation be biased?",
+      "What does a restart from CONTCAR rebuild?"
     ],
-    "difficulty": 0,
-    "level": "beginner",
+    "difficulty": 1,
+    "level": "intermediate",
     "sources": [
-      "S-019",
+      "S-040",
+      "S-041",
       "S-042"
     ],
     "visual": {
-      "scene": "diamond",
-      "caption": "Illustrative crystal scene for relaxation-analysis.",
-      "alt": "Crystal structure scene diamond."
+      "plot": "dof-cell",
+      "params": {
+        "atoms": true,
+        "shape": true,
+        "volume": true
+      },
+      "caption": "Degrees of freedom in a full cell relaxation.",
+      "alt": "A cell outline with two atoms, a dashed larger and sheared outline and arrows on the atoms, labelled with what may change."
     }
   },
   {
@@ -245,38 +380,48 @@
       "relaxation-analysis"
     ],
     "type": "single",
-    "prompt": "Which output line in OUTCAR confirms that ionic relaxation met your EDIFFG criterion?",
+    "prompt": "Which line in OUTCAR confirms that the ionic relaxation met its EDIFFG criterion?",
     "options": [
       {
         "text": "reached required accuracy",
         "correct": true,
-        "why": "Matches the VASP output conventions and Field Handbook."
+        "why": "VASP prints this when the ionic stopping criterion set by EDIFFG is met, before it stops."
+      },
+      {
+        "text": "General timing and accounting informations for this job",
+        "correct": false,
+        "why": "This shows the run ended normally, which also happens when it stops at NSW without converging."
       },
       {
         "text": "aborting loop because EDIFF is reached",
         "correct": false,
-        "why": "Check the exact VASP definition."
+        "why": "That marks the end of one electronic loop, not of the ionic relaxation."
       },
       {
-        "text": "POTCAR read successfully",
+        "text": "The last F= line of OSZICAR",
         "correct": false,
-        "why": "This confuses two different quantities."
+        "why": "OSZICAR prints one F= line per ionic step whether or not the relaxation has converged."
       }
     ],
     "hints": [
-      "Check how VASP defines this quantity in OUTCAR or the output file.",
-      "Review the summary table on the topic page."
+      "Which loop does EDIFFG control, and which EDIFF?",
+      "A normal end of a job is not the same as a converged one."
     ],
-    "difficulty": 0,
+    "difficulty": -1,
     "level": "beginner",
     "sources": [
-      "S-019",
+      "S-041",
       "S-042"
     ],
     "visual": {
-      "scene": "diamond",
-      "caption": "Illustrative crystal scene for relaxation-analysis.",
-      "alt": "Crystal structure scene diamond."
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "OUTCAR"
+        ]
+      },
+      "caption": "Input and output files of a VASP run.",
+      "alt": "Four input files feeding VASP and five output files coming out, with OUTCAR emphasised."
     }
   },
   {
@@ -285,38 +430,135 @@
       "relaxation-analysis"
     ],
     "type": "single",
-    "prompt": "Which file stores the relaxed structure at the end of a VASP relaxation?",
+    "prompt": "Which file holds the latest structure of a relaxation, in a form you can copy straight to POSCAR to restart?",
     "options": [
       {
         "text": "CONTCAR",
         "correct": true,
-        "why": "Matches the VASP output conventions and Field Handbook."
+        "why": "CONTCAR is rewritten after every ionic step in POSCAR format, so it holds the latest geometry even if the job stops early."
       },
       {
-        "text": "OSZICAR",
+        "text": "POSCAR",
         "correct": false,
-        "why": "Check the exact VASP definition."
+        "why": "POSCAR is the input; VASP never updates it."
       },
       {
-        "text": "DOSCAR",
+        "text": "XDATCAR",
         "correct": false,
-        "why": "This confuses two different quantities."
+        "why": "XDATCAR holds the whole trajectory; its last frame has the same positions, but it is not a POSCAR-format restart file."
+      },
+      {
+        "text": "OUTCAR",
+        "correct": false,
+        "why": "OUTCAR prints positions in its force tables, but not in a format VASP reads as a structure."
       }
     ],
     "hints": [
-      "Check how VASP defines this quantity in OUTCAR or the output file.",
-      "Review the summary table on the topic page."
+      "Which file has the same format as POSCAR?",
+      "Which file is updated after every ionic step?"
+    ],
+    "difficulty": -1.5,
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {},
+      "caption": "Input and output files of a VASP run.",
+      "alt": "Four input files feeding VASP and five output files coming out."
+    }
+  },
+  {
+    "id": "q-m9-29",
+    "concepts": [
+      "relaxation-analysis"
+    ],
+    "type": "single",
+    "prompt": "You start a relaxation from a rough structure with large forces. Which IBRION is the robust first choice?",
+    "options": [
+      {
+        "text": "IBRION = 2, conjugate gradient",
+        "correct": true,
+        "why": "Conjugate gradient with line minimizations is the robust standard for rough starts; RMM-DIIS can take over close to the minimum."
+      },
+      {
+        "text": "IBRION = 1, RMM-DIIS quasi-Newton",
+        "correct": false,
+        "why": "It is efficient near the minimum, but with large forces far from it it can be unstable."
+      },
+      {
+        "text": "IBRION = 0",
+        "correct": false,
+        "why": "That is molecular dynamics, not a relaxation."
+      },
+      {
+        "text": "IBRION = -1",
+        "correct": false,
+        "why": "That is a static run: the ions do not move at all."
+      }
+    ],
+    "hints": [
+      "Which optimizer is described as robust far from the minimum?",
+      "Two of the options do not relax the structure at all."
     ],
     "difficulty": 0,
     "level": "beginner",
     "sources": [
       "S-019",
-      "S-042"
+      "S-041"
     ],
     "visual": {
-      "scene": "diamond",
-      "caption": "Illustrative crystal scene for relaxation-analysis.",
-      "alt": "Crystal structure scene diamond."
+      "plot": "ionic-steps",
+      "params": {
+        "nsw": 100
+      },
+      "caption": "The allowed number of ionic steps in a relaxation.",
+      "alt": "A row of boxes for ionic steps, with a note that up to 100 steps are allowed."
+    }
+  },
+  {
+    "id": "q-m9-30",
+    "concepts": [
+      "relaxation-analysis"
+    ],
+    "type": "single",
+    "prompt": "You relax a metal surface slab with 15 angstrom of vacuum. Which ISIF should you use?",
+    "options": [
+      {
+        "text": "ISIF = 2: ions move, the cell stays fixed",
+        "correct": true,
+        "why": "The vacuum and the in-plane cell are set on purpose; relaxing the ions only keeps them."
+      },
+      {
+        "text": "ISIF = 3: ions, shape and volume",
+        "correct": false,
+        "why": "Vacuum has no stress to resist, so the cell would shrink into it."
+      },
+      {
+        "text": "ISIF = 7: volume only",
+        "correct": false,
+        "why": "The atoms would not relax, and the vacuum would still be free to change."
+      },
+      {
+        "text": "ISIF = 4: ions and cell shape at fixed volume",
+        "correct": false,
+        "why": "The volume stays fixed, but the cell shape may still shear and stretch, which distorts the vacuum and the in-plane lattice."
+      }
+    ],
+    "hints": [
+      "What would happen to the vacuum if the cell could change?",
+      "Which ISIF moves ions only and keeps the cell?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "scene": "miller-111-fcc",
+      "caption": "The (111) plane of an fcc crystal, a common surface for slabs.",
+      "alt": "Face-centred cubic cell with the (111) plane drawn as a triangle through three cube corners."
     }
   },
   {
@@ -325,38 +567,46 @@
       "dos-analysis"
     ],
     "type": "single",
-    "prompt": "Before reading a DOS plot from DOSCAR, how should you shift the energy axis?",
+    "prompt": "Before you read a DOS plot from a non-self-consistent (ICHARG = 11) DOS run, how should you shift the energy axis?",
     "options": [
       {
-        "text": "Subtract the Fermi energy so E - E_F = 0 sits at the Fermi level",
+        "text": "Subtract E-fermi taken from the OUTCAR of the self-consistent run",
         "correct": true,
-        "why": "Matches the VASP output conventions and Field Handbook."
+        "why": "DOSCAR energies are absolute, and the Fermi level written by an ICHARG = 11 run can be shifted; the SCF value is the reliable one."
       },
       {
-        "text": "Multiply all energies by cell volume",
+        "text": "Subtract the E-fermi written by the ICHARG = 11 run",
         "correct": false,
-        "why": "Check the exact VASP definition."
+        "why": "Tempting, since it is in the same folder, but a Fermi level from a non-self-consistent run can be shifted."
       },
       {
-        "text": "Shift the highest unoccupied band to zero",
+        "text": "No shift is needed; DOSCAR energies are already relative to E_F",
         "correct": false,
-        "why": "This confuses two different quantities."
+        "why": "They are absolute; line 6 gives E_F so that you can subtract it."
+      },
+      {
+        "text": "Shift so that the lowest state sits at zero",
+        "correct": false,
+        "why": "The convention is E - E_F = 0 (or the VBM for semiconductors), so that filled and empty states are read off at a glance."
       }
     ],
     "hints": [
-      "Check how VASP defines this quantity in OUTCAR or the output file.",
-      "Review the summary table on the topic page."
+      "Are DOSCAR energies absolute or relative?",
+      "Which run determined the occupations self-consistently?"
     ],
-    "difficulty": 0,
+    "difficulty": -0.5,
     "level": "beginner",
     "sources": [
-      "S-019",
+      "S-041",
       "S-042"
     ],
     "visual": {
-      "scene": "bcc",
-      "caption": "Illustrative crystal scene for dos-analysis.",
-      "alt": "Crystal structure scene bcc."
+      "plot": "band-gap",
+      "params": {
+        "dos": true
+      },
+      "caption": "Number of levels at each energy in a toy material. Toy model.",
+      "alt": "A histogram of how many levels fall at each energy, drawn sideways along the energy axis."
     }
   },
   {
@@ -365,38 +615,49 @@
       "dos-analysis"
     ],
     "type": "single",
-    "prompt": "Why should Gaussian post-smoothing be off by default when reading band edges in a DOS viewer?",
+    "prompt": "A DOS made with ISMEAR = 0 and SIGMA = 0.1 shows a smaller gap than the band structure. What is the most likely reason?",
     "options": [
       {
-        "text": "Artificial broadening can smear states into the band gap and hide a narrow gap",
+        "text": "Gaussian broadening puts tails of width a few SIGMA into the gap",
         "correct": true,
-        "why": "Matches the VASP output conventions and Field Handbook."
+        "why": "Each level is drawn as a Gaussian bell of width SIGMA; its tails reach into the gap from both edges, so the gap looks narrower than the eigenvalues say."
       },
       {
-        "text": "Smoothing removes the spin-down channel",
+        "text": "The DOS run used a different functional",
         "correct": false,
-        "why": "Check the exact VASP definition."
+        "why": "Possible in principle, but nothing in the setup suggests it; broadening alone explains a smaller apparent gap."
       },
       {
-        "text": "Smoothing changes the Fermi energy to 10 eV",
+        "text": "The band structure always overestimates gaps",
         "correct": false,
-        "why": "This confuses two different quantities."
+        "why": "Bands and DOS come from the same eigenvalues; the band plot shows them without broadening."
+      },
+      {
+        "text": "NEDOS was too large",
+        "correct": false,
+        "why": "A finer energy grid resolves the edges better; it does not shrink the gap."
       }
     ],
     "hints": [
-      "Check how VASP defines this quantity in OUTCAR or the output file.",
-      "Review the summary table on the topic page."
+      "What does SIGMA do to each level in the DOS?",
+      "Which plot shows the eigenvalues without any broadening?"
     ],
     "difficulty": 0,
     "level": "beginner",
     "sources": [
-      "S-019",
+      "S-041",
       "S-042"
     ],
     "visual": {
-      "scene": "bcc",
-      "caption": "Illustrative crystal scene for dos-analysis.",
-      "alt": "Crystal structure scene bcc."
+      "plot": "smearing-curves",
+      "params": {
+        "schemes": [
+          "gaussian"
+        ],
+        "series": "delta"
+      },
+      "caption": "The broadened delta function of Gaussian smearing.",
+      "alt": "A bell-shaped curve centred on zero, the energy axis in units of the smearing width."
     }
   },
   {
@@ -405,38 +666,53 @@
       "dos-analysis"
     ],
     "type": "single",
-    "prompt": "Which VASP tag writes lm-decomposed projected DOS columns (s, py, pz, px, dxy, ...) into DOSCAR?",
+    "prompt": "Which LORBIT value is the usual choice for site- and lm-resolved PDOS (s, py, pz, px, dxy, ...) in DOSCAR?",
     "options": [
       {
         "text": "LORBIT = 11",
         "correct": true,
-        "why": "Matches the VASP output conventions and Field Handbook."
+        "why": "11 resolves each atom's projection into the individual p and d orbitals and takes the sphere radii from the POTCAR."
       },
       {
-        "text": "ISIF = 3",
+        "text": "LORBIT = 10",
         "correct": false,
-        "why": "Check the exact VASP definition."
+        "why": "10 gives s, p and d per atom, but not the individual m components."
       },
       {
-        "text": "LWAVE = .FALSE.",
+        "text": "LORBIT = 12",
         "correct": false,
-        "why": "This confuses two different quantities."
+        "why": "12 has the same projections as 11 and adds phase factors to PROCAR, which a PDOS does not need."
+      },
+      {
+        "text": "NEDOS = 3001",
+        "correct": false,
+        "why": "NEDOS sets the energy grid, not the projections."
       }
     ],
     "hints": [
-      "Check how VASP defines this quantity in OUTCAR or the output file.",
-      "Review the summary table on the topic page."
+      "Which value splits p into px, py and pz?",
+      "Which value adds phase information you rarely need?"
     ],
     "difficulty": 0,
     "level": "beginner",
     "sources": [
       "S-019",
-      "S-042"
+      "S-041"
     ],
     "visual": {
-      "scene": "bcc",
-      "caption": "Illustrative crystal scene for dos-analysis.",
-      "alt": "Crystal structure scene bcc."
+      "plot": "orbital-slice",
+      "params": {
+        "orbitals": [
+          {
+            "l": 1,
+            "m": 0,
+            "plane": "xz",
+            "label": "one p orbital"
+          }
+        ]
+      },
+      "caption": "A slice through one p orbital.",
+      "alt": "A two-lobed p orbital shape drawn in the xz plane, one lobe positive and one negative."
     }
   },
   {
@@ -445,38 +721,162 @@
       "dos-analysis"
     ],
     "type": "single",
-    "prompt": "What is the standard smearing method for a sharp DOS calculation on an insulator with a dense k-mesh?",
+    "prompt": "You want a sharp, accurate total DOS of a bulk semiconductor on a dense uniform Gamma-centred mesh. Which ISMEAR fits?",
     "options": [
       {
-        "text": "ISMEAR = -5 (tetrahedron method with Bloechl corrections)",
+        "text": "ISMEAR = -5, the tetrahedron method with Blochl corrections",
         "correct": true,
-        "why": "Matches the VASP output conventions and Field Handbook."
+        "why": "It interpolates the bands between k-points and gives sharp edges and accurate DOS for bulk cells on a uniform mesh with at least 4 k-points."
       },
       {
-        "text": "ISMEAR = 2 with SIGMA = 0.5",
+        "text": "ISMEAR = 1 with SIGMA = 0.2",
         "correct": false,
-        "why": "Check the exact VASP definition."
+        "why": "Methfessel-Paxton is for metals and gives wrong energies and occupations for semiconductors."
       },
       {
-        "text": "ISMEAR = -1 with SIGMA = 1.0",
+        "text": "ISMEAR = 0 with SIGMA = 0.5",
         "correct": false,
-        "why": "This confuses two different quantities."
+        "why": "A width this large blurs the peaks and fills the gap with tails."
+      },
+      {
+        "text": "ISMEAR = -5 on a line-mode path",
+        "correct": false,
+        "why": "The tetrahedron method needs a uniform mesh that fills the zone; a path does not."
       }
     ],
     "hints": [
-      "Check how VASP defines this quantity in OUTCAR or the output file.",
-      "Review the summary table on the topic page."
+      "Which method uses the mesh geometry itself instead of a broadening width?",
+      "Which scheme should never be used on semiconductors?"
     ],
     "difficulty": 0,
     "level": "beginner",
     "sources": [
-      "S-019",
+      "S-017",
+      "S-041",
       "S-042"
     ],
     "visual": {
-      "scene": "bcc",
-      "caption": "Illustrative crystal scene for dos-analysis.",
-      "alt": "Crystal structure scene bcc."
+      "plot": "kmesh-grid",
+      "params": {
+        "n": 8,
+        "gamma": true
+      },
+      "caption": "An 8 by 8 Gamma-centred k-point mesh (2D slice).",
+      "alt": "A square grid of 8 by 8 k-points with one point at the zone centre."
+    }
+  },
+  {
+    "id": "q-m9-23",
+    "concepts": [
+      "dos-analysis"
+    ],
+    "type": "numeric",
+    "prompt": "A DOS run uses EMIN = -10, EMAX = 15 and NEDOS = 2501. What is the spacing of the energy grid, in eV?",
+    "answer": 0.01,
+    "tolerance": 0.0005,
+    "unit": "eV",
+    "hints": [
+      "The window is EMAX minus EMIN.",
+      "There are NEDOS - 1 intervals between NEDOS points."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Window width"
+          },
+          {
+            "label": "Number of intervals"
+          },
+          {
+            "label": "Divide"
+          }
+        ]
+      },
+      "caption": "Working out the energy resolution of a DOS run.",
+      "alt": "A three-step flow: find the window width, find the number of intervals, divide one by the other."
+    }
+  },
+  {
+    "id": "q-m9-24",
+    "concepts": [
+      "dos-analysis"
+    ],
+    "type": "numeric",
+    "prompt": "In a spin-polarized DOSCAR, the integrated DOS at the Fermi level is 14.6 electrons for spin up and 12.4 for spin down. What is the total magnetic moment of the cell, in Bohr magnetons?",
+    "answer": 2.2,
+    "tolerance": 0.01,
+    "unit": "mu_B",
+    "hints": [
+      "The moment is the number of up electrons minus the number of down electrons.",
+      "Each unpaired electron contributes one Bohr magneton."
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "ispin-ladders",
+      "params": {
+        "spin": 2
+      },
+      "caption": "Spin-up and spin-down levels of a toy system. Illustrative.",
+      "alt": "Two ladders of levels, one for spin up and one for spin down, with different filling."
+    }
+  },
+  {
+    "id": "q-m9-31",
+    "concepts": [
+      "dos-analysis"
+    ],
+    "type": "single",
+    "prompt": "On a transition-metal surface, the d-band center moves closer to the Fermi level. In the Hammer-Norskov model, what does that usually mean?",
+    "options": [
+      {
+        "text": "Adsorbates bind more strongly",
+        "correct": true,
+        "why": "A higher d-band center leaves the antibonding adsorbate-metal states emptier, so binding gets stronger; the d-band center tracks this trend."
+      },
+      {
+        "text": "Adsorbates bind more weakly",
+        "correct": false,
+        "why": "That is the trend for a center moving down, away from the Fermi level."
+      },
+      {
+        "text": "The surface becomes an insulator",
+        "correct": false,
+        "why": "The d-band center is a first moment of the d PDOS; it says nothing by itself about a gap opening."
+      },
+      {
+        "text": "Nothing, because the d-band center depends only on SIGMA",
+        "correct": false,
+        "why": "Broadening changes the shape of the PDOS a little, but the center is set by the electronic structure; compare centers at matched settings."
+      }
+    ],
+    "hints": [
+      "The d-band center is the average energy of the d states.",
+      "Closer to E_F means the antibonding states with an adsorbate are pushed up and emptied."
+    ],
+    "difficulty": 1.5,
+    "level": "pro",
+    "sources": [
+      "S-085",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "band-gap",
+      "params": {
+        "dos": true
+      },
+      "caption": "Number of levels at each energy in a toy material. Toy model.",
+      "alt": "A histogram of how many levels fall at each energy, drawn sideways along the energy axis."
     }
   },
   {
@@ -485,38 +885,43 @@
       "band-structure-analysis"
     ],
     "type": "single",
-    "prompt": "When is a band gap classified as indirect?",
+    "prompt": "When is a band gap called indirect?",
     "options": [
       {
-        "text": "When the valence-band maximum (VBM) and conduction-band minimum (CBM) occur at different k-points",
+        "text": "When the valence-band maximum and the conduction-band minimum sit at different k-points",
         "correct": true,
-        "why": "Matches the VASP output conventions and Field Handbook."
+        "why": "An indirect gap needs a change of crystal momentum to cross, which a photon alone cannot supply, as in silicon."
       },
       {
-        "text": "When the VBM and CBM occur at the exact same k-point",
+        "text": "When the gap is smaller than 1 eV",
         "correct": false,
-        "why": "Check the exact VASP definition."
+        "why": "The size of the gap does not decide whether it is direct or indirect."
       },
       {
-        "text": "Whenever ISPIN = 2 is enabled",
+        "text": "When the valence-band maximum and the conduction-band minimum sit at the same k-point",
         "correct": false,
-        "why": "This confuses two different quantities."
+        "why": "That is the definition of a direct gap, as in GaAs."
+      },
+      {
+        "text": "When spin-orbit coupling is switched on",
+        "correct": false,
+        "why": "Spin-orbit coupling can change the band edges, but the definition is about where in k they sit."
       }
     ],
     "hints": [
-      "Check how VASP defines this quantity in OUTCAR or the output file.",
-      "Review the summary table on the topic page."
+      "Look at the k-point of the top of the filled bands and of the bottom of the empty bands.",
+      "Light carries almost no crystal momentum."
     ],
-    "difficulty": 1,
-    "level": "intermediate",
+    "difficulty": -1,
+    "level": "beginner",
     "sources": [
-      "S-019",
-      "S-042"
+      "S-042",
+      "S-050"
     ],
     "visual": {
       "scene": "reciprocal-fcc",
-      "caption": "Illustrative crystal scene for band-structure-analysis.",
-      "alt": "Crystal structure scene reciprocal-fcc."
+      "caption": "Real and reciprocal lattice vectors of the fcc lattice.",
+      "alt": "Primitive fcc cell with its three real-space lattice vectors and the three reciprocal vectors."
     }
   },
   {
@@ -525,38 +930,43 @@
       "band-structure-analysis"
     ],
     "type": "single",
-    "prompt": "Why must you avoid ISMEAR = -5 on a line-mode KPOINTS band-structure run?",
+    "prompt": "Why should you not use ISMEAR = -5 in a band-structure run on a line-mode path?",
     "options": [
       {
-        "text": "The tetrahedron method requires a 3D k-point mesh and fails on a 1D k-path",
+        "text": "The tetrahedron method needs a uniform mesh that tiles the whole Brillouin zone, and a path does not",
         "correct": true,
-        "why": "Matches the VASP output conventions and Field Handbook."
+        "why": "Tetrahedra are built between neighbouring points of a 3D mesh; points along lines cannot form them."
       },
       {
-        "text": "ISMEAR = -5 only works for molecules",
+        "text": "Because ISMEAR = -5 is only for metals",
         "correct": false,
-        "why": "Check the exact VASP definition."
+        "why": "It is used for insulators and metals alike on a uniform mesh; the problem here is the path."
       },
       {
-        "text": "ISMEAR = -5 deletes EIGENVAL",
+        "text": "Because it makes the bands smoother than they are",
         "correct": false,
-        "why": "This confuses two different quantities."
+        "why": "The occupations scheme does not change the eigenvalues on the path; the method simply cannot be built on a line."
+      },
+      {
+        "text": "Because the path has too many k-points",
+        "correct": false,
+        "why": "The number is not the issue: even a dense path does not fill the zone."
       }
     ],
     "hints": [
-      "Check how VASP defines this quantity in OUTCAR or the output file.",
-      "Review the summary table on the topic page."
+      "What geometric objects does the tetrahedron method need?",
+      "Do points along a few lines fill a volume?"
     ],
-    "difficulty": 1,
-    "level": "intermediate",
+    "difficulty": 0,
+    "level": "beginner",
     "sources": [
       "S-019",
-      "S-042"
+      "S-041"
     ],
     "visual": {
       "scene": "reciprocal-fcc",
-      "caption": "Illustrative crystal scene for band-structure-analysis.",
-      "alt": "Crystal structure scene reciprocal-fcc."
+      "caption": "Real and reciprocal lattice vectors of the fcc lattice.",
+      "alt": "Primitive fcc cell with its three real-space lattice vectors and the three reciprocal vectors."
     }
   },
   {
@@ -565,38 +975,46 @@
       "band-structure-analysis"
     ],
     "type": "single",
-    "prompt": "What advantage does KPOINTS_OPT (VASP 6.3+) offer for band structures?",
+    "prompt": "What does KPOINTS_OPT (VASP 6.3 and newer) change in the band-structure workflow?",
     "options": [
       {
-        "text": "It evaluates the band path in a single run after SCF and works with hybrid functionals",
+        "text": "The path is evaluated in the same job, after the SCF converges on the uniform mesh in KPOINTS",
         "correct": true,
-        "why": "Matches the VASP output conventions and Field Handbook."
+        "why": "VASP converges the density on the uniform mesh and then computes the eigenvalues on the KPOINTS_OPT path, so no separate ICHARG = 11 run is needed."
       },
       {
-        "text": "It eliminates the need for a POSCAR file",
+        "text": "It makes PBE band gaps agree with experiment",
         "correct": false,
-        "why": "Check the exact VASP definition."
+        "why": "It changes how the path is computed, not the functional; PBE still underestimates gaps."
       },
       {
-        "text": "It forces all gaps to be direct",
+        "text": "It lets the SCF run on the path alone, without a uniform mesh",
         "correct": false,
-        "why": "This confuses two different quantities."
+        "why": "The density still needs the uniform mesh; a path cannot converge it."
+      },
+      {
+        "text": "It works in VASP 5.4 as well",
+        "correct": false,
+        "why": "It is a VASP 6.3 feature; older versions use the two-step ICHARG = 11 route."
       }
     ],
     "hints": [
-      "Check how VASP defines this quantity in OUTCAR or the output file.",
-      "Review the summary table on the topic page."
+      "Which file still holds the uniform mesh?",
+      "How many runs does the classic route need?"
     ],
-    "difficulty": 1,
+    "difficulty": 0.5,
     "level": "intermediate",
     "sources": [
       "S-019",
       "S-042"
     ],
     "visual": {
-      "scene": "reciprocal-fcc",
-      "caption": "Illustrative crystal scene for band-structure-analysis.",
-      "alt": "Crystal structure scene reciprocal-fcc."
+      "plot": "restart-chain",
+      "params": {
+        "focus": "CHGCAR"
+      },
+      "caption": "The classic chain of runs before a band or DOS calculation.",
+      "alt": "Three stages in a row, relaxation then SCF in the same folder then a band or density-of-states run, with the file that travels along each arrow."
     }
   },
   {
@@ -604,39 +1022,129 @@
     "concepts": [
       "band-structure-analysis"
     ],
-    "type": "single",
-    "prompt": "In the two-step ICHARG = 11 band workflow, which tags must match the preceding SCF calculation?",
+    "type": "multi",
+    "prompt": "In the two-step ICHARG = 11 band workflow, which settings must be identical to the SCF run that wrote CHGCAR? Select all that apply.",
     "options": [
       {
-        "text": "ISPIN, MAGMOM, LMAXMIX, and LDAU*",
+        "text": "ENCUT",
         "correct": true,
-        "why": "Matches the VASP output conventions and Field Handbook."
+        "why": "The fixed density belongs to one basis; a different cutoff no longer matches it."
       },
       {
-        "text": "NSW and POTIM",
-        "correct": false,
-        "why": "Check the exact VASP definition."
+        "text": "ISPIN and MAGMOM",
+        "correct": true,
+        "why": "A spin-polarized density read into a non-spin run, or with other moments, gives a different Hamiltonian."
       },
       {
-        "text": "Only the job name",
+        "text": "LMAXMIX for d or f elements",
+        "correct": true,
+        "why": "It sets how much of the one-centre density CHGCAR keeps; a mismatch loses d or f occupation information."
+      },
+      {
+        "text": "NBANDS",
         "correct": false,
-        "why": "This confuses two different quantities."
+        "why": "You may raise NBANDS in the band run to see more conduction bands; the density is frozen, so this is safe."
+      },
+      {
+        "text": "The KPOINTS file",
+        "correct": false,
+        "why": "This is the one thing that must change: the band run uses the path instead of the uniform mesh."
       }
     ],
     "hints": [
-      "Check how VASP defines this quantity in OUTCAR or the output file.",
-      "Review the summary table on the topic page."
+      "Which settings define the Hamiltonian that the frozen density belongs to?",
+      "Which two things are you meant to change in the band run?"
     ],
     "difficulty": 1,
     "level": "intermediate",
     "sources": [
-      "S-019",
+      "S-041",
       "S-042"
     ],
     "visual": {
-      "scene": "reciprocal-fcc",
-      "caption": "Illustrative crystal scene for band-structure-analysis.",
-      "alt": "Crystal structure scene reciprocal-fcc."
+      "plot": "restart-chain",
+      "params": {
+        "focus": "CHGCAR"
+      },
+      "caption": "The classic chain of runs before a band or DOS calculation.",
+      "alt": "Three stages in a row, relaxation then SCF in the same folder then a band or density-of-states run, with the file that travels along each arrow."
+    }
+  },
+  {
+    "id": "q-m9-21",
+    "concepts": [
+      "band-structure-analysis"
+    ],
+    "type": "numeric",
+    "prompt": "Near a conduction-band minimum, a fit gives d2E/dk2 = 38.1 eV Angstrom^2 (k in Cartesian inverse angstrom, 2 pi included). Using hbar^2/m_e = 7.62 eV Angstrom^2, what is m*/m_e? (Illustrative numbers.)",
+    "answer": 0.2,
+    "tolerance": 0.01,
+    "unit": "m_e",
+    "hints": [
+      "m*/m_e = (hbar^2/m_e) divided by the curvature.",
+      "7.62 divided by 38.1."
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-031",
+      "S-036"
+    ],
+    "visual": {
+      "plot": "pw-parabola",
+      "params": {
+        "showCutoff": false
+      },
+      "caption": "Kinetic energy of a free electron against its wave vector.",
+      "alt": "Curve of the kinetic energy against wave vector, rising as a parabola that is lowest at zero."
+    }
+  },
+  {
+    "id": "q-m9-22",
+    "concepts": [
+      "band-structure-analysis"
+    ],
+    "type": "single",
+    "prompt": "Your band plot stops just above the conduction-band minimum: the higher conduction bands are missing. What is the fix?",
+    "options": [
+      {
+        "text": "Raise NBANDS in the ICHARG = 11 band run",
+        "correct": true,
+        "why": "VASP computes only NBANDS bands, and the default adds few empty ones. With the density frozen, more bands cost a little time and change nothing else."
+      },
+      {
+        "text": "Raise ENCUT",
+        "correct": false,
+        "why": "The cutoff sets the basis quality, not how many bands are computed."
+      },
+      {
+        "text": "Rerun the SCF with a denser k-mesh",
+        "correct": false,
+        "why": "A denser SCF mesh changes the density sampling, not the number of bands on the path."
+      },
+      {
+        "text": "Switch to ISMEAR = -5",
+        "correct": false,
+        "why": "The tetrahedron method cannot be used on a path, and smearing does not add bands."
+      }
+    ],
+    "hints": [
+      "Which tag sets how many bands VASP computes?",
+      "Is it safe to change it when the density is frozen?"
+    ],
+    "difficulty": 0,
+    "level": "beginner",
+    "sources": [
+      "S-041",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "band-gap",
+      "params": {
+        "labels": false
+      },
+      "caption": "Energy blocks of a toy material. Toy model.",
+      "alt": "Two blocks of energy, a lower one drawn full and an upper one empty, with a space between them."
     }
   },
   {
@@ -645,38 +1153,46 @@
       "charge-density-analysis"
     ],
     "type": "single",
-    "prompt": "How do you convert raw CHGCAR grid values into physical electron density in e/A^3?",
+    "prompt": "How do you turn a raw CHGCAR grid value into an electron density in e per cubic angstrom?",
     "options": [
       {
-        "text": "Divide each grid value by the unit-cell volume V_cell",
+        "text": "Divide it by the cell volume in cubic angstrom",
         "correct": true,
-        "why": "Matches the VASP output conventions and Field Handbook."
+        "why": "CHGCAR stores rho times the cell volume, so dividing by V gives rho itself."
       },
       {
-        "text": "Multiply each grid value by the unit-cell volume V_cell",
+        "text": "Multiply it by the cell volume",
         "correct": false,
-        "why": "Check the exact VASP definition."
+        "why": "The volume is already multiplied in; multiplying again makes it worse."
       },
       {
-        "text": "Divide by the number of k-points",
+        "text": "Divide it by the number of grid points",
         "correct": false,
-        "why": "This confuses two different quantities."
+        "why": "Dividing the sum of all values by the number of points gives the electron count, not the density at one point."
+      },
+      {
+        "text": "Use it as it is",
+        "correct": false,
+        "why": "The values are scaled by the volume, so they are too large by V."
       }
     ],
     "hints": [
-      "Check how VASP defines this quantity in OUTCAR or the output file.",
-      "Review the summary table on the topic page."
+      "What is stored: rho, or rho times something?",
+      "Averaging all grid values gives the number of electrons."
     ],
-    "difficulty": 1,
-    "level": "intermediate",
+    "difficulty": -0.5,
+    "level": "beginner",
     "sources": [
-      "S-019",
-      "S-042"
+      "S-041"
     ],
     "visual": {
-      "scene": "rocksalt",
-      "caption": "Illustrative crystal scene for charge-density-analysis.",
-      "alt": "Crystal structure scene rocksalt."
+      "plot": "density-box",
+      "params": {
+        "L": 5,
+        "electrons": 2
+      },
+      "caption": "Electron density of two electrons in a 5 angstrom box.",
+      "alt": "A single hump of electron density across a box, highest in the middle and zero at the walls."
     }
   },
   {
@@ -685,38 +1201,47 @@
       "charge-density-analysis"
     ],
     "type": "single",
-    "prompt": "In what axis order does VASP write the 3D volumetric grid in CHGCAR?",
+    "prompt": "In which order does VASP write the 3D grid values in CHGCAR?",
     "options": [
       {
-        "text": "x varies fastest, then y, then z (Fortran order)",
+        "text": "x fastest, then y, then z",
         "correct": true,
-        "why": "Matches the VASP output conventions and Field Handbook."
+        "why": "This is Fortran order: the index is ix + nx * (iy + ny * iz)."
       },
       {
-        "text": "z varies fastest, then y, then x (C order)",
+        "text": "z fastest, then y, then x",
         "correct": false,
-        "why": "Check the exact VASP definition."
+        "why": "That is C order; reading CHGCAR this way distorts non-cubic cells and moves the density off the atoms."
       },
       {
-        "text": "Random order indexed by energy",
+        "text": "In random order, with coordinates on every line",
         "correct": false,
-        "why": "This confuses two different quantities."
+        "why": "No coordinates are written; the position of each value follows from its place in the list."
+      },
+      {
+        "text": "Atom by atom, around each nucleus",
+        "correct": false,
+        "why": "The values are on a regular grid over the whole cell, not grouped by atoms."
       }
     ],
     "hints": [
-      "Check how VASP defines this quantity in OUTCAR or the output file.",
-      "Review the summary table on the topic page."
+      "Is VASP written in Fortran or C?",
+      "What changes fastest when you read the numbers in order?"
     ],
-    "difficulty": 1,
+    "difficulty": 0,
     "level": "intermediate",
     "sources": [
-      "S-019",
-      "S-042"
+      "S-041"
     ],
     "visual": {
-      "scene": "rocksalt",
-      "caption": "Illustrative crystal scene for charge-density-analysis.",
-      "alt": "Crystal structure scene rocksalt."
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "CHGCAR"
+        ]
+      },
+      "caption": "Input and output files of a VASP run.",
+      "alt": "Four input files feeding VASP and five output files coming out, with CHGCAR emphasised."
     }
   },
   {
@@ -725,38 +1250,42 @@
       "charge-density-analysis"
     ],
     "type": "single",
-    "prompt": "What does the second volumetric grid block in a spin-polarized (ISPIN = 2) CHGCAR store?",
+    "prompt": "What does the second data block of a spin-polarized (ISPIN = 2) CHGCAR hold?",
     "options": [
       {
-        "text": "The magnetization density (rho_up - rho_down) * V_cell",
+        "text": "The magnetization density, rho up minus rho down, times the cell volume",
         "correct": true,
-        "why": "Matches the VASP output conventions and Field Handbook."
+        "why": "The first block is the total density, the second the spin difference; together they give both channels."
       },
       {
-        "text": "The electrostatic potential in eV",
+        "text": "The spin-down density alone",
         "correct": false,
-        "why": "Check the exact VASP definition."
+        "why": "Tempting, but VASP stores the difference; spin down is (total minus magnetization) divided by 2."
       },
       {
-        "text": "Only the core electrons",
+        "text": "The electrostatic potential",
         "correct": false,
-        "why": "This confuses two different quantities."
+        "why": "The potential is written to LOCPOT, not CHGCAR."
+      },
+      {
+        "text": "The density of the second SCF iteration",
+        "correct": false,
+        "why": "CHGCAR holds only the density of the last electronic step."
       }
     ],
     "hints": [
-      "Check how VASP defines this quantity in OUTCAR or the output file.",
-      "Review the summary table on the topic page."
+      "The two blocks let you rebuild both spin channels.",
+      "Which combination is zero in a non-magnetic material?"
     ],
-    "difficulty": 1,
+    "difficulty": 0,
     "level": "intermediate",
     "sources": [
-      "S-019",
-      "S-042"
+      "S-041"
     ],
     "visual": {
-      "scene": "rocksalt",
-      "caption": "Illustrative crystal scene for charge-density-analysis.",
-      "alt": "Crystal structure scene rocksalt."
+      "scene": "fm-cubic",
+      "caption": "Toy model, hand-set: a ferromagnetic cubic cell.",
+      "alt": "Eight atoms in a 2 by 2 by 2 cubic cell, every moment pointing up."
     }
   },
   {
@@ -768,35 +1297,166 @@
     "prompt": "How does LOCPOT differ from CHGCAR in scaling?",
     "options": [
       {
-        "text": "LOCPOT values are electrostatic potential in eV and are NOT multiplied by V_cell",
+        "text": "LOCPOT holds a potential in eV that is not multiplied by the cell volume",
         "correct": true,
-        "why": "Matches the VASP output conventions and Field Handbook."
+        "why": "It uses the same grid layout, but the values are the potential itself, so you plot or average them directly."
       },
       {
-        "text": "LOCPOT values are multiplied by V_cell^2",
+        "text": "LOCPOT is also multiplied by the volume, like CHGCAR",
         "correct": false,
-        "why": "Check the exact VASP definition."
+        "why": "Only the density files carry the volume factor; dividing LOCPOT by V would give nonsense."
       },
       {
-        "text": "LOCPOT has no POSCAR header",
+        "text": "LOCPOT is written on a coarser grid with a different axis order",
         "correct": false,
-        "why": "This confuses two different quantities."
+        "why": "It uses the same grid layout and axis order as CHGCAR."
+      },
+      {
+        "text": "LOCPOT stores the density in e per cubic angstrom",
+        "correct": false,
+        "why": "LOCPOT is a potential, not a density."
       }
     ],
     "hints": [
-      "Check how VASP defines this quantity in OUTCAR or the output file.",
-      "Review the summary table on the topic page."
+      "Which quantity does LOCPOT hold?",
+      "Does a potential need a volume factor?"
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "CHGCAR"
+        ]
+      },
+      "caption": "Input and output files of a VASP run.",
+      "alt": "Four input files feeding VASP and five output files coming out, with CHGCAR emphasised."
+    }
+  },
+  {
+    "id": "q-m9-25",
+    "concepts": [
+      "charge-density-analysis"
+    ],
+    "type": "single",
+    "prompt": "You want the charge density difference for a molecule adsorbed on a slab (AB = molecule on slab). How should the runs for A and B be done?",
+    "options": [
+      {
+        "text": "Static runs of each part at its position in the relaxed AB, in the same cell and on the same FFT grid",
+        "correct": true,
+        "why": "Then the only difference between the three densities is the interaction; the grid points line up one to one for the subtraction."
+      },
+      {
+        "text": "Relax the molecule and the slab separately first",
+        "correct": false,
+        "why": "The difference would then mix the bonding with the change of geometry."
+      },
+      {
+        "text": "Put the molecule in a smaller box to save time",
+        "correct": false,
+        "why": "A different cell gives a different grid, and the points no longer line up."
+      },
+      {
+        "text": "Let each run choose its own default FFT grid",
+        "correct": false,
+        "why": "Defaults can differ between runs; copy NGXF, NGYF and NGZF so that every grid is the same."
+      }
+    ],
+    "hints": [
+      "What must line up point by point for a subtraction to mean anything?",
+      "Should the parts be allowed to change shape?"
     ],
     "difficulty": 1,
     "level": "intermediate",
     "sources": [
-      "S-019",
       "S-042"
     ],
     "visual": {
-      "scene": "rocksalt",
-      "caption": "Illustrative crystal scene for charge-density-analysis.",
-      "alt": "Crystal structure scene rocksalt."
+      "plot": "density-box",
+      "params": {
+        "L": 5,
+        "electrons": 2
+      },
+      "caption": "Electron density of two electrons in a 5 angstrom box.",
+      "alt": "A single hump of electron density across a box, highest in the middle and zero at the walls."
+    }
+  },
+  {
+    "id": "q-m9-26",
+    "concepts": [
+      "charge-density-analysis"
+    ],
+    "type": "single",
+    "prompt": "In an ELF map of a crystal, a large region has ELF close to 0.5. What does that suggest?",
+    "options": [
+      {
+        "text": "The electrons there behave like a uniform electron gas, as in a metal",
+        "correct": true,
+        "why": "ELF is built so that a uniform electron gas gives exactly 0.5; metallic regions sit near this value."
+      },
+      {
+        "text": "Half an electron sits in that region",
+        "correct": false,
+        "why": "ELF is a localization measure between 0 and 1, not an electron count."
+      },
+      {
+        "text": "A strong covalent bond or lone pair",
+        "correct": false,
+        "why": "Bonds and lone pairs show values close to 1."
+      },
+      {
+        "text": "That the region is vacuum",
+        "correct": false,
+        "why": "Regions with almost no density can give noisy ELF values, but a broad plateau near 0.5 inside a crystal is the uniform-gas signature, not emptiness."
+      }
+    ],
+    "hints": [
+      "What value does a uniform electron gas give?",
+      "Which value marks a localized electron pair?"
+    ],
+    "difficulty": 1,
+    "level": "intermediate",
+    "sources": [
+      "S-086",
+      "S-087"
+    ],
+    "visual": {
+      "scene": "fcc",
+      "caption": "Face-centred cubic: the structure of many metals.",
+      "alt": "Face-centred cubic cell: an atom at each corner and in the middle of each face of a cube."
+    }
+  },
+  {
+    "id": "q-m9-32",
+    "concepts": [
+      "charge-density-analysis"
+    ],
+    "type": "numeric",
+    "prompt": "A CHGCAR grid has 40 x 40 x 40 points, and the sum of all its values is 512000. How many valence electrons are in the cell?",
+    "answer": 8.0,
+    "tolerance": 0.01,
+    "unit": "electrons",
+    "hints": [
+      "The electron count is the average of the grid values.",
+      "Divide the sum by the number of grid points, 64000."
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ],
+    "visual": {
+      "plot": "density-box",
+      "params": {
+        "L": 5,
+        "electrons": 2
+      },
+      "caption": "Electron density of two electrons in a 5 angstrom box.",
+      "alt": "A single hump of electron density across a box, highest in the middle and zero at the walls."
     }
   }
 ]

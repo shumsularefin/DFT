@@ -3,29 +3,39 @@ id: band-structures
 title: Reading a band structure
 module: 9
 order: 4
-summary: How to run band structures via both the standard ICHARG = 11 route and VASP 6.3+ KPOINTS_OPT, read EIGENVAL, and identify direct versus indirect band gaps.
+summary: How to run a band structure (ICHARG = 11 on a line-mode path, or KPOINTS_OPT in VASP 6.3+), why NBANDS matters, how to read direct and indirect gaps, effective masses, spin and projected bands, and what DFT gaps leave out.
 concepts: [band-structure-analysis]
 requires: [dos-analysis, k-points]
-vaspTags: [ICHARG, LORBIT, LMAXMIX]
-sources: [S-019, S-042]
+vaspTags: [ICHARG, NBANDS, LORBIT, ISPIN, ISMEAR, KPOINTS_OPT, LMAXMIX]
+sources: [S-005, S-006, S-019, S-020, S-031, S-034, S-036, S-041, S-042, S-050, S-088, S-089, S-091]
 status: draft
-updated: 2026-11-24
+updated: 2026-11-27
 ---
 
 <Why>
 
-While the DOS averages over the whole Brillouin zone, a **band structure** plots the Kohn-Sham eigenvalues $\varepsilon_{n\mathbf k}$ along high-symmetry lines of the Brillouin zone. It reveals whether a band gap is direct or indirect and shows band curvature (effective masses) <Cite id="S-042" />.
+A <Term id="band">band</Term> structure plots the allowed electron energies against the crystal momentum $\mathbf k$ along a path of high-symmetry lines through the <Term id="brillouin-zone">Brillouin zone</Term>. The density of states tells you how many states sit at each energy; the band structure also tells you **where in k** they sit. That extra information answers questions the DOS cannot: is the <Term id="band-gap">band gap</Term> direct or indirect, how light or heavy are the electrons and holes (the <Term id="effective-mass">effective mass</Term>), which bands cross, and which atoms and orbitals form the band edges <Cite id="S-042" />.
+
+It is also the plot most often made wrongly. A band run copied from the self-consistent INCAR, a path for the wrong cell, or too few empty bands gives a picture that looks plausible and is wrong <Cite id="S-041" />.
 
 </Why>
 
 <Intuition>
 
-In the author's workflow there are two clean routes to a band structure <Cite id="S-042" />:
+Picture the crystal's electron energies as a landscape over the Brillouin zone. A band structure is a walk along a few straight roads through that landscape, chosen because they pass through the special points ($\Gamma$, X, L, K and so on) where the extremes usually sit. Each road is a segment of the plot; the labels on the horizontal axis are the points you walk through <Cite id="S-006" />.
 
-1. **Standard two-step route (`ICHARG = 11`):** Run a self-consistent calculation on a uniform k-mesh to produce `CHGCAR`, then run a non-self-consistent calculation (`ICHARG = 11`, `LWAVE = .FALSE.`, `LCHARG = .FALSE.`) using a line-mode `KPOINTS` path from the [k-path tool](/tools/kpath/).
-2. **Single-step `KPOINTS_OPT` route (VASP 6.3 and newer):** Keep your uniform mesh in `KPOINTS` and supply the high-symmetry path in `KPOINTS_OPT`; VASP converges the density on `KPOINTS` and then evaluates the bands along `KPOINTS_OPT` automatically (and this route also works for hybrid functionals) <Cite id="S-019" />.
+**Two runs, two jobs.** The density must be converged on a uniform mesh that samples the whole zone. A path does not sample the zone, so the VASP wiki says a line-mode mesh is not suitable for a self-consistent run <Cite id="S-042" />. The workflow is therefore:
 
-If the valence-band maximum (VBM) and conduction-band minimum (CBM) sit at the same $\mathbf k$-point, the gap is **direct**; if they sit at different $\mathbf k$-points, it is **indirect**.
+1. A self-consistent run on a uniform mesh writes `CHGCAR`.
+2. A **non-self-consistent** run reads that density and keeps it fixed (`ICHARG = 11`) while it solves for the eigenvalues at the path points. Nothing about the density changes; only the k-points do <Cite id="S-041" />.
+
+From VASP 6.3 there is a one-run alternative: keep the uniform mesh in `KPOINTS` and put the path in `KPOINTS_OPT`; after the SCF converges, VASP evaluates the bands on the path in the same job <Cite id="S-042" />. Hybrid functionals cannot use `ICHARG = 11` at all; they put the path points into the SCF list with zero weight, as described in [the functionals topic](/handbook/05-practical-choices/functionals/) <Cite id="S-041" />.
+
+**Empty bands.** VASP computes only `NBANDS` bands. The default adds just a few empty bands above the occupied ones, enough for the SCF but often too few to show the conduction band you want to plot <Cite id="S-041" />. Because the density is frozen in the band run, raising `NBANDS` there is safe and cheap.
+
+**Reading the gap.** The top of the filled bands is the valence-band maximum (VBM); the bottom of the empty bands is the conduction-band minimum (CBM). If they sit at the same k-point the gap is **direct**; if not, it is **indirect** and a photon alone cannot bridge it, because light carries almost no crystal momentum. Silicon is the textbook indirect case and GaAs the textbook direct one <Cite id="S-050" />.
+
+**Curvature means mass.** A steep, strongly curved band near an edge means a light, mobile carrier; a flat band means a heavy, localised one <Cite id="S-042" />.
 
 </Intuition>
 
@@ -33,49 +43,167 @@ If the valence-band maximum (VBM) and conduction-band minimum (CBM) sit at the s
 
 <TheMath>
 
-The fundamental Kohn-Sham band gap is:
+The Kohn-Sham band gap is the lowest empty eigenvalue minus the highest filled one, each searched over every k-point and band:
 
-$$E_g = \min_{\mathbf k,\;n \in \text{unocc}} \varepsilon_{n\mathbf k} - \max_{\mathbf k,\;m \in \text{occ}} \varepsilon_{m\mathbf k}$$
+$$E_g = \min_{\mathbf k,\;n \in \text{empty}} \varepsilon_{n\mathbf k} \;-\; \max_{\mathbf k,\;m \in \text{filled}} \varepsilon_{m\mathbf k}$$
 
-Standard semilocal functionals (such as PBE) systematically underestimate experimental band gaps due to the derivative discontinuity and self-interaction error <Cite id="S-042" />.
+The gap is direct when both extremes are found at the same $\mathbf k$.
+
+**Effective mass.** Near a band extremum the energy is close to a parabola in $k$. The curvature of that parabola defines the effective mass <Cite id="S-036" />:
+
+$$\frac{1}{m^*} = \frac{1}{\hbar^2}\,\frac{d^2E}{dk^2}, \qquad \frac{m^*}{m_e} = \frac{\hbar^2/m_e}{d^2E/dk^2}$$
+
+With $E$ in eV and $k$ in $\text{\AA}^{-1}$, the constant is $\hbar^2/m_e = 7.620$ eV $\text{\AA}^2$ (twice the CODATA value $\hbar^2/2m_e = 3.80998$ eV $\text{\AA}^2$) <Cite id="S-031" />.
+
+**Worked example (illustrative numbers, not a real material).** Take three points along a line through a CBM, spaced $\Delta k = 0.02\ \text{\AA}^{-1}$ apart, with energies 0.50381, 0.50000 and 0.50381 eV. The central finite difference gives
+
+$$\frac{d^2E}{dk^2} \approx \frac{E_+ - 2E_0 + E_-}{\Delta k^2} = \frac{0.00762\ \text{eV}}{0.0004\ \text{\AA}^{-2}} = 19.05\ \text{eV}\,\text{\AA}^2,$$
+
+so $m^*/m_e = 7.620 / 19.05 = 0.40$. At a VBM the curvature is negative, so the formula gives a negative mass; the hole mass is its magnitude.
+
+<Level min="intermediate">
+
+Two cautions. First, $k$ must be a Cartesian distance in $\text{\AA}^{-1}$ that includes the factor $2\pi$. `EIGENVAL` lists fractional coordinates of the reciprocal vectors, and VASP prints those vectors without the $2\pi$, so a hand-made $k$ axis can be off by $2\pi$, which changes $m^*$ by a factor of about 39.5 <Cite id="S-019" />. Second, the mass is a tensor: in an anisotropic crystal, or at a valley away from $\Gamma$, the curvature differs by direction, and you should quote the direction. Fit over a few points close to the extremum (a parabola is only valid near it), and check that the result does not change when you halve $\Delta k$. VASPKIT task 912 does this fit on a fine grid around the VBM and CBM <Cite id="S-042" />.
+
+</Level>
+
+<Level min="pro">
+
+The Kohn-Sham gap is not the fundamental gap. Even the exact functional would miss it by the derivative discontinuity of the exchange-correlation potential, and semilocal functionals add self-interaction error on top; both push the gap down <Cite id="S-089" />. This is why PBE gaps are typically too small and why the band dispersion is often more trustworthy than the absolute gap.
+
+**Band unfolding.** A supercell (for a defect, an alloy or a slab) folds the bands of the primitive cell back into its smaller Brillouin zone, so the plot fills with lines. Unfolding projects each supercell state onto the primitive-cell k-points and gives a spectral weight $P_{\mathbf K}(\mathbf k_i) = \sum_n \lvert\langle \mathbf K m \mid \mathbf k_i n\rangle\rvert^2$, the "effective band structure" <Cite id="S-088" />. VASPKIT tasks 281 and 282 prepare the k-points and write the unfolded data <Cite id="S-042" />.
+
+</Level>
 
 </TheMath>
 
 <InVasp>
 
-- Keep `ISPIN`, `MAGMOM`, `LMAXMIX`, and `LDAU*` identical between the SCF run and the `ICHARG = 11` band run <Cite id="S-042" />.
-- Do not use `ISMEAR = -5` on a line-mode `KPOINTS` path; use `ISMEAR = 0` with small `SIGMA` <Cite id="S-019" />.
-- Generate standardized primitive cells and HPKOT high-symmetry paths in the [k-path tool](/tools/kpath/).
+**Route B (all versions): the two-step `ICHARG = 11` run.** Converge the SCF on a uniform mesh, keep its `CHGCAR` in the new folder, copy the path file to `KPOINTS`, and run with this INCAR <Cite id="S-042" />:
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM = Si band structure
+ICHARG = 11
+PREC   = Accurate
+ENCUT  = 520
+ISMEAR = 0
+SIGMA  = 0.05
+NBANDS = 16
+LORBIT = 11
+NSW    = 0
+LWAVE  = .FALSE.
+LCHARG = .FALSE.`}
+  annotations={{
+    2: 'read CHGCAR from the SCF run and keep it fixed',
+    4: 'identical to the SCF run that wrote CHGCAR',
+    5: 'Gaussian smearing; the tetrahedron method needs a 3D mesh',
+    7: 'more empty bands than the default, to show the conduction bands',
+    8: 'writes PROCAR for projected (fat) bands',
+  }}
+/>
+
+The path for the fcc primitive cell of silicon, from the Field Handbook recipe <Cite id="S-041" />:
+
+<VaspFile
+  name="KPOINTS"
+  code={`k-path fcc G-X-W-K-G-L
+40
+Line-mode
+Reciprocal
+0.000 0.000 0.000 G
+0.500 0.000 0.500 X
+
+0.500 0.000 0.500 X
+0.500 0.250 0.750 W
+
+0.500 0.250 0.750 W
+0.375 0.375 0.750 K
+
+0.375 0.375 0.750 K
+0.000 0.000 0.000 G
+
+0.000 0.000 0.000 G
+0.500 0.500 0.500 L`}
+annotations={{
+    2: 'points per segment',
+    3: 'line mode: each pair of lines is one segment',
+    4: 'fractions of the reciprocal lattice vectors',
+  }}
+/>
+
+- **Keep the physics identical to the SCF run**: `ENCUT`, `POTCAR`, `ISPIN`, `MAGMOM`, `LMAXMIX` (4 for d, 6 for f elements), the functional and any `LDAU` tags, and the cell itself <Cite id="S-042" />.
+- **The path belongs to one cell.** Coordinates depend on the cell setting. Generate them for your exact cell with the [k-path tool](/tools/kpath/), SeeK-path or VASPKIT task 303; if VASPKIT writes a `PRIMCELL.vasp` that differs from your `POSCAR`, use it <Cite id="S-042" /> <Cite id="S-006" />.
+- **NBANDS.** Read the SCF value with `grep NBANDS OUTCAR` and raise it in the band run until the conduction bands you need are on the plot. VASP may round it up to suit the parallel layout <Cite id="S-042" />.
+- **Fermi level.** Take `E-fermi` from the SCF `OUTCAR`: a value computed from path points alone is unreliable. For semiconductors many people set the VBM to zero instead <Cite id="S-042" /> <Cite id="S-041" />.
+- **Route A (VASP 6.3 and newer).** Uniform mesh in `KPOINTS`, path in `KPOINTS_OPT`, no `ICHARG = 11`. The path eigenvalues go to `vasprun.xml` (and `vaspout.h5` in HDF5 builds) <Cite id="S-042" />.
+- **Spin.** With `ISPIN = 2`, `EIGENVAL` holds both channels at each k-point (index, E up, E down, occupations). Plot both; the gap is the smallest over both channels, and a half-metal is metallic in one channel and gapped in the other <Cite id="S-041" /> <Cite id="S-042" />.
+- **Fat bands.** `LORBIT = 11` writes `PROCAR`, with the weight of every band on each atom and orbital. Drawing each point with a size or colour set by, say, the O p weight shows which orbitals form each band. The weights are sphere projections, so they do not add up to exactly 1 per band <Cite id="S-041" />.
+- **Hybrids and meta-GGAs**: no `ICHARG = 11`; use zero-weight path points as in [the functionals topic](/handbook/05-practical-choices/functionals/) <Cite id="S-042" />.
+- **Plotting.** VASPKIT task 211 writes `BAND.dat`, `KLABELS` and `BAND_GAP` (213 for projected bands, 911 for the gap, 912 for effective masses) <Cite id="S-042" /> <Cite id="S-020" />. In Python, pymatgen reads `vasprun.xml` and plots bands <Cite id="S-034" />, and py4vasp, the VASP developers' package, reads `vaspout.h5` <Cite id="S-091" />. This site's viewer above reads `EIGENVAL` directly.
 
 </InVasp>
 
 <WhatChanges>
 
-| Choice in band run          | Effect                                                               |
-| --------------------------- | -------------------------------------------------------------------- |
-| Standard cell vs primitive  | Non-standard cells scramble high-symmetry labels                     |
-| `ISMEAR = -5` on line-mode  | Fails: tetrahedron method requires a 3D k-mesh                       |
-| `KPOINTS_OPT` (VASP >= 6.3) | Works in one run and supports hybrid functionals <Cite id="S-019" /> |
+| Choice in the band run         | What you see                                           | Why                                                     |
+| ------------------------------ | ------------------------------------------------------ | ------------------------------------------------------- |
+| `ICHARG = 11` left out         | Jagged bands, wrong gap                                | The density was re-converged on a path                  |
+| `CHGCAR` from another cell     | Shifted or distorted bands                             | The fixed density does not belong to this structure     |
+| Default `NBANDS`               | Conduction bands cut off at the top of the plot        | VASP adds only a few empty bands                        |
+| More `NBANDS`                  | More conduction bands, slightly longer run             | Safe here, because the density is fixed                 |
+| `ISMEAR = -5` on a path        | Error or meaningless occupations                       | Tetrahedra need a uniform 3D mesh                       |
+| Path for the conventional cell | Labels and folded bands that do not match the textbook | The path is defined for the standardized primitive cell |
+| `KPOINTS_OPT` (VASP 6.3+)      | Bands from one run                                     | The path is evaluated after the SCF in the same job     |
+| PBE to HSE06                   | Larger gap, similar shape                              | Exact exchange reduces the gap error                    |
 
-Why standardize the cell first: high-symmetry labels ($\Gamma, X, L, K, \dots$) only match the textbook path on the standardized primitive cell.
+Why a separate run: a path cannot converge a density. Why these values: the band run must inherit every physical setting from the SCF. What happens if you get it wrong: a plot that looks like a band structure but describes a different calculation <Cite id="S-041" />.
 
 </WhatChanges>
 
 <Mistakes>
 
-<Callout variant="mistake" title="Changing ISPIN or omitting LMAXMIX between SCF and ICHARG = 11">
+<Callout variant="mistake" title="Running the path self-consistently">
 
-Mismatched spin or `LMAXMIX` settings between the SCF `CHGCAR` and the `ICHARG = 11` band run corrupt the eigenvalues <Cite id="S-042" />.
+Cause: the SCF INCAR was reused without `ICHARG = 11`, so VASP tried to converge the density on path points. Fix: copy the SCF `CHGCAR` into the folder and set `ICHARG = 11`, or use `KPOINTS_OPT` <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Changing ISPIN, MAGMOM or LMAXMIX between the SCF and the band run">
+
+Cause: a fresh INCAR for the band run. The frozen density then does not match the Hamiltonian, and the bands are wrong. Fix: copy those tags from the SCF INCAR, and set `LMAXMIX = 4` (d) or `6` (f) in both runs <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Reading the gap from a uniform mesh">
+
+Cause: the CBM of an indirect semiconductor can fall between mesh points. Fix: take the gap from the band path or a denser mesh, and check that the path passes through the extremum <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="A k axis without the factor 2 pi">
+
+Cause: the k distance was built from fractional coordinates and reciprocal vectors printed without $2\pi$. Effective masses then come out wrong by a large factor. Fix: convert to Cartesian $\text{\AA}^{-1}$ with $2\pi$ included, or let VASPKIT or pymatgen build the axis <Cite id="S-019" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Quoting a PBE gap as the material's gap">
+
+Cause: semilocal functionals underestimate gaps. Fix: say which functional gave the number, and use HSE06 or mBJ when the gap itself matters (see [the functionals topic](/handbook/05-practical-choices/functionals/)) <Cite id="S-042" />.
 
 </Callout>
 
 </Mistakes>
 
-<Check ids={['q-m9-13', 'q-m9-14', 'q-m9-15', 'q-m9-16']} />
+<Check ids={['q-m9-13', 'q-m9-14', 'q-m9-15', 'q-m9-16', 'q-m9-21', 'q-m9-22']} />
 
 <GoDeeper>
 
-- VASP wiki pages `EIGENVAL`, `ICHARG`, and `KPOINTS_OPT` <Cite id="S-019" />.
-- [Brillouin zone and k-path viewer](/tools/kpath/).
+- VASP wiki pages EIGENVAL, ICHARG, NBANDS, KPOINTS_OPT, LORBIT and PROCAR, by page name <Cite id="S-019" />.
+- Hinuma and co-workers on standardized cells and band paths <Cite id="S-006" />, and Setyawan and Curtarolo for the older convention <Cite id="S-005" />.
+- Ashcroft and Mermin on effective masses and semiclassical dynamics <Cite id="S-036" />.
+- Popescu and Zunger on unfolding supercell bands <Cite id="S-088" />.
+- Perdew and Levy, and Sham and Schluter, on why Kohn-Sham gaps are too small <Cite id="S-089" />.
+- The [k-path tool](/tools/kpath/) on this site for paths and cells.
 
 </GoDeeper>
