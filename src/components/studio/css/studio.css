@@ -1228,12 +1228,9 @@
   padding: 4px 0;
   background: color-mix(in srgb, var(--cat, transparent) 22%, var(--st-bg-input));
 }
-/* Non-matching cells lose their category tint but keep readable text
-   (opacity would drop the label below WCAG AA contrast). */
+/* A search shows only the matching cells, each in its own place in the table. */
 .studio-root .mol-pt .pt-cell.is-dim {
-  background: transparent;
-  border-color: transparent;
-  color: var(--st-text-secondary);
+  visibility: hidden;
 }
 .studio-root .mol-pt .pt-cell[aria-pressed='true'] {
   background: var(--st-accent);
