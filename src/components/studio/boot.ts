@@ -39,7 +39,15 @@ async function boot() {
   w.Plotly = MiniPlotly;
   w.JSZip = MiniZip;
   w.SiteBridge = SiteBridge;
-  for (const src of SCRIPTS) await load(src);
+  for (const src of SCRIPTS) {
+    await load(src);
+    // Yield between scripts so no single start-up task blocks input for long.
+    await new Promise((r) => setTimeout(r, 0));
+    if (src === 'js/vesta.js') {
+      (w.VESTA as { start: () => void }).start();
+      await new Promise((r) => setTimeout(r, 0));
+    }
+  }
   document.documentElement.dataset.studioReady = 'true';
 }
 

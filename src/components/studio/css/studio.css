@@ -1068,18 +1068,6 @@
 .studio-root .site-card {
   border-style: dashed;
 }
-/* Header: the structure picker is the only item that shrinks, so buttons never slide over it at medium widths. */
-.studio-root > .studio-header > div:first-of-type > * {
-  flex-shrink: 0;
-}
-.studio-root > .studio-header > div:first-of-type > div:has(> #sample-select) {
-  flex: 0 1 auto;
-  min-width: 0;
-}
-.studio-root > .studio-header #sample-select {
-  min-width: 64px;
-  width: 100%;
-}
 /* Dense app look (site template): 32px toolbar controls, 28px controls in the panels. */
 .studio-root > .studio-header .v-btn,
 .studio-root > .studio-header .v-input {
@@ -1099,4 +1087,48 @@
 }
 .studio-root .tab-btn.active {
   color: var(--st-accent-text);
+}
+
+/* Toolbar fit: the workspace is the window minus the site sidebar, so the toolbar sizes by its own width
+   (container query), not the window. The structure picker never shrinks under its neighbours; optional
+   button labels drop first and the buttons keep their icon and accessible name. */
+.studio-root > .studio-header {
+  container: studio-toolbar / inline-size;
+}
+.studio-root > .studio-header > div:first-of-type > * {
+  flex-shrink: 0;
+}
+.studio-root > .studio-header #sample-select {
+  flex: 0 0 auto;
+  width: 13rem;
+  min-width: 0;
+  max-width: none;
+}
+@container studio-toolbar (max-width: 84rem) {
+  .studio-root label[for='sample-select'],
+  .studio-root :is(#btn-paste-modal, #btn-redo, #btn-cmd, #btn-send-site) > span:not([id]) {
+    display: none;
+  }
+}
+@container studio-toolbar (max-width: 70rem) {
+  .studio-root :is(#btn-import-file, #btn-library, #btn-undo, #btn-toggle-right) > span:not([id]) {
+    display: none;
+  }
+  .studio-root > .studio-header #sample-select {
+    width: 10.5rem;
+  }
+}
+@container studio-toolbar (max-width: 56rem) {
+  /* Narrowest desktop workspace (1024 px window): icon-only buttons, and the snapshot and guide buttons
+     give way to the core actions so nothing overlaps (checked at 1024, 1280, 1440 and 1920 px). */
+  .studio-root #btn-export-poscar > span:not([id]),
+  .studio-root :is(#btn-snapshot, #btn-guide) {
+    display: none;
+  }
+  .studio-root > .studio-header #sample-select {
+    width: 7rem;
+  }
+  .studio-root > .studio-header > div {
+    gap: 0.375rem;
+  }
 }

@@ -1474,6 +1474,7 @@
     orthoSize: 7.5
   };
   function updateCameraTransform() {
+    invalidate();
     const w = Math.max(1, container.clientWidth);
     const h = Math.max(1, container.clientHeight);
     const aspect = w / h;
@@ -1584,6 +1585,7 @@
   }
 
   function rebuildScene() {
+    invalidate();
     clearGroup(rootGroup);
     displayedAtoms = [];
     atomMeshes.length = 0;
@@ -1819,6 +1821,7 @@
 
   // Projected 2D Labels (Atom Labels & Measurement Badges)
   function updateProjectedLabels() {
+    invalidate();
     const overlay = document.getElementById('labels-overlay');
     overlay.innerHTML = '';
     const w = container.clientWidth, h = container.clientHeight;
@@ -1895,12 +1898,35 @@
     });
   }
 
-  // Animation Loop
-  let animId = null;
+  // Render on demand: a frame is drawn only after something changed (user input, a scene rebuild, the
+  // camera, the theme or a resize), never continuously, so an idle viewer costs no CPU.
+  var animId = null;
+  var dirtyFrames = 1;
+  function invalidate(n) {
+    dirtyFrames = Math.max(dirtyFrames || 0, n || 1);
+  }
   function animate() {
     animId = requestAnimationFrame(animate);
+    // Wait for boot.ts to finish loading the Studio scripts, so start-up draws once rather than once per script.
+    if (document.hidden || !(dirtyFrames > 0) || document.documentElement.dataset.studioReady !== 'true') return;
+    // First frame: let the browser build the shader programs off the main thread (compileAsync), then draw.
+    if (!shadersReady) {
+      if (!shadersPending && renderer.compileAsync) {
+        shadersPending = true;
+        renderer.compileAsync(scene, activeCam).catch(function () {}).then(function () { shadersReady = true; invalidate(); });
+        return;
+      }
+      if (shadersPending) return;
+    }
+    dirtyFrames--;
     renderer.render(scene, activeCam);
   }
+  var shadersReady = false, shadersPending = false;
+  ['pointerdown', 'pointermove', 'pointerup', 'wheel', 'keydown', 'input', 'change', 'click'].forEach(function (t) {
+    document.addEventListener(t, function () { invalidate(); }, { passive: true, capture: true });
+  });
+  window.addEventListener('resize', function () { invalidate(); });
+  new MutationObserver(function () { invalidate(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
   // =========================================================================
   // 8. INTERACTIVE MOUSE / TOUCH CONTROLS & RAYCASTING
@@ -2063,7 +2089,8 @@
     row.className = tone === 'accent' ? 'text-blue-500 font-semibold' : (tone === 'warn' ? 'text-amber-500' : 'text-sub');
     row.textContent = `[${ts}] ${msg}`;
     log.appendChild(row);
-    log.scrollTop = log.scrollHeight;
+    // Scroll on the next frame: reading scrollHeight here would force a full layout in the middle of a load.
+    requestAnimationFrame(() => { log.scrollTop = log.scrollHeight; });
   }
 
   function copyToClipboard(text, label) {
@@ -2631,6 +2658,7 @@
     return !!(darkQuery && darkQuery.matches);
   }
   function syncTheme() {
+    invalidate();
     const dark = siteIsDark();
     if (dark === state.dark) return;
     state.dark = dark;
@@ -3808,8 +3836,12 @@
     document.getElementById('left-sidebar').classList.add('hidden');
     document.getElementById('right-workbench').classList.add('hidden');
   }
-  state.dark = siteIsDark();
-  loadSample('nio_afm');
-  if (animId) cancelAnimationFrame(animId);
-  animate();
+  // boot.ts calls start() in its own task after this script, so setting up the workspace and loading the
+  // first structure are two short tasks instead of one long one.
+  window.VESTA.start = function () {
+    state.dark = siteIsDark();
+    loadSample('nio_afm');
+    if (animId) cancelAnimationFrame(animId);
+    animate();
+  };
 })();
