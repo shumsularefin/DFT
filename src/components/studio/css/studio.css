@@ -1228,8 +1228,9 @@
   padding: 4px 0;
   background: color-mix(in srgb, var(--cat, transparent) 22%, var(--st-bg-input));
 }
+/* A search shows only the matching cells, each in its own place in the table. */
 .studio-root .mol-pt .pt-cell.is-dim {
-  opacity: 0.25;
+  visibility: hidden;
 }
 .studio-root .mol-pt .pt-cell[aria-pressed='true'] {
   background: var(--st-accent);
