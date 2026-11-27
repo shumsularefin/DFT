@@ -1,5 +1,24 @@
 ---
 id: reading-magnetic-output
+stage:
+  scene: m05s-site-moments
+  states:
+    - id: final-table
+      section: why
+      params: { table: 2, column: tot, magmom: afm }
+      caption: 'The final table of a sample OUTCAR: ion 1 at +3.41, ion 2 at -3.41 and ion 3 nearly zero. Dashed lines show the starting MAGMOM beside each arrow.'
+    - id: first-table
+      section: intuition
+      params: { table: 1, column: tot, magmom: afm }
+      caption: 'The first table belongs to an early step and differs: ion 2 is below half its start. Step to table 2, the last one, which is the result.'
+    - id: d-column
+      section: math
+      params: { table: 2, column: d, magmom: afm }
+      caption: 'The d column carries almost all of the moment; s and p are tiny. Switch columns to compare the orbital parts.'
+    - id: flipped
+      section: mistakes
+      params: { table: 2, column: tot, magmom: fm }
+      caption: 'Started ferromagnetic, the same output means ion 2 flipped. The run found an antiferromagnetic state, not the one you asked for.'
 title: Reading magnetic output
 module: 5
 order: 10
