@@ -1,5 +1,30 @@
 ---
 id: geometry-relaxation
+stage:
+  scene: m05b-relaxation
+  states:
+    - id: landscape
+      section: why
+      params: { view: landscape, ibrion: cg, potim: 1, start: upper, step: 0 }
+      camera: iso
+      caption: 'The ball is the starting structure on a model energy landscape; the arrow is the force. Step the ionic steps forward and watch it roll downhill until the force falls below the stopping value.'
+    - id: local
+      section: intuition
+      params: { view: landscape, ibrion: cg, potim: 1, start: middle, step: 60 }
+      caption: 'Started on the middle slope, the ball stops in the shallowest valley, not in the deepest one. A relaxation finds the nearest minimum; try the other starting geometries.'
+    - id: optimisers
+      section: math
+      params: { view: landscape, ibrion: sd, potim: 1, start: upper, step: 60 }
+      caption: 'Steepest descent takes many short steps down the narrow valley. Switch to conjugate gradients (trial and corrector points along each line) or quasi-Newton and compare the step count.'
+    - id: isif
+      section: in-vasp
+      params: { view: cell, isif: '3', step: 0 }
+      camera: iso
+      caption: 'A strained SrTiO3 cell with Ti off centre. Solid arrows are what ISIF = 3 lets the run remove: the force on Ti, the volume and the shape stress. Step forward, then try ISIF = 2, which leaves the cell as it is.'
+    - id: saddle
+      section: mistakes
+      params: { view: landscape, ibrion: cg, potim: 1, start: saddle, step: 60 }
+      caption: 'Started next to a saddle point, the ball rolls off into a nearby valley. A perfectly symmetric start could sit on the ridge with zero force, which is why a small rattle helps.'
 title: Geometry relaxation
 module: 5
 order: 14

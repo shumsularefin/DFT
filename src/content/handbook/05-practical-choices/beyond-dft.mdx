@@ -1,5 +1,25 @@
 ---
 id: beyond-dft
+stage:
+  scene: m05b-beyond-dft
+  states:
+    - id: pbe
+      section: why
+      params: { method: pbe, view: gap, material: all }
+      camera: iso
+      caption: 'Measured gaps (flat plates) against PBE gaps (bright bars) for seven solids. PBE falls short for every one; the arrows show how far each bar is from experiment.'
+    - id: g0w0
+      section: intuition
+      params: { method: g0w0, view: gap, material: all }
+      caption: 'One rung up the ladder: G0W0 on top of PBE closes most of the gap error. Switch rungs to compare the three.'
+    - id: errors
+      section: math
+      params: { method: gw0, view: error, material: all }
+      caption: 'Height is now computed minus measured gap, so a perfect method would sit at zero. GW0 comes closest for most of these solids.'
+    - id: zno
+      section: mistakes
+      params: { method: gw0, view: error, material: ZnO }
+      caption: 'ZnO is the hard case: even GW0 stays well below the measured gap. These are literature values, quoted until checked against the paper.'
 title: When DFT is not enough
 module: 5
 order: 15

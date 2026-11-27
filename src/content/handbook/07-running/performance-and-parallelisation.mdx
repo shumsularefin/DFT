@@ -1,5 +1,29 @@
 ---
 id: performance-and-parallelisation
+stage:
+  scene: m07b-parallel
+  states:
+    - id: blocks
+      section: why
+      params: { system: page, nodes: 1, kpar: '1', ncore: '4', serial: 0.05 }
+      camera: iso
+      caption: 'The work of one electronic step as a block: bands across, k-points deep, plane waves up. Each brick is what one rank holds, and rank 0 is outlined. Add nodes to cut the block finer.'
+    - id: kpar
+      section: intuition
+      params: { system: bulk, nodes: 4, kpar: '4', ncore: '4', serial: 0.05 }
+      caption: 'KPAR gives each k group its own k-points, one colour per group. The groups hardly talk to each other, so the speed-up stays high, but each keeps its own copy of the shared arrays.'
+    - id: memory
+      section: math
+      params: { system: page, nodes: 2, kpar: '1', ncore: '8', serial: 0.05 }
+      caption: 'The memory estimate, 16 bytes per plane wave, band, k-point and spin, gives 3.2 GB here, shared by the ranks. Raise the serial fraction to see the Amdahl law cap the speed-up.'
+    - id: padding
+      section: in-vasp
+      params: { system: bulk, nodes: 8, kpar: '1', ncore: '1', serial: 0.05 }
+      caption: 'With KPAR = 1 and NCORE = 1 on 128 ranks there are more band groups than bands, so NBANDS is padded (dashed box) and the efficiency collapses. Raise KPAR and NCORE to fix it.'
+    - id: idle
+      section: mistakes
+      params: { system: supercell, nodes: 8, kpar: '8', ncore: '4', serial: 0.05 }
+      caption: 'A supercell with one k-point cannot use KPAR: seven of the eight k groups sit idle. Set KPAR back to 1 and let NCORE split the plane waves instead.'
 title: Performance and parallelisation
 module: 7
 order: 6
