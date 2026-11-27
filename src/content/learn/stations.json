@@ -285,7 +285,7 @@
       "kind": "plot",
       "plot": "scf-iterations",
       "params": {
-        "Z": 2,
+        "Z": 1,
         "alpha": 0.3,
         "tol": 1e-6,
         "step": 1

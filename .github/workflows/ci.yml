@@ -85,7 +85,7 @@ jobs:
       - name: Print stage screenshots
         if: always() && steps.detect.outputs.present == 'true' && github.event_name == 'pull_request'
         run: |
-          for f in test-results/stage-shots/*-2-iso.png test-results/stage-shots/*-3-turned.png; do
+          for f in test-results/stage-shots/*-2-iso.png test-results/stage-shots/*-3-turned.png test-results/stage-shots/learn-*.png; do
             [ -f "$f" ] || continue
             echo "::group::stage-shot $(basename "$f")"
             echo "BEGIN-SHOT $(basename "$f")"
