@@ -1,11 +1,11 @@
-// The nudged elastic band on a two-dimensional energy landscape (M16.14): the Muller-Brown model surface (S-167), its
+// The nudged elastic band on a two-dimensional energy landscape (M16.14): the Muller-Brown model surface (S-164), its
 // stationary points refined by Newton's method, and a NEB with the improved tangent and the climbing image (S-121)
 // relaxed by the quick-min optimizer (velocity Verlet with the velocity projected onto the force, S-124).
 // Energies and coordinates are in the model's own units (it is a test surface, not a material).
-// @source S-167 S-121 S-124
+// @source S-164 S-121 S-124
 export type P2 = [number, number];
 
-// Muller and Brown, Theor. Chim. Acta 53, 75 (1979), equation for the model potential (S-167).
+// Muller and Brown, Theor. Chim. Acta 53, 75 (1979), equation for the model potential (S-164).
 const A = [-200, -100, -170, 15];
 const a = [-1, -1, -6.5, 0.7];
 const b = [0, 0, 11, 0.6];
@@ -56,7 +56,7 @@ export function mullerBrownHessian(x: number, y: number): [number, number, numbe
   return [hxx, hxy, hyy];
 }
 
-/** Literature positions of the three minima and two saddle points, rounded to 3 decimals (S-167). */
+/** Literature positions of the three minima and two saddle points, rounded to 3 decimals (S-164). */
 export const MB_MINIMA: readonly P2[] = [
   [-0.558, 1.442],
   [0.623, 0.028],

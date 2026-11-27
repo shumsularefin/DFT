@@ -161,7 +161,7 @@ describe('m12b-hull', () => {
 });
 
 describe('m12b-neb', () => {
-  it('the exact barrier is the higher Muller-Brown saddle above minimum A (S-167)', () => {
+  it('the exact barrier is the higher Muller-Brown saddle above minimum A (S-164)', () => {
     const A = refineStationary(MB_MINIMA[0]!);
     const S = refineStationary(MB_SADDLES[0]!);
     expect(exactBarrier()).toBeCloseTo(mullerBrown(...S) - mullerBrown(...A), 9);

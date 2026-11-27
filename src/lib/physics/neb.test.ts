@@ -14,11 +14,11 @@ import {
   type P2,
 } from './neb';
 
-// Literature energies of the stationary points of the Muller-Brown surface (S-167), in the model's units.
+// Literature energies of the stationary points of the Muller-Brown surface (S-164), in the model's units.
 const E_MIN = [-146.7, -108.17, -80.77];
 const E_SAD = [-40.66, -72.25];
 
-describe('Muller-Brown surface (S-167)', () => {
+describe('Muller-Brown surface (S-164)', () => {
   it('has analytic derivatives that match finite differences', () => {
     const h = 1e-6;
     for (const [x, y] of [

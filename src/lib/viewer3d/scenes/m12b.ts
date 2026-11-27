@@ -1,7 +1,7 @@
 // Module 12 new topics (M16.13, M16.14): surfaces and slabs, point defects, the convex hull, the nudged elastic band and
 // molecular dynamics. Pure generators on tested libraries: crystal/slab (with the cubic symmetry provider), crystal/
 // defects and supercell, physics/slabPotential, physics/lennardJones, physics/hull and physics/neb.
-// @source S-064 S-063 S-066 S-109 S-067 S-125 S-126 S-036 S-044 S-034 S-120 S-167 S-121 S-124
+// @source S-064 S-063 S-066 S-109 S-067 S-125 S-126 S-036 S-044 S-034 S-120 S-164 S-121 S-124
 import { covalentRadius } from '../../crystal/covalent';
 import { cubicMoyo } from '../../crystal/cubicSymmetry';
 import { shortestLatticeVector, vacancy } from '../../crystal/defects';
@@ -987,7 +987,7 @@ const nebScene: SceneDef = {
   id: 'm12b-neb',
   title: 'Nudged elastic band on an energy landscape',
   badge: 'toy-model',
-  sources: ['S-167', 'S-121', 'S-124'],
+  sources: ['S-164', 'S-121', 'S-124'],
   banner:
     'The landscape is the analytic Muller-Brown surface, a standard test for path methods, not a material: positions ' +
     'and energies are in its own units. The band is relaxed by a tested NEB with the improved tangent.',

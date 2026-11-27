@@ -987,15 +987,17 @@ function relaxCell(p: Record<string, unknown>) {
   }
   // shape: the top corners toward the cube of the same volume
   const cube = cellLattice(a0, { ...st, ca: 1, tilt: 0 });
-  const tops: [Vec3, Vec3][] = [
+  const tops: [Vec3, Vec3][] = (
     [
-      [0, 0, 0],
-      [0, 0, 0],
-    ],
-    [a, cube[0]],
-    [b, cube[1]],
-    [add(a, b), add(cube[0], cube[1])],
-  ].map(([x, y]) => [add(x, c), add(y, cube[2])] as [Vec3, Vec3]);
+      [
+        [0, 0, 0],
+        [0, 0, 0],
+      ],
+      [a, cube[0]! as Vec3],
+      [b, cube[1]! as Vec3],
+      [add(a, b), add(cube[0]! as Vec3, cube[1]! as Vec3)],
+    ] as [Vec3, Vec3][]
+  ).map(([x, y]) => [add(x, c), add(y, cube[2]! as Vec3)] as [Vec3, Vec3]);
   const shapeVec = tops.map(([x, y]) => sub(y, x));
   if (Math.max(...shapeVec.map(norm)) > 0.01)
     layers.push(
