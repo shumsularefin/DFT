@@ -1,5 +1,28 @@
 ---
 id: formation-energy-and-convex-hull
+stage:
+  scene: m12b-hull
+  states:
+    - id: stable
+      section: why
+      params: { phase: ABC, shift: 0 }
+      caption: 'The hull of a sample A-B-C system as a sheet of flat facets under the composition triangle. ABC sits on the sheet, so no mixture of other phases is lower: it is stable.'
+    - id: above
+      section: intuition
+      params: { phase: B2C, shift: 0 }
+      caption: 'B2C sits above the sheet; the dashed line is its energy above the hull. It would split into B and BC, the ends of the edge below it. Turn the view to look along that edge.'
+    - id: ternary
+      section: math
+      params: { phase: A2BC, shift: 0 }
+      caption: 'A2BC lies over a facet with three corners. Its energy above the hull is its height above that facet, and the decomposition uses the weights of the three corner phases.'
+    - id: drop
+      section: what-changes
+      params: { phase: B2C, shift: -50 }
+      caption: 'Lower B2C by 50 meV/atom: it falls through the sheet, joins the hull and the facets around it re-form. Drag the shift slider to find where it crosses.'
+    - id: mismatch
+      section: mistakes
+      params: { phase: ABC, shift: 150 }
+      caption: 'Raise ABC by 150 meV/atom, as an energy from mismatched settings might: it leaves the hull, the facets re-form, and the phases that split into it now sit at new heights above the sheet.'
 title: Formation energy and the convex hull
 module: 12
 order: 10

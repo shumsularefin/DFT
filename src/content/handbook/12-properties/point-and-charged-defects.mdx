@@ -1,5 +1,28 @@
 ---
 id: point-and-charged-defects
+stage:
+  scene: m12b-defect
+  states:
+    - id: images
+      section: why
+      params: { defect: vacancy, size: 2, step: 0, images: true }
+      caption: 'A vacancy (wire sphere) at the centre of a 2 x 2 x 2 supercell, with its copies in the 26 neighbouring cells. Every defect in a periodic calculation sees these images.'
+    - id: relax
+      section: intuition
+      params: { defect: vacancy, size: 2, step: 20, images: false }
+      caption: 'After 20 relaxation steps the twelve neighbours of the vacancy have moved; the arrows are drawn ten times longer. Step back to 0 and play to watch them settle.'
+    - id: interstitial
+      section: math
+      params: { defect: interstitial, size: 2, step: 20, images: false }
+      caption: 'An extra atom in the octahedral hole pushes its six neighbours outward. The readout is the formation energy of this model, the defect cell minus the bulk energy per atom times the atoms present.'
+    - id: substitution
+      section: in-vasp
+      params: { defect: substitution, size: 3, step: 20, images: false }
+      caption: 'A larger atom X on a host site in a 3 x 3 x 3 supercell, relaxed at fixed cell shape as with ISIF = 2. Rotate to see the strain spread through the neighbours.'
+    - id: size
+      section: what-changes
+      params: { defect: vacancy, size: 4, step: 20, images: true }
+      caption: 'Grow the supercell with the size slider: the image distance rises as n times the cubic edge and the formation energy settles by n = 3 or 4. At n = 1 the vacancy is closer to its images than the range of the forces, so they interact and the energy is off.'
 title: Point and charged defects
 module: 12
 order: 9

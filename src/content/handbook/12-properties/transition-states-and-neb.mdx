@@ -1,5 +1,28 @@
 ---
 id: transition-states-and-neb
+stage:
+  scene: m12b-neb
+  states:
+    - id: landscape
+      section: why
+      params: { iter: 0, images: 7, climb: true }
+      caption: 'The Muller-Brown landscape: valleys A and B, a shallow minimum C and two saddles (wire spheres). The starting band is a straight line that climbs high ground. Press play to relax it.'
+    - id: band
+      section: intuition
+      params: { iter: 40, images: 7, climb: false }
+      caption: 'After relaxation the plain band lies on the valley floor, bending past the shallow minimum C. Its highest image sits just below saddle 1, so the barrier read from it is a little too low.'
+    - id: climbing
+      section: math
+      params: { iter: 40, images: 7, climb: true }
+      caption: 'Climbing image on: the highest image climbs along the band onto saddle 1, and the band barrier matches the exact barrier. Step the iterations to watch it climb.'
+    - id: few-images
+      section: in-vasp
+      params: { iter: 40, images: 3, climb: false }
+      caption: 'With IMAGES = 3 and no climbing image the band is too coarse: its highest image misses the barrier by far. Turn on the climbing image or add images.'
+    - id: many-images
+      section: what-changes
+      params: { iter: 10, images: 13, climb: true }
+      caption: 'Thirteen images map the whole path, including the dip into C, but take longer to converge: compare the largest NEB force with seven images at the same iteration.'
 title: Transition states and the nudged elastic band
 module: 12
 order: 11
