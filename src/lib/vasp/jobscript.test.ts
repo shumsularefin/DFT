@@ -104,5 +104,26 @@ describe('helpers', () => {
   it('submit commands', () => {
     expect(submitCommand('slurm', 'job.sh')).toBe('sbatch job.sh');
     expect(submitCommand('pbs', 'job.sh')).toBe('qsub job.sh');
+    expect(submitCommand('local', 'job.sh')).toBe('bash job.sh');
+  });
+  it('local shell run, exact text: no directives, and mpirun even when srun was chosen (D-108)', () => {
+    const t = jobScript({
+      ...DEFAULT_JOB,
+      scheduler: 'local',
+      jobName: 'test run',
+      tasksPerNode: 4,
+      launcher: 'srun',
+    });
+    expect(t).toBe(
+      [
+        '#!/bin/bash',
+        '# test_run: run on this machine (no scheduler)',
+        '',
+        'cd "$(dirname "$0")"',
+        '',
+        'mpirun -np 4 vasp_std > vasp.out 2>&1',
+        '',
+      ].join('\n'),
+    );
   });
 });

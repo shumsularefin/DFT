@@ -135,6 +135,117 @@
        "value": "4"
       }
      ]
+    },
+    {
+     "id": "ions-only",
+     "title": "Ions only, cell fixed (ISIF = 2: slabs, defects, adsorbates)",
+     "requires": [
+      "POSCAR",
+      "POTCAR",
+      "KPOINTS"
+     ],
+     "entries": [
+      {
+       "name": "SYSTEM",
+       "value": "Compound-relax"
+      },
+      {
+       "name": "PREC",
+       "value": "Accurate"
+      },
+      {
+       "name": "ENCUT",
+       "value": "520",
+       "comment": "1.3 × largest ENMAX (grep ENMAX POTCAR)",
+       "placeholder": "<1.3 x largest ENMAX in your POTCAR>"
+      },
+      {
+       "name": "EDIFF",
+       "value": "1E-6",
+       "comment": "1E-7 to 1E-8 when EDIFFG = -0.001"
+      },
+      {
+       "name": "ALGO",
+       "value": "Normal"
+      },
+      {
+       "name": "NELM",
+       "value": "120"
+      },
+      {
+       "name": "NELMIN",
+       "value": "6"
+      },
+      {
+       "name": "ISMEAR",
+       "value": "0",
+       "comment": "metals: ISMEAR = 1, SIGMA = 0.1-0.2"
+      },
+      {
+       "name": "SIGMA",
+       "value": "0.05"
+      },
+      {
+       "name": "LREAL",
+       "value": ".FALSE.",
+       "comment": "Auto for cells above ~20 atoms"
+      },
+      {
+       "name": "LASPH",
+       "value": ".TRUE.",
+       "comment": "d/f elements"
+      },
+      {
+       "name": "ISPIN",
+       "value": "2"
+      },
+      {
+       "name": "MAGMOM",
+       "value": "2*5.0 4*0.6",
+       "comment": "one entry per atom, POSCAR order",
+       "placeholder": "<one value per atom, in POSCAR order>"
+      },
+      {
+       "name": "LMAXMIX",
+       "value": "4",
+       "comment": "d elements (6 for f)"
+      },
+      {
+       "name": "IBRION",
+       "value": "2",
+       "comment": "CG; switch to 1 near the minimum"
+      },
+      {
+       "name": "ISIF",
+       "value": "2",
+       "comment": "ions only; cell shape and volume fixed"
+      },
+      {
+       "name": "NSW",
+       "value": "200"
+      },
+      {
+       "name": "EDIFFG",
+       "value": "-0.005",
+       "comment": "max force 0.005 eV/Å; -0.001 for high accuracy"
+      },
+      {
+       "name": "POTIM",
+       "value": "0.3"
+      },
+      {
+       "name": "LWAVE",
+       "value": ".TRUE."
+      },
+      {
+       "name": "LCHARG",
+       "value": ".TRUE."
+      },
+      {
+       "name": "NCORE",
+       "value": "4"
+      }
+     ]
     }
    ]
   },
@@ -909,6 +1020,90 @@
    ]
   },
   {
+   "id": "soc",
+   "title": "Spin-orbit coupling (non-collinear)",
+   "summary": "Spin-orbit coupling for heavy elements, magnetic anisotropy and topological bands.",
+   "protocolStage": null,
+   "fragment": true,
+   "sources": [
+    "S-042",
+    "S-065"
+   ],
+   "notes": [
+    "Run with the vasp_ncl executable (set it in the job step).",
+    "MAGMOM needs three values (mx my mz) per atom.",
+    "For bands or the anisotropy energy, start from the collinear CHGCAR with ICHARG = 11, one run per spin direction."
+   ],
+   "variants": [
+    {
+     "id": "default",
+     "title": "SOC on top of a full INCAR",
+     "requires": [],
+     "entries": [
+      {
+       "name": "LSORBIT",
+       "value": ".TRUE.",
+       "comment": "spin-orbit coupling"
+      },
+      {
+       "name": "SAXIS",
+       "value": "0 0 1",
+       "comment": "spin quantization axis"
+      },
+      {
+       "name": "ISYM",
+       "value": "-1",
+       "comment": "symmetry off for non-collinear runs"
+      },
+      {
+       "name": "LMAXMIX",
+       "value": "4",
+       "comment": "d elements (6 for f)"
+      },
+      {
+       "name": "MAGMOM",
+       "value": "0 0 4",
+       "comment": "three values per atom, POSCAR order",
+       "placeholder": "<three values (mx my mz) per atom, in POSCAR order>"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "dipole",
+   "title": "Dipole correction for slabs",
+   "summary": "Removes the artificial field across the vacuum of an asymmetric slab or a slab with adsorbates.",
+   "protocolStage": null,
+   "fragment": true,
+   "sources": [
+    "S-042",
+    "S-065"
+   ],
+   "notes": [
+    "Add to a relaxation or static template for asymmetric slabs and adsorption. IDIPOL = 3 is the z direction."
+   ],
+   "variants": [
+    {
+     "id": "default",
+     "title": "Dipole along z",
+     "requires": [],
+     "entries": [
+      {
+       "name": "LDIPOL",
+       "value": ".TRUE.",
+       "comment": "dipole correction"
+      },
+      {
+       "name": "IDIPOL",
+       "value": "3",
+       "comment": "along z"
+      }
+     ]
+    }
+   ]
+  },
+  {
    "id": "elastic",
    "title": "Elastic constants",
    "summary": "Step 4 of the protocol: finite distortions with IBRION = 6 and ISIF = 3.",
@@ -1202,6 +1397,92 @@
       {
        "name": "LCHARG",
        "value": ".FALSE."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "phonon-dfpt",
+   "title": "Phonons: DFPT force constants",
+   "summary": "One run on the perfect supercell (IBRION = 8) instead of one per displacement; phonopy reads vasprun.xml.",
+   "protocolStage": null,
+   "fragment": false,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-042",
+    "S-083"
+   ],
+   "notes": [
+    "Copy SPOSCAR to POSCAR first, then run phonopy --fc vasprun.xml and add FORCE_CONSTANTS = READ to band.conf and mesh.conf.",
+    "NCORE must not be set. DFPT does not support every functional."
+   ],
+   "variants": [
+    {
+     "id": "default",
+     "title": "IBRION = 8 on the supercell",
+     "requires": [
+      "POSCAR (the perfect supercell, from SPOSCAR)",
+      "POTCAR",
+      "KPOINTS (scaled for the supercell)"
+     ],
+     "entries": [
+      {
+       "name": "PREC",
+       "value": "Accurate"
+      },
+      {
+       "name": "ENCUT",
+       "value": "520",
+       "placeholder": "<1.3 x largest ENMAX in your POTCAR>"
+      },
+      {
+       "name": "EDIFF",
+       "value": "1E-8"
+      },
+      {
+       "name": "ISMEAR",
+       "value": "0"
+      },
+      {
+       "name": "SIGMA",
+       "value": "0.02"
+      },
+      {
+       "name": "LREAL",
+       "value": ".FALSE."
+      },
+      {
+       "name": "ADDGRID",
+       "value": ".TRUE."
+      },
+      {
+       "name": "LASPH",
+       "value": ".TRUE."
+      },
+      {
+       "name": "ISPIN",
+       "value": "2",
+       "comment": "magnetic: MAGMOM for the SUPERCELL"
+      },
+      {
+       "name": "NSW",
+       "value": "1",
+       "comment": "1 for IBRION 5 to 8"
+      },
+      {
+       "name": "LWAVE",
+       "value": ".FALSE."
+      },
+      {
+       "name": "LCHARG",
+       "value": ".FALSE."
+      },
+      {
+       "name": "IBRION",
+       "value": "8",
+       "comment": "DFPT force constants"
       }
      ]
     }

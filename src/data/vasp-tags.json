@@ -33,6 +33,7 @@
     "elastic",
     "hybrid",
     "optics",
+    "phonon-dfpt",
     "phonon-finite-displacement",
     "r2scan",
     "relax",
@@ -84,6 +85,7 @@
     "elastic",
     "hybrid",
     "optics",
+    "phonon-dfpt",
     "phonon-finite-displacement",
     "r2scan",
     "relax",
@@ -129,6 +131,7 @@
     "elastic",
     "hybrid",
     "optics",
+    "phonon-dfpt",
     "phonon-finite-displacement",
     "r2scan",
     "relax",
@@ -364,6 +367,7 @@
     "hybrid",
     "mbj",
     "optics",
+    "phonon-dfpt",
     "phonon-finite-displacement",
     "r2scan",
     "relax",
@@ -417,6 +421,7 @@
     "hybrid",
     "mbj",
     "optics",
+    "phonon-dfpt",
     "phonon-finite-displacement",
     "r2scan",
     "relax",
@@ -460,6 +465,7 @@
     "dos",
     "elastic",
     "optics",
+    "phonon-dfpt",
     "phonon-finite-displacement",
     "relax",
     "spin",
@@ -511,6 +517,7 @@
     "elastic",
     "optics",
     "relax",
+    "soc",
     "spin",
     "static"
    ],
@@ -806,6 +813,7 @@
     "aimd-nvt",
     "dielectric",
     "elastic",
+    "phonon-dfpt",
     "relax"
    ],
    "related": [
@@ -893,6 +901,7 @@
     "hybrid",
     "mbj",
     "optics",
+    "phonon-dfpt",
     "phonon-finite-displacement",
     "relax",
     "static"
@@ -1006,6 +1015,7 @@
     "dielectric",
     "dos",
     "elastic",
+    "phonon-dfpt",
     "phonon-finite-displacement",
     "relax",
     "static"
@@ -1041,6 +1051,7 @@
    "why": "Reduces force noise; marginal cost.",
    "breaks": "Without it, phonon force constants can be noisier.",
    "tasks": [
+    "phonon-dfpt",
     "phonon-finite-displacement"
    ],
    "related": [
@@ -1085,6 +1096,7 @@
     "elastic",
     "hybrid",
     "mbj",
+    "phonon-dfpt",
     "phonon-finite-displacement",
     "r2scan",
     "relax"
@@ -1122,7 +1134,8 @@
     "dftu",
     "elastic",
     "optics",
-    "relax"
+    "relax",
+    "soc"
    ],
    "related": [
     "LASPH",
@@ -1392,6 +1405,7 @@
     "dos",
     "elastic",
     "optics",
+    "phonon-dfpt",
     "phonon-finite-displacement",
     "relax",
     "static"
@@ -1434,6 +1448,7 @@
     "dos",
     "elastic",
     "optics",
+    "phonon-dfpt",
     "phonon-finite-displacement",
     "relax",
     "static"
@@ -2146,7 +2161,9 @@
    },
    "why": "Heavy elements, MAE, topological bands. Needs vasp_ncl and 3 MAGMOM values per atom.",
    "breaks": "Needs the non-collinear VASP build and three MAGMOM values per atom.",
-   "tasks": [],
+   "tasks": [
+    "soc"
+   ],
    "related": [
     "SAXIS",
     "MAGMOM"
@@ -2175,7 +2192,9 @@
    },
    "why": "Heavy elements, MAE, topological bands. Needs vasp_ncl and 3 MAGMOM values per atom.",
    "breaks": "Needs LSORBIT; a wrong axis changes magnetic-anisotropy results.",
-   "tasks": [],
+   "tasks": [
+    "soc"
+   ],
    "related": [
     "LSORBIT"
    ],
@@ -2204,7 +2223,8 @@
    "why": "Change only to fix symmetry errors or for LOBSTER/defects.",
    "breaks": "Leaving it on can fight a hand-built antiferromagnetic MAGMOM pattern; changing it is only for fixing symmetry errors.",
    "tasks": [
-    "aimd-nvt"
+    "aimd-nvt",
+    "soc"
    ],
    "related": [
     "SYMPREC",
@@ -2300,7 +2320,9 @@
    },
    "why": "Asymmetric slabs and adsorption.",
    "breaks": "Without it an asymmetric slab sees a false field across the vacuum.",
-   "tasks": [],
+   "tasks": [
+    "dipole"
+   ],
    "related": [
     "IDIPOL",
     "LVHAR"
@@ -2329,7 +2351,9 @@
    },
    "why": "Asymmetric slabs and adsorption.",
    "breaks": "The wrong direction applies the correction across the wrong axis.",
-   "tasks": [],
+   "tasks": [
+    "dipole"
+   ],
    "related": [
     "LDIPOL",
     "LVHAR"
