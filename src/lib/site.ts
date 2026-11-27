@@ -23,7 +23,7 @@ export const MODULES = [
   'Convergence testing and common errors',
   'Analysis',
   'Worked example: a perovskite oxide',
-  'Screening Studio and Material Builder',
+  'Materials Screening and Material Builder',
   'Lattice response and properties',
 ] as const;
 
