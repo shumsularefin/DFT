@@ -228,6 +228,17 @@ main .topic-section > h2.card-h {
   padding: var(--space-1) var(--space-2);
   border-bottom: 1px solid var(--border);
 }
+/* On a desktop a column is at least as wide as its longest word, so "POSCAR" never splits as "POS / CAR";
+   only a code token too long for any column still breaks (D-126). Phones keep wrapping anywhere (M7.3). */
+@media (min-width: 48rem) {
+  .prose th,
+  .prose td {
+    overflow-wrap: break-word;
+  }
+  .prose :is(th, td) code {
+    overflow-wrap: anywhere;
+  }
+}
 .cite-list {
   padding-left: var(--space-5);
 }

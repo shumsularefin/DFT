@@ -37,6 +37,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 - Paragraphs and lists inside cards, callouts and other panels run to the panel's edge instead of stopping two thirds of the way across; text with no panel around it keeps a readable line length (D-126).
 - The right-hand rail of a Workflow step no longer draws "Learn why" over "On this page" on wide screens (D-126).
+- Table cells on desktop no longer split a short word over two lines ("POS / CAR"); a column is at least as wide as its longest word (D-126).
 - Previous and next buttons on handbook topics and Workflow steps stand out from the text: next is filled in the accent colour and previous in the grey button colour, as on the guided path (D-126).
 - Guided path and topic stages: changing an option (n = 1 to 3, the orbital, the number of periodic copies, any stage parameter) keeps the 3D view framed on the new picture, so Reset view is no longer needed; the Try this box no longer spills out of its card (D-124).
 - Guided path pictures explain themselves: the self-consistency loop is shown step by step until the density settles, the density map, cutoff sphere and bands beside the DOS are new pictures, each station says how to read its picture, and a new station and handbook subsection compare real space with reciprocal space (D-124).

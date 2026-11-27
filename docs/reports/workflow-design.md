@@ -1,7 +1,7 @@
 # Report: Workflow in the handbook design, previous and next buttons, text width (D-126)
 
 - **Date:** 2026-11-27
-- **Branch:** `claude/workflow-design-text-width` (from `main` at 3039c88)
+- **Branch:** `claude/workflow-design-text-width` (from `main` at 3039c88, with `main` at d0bc595 merged in)
 - **Decision:** D-126. **Questions:** none opened.
 
 ## What the owner asked
@@ -17,16 +17,18 @@
 - **Previous and next:** filled buttons with an arrow, a small label and the title; next in the accent colour, previous in the grey button colour, under a rule. Shared by the handbook and the Workflow.
 - **Text width:** one rule in `interface.css` lifts the 68ch measure (base.css) and the 78ch topic measure (removed from learning.css) inside any panel (card, callout, readout, lab shell, notice, stage, disclosure), including callouts and disclosures inside cards. Text outside panels keeps its measure.
 - **Rail overlap:** the cause was layout, not wrapping. On screens of 100rem and up every rail card was placed on the first row of the right column, so a second card ("Learn why") was drawn over "On this page". The page's rail cards now sit in one `.hb-aside` column in both layouts.
+- **Words split in tables:** table cells used `overflow-wrap: anywhere`, which lets a browser squeeze a column below its longest word, so "POSCAR" printed as "POS / CAR". The narrower column beside the stage made this worse ("Fil / e"). On desktop cells now use `break-word`, so a column is at least as wide as its longest word; code tokens still break, and phones keep wrapping anywhere (M7.3).
+- **Main took D-125** while this branch was open, so this change is D-126.
 
-What the redesign alone would have fixed: on Workflow steps, most of the short text. With the stage beside it the text column is narrower than the 78ch cap, so the gap mostly disappears at the owner's screen width; that is why handbook topics hid it. The cap itself (`.topic-section`, shared with the handbook) still cut text short in Text only mode, on the Workflow index, in callouts and disclosures and on other pages with cards, so it is removed for every panel. The rail overlap was not fixed by the redesign: it came from the shared rail grid and needed its own fix.
+What the redesign alone would have fixed: on Workflow steps, most of the short text. With the stage beside it the text column is narrower than the 78ch cap, so the gap mostly disappears at the owner's screen width; that is why handbook topics hid it. The cap itself (`.topic-section`, shared with the handbook) still cut text short in Text only mode, on the Workflow index, in callouts and disclosures and on other pages with cards, so it is removed for every panel. The rail overlap was not fixed by the redesign: it came from the shared rail grid and needed its own fix. The split words in tables got worse with the redesign, not better, because the text column is narrower, and needed their own fix.
 
 ## Checks
 
 | Check | Result |
 | --- | --- |
-| `npm run verify` (format, lint, typecheck, 3287 unit tests, guards, content lint, build, links, size, contrast) | pass |
+| `npm run verify` (format, lint, typecheck, 3291 unit tests, guards, content lint, build, links, size, contrast) | pass |
 | `stages.test.ts`: 16 Workflow stages (scene, parameters, layers, sections in page order) | pass |
 | `check-3d-stages` now covers Workflow steps | pass |
-| e2e, axe, Lighthouse | run in CI on the pull request: this cloud session has no Chromium (`/opt/pw-browsers` missing, the Playwright download blocked) |
+| e2e (Playwright, axe), Lighthouse, Firestore rules, preview deploy | pass in CI on the pull request (this cloud session has no Chromium, so they run there) |
 
-New tests: `tests/e2e/layout-width.spec.ts` (text fills its card on two Workflow and two handbook pages, rail cards and entries do not overlap, the buttons' colours and rule, the stage beside the text on three Workflow pages) and `tests/e2e/ui-shots.spec.ts` (review screenshots, printed by CI).
+New tests: `tests/e2e/layout-width.spec.ts` (text fills its card on two Workflow and two handbook pages, rail cards and entries do not overlap, the buttons' colours and rule, the stage beside the text on three Workflow pages, no word split over two lines in a table cell on every handbook topic and Workflow step that has a table) and `tests/e2e/ui-shots.spec.ts` (review screenshots, printed by CI).

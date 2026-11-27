@@ -1,8 +1,29 @@
 // D-126: text inside a card runs to the card's own margin, the right rail never draws one card over another, the
 // previous and next buttons stand out from the text, and a Workflow step has the handbook's stage beside its text.
+import { readdirSync, readFileSync } from 'node:fs';
+import { join, relative } from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
 
 const WIDE = { width: 1650, height: 900 };
+
+/** Every handbook topic and Workflow step whose text has a Markdown table, as its URL. */
+function pagesWithTables(): string[] {
+  const urls: string[] = [];
+  const walk = (dir: string, base: string, prefix: string) => {
+    for (const e of readdirSync(dir, { withFileTypes: true })) {
+      const full = join(dir, e.name);
+      if (e.isDirectory()) walk(full, base, prefix);
+      else if (e.name.endsWith('.mdx') && /^\|/m.test(readFileSync(full, 'utf8')))
+        urls.push(`${prefix}${relative(base, full).replace(/\.mdx$/, '')}/`);
+    }
+  };
+  for (const [dir, prefix] of [
+    ['src/content/handbook', '/handbook/'],
+    ['src/content/workflow', '/workflow/'],
+  ] as const)
+    walk(dir, dir, prefix);
+  return urls.sort();
+}
 const PAGES = [
   '/workflow/prepare-inputs/',
   '/workflow/phonons/',
@@ -29,8 +50,43 @@ async function shortfalls(page: Page) {
   });
 }
 
+/** Words in table cells (outside code) that the browser split over two lines, and tables wider than their card. */
+async function brokenCells(page: Page) {
+  return page.evaluate(() => {
+    const out: string[] = [];
+    for (const table of document.querySelectorAll<HTMLElement>('main .prose table')) {
+      if (table.offsetParent === null) continue;
+      const card = table.closest<HTMLElement>('.card');
+      if (card && table.getBoundingClientRect().right > card.getBoundingClientRect().right + 1)
+        out.push(`table wider than its card: ${(table.textContent ?? '').trim().slice(0, 30)}`);
+      const walker = document.createTreeWalker(table, NodeFilter.SHOW_TEXT);
+      for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+        if (n.parentElement?.closest('code')) continue;
+        const text = n.textContent ?? '';
+        for (const m of text.matchAll(/[^\s\-\u2013/]+/g)) {
+          const range = document.createRange();
+          range.setStart(n, m.index);
+          range.setEnd(n, m.index + m[0].length);
+          const tops = new Set([...range.getClientRects()].map((r) => Math.round(r.top)));
+          if (tops.size > 1) out.push(m[0]);
+        }
+      }
+    }
+    return out;
+  });
+}
+
 test.describe('text width and rails', () => {
   test.skip(({ isMobile }) => isMobile, 'desktop only (D-105)');
+
+  for (const url of pagesWithTables())
+    test(`${url}: table cells keep each word on one line`, async ({ page }) => {
+      await page.setViewportSize(WIDE);
+      await page.goto(url);
+      await expect(page.locator('main .prose')).toBeVisible();
+      const broken = await brokenCells(page);
+      expect(broken, broken.slice(0, 8).join(', ')).toEqual([]);
+    });
 
   for (const url of PAGES)
     test(`${url}: paragraphs and lists fill their card`, async ({ page }) => {
