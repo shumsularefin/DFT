@@ -1,5 +1,28 @@
 ---
 id: your-roadmap-to-a-first-vasp-project
+stage:
+  scene: m01-roadmap
+  states:
+    - id: route
+      section: why
+      params: { station: 1 }
+      caption: 'A first project as five stations on a rising path, each a small live view of SrTiO3. Step through them with the step bar, or press ] to move on.'
+    - id: relax
+      section: intuition
+      params: { station: 1, a: 3.85 }
+      caption: 'Station 1 relaxes the cell. Drag the lattice constant and every later station follows: the cell grows while the zone and the k-mesh shrink.'
+    - id: scf
+      section: in-vasp
+      params: { station: 2, kmesh: 6 }
+      caption: 'Station 2: the SCF run samples the zone on a k-mesh, here 6 by 6 by 6. Change the divisions and read the spacing, the quantity that KSPACING sets.'
+    - id: bands
+      section: what-changes
+      params: { station: 3 }
+      caption: 'Station 3: the bands are computed along the path Gamma-X-M-Gamma-R-X and M-R through the cubic zone, from the density of station 2.'
+    - id: finish
+      section: mistakes
+      params: { station: 5 }
+      caption: 'Stations 4 and 5 reuse the relaxed cell: a strained copy for elastic constants and light for optics. Everything rests on station 1, so get the relaxation right first.'
 title: Your roadmap to a first VASP project
 module: 1
 order: 4
