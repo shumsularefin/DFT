@@ -136,7 +136,7 @@ LCHARG = .FALSE.`}
 
 **Where to read each number** <Cite id="S-041" />:
 
-```bash
+```text
 grep "free  energy   TOTEN" OUTCAR | tail -1   # F
 grep "energy  without entropy" OUTCAR | tail -1 # E and energy(sigma->0)
 grep EENTRO OUTCAR | tail -1                     # -T*S, divide by the number of atoms

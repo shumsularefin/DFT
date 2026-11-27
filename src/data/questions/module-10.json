@@ -370,7 +370,9 @@
       "S-001"
     ],
     "visual": {
-      "none": "A table lookup question: the answer is the key of a radius table, which no picture shows."
+      "scene": "perovskite-octahedra",
+      "caption": "In a cubic perovskite (SrTiO3 drawn here) the centre atom has six oxygen neighbours and the corner atom twelve: the coordination number is one key of a radius table. Illustrative.",
+      "alt": "A cubic perovskite cell with the six oxygen atoms around the central atom joined into an octahedron."
     }
   },
   {
@@ -481,7 +483,9 @@
       "S-001"
     ],
     "visual": {
-      "none": "A trend in a radius table; the question is answered by comparing table rows, not by a picture."
+      "scene": "perovskite-octahedra",
+      "caption": "Two sites with different numbers of neighbours: six around the centre atom, twelve around a corner atom (SrTiO3 drawn here). Illustrative.",
+      "alt": "A cubic perovskite cell with an octahedron of six oxygen atoms around the central atom and atoms at the corners."
     }
   },
   {

@@ -104,7 +104,7 @@ EDIFF   = 1E-6`}
 
 The handbook's commands for a cell of `N` atoms <Cite id="S-042" />:
 
-```bash
+```text
 grep "mag=" OSZICAR | tail -1                       # total cell moment
 grep -A $((N+6)) "magnetization (x)" OUTCAR | tail -$((N+6))   # last per-site table
 grep "number of electron" OUTCAR | tail -1          # electrons and total magnetization

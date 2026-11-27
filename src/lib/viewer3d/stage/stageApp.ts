@@ -223,7 +223,7 @@ export class StageApp {
               this.doc,
               'button',
               { type: 'button', class: 'btn btn-small', 'aria-label': `${p.label}: previous` },
-              'Prev',
+              'Previous',
             );
             const next = el(
               this.doc,

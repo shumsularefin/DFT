@@ -47,7 +47,7 @@ const cited = def.sources
 const hasLattice = frames.some((f) => !!f.lattice);
 const data = JSON.stringify({ scene: stage.scene, states: stage.states }).replace(/</g, '\\u003c');
 const views = [
-  ['iso', 'Iso', 'three-quarter view'],
+  ['iso', 'Iso', 'Iso, three-quarter view'],
   ['top', 'Top', 'from the top'],
   ['front', 'Front', 'from the front'],
   ['side', 'Side', 'from the side'],
@@ -146,7 +146,7 @@ const crystalViews = ['a', 'b', 'c', 'a*', 'b*', 'c*'] as const;
   )}
   <nav class="stage-states" aria-label="Steps of this view">
     <button type="button" class="btn btn-small js-only" data-step="-1" aria-label="Previous step">
-      Prev
+      Previous
     </button>
     <ol>
       {stage.states.map((st, i) => (

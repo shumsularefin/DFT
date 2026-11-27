@@ -2399,7 +2399,9 @@
       "S-042"
     ],
     "visual": {
-      "none": "The question is about when to switch a tag on, so a picture would only restate the answer text."
+      "scene": "graphite",
+      "caption": "A layered crystal: strong bonds inside each layer, weak binding between the layers. Illustrative.",
+      "alt": "Graphite: hexagonal layers of carbon atoms stacked along c, bonded within each layer."
     }
   },
   {

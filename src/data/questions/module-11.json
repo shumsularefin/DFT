@@ -356,7 +356,9 @@
       "S-067"
     ],
     "visual": {
-      "none": "A supercell-search question answered by counting atoms and vector lengths, not by a picture."
+      "scene": "perovskite-octahedra",
+      "caption": "The five-atom cubic perovskite cell (SrTiO3 drawn here, the same structure type as the LaCuO3 template) that a supercell repeats. Illustrative.",
+      "alt": "A cubic perovskite cell: one atom at the centre inside an octahedron of six oxygen atoms, other atoms at the corners."
     }
   },
   {
@@ -393,7 +395,9 @@
       "S-058"
     ],
     "visual": {
-      "none": "A question about how a site tool behaves; a picture would only restate the answer."
+      "scene": "afm-g",
+      "caption": "G-type order: every neighbour is opposite, so one cubic cell cannot hold it and a larger cell is needed. Toy model, hand-set signs.",
+      "alt": "Eight atoms in a 2 by 2 by 2 cubic block with alternating up and down arrows; up arrows have a solid head, down arrows an open head."
     }
   },
   {
@@ -552,7 +556,9 @@
       "S-067"
     ],
     "visual": {
-      "none": "An algebra question on the sign of one term; a picture would not help."
+      "scene": "perovskite-octahedra",
+      "caption": "A cubic perovskite cell (SrTiO3 drawn here, the same structure type as LaCuO3). A vacancy removes one of the oxygen atoms. Illustrative.",
+      "alt": "A cubic perovskite cell with an octahedron of six oxygen atoms around the central atom."
     }
   },
   {

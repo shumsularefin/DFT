@@ -219,7 +219,20 @@
       "S-064"
     ],
     "visual": {
-      "none": "The question is about the procedure of a convergence test, which a crystal picture would not show."
+      "plot": "conv-series",
+      "params": {
+        "diff": [
+          30,
+          8,
+          2,
+          0.5,
+          0.1
+        ],
+        "threshold": 1,
+        "xlabel": "vacuum thickness (rising)"
+      },
+      "caption": "The shape of a convergence test: the change in the result between neighbouring settings falls below the threshold. Illustrative numbers, not a computed series.",
+      "alt": "Change between neighbouring vacuum settings on a logarithmic axis, falling below a horizontal threshold line as the vacuum grows."
     }
   },
   {
@@ -623,7 +636,7 @@
       "params": {
         "Z": 2,
         "alpha": 0.1,
-        "tol": 1e-08,
+        "tol": 1e-8,
         "show": 40
       },
       "caption": "The toy loop with a smaller mixing fraction.",
@@ -1032,8 +1045,8 @@
           10,
           0.1,
           0.001,
-          1e-05,
-          1e-07
+          0.00001,
+          1e-7
         ],
         "ediff": 0.0001
       },
