@@ -91,6 +91,13 @@ table.numeric,
 .card {
   padding: var(--space-4);
 }
+/* Text inside a panel runs to the panel's own margin, as its code blocks and tables already do (D-126). The 68ch
+   measure of base.css is for running text with no panel around it (page intros, prose pages); inside a panel the
+   panel is the measure, so paragraphs and lists no longer stop two thirds of the way across. */
+:is(.card, .callout, .readout, .lab-shell, .notice, .stage, .disclosure)
+  :is(p, ul, ol, dl, blockquote, .disclosure, .callout) {
+  max-width: none;
+}
 .card-title {
   margin: 0 0 var(--space-2);
   font-size: 1rem;

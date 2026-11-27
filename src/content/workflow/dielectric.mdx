@@ -29,6 +29,22 @@ checklist: [Dielectric / Z*]
 sources: [S-042, S-020]
 status: draft
 updated: 2026-11-27
+stage:
+  scene: m12-dielectric
+  states:
+    - id: isotropic
+      section: why
+      params: { symmetry: cubic, theta: 50, phi: 30 }
+      camera: iso
+      caption: 'In a cubic crystal the dielectric ellipsoid is a sphere, so D is parallel to E whichever way the field points. Move the field angles and check that the angle between them stays zero.'
+    - id: uniaxial
+      section: inputs
+      params: { symmetry: uniaxial, theta: 50, phi: 30 }
+      caption: 'A uniaxial crystal stretches the sphere along z. For a field between the axes D tilts toward the more polarizable axis; the dashed segment is the part of D across E.'
+    - id: tilted
+      section: read
+      params: { symmetry: monoclinic, tilt: 25, theta: 50, phi: 30 }
+      caption: 'In a monoclinic crystal the principal axes need not follow the crystal axes. Tilt them and the tensor printed in OUTCAR gains xz terms; report the principal values or all the components.'
 ---
 
 <Section id="why" heading="What you compute and why">

@@ -55,6 +55,14 @@
   gap: var(--space-4);
   min-width: 0;
 }
+/* The page's own rail cards ("On this page", a Workflow step's "Learn why" and "Tools") sit in one column, so on wide
+   screens they stack in the right rail instead of sharing its first grid row and drawing over each other. */
+.hb-aside {
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
+  min-width: 0;
+}
 .handbook-main {
   min-width: 0;
 }
@@ -200,9 +208,6 @@ main .topic-section > h2.card-h {
 .topic-section > :last-child {
   margin-bottom: 0;
 }
-.topic-section :is(p, ul, ol) {
-  max-width: 78ch;
-}
 .prose math {
   font-family: 'Cambria Math', 'STIX Two Math', 'Latin Modern Math', 'Noto Sans Math', math, serif;
   font-size: 1.1em;
@@ -222,6 +227,22 @@ main .topic-section > h2.card-h {
   vertical-align: top;
   padding: var(--space-1) var(--space-2);
   border-bottom: 1px solid var(--border);
+}
+/* On a desktop a column is at least as wide as its longest word, so "POSCAR" never splits as "POS / CAR";
+   only a code token too long for any column still breaks (D-126). Phones keep wrapping anywhere (M7.3). */
+@media (min-width: 48rem) {
+  .prose th,
+  .prose td {
+    overflow-wrap: break-word;
+  }
+  .prose :is(th, td) code {
+    overflow-wrap: anywhere;
+  }
+  /* A formula cannot wrap, so a table of formulas that is wider than the column scrolls inside its card. */
+  .prose table:has(math) {
+    display: block;
+    overflow-x: auto;
+  }
 }
 .cite-list {
   padding-left: var(--space-5);
@@ -305,19 +326,13 @@ main .topic-section > h2.card-h {
   font-size: var(--step--1);
 }
 
-/* Previous and next as two quiet cards */
+/* Previous and next: the buttons themselves are styled in PrevNext.astro (D-126); here they only wrap on narrow
+   columns and keep a sensible minimum width. */
 .handbook-main .prev-next {
   flex-wrap: wrap;
-  margin-top: var(--space-4);
 }
 .handbook-main .prev-next a {
   min-width: min(14rem, 100%);
-  color: var(--text);
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-}
-.handbook-main .prev-next a:hover {
-  border-color: var(--accent);
 }
 
 /* ---------- Shared bits for practice, progress and the guided path ---------- */

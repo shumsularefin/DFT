@@ -28,6 +28,26 @@ tools:
 sources: [S-042, S-020]
 status: draft
 updated: 2026-11-27
+stage:
+  scene: m06-poscar
+  states:
+    - id: species
+      section: why
+      params: { file: si, line: species }
+      caption: 'Si diamond built from a POSCAR. Lines 6 and 7 name the species and count the atoms; the POTCAR you make next must list the same species in the same order.'
+    - id: vectors
+      section: inputs
+      params: { file: si, line: lattice }
+      camera: iso
+      caption: 'Lines 3 to 5 are the lattice vectors a1, a2 and a3 that span the cell. Turn it: these three vectors make a slanted box, not a cube.'
+    - id: positions
+      section: generate
+      params: { file: srtio3, line: positions }
+      caption: 'The atom lines place each atom as a sum of the lattice vectors. Pick another file to see the same rule in other cells.'
+    - id: misread
+      section: symmetry
+      params: { file: nacl, line: keyword, reading: misread }
+      caption: 'NaCl with its Direct numbers read as Cartesian: all eight atoms crowd near the origin, the case where VASP warns that ions are too close. Check the cell before you relax it.'
 ---
 
 <Section id="why" heading="Why this step comes first">

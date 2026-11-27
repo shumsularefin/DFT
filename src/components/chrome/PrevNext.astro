@@ -16,44 +16,95 @@ const { prev, next, base = '/handbook/', label = 'Previous and next topic' } = A
 {(prev || next) && (
   <nav class="prev-next" aria-label={label}>
     {prev ? (
-      <a rel="prev" href={`${base}${prev.id}/`}>
-        <span class="pn-dir">Previous</span>
-        {prev.title}
+      <a rel="prev" href={`${base}${prev.id}/`} class="pn-link pn-prev">
+        <span class="pn-arrow" aria-hidden="true">
+          ←
+        </span>
+        <span class="pn-text">
+          <span class="pn-dir">Previous</span>
+          <span class="pn-title">{prev.title}</span>
+        </span>
       </a>
     ) : (
       <span />
     )}
     {next && (
-      <a rel="next" href={`${base}${next.id}/`} class="pn-next">
-        <span class="pn-dir">Next</span>
-        {next.title}
+      <a rel="next" href={`${base}${next.id}/`} class="pn-link pn-next">
+        <span class="pn-text">
+          <span class="pn-dir">Next</span>
+          <span class="pn-title">{next.title}</span>
+        </span>
+        <span class="pn-arrow" aria-hidden="true">
+          →
+        </span>
       </a>
     )}
   </nav>
 )}
 
 <style is:global>
+  /* Previous and next as buttons, in the look of the guided path's "Previous station" and "Next station" (D-126):
+     a filled accent button for the way forward and a grey one for the way back, set off from the text by a rule. */
   .prev-next {
     display: flex;
     justify-content: space-between;
     gap: var(--space-4);
     margin-top: var(--space-7);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border);
   }
-  .prev-next a {
-    display: block;
-    min-height: var(--target);
+  .prev-next .pn-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: calc(var(--target) + var(--space-3));
+    max-width: min(48%, 28rem);
     padding: var(--space-3) var(--space-4);
     border: 1px solid var(--border);
     border-radius: var(--radius);
+    background: var(--surface-2);
+    color: var(--text);
+    font-weight: 500;
     text-decoration: none;
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--text) 10%, transparent);
   }
-  .pn-next {
+  .prev-next .pn-prev:hover {
+    background: color-mix(in srgb, var(--text) 7%, var(--surface-2));
+  }
+  .prev-next .pn-next {
     margin-inline-start: auto;
     text-align: right;
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-contrast);
+  }
+  .prev-next .pn-next:hover {
+    filter: brightness(0.92);
+  }
+  .prev-next .pn-link:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+  .pn-text {
+    display: grid;
+    gap: 0.15rem;
+    min-width: 0;
   }
   .pn-dir {
-    display: block;
-    color: var(--text-muted);
     font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .pn-prev .pn-dir {
+    color: var(--text-muted);
+  }
+  .pn-title {
+    line-height: 1.3;
+  }
+  .pn-arrow {
+    flex: none;
+    font-size: var(--step-1);
+    line-height: 1;
   }
 </style>

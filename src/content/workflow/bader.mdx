@@ -22,6 +22,22 @@ checklist: [Bader]
 sources: [S-042, S-020, S-029, S-084]
 status: draft
 updated: 2026-11-27
+stage:
+  scene: m12-bader
+  states:
+    - id: basins
+      section: why
+      params: { pair: polar, distance: 2.6, transfer: 0, level: 0.05 }
+      camera: iso
+      caption: 'Two model atoms: each lobe is the density inside one Bader basin, and the grey sheet between them is the zero-flux surface. Lower the density surface to see how far each basin reaches.'
+    - id: no-sheet
+      section: inputs
+      params: { pair: polar, surface: false, level: 0.1 }
+      caption: 'Without the sheet only the two basin densities remain. The bader program partitions CHGCAR using AECCAR0 plus AECCAR2 as the reference, so the basins see the core density too.'
+    - id: transfer
+      section: read
+      params: { pair: polar, transfer: 0.5, level: 0.03 }
+      caption: 'Move half an electron from A to B and the Bader charges follow, though not one for one, because the boundary moves too. The two basins always add up to the grid total.'
 ---
 
 <Section id="why" heading="What a Bader analysis does">

@@ -40,7 +40,11 @@ const crumbs = id
   <div class="container handbook-layout wf-layout">
     <div class="hb-rail">
       <WorkflowNav groups={groups} currentId={id} />
-      <slot name="rail" />
+      {Astro.slots.has('rail') && (
+        <div class="hb-aside">
+          <slot name="rail" />
+        </div>
+      )}
     </div>
     <div class="handbook-main" data-workflow-step={id}>
       <Breadcrumbs items={crumbs} />

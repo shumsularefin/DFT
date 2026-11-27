@@ -12,6 +12,7 @@ The Workflow section (`/workflow/`, D-110) follows a research group's protocol, 
 | "The protocol step" quote and its notes | `src/data/workflow-protocol.json`, shown by `src/components/workflow/Protocol.astro` | Generated from the HTML handbook by `scripts/build/build-vasp-data.mjs`. |
 | "Before you submit" | `CHECKLIST` in `src/lib/reference/tables.ts`, picked by the `checklist:` front matter | Hand-written. The same rows are on `/reference/checklist/`. |
 | Version, revised date and the Revisions list | `src/data/workflow.json` | Hand-written. |
+| The 3D view beside a step | `stage:` in the step's front matter (a scene id and three or four states, each tied to a `<Section id>` of the page) | Hand-written. The scenes are the handbook's (`src/lib/viewer3d/scenes/`); `src/lib/viewer3d/stages.test.ts` checks every state (D-126). |
 | Order of the steps, the sidebar, the map and previous / next | `group:` and `order:` in each step's front matter | Automatic. |
 | The source of truth | `docs/source-material/VASP_Workflow_Handbook.html` (S-042) | The author's handbook. |
 
@@ -40,7 +41,7 @@ Every page and tool that shows that INCAR (the step page, the Input Builder, the
 
 ## 3. Add, remove or reorder a step
 
-- **Add:** copy a similar step, for example `src/content/workflow/relaxation.mdx`, to `src/content/workflow/<new-id>.mdx`. Set `id` to the file name, and set `title`, `short`, `group` (one of Geometry, Electronic, Lattice and response, Beyond PBE), `order` and the rest of the front matter. The sidebar, the map on `/workflow/` and previous / next update themselves. If the step needs a new INCAR, add it to the handbook and follow section 2, or add a preset variant in `scripts/build/build-vasp-data.mjs`.
+- **Add:** every step needs a `stage:` block (the `3d-stages` guard fails without one); reuse the scene of the handbook topic the step links to. Then copy a similar step, for example `src/content/workflow/relaxation.mdx`, to `src/content/workflow/<new-id>.mdx`. Set `id` to the file name, and set `title`, `short`, `group` (one of Geometry, Electronic, Lattice and response, Beyond PBE), `order` and the rest of the front matter. The sidebar, the map on `/workflow/` and previous / next update themselves. If the step needs a new INCAR, add it to the handbook and follow section 2, or add a preset variant in `scripts/build/build-vasp-data.mjs`.
 - **Remove:** delete the file and search for links to it: `grep -rn "/workflow/<id>/" src`.
 - **Reorder:** change `order:` (within a group) or `group:`.
 - **A new group:** add it to `WORKFLOW_GROUPS` in `src/lib/workflow.ts` and `WORKFLOW_GROUP_NAMES` in `src/lib/content-schema.mjs`, and give it a lane note in `src/pages/workflow/index.astro`.

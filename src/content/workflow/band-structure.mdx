@@ -28,6 +28,33 @@ checklist: [Bands]
 sources: [S-042, S-019, S-020, S-033]
 status: draft
 updated: 2026-11-27
+stage:
+  scene: m09-bands
+  states:
+    - id: path-and-bands
+      section: why
+      params: { model: fcc-indirect, view: path, cursor: 0, mix: 0 }
+      layers: [zone, path, bands]
+      camera: iso
+      caption: 'A band structure is E(k) along a path of special points. Left, the fcc Brillouin zone with its path; right, the valence and conduction bands drawn along it.'
+    - id: surfaces
+      section: inputs
+      params: { model: fcc-indirect, view: surface, cursor: 0, mix: 0 }
+      layers: [surface, reference]
+      camera: iso
+      caption: 'The same two bands as surfaces over the kz = 0 slice of the zone. A band plot is a set of cuts through surfaces like these, taken along the lines of the path.'
+    - id: indirect-gap
+      section: read
+      params: { model: fcc-indirect, view: path, cursor: 0.625, mix: 0 }
+      layers: [edges, cursor]
+      camera: front
+      caption: 'The cursor at L, where the conduction band has its minimum. The valence maximum is at Gamma, so this gap is indirect: the two band edges sit at different k-points.'
+    - id: metal
+      section: check
+      params: { model: fcc-metal, view: path, cursor: 0.3, mix: 0 }
+      layers: [bands, path]
+      camera: front
+      caption: 'A half-filled band of an fcc metal crosses E = 0, the Fermi level, so there is no gap to read. Check for bands crossing the Fermi level before quoting a gap.'
 ---
 
 <Section id="why" heading="Why the density comes from a uniform mesh">

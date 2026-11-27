@@ -25,6 +25,25 @@ checklist: [DFT+U]
 sources: [S-042, S-014, S-081]
 status: draft
 updated: 2026-11-27
+stage:
+  scene: m05-dftu
+  states:
+    - id: penalty
+      section: why
+      params: { u: 4, j: 0, n: 0.5, quantity: energy }
+      caption: 'The Dudarev penalty for one orbital over its occupation n (across) and U_eff (back). It is zero for an empty or a full orbital and largest at half filling.'
+    - id: u-minus-j
+      section: inputs
+      params: { u: 5, j: 1, n: 0.3, quantity: energy }
+      caption: 'Only U - J enters the Dudarev form (LDAUTYPE = 2): U = 5 eV with J = 1 eV gives the same surface point as U = 4 eV with J = 0.'
+    - id: gap
+      section: choose-u
+      params: { u: 6, j: 0, n: 0.5, quantity: potential }
+      caption: 'The potential shift V = U_eff (1/2 - n): a filled level drops by U_eff/2 and an empty one rises by U_eff/2, so a gap of U_eff opens. Drag U and watch the two arrows grow.'
+    - id: no-u
+      section: check
+      params: { u: 0, j: 0, n: 0.3, quantity: energy }
+      caption: 'With U = 0 there is no penalty at all. Energies from runs with different U values sit on different surfaces, so compare only runs with the same U.'
 ---
 
 <Section id="why" heading="Why add U">

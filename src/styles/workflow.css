@@ -24,7 +24,8 @@
 /* The step card: what this step needs, what you run, what it leaves for the next step */
 .wf-stepcard dl {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  /* four across in a wide column, two or one when the 3D view sits beside the text (D-126) */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
   gap: var(--space-4);
   margin: 0;
 }
@@ -105,7 +106,7 @@
 /* Index page: the workflow map as lanes of numbered steps */
 .wf-map {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
   gap: var(--space-3);
 }
 .wf-lane {
