@@ -6,6 +6,7 @@ import { fracToCart, reciprocalLattice } from '../crystal/lattice';
 import type { Mat3, Structure } from '../crystal/types';
 import { extractIsosurface } from '../physics/marchingCubes';
 import { convexHull } from '../scene/polyhedra';
+import { elementColor, VESTA_SIZES } from '../three/vestaStyle';
 import { add, cross, normalize, norm, scale, sub, type Vec3 } from './math';
 import type {
   ArrowsLayer,
@@ -29,10 +30,13 @@ export function fmt(x: number, digits = 2): string {
   return s === `-${(0).toFixed(digits)}` ? (0).toFixed(digits) : s;
 }
 
-/** Atom palette colour per element, by order of first appearance (colour never carries chemistry, S-057). */
+/**
+ * Atom colour per species: the element colour of the Studio viewer (D-122), the same on every page. The element symbol is
+ * always shown as well (legend, labels, description), so colour never carries the meaning alone.
+ */
 export function speciesTones(species: readonly string[]): Map<string, Color> {
   const out = new Map<string, Color>();
-  for (const s of species) if (!out.has(s)) out.set(s, `c${out.size % 8}` as Color);
+  for (const s of species) if (!out.has(s)) out.set(s, elementColor(s) as Color);
   return out;
 }
 
@@ -100,7 +104,7 @@ export function crystalLayers(
   }
   const positions = fracs.map((f) => v3(fracToCart(f, s.lattice)));
   const tones = speciesTones(s.species);
-  const rs = o.radiusScale ?? 0.45;
+  const rs = o.radiusScale ?? VESTA_SIZES.atomScale;
   const g = { atoms: 'atoms', bonds: 'bonds', cell: 'cell', ...o.groups };
   const layers: Layer[] = [
     {
@@ -114,15 +118,28 @@ export function crystalLayers(
     },
   ];
   if (o.bonds !== false && positions.length <= 1200) {
-    const pairs = bondPairs(positions, species);
-    if (pairs.length)
+    // two-tone bonds as in the Studio viewer: each half in the colour of the atom it starts from
+    const halves = new Map<string, [Vec3, Vec3][]>();
+    for (const [i, j] of bondPairs(positions, species)) {
+      const a = positions[i]!;
+      const b = positions[j]!;
+      const mid: Vec3 = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2];
+      for (const [el, p, q] of [
+        [species[i]!, a, mid],
+        [species[j]!, mid, b],
+      ] as const) {
+        if (!halves.has(el)) halves.set(el, []);
+        halves.get(el)!.push([p, q]);
+      }
+    }
+    for (const [el, segments] of halves)
       layers.push({
         kind: 'lines',
         group: g.bonds,
         name: 'Bonds',
-        segments: pairs.map(([i, j]) => [positions[i]!, positions[j]!]),
-        color: 'muted',
-        tube: 0.08,
+        segments,
+        color: tones.get(el)!,
+        tube: VESTA_SIZES.bondRadius,
       });
   }
   const sup: Vec3[] = [scale(v3(s.lattice[0]), n1), scale(v3(s.lattice[1]), n2), scale(v3(s.lattice[2]), n3)];

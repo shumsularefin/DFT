@@ -22,6 +22,7 @@ import {
   SphereGeometry,
   Vector3,
 } from 'three';
+import { VESTA_MATERIAL, VESTA_SIZES } from './vestaStyle';
 import type { Vec3 } from '../crystal/types';
 import { cameraDirection } from '../scene/project';
 import type { ResolvedScene } from '../scene/resolve';
@@ -88,8 +89,8 @@ export class SpecScene extends ViewScene {
     for (const [, list] of bySpecies) {
       const first = list[0]!;
       const body = new InstancedMesh(
-        new SphereGeometry(first.radius, 24, 16),
-        new MeshStandardMaterial({ color: new Color(first.color), roughness: 0.5 }),
+        new SphereGeometry(first.radius, ...VESTA_SIZES.sphereSegments),
+        new MeshStandardMaterial({ color: new Color(first.color), ...VESTA_MATERIAL.atom }),
         list.length,
       );
       const rim = new InstancedMesh(

@@ -345,3 +345,18 @@
     transition: none;
   }
 }
+.v3d-gizmo {
+  position: absolute;
+  left: var(--space-1, 0.5rem);
+  bottom: var(--space-1, 0.5rem);
+  pointer-events: none;
+  line-height: 0;
+}
+/* letters in the text colour for contrast; the line beside each carries the axis colour */
+.v3d-gizmo text {
+  fill: var(--text);
+  font-family: var(--font-sans);
+  paint-order: stroke;
+  stroke: var(--surface);
+  stroke-width: 3px;
+}

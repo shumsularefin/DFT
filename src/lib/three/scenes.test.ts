@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { VESTA_LIGHTS } from './vestaStyle';
 import { brillouinZone } from '../crystal/brillouin';
 import { reciprocalLattice } from '../crystal/lattice';
 import { readStructure } from '../crystal/io';
@@ -182,13 +183,17 @@ describe('CellScene', () => {
     expect(s.setStructure(cu, { repeat: [2, 1, 1] }).drawn).toBe(23);
     s.dispose();
   });
-  it('lights its atoms: an ambient light and a light that rides on the camera', () => {
+  it('lights its atoms with the Studio rig (D-122): an ambient light and a key and a fill light fixed in the scene', () => {
     const f = fakes();
     const s = new CellScene(f.container, f.opts);
     const kinds = new Set<string>();
     s.scene.traverse((o) => kinds.add(o.type));
     expect(kinds.has('AmbientLight')).toBe(true);
-    expect(s.camera.children.some((c) => c.type === 'DirectionalLight')).toBe(true);
+    const fixed = s.scene.children.filter((c) => c.type === 'DirectionalLight');
+    expect(fixed.map((l) => (l as unknown as { intensity: number }).intensity).sort()).toEqual(
+      [VESTA_LIGHTS.fill.intensity, VESTA_LIGHTS.key.intensity].sort(),
+    );
+    expect(s.camera.children.some((c) => c.type === 'DirectionalLight')).toBe(false);
     s.dispose();
   });
   it('skips bonds for very large blocks and says so', () => {

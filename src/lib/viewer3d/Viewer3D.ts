@@ -37,6 +37,7 @@ import {
   type Material,
 } from 'three';
 import { browserEnvironment, type Environment } from '../three/SceneController';
+import { GIZMO_COLORS, VESTA_LIGHTS, VESTA_MATERIAL, VESTA_SIZES } from '../three/vestaStyle';
 import { cameraFrom, cameraKey, interpolate, type CameraState } from './arcball';
 import { ArcballControls } from './controls';
 import { frameBounds } from './kit';
@@ -95,6 +96,7 @@ export class Viewer3D {
   readonly scene = new Scene();
   readonly persp = new PerspectiveCamera(FOV, 1, 0.01, 1000);
   readonly ortho = new OrthographicCamera(-1, 1, 1, -1, 0.01, 1000);
+  private gizmo: Gizmo | undefined;
   private renderer: ReturnType<NonNullable<Viewer3DOptions['createRenderer']>> | undefined;
   private controls: ArcballControls | undefined;
   private loop: RenderLoop;
@@ -173,12 +175,22 @@ export class Viewer3D {
     this.overlay.setAttribute('aria-hidden', 'true');
     this.container.appendChild(this.overlay);
 
-    const head = new DirectionalLight(0xffffff, 1.7);
-    head.position.set(0.6, 1, 2);
-    const head2 = head.clone();
-    this.persp.add(head);
-    this.ortho.add(head2);
-    this.scene.add(new AmbientLight(0xffffff, 1.15), this.persp, this.ortho);
+    // The Studio viewer's light rig (D-122): fixed in the scene, so turning a crystal shows its lit and shaded sides.
+    const key = new DirectionalLight(VESTA_LIGHTS.key.color, VESTA_LIGHTS.key.intensity);
+    key.position.set(...VESTA_LIGHTS.key.position);
+    const fill = new DirectionalLight(VESTA_LIGHTS.fill.color, VESTA_LIGHTS.fill.intensity);
+    fill.position.set(...VESTA_LIGHTS.fill.position);
+    this.scene.add(
+      new AmbientLight(VESTA_LIGHTS.ambient.color, VESTA_LIGHTS.ambient.intensity),
+      key,
+      fill,
+      this.persp,
+      this.ortho,
+    );
+    if (typeof doc.createElementNS === 'function') {
+      this.gizmo = createGizmo(doc);
+      this.container.appendChild(this.gizmo.root);
+    }
 
     this.controls = new ArcballControls(this.persp, canvas, () => new Vector3());
     this.controls.onOrthoZoom = undefined;
@@ -537,6 +549,7 @@ export class Viewer3D {
     this.syncOrtho();
     this.renderer.render(this.scene, this.camera);
     this.placeLabels();
+    if (this.gizmo) updateGizmo(this.gizmo, this.camera, this.frame?.lattice);
     this.container.setAttribute('data-frames', String(this.loop.frames));
     return more;
   }
@@ -580,6 +593,8 @@ export class Viewer3D {
     this.renderer?.dispose();
     this.renderer?.domElement.remove();
     this.overlay?.remove();
+    this.gizmo?.root.remove();
+    this.gizmo = undefined;
     this.renderer = undefined;
   }
 }
@@ -587,7 +602,7 @@ export class Viewer3D {
 /* Layer builders. Everything is created inside one Group so dispose is one traversal. */
 
 const sphereGeo = (detail: 'high' | 'low') =>
-  detail === 'high' ? new SphereGeometry(1, 28, 18) : new SphereGeometry(1, 14, 10);
+  detail === 'high' ? new SphereGeometry(1, ...VESTA_SIZES.sphereSegments) : new SphereGeometry(1, 14, 10);
 const Y = new Vector3(0, 1, 0);
 
 function segmentMatrix(a: Vec3, b: Vec3, r: number, m = new Matrix4()): Matrix4 {
@@ -598,8 +613,16 @@ function segmentMatrix(a: Vec3, b: Vec3, r: number, m = new Matrix4()): Matrix4 
   return m.compose(va.add(d.multiplyScalar(0.5)), q, new Vector3(r, len, r));
 }
 
-function std(color: string, opacity = 1, extra: Partial<MeshStandardMaterial> = {}): MeshStandardMaterial {
-  const m = new MeshStandardMaterial({ color: new Color(color), roughness: 0.45, metalness: 0.05 });
+type Finish = keyof typeof VESTA_MATERIAL;
+
+/** A lit material with the Studio viewer's finish for that kind of object (D-122). */
+function std(
+  color: string,
+  opacity = 1,
+  extra: Partial<MeshStandardMaterial> = {},
+  finish: Finish = 'surface',
+): MeshStandardMaterial {
+  const m = new MeshStandardMaterial({ color: new Color(color), ...VESTA_MATERIAL[finish] });
   if (opacity < 1) {
     m.transparent = true;
     m.opacity = opacity;
@@ -648,7 +671,7 @@ export function buildLayers(
         const detail = n > 400 ? 'low' : 'high';
         const radius = (i: number) => (typeof l.radius === 'number' ? l.radius : (l.radius[i] ?? 0.3));
         for (const mesh of byColor(n, l.color, theme, (hex, idx) => {
-          const im = new InstancedMesh(sphereGeo(detail), std(hex, l.opacity ?? 1), idx.length);
+          const im = new InstancedMesh(sphereGeo(detail), std(hex, l.opacity ?? 1, {}, 'atom'), idx.length);
           idx.forEach((i, k) => {
             const r = radius(i);
             im.setMatrixAt(
@@ -694,7 +717,11 @@ export function buildLayers(
       case 'points': {
         const n = l.positions.length;
         for (const mesh of byColor(n, l.color, theme, (hex, idx) => {
-          const im = new InstancedMesh(new IcosahedronGeometry(1, n > 1500 ? 0 : 1), std(hex), idx.length);
+          const im = new InstancedMesh(
+            new IcosahedronGeometry(1, n > 1500 ? 0 : 1),
+            std(hex, 1, {}, 'atom'),
+            idx.length,
+          );
           idx.forEach((i, k) =>
             im.setMatrixAt(
               k,
@@ -724,8 +751,8 @@ export function buildLayers(
         const hex = resolveColor(l.color, theme);
         if (l.tube) {
           const im = new InstancedMesh(
-            new CylinderGeometry(1, 1, 1, 10, 1, true),
-            std(hex),
+            new CylinderGeometry(1, 1, 1, 14, 1, true),
+            std(hex, 1, {}, 'bond'),
             l.segments.length,
           );
           l.segments.forEach(([a, b], k) => im.setMatrixAt(k, segmentMatrix(a, b, l.tube!, m)));
@@ -753,12 +780,16 @@ export function buildLayers(
         const hex = resolveColor(l.color, theme);
         const pts = l.closed ? [...l.points, l.points[0]!] : l.points;
         if (l.tube) {
-          const im = new InstancedMesh(new CylinderGeometry(1, 1, 1, 8, 1, true), std(hex), pts.length - 1);
+          const im = new InstancedMesh(
+            new CylinderGeometry(1, 1, 1, 8, 1, true),
+            std(hex, 1, {}, 'bond'),
+            pts.length - 1,
+          );
           for (let k = 0; k + 1 < pts.length; k++)
             im.setMatrixAt(k, segmentMatrix(pts[k]!, pts[k + 1]!, l.tube, m));
           im.instanceMatrix.needsUpdate = true;
           add(l.group, im);
-          const joints = new InstancedMesh(new SphereGeometry(1, 8, 6), std(hex), pts.length);
+          const joints = new InstancedMesh(new SphereGeometry(1, 8, 6), std(hex, 1, {}, 'bond'), pts.length);
           pts.forEach((p, k) =>
             joints.setMatrixAt(
               k,
@@ -779,17 +810,21 @@ export function buildLayers(
         const heads = (i: number) => (Array.isArray(l.head) ? (l.head[i] ?? 'solid') : (l.head ?? 'solid'));
         const th = l.thickness ?? 0.04;
         for (const objs of byColor(n, l.color, theme, (hex, idx) => {
-          const shafts = new InstancedMesh(new CylinderGeometry(1, 1, 1, 10), std(hex), idx.length);
+          const shafts = new InstancedMesh(
+            new CylinderGeometry(1, 1, 1, 10),
+            std(hex, 1, {}, 'arrow'),
+            idx.length,
+          );
           const solid = idx.filter((i) => heads(i) === 'solid');
           const open = idx.filter((i) => heads(i) === 'open');
           const solidHeads = new InstancedMesh(
             new ConeGeometry(1, 1, 16),
-            std(hex),
+            std(hex, 1, {}, 'arrow'),
             Math.max(1, solid.length),
           );
           const openHeads = new InstancedMesh(
             new ConeGeometry(1, 1, 12, 1, true),
-            std(hex, 1, { wireframe: true }),
+            std(hex, 1, { wireframe: true }, 'arrow'),
             Math.max(1, open.length),
           );
           solidHeads.count = solid.length;
@@ -875,5 +910,88 @@ export function disposeTree(root: Object3D): void {
         : [];
     for (const mat of mats) mat.dispose();
     (obj as InstancedMesh).dispose?.();
+  });
+}
+
+/* The corner axes marker of the Studio viewer: a, b, c (or x, y, z) as coloured lines with their letters, so the axes are
+   never told by colour alone. An SVG overlay built with DOM calls (no inline markup, CSP), redrawn with each frame. */
+interface Gizmo {
+  root: HTMLElement;
+  lines: SVGLineElement[];
+  texts: SVGTextElement[];
+}
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const GIZMO_SIZE = 64;
+
+function createGizmo(doc: Document): Gizmo {
+  const root = doc.createElement('div');
+  root.className = 'v3d-gizmo';
+  root.setAttribute('aria-hidden', 'true');
+  const svg = doc.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', `0 0 ${GIZMO_SIZE} ${GIZMO_SIZE}`);
+  svg.setAttribute('width', String(GIZMO_SIZE));
+  svg.setAttribute('height', String(GIZMO_SIZE));
+  const lines: SVGLineElement[] = [];
+  const texts: SVGTextElement[] = [];
+  for (let i = 0; i < 3; i++) {
+    const g = doc.createElementNS(SVG_NS, 'g');
+    const line = doc.createElementNS(SVG_NS, 'line');
+    line.setAttribute('stroke', GIZMO_COLORS[i]!);
+    line.setAttribute('stroke-width', '2.5');
+    line.setAttribute('stroke-linecap', 'round');
+    const text = doc.createElementNS(SVG_NS, 'text');
+    text.setAttribute('font-size', '12');
+    text.setAttribute('font-weight', '700');
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('dominant-baseline', 'central');
+    g.append(line, text);
+    svg.appendChild(g);
+    lines.push(line);
+    texts.push(text);
+  }
+  root.appendChild(svg);
+  return { root, lines, texts };
+}
+
+/** Screen directions of the three axes for a camera, nearest last (so it is drawn on top). Exported for tests. */
+export function gizmoAxes(
+  camera: Camera,
+  lattice?: readonly [Vec3, Vec3, Vec3],
+): { label: string; color: string; x: number; y: number; depth: number }[] {
+  const inv = camera.quaternion.clone().invert();
+  const names = lattice ? ['a', 'b', 'c'] : ['x', 'y', 'z'];
+  const dirs: Vec3[] = lattice
+    ? [lattice[0], lattice[1], lattice[2]]
+    : [
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1],
+      ];
+  return dirs
+    .map((d, i) => {
+      const v = new Vector3(...d).normalize().applyQuaternion(inv);
+      return { label: names[i]!, color: GIZMO_COLORS[i]!, x: v.x, y: v.y, depth: v.z };
+    })
+    .sort((p, q) => p.depth - q.depth);
+}
+
+function updateGizmo(g: Gizmo, camera: Camera, lattice?: readonly [Vec3, Vec3, Vec3]): void {
+  const c = GIZMO_SIZE / 2;
+  const len = c - 12;
+  const axes = gizmoAxes(camera, lattice);
+  axes.forEach((a, k) => {
+    const line = g.lines[k]!;
+    const text = g.texts[k]!;
+    const x2 = c + a.x * len;
+    const y2 = c - a.y * len;
+    line.setAttribute('x1', String(c));
+    line.setAttribute('y1', String(c));
+    line.setAttribute('x2', x2.toFixed(1));
+    line.setAttribute('y2', y2.toFixed(1));
+    line.setAttribute('stroke', a.color);
+    text.setAttribute('x', (c + a.x * (len + 7)).toFixed(1));
+    text.setAttribute('y', (c - a.y * (len + 7)).toFixed(1));
+    text.textContent = a.label;
   });
 }

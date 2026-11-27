@@ -22,6 +22,7 @@ import {
   type Material,
   type Texture,
 } from 'three';
+import { VESTA_LIGHTS, VESTA_MATERIAL } from './vestaStyle';
 import { ArcballControls } from '../viewer3d/controls';
 import { placeLabels } from './labelPlacement';
 
@@ -280,23 +281,23 @@ export class SceneController {
 
   /* Helpers. Everything created here is released by dispose(). */
 
+  /** The Studio viewer's light rig (D-122): soft ambient light and two lights fixed in the scene. */
   addLights(): void {
-    const ambient = new AmbientLight(0xffffff, 0.8);
-    const sun = new DirectionalLight(0xffffff, 1.6);
-    sun.position.set(5, 8, 6);
-    this.scene.add(ambient, sun);
+    const ambient = new AmbientLight(VESTA_LIGHTS.ambient.color, VESTA_LIGHTS.ambient.intensity);
+    const key = new DirectionalLight(VESTA_LIGHTS.key.color, VESTA_LIGHTS.key.intensity);
+    key.position.set(...VESTA_LIGHTS.key.position);
+    const fill = new DirectionalLight(VESTA_LIGHTS.fill.color, VESTA_LIGHTS.fill.intensity);
+    fill.position.set(...VESTA_LIGHTS.fill.position);
+    this.scene.add(ambient, key, fill);
   }
 
   /**
-   * Soft ambient light plus a light that rides on the camera, so the side of an atom facing the reader is always lit however
-   * the view is turned. Lit materials (MeshStandardMaterial) are black without a light.
+   * Lights for lit materials (MeshStandardMaterial is black without one). Since D-122 this is the same fixed rig as
+   * `addLights`, the look of the Studio viewer; the camera is still added to the scene, as callers expect.
    */
   addHeadlight(): void {
-    const ambient = new AmbientLight(0xffffff, 1.1);
-    const head = new DirectionalLight(0xffffff, 1.9);
-    head.position.set(1, 1.5, 2);
-    this.camera.add(head);
-    this.scene.add(ambient, this.camera);
+    this.addLights();
+    this.scene.add(this.camera);
   }
 
   /** One draw call for many spheres. */
@@ -306,7 +307,7 @@ export class SceneController {
     color: number | string,
   ): InstancedMesh {
     const geometry = new SphereGeometry(radius, 20, 14);
-    const material = new MeshStandardMaterial({ color: new Color(color), roughness: 0.5 });
+    const material = new MeshStandardMaterial({ color: new Color(color), ...VESTA_MATERIAL.atom });
     const mesh = new InstancedMesh(geometry, material, positions.length);
     const m = new Matrix4();
     positions.forEach(([x, y, z], i) => mesh.setMatrixAt(i, m.makeTranslation(x, y, z)));
