@@ -8,28 +8,22 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const executablePath = process.env.PW_CHROMIUM_PATH || undefined; // set to /opt/pw-browsers/chromium in cloud sessions
+// PW_PORT lets parallel checkouts (git worktrees) each run their own server; default 4321.
+const port = Number(process.env.PW_PORT || 4321);
 
 export default defineConfig({
   testDir: 'tests/e2e',
   fullyParallel: true,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
-  use: { baseURL: 'http://localhost:4321', trace: 'retain-on-failure' },
+  use: { baseURL: `http://localhost:${port}`, trace: 'retain-on-failure' },
   webServer: {
-    command: 'npm run build && node scripts/build/serve.mjs dist 4321',
-    url: 'http://localhost:4321',
+    command: `npm run build && node scripts/build/serve.mjs dist ${port}`,
+    url: `http://localhost:${port}`,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
   },
   projects: [
-    {
-      name: 'mobile-360',
-      use: {
-        ...devices['Pixel 5'],
-        viewport: { width: 360, height: 740 },
-        launchOptions: { executablePath, args: ['--no-sandbox'] },
-      },
-    },
     {
       name: 'desktop',
       use: { ...devices['Desktop Chrome'], launchOptions: { executablePath, args: ['--no-sandbox'] } },

@@ -8,6 +8,7 @@ import { reducedFormula } from '../../lib/crystal/structure';
 import type { Structure } from '../../lib/crystal/types';
 import type { SceneSpec } from '../../lib/scene/spec';
 import { expandRepeats } from '../../lib/vasp/incar';
+import { sendHandoff, type ToolId } from '../../lib/handoff';
 import './structure.css';
 
 interface Props {
@@ -21,6 +22,8 @@ interface Props {
   onSelect?: (site: number | null) => void;
   /** Stable id used for element ids; defaults to "sv". */
   id?: string;
+  /** The tool showing this view; adds "Open in the Material Builder" (full VESTA-style viewer) when given. */
+  from?: ToolId;
 }
 
 const MAX_ROWS = 400;
@@ -33,6 +36,7 @@ export default function StructureView({
   selected,
   onSelect,
   id = 'sv',
+  from,
 }: Props) {
   const [inner, setInner] = useState<number | null>(null);
   const [measure, setMeasure] = useState(false);
@@ -118,6 +122,26 @@ export default function StructureView({
           />
           Measure mode
         </label>
+        {from && (
+          <button
+            type="button"
+            onClick={() =>
+              sendHandoff(
+                {
+                  v: 1,
+                  kind: 'structure',
+                  from,
+                  structure: s,
+                  label: s.comment || label,
+                  ...(magmom && expandRepeats(magmom).length === s.species.length ? { magmom } : {}),
+                },
+                '/builder/',
+              )
+            }
+          >
+            Open in the Material Builder
+          </button>
+        )}
         {measure && (
           <button type="button" onClick={() => setPicks([])}>
             Clear picks
@@ -133,7 +157,7 @@ export default function StructureView({
               ? ''
               : 'Select a site in the table to highlight it.'}
       </p>
-      <div className="sv-table-wrap" role="region" aria-label={`Sites of ${label}`} tabIndex={0}>
+      <div className="sv-table-wrap" role="region" aria-label={`Sites of ${label} (${formula})`} tabIndex={0}>
         <table className="sv-table">
           <caption>
             Sites ({s.species.length}).{' '}

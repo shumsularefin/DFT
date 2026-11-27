@@ -1,7 +1,5 @@
-/* macOS scientific desktop UI theme:
-   Cool aluminum window canvas (#eef1f6), crisp white rounded panels (#ffffff),
-   segmented control navigation with vivid macOS cobalt blue active state (#1463d1),
-   clean system sans-serif UI with tabular monospace for numbers and readouts. */
+/* Calm workspace UI: warm paper canvas, quiet sidebar chrome, soft rounded panels,
+   one terracotta accent, system sans-serif for text and tabular monospace for numbers. */
 
 body {
   display: flex;
@@ -16,8 +14,8 @@ h1,
 h2,
 h3,
 h4 {
-  font-weight: 700;
-  letter-spacing: -0.015em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 /* Clean sans-serif for interface chrome; tabular monospace for numbers and code. */
@@ -52,74 +50,9 @@ table.numeric,
   font-variant-numeric: tabular-nums;
 }
 
-/* Top macOS desktop toolbar header */
-.site-header {
-  background: var(--chrome-bg);
-  border-bottom: 1px solid var(--border);
-  box-shadow: 0 1px 0 rgb(255 255 255 / 0.65) inset;
-}
-:root[data-theme='dark'] .site-header {
-  box-shadow: none;
-}
-
-.brand {
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
 .site-footer {
   border-top: 1px solid var(--border);
-  background: var(--chrome-bg);
-}
-
-/* Segmented control navigation (desktop) */
-.nav-list a {
-  font-size: var(--step--1);
-  font-weight: 500;
-}
-@media (min-width: 64rem) {
-  .nav-list {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow-1);
-  }
-  .nav-list li + li a {
-    border-inline-start: 1px solid var(--border);
-  }
-  .nav-list a {
-    min-height: 2.35rem;
-    padding: 0 0.9rem;
-    border-bottom: 0;
-    transition:
-      background-color var(--dur-fast),
-      color var(--dur-fast);
-  }
-  .nav-list a:hover {
-    background: var(--surface-2);
-  }
-  .nav-list a[aria-current='page'] {
-    background: var(--accent);
-    color: var(--accent-contrast);
-    font-weight: 600;
-    border-bottom: 0;
-  }
-  .nav-list a[aria-current='page']:hover {
-    background: var(--accent);
-    filter: brightness(0.95);
-  }
-}
-
-/* Mobile nav active pill */
-@media (max-width: 63.99rem) {
-  .nav-list a[aria-current='page'] {
-    background: var(--accent);
-    color: var(--accent-contrast);
-    border-radius: var(--radius);
-    border-bottom: 0;
-    font-weight: 600;
-  }
+  background: var(--bg);
 }
 
 /* Crisp macOS toolbar buttons */
@@ -138,7 +71,7 @@ table.numeric,
   background: var(--surface-2);
 }
 
-/* Crisp white rounded panels with subtle elevation */
+/* Panels: surface, one 1px border, 10px radius. Only floating popovers keep a shadow. */
 .card,
 .callout,
 .readout,
@@ -149,25 +82,52 @@ table.numeric,
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-1);
+}
+.search-results,
+.progress-pop,
+.help-dialog {
+  box-shadow: var(--shadow-2);
+}
+.card {
+  padding: var(--space-4);
+}
+.card-title {
+  margin: 0 0 var(--space-2);
+  font-size: 1rem;
+  font-weight: 600;
 }
 
-/* Form controls: crisp macOS rounded inputs and selects */
+/* Form controls (template): 34px fields on the page background, 1px border, accent on focus. */
 input[type='text'],
 input[type='number'],
 input[type='search'],
+input[type='email'],
+input[type='url'],
 select,
 textarea {
+  min-height: 2.125rem;
+  padding: 0 0.625rem;
   font-family: var(--font-sans);
+  font-size: var(--step-0);
   color: var(--text);
-  background: var(--surface);
+  background: var(--bg);
   border: 1px solid var(--border-strong);
-  border-radius: var(--radius-sm);
-  box-shadow: inset 0 1px 1px rgb(15 23 42 / 0.04);
+  border-radius: var(--radius);
+}
+textarea {
+  padding: 0.5rem 0.625rem;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+}
+:is(input, select, textarea):focus {
+  border-color: var(--accent);
 }
 input[type='number'] {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+}
+label {
+  font-size: var(--step-0);
 }
 
 /* Clean scientific data tables */
@@ -182,12 +142,16 @@ table {
 }
 thead th {
   background: var(--surface-2);
-  color: var(--text);
-  font-weight: 600;
+  color: var(--text-muted);
+  font-weight: 500;
   font-size: var(--step--1);
+  text-align: start;
+  padding: 0.5rem 0.75rem;
   border-bottom: 1px solid var(--border);
 }
 tbody td {
+  padding: 0.5rem 0.75rem;
+  font-size: var(--step--1);
   border-bottom: 1px solid var(--border);
 }
 tbody tr:last-child td {
@@ -237,9 +201,6 @@ tbody tr:last-child td {
 }
 
 /* Landing workspace: macOS search bar + crisp white card grid */
-.session {
-  padding-block: var(--space-6);
-}
 .session-prompt {
   display: flex;
   align-items: center;
@@ -255,7 +216,6 @@ tbody tr:last-child td {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-1);
   cursor: pointer;
   transition:
     border-color var(--dur-fast),
@@ -263,7 +223,6 @@ tbody tr:last-child td {
 }
 .session-prompt:hover {
   border-color: var(--accent);
-  box-shadow: var(--shadow-2);
 }
 .session-prompt .prompt-mark {
   color: var(--accent);
@@ -271,6 +230,7 @@ tbody tr:last-child td {
 }
 .session-prompt kbd {
   margin-inline-start: auto;
+  white-space: nowrap;
   padding: 0.15rem 0.45rem;
   font-size: var(--step--1);
   background: var(--surface-2);
@@ -278,48 +238,6 @@ tbody tr:last-child td {
   border-radius: var(--radius-sm);
   color: var(--text-muted);
 }
-.starts {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
-  gap: var(--space-3);
-  list-style: none;
-  padding: 0;
-  margin: var(--space-5) 0;
-  max-width: none;
-}
-.starts li {
-  margin: 0;
-}
-.starts a {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  min-height: 100%;
-  padding: var(--space-3) var(--space-4);
-  color: var(--text);
-  text-decoration: none;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-1);
-  transition:
-    border-color var(--dur-fast),
-    box-shadow var(--dur-fast);
-}
-.starts a:hover {
-  border-color: var(--accent);
-  box-shadow: var(--shadow-2);
-}
-.starts a span {
-  font-weight: 600;
-  color: var(--text);
-}
-.starts small {
-  color: var(--text-muted);
-  font-family: var(--font-sans);
-  font-size: var(--step--1);
-}
-
 /* Command palette (macOS Spotlight style) */
 .palette {
   width: min(40rem, 100vw - 1.5rem);
@@ -393,7 +311,6 @@ tbody tr:last-child td {
 }
 .palette-opt[aria-selected='true'] .palette-group {
   color: var(--accent-contrast);
-  opacity: 0.85;
 }
 .palette-group {
   color: var(--text-muted);
@@ -425,4 +342,210 @@ tbody tr:last-child td {
   vertical-align: top;
   padding: 0.4rem 0.6rem;
   border-bottom: 1px solid var(--border);
+}
+
+/* ------------------------------------------------------------------
+   One page layout for every page in the main column.
+   Container: the whole main column, 24px side padding. Grids and lists fill the row; running prose
+   keeps a readable measure (48rem on prose pages, 68ch for paragraphs). Tool pages fill the column too,
+   so their right margin matches every other page.
+   ------------------------------------------------------------------ */
+main .container {
+  width: auto;
+  max-width: none;
+  margin: 0;
+  padding: var(--space-5) var(--space-5) var(--space-7);
+}
+.prose-page > *,
+.ref-page > :not(.ref-scroll) {
+  max-width: 48rem;
+}
+/* Changelog: each list of entries fills the column as a grid of readable-width entries, so the page has no
+   empty right half on wide screens. Headings and the intro keep the prose measure. */
+.changelog > ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 30rem), 1fr));
+  column-gap: var(--space-7);
+  max-width: none;
+}
+.changelog > ul > li p {
+  margin-top: 0;
+}
+/* Short reading pages (About, Privacy) set their sections in two columns on wide screens, so the
+   right half of the page is not empty. Title and lede span both columns. */
+@media (min-width: 90rem) {
+  .prose-columns {
+    columns: 2;
+    column-gap: var(--space-7);
+    max-width: calc(96rem + var(--space-7) + 2 * var(--space-5));
+  }
+  .prose-columns > :is(h1, h1 + p) {
+    column-span: all;
+  }
+  .prose-columns :is(p, li) {
+    break-inside: avoid;
+  }
+  .prose-columns > h2 {
+    break-after: avoid;
+  }
+  .prose-columns > h2:first-of-type {
+    margin-top: 0;
+  }
+}
+
+/* Page header: modest h1, one muted lede, 24px before the content. */
+main h1 {
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--space-1);
+}
+main h1 + p {
+  margin-top: 0;
+  margin-bottom: var(--space-5);
+  color: var(--text-muted);
+}
+main h2 {
+  font-size: var(--step-2);
+  margin: var(--space-6) 0 var(--space-3);
+}
+main h3 {
+  font-size: var(--step-1);
+}
+.card h2,
+.card > h3 {
+  font-size: 0.9375rem;
+  margin: 0 0 var(--space-3);
+}
+.page-head {
+  margin-bottom: var(--space-5);
+}
+.page-head h1 + p,
+.page-lede {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+/* Small muted section label (no uppercase). */
+.section-label {
+  margin: var(--space-6) 0 var(--space-3);
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--text-muted);
+  max-width: none;
+}
+
+/* Quiet notice: thin border, surface-2 fill, no side stripe. */
+.notice {
+  margin: 0 0 var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  color: var(--text-muted);
+  font-size: var(--step--1);
+  max-width: none;
+}
+.notice > :first-child {
+  margin-top: 0;
+}
+.notice > :last-child {
+  margin-bottom: 0;
+}
+
+/* Card grid: one gap (16px) everywhere. */
+.card-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+}
+.card-grid > li {
+  margin: 0;
+}
+
+/* Feature cards: 4, 2 or 1 columns by the width of the area they sit in. */
+.feature-area {
+  container-type: inline-size;
+}
+.feature-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: 1fr;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+}
+@container (min-width: 34rem) {
+  .feature-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container (min-width: 56rem) {
+  .feature-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.feature-grid > li {
+  margin: 0;
+}
+.feature {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  height: 100%;
+  padding: var(--space-4);
+  color: var(--text);
+  text-decoration: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: border-color var(--dur-fast);
+}
+a.feature:hover {
+  border-color: var(--accent);
+}
+.feature-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+  font-size: var(--step-0);
+}
+.feature-title svg {
+  flex: none;
+  color: var(--accent);
+}
+.feature-meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.feature-text {
+  margin: var(--space-1) 0 0;
+  font-size: var(--step--1);
+  color: var(--text-muted);
+}
+
+/* Metric tile: muted label, mono value. */
+.tile {
+  padding: var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.tile-label {
+  margin: 0;
+  font-size: var(--step--1);
+  color: var(--text-muted);
+}
+.tile-value {
+  margin: var(--space-1) 0 0;
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
 }

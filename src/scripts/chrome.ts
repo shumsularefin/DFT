@@ -1,6 +1,7 @@
 // Client behaviour for the site chrome. Vanilla TypeScript, no framework (D-001). Everything here is an
 // enhancement: without JavaScript the page is complete and the .js-only controls stay hidden.
 import { LEVELS, normalizeLevel, type Level } from '../lib/levels';
+import { setJSON } from '../lib/storage';
 import { modulePercent, modulesDone, percent } from '../lib/progress';
 import { levelStore, setLevel } from '../stores/level';
 import { effectiveTheme, themeStore, toggleTheme } from '../stores/theme';
@@ -49,6 +50,24 @@ themeStore.subscribe(renderTheme);
 renderTheme();
 themeButton?.addEventListener('click', toggleTheme);
 
+/* Sidebar: collapse to an icon rail and back (desktop shell), remembered across pages as dft:sidebar. */
+const sidebarButton = $<HTMLButtonElement>('[data-sidebar-toggle]');
+function renderSidebar() {
+  const collapsed = root.dataset.sidebar === 'collapsed';
+  sidebarButton?.setAttribute('aria-expanded', String(!collapsed));
+  sidebarButton?.setAttribute('title', collapsed ? 'Expand sidebar' : 'Collapse sidebar');
+}
+renderSidebar();
+sidebarButton?.addEventListener('click', () => {
+  const collapse = root.dataset.sidebar !== 'collapsed';
+  if (collapse) root.dataset.sidebar = 'collapsed';
+  else delete root.dataset.sidebar;
+  setJSON('sidebar', collapse ? 'collapsed' : 'expanded');
+  renderSidebar();
+  // Charts and viewers that size themselves on window resize get the new width too.
+  window.dispatchEvent(new Event('resize'));
+});
+
 /* Progress */
 const tracker = $<HTMLElement>('[data-progress-tracker]');
 const total = Number(tracker?.dataset.total ?? 0);
@@ -69,7 +88,18 @@ function renderProgress() {
   }
   for (const el of $$<HTMLElement>('[data-module-pct]')) {
     const ids = (el.dataset.moduleIds ?? '').split(',').filter(Boolean);
-    el.textContent = ids.length ? `${modulePercent(p, ids)}%` : '';
+    const pct = ids.length ? modulePercent(p, ids) : 0;
+    // A finished module shows a tick (with words for screen readers); an unstarted one shows nothing.
+    el.toggleAttribute('data-done', pct === 100);
+    if (pct === 100) {
+      const tick = document.createElement('span');
+      tick.setAttribute('aria-hidden', 'true');
+      tick.textContent = '✓';
+      const words = document.createElement('span');
+      words.className = 'sr-only';
+      words.textContent = 'completed';
+      el.replaceChildren(tick, words);
+    } else el.textContent = pct > 0 ? `${pct}%` : '';
   }
   const mark = $<HTMLButtonElement>('[data-mark-complete]');
   if (mark && topicId) {

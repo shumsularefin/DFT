@@ -51,5 +51,41 @@ for (const [h, v] of [
   check(`security header ${h}`, home.headers.get(h) === v, `got ${home.headers.get(h)}`);
 }
 
+// D-105, D-107: the Material Builder pages (/builder/ and /builder/molecule/, the two modes of the Studio
+// workspace) have their own CSP (Pyodide from cdn.jsdelivr.net) and are never framed; every other page keeps
+// the strict site CSP. /dft-studio/ is a 301 to /builder/.
+const csp = (r) => r.headers.get('content-security-policy') ?? '';
+for (const p of ['/', '/tools/convergence/', '/dft-studio/js/vesta.js']) {
+  const r = await get(p);
+  check(
+    `${p} strict CSP (no CDN)`,
+    csp(r).includes("script-src 'self'") && !csp(r).includes('jsdelivr'),
+    csp(r),
+  );
+  check(
+    `${p} X-Frame-Options DENY`,
+    r.headers.get('x-frame-options') === 'DENY',
+    r.headers.get('x-frame-options'),
+  );
+}
+for (const p of ['/builder/', '/builder/molecule/']) {
+  const r = await get(p);
+  check(`${p} workspace CSP allows Pyodide`, csp(r).includes('https://cdn.jsdelivr.net'), csp(r));
+  check(`${p} is never framed`, csp(r).includes("frame-ancestors 'none'"), csp(r));
+  check(
+    `${p} X-Frame-Options DENY`,
+    r.headers.get('x-frame-options') === 'DENY',
+    r.headers.get('x-frame-options'),
+  );
+}
+for (const p of ['/dft-studio', '/dft-studio/']) {
+  const r = await get(p);
+  check(
+    `${p} redirects to /builder/`,
+    r.status === 301 && (r.headers.get('location') ?? '').endsWith('/builder/'),
+    `got ${r.status} ${r.headers.get('location')}`,
+  );
+}
+
 // .wasm, /data/, /pagefind/ rules cannot be exercised yet: no such files exist in dist/ (later stages).
 process.exit(failed ? 1 : 0);

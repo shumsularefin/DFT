@@ -1,7 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content';
 import HandbookLayout from '../../../layouts/HandbookLayout.astro';
-import Badge from '../../../components/ui/Badge.astro';
 import Why from '../../../components/handbook/Why.astro';
 import Intuition from '../../../components/handbook/Intuition.astro';
 import Lab from '../../../components/handbook/Lab.astro';
@@ -59,7 +58,8 @@ const components = {
   TagVisual,
   ErrorFinder,
 };
-const statusLabel = { draft: 'Draft', review: 'Awaiting verification', verified: 'Verified' }[
+// Plain words instead of a badge: every topic is a first edition until an expert has checked it.
+const statusLabel = { draft: 'First edition', review: 'Awaiting verification', verified: 'Verified' }[
   entry.data.status
 ];
 ---
@@ -72,83 +72,44 @@ const statusLabel = { draft: 'Draft', review: 'Awaiting verification', verified:
   moduleTitle={moduleName(entry.data.module)}
   pageClass={topicPageClass(body)}
 >
+  <nav class="card toc" aria-label="On this page" slot="rail">
+    <p class="card-h">On this page</p>
+    <ol>
+      {sections.map((s) => (
+        <li>
+          <a href={`#${s.id}`}>{s.heading}</a>
+        </li>
+      ))}
+    </ol>
+  </nav>
   <div
     class="topic"
     data-pagefind-body
     data-pagefind-meta={`module:${entry.data.module}. ${moduleName(entry.data.module)}`}
   >
     <span hidden data-pagefind-meta={`levels:${levelNotes(body)}`}></span>
-    <h1>{entry.data.title}</h1>
-    <p class="topic-summary">{entry.data.summary}</p>
-    <p>
-      <Badge variant={entry.data.status === 'verified' ? 'verified' : 'draft'} />
-      <span class="topic-status">
-        {statusLabel}. Updated {entry.data.updated}.
-      </span>
-    </p>
-    <nav class="toc" aria-label="On this page">
-      <p class="toc-title">On this page</p>
-      <ul>
-        {sections.map((s) => (
-          <li>
-            <a href={`#${s.id}`}>{s.heading}</a>
-          </li>
-        ))}
-      </ul>
-    </nav>
+    <header class="topic-head">
+      <div class="page-h">
+        <div>
+          <h1>{entry.data.title}</h1>
+          <p class="topic-summary">{entry.data.summary}</p>
+          <p class="topic-meta">
+            {statusLabel}, updated <time datetime={entry.data.updated}>{entry.data.updated}</time>.
+          </p>
+        </div>
+        <button
+          type="button"
+          class="btn js-only"
+          aria-pressed="false"
+          data-mark-complete
+          data-pagefind-ignore
+        >
+          Mark complete
+        </button>
+      </div>
+    </header>
     <article class="prose">
       <Content components={components} />
     </article>
   </div>
 </HandbookLayout>
-
-<style is:global>
-  .topic-status,
-  .topic-summary {
-    color: var(--text-muted);
-  }
-  .toc {
-    margin: var(--space-5) 0;
-    padding: var(--space-3) var(--space-4);
-    border-left: 3px solid var(--border-strong);
-    max-width: var(--measure);
-  }
-  .toc-title {
-    margin: 0 0 var(--space-2);
-    font-weight: 600;
-  }
-  .toc ul {
-    margin: 0;
-    padding-left: var(--space-4);
-  }
-  .toc a {
-    display: inline-block;
-    padding-block: var(--space-1);
-  }
-  .prose {
-    max-width: var(--measure);
-  }
-  .prose math {
-    font-family: 'Cambria Math', 'STIX Two Math', 'Latin Modern Math', 'Noto Sans Math', math, serif;
-    font-size: 1.1em;
-  }
-  .prose math[display='block'] {
-    margin-block: var(--space-4);
-  }
-  /* Tables of facts must wrap, not scroll sideways, at 360 px (M7.3). */
-  .prose table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  .prose th,
-  .prose td {
-    overflow-wrap: anywhere;
-    text-align: left;
-    vertical-align: top;
-    padding: var(--space-1) var(--space-2);
-    border-bottom: 1px solid var(--border);
-  }
-  .cite-list {
-    padding-left: var(--space-5);
-  }
-</style>

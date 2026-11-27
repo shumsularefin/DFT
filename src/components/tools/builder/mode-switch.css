@@ -1,0 +1,42 @@
+/* Crystal | Molecule: two links styled as a segmented control, on /builder/ (Studio toolbar) and
+   /builder/molecule/. The current mode carries aria-current="page". */
+.builder-mode {
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  font-family: var(--font-sans);
+}
+.builder-mode .builder-mode-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: calc(var(--radius-sm) - 2px);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.4;
+  text-decoration: none;
+}
+.builder-mode .builder-mode-link:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+.builder-mode .builder-mode-link[aria-current='page'] {
+  color: var(--accent-contrast);
+  background: var(--accent);
+}
+.builder-mode-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-block: var(--space-3);
+}
+.builder-mode-bar .builder-mode .builder-mode-link {
+  min-height: 2rem;
+  font-size: var(--step--1);
+}

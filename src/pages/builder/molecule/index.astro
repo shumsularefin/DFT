@@ -1,0 +1,15 @@
+---
+// @source S-021, S-034, S-042, S-067
+// Material Builder, molecule mode: the same VESTA-style workspace as crystal mode (D-105), with the Molecule
+// tab to build an isolated molecule from any element and put it in a vacuum box for VASP (D-107).
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import StudioWorkspace from '../../../components/studio/StudioWorkspace.astro';
+---
+
+<BaseLayout
+  title="Molecule Builder"
+  description="Build a molecule atom by atom from any element in the VESTA-style 3D workspace, add hydrogens, put it in a vacuum box as a POSCAR for VASP, or export XYZ or MOL, locally in your browser."
+  pageClass="workspace"
+>
+  <StudioWorkspace mode="molecule" />
+</BaseLayout>

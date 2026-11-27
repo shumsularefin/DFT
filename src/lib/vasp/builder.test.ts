@@ -172,6 +172,20 @@ describe('files', () => {
     const f = buildFiles({ structure: cu, entries: [], kpoints: null, job: DEFAULT_JOB, presetTitle: 'x' });
     expect(f.map((x) => x.name)).not.toContain('KPOINTS');
   });
+  it('README uses the POTCAR variants chosen in the Material Builder when they match the species (D-108)', () => {
+    const mkR = (labels: string[]) =>
+      buildFiles({
+        structure: cu,
+        entries: [],
+        kpoints: null,
+        job: DEFAULT_JOB,
+        presetTitle: 'x',
+        potcarLabels: labels,
+      }).find((f) => f.name === 'README.txt')!.text;
+    expect(mkR(['Cu_pv'])).toContain('cat "$POTCAR_LIBRARY/Cu_pv/POTCAR" > POTCAR');
+    // a list of the wrong length is ignored
+    expect(mkR(['Cu_pv', 'O'])).toContain('cat "$POTCAR_LIBRARY/Cu/POTCAR" > POTCAR');
+  });
   it('POTCAR labels keep raw labels in POSCAR order', () => {
     expect(potcarLabels(mk(['Ti_pv', 'Ti_pv', 'O', 'O']))).toEqual(['Ti_pv', 'O']);
   });

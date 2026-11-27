@@ -90,9 +90,25 @@ describe('vasp-tags.json', () => {
 });
 
 describe('incar-presets.json', () => {
-  it('has 17 presets with unique ids', () => {
-    expect(presets).toHaveLength(17);
-    expect(new Set(presets.map((p) => p.id)).size).toBe(17);
+  it('has 20 presets with unique ids, including the three carried over from the Material Builder (D-108)', () => {
+    expect(presets).toHaveLength(20);
+    expect(new Set(presets.map((p) => p.id)).size).toBe(20);
+    const ids = presets.map((p) => p.id);
+    for (const id of ['soc', 'dipole', 'phonon-dfpt']) expect(ids).toContain(id);
+  });
+  it('the carried-over presets hold the handbook values (S-042)', () => {
+    const entry = (id: string, variant: string, name: string) =>
+      presets
+        .find((p) => p.id === id)!
+        .variants.find((v) => v.id === variant)!
+        .entries.find((e) => e.name === name)?.value;
+    expect(entry('relax', 'ions-only', 'ISIF')).toBe('2');
+    expect(entry('relax', 'default', 'ISIF')).toBe('3');
+    expect(entry('soc', 'default', 'LSORBIT')).toBe('.TRUE.');
+    expect(entry('dipole', 'default', 'IDIPOL')).toBe('3');
+    expect(entry('phonon-dfpt', 'default', 'IBRION')).toBe('8');
+    expect(entry('phonon-dfpt', 'default', 'EDIFF')).toBe('1E-8');
+    expect(entry('phonon-dfpt', 'default', 'NCORE')).toBeUndefined();
   });
   it('uses only known tags, and each variant parses', () => {
     for (const p of presets)

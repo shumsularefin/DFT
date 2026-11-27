@@ -1,24 +1,16 @@
 .mg {
-  display: grid;
-  gap: var(--space-4);
-  grid-template-columns: minmax(0, 1fr);
-}
-@media (min-width: 70rem) {
-  .mg {
-    grid-template-columns: minmax(16rem, 1fr) minmax(0, 1.6fr) minmax(16rem, 1fr);
-    align-items: start;
-  }
-}
-.mg-card {
-  border: 1px solid var(--border-strong);
-  border-radius: 0.5rem;
-  padding: var(--space-3);
-  background: var(--surface);
   min-width: 0;
 }
+.mg-card {
+  min-width: 0;
+}
+.mg-left > h2:not(.card-h) {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+}
 .mg-row,
-.mg-toggles,
-.mg-tabs {
+.mg-toggles {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
@@ -32,6 +24,7 @@
 }
 .mg-drop {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-2);
 }
 .mg-drop textarea,
@@ -70,16 +63,10 @@
   font-weight: 600;
 }
 .mg-banner {
-  border-inline-start: 4px solid var(--accent, currentColor);
-  padding-inline-start: var(--space-2);
-}
-.mg-tabs button {
-  min-height: 2.75rem;
-  padding-inline: var(--space-3);
-}
-.mg-tabs button[aria-selected='true'] {
-  font-weight: 700;
-  border-bottom: 3px solid var(--accent, currentColor);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
 }
 .mg-table {
   width: 100%;
@@ -123,6 +110,10 @@
 .mg-src {
   color: var(--muted, inherit);
 }
+.mg-file {
+  min-width: 0;
+  max-width: 100%;
+}
 .mg-file input {
   max-width: 100%;
 }
@@ -149,4 +140,76 @@
   text-align: start;
   font-size: 0.9rem;
   padding-block: 0.25rem;
+}
+
+/* Text fields, menus and the file picker in this tool match the site's controls (browser defaults before). */
+:where(.mg) :is(input:not([type='radio'], [type='checkbox'], [type='range'], [type='file']), select) {
+  min-height: 2.5rem;
+  padding: 0 var(--space-2);
+  font: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+:where(.mg) textarea {
+  padding: var(--space-2);
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+:where(.mg) input[type='file'] {
+  max-width: 100%;
+  font: inherit;
+}
+:where(.mg) input[type='file']::file-selector-button {
+  min-height: var(--target);
+  margin-inline-end: var(--space-2);
+  padding: 0 var(--space-3);
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+/* Plain buttons in this tool share the site's button look (browser defaults before). */
+:where(.mg) button {
+  min-height: var(--target);
+  padding: 0 var(--space-3);
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+:where(.mg) button:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+:where(.mg) button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* The ordering tabs use the shared .tabbar underline look; undo the generic button box here. */
+.mg-tabs > button {
+  min-height: 0;
+  border-radius: 0;
+  border-width: 0 0 2px;
+  border-color: transparent;
+  background: none;
+}
+.mg-tabs > button[aria-selected='true'] {
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+/* The card's own padding is the top space; a heading's margin on top of it left a gap. */
+.mg-card > h2:first-child {
+  margin-top: 0;
 }

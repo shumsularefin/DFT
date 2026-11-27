@@ -2,8 +2,10 @@ import { useRef } from 'react';
 import { latticeParameters, cellVolume, guessCellType } from '../../../lib/crystal/lattice';
 import { reducedFormula, speciesCounts } from '../../../lib/crystal/structure';
 import { takeHandoff } from '../../../lib/handoff';
+import { expandRepeats } from '../../../lib/vasp/incar';
+import { parseKpoints } from '../../../lib/vasp/kpoints';
 import StructureView from '../../structure/StructureView';
-import { MAX_POSCAR_BYTES, useBuilder } from './store';
+import { MAX_POSCAR_BYTES, PRESETS, useBuilder } from './store';
 import { useEffect } from 'react';
 
 export default function StructureStep() {
@@ -15,10 +17,44 @@ export default function StructureStep() {
     const h = takeHandoff(['structure']);
     if (h && h.kind === 'structure') {
       setStructure(h.structure, h.label);
+      const st = useBuilder.getState();
+      // What the previous tool already knows comes with the structure (D-108): ENMAX and the POTCAR variants from
+      // the Material Builder, the band path from the k-path tool, and the task to open with.
+      if (h.enmax) st.set('enmax', String(h.enmax));
+      if (h.potcar) st.set('potcarLabels', h.potcar.split(/\s+/).filter(Boolean));
+      if (h.task && PRESETS.some((p) => p.id === h.task)) st.choosePreset(h.task);
+      else if (h.enmax) st.resetToPreset();
+      if (h.kpoints) {
+        // A line path (k-path tool) or a mesh (the Material Builder's k-point convergence test).
+        let k: ReturnType<typeof parseKpoints> | null;
+        try {
+          k = parseKpoints(h.kpoints);
+        } catch {
+          k = null;
+        }
+        if (k?.kind === 'mesh') {
+          st.setKpMode(k.centering);
+          st.set('meshOverride', k.mesh);
+        } else st.set('lineKpoints', h.kpoints);
+      }
+      if (h.system) st.set('systemType', h.system);
       if (h.magmom) {
-        // from the magnetic tool: MAGMOM refers to this POSCAR's atom order
-        useBuilder.getState().setEntry('ISPIN', '2');
-        useBuilder.getState().setEntry('MAGMOM', h.magmom);
+        // MAGMOM refers to this POSCAR's atom order. A non-collinear preset (SOC) needs three numbers per atom, so
+        // collinear moments are written along z, as the Material Builder did before D-108.
+        const now = useBuilder.getState();
+        const on = (n: string) => /^\.?t/i.test(now.entries.find((e) => e.name === n)?.value.trim() ?? '');
+        const m = expandRepeats(h.magmom);
+        const n = h.structure.species.length;
+        if (on('LSORBIT') || on('LNONCOLLINEAR')) {
+          now.setEntry('MAGMOM', m.length === n ? m.map((x) => `0 0 ${x}`).join('  ') : h.magmom);
+        } else if (m.length === 3 * n) {
+          // Three numbers per atom: non-collinear moments from the Builder (S-065, LNONCOLLINEAR).
+          now.setEntry('LNONCOLLINEAR', '.TRUE.');
+          now.setEntry('MAGMOM', h.magmom);
+        } else {
+          now.setEntry('ISPIN', '2');
+          now.setEntry('MAGMOM', h.magmom);
+        }
       }
     }
   }, [setStructure]);
@@ -108,7 +144,13 @@ export default function StructureStep() {
       {structure && (
         <div className="ib-view">
           <h3>See it</h3>
-          <StructureView structure={structure} label="your POSCAR" magmom={magmom} id="ib-sv" />
+          <StructureView
+            structure={structure}
+            label="your POSCAR"
+            magmom={magmom}
+            id="ib-sv"
+            from="input-builder"
+          />
         </div>
       )}
     </section>

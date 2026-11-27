@@ -3,6 +3,8 @@ import '../styles/fonts.css';
 import '../styles/tokens.css';
 import '../styles/base.css';
 import '../styles/interface.css';
+import '../styles/components.css';
+import '../components/ui/button.css';
 import plexRegular from '@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-400-normal.woff2?url';
 import { getCollection } from 'astro:content';
 import { INDEXING_ENABLED, SITE } from '../lib/site';
@@ -13,7 +15,7 @@ import StatusLine from '../components/chrome/StatusLine.astro';
 interface Props {
   title?: string;
   description?: string;
-  pageClass?: 'content' | 'island' | 'tool';
+  pageClass?: 'content' | 'island' | 'tool' | 'workspace';
 }
 const { title, description = SITE.tagline, pageClass = 'content' } = Astro.props;
 const fullTitle = title ? `${title} | ${SITE.name}` : SITE.name;
@@ -65,6 +67,13 @@ const jsonLd = JSON.stringify({
       } catch {
         /* storage unavailable: keep the system theme */
       }
+      try {
+        // Desktop sidebar: collapsed to an icon rail, or the full sidebar (the default).
+        const s = JSON.parse(localStorage.getItem('dft:sidebar'));
+        if (s && s.v === 1 && s.data === 'collapsed') document.documentElement.dataset.sidebar = 'collapsed';
+      } catch {
+        /* storage unavailable: full sidebar */
+      }
     </script>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="manifest" href="/manifest.webmanifest" />
@@ -75,7 +84,7 @@ const jsonLd = JSON.stringify({
     <a class="skip-link" href="#main">
       Skip to main content
     </a>
-    <Header topicIds={topicIds} />
+    <Header topicIds={topicIds} title={title} />
     <main id="main">
       <slot />
     </main>

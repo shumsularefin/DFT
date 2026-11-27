@@ -1,95 +1,237 @@
+/* Materials Screening on the template "screening" view: preset pills with the export on the right, a filter
+   card, then the results table (padding-0 card) beside an inspector card. Shared pieces (.page-h, .pill,
+   .split, .grid, .card-h, .ph, .notice, .btn) come from components.css, interface.css and ui/button.css. */
 .st-root {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  margin-top: var(--space-4);
+}
+.st-root > .page-h {
+  margin: 0;
+}
+.st-root > .notice {
+  margin: 0;
+}
+.st-banner {
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--warn) 45%, var(--border));
 }
 
-.st-banner {
-  padding: var(--space-3) var(--space-4);
-  background: var(--surface-2);
-  border: 1px solid var(--warn);
-  border-left: 4px solid var(--warn);
-  border-radius: var(--radius);
-  font-size: var(--step--1);
+.st-pills {
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.st-spacer {
+  flex: 1;
+}
+.st-ico {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .st-filters {
   display: grid;
   gap: var(--space-3);
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
-  padding: var(--space-4);
-  background: var(--surface);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  align-items: end;
 }
-
 .st-field {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  display: grid;
+  gap: 0.375rem;
   font-size: var(--step--1);
+  color: var(--text-muted);
 }
-
-.st-field input,
-.st-field select {
-  min-height: var(--target);
-  padding: 0 var(--space-2);
+.st-field :is(input, select) {
+  width: 100%;
+  min-width: 0;
+  min-height: 2.125rem;
+  padding: 0 0.625rem;
   font: inherit;
+  font-size: var(--step-0);
   color: var(--text);
   background: var(--bg);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius);
 }
-
-.st-table-wrap {
-  overflow-x: auto;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius);
+.st-field :is(input, select):focus {
+  border-color: var(--accent);
 }
-
-.st-table {
-  width: 100%;
-  border-collapse: collapse;
+.st-checks {
+  display: grid;
+  gap: 0.25rem;
   font-size: var(--step--1);
 }
-
-.st-table th,
-.st-table td {
-  padding: var(--space-2);
-  border-bottom: 1px solid var(--border);
-  text-align: left;
+.st-checks label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: var(--step--1);
+}
+.st-count {
+  margin: 0;
+  font-size: var(--step--1);
+  color: var(--text-muted);
+  max-width: none;
 }
 
-.st-table tr:hover td {
+/* Results table: flush inside a padding-0 card, muted 500 header, 12.5px mono cells. */
+.st-table-card {
+  padding: 0;
+  overflow: auto;
+  max-height: 40rem;
+}
+.st-table {
+  width: 100%;
+  border: 0;
+  border-radius: 0;
+  border-collapse: collapse;
+  background: transparent;
+}
+.st-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 0.5625rem 0.75rem;
+  font-size: var(--step--1);
+  font-weight: 500;
+  color: var(--text-muted);
+  text-align: left;
+  white-space: nowrap;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.st-table td {
+  padding: 0.5625rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.78125rem;
+  font-variant-numeric: tabular-nums;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.st-table td.st-formula {
+  font-weight: 600;
+}
+.st-table tbody tr {
+  cursor: pointer;
+}
+.st-table tbody tr:hover {
   background: var(--surface-2);
 }
+.st-table tbody tr.on {
+  background: var(--accent-soft);
+}
+.st-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.st-table .btn.st-inspect {
+  min-height: 1.625rem;
+  padding: 0 0.5rem;
+  font-size: var(--step--1);
+}
+.st-empty {
+  margin: var(--space-4);
+}
 
+/* Inspector (and the project card page's sections) */
 .st-card {
+  min-width: 0;
   padding: var(--space-4);
   background: var(--surface);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.st-split > .st-card {
+  position: sticky;
+  top: var(--space-4);
+}
+.st-card .card-h code {
+  font-size: var(--step--1);
+  font-weight: 400;
+  color: var(--text-muted);
+}
+.st-ph {
+  min-height: 11rem;
+  margin: 0;
+  max-width: none;
+}
+.st-badges {
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-bottom: var(--space-3);
+}
+.st-tag {
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+.st-stats {
+  gap: var(--space-3);
+  margin: 0 0 var(--space-3);
+}
+.st-stats dt {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+.st-stats dd {
+  margin: 0.125rem 0 0;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.st-caveat {
+  margin: 0 0 var(--space-3);
+}
+.st-actions {
+  gap: var(--space-2);
+}
+.st-actions .btn {
+  justify-content: center;
+  width: 100%;
 }
 
 .st-btn {
+  display: inline-flex;
+  align-items: center;
   min-height: var(--target);
   padding: 0 var(--space-3);
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--step--1);
   color: var(--text);
-  background: var(--bg);
+  text-decoration: none;
+  background: var(--surface);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius);
   cursor: pointer;
 }
-
 .st-btn:hover {
-  border-color: var(--accent);
+  background: var(--surface-2);
+}
+.st-banner:not(.notice) {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--step--1);
+  background: var(--surface-2);
+  border: 1px solid color-mix(in srgb, var(--warn) 45%, var(--border));
+  border-radius: var(--radius-lg);
 }
 
+.st-details summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.st-details p {
+  margin: var(--space-2) 0 0;
+  font-size: var(--step--1);
+  color: var(--text-muted);
+  max-width: none;
+}
 .st-footer {
-  padding: var(--space-3);
+  padding: var(--space-3) 0 0;
   border-top: 1px solid var(--border);
   color: var(--text-muted);
   font-size: var(--step--1);

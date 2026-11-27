@@ -285,3 +285,25 @@ The work order asked for a textbook source for n, k, alpha, R, L and sigma from 
 
 ## Q-058. Near-zero level for the acoustic modes in the phonon check
 `ACOUSTIC_NEAR_ZERO_CM1 = 5` in `src/lib/vasp/phonons.ts` decides when one of the three lowest Gamma modes counts as near zero (review check POST-PHONON-ACOUSTIC, Heuristic). S-042 says only that a small imaginary acoustic dip of "a few cm^-1" is numerical noise; 5 is the builder's reading of that phrase, not a sourced value. The imaginary-mode check (POST-PHONON-IMAG) does not use it: it flags every f/i mode outside the three lowest. **Close:** the author confirms 5 cm^-1 or gives the level to use. **Owner: author.**
+
+## Q-059. DFT Studio science has no golden tests yet
+The merged Studio (`public/dft-studio/js/`, D-103) computes several things the site has not verified: the XRD pattern (Cromer-Mann form factors), bond-valence sums, ECoN coordination, element radii and colours, VASPKIT-style INCAR presets, the k-spacing to mesh rule, the EOS fit in step 7, the band, DOS, phonon, elastic, thermochemistry and diffusion analyzers. None has an S-xxx source or a reference test in this repository. They are labelled Heuristic in the UI, and each step links to the golden-tested site tool (convergence plotter, EOS, work function, review, k-path, Input Builder rules). **Close:** for each item, register the source, generate golden values with `scripts/reference/`, add tests against the Studio functions (or route the Studio through the site library), then drop the Heuristic label for that item. **Owner: builder.**
+
+## Q-060. Licence of the POTCAR summary metadata in DFT Studio
+`public/dft-studio/data/pp_index.js` lists, for every POTCAR variant, TITEL, VRHFIN, LEXCH, POMASS, ZVAL, ENMAX and ENMIN. The verbatim header lines (`header_preview`, 1624 entries) were removed in this merge because they are POTCAR text. The remaining fields are facts that pymatgen and VASPKIT also publish, but VASP Software GmbH has not been asked whether hosting them is allowed. Note that the history of the `dft-studio` branch (and the merge commit that brought it in) still contains the removed header lines. **Close:** the author confirms the metadata may be hosted (or removes it and asks users to load their own library), and decides whether to delete the `dft-studio` branch or rewrite its history. **Owner: author.**
+
+## Q-061. Source of the DFT Studio crystal library
+`public/dft-studio/data/crystals/` holds 350 structures from the VASPKIT Studio lab tool. Their origin (Materials Project, COD, ICSD, hand-built) and licence are not recorded, and the site's attribution rules (Q-009) may apply. **Close:** the author records the source of each family and any attribution needed, or the library is regenerated from a source with a known licence. **Owner: author.**
+
+
+## Q-070. Source for a CI-NEB INCAR preset
+The Material Builder had a CI-NEB INCAR preset (IMAGES, LCLIMB, SPRING, IBRION 3 with POTIM 0, IOPT for the VTST optimisers). D-108 removed the Builder's INCAR writer, and the Input Builder has no NEB preset because no registered source covers these tags: the VTST pages that define LCLIMB and IOPT were not reachable from the builder session, and S-042 does not list a NEB recipe. Until then a user types the NEB tags in the Input Builder's custom tag field. **Close:** register the VTST tools documentation (or the VASP wiki NEB page) as a source and add a sourced `neb` preset with its validation rules. **Owner: author.**
+
+## Q-071. Selective dynamics with a task that does not move the ions
+The Builder warned when POSCAR used selective dynamics but the INCAR did not move ions (IBRION -1 or NSW 0), since the flags then do nothing. The hint had no source and was not ported to the Input Builder rules in D-108. **Close:** find a source that states the behaviour (VASP wiki POSCAR or IBRION page) and add it as a rule, or record that the hint is not wanted. **Owner: author.**
+
+## Q-072. Default U values and starting moments removed from the Builder
+The Builder filled DFT+U with a per-element U table and FM starting moments from a per-element table, neither with a source. D-108 removed both, in line with the site policy in `src/lib/magnetism/magmom.ts` (no per-element table). The Input Builder asks for U per species and the Magnetic tool gives the sourced starting-moment guidance. **Close:** if a sourced table of typical U values (for example the Materials Project values with their paper) is wanted, register it and add it to the Input Builder as a labelled suggestion, never a silent default. **Owner: author.**
+
+## Q-073. Explicit k-mesh is not in the Input Builder share link
+The Input Builder's typed mesh (`meshOverride`, D-108) is not written to the share link, so a shared link falls back to the k-spacing mesh. **Close:** add the mesh to the share fragment with a round-trip test, or record that typed meshes are local only. **Owner: builder.**

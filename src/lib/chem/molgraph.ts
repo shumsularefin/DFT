@@ -399,13 +399,41 @@ export function expandHydrogens(g: MolGraph): MolGraph {
   const atoms: MolAtom[] = g.atoms.map((a) => ({ ...a, hCount: 0 }));
   const bonds: MolBond[] = g.bonds.map((b) => ({ ...b }));
   const coords = g.coords2d ? g.coords2d.map((c) => [...c] as [number, number]) : undefined;
+  // In the 2D start, hydrogens point away from the atom's heavy neighbours (a ring hydrogen points out of the
+  // ring), spread evenly around that direction; an atom with no neighbours gets them evenly around it.
+  const heavyNb: number[][] = g.atoms.map(() => []);
+  for (const b of g.bonds) {
+    heavyNb[b.a]!.push(b.b);
+    heavyNb[b.b]!.push(b.a);
+  }
   g.atoms.forEach((a, i) => {
+    let base = Math.PI;
+    let step = (2 * Math.PI) / Math.max(1, a.hCount);
+    if (coords && heavyNb[i]!.length) {
+      const [x, y] = g.coords2d![i]!;
+      let sx = 0;
+      let sy = 0;
+      for (const j of heavyNb[i]!) {
+        const [qx, qy] = g.coords2d![j]!;
+        const r = Math.hypot(qx - x, qy - y) || 1;
+        sx += (qx - x) / r;
+        sy += (qy - y) / r;
+      }
+      if (Math.hypot(sx, sy) > 1e-6) base = Math.atan2(-sy, -sx);
+      else {
+        const [qx, qy] = g.coords2d![heavyNb[i]![0]!]!;
+        base = Math.atan2(qy - y, qx - x) + Math.PI / 2;
+      }
+      step = (2 * Math.PI) / (a.hCount + heavyNb[i]!.length);
+    }
     for (let k = 0; k < a.hCount; k++) {
       atoms.push({ el: 'H', charge: 0, hCount: 0 });
       bonds.push({ a: i, b: atoms.length - 1, order: 1 });
       if (coords) {
         const [x, y] = g.coords2d![i]!;
-        const t = (2 * Math.PI * (k + 0.5)) / a.hCount;
+        const t = heavyNb[i]!.length
+          ? base + (k - (a.hCount - 1) / 2) * step
+          : (2 * Math.PI * (k + 0.5)) / a.hCount;
         coords.push([x + Math.cos(t), y + Math.sin(t)]);
       }
     }

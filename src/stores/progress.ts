@@ -4,6 +4,10 @@ import { complete, emptyProgress, parseProgress, uncomplete, visit, type Progres
 
 export const progressStore = createStore<Progress>(() => parseProgress(getJSON<unknown>('progress', null)));
 
+/** What the server renders and what hydration must match: no progress yet. The stored state follows. */
+const SERVER_PROGRESS: Progress = emptyProgress();
+export const progressServerSnapshot = (): Progress => SERVER_PROGRESS;
+
 const commit = (next: Progress) => {
   if (next === progressStore.getState()) return;
   progressStore.setState(next, true);

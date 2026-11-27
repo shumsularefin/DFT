@@ -6,6 +6,7 @@ import Toggle from '../ui/Toggle';
 import { prefersReducedMotion } from '../../lib/three/capabilities';
 import type { SceneController } from '../../lib/three/SceneController';
 import { cubeEdges, DEMO_POINTS } from '../../lib/three/demo-geometry';
+import '../ui/button.css';
 
 const load = (): Promise<SceneModule> => import('../../lib/three/DemoScene');
 

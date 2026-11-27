@@ -28,9 +28,16 @@ const struct: Handoff = {
 const site = { occupants: [{ symbol: 'Ti', oxidation: 4, cn: 6, fraction: 1 }] };
 const comp: Handoff = { v: 1, kind: 'composition', from: 'tolerance-factor', a: site, b: site, x: site };
 const mol: Handoff = { v: 1, kind: 'molecule', from: 'studio', xyz: '1\n\nH 0 0 0\n' };
+const series: Handoff = {
+  v: 1,
+  kind: 'series',
+  from: 'dft-studio',
+  csv: 'label,energy\nkpt_4x4x4,-10.5\n',
+  label: 'k-points',
+};
 
 describe('handoff', () => {
-  it.each([struct, comp, mol])('round trips %#', (h) => {
+  it.each([struct, comp, mol, series])('round trips %#', (h) => {
     const s = mem();
     let to = '';
     expect(sendHandoff(h, '/tools/x/', s, (u) => (to = u))).toBe(true);
@@ -45,6 +52,31 @@ describe('handoff', () => {
     sendHandoff(h, '/tools/input-builder/', s, () => {});
     expect(takeHandoff(['structure'], s)).toEqual(h);
     expect(validateHandoff({ ...h, magmom: 4 })).toBeNull();
+  });
+  it('carries ENMAX, POTCAR variants, a line-mode KPOINTS and a task to the Input Builder (D-108)', () => {
+    const s = mem();
+    const h = {
+      ...struct,
+      from: 'builder' as const,
+      enmax: 400,
+      potcar: 'Fe_pv O',
+      kpoints: 'path\n20\nLine-mode\nReciprocal\n',
+      task: 'band',
+      system: 'slab' as const,
+    };
+    sendHandoff(h, '/tools/input-builder/', s, () => {});
+    expect(takeHandoff(['structure'], s)).toEqual(h);
+    expect(validateHandoff({ ...h, enmax: -1 })).toBeNull();
+    expect(validateHandoff({ ...h, enmax: '400' })).toBeNull();
+    expect(validateHandoff({ ...h, potcar: 7 })).toBeNull();
+    expect(validateHandoff({ ...h, kpoints: 'x'.repeat(200_001) })).toBeNull();
+    expect(validateHandoff({ ...h, task: 'Band Structure!' })).toBeNull();
+    expect(validateHandoff({ ...h, system: 'metal' })).toBeNull();
+  });
+  it('series hand-off needs a string CSV of bounded size', () => {
+    expect(validateHandoff({ ...series, csv: 5 })).toBeNull();
+    expect(validateHandoff({ ...series, csv: 'x'.repeat(1_000_001) })).toBeNull();
+    expect(validateHandoff({ ...series, from: 'nowhere' })).toBeNull();
   });
   it('wrong kind is rejected and still cleared', () => {
     const s = mem();

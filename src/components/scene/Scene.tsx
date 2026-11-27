@@ -10,6 +10,7 @@ import { projectionToSvg } from '../../lib/scene/svg';
 import { hasWebGL } from '../../lib/three/capabilities';
 import type { SpecScene } from '../../lib/three/SpecScene';
 import './scene.css';
+import '../ui/button.css';
 
 interface Props {
   /** A spec whose structure is inline (the Astro wrapper resolves named structures at build time). */

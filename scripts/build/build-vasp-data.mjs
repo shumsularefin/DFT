@@ -95,6 +95,17 @@ const presets = [
       v('default', 'Bulk cell relaxation', withPlaceholders(relax, ['ENCUT', 'MAGMOM']), {
         requires: ['POSCAR', 'POTCAR', 'KPOINTS'],
       }),
+      // The handbook's own note above: ISIF = 2 for slabs and defects (D-108, the Material Builder's SR preset).
+      v(
+        'ions-only',
+        'Ions only, cell fixed (ISIF = 2: slabs, defects, adsorbates)',
+        withPlaceholders(relax, ['ENCUT', 'MAGMOM']).map((e) =>
+          e.name === 'ISIF'
+            ? { name: 'ISIF', value: '2', comment: 'ions only; cell shape and volume fixed' }
+            : e,
+        ),
+        { requires: ['POSCAR', 'POTCAR', 'KPOINTS'] },
+      ),
     ],
   },
   {
@@ -291,6 +302,53 @@ const presets = [
     ],
   },
   {
+    // D-108: carried over from the Material Builder (its SO preset), now from the handbook's tag table and MAE recipe.
+    id: 'soc',
+    title: 'Spin-orbit coupling (non-collinear)',
+    summary: 'Spin-orbit coupling for heavy elements, magnetic anisotropy and topological bands.',
+    protocolStage: null,
+    fragment: true,
+    sources: ['S-042', 'S-065'],
+    notes: [
+      'Run with the vasp_ncl executable (set it in the job step).',
+      'MAGMOM needs three values (mx my mz) per atom.',
+      'For bands or the anisotropy energy, start from the collinear CHGCAR with ICHARG = 11, one run per spin direction.',
+    ],
+    variants: [
+      v('default', 'SOC on top of a full INCAR', [
+        { name: 'LSORBIT', value: '.TRUE.', comment: 'spin-orbit coupling' },
+        { name: 'SAXIS', value: '0 0 1', comment: 'spin quantization axis' },
+        { name: 'ISYM', value: '-1', comment: 'symmetry off for non-collinear runs' },
+        { name: 'LMAXMIX', value: '4', comment: 'd elements (6 for f)' },
+        {
+          name: 'MAGMOM',
+          value: '0 0 4',
+          comment: 'three values per atom, POSCAR order',
+          placeholder: '<three values (mx my mz) per atom, in POSCAR order>',
+        },
+      ]),
+    ],
+  },
+  {
+    // D-108: carried over from the Material Builder's dipole switch.
+    id: 'dipole',
+    title: 'Dipole correction for slabs',
+    summary:
+      'Removes the artificial field across the vacuum of an asymmetric slab or a slab with adsorbates.',
+    protocolStage: null,
+    fragment: true,
+    sources: ['S-042', 'S-065'],
+    notes: [
+      'Add to a relaxation or static template for asymmetric slabs and adsorption. IDIPOL = 3 is the z direction.',
+    ],
+    variants: [
+      v('default', 'Dipole along z', [
+        { name: 'LDIPOL', value: '.TRUE.', comment: 'dipole correction' },
+        { name: 'IDIPOL', value: '3', comment: 'along z' },
+      ]),
+    ],
+  },
+  {
     id: 'elastic',
     title: 'Elastic constants',
     summary: 'Step 4 of the protocol: finite distortions with IBRION = 6 and ISIF = 3.',
@@ -335,6 +393,39 @@ const presets = [
       v('default', 'Single displacement', withPlaceholders(phonon, ['ENCUT']), {
         requires: ['POSCAR-xxx (displaced supercell)', 'POTCAR', 'KPOINTS (scaled for the supercell)'],
       }),
+    ],
+  },
+  {
+    // D-108: the handbook's phonopy route B, carried over from the Material Builder (its DT preset).
+    id: 'phonon-dfpt',
+    title: 'Phonons: DFPT force constants',
+    summary:
+      'One run on the perfect supercell (IBRION = 8) instead of one per displacement; phonopy reads vasprun.xml.',
+    protocolStage: null,
+    fragment: false,
+    sources: [...H, 'S-083'],
+    notes: [
+      'Copy SPOSCAR to POSCAR first, then run phonopy --fc vasprun.xml and add FORCE_CONSTANTS = READ to band.conf and mesh.conf.',
+      'NCORE must not be set. DFPT does not support every functional.',
+    ],
+    variants: [
+      v(
+        'default',
+        'IBRION = 8 on the supercell',
+        [
+          ...withPlaceholders(phonon, ['ENCUT']).map((e) =>
+            e.name === 'NSW' ? { name: 'NSW', value: '1', comment: '1 for IBRION 5 to 8' } : e,
+          ),
+          { name: 'IBRION', value: '8', comment: 'DFPT force constants' },
+        ],
+        {
+          requires: [
+            'POSCAR (the perfect supercell, from SPOSCAR)',
+            'POTCAR',
+            'KPOINTS (scaled for the supercell)',
+          ],
+        },
+      ),
     ],
   },
   {

@@ -6,6 +6,7 @@ import SyncPanel from '../components/practice/SyncPanel';
 import { readConfig } from '../lib/sync/config';
 import HowThisWorks from '../components/practice/HowThisWorks.astro';
 import { conceptGraph, questionBank, topicsByConcept } from '../lib/learning/loadBank';
+import '../styles/learning.css';
 
 const syncEnabled = readConfig(import.meta.env) !== null;
 const concepts = conceptGraph().filter((c) => c.status === 'published');
@@ -22,19 +23,25 @@ const links = Object.fromEntries(
   description="Short practice sessions that pick your next question, with reviews when they are due. Everything stays in your browser."
   pageClass="island"
 >
-  <div class="container">
-    <h1>Practice</h1>
-    <p>
-      Short sessions of questions from the handbook, chosen to fit where you are. Reviews come back when they
-      are due. Everything stays on this device. No sign-in, no timers, no ranking.
-    </p>
+  <div class="container learn-page">
+    <div class="page-h">
+      <div>
+        <h1>Practice</h1>
+        <p>
+          Short sessions of questions from the handbook, chosen to fit where you are. Reviews come back when
+          they are due. Everything stays on this device. No sign-in, no timers, no ranking.
+        </p>
+      </div>
+    </div>
     <noscript>
       <p>Practice needs JavaScript. The handbook pages list their questions with the answers hidden.</p>
     </noscript>
-    <div class="js-only">
-      <Practice client:load bank={bank} concepts={concepts} topics={links} />
+    <div class="js-only stack">
+      <Practice client:load bank={bank} concepts={concepts} topics={links}>
+        <HowThisWorks slot="how" part="how" />
+        <HowThisWorks slot="pieces" part="pieces" />
+      </Practice>
       {syncEnabled && <SyncPanel compact client:idle />}
     </div>
-    <HowThisWorks />
   </div>
 </BaseLayout>

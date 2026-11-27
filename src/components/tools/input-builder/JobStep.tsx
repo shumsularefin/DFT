@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { zipSync, strToU8 } from 'fflate';
-import { buildFiles, potcarLabels } from '../../../lib/vasp/builder';
+import { potcarLabels } from '../../../lib/vasp/builder';
 import {
   POTCAR_NOTE,
   jobScript,
@@ -10,7 +10,7 @@ import {
   type Launcher,
   type Scheduler,
 } from '../../../lib/vasp/jobscript';
-import { canDownload, issuesOf, kpointsOf, presetOf, shareOf, useBuilder } from './store';
+import { canDownload, filesOf, issuesOf, kpointsOf, shareOf, useBuilder } from './store';
 import { copyText, downloadBlob } from './hooks';
 
 export default function JobStep() {
@@ -23,17 +23,7 @@ export default function JobStep() {
   const setJob = (patch: Partial<typeof job>) => s.set('job', { ...job, ...patch });
   const num = (v: string) => Math.max(1, Math.floor(Number(v) || 1));
 
-  const files = () =>
-    s.structure
-      ? buildFiles({
-          structure: s.structure,
-          entries: s.entries,
-          kpoints: kpointsOf(s).text,
-          job,
-          presetTitle: presetOf(s.presetId).title,
-          vaspVersion: s.version,
-        })
-      : [];
+  const files = () => (s.structure ? filesOf(s) : []);
 
   const say = (t: string) => setMsg(t);
   const one = (name: string) => {
@@ -55,7 +45,10 @@ export default function JobStep() {
         : 'Link is in the address bar; copy it from there',
     );
   };
-  const labels = s.structure ? potcarLabels(s.structure) : [];
+  const own = s.structure ? potcarLabels(s.structure) : [];
+  const labels = s.potcarLabels.length === own.length && own.length ? s.potcarLabels : own;
+  const isTrue = (n: string) => /^\.?t/i.test(s.entries.find((e) => e.name === n)?.value.trim() ?? '');
+  const nonCollinear = isTrue('LSORBIT') || isTrue('LNONCOLLINEAR');
 
   return (
     <section aria-labelledby="ib-s6">
@@ -70,6 +63,7 @@ export default function JobStep() {
           >
             <option value="slurm">SLURM</option>
             <option value="pbs">PBS</option>
+            <option value="local">Local shell (no scheduler)</option>
           </select>
         </div>
         <div className="ib-field">
@@ -98,10 +92,16 @@ export default function JobStep() {
           <label htmlFor="ib-wall">Walltime (HH:MM:SS)</label>
           <input id="ib-wall" value={job.walltime} onChange={(e) => setJob({ walltime: e.target.value })} />
         </div>
-        <div className="ib-field">
-          <label htmlFor="ib-part">{job.scheduler === 'slurm' ? 'Partition' : 'Queue'} (optional)</label>
-          <input id="ib-part" value={job.partition} onChange={(e) => setJob({ partition: e.target.value })} />
-        </div>
+        {job.scheduler !== 'local' && (
+          <div className="ib-field">
+            <label htmlFor="ib-part">{job.scheduler === 'slurm' ? 'Partition' : 'Queue'} (optional)</label>
+            <input
+              id="ib-part"
+              value={job.partition}
+              onChange={(e) => setJob({ partition: e.target.value })}
+            />
+          </div>
+        )}
         <div className="ib-field">
           <label htmlFor="ib-exe">Executable</label>
           <select
@@ -126,6 +126,14 @@ export default function JobStep() {
           </select>
         </div>
       </div>
+      {nonCollinear && job.executable !== 'vasp_ncl' && (
+        <p className="ib-note">
+          This INCAR is non-collinear (LSORBIT or LNONCOLLINEAR), which needs the vasp_ncl executable.{' '}
+          <button type="button" onClick={() => setJob({ executable: 'vasp_ncl' })}>
+            Use vasp_ncl
+          </button>
+        </p>
+      )}
       <div className="ib-field">
         <label htmlFor="ib-mods">Modules to load (one per line)</label>
         <textarea
@@ -201,6 +209,16 @@ export default function JobStep() {
       <p className="ib-small">
         The share link holds settings and, when it is 2 KB or less, the structure. Nothing is uploaded.
       </p>
+
+      <div className="next-step">
+        <p>
+          <b>Next step:</b> after the run, load OUTCAR and OSZICAR into the{' '}
+          <a href="/tools/review/">Calculation review</a>, paste an error into the{' '}
+          <a href="/errors/">Error finder</a>, or plot a series in the{' '}
+          <a href="/tools/convergence/">Convergence plotter</a>. To plan the whole study first, use the{' '}
+          <a href="/tools/planner/">Research Planner</a>.
+        </p>
+      </div>
     </section>
   );
 }

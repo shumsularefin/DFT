@@ -216,13 +216,29 @@ const CASES: Case[] = [
     { incar: inc('NBANDS = 8'), structure: si2, zvalBySpecies: { Si: 4 } },
   ),
   c('V033', 'warn', { incar: inc('KPAR = 3'), cores: 16 }, { incar: inc('KPAR = 4'), cores: 16 }),
+  c(
+    'V034',
+    'warn',
+    { incar: inc('ISIF = 2'), systemType: 'slab', kpoints: mesh(4) },
+    {
+      incar: inc('ISIF = 2'),
+      systemType: 'slab',
+      kpoints: { kind: 'mesh', centering: 'gamma', mesh: [4, 4, 1], shift: [0, 0, 0], comment: '' },
+    },
+  ),
+  c(
+    'V035',
+    'info',
+    { incar: inc('ISIF = 2'), systemType: 'slab' },
+    { incar: inc('ISIF = 2\nLDIPOL = .TRUE.\nIDIPOL = 3'), systemType: 'slab' },
+  ),
 ];
 
 describe('rule table', () => {
-  it('has 33 unique, sorted, sourced rules', () => {
-    expect(ALL_RULES).toHaveLength(33);
+  it('has 35 unique, sorted, sourced rules', () => {
+    expect(ALL_RULES).toHaveLength(35);
     expect(ALL_RULES.map((r) => r.id)).toEqual(
-      Array.from({ length: 33 }, (_, i) => `V${String(i + 1).padStart(3, '0')}`),
+      Array.from({ length: 35 }, (_, i) => `V${String(i + 1).padStart(3, '0')}`),
     );
     for (const r of ALL_RULES) {
       expect(r.source.length, r.id).toBeGreaterThan(0);

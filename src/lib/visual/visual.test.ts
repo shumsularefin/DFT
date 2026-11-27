@@ -80,6 +80,41 @@ describe('question visuals (M12.3)', () => {
   });
 });
 
+describe('plot layout (guided path figures)', () => {
+  const svg = (id: string, params: Record<string, unknown>) => renderPlot(id, params, 'alt').svg;
+  it('draws powers of ten with a raised exponent, not a caret', () => {
+    const s = svg('exp-wall', { perElectron: 4, maxN: 20 });
+    expect(s).not.toContain('10^');
+    expect(s).toMatch(/>10<tspan class="vp-sup" dy="-4">0<\/tspan>/);
+  });
+  it('keeps the y tick labels clear of the y title', () => {
+    const s = svg('exp-wall', { perElectron: 4, maxN: 20 });
+    const axisX = Number(/<line class="vp-axis" x1="([\d.]+)"/.exec(s)![1]);
+    const titles = [...s.matchAll(/translate\(([\d.]+) [\d.]+\) rotate\(-90\)/g)].map((m) => Number(m[1]));
+    // a rotated title's glyphs reach about 4 units right of its baseline; tick labels end 7 left of the axis
+    const top = /<tspan class="vp-sup" dy="-4">(\d+)</g;
+    const digits = Math.max(...[...s.matchAll(top)].map((m) => m[1]!.length));
+    const widest = (2 + 0.75 * digits) * 6.2;
+    expect(axisX - 7 - widest).toBeGreaterThan(Math.max(...titles) + 4);
+  });
+  it('wraps a y title longer than its axis onto two lines', () => {
+    const s = svg('scf-density', { Zs: [2] });
+    expect([...s.matchAll(/rotate\(-90\)/g)]).toHaveLength(2);
+  });
+  it('centres each band label in its band', () => {
+    const s = svg('band-gap', { labels: true });
+    const boxes = [
+      ...s.matchAll(/<rect class="vp-band[^"]*" x="[\d.]+" y="([\d.]+)" width="[\d.]+" height="([\d.]+)"/g),
+    ].map((m) => [Number(m[1]), Number(m[1]) + Number(m[2])] as const);
+    for (const label of ['band, full', 'band, empty']) {
+      const y = Number(new RegExp(`y="([\\d.]+)"[^>]*>${label}<`).exec(s)![1]) - 4;
+      const box = boxes.find(([a, b]) => y > a && y < b);
+      expect(box, label).toBeDefined();
+      expect(Math.abs(y - (box![0] + box![1]) / 2), label).toBeLessThan(1);
+    }
+  });
+});
+
 describe('lint plot list', () => {
   it('equals the registry', async () => {
     const { PLOT_IDS: linted } = await import('../../../scripts/lint-questions.mjs');

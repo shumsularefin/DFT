@@ -194,7 +194,7 @@ test.describe('navigation', () => {
     ).toHaveAttribute('aria-current', 'page');
   });
 
-  test('tap targets in the header are at least 44px', async ({ page }) => {
+  test('controls in the header are at least 24px (WCAG 2.5.8; desktop only, D-105)', async ({ page }) => {
     await page.goto('/');
     await openMenu(page);
     const small = await page.locator('.site-header :is(a, button, input):visible').evaluateAll((els) =>
@@ -203,9 +203,31 @@ test.describe('navigation', () => {
           t: e.textContent?.trim() || e.getAttribute('aria-label'),
           h: e.getBoundingClientRect().height,
         }))
-        .filter((x) => x.h < 43.5),
+        .filter((x) => x.h < 23.5),
     );
     expect(small).toEqual([]);
+  });
+
+  test('the sidebar collapses to an icon rail, is remembered, and keeps link names', async ({ page }) => {
+    await page.goto('/handbook/');
+    const toggle = page.getByRole('button', { name: 'Sidebar' });
+    const nav = page.getByRole('navigation', { name: 'Main' });
+    const width = () => page.locator('.site-header').evaluate((e) => e.getBoundingClientRect().width);
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    const wide = await width();
+    await toggle.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('html')).toHaveAttribute('data-sidebar', 'collapsed');
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(await width()).toBeLessThan(wide / 2);
+    await expect(nav.getByRole('link').first()).toHaveAccessibleName('Learn');
+    await page.goto('/glossary/');
+    await expect(page.locator('html')).toHaveAttribute('data-sidebar', 'collapsed');
+    await page.getByRole('button', { name: 'Sidebar' }).click();
+    await expect(page.locator('html')).not.toHaveAttribute('data-sidebar', 'collapsed');
+    await page.reload();
+    await expect(page.locator('html')).not.toHaveAttribute('data-sidebar', 'collapsed');
+    expect(await width()).toBeCloseTo(wide, 0);
   });
 
   test('topic page has sidebar, breadcrumbs and the module link', async ({ page }) => {

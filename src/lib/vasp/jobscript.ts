@@ -1,9 +1,9 @@
-// Job script templates (SLURM and PBS) and the POTCAR assembly command. Pure functions, no DOM.
+// Job script templates (SLURM, PBS and a plain local shell run) and the POTCAR assembly command. Pure functions, no DOM.
 // Directives: SLURM sbatch (--job-name, --nodes, --ntasks-per-node, --time, --partition, --output) and PBS Pro
 // (-N, -l select=..:ncpus=..:mpiprocs=.., -l walltime, -q, -j oe). Site-specific values (modules, queue names, the POTCAR
 // directory) are placeholders the user edits; nothing here is a real cluster default.
 // @source S-042 (VASP Workflow Handbook, job and POTCAR sections)
-export type Scheduler = 'slurm' | 'pbs';
+export type Scheduler = 'slurm' | 'pbs' | 'local';
 export type Executable = 'vasp_std' | 'vasp_gam' | 'vasp_ncl';
 export type Launcher = 'mpirun' | 'srun';
 
@@ -14,7 +14,7 @@ export interface JobOptions {
   tasksPerNode: number;
   /** HH:MM:SS */
   walltime: string;
-  /** Partition (SLURM) or queue (PBS); empty to omit. */
+  /** Partition (SLURM) or queue (PBS); empty to omit. Unused for a local run. */
   partition: string;
   /** One `module load` line each, for example "vasp/6.4.2". */
   modules: string[];
@@ -63,7 +63,8 @@ const safeName = (s: string) => clean(s).replace(/[^A-Za-z0-9._-]/g, '_') || 'va
 
 function launchLine(o: JobOptions): string {
   const exe = o.executable;
-  return o.launcher === 'srun'
+  // srun needs a SLURM allocation, so a local run always uses mpirun.
+  return o.launcher === 'srun' && o.scheduler !== 'local'
     ? `srun ${exe} > vasp.out 2>&1`
     : `mpirun -np ${totalCores(o)} ${exe} > vasp.out 2>&1`;
 }
@@ -79,15 +80,23 @@ export function jobScript(o: JobOptions): string {
     lines.push(`#SBATCH --time=${clean(o.walltime)}`);
     if (clean(o.partition)) lines.push(`#SBATCH --partition=${clean(o.partition)}`);
     lines.push('#SBATCH --output=%x-%j.out');
-  } else {
+  } else if (o.scheduler === 'pbs') {
     lines.push(`#PBS -N ${name}`);
     lines.push(`#PBS -l select=${o.nodes}:ncpus=${o.tasksPerNode}:mpiprocs=${o.tasksPerNode}`);
     lines.push(`#PBS -l walltime=${clean(o.walltime)}`);
     if (clean(o.partition)) lines.push(`#PBS -q ${clean(o.partition)}`);
     lines.push('#PBS -j oe');
+  } else {
+    lines.push(`# ${name}: run on this machine (no scheduler)`);
   }
   lines.push('');
-  lines.push(o.scheduler === 'slurm' ? 'cd "$SLURM_SUBMIT_DIR"' : 'cd "$PBS_O_WORKDIR"');
+  lines.push(
+    o.scheduler === 'slurm'
+      ? 'cd "$SLURM_SUBMIT_DIR"'
+      : o.scheduler === 'pbs'
+        ? 'cd "$PBS_O_WORKDIR"'
+        : 'cd "$(dirname "$0")"',
+  );
   for (const m of o.modules.map(clean).filter(Boolean)) lines.push(`module load ${m}`);
   lines.push('');
   lines.push(launchLine(o));
@@ -96,7 +105,7 @@ export function jobScript(o: JobOptions): string {
 
 /** Name of the submit command for the README. */
 export const submitCommand = (s: Scheduler, file: string): string =>
-  s === 'slurm' ? `sbatch ${file}` : `qsub ${file}`;
+  s === 'slurm' ? `sbatch ${file}` : s === 'pbs' ? `qsub ${file}` : `bash ${file}`;
 
 /**
  * Command that builds POTCAR by joining the per-element files in POSCAR species order. It contains no POTCAR content.

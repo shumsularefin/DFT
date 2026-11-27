@@ -3,6 +3,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Page not found">
-  <h1>Page not found</h1>
-  <p>That page does not exist yet.</p>
+  <div class="container prose-page">
+    <h1>Page not found</h1>
+    <p>That page does not exist yet.</p>
+    <p>
+      Try the <a href="/handbook/">Handbook</a>, the <a href="/tools/">Tools</a> or the
+      <a href="/">start page</a>.
+    </p>
+  </div>
 </BaseLayout>

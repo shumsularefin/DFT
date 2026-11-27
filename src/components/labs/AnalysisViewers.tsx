@@ -9,6 +9,7 @@ import { parseDoscar, smoothDos, type DoscarResult } from '../../lib/vasp/doscar
 import { computeBandGap, parseEigenval, type EigenvalResult } from '../../lib/vasp/eigenval';
 import { gridIndex, parseChgcar, type ChgcarResult } from '../../lib/vasp/chgcar';
 import { extractIsosurface } from '../../lib/physics/marchingCubes';
+import '../ui/button.css';
 
 function downloadText(content: string, filename: string) {
   const blob = new Blob([content], { type: 'text/plain' });
@@ -77,7 +78,11 @@ export function RelaxationViewer() {
             />
           )}
           {cur && (
-            <button type="button" onClick={() => downloadText(writePoscar(cur.structure).text, 'CONTCAR')}>
+            <button
+              type="button"
+              className="btn"
+              onClick={() => downloadText(writePoscar(cur.structure).text, 'CONTCAR')}
+            >
               Download selected frame as CONTCAR
             </button>
           )}
@@ -334,7 +339,11 @@ export function DensityViewer() {
                 onChange={setSliceZ}
               />
               {chg.diffRaw && (
-                <button type="button" onClick={() => setChannel((c) => (c === 'total' ? 'spin' : 'total'))}>
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => setChannel((c) => (c === 'total' ? 'spin' : 'total'))}
+                >
                   Showing: {channel === 'total' ? 'Total density' : 'Spin magnetization'} (switch)
                 </button>
               )}

@@ -23,21 +23,51 @@ export const MODULES = [
   'Convergence testing and common errors',
   'Analysis',
   'Worked example: a perovskite oxide',
-  'Screening Studio and Material Builder',
+  'Materials Screening and Material Builder',
   'Lattice response and properties',
 ] as const;
 
 export const moduleName = (n: number): string => MODULES[n - 1] ?? `Module ${n}`;
 
-/** Top navigation. */
-export const NAV = [
-  { label: 'Learn', href: '/learn/' },
-  { label: 'Handbook', href: '/handbook/' },
-  { label: 'Tools', href: '/tools/' },
-  { label: 'Studio', href: '/studio/' },
-  { label: 'Builder', href: '/builder/' },
-  { label: 'Practice', href: '/practice/' },
-] as const;
+export interface NavItem {
+  label: string;
+  href: string;
+  icon: string;
+}
+
+/** Sidebar navigation, grouped as in the app shell (D-105). The first link must stay "Learn" (keyboard order test). */
+export const NAV_GROUPS: readonly { label: string; items: readonly NavItem[] }[] = [
+  {
+    label: 'Study',
+    items: [
+      { label: 'Learn', href: '/learn/', icon: 'path' },
+      { label: 'Handbook', href: '/handbook/', icon: 'book' },
+      { label: 'Practice', href: '/practice/', icon: 'check' },
+      { label: 'Progress', href: '/progress/', icon: 'trend' },
+    ],
+  },
+  {
+    label: 'Build',
+    items: [
+      { label: 'Material Builder', href: '/builder/', icon: 'cube' },
+      { label: 'Input Builder', href: '/tools/input-builder/', icon: 'file' },
+      { label: 'Screening', href: '/studio/', icon: 'filter' },
+    ],
+  },
+  {
+    label: 'Calculate',
+    items: [
+      { label: 'Convergence', href: '/tools/convergence/', icon: 'chart' },
+      { label: 'k-path', href: '/tools/kpath/', icon: 'kpath' },
+      { label: 'Magnetic', href: '/tools/magnetic/', icon: 'magnet' },
+      { label: 'Error finder', href: '/errors/', icon: 'search' },
+      { label: 'All tools', href: '/tools/', icon: 'grid' },
+    ],
+  },
+];
+
+/** Flat list of the sidebar links. */
+export const NAV: readonly NavItem[] = NAV_GROUPS.flatMap((g) => g.items);
 
 export const FOOTER_LINKS = [
   { label: 'About', href: '/about/' },

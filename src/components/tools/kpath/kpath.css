@@ -3,11 +3,12 @@
   gap: var(--space-4);
 }
 .kp-card {
-  border: 1px solid var(--border-strong);
-  border-radius: 0.5rem;
-  padding: var(--space-3);
-  background: var(--surface);
   min-width: 0;
+}
+.kp-card > h2 {
+  margin: 0 0 var(--space-3);
+  font-size: var(--step-1);
+  font-weight: 600;
 }
 .kp-row {
   display: flex;
@@ -17,8 +18,10 @@
 }
 .kp-field {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.25rem;
   min-width: 0;
+  max-width: 100%;
 }
 .kp-field input,
 .kp-field select,
@@ -44,18 +47,20 @@
 .kp-radio {
   display: flex;
   gap: var(--space-2);
-  align-items: center;
+  align-items: flex-start;
   min-height: 2.75rem;
 }
 .kp-error {
   color: var(--text);
-  border-left: 4px solid var(--danger, #b00020);
-  padding-left: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--danger) 45%, var(--border));
+  border-radius: var(--radius);
 }
 .kp-note {
   color: var(--text);
-  border-left: 4px solid var(--warn);
-  padding-left: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--warn) 45%, var(--border));
+  border-radius: var(--radius);
 }
 .kp-tablewrap {
   overflow-x: auto;
@@ -86,4 +91,66 @@
 }
 .kp-readout {
   min-height: 1.5em;
+}
+
+/* Text fields, menus and the file picker in this tool match the site's controls (browser defaults before). */
+:where(.kp) :is(input:not([type='radio'], [type='checkbox'], [type='range'], [type='file']), select) {
+  min-height: 2.5rem;
+  padding: 0 var(--space-2);
+  font: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+:where(.kp) textarea {
+  padding: var(--space-2);
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+:where(.kp) input[type='file'] {
+  max-width: 100%;
+  font: inherit;
+}
+:where(.kp) input[type='file']::file-selector-button {
+  min-height: var(--target);
+  margin-inline-end: var(--space-2);
+  padding: 0 var(--space-3);
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.kp-radio input {
+  margin-top: 0.3em;
+}
+
+/* The card's own padding is the top space; a heading's margin on top of it left a gap. */
+.kp-card > h2:first-child {
+  margin-top: 0;
+}
+
+/* Plain buttons here share the site's button look (browser defaults before). */
+:where(.kp) button {
+  min-height: var(--target);
+  padding: 0 var(--space-3);
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+:where(.kp) button:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+:where(.kp) button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }

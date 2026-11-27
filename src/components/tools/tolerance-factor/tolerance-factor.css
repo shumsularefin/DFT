@@ -150,8 +150,9 @@
 .tf-honesty {
   margin: 0;
   padding: var(--space-3) var(--space-4);
-  background: var(--surface);
-  border-left: 3px solid var(--border-strong);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   color: var(--text-muted);
   font-size: var(--step--1);
 }
@@ -173,15 +174,15 @@
 }
 
 .tf-check-error {
-  border-left: 4px solid var(--danger);
+  border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
 }
 
 .tf-check-warning {
-  border-left: 4px solid var(--warn);
+  border-color: color-mix(in srgb, var(--warn) 45%, var(--border));
 }
 
 .tf-check-info {
-  border-left: 4px solid var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
 }
 
 .tf-actions {
@@ -189,4 +190,62 @@
   flex-wrap: wrap;
   gap: var(--space-2);
   align-items: center;
+}
+
+/* Template tool view: Inputs card on the left, factor tiles and the maps card on the right. */
+.tf-root {
+  display: block;
+  margin-top: 0;
+}
+.tf-split {
+  grid-template-columns: 22rem minmax(0, 1fr);
+}
+@media (max-width: 70rem) {
+  .tf-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.tf-inputs .tf-presets {
+  margin-bottom: var(--space-3);
+}
+.tf-inputs .tf-radius {
+  flex: 1 1 100%;
+}
+.tf-inputs .tf-sites {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+.tf-inputs .tf-site {
+  padding: var(--space-3) 0;
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+}
+.tf-inputs .tf-site-head h2 {
+  font-size: var(--step-0);
+}
+.tf-results .tf-card {
+  border-color: var(--border);
+  border-radius: var(--radius-lg);
+}
+.tf-results .tf-metric {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+.tf-results .tf-card > p:not(.tf-metric) {
+  font-size: var(--step--1);
+  color: var(--text-muted);
+}
+.tf-checkbox {
+  margin: var(--space-3) 0 0;
+}
+.tf-checkbox h3 {
+  margin: 0 0 var(--space-2);
+}
+.tf-honesty {
+  margin: 0;
+}
+.tf-root .tf-preset-btn {
+  font-family: var(--font-sans);
 }

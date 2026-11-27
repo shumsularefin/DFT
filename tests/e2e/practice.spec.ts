@@ -206,6 +206,26 @@ test.describe('progress page data controls', () => {
     }
   });
 
+  test('the mastery map fits its width: no sideways scrollbar and every idea inside its row', async ({
+    page,
+  }) => {
+    await page.goto('/progress/');
+    await ready(page);
+    const fits = () =>
+      page
+        .locator('[data-map-scroll]')
+        .evaluate(
+          (el) =>
+            el.scrollWidth <= el.clientWidth &&
+            [...el.querySelectorAll('.map-node')].every(
+              (n) => n.getBoundingClientRect().right <= el.getBoundingClientRect().right + 1,
+            ),
+        );
+    await expect.poll(fits).toBe(true);
+    await page.setViewportSize({ width: 1100, height: 800 });
+    await expect.poll(fits).toBe(true);
+  });
+
   test('the map filter narrows both the map and the list', async ({ page }) => {
     await page.goto('/progress/');
     await ready(page);

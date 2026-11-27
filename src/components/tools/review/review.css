@@ -57,19 +57,19 @@
 }
 
 .rev-pass {
-  border-left: 4px solid var(--ok);
+  border-color: color-mix(in srgb, var(--ok) 45%, var(--border));
 }
 
 .rev-warn {
-  border-left: 4px solid var(--warn);
+  border-color: color-mix(in srgb, var(--warn) 45%, var(--border));
 }
 
 .rev-fail {
-  border-left: 4px solid var(--danger);
+  border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
 }
 
 .rev-not-checked {
-  border-left: 4px solid var(--border-strong);
+  border-style: dashed;
 }
 
 .rev-meta {
@@ -82,7 +82,32 @@
   margin: 0;
   padding: var(--space-3);
   background: var(--surface-2);
-  border-left: 3px solid var(--border-strong);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   font-size: var(--step--1);
   color: var(--text-muted);
+}
+
+/* Template tool view */
+.rev-root {
+  display: block;
+  margin-top: 0;
+}
+.tool-inputs label.rev-file {
+  color: var(--accent-contrast);
+  font-size: var(--step-0);
+}
+.rev-file {
+  position: relative;
+  cursor: pointer;
+}
+.rev-file:focus-within {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.rev-sample {
+  margin: var(--space-3) 0 0;
+}
+.rev-root .tool-inputs h3 {
+  margin-top: var(--space-4);
 }

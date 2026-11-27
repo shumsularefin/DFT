@@ -12,6 +12,7 @@ export default [
       '.astro/',
       'node_modules/',
       'public/pagefind/',
+      'public/dft-studio/',
       'coverage/',
       'playwright-report/',
       'test-results/',

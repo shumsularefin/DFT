@@ -17,6 +17,7 @@ import { latticePointGroup } from '../../lib/crystal/pointgroup';
 import type { Mat3 } from '../../lib/crystal/types';
 import type { SceneController } from '../../lib/three/SceneController';
 import type { KmeshScene } from '../../lib/three/KmeshScene';
+import '../ui/button.css';
 
 const load = (): Promise<SceneModule> => import('../../lib/three/KmeshScene');
 const isKmeshScene = (c: SceneController | null): c is KmeshScene =>
@@ -207,10 +208,10 @@ export default function KmeshLab({ headingLevel = 3 }: { headingLevel?: 2 | 3 })
       {!scene && <SliceView coords={pts.coords} n={n} b={b} colors={byOrbit ? colorIndex : null} />}
       {scene && (
         <div className="cv-actions">
-          <button type="button" onClick={() => scene.rotate(-15)}>
+          <button type="button" className="btn" onClick={() => scene.rotate(-15)}>
             Turn left
           </button>
-          <button type="button" onClick={() => scene.rotate(15)}>
+          <button type="button" className="btn" onClick={() => scene.rotate(15)}>
             Turn right
           </button>
         </div>

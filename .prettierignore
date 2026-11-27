@@ -22,3 +22,5 @@ README.md
 scripts/__generated__/
 public/data/mp/
 scripts/mp/
+public/dft-studio/
+src/components/studio/css/tailwind.css

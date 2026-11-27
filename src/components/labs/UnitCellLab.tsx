@@ -11,6 +11,7 @@ import { parallelepiped } from '../../lib/three/solid';
 import type { CellScene, CellSummary } from '../../lib/three/CellScene';
 import type { SceneController } from '../../lib/three/SceneController';
 import type { Structure } from '../../lib/crystal/types';
+import '../ui/button.css';
 
 const load = (): Promise<SceneModule> => import('../../lib/three/CellScene');
 const isCell = (c: SceneController | null): c is CellScene =>
@@ -148,7 +149,7 @@ export default function UnitCellLab({ headingLevel = 2 }: { headingLevel?: 2 | 3
               <label htmlFor="uc-poscar">Paste a POSCAR (read in your browser, nothing is uploaded)</label>
               <textarea id="uc-poscar" rows={8} value={text} onChange={(e) => setText(e.target.value)} />
             </div>
-            <button type="button" onClick={apply}>
+            <button type="button" className="btn" onClick={apply}>
               Use this structure
             </button>
             {error && (
@@ -163,13 +164,13 @@ export default function UnitCellLab({ headingLevel = 2 }: { headingLevel?: 2 | 3
           <Toggle label="Show bonds" checked={bonds} onChange={setBonds} />
           {scene && (
             <div className="cv-actions" role="group" aria-label="Preset views">
-              <button type="button" onClick={() => scene.viewAlongLattice(0)}>
+              <button type="button" className="btn" onClick={() => scene.viewAlongLattice(0)}>
                 Along a
               </button>
-              <button type="button" onClick={() => scene.viewAlongLattice(1)}>
+              <button type="button" className="btn" onClick={() => scene.viewAlongLattice(1)}>
                 Along b
               </button>
-              <button type="button" onClick={() => scene.viewAlongLattice(2)}>
+              <button type="button" className="btn" onClick={() => scene.viewAlongLattice(2)}>
                 Along c
               </button>
             </div>

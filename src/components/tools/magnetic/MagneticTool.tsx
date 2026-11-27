@@ -43,6 +43,7 @@ import {
   suggestedElements,
   type Axis,
 } from './magneticModel';
+import '../../../styles/tools.css';
 import './magnetic.css';
 
 const AnalysePanel = lazy(() => import('./AnalysePanel'));
@@ -332,518 +333,583 @@ export default function MagneticTool() {
 
   return (
     <div className="mg">
-      <section aria-labelledby="mg-in" className="mg-card mg-left">
-        <h2 id="mg-in">1. Your cell</h2>
-        <div className="mg-drop">
-          <label htmlFor="mg-text">Paste a POSCAR or CIF, or choose a file</label>
-          <textarea
-            id="mg-text"
-            rows={6}
-            spellCheck={false}
-            value={text}
-            onChange={(e) => {
-              setIsExample(false);
-              setText(e.target.value);
-            }}
-          />
-          <div className="mg-row">
-            <label className="mg-file">
-              <span>Choose a file</span>
-              <input type="file" onChange={(e) => void onFile(e.target.files?.[0])} />
-            </label>
-            <button
-              type="button"
-              onClick={() => {
-                setIsExample(true);
-                setText(EXAMPLE_POSCAR);
+      <header className="page-h tool-head">
+        <div>
+          <h1>Magnetic configuration tool</h1>
+          <p>
+            Give a cell, pick an ordering, and get the supercell, the up and down arrows, and the POSCAR,
+            MAGMOM and INCAR lines for each configuration. Collinear orderings only. Nothing leaves your
+            browser.
+          </p>
+        </div>
+      </header>
+      <div className="split left">
+        <section aria-labelledby="mg-in" className="card tool-inputs mg-card mg-left">
+          <h2 id="mg-in" className="card-h">
+            1. Your cell
+          </h2>
+          <div className="mg-drop">
+            <label htmlFor="mg-text">Paste a POSCAR or CIF, or choose a file</label>
+            <textarea
+              id="mg-text"
+              rows={6}
+              spellCheck={false}
+              value={text}
+              onChange={(e) => {
+                setIsExample(false);
+                setText(e.target.value);
               }}
-            >
-              Try an example cell
-            </button>
+            />
+            <div className="mg-row">
+              <label className="mg-file">
+                <span>Choose a file</span>
+                <input type="file" onChange={(e) => void onFile(e.target.files?.[0])} />
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsExample(true);
+                  setText(EXAMPLE_POSCAR);
+                }}
+              >
+                Try an example cell
+              </button>
+            </div>
+            <p className="mg-note">Files are read in this page and never uploaded.</p>
           </div>
-          <p className="mg-note">Files are read in this page and never uploaded.</p>
-        </div>
-        {isExample && (
-          <p className="mg-banner" role="note">
-            <Badge variant="illustrative" /> Example cell with illustrative geometry. It is not a result for a
-            real material.
-          </p>
-        )}
-        {fileError && (
-          <p className="mg-error" role="alert">
-            {fileError}
-          </p>
-        )}
-        {warnings.map((w) => (
-          <p key={w} className="mg-note">
-            {w}
-          </p>
-        ))}
-        {structure && (
-          <>
-            <h2 id="mg-opt">2. Magnetic sites and moments</h2>
-            <fieldset className="mg-fieldset">
-              <legend>Which elements carry a moment?</legend>
-              {allElements.map((el) => (
-                <label key={el} className="mg-check">
-                  <input
-                    type="checkbox"
-                    checked={elements.includes(el)}
-                    onChange={(e) =>
-                      setElements((cur) => (e.target.checked ? [...cur, el] : cur.filter((x) => x !== el)))
-                    }
-                  />
-                  {el}
-                </label>
-              ))}
-            </fieldset>
-            {elements.length === 0 && (
-              <p className="mg-note">
-                No transition-metal element was found. Tick the element you want to order.
-              </p>
-            )}
-            {elements.map((el) => (
-              <div key={el} className="mg-field">
-                <label htmlFor={`mg-mag-${el}`}>Starting moment for {el} (μB)</label>
-                <input
-                  id={`mg-mag-${el}`}
-                  inputMode="decimal"
-                  value={mags[el] ?? ''}
-                  onChange={(e) => setMags((m) => ({ ...m, [el]: e.target.value }))}
-                  aria-invalid={mags[el] !== undefined && mags[el] !== '' && !(num(mags[el]) > 0)}
-                />
-              </div>
-            ))}
-            <details className="mg-details">
-              <summary>How large should the starting moment be?</summary>
-              <ul>
-                {STARTING_MOMENT_GUIDANCE.map((g) => (
-                  <li key={g.source}>
-                    {g.text} <span className="mg-src">({g.source})</span>
-                  </li>
-                ))}
-              </ul>
-              <p>
-                The tool does not fill a number in for you. Type the value you want. The starting moments only
-                seed the calculation: check the final moments in OUTCAR.
-              </p>
-            </details>
-            <h2 id="mg-cell">3. Cell policy</h2>
-            <label className="mg-check">
-              <input type="checkbox" checked={!common} onChange={(e) => setCommon(!e.target.checked)} />
-              Smallest cell per ordering
-            </label>
-            <p className="mg-note">
-              {common
-                ? 'One cell for all orderings (default): every file has the same lattice and atom order, so energies are comparable.'
-                : 'Each ordering uses its own smallest cell. The k-meshes then need separate convergence.'}
+          {isExample && (
+            <p className="mg-banner" role="note">
+              <Badge variant="illustrative" /> Example cell with illustrative geometry. It is not a result for
+              a real material.
             </p>
-            <label className="mg-check">
-              <input type="checkbox" checked={split} onChange={(e) => setSplit(e.target.checked)} />
-              Write up and down sites as separate species (Mn1, Mn2)
-            </label>
-            <fieldset className="mg-fieldset">
-              <legend>DFT+U (optional)</legend>
-              <label className="mg-check">
-                <input type="checkbox" checked={ldauOn} onChange={(e) => setLdauOn(e.target.checked)} />
-                Add a DFT+U block
-              </label>
-              {ldauOn &&
-                elements.map((el) => (
-                  <div key={el} className="mg-row">
-                    {(['l', 'u', 'j'] as const).map((k) => (
-                      <div key={k} className="mg-field">
-                        <label htmlFor={`mg-ldau-${el}-${k}`}>
-                          {el} {k === 'l' ? 'channel (2 = d, 3 = f)' : `${k.toUpperCase()} (eV)`}
-                        </label>
-                        <input
-                          id={`mg-ldau-${el}-${k}`}
-                          inputMode="decimal"
-                          value={ldau[el]?.[k] ?? ''}
-                          onChange={(e) =>
-                            setLdau((d) => ({
-                              ...d,
-                              [el]: { l: '', u: '', j: '', ...d[el], [k]: e.target.value },
-                            }))
-                          }
-                        />
-                      </div>
-                    ))}
-                  </div>
-                ))}
-              {ldauOn && <p className="mg-note">Type your own values. None is suggested here.</p>}
-            </fieldset>
-          </>
-        )}
-      </section>
-
-      <section aria-labelledby="mg-view" className="mg-card mg-centre">
-        <h2 id="mg-view">Ordering</h2>
-        <div role="tablist" aria-label="Ordering" className="mg-tabs">
-          {TABS.map((t, i) => (
-            <button
-              key={t.id}
-              id={`mg-tab-${t.id}`}
-              type="button"
-              role="tab"
-              aria-selected={tab === t.id}
-              tabIndex={tab === t.id ? 0 : -1}
-              onClick={() => setTab(t.id)}
-              onKeyDown={(e) => onTabKey(e, i)}
-            >
-              {t.label}
-            </button>
+          )}
+          {fileError && (
+            <p className="mg-error" role="alert">
+              {fileError}
+            </p>
+          )}
+          {warnings.map((w) => (
+            <p key={w} className="mg-note">
+              {w}
+            </p>
           ))}
-        </div>
-        <div role="tabpanel" aria-labelledby={`mg-tab-${tab}`} className="mg-panel">
-          {!structure && <p>Give a cell on the left to see the ordering.</p>}
-          {structure && named && tab !== 'analyse' && (
+          {structure && (
             <>
-              <p className="mg-note">
-                {NAMED_LABEL[tab as NamedKind]}. <a href="/handbook/">Why orderings differ (handbook)</a>.
-              </p>
-              <label className="mg-check">
-                <input
-                  type="checkbox"
-                  checked={batch.includes(tab as NamedKind)}
-                  onChange={(e) =>
-                    setBatch((b) =>
-                      e.target.checked
-                        ? NAMED.filter((k) => k === tab || b.includes(k))
-                        : b.filter((k) => k !== tab),
-                    )
-                  }
-                />
-                Include {TABS.find((t) => t.id === tab)!.label} in "Download all"
-              </label>
-              {(tab === 'A' || tab === 'C') && (
-                <div className="mg-field">
-                  <label htmlFor="mg-axis">{tab === 'A' ? 'Stacking axis' : 'Chain axis'}</label>
-                  <select
-                    id="mg-axis"
-                    value={String(axis)}
-                    onChange={(e) =>
-                      setAxis(e.target.value === 'auto' ? 'auto' : (Number(e.target.value) as Axis))
-                    }
-                  >
-                    <option value="auto">Automatic (the unique or longest direction)</option>
-                    <option value="0">First grid axis</option>
-                    <option value="1">Second grid axis</option>
-                    <option value="2">Third grid axis</option>
-                  </select>
-                  {active?.axis && <p className="mg-note">{active.axis.reason}</p>}
-                </div>
-              )}
-              {built.error && (
-                <p className="mg-error" role="alert">
-                  {built.error}
+              <h2 id="mg-opt">2. Magnetic sites and moments</h2>
+              <fieldset className="mg-fieldset">
+                <legend>Which elements carry a moment?</legend>
+                {allElements.map((el) => (
+                  <label key={el} className="mg-check">
+                    <input
+                      type="checkbox"
+                      checked={elements.includes(el)}
+                      onChange={(e) =>
+                        setElements((cur) => (e.target.checked ? [...cur, el] : cur.filter((x) => x !== el)))
+                      }
+                    />
+                    {el}
+                  </label>
+                ))}
+              </fieldset>
+              {elements.length === 0 && (
+                <p className="mg-note">
+                  No transition-metal element was found. Tick the element you want to order.
                 </p>
               )}
-            </>
-          )}
-          {structure && tab === 'custom' && (
-            <>
-              <p className="mg-note">
-                Select a site, then press <kbd>U</kbd> for up, <kbd>D</kbd> for down or <kbd>0</kbd> for no
-                moment. Arrow keys move between sites.
-              </p>
-              <table className="mg-table">
-                <caption>Sites of your cell</caption>
-                <thead>
-                  <tr>
-                    <th scope="col">Site</th>
-                    <th scope="col">Element</th>
-                    <th scope="col">Spin</th>
-                    <th scope="col">Moment (μB)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {structure.species.map((el, j) => (
-                    <tr key={j} className={sel === j ? 'is-sel' : undefined}>
-                      <th scope="row">
-                        <button
-                          id={`mg-site-${j}`}
-                          type="button"
-                          className="mg-site"
-                          aria-pressed={sel === j}
-                          aria-label={`Site ${j + 1}, ${el}, spin ${signs[j] === 1 ? 'up' : signs[j] === -1 ? 'down' : 'none'}`}
-                          onClick={() => setSel(j)}
-                          onFocus={() => setSel(j)}
-                          onKeyDown={(e) => onSiteKey(e, j)}
-                        >
-                          {j + 1}
-                        </button>
-                      </th>
-                      <td>{el}</td>
-                      <td>
-                        <select
-                          aria-label={`Spin of site ${j + 1}`}
-                          value={String(signs[j] ?? 0)}
-                          onChange={(e) =>
-                            setSigns((s) => s.map((x, k) => (k === j ? Number(e.target.value) : x)))
-                          }
-                        >
-                          <option value="1">Up (+)</option>
-                          <option value="-1">Down (−)</option>
-                          <option value="0">None (0)</option>
-                        </select>
-                      </td>
-                      <td>
-                        <input
-                          aria-label={`Moment of site ${j + 1} in μB (blank uses the element value)`}
-                          inputMode="decimal"
-                          value={siteMags[j] ?? ''}
-                          onChange={(e) =>
-                            setSiteMags((m) => m.map((x, k) => (k === j ? e.target.value : x)))
-                          }
-                        />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </>
-          )}
-          {structure && tab === 'enumerate' && (
-            <>
-              <p className="mg-note">
-                List every distinct up and down arrangement of the magnetic sites, grouped by your cell's
-                symmetry. This finds candidates; it does not say which one is lowest in energy.
-              </p>
-              <div className="mg-row">
-                {([0, 1, 2] as const).map((i) => (
-                  <div key={i} className="mg-field">
-                    <label htmlFor={`mg-dim-${i}`}>Repeat along {'abc'[i]}</label>
-                    <select
-                      id={`mg-dim-${i}`}
-                      value={dims[i]}
-                      onChange={(e) =>
-                        setDims(
-                          (d) =>
-                            d.map((x, k) => (k === i ? Number(e.target.value) : x)) as [
-                              number,
-                              number,
-                              number,
-                            ],
-                        )
-                      }
-                    >
-                      {[1, 2, 3].map((n) => (
-                        <option key={n} value={n}>
-                          {n}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => void runEnumerate()}
-                  disabled={enumBusy || !elements.length}
-                >
-                  {enumBusy ? 'Working...' : 'Enumerate'}
-                </button>
-              </div>
-              <p role="status">{enumMsg}</p>
-              {classes && (
-                <ul className="mg-classes">
-                  {classes.map((c, i) => (
-                    <li key={i}>
-                      <label className="mg-check">
-                        <input
-                          type="checkbox"
-                          checked={chosen.includes(i)}
-                          onChange={(e) =>
-                            setChosen((x) =>
-                              e.target.checked ? [...x, i].sort((a, b) => a - b) : x.filter((y) => y !== i),
-                            )
-                          }
-                        />
-                        {c.label}: {c.signs.filter((s) => s > 0).length} up,{' '}
-                        {c.signs.filter((s) => s < 0).length} down. {c.notes[0]}
-                      </label>
+              {elements.map((el) => (
+                <div key={el} className="mg-field">
+                  <label htmlFor={`mg-mag-${el}`}>Starting moment for {el} (μB)</label>
+                  <input
+                    id={`mg-mag-${el}`}
+                    inputMode="decimal"
+                    value={mags[el] ?? ''}
+                    onChange={(e) => setMags((m) => ({ ...m, [el]: e.target.value }))}
+                    aria-invalid={mags[el] !== undefined && mags[el] !== '' && !(num(mags[el]) > 0)}
+                  />
+                </div>
+              ))}
+              <details className="mg-details">
+                <summary>How large should the starting moment be?</summary>
+                <ul>
+                  {STARTING_MOMENT_GUIDANCE.map((g) => (
+                    <li key={g.source}>
+                      {g.text} <span className="mg-src">({g.source})</span>
                     </li>
                   ))}
                 </ul>
-              )}
-            </>
-          )}
-          {structure && tab === 'analyse' && (
-            <>
-              <p className="mg-note">
-                Analysing the {outputs.list.length} configuration(s) from the{' '}
-                {TABS.find((x) => x.id === lastBuild)!.label} tab
-                {named ? ' ("Download all" set)' : ''}. Their MAGMOM is the intended pattern.
-              </p>
-              {outputs.list.length === 0 ? (
-                <p className="mg-note">{outputs.error || 'Build some configurations first.'}</p>
-              ) : (
-                <Suspense fallback={<p>Loading the analysis...</p>}>
-                  <AnalysePanel outputs={outputs.list} />
-                </Suspense>
-              )}
-            </>
-          )}
-          {spec && tab !== 'analyse' && (
-            <>
-              <div className="mg-toggles">
-                <label className="mg-check">
-                  <input type="checkbox" checked={poly} onChange={(e) => setPoly(e.target.checked)} />
-                  Show coordination polyhedra
-                </label>
-                <label className="mg-check">
-                  <input type="checkbox" checked={cells} onChange={(e) => setCells(e.target.checked)} />
-                  Show neighbouring cells (2×2×2)
-                </label>
-              </div>
-              <Scene key={`${tab}-${active?.structure.species.length}`} spec={spec} />
-              {poly && <p className="mg-note">Polyhedra use a distance cutoff of 2.6 Å (Heuristic).</p>}
-              {active && structure && (
-                <p className="mg-note">
-                  <strong>Why this cell:</strong> {whyThisCell(active, built.det, common, batch.length)}
+                <p>
+                  The tool does not fill a number in for you. Type the value you want. The starting moments
+                  only seed the calculation: check the final moments in OUTCAR.
                 </p>
-              )}
+              </details>
+              <h2 id="mg-cell">3. Cell policy</h2>
+              <label className="mg-check">
+                <input type="checkbox" checked={!common} onChange={(e) => setCommon(!e.target.checked)} />
+                Smallest cell per ordering
+              </label>
+              <p className="mg-note">
+                {common
+                  ? 'One cell for all orderings (default): every file has the same lattice and atom order, so energies are comparable.'
+                  : 'Each ordering uses its own smallest cell. The k-meshes then need separate convergence.'}
+              </p>
+              <label className="mg-check">
+                <input type="checkbox" checked={split} onChange={(e) => setSplit(e.target.checked)} />
+                Write up and down sites as separate species (Mn1, Mn2)
+              </label>
+              <fieldset className="mg-fieldset">
+                <legend>DFT+U (optional)</legend>
+                <label className="mg-check">
+                  <input type="checkbox" checked={ldauOn} onChange={(e) => setLdauOn(e.target.checked)} />
+                  Add a DFT+U block
+                </label>
+                {ldauOn &&
+                  elements.map((el) => (
+                    <div key={el} className="mg-row">
+                      {(['l', 'u', 'j'] as const).map((k) => (
+                        <div key={k} className="mg-field">
+                          <label htmlFor={`mg-ldau-${el}-${k}`}>
+                            {el} {k === 'l' ? 'channel (2 = d, 3 = f)' : `${k.toUpperCase()} (eV)`}
+                          </label>
+                          <input
+                            id={`mg-ldau-${el}-${k}`}
+                            inputMode="decimal"
+                            value={ldau[el]?.[k] ?? ''}
+                            onChange={(e) =>
+                              setLdau((d) => ({
+                                ...d,
+                                [el]: { l: '', u: '', j: '', ...d[el], [k]: e.target.value },
+                              }))
+                            }
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                {ldauOn && <p className="mg-note">Type your own values. None is suggested here.</p>}
+              </fieldset>
             </>
           )}
-        </div>
-      </section>
+        </section>
 
-      <section aria-labelledby="mg-out" className="mg-card mg-right">
-        <h2 id="mg-out">Output</h2>
-        {!active && <p>Nothing to show yet.</p>}
-        {active && (
-          <div className="mg-transcript" role="region" aria-label="What was computed" tabIndex={0}>
-            <p>
-              <Badge variant="computed" /> {active.label}
-            </p>
-            <p>
-              Cell: {active.structure.species.length} atoms (
-              {active.matrix.map((r) => r.join(' ')).join(' / ')}).
-            </p>
-            <p>
-              Magnetic sites: {active.magneticSites.length} ({upN} up, {downN} down).
-            </p>
-            {nn && (
-              <p>
-                Nearest neighbours of the first magnetic site: {nn.parallel} parallel, {nn.antiparallel}{' '}
-                antiparallel.
-              </p>
-            )}
-            {net !== undefined && <p>Net moment per cell: {net.toFixed(2)} μB.</p>}
-            {af !== null && (
-              <p>
-                {af
-                  ? 'This is a true antiferromagnet in this cell.'
-                  : 'This is not a compensated antiferromagnet.'}
-              </p>
-            )}
-            {active.notes.map((n) => (
-              <p key={n}>{n}</p>
-            ))}
+        <div className="stack tool-results">
+          <div className="grid g3 tool-tiles">
+            <div className="tile">
+              <div className="k">Magnetic sites</div>
+              <div className={`v${active ? '' : ' is-empty'}`}>
+                {active ? active.magneticSites.length : 'n/a'}
+              </div>
+              <div className="tile-sub">
+                {active ? `${active.structure.species.length} atoms in the cell` : 'give a cell first'}
+              </div>
+            </div>
+            <div className="tile">
+              <div className="k">Up / down</div>
+              <div className={`v${active ? '' : ' is-empty'}`}>{active ? `${upN} / ${downN}` : 'n/a'}</div>
+              <div className="tile-sub">{active ? active.label : 'no ordering yet'}</div>
+            </div>
+            <div className="tile">
+              <div className="k">Net moment per cell</div>
+              <div className={`v${net !== undefined ? '' : ' is-empty'}`}>
+                {net !== undefined ? net.toFixed(2) : 'n/a'}
+              </div>
+              <div className="tile-sub">μB</div>
+            </div>
           </div>
-        )}
-        {outputs.error && (
-          <p className="mg-note" role="status">
-            {outputs.error}
-          </p>
-        )}
-        {activeOut && (
-          <>
-            <h3>MAGMOM</h3>
-            <pre className="mg-pre" data-testid="magmom">
-              {activeOut.result.magmom}
-            </pre>
-            {activeOut.issues.length === 0 ? (
-              <p className="mg-note">The checks for MAGMOM and ISPIN found no problems.</p>
-            ) : (
-              <ul className="mg-issues">
-                {activeOut.issues.map((i) => (
-                  <li key={i.rule}>
-                    {i.rule} {i.severity}: {i.title}
-                  </li>
+          <section aria-labelledby="mg-view" className="card tool-card mg-card mg-centre">
+            <h2 id="mg-view" className="card-h">
+              Ordering
+            </h2>
+            <div role="tablist" aria-label="Ordering" className="tabbar mg-tabs">
+              {TABS.map((t, i) => (
+                <button
+                  key={t.id}
+                  id={`mg-tab-${t.id}`}
+                  type="button"
+                  role="tab"
+                  aria-selected={tab === t.id}
+                  tabIndex={tab === t.id ? 0 : -1}
+                  onClick={() => setTab(t.id)}
+                  onKeyDown={(e) => onTabKey(e, i)}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+            <div role="tabpanel" aria-labelledby={`mg-tab-${tab}`} className="mg-panel">
+              {!structure && <p>Give a cell on the left to see the ordering.</p>}
+              {structure && named && tab !== 'analyse' && (
+                <>
+                  <p className="mg-note">
+                    {NAMED_LABEL[tab as NamedKind]}. <a href="/handbook/">Why orderings differ (handbook)</a>.
+                  </p>
+                  <label className="mg-check">
+                    <input
+                      type="checkbox"
+                      checked={batch.includes(tab as NamedKind)}
+                      onChange={(e) =>
+                        setBatch((b) =>
+                          e.target.checked
+                            ? NAMED.filter((k) => k === tab || b.includes(k))
+                            : b.filter((k) => k !== tab),
+                        )
+                      }
+                    />
+                    Include {TABS.find((t) => t.id === tab)!.label} in "Download all"
+                  </label>
+                  {(tab === 'A' || tab === 'C') && (
+                    <div className="mg-field">
+                      <label htmlFor="mg-axis">{tab === 'A' ? 'Stacking axis' : 'Chain axis'}</label>
+                      <select
+                        id="mg-axis"
+                        value={String(axis)}
+                        onChange={(e) =>
+                          setAxis(e.target.value === 'auto' ? 'auto' : (Number(e.target.value) as Axis))
+                        }
+                      >
+                        <option value="auto">Automatic (the unique or longest direction)</option>
+                        <option value="0">First grid axis</option>
+                        <option value="1">Second grid axis</option>
+                        <option value="2">Third grid axis</option>
+                      </select>
+                      {active?.axis && <p className="mg-note">{active.axis.reason}</p>}
+                    </div>
+                  )}
+                  {built.error && (
+                    <p className="mg-error" role="alert">
+                      {built.error}
+                    </p>
+                  )}
+                </>
+              )}
+              {structure && tab === 'custom' && (
+                <>
+                  <p className="mg-note">
+                    Select a site, then press <kbd>U</kbd> for up, <kbd>D</kbd> for down or <kbd>0</kbd> for
+                    no moment. Arrow keys move between sites.
+                  </p>
+                  <table className="mg-table">
+                    <caption>Sites of your cell</caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">Site</th>
+                        <th scope="col">Element</th>
+                        <th scope="col">Spin</th>
+                        <th scope="col">Moment (μB)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {structure.species.map((el, j) => (
+                        <tr key={j} className={sel === j ? 'is-sel' : undefined}>
+                          <th scope="row">
+                            <button
+                              id={`mg-site-${j}`}
+                              type="button"
+                              className="mg-site"
+                              aria-pressed={sel === j}
+                              aria-label={`Site ${j + 1}, ${el}, spin ${signs[j] === 1 ? 'up' : signs[j] === -1 ? 'down' : 'none'}`}
+                              onClick={() => setSel(j)}
+                              onFocus={() => setSel(j)}
+                              onKeyDown={(e) => onSiteKey(e, j)}
+                            >
+                              {j + 1}
+                            </button>
+                          </th>
+                          <td>{el}</td>
+                          <td>
+                            <select
+                              aria-label={`Spin of site ${j + 1}`}
+                              value={String(signs[j] ?? 0)}
+                              onChange={(e) =>
+                                setSigns((s) => s.map((x, k) => (k === j ? Number(e.target.value) : x)))
+                              }
+                            >
+                              <option value="1">Up (+)</option>
+                              <option value="-1">Down (−)</option>
+                              <option value="0">None (0)</option>
+                            </select>
+                          </td>
+                          <td>
+                            <input
+                              aria-label={`Moment of site ${j + 1} in μB (blank uses the element value)`}
+                              inputMode="decimal"
+                              value={siteMags[j] ?? ''}
+                              onChange={(e) =>
+                                setSiteMags((m) => m.map((x, k) => (k === j ? e.target.value : x)))
+                              }
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </>
+              )}
+              {structure && tab === 'enumerate' && (
+                <>
+                  <p className="mg-note">
+                    List every distinct up and down arrangement of the magnetic sites, grouped by your cell's
+                    symmetry. This finds candidates; it does not say which one is lowest in energy.
+                  </p>
+                  <div className="mg-row">
+                    {([0, 1, 2] as const).map((i) => (
+                      <div key={i} className="mg-field">
+                        <label htmlFor={`mg-dim-${i}`}>Repeat along {'abc'[i]}</label>
+                        <select
+                          id={`mg-dim-${i}`}
+                          value={dims[i]}
+                          onChange={(e) =>
+                            setDims(
+                              (d) =>
+                                d.map((x, k) => (k === i ? Number(e.target.value) : x)) as [
+                                  number,
+                                  number,
+                                  number,
+                                ],
+                            )
+                          }
+                        >
+                          {[1, 2, 3].map((n) => (
+                            <option key={n} value={n}>
+                              {n}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => void runEnumerate()}
+                      disabled={enumBusy || !elements.length}
+                    >
+                      {enumBusy ? 'Working...' : 'Enumerate'}
+                    </button>
+                  </div>
+                  <p role="status">{enumMsg}</p>
+                  {classes && (
+                    <ul className="mg-classes">
+                      {classes.map((c, i) => (
+                        <li key={i}>
+                          <label className="mg-check">
+                            <input
+                              type="checkbox"
+                              checked={chosen.includes(i)}
+                              onChange={(e) =>
+                                setChosen((x) =>
+                                  e.target.checked
+                                    ? [...x, i].sort((a, b) => a - b)
+                                    : x.filter((y) => y !== i),
+                                )
+                              }
+                            />
+                            {c.label}: {c.signs.filter((s) => s > 0).length} up,{' '}
+                            {c.signs.filter((s) => s < 0).length} down. {c.notes[0]}
+                          </label>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </>
+              )}
+              {structure && tab === 'analyse' && (
+                <>
+                  <p className="mg-note">
+                    Analysing the {outputs.list.length} configuration(s) from the{' '}
+                    {TABS.find((x) => x.id === lastBuild)!.label} tab
+                    {named ? ' ("Download all" set)' : ''}. Their MAGMOM is the intended pattern.
+                  </p>
+                  {outputs.list.length === 0 ? (
+                    <p className="mg-note">{outputs.error || 'Build some configurations first.'}</p>
+                  ) : (
+                    <Suspense fallback={<p>Loading the analysis...</p>}>
+                      <AnalysePanel outputs={outputs.list} />
+                    </Suspense>
+                  )}
+                </>
+              )}
+              {spec && tab !== 'analyse' && (
+                <>
+                  <div className="mg-toggles">
+                    <label className="mg-check">
+                      <input type="checkbox" checked={poly} onChange={(e) => setPoly(e.target.checked)} />
+                      Show coordination polyhedra
+                    </label>
+                    <label className="mg-check">
+                      <input type="checkbox" checked={cells} onChange={(e) => setCells(e.target.checked)} />
+                      Show neighbouring cells (2×2×2)
+                    </label>
+                  </div>
+                  <Scene key={`${tab}-${active?.structure.species.length}`} spec={spec} />
+                  {poly && <p className="mg-note">Polyhedra use a distance cutoff of 2.6 Å (Heuristic).</p>}
+                  {active && structure && (
+                    <p className="mg-note">
+                      <strong>Why this cell:</strong> {whyThisCell(active, built.det, common, batch.length)}
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
+          </section>
+
+          <section aria-labelledby="mg-out" className="card tool-card mg-card mg-right">
+            <h2 id="mg-out" className="card-h">
+              Output
+            </h2>
+            {!active && <p>Nothing to show yet.</p>}
+            {active && (
+              <div className="mg-transcript" role="region" aria-label="What was computed" tabIndex={0}>
+                <p>
+                  <Badge variant="computed" /> {active.label}
+                </p>
+                <p>
+                  Cell: {active.structure.species.length} atoms (
+                  {active.matrix.map((r) => r.join(' ')).join(' / ')}).
+                </p>
+                <p>
+                  Magnetic sites: {active.magneticSites.length} ({upN} up, {downN} down).
+                </p>
+                {nn && (
+                  <p>
+                    Nearest neighbours of the first magnetic site: {nn.parallel} parallel, {nn.antiparallel}{' '}
+                    antiparallel.
+                  </p>
+                )}
+                {net !== undefined && <p>Net moment per cell: {net.toFixed(2)} μB.</p>}
+                {af !== null && (
+                  <p>
+                    {af
+                      ? 'This is a true antiferromagnet in this cell.'
+                      : 'This is not a compensated antiferromagnet.'}
+                  </p>
+                )}
+                {active.notes.map((n) => (
+                  <p key={n}>{n}</p>
                 ))}
-              </ul>
+              </div>
             )}
-            <h3>INCAR lines</h3>
-            <pre className="mg-pre">{activeOut.incarText}</pre>
-            <div className="mg-row">
-              <button type="button" onClick={() => downloadBlob('POSCAR', activeOut.result.poscar)}>
-                Download POSCAR
-              </button>
-              <button type="button" onClick={() => downloadBlob('INCAR', activeOut.incarText)}>
-                Download INCAR
-              </button>
-              <button
-                type="button"
-                onClick={async () =>
-                  setStatus((await copyText(activeOut.incarText)) ? 'INCAR copied.' : 'Copy failed.')
-                }
-              >
-                Copy INCAR
-              </button>
-            </div>
-            <h3>All {outputs.list.length} in one zip</h3>
-            <pre className="mg-pre" aria-label="Zip contents">
-              {treeLines(files).join('\n')}
-            </pre>
-            <div className="mg-row">
-              <button
-                type="button"
-                onClick={() => void download('magnetic-configurations.zip', outputs.list)}
-              >
-                Download all
-              </button>
-              {structure && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    sendHandoff(
-                      {
-                        v: 1,
-                        kind: 'structure',
-                        from: 'magnetic',
-                        structure: activeOut.result.structure,
-                        label: activeOut.config.label,
-                        magmom: activeOut.result.magmom,
-                      },
-                      '/tools/input-builder/',
-                    )
-                  }
-                >
-                  Open in the input builder (with MAGMOM)
-                </button>
-              )}
-              {structure && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    sendHandoff(
-                      {
-                        v: 1,
-                        kind: 'structure',
-                        from: 'magnetic',
-                        structure: activeOut.result.structure,
-                        label: activeOut.config.label,
-                      },
-                      '/tools/kpath/',
-                    )
-                  }
-                >
-                  Open in the k-path tool
-                </button>
-              )}
-            </div>
-          </>
-        )}
-        <ul className="mg-caveats">
-          <li>The starting moments only seed the calculation. Check the final moments in OUTCAR.</li>
-          <li>VASP may find a different ground state than the pattern you started from.</li>
-          <li>POTCAR files are never generated or included.</li>
-        </ul>
-        <p role="status" className="mg-note">
-          {status}
-        </p>
-      </section>
+            {outputs.error && (
+              <p className="mg-note" role="status">
+                {outputs.error}
+              </p>
+            )}
+            {activeOut && (
+              <>
+                <h3>MAGMOM</h3>
+                <pre className="mg-pre" data-testid="magmom">
+                  {activeOut.result.magmom}
+                </pre>
+                {activeOut.issues.length === 0 ? (
+                  <p className="mg-note">The checks for MAGMOM and ISPIN found no problems.</p>
+                ) : (
+                  <ul className="mg-issues">
+                    {activeOut.issues.map((i) => (
+                      <li key={i.rule}>
+                        {i.rule} {i.severity}: {i.title}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <h3>INCAR lines</h3>
+                <pre className="mg-pre">{activeOut.incarText}</pre>
+                <div className="mg-row">
+                  <button type="button" onClick={() => downloadBlob('POSCAR', activeOut.result.poscar)}>
+                    Download POSCAR
+                  </button>
+                  <button type="button" onClick={() => downloadBlob('INCAR', activeOut.incarText)}>
+                    Download INCAR
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () =>
+                      setStatus((await copyText(activeOut.incarText)) ? 'INCAR copied.' : 'Copy failed.')
+                    }
+                  >
+                    Copy INCAR
+                  </button>
+                </div>
+                <h3>All {outputs.list.length} in one zip</h3>
+                <pre className="mg-pre" aria-label="Zip contents">
+                  {treeLines(files).join('\n')}
+                </pre>
+                <div className="mg-row">
+                  <button
+                    type="button"
+                    onClick={() => void download('magnetic-configurations.zip', outputs.list)}
+                  >
+                    Download all
+                  </button>
+                  {structure && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        sendHandoff(
+                          {
+                            v: 1,
+                            kind: 'structure',
+                            from: 'magnetic',
+                            structure: activeOut.result.structure,
+                            label: activeOut.config.label,
+                            magmom: activeOut.result.magmom,
+                          },
+                          '/tools/input-builder/',
+                        )
+                      }
+                    >
+                      Open in the input builder (with MAGMOM)
+                    </button>
+                  )}
+                  {structure && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        sendHandoff(
+                          {
+                            v: 1,
+                            kind: 'structure',
+                            from: 'magnetic',
+                            structure: activeOut.result.structure,
+                            label: activeOut.config.label,
+                          },
+                          '/tools/kpath/',
+                        )
+                      }
+                    >
+                      Open in the k-path tool
+                    </button>
+                  )}
+                  {structure && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        sendHandoff(
+                          {
+                            v: 1,
+                            kind: 'structure',
+                            from: 'magnetic',
+                            structure: activeOut.result.structure,
+                            label: activeOut.config.label,
+                            magmom: activeOut.result.magmom,
+                          },
+                          '/builder/',
+                        )
+                      }
+                    >
+                      Open in the Material Builder (3D spins)
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
+            <ul className="mg-caveats">
+              <li>The starting moments only seed the calculation. Check the final moments in OUTCAR.</li>
+              <li>VASP may find a different ground state than the pattern you started from.</li>
+              <li>POTCAR files are never generated or included.</li>
+            </ul>
+            <p role="status" className="mg-note">
+              {status}
+            </p>
+          </section>
+        </div>
+      </div>
     </div>
   );
 }

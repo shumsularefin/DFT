@@ -45,3 +45,23 @@
 .sv-table .is-sel {
   background: var(--surface-2, rgba(128, 128, 128, 0.15));
 }
+
+/* Plain buttons here share the site's button look (browser defaults before). */
+:where(.sv) button {
+  min-height: var(--target);
+  padding: 0 var(--space-3);
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+:where(.sv) button:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+:where(.sv) button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

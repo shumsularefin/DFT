@@ -4,6 +4,7 @@ import { ParseError } from '../../lib/crystal/errors';
 import { SymmetryClient } from '../../lib/crystal/symmetry-client';
 import { describeStandardization, type StandardizationReport } from '../../lib/crystal/standardize';
 import type { SymmetryResult } from '../../lib/crystal/symmetry';
+import '../ui/button.css';
 
 const EXAMPLE = `data_Cu
 _cell_length_a 3.61

@@ -1,21 +1,15 @@
 ---
 // @source S-021, S-034, S-042, S-067
+// Material Builder, crystal mode: the VESTA-style viewer and editor with the VASP workflow (D-105). Molecule
+// mode (/builder/molecule/) is the same workspace with the Molecule tab (D-107).
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import MaterialBuilder from '../../components/tools/builder/MaterialBuilder';
+import StudioWorkspace from '../../components/studio/StudioWorkspace.astro';
 ---
 
 <BaseLayout
   title="Material Builder"
-  description="Build, edit, validate and export crystals (POSCAR, CIF) and molecules (2D canvas, rough 3D clean-up, XYZ, MOL, POSCAR in a box) locally in your browser."
-  pageClass="tool"
+  description="Build, view and edit crystals in a VESTA-style 3D workspace (supercells, slabs, defects, symmetry, magnetism, structure checks) and set up the VASP run (POTCAR, INCAR, KPOINTS, k-point convergence, run bundle, analysis), locally in your browser."
+  pageClass="workspace"
 >
-  <div class="container">
-    <h1>Material Builder</h1>
-    <p>
-      Switch between Crystal mode and Molecule mode (loaded lazily). Validate structures live against B001 to
-      B012, export POSCAR/CIF/XYZ/MOL, or hand off directly to the Input Builder, k-path tool, or Magnetic
-      configuration tool.
-    </p>
-    <MaterialBuilder client:load />
-  </div>
+  <StudioWorkspace mode="crystal" />
 </BaseLayout>

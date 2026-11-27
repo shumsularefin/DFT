@@ -19,6 +19,7 @@ import {
 import { MAX_FILE_BYTES } from '../../../lib/vasp/seriesInput';
 import { downloadBlob } from '../input-builder/hooks';
 import '../convergence/convergence.css';
+import '../../../styles/tools.css';
 import './eos.css';
 import { svgToPng, svgToString } from '../convergence/exportSvg';
 import EosPlot, { H, W } from './EosPlot';
@@ -125,338 +126,384 @@ export default function EosTool() {
 
   return (
     <div className="cv">
-      <p className="cv-banner" role="note">
+      <header className="page-h tool-head">
+        <div>
+          <h1>Equation of state fit</h1>
+          <p>
+            Squeeze and stretch a crystal, compute the energy at each volume, and fit a smooth curve through
+            the points. The bottom of the curve is the equilibrium volume; how sharply it curves is the bulk
+            modulus.
+          </p>
+        </div>
+        <div className="row">
+          <button type="button" className="btn" disabled={!fit} onClick={exportSvg}>
+            Export SVG
+          </button>
+          <button type="button" className="btn" disabled={!fit} onClick={() => void exportPng()}>
+            Export PNG
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary"
+            disabled={!fit}
+            onClick={() => {
+              if (!fit) return;
+              downloadBlob('eos-fit.csv', eosResultCsv(fit), 'text/csv');
+              setMsg('Downloaded eos-fit.csv');
+            }}
+          >
+            Export CSV
+          </button>
+        </div>
+      </header>
+      <p className="notice tool-note" role="note">
         Everything is read in this page and nothing is uploaded. Checks marked <strong>Heuristic</strong> are
         rules of thumb, not published limits.
       </p>
-      <section aria-labelledby="eos-in">
-        <h2 id="eos-in">1. Your energy-volume points</h2>
-        <p>
-          Drop the OUTCAR of every volume (each in its own folder, for example <code>vol_0.980/OUTCAR</code>).
-          The tool reads the last <code>volume of cell</code> line and the last{' '}
-          <code>energy(sigma-&gt;0)</code>. An OSZICAR has no volume, so type it in the table. Or paste the
-          output of the <code>collect.sh</code> the Input Builder writes for an EOS series.
-        </p>
-        <div
-          className="cv-drop"
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e) => {
-            e.preventDefault();
-            void onFiles(e.dataTransfer.files);
-          }}
-        >
-          <label htmlFor="eos-files">
-            Choose OUTCAR or OSZICAR files (several at once, or drop them here)
-          </label>
-          <input id="eos-files" type="file" multiple onChange={(e) => void onFiles(e.target.files)} />
-        </div>
-        <div className="cv-field">
-          <label htmlFor="eos-paste">
-            Or paste a table: volume (Å³ per cell), energy (eV per cell), optional atom count. CSV, tab or
-            spaces; a header row is optional.
-          </label>
-          <textarea
-            id="eos-paste"
-            rows={6}
-            spellCheck={false}
-            value={paste}
-            onChange={(e) => setPaste(e.target.value)}
-          />
-        </div>
-        <div className="cv-actions">
-          <button
-            type="button"
-            onClick={() => {
-              add(ingestEosCsv(paste));
-              setPaste('');
-              setSample(false);
-            }}
-            disabled={paste.trim() === ''}
-          >
-            Add pasted table
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setRows([]);
-              add(ingestEosCsv(sampleCsv()));
-              setSample(true);
-            }}
-          >
-            Load sample data
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              setRows((old) => [
-                ...old,
-                { id: nextId.current++, label: '', volume: '', energy: '', natoms: '' },
-              ])
-            }
-          >
-            Add a row
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setRows([]);
-              setNotes([]);
-              setSample(false);
-            }}
-            disabled={rows.length === 0}
-          >
-            Clear table
-          </button>
-        </div>
-        {sample && (
-          <p className="cv-sample" role="note" data-testid="sample-banner">
-            <strong>Sample data (synthetic).</strong> These points come from made-up parameters with small
-            added offsets. They are not a real calculation or a real material.
-          </p>
-        )}
-        {notes.map((t) => (
-          <p key={t} className="cv-note" role="alert">
-            {t}
-          </p>
-        ))}
-        {model.skipped.length > 0 && (
-          <p className="cv-note" role="note">
-            Row {model.skipped.join(', ')} left out: it needs a positive volume and an energy.
-          </p>
-        )}
-      </section>
-
-      <section aria-labelledby="eos-opt">
-        <h2 id="eos-opt">2. Settings</h2>
-        <div className="cv-row">
-          <fieldset className="cv-fieldset">
-            <legend>Equation of state</legend>
-            {(Object.keys(EOS_FORMS) as EosForm[]).map((k) => (
-              <label key={k} className="cv-radio">
-                <input type="radio" name="eos-form" checked={form === k} onChange={() => setForm(k)} />{' '}
-                {EOS_FORMS[k]}
+      <div className="split left">
+        <div className="card tool-inputs">
+          <h2 className="card-h">Inputs</h2>
+          <section aria-labelledby="eos-in">
+            <h3 id="eos-in">1. Your energy-volume points</h3>
+            <p>
+              Drop the OUTCAR of every volume (each in its own folder, for example{' '}
+              <code>vol_0.980/OUTCAR</code>). The tool reads the last <code>volume of cell</code> line and the
+              last <code>energy(sigma-&gt;0)</code>. An OSZICAR has no volume, so type it in the table. Or
+              paste the output of the <code>collect.sh</code> the Input Builder writes for an EOS series.
+            </p>
+            <div
+              className="cv-drop"
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                void onFiles(e.dataTransfer.files);
+              }}
+            >
+              <label htmlFor="eos-files">
+                Choose OUTCAR or OSZICAR files (several at once, or drop them here)
               </label>
-            ))}
-          </fieldset>
-          <div className="cv-field">
-            <label htmlFor="eos-nat">Atoms in the cell (for per-atom values)</label>
-            <input
-              id="eos-nat"
-              inputMode="numeric"
-              value={natoms}
-              placeholder={n ? String(n) : ''}
-              onChange={(e) => setNatoms(e.target.value)}
-            />
-          </div>
-          <div className="cv-field">
-            <label htmlFor="eos-cell">Cell type, for the lattice constant</label>
-            <select id="eos-cell" value={cell} onChange={(e) => setCell(e.target.value as CellId)}>
-              {CELLS.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-        {model.mismatch && (
-          <p className="cv-note" role="note">
-            The rows have different atom counts. Every point of one curve must be the same cell.
-          </p>
-        )}
-      </section>
-
-      <section aria-labelledby="eos-res">
-        <h2 id="eos-res">3. Result</h2>
-        {model.error && (
-          <p className="cv-note" role="alert">
-            {model.error}
-          </p>
-        )}
-        {!fit ? (
-          !model.error && <p>Add at least {EOS_RULES.minPoints} points above to fit a curve.</p>
-        ) : (
-          <>
-            <dl className="eos-results" data-testid="eos-results" aria-live="polite">
-              <dt>Equilibrium volume V0</dt>
-              <dd data-testid="v0">
-                {fit.params.v0.toFixed(4)}
-                {pm(fit.stderr?.v0, 4)} Å³ per cell
-                {n ? ` (${(fit.params.v0 / n).toFixed(4)} Å³ per atom)` : ''}
-              </dd>
-              <dt>Bulk modulus B0</dt>
-              <dd data-testid="b0">
-                {fit.b0GPa.toFixed(2)}
-                {pm(gpaErr, 2)} GPa ({fit.params.b0.toFixed(5)} eV/Å³)
-              </dd>
-              <dt>Pressure derivative B0&apos;</dt>
-              <dd data-testid="b1">
-                {fit.params.b1.toFixed(3)}
-                {pm(fit.stderr?.b1, 3)} (dimensionless)
-              </dd>
-              <dt>Minimum energy E0</dt>
-              <dd data-testid="e0">
-                {fit.params.e0.toFixed(5)}
-                {pm(fit.stderr?.e0, 5)} eV per cell
-                {n ? ` (${(fit.params.e0 / n).toFixed(5)} eV per atom)` : ''}
-              </dd>
-              {lat && (
-                <>
-                  <dt>Cubic lattice constant a</dt>
-                  <dd data-testid="lattice">
-                    {lat.a.toFixed(4)}
-                    {pm(lat.aErr, 4)} Å
-                  </dd>
-                </>
-              )}
-              <dt>RMS residual</dt>
-              <dd data-testid="rms">
-                {(fit.rmsResidual * 1000).toFixed(3)} meV per cell
-                {fit.rmsResidualPerAtom !== undefined
-                  ? ` (${(fit.rmsResidualPerAtom * 1000).toFixed(3)} meV per atom)`
-                  : ''}
-              </dd>
-              <dt>Fit</dt>
-              <dd>
-                {EOS_FORMS[fit.form]}, {fit.points.length} points, Levenberg-Marquardt from a parabola start,{' '}
-                {fit.converged ? `converged in ${fit.iterations} steps` : 'not converged'}.
-                {fit.stderr
-                  ? ' Errors are one standard error from the fit.'
-                  : ' No errors: no points to spare.'}
-              </dd>
-            </dl>
-            <div data-testid="eos-warnings">
-              {fit.warnings.length === 0 ? (
-                <p className="cv-advice">No sampling or quality warning for this set.</p>
-              ) : (
-                fit.warnings.map((w) => (
-                  <p
-                    key={w.code}
-                    className={w.severity === 'warning' ? 'cv-note' : 'cv-advice'}
-                    data-code={w.code}
-                    role="note"
-                  >
-                    {w.heuristic && <strong>Heuristic: </strong>}
-                    {w.message}
-                  </p>
-                ))
-              )}
+              <input id="eos-files" type="file" multiple onChange={(e) => void onFiles(e.target.files)} />
             </div>
-            <EosPlot
-              ref={svgRef}
-              fit={fit}
-              description={`${fit.points.length} points and the fitted ${EOS_FORMS[fit.form]} curve, minimum at ${fit.params.v0.toFixed(3)} Å³. Lower panel: residuals in meV.`}
-            />
+            <div className="cv-field">
+              <label htmlFor="eos-paste">
+                Or paste a table: volume (Å³ per cell), energy (eV per cell), optional atom count. CSV, tab or
+                spaces; a header row is optional.
+              </label>
+              <textarea
+                id="eos-paste"
+                rows={6}
+                spellCheck={false}
+                value={paste}
+                onChange={(e) => setPaste(e.target.value)}
+              />
+            </div>
             <div className="cv-actions">
-              <button type="button" onClick={exportSvg}>
-                Export SVG
-              </button>
-              <button type="button" onClick={() => void exportPng()}>
-                Export PNG
+              <button
+                type="button"
+                onClick={() => {
+                  add(ingestEosCsv(paste));
+                  setPaste('');
+                  setSample(false);
+                }}
+                disabled={paste.trim() === ''}
+              >
+                Add pasted table
               </button>
               <button
                 type="button"
                 onClick={() => {
-                  downloadBlob('eos-fit.csv', eosResultCsv(fit), 'text/csv');
-                  setMsg('Downloaded eos-fit.csv');
+                  setRows([]);
+                  add(ingestEosCsv(sampleCsv()));
+                  setSample(true);
                 }}
               >
-                Export CSV
+                Load sample data
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setRows((old) => [
+                    ...old,
+                    { id: nextId.current++, label: '', volume: '', energy: '', natoms: '' },
+                  ])
+                }
+              >
+                Add a row
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setRows([]);
+                  setNotes([]);
+                  setSample(false);
+                }}
+                disabled={rows.length === 0}
+              >
+                Clear table
               </button>
             </div>
-            <p role="status">{msg}</p>
-            <div className="cv-scroll" tabIndex={0} role="region" aria-label="Points and fit table">
-              <table className="cv-table">
-                <caption>Points and fit (text version of the plot)</caption>
-                <thead>
-                  <tr>
-                    <th scope="col">Point</th>
-                    <th scope="col">Volume (Å³)</th>
-                    <th scope="col">Energy (eV)</th>
-                    <th scope="col">Fit (eV)</th>
-                    <th scope="col">Residual (meV)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {fit.points.map((q, i) => (
-                    <tr key={`${q.volume}-${i}`}>
-                      <th scope="row">{q.label ?? i + 1}</th>
-                      <td>{q.volume}</td>
-                      <td>{q.energy}</td>
-                      <td>{q.fit.toFixed(6)}</td>
-                      <td>{(q.residual * 1000).toFixed(3)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
-        )}
-      </section>
+            {sample && (
+              <p className="cv-sample" role="note" data-testid="sample-banner">
+                <strong>Sample data (synthetic).</strong> These points come from made-up parameters with small
+                added offsets. They are not a real calculation or a real material.
+              </p>
+            )}
+            {notes.map((t) => (
+              <p key={t} className="cv-note" role="alert">
+                {t}
+              </p>
+            ))}
+            {model.skipped.length > 0 && (
+              <p className="cv-note" role="note">
+                Row {model.skipped.join(', ')} left out: it needs a positive volume and an energy.
+              </p>
+            )}
+          </section>
 
-      {rows.length > 0 && (
-        <section aria-labelledby="eos-tab">
-          <h2 id="eos-tab">Your table (editable)</h2>
-          <div className="cv-scroll">
-            <table className="cv-table">
-              <caption>Input rows: volume in Å³ per cell, energy in eV per cell.</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Row</th>
-                  <th scope="col">Volume (Å³)</th>
-                  <th scope="col">Energy (eV)</th>
-                  <th scope="col">Atoms</th>
-                  <th scope="col">
-                    <span className="sr-only">Remove</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((r, i) => (
-                  <tr key={r.id}>
-                    <th scope="row" title={r.label}>
-                      {r.label || i + 1}
-                    </th>
-                    <td>
-                      <input
-                        aria-label={`Row ${i + 1} volume`}
-                        inputMode="decimal"
-                        value={r.volume}
-                        onChange={(e) => edit(r.id, { volume: e.target.value })}
-                      />
-                    </td>
-                    <td>
-                      <input
-                        aria-label={`Row ${i + 1} energy`}
-                        inputMode="decimal"
-                        value={r.energy}
-                        onChange={(e) => edit(r.id, { energy: e.target.value })}
-                      />
-                    </td>
-                    <td>
-                      <input
-                        aria-label={`Row ${i + 1} atoms`}
-                        inputMode="numeric"
-                        value={r.natoms}
-                        onChange={(e) => edit(r.id, { natoms: e.target.value })}
-                      />
-                    </td>
-                    <td>
-                      <button
-                        type="button"
-                        aria-label={`Remove row ${i + 1}`}
-                        onClick={() => setRows((old) => old.filter((o) => o.id !== r.id))}
-                      >
-                        Remove
-                      </button>
-                    </td>
-                  </tr>
+          <section aria-labelledby="eos-opt">
+            <h3 id="eos-opt">2. Settings</h3>
+            <div className="cv-row">
+              <fieldset className="cv-fieldset">
+                <legend>Equation of state</legend>
+                {(Object.keys(EOS_FORMS) as EosForm[]).map((k) => (
+                  <label key={k} className="cv-radio">
+                    <input type="radio" name="eos-form" checked={form === k} onChange={() => setForm(k)} />{' '}
+                    {EOS_FORMS[k]}
+                  </label>
                 ))}
-              </tbody>
-            </table>
+              </fieldset>
+              <div className="cv-field">
+                <label htmlFor="eos-nat">Atoms in the cell (for per-atom values)</label>
+                <input
+                  id="eos-nat"
+                  inputMode="numeric"
+                  value={natoms}
+                  placeholder={n ? String(n) : ''}
+                  onChange={(e) => setNatoms(e.target.value)}
+                />
+              </div>
+              <div className="cv-field">
+                <label htmlFor="eos-cell">Cell type, for the lattice constant</label>
+                <select id="eos-cell" value={cell} onChange={(e) => setCell(e.target.value as CellId)}>
+                  {CELLS.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            {model.mismatch && (
+              <p className="cv-note" role="note">
+                The rows have different atom counts. Every point of one curve must be the same cell.
+              </p>
+            )}
+          </section>
+        </div>
+        <div className="stack tool-results">
+          <div className="grid g3 tool-tiles">
+            <div className="tile">
+              <div className="k">Equilibrium volume V0</div>
+              <div className={`v${fit ? '' : ' is-empty'}`}>{fit ? fit.params.v0.toFixed(3) : 'n/a'}</div>
+              <div className="tile-sub">Å³ per cell</div>
+            </div>
+            <div className="tile">
+              <div className="k">Bulk modulus B0</div>
+              <div className={`v${fit ? '' : ' is-empty'}`}>{fit ? fit.b0GPa.toFixed(1) : 'n/a'}</div>
+              <div className="tile-sub">GPa</div>
+            </div>
+            <div className="tile">
+              <div className="k">{lat ? 'Cubic lattice constant a' : "Pressure derivative B0'"}</div>
+              <div className={`v${fit ? '' : ' is-empty'}`}>
+                {lat ? lat.a.toFixed(4) : fit ? fit.params.b1.toFixed(2) : 'n/a'}
+              </div>
+              <div className="tile-sub">{lat ? 'Å' : 'dimensionless'}</div>
+            </div>
           </div>
-        </section>
-      )}
+          <section className="card tool-card" aria-labelledby="eos-res">
+            <h2 id="eos-res" className="card-h">
+              Result
+            </h2>
+            {model.error && (
+              <p className="cv-note" role="alert">
+                {model.error}
+              </p>
+            )}
+            {!fit ? (
+              !model.error && (
+                <p className="ph">
+                  Add at least {EOS_RULES.minPoints} points in the Inputs card to fit a curve.
+                </p>
+              )
+            ) : (
+              <>
+                <dl className="eos-results" data-testid="eos-results" aria-live="polite">
+                  <dt>Equilibrium volume V0</dt>
+                  <dd data-testid="v0">
+                    {fit.params.v0.toFixed(4)}
+                    {pm(fit.stderr?.v0, 4)} Å³ per cell
+                    {n ? ` (${(fit.params.v0 / n).toFixed(4)} Å³ per atom)` : ''}
+                  </dd>
+                  <dt>Bulk modulus B0</dt>
+                  <dd data-testid="b0">
+                    {fit.b0GPa.toFixed(2)}
+                    {pm(gpaErr, 2)} GPa ({fit.params.b0.toFixed(5)} eV/Å³)
+                  </dd>
+                  <dt>Pressure derivative B0&apos;</dt>
+                  <dd data-testid="b1">
+                    {fit.params.b1.toFixed(3)}
+                    {pm(fit.stderr?.b1, 3)} (dimensionless)
+                  </dd>
+                  <dt>Minimum energy E0</dt>
+                  <dd data-testid="e0">
+                    {fit.params.e0.toFixed(5)}
+                    {pm(fit.stderr?.e0, 5)} eV per cell
+                    {n ? ` (${(fit.params.e0 / n).toFixed(5)} eV per atom)` : ''}
+                  </dd>
+                  {lat && (
+                    <>
+                      <dt>Cubic lattice constant a</dt>
+                      <dd data-testid="lattice">
+                        {lat.a.toFixed(4)}
+                        {pm(lat.aErr, 4)} Å
+                      </dd>
+                    </>
+                  )}
+                  <dt>RMS residual</dt>
+                  <dd data-testid="rms">
+                    {(fit.rmsResidual * 1000).toFixed(3)} meV per cell
+                    {fit.rmsResidualPerAtom !== undefined
+                      ? ` (${(fit.rmsResidualPerAtom * 1000).toFixed(3)} meV per atom)`
+                      : ''}
+                  </dd>
+                  <dt>Fit</dt>
+                  <dd>
+                    {EOS_FORMS[fit.form]}, {fit.points.length} points, Levenberg-Marquardt from a parabola
+                    start, {fit.converged ? `converged in ${fit.iterations} steps` : 'not converged'}.
+                    {fit.stderr
+                      ? ' Errors are one standard error from the fit.'
+                      : ' No errors: no points to spare.'}
+                  </dd>
+                </dl>
+                <div data-testid="eos-warnings">
+                  {fit.warnings.length === 0 ? (
+                    <p className="cv-advice">No sampling or quality warning for this set.</p>
+                  ) : (
+                    fit.warnings.map((w) => (
+                      <p
+                        key={w.code}
+                        className={w.severity === 'warning' ? 'cv-note' : 'cv-advice'}
+                        data-code={w.code}
+                        role="note"
+                      >
+                        {w.heuristic && <strong>Heuristic: </strong>}
+                        {w.message}
+                      </p>
+                    ))
+                  )}
+                </div>
+                <EosPlot
+                  ref={svgRef}
+                  fit={fit}
+                  description={`${fit.points.length} points and the fitted ${EOS_FORMS[fit.form]} curve, minimum at ${fit.params.v0.toFixed(3)} Å³. Lower panel: residuals in meV.`}
+                />
+                <p role="status">{msg}</p>
+                <div className="cv-scroll" tabIndex={0} role="region" aria-label="Points and fit table">
+                  <table className="cv-table">
+                    <caption>Points and fit (text version of the plot)</caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">Point</th>
+                        <th scope="col">Volume (Å³)</th>
+                        <th scope="col">Energy (eV)</th>
+                        <th scope="col">Fit (eV)</th>
+                        <th scope="col">Residual (meV)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {fit.points.map((q, i) => (
+                        <tr key={`${q.volume}-${i}`}>
+                          <th scope="row">{q.label ?? i + 1}</th>
+                          <td>{q.volume}</td>
+                          <td>{q.energy}</td>
+                          <td>{q.fit.toFixed(6)}</td>
+                          <td>{(q.residual * 1000).toFixed(3)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
+          </section>
+
+          {rows.length > 0 && (
+            <section className="card tool-card" aria-labelledby="eos-tab">
+              <h2 id="eos-tab" className="card-h">
+                Your table (editable)
+              </h2>
+              <div className="cv-scroll">
+                <table className="cv-table">
+                  <caption>Input rows: volume in Å³ per cell, energy in eV per cell.</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Row</th>
+                      <th scope="col">Volume (Å³)</th>
+                      <th scope="col">Energy (eV)</th>
+                      <th scope="col">Atoms</th>
+                      <th scope="col">
+                        <span className="sr-only">Remove</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((r, i) => (
+                      <tr key={r.id}>
+                        <th scope="row" title={r.label}>
+                          {r.label || i + 1}
+                        </th>
+                        <td>
+                          <input
+                            aria-label={`Row ${i + 1} volume`}
+                            inputMode="decimal"
+                            value={r.volume}
+                            onChange={(e) => edit(r.id, { volume: e.target.value })}
+                          />
+                        </td>
+                        <td>
+                          <input
+                            aria-label={`Row ${i + 1} energy`}
+                            inputMode="decimal"
+                            value={r.energy}
+                            onChange={(e) => edit(r.id, { energy: e.target.value })}
+                          />
+                        </td>
+                        <td>
+                          <input
+                            aria-label={`Row ${i + 1} atoms`}
+                            inputMode="numeric"
+                            value={r.natoms}
+                            onChange={(e) => edit(r.id, { natoms: e.target.value })}
+                          />
+                        </td>
+                        <td>
+                          <button
+                            type="button"
+                            aria-label={`Remove row ${i + 1}`}
+                            onClick={() => setRows((old) => old.filter((o) => o.id !== r.id))}
+                          >
+                            Remove
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

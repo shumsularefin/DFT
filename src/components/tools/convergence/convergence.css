@@ -7,22 +7,28 @@
 }
 .cv-note {
   color: var(--text);
-  border-left: 4px solid var(--warn);
-  padding-left: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--warn) 45%, var(--border));
+  border-radius: var(--radius);
 }
 .cv-drop {
   border: 2px dashed var(--border-strong);
   border-radius: 0.5rem;
   padding: var(--space-3);
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-2);
 }
 .cv-field {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.25rem;
   min-width: 0;
+  max-width: 100%;
   margin-block: var(--space-2);
 }
+.cv-field select,
+.cv-field input,
 .cv-field textarea {
   max-width: 100%;
   font-family: var(--font-mono, monospace);
@@ -53,8 +59,10 @@
   background: var(--surface);
 }
 .cv-advice {
-  border-left: 4px solid var(--accent);
-  padding-left: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
 }
 .cv-fig {
   margin: var(--space-3) 0;
@@ -135,4 +143,58 @@
 .cv-table input {
   width: 7rem;
   max-width: 100%;
+}
+
+/* Text fields, menus and the file picker in this tool match the site's controls (browser defaults before). */
+:where(.cv) :is(input:not([type='radio'], [type='checkbox'], [type='range'], [type='file']), select) {
+  min-height: 2.5rem;
+  padding: 0 var(--space-2);
+  font: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+:where(.cv) textarea {
+  padding: var(--space-2);
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+:where(.cv) input[type='file'] {
+  max-width: 100%;
+  font: inherit;
+}
+:where(.cv) input[type='file']::file-selector-button {
+  min-height: var(--target);
+  margin-inline-end: var(--space-2);
+  padding: 0 var(--space-3);
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+/* Plain buttons in this tool share the site's button look (browser defaults before). */
+:where(.cv) button {
+  min-height: var(--target);
+  padding: 0 var(--space-3);
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+:where(.cv) button:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+:where(.cv) button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }

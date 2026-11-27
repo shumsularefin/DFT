@@ -1,0 +1,165 @@
+/* Plot visuals (M12.3): the classes that src/lib/visual/plots.ts writes into its SVG strings. Without them an SVG
+   shape falls back to the default black fill and text to the default size, so every page that shows a plot
+   imports this file (practice.css does, and so does the guided path). Colours come from the theme tokens. */
+.vp {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.vp-t {
+  fill: var(--text);
+  font-family: var(--font-sans);
+  font-size: 11px;
+}
+.vp-small {
+  font-size: 10px;
+}
+.vp-b {
+  font-weight: 600;
+}
+.vp-axis,
+.vp-zero,
+.vp-guide,
+.vp-tick,
+.vp-arrow,
+.vp-hatchline {
+  fill: none;
+}
+.vp-axis {
+  stroke: var(--border-strong);
+  stroke-width: 1.2;
+}
+.vp-zero {
+  stroke: var(--border-strong);
+  stroke-width: 0.8;
+  opacity: 0.7;
+}
+.vp-guide {
+  stroke: var(--text-muted);
+  stroke-width: 1.2;
+  stroke-dasharray: 3 3;
+}
+.vp-curve,
+.vp-curve2,
+.vp-curve3,
+.vp-curve4,
+.vp-curve5,
+.vp-curve6,
+.vp-curve7 {
+  fill: none;
+  stroke-width: 2;
+}
+.vp-curve {
+  stroke: var(--accent);
+}
+.vp-heavy {
+  stroke-width: 4;
+}
+.vp-curve2 {
+  stroke: var(--text);
+  stroke-dasharray: 7 4;
+}
+.vp-curve3 {
+  stroke: var(--text-muted);
+  stroke-dasharray: 2 3;
+}
+.vp-curve4 {
+  stroke: var(--accent);
+  stroke-dasharray: 10 3 2 3;
+}
+.vp-curve5 {
+  stroke: var(--text);
+  stroke-dasharray: 2 2;
+}
+.vp-curve6 {
+  stroke: var(--text-muted);
+  stroke-dasharray: 12 4;
+}
+.vp-curve7 {
+  stroke: var(--accent);
+  stroke-dasharray: 4 4;
+}
+.vp-fill {
+  fill: var(--accent);
+  fill-opacity: 0.18;
+  stroke: none;
+}
+.vp-node {
+  fill: var(--bg);
+  stroke: var(--text);
+  stroke-width: 1.5;
+}
+.vp-node.vp-solid {
+  fill: var(--accent);
+  stroke: var(--accent);
+}
+.vp-pos {
+  fill: var(--accent);
+  fill-opacity: 0.6;
+  stroke: var(--text);
+  stroke-width: 1.2;
+}
+.vp-neg {
+  stroke: var(--text);
+  stroke-width: 1.2;
+}
+.vp-hatchline {
+  stroke: var(--text);
+  stroke-width: 1.2;
+}
+.vp-arrow {
+  stroke: var(--text);
+  stroke-width: 2;
+}
+.vp-arrowhead {
+  fill: var(--text);
+}
+.vp-box {
+  fill: var(--bg);
+  stroke: var(--text);
+  stroke-width: 1.5;
+}
+.vp-tick {
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+.vp-band {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 1.5;
+}
+.vp-band.vp-filled {
+  fill: var(--accent);
+  fill-opacity: 0.3;
+}
+.vp-bar {
+  fill: var(--accent);
+  fill-opacity: 0.5;
+  stroke: var(--accent);
+}
+.vp-step {
+  fill: var(--surface);
+  stroke: var(--border-strong);
+  stroke-width: 1.2;
+}
+.vp-step.vp-active {
+  stroke: var(--accent);
+  stroke-width: 2.5;
+}
+.vp-hot .vp-curve {
+  stroke-width: 4;
+}
+.vp-sup {
+  font-size: 8px;
+}
+/* an open marker around a point that stays visible inside it (the Gamma point of a mesh) */
+.vp-node.vp-ring {
+  fill: none;
+}
+/* a label that may sit on a line or a point: a halo in the page colour keeps it readable */
+.vp-halo {
+  paint-order: stroke;
+  stroke: var(--bg);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
