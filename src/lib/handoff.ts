@@ -47,6 +47,8 @@ export type Handoff =
       kpoints?: string;
       /** An Input Builder preset id to open with, e.g. "band" (D-108). */
       task?: string;
+      /** What the sending tool knows the system is (a slab with vacuum, an isolated molecule), D-108. */
+      system?: 'slab' | 'molecule';
     }
   | { v: 1; kind: 'composition'; from: ToolId; a: SiteSpec; b: SiteSpec; x: SiteSpec; label?: string }
   | { v: 1; kind: 'molecule'; from: ToolId; xyz: string; smiles?: string }
@@ -120,7 +122,8 @@ export function validateHandoff(x: unknown): Handoff | null {
         (x.enmax === undefined || (isNum(x.enmax) && x.enmax > 0 && x.enmax < 5000)) &&
         (x.potcar === undefined || (isStr(x.potcar) && x.potcar.length <= 2000)) &&
         (x.kpoints === undefined || (isStr(x.kpoints) && x.kpoints.length <= 200_000)) &&
-        (x.task === undefined || (isStr(x.task) && /^[a-z0-9-]{1,60}$/.test(x.task)))
+        (x.task === undefined || (isStr(x.task) && /^[a-z0-9-]{1,60}$/.test(x.task))) &&
+        (x.system === undefined || x.system === 'slab' || x.system === 'molecule')
         ? (x as unknown as Handoff)
         : null;
     case 'composition':

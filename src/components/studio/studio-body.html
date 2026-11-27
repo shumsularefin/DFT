@@ -145,8 +145,8 @@
     id="check-pill"
     class="check-pill"
     type="button"
-    onclick="window.Studio && window.Studio.go('bundle')"
-    title="Open the pre-flight checks"
+    onclick="window.Studio && window.Studio.go('inputs')"
+    title="Open the checks before the hand-off"
   >
     Checks
   </button>
@@ -1485,8 +1485,6 @@
     <div id="right-tab-vasp" class="p-2.5 overflow-y-auto flex-1 space-y-2.5 hidden">
       <div class="flex gap-1">
         <button class="v-btn v-btn-active flex-1 text-[11px]" data-vasp-file="POSCAR">POSCAR</button>
-        <button class="v-btn flex-1 text-[11px]" data-vasp-file="KPOINTS">KPOINTS</button>
-        <button class="v-btn flex-1 text-[11px]" data-vasp-file="INCAR">INCAR</button>
       </div>
 
       <!-- POSCAR Options -->
@@ -1504,30 +1502,14 @@
         <button id="btn-export-cif" class="v-btn text-[10.5px] py-0.5">Export .CIF</button>
       </div>
 
-      <!-- KPOINTS Options -->
-      <div id="vasp-opt-KPOINTS" class="card-bg border border-subtle rounded-md p-2 space-y-1.5 hidden">
-        <div class="route-card">
-          <span
-            >KPOINTS is built in <b>step 4</b> (mesh from k-spacing, explicit mesh, or band path) and can come
-            from the k-point convergence test (step 5).</span
-          >
-          <button class="v-btn v-btn-primary text-[11px]" onclick="window.Studio.go('kpoints')">
-            Edit KPOINTS in step 4
-          </button>
-        </div>
-      </div>
-
-      <!-- INCAR Options -->
-      <div id="vasp-opt-INCAR" class="card-bg border border-subtle rounded-md p-2 space-y-1.5 hidden">
-        <div class="route-card">
-          <span
-            >INCAR is built in <b>step 3</b> from a preset, the POTCAR ENMAX (step 2) and the spins you set in
-            the Magnetic tab.</span
-          >
-          <button class="v-btn v-btn-primary text-[11px]" onclick="window.Studio.go('incar')">
-            Edit INCAR in step 3
-          </button>
-        </div>
+      <div class="route-card">
+        <span
+          >INCAR, KPOINTS and the job script are made in the <b>Input Builder</b> (step 4), with this structure, its
+          spins and your POTCAR choices.</span
+        >
+        <button class="v-btn v-btn-primary text-[11px]" onclick="window.Studio.go('inputs')">
+          Go to step 4: Input files
+        </button>
       </div>
 
       <!-- Live File Preview -->

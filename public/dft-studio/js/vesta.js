@@ -753,83 +753,6 @@
     return 'MAGMOM = ' + blocks.join('   ');
   }
 
-  function computeAutoKMesh() {
-    const B = getReciprocalLattice(state.structure.lattice);
-    const dk = Math.max(0.005, state.kptsSpacing) * 2 * Math.PI;
-    return B.map(b => Math.max(1, Math.round(vNorm(b) / dk)));
-  }
-
-  function generateKPOINTS() {
-    const [kx, ky, kz] = computeAutoKMesh();
-    const kb = document.getElementById('kpts-grid-badge'); if (kb) kb.textContent = `${kx}×${ky}×${kz}`;
-    return [
-      `Automatic mesh (k-spacing = ${state.kptsSpacing} 2pi/A)`,
-      '0',
-      state.kptsMode,
-      `  ${kx}  ${ky}  ${kz}`,
-      '  0  0  0'
-    ].join('\n') + '\n';
-  }
-
-  function generateINCAR() {
-    const s = state.structure;
-    const hasMag = s.atoms.some(a => vNorm(a.mag) > 1e-3);
-    const magLine = generateMAGMOMString();
-    const lines = [
-      `SYSTEM = ${s.name}`,
-      'PREC   = Accurate',
-      `ENCUT  = ${state.incarEncut}`,
-      'EDIFF  = 1E-8',
-      'NELM   = 150',
-      'ALGO   = Normal',
-      'LREAL  = .FALSE.',
-      'ADDGRID = .TRUE.',
-      'LWAVE  = .FALSE.',
-      'LCHARG = .TRUE.'
-    ];
-    if (state.incarPreset === 'relax') {
-      lines.push('', '# Ionic & Cell Relaxation', 'IBRION = 2', 'ISIF   = 3', 'NSW    = 100', 'EDIFFG = -0.01', 'ISMEAR = 0', 'SIGMA  = 0.05');
-    } else if (state.incarPreset === 'dos') {
-      lines.push('', '# Density of States', 'ICHARG = 11', 'ISMEAR = -5', 'LORBIT = 11', 'NEDOS  = 2001');
-    } else if (state.incarPreset === 'bands') {
-      lines.push('', '# Band Structure (Line-Mode KPOINTS)', 'ICHARG = 11', 'ISMEAR = 0', 'SIGMA  = 0.05', 'LORBIT = 11');
-    } else if (state.incarPreset === 'soc') {
-      lines.push('', '# Spin-Orbit Coupling + Non-Collinear Magnetism', 'ISMEAR = 0', 'SIGMA  = 0.05', 'LSORBIT = .TRUE.', 'LNONCOLLINEAR = .TRUE.', 'SAXIS  = 0 0 1', 'ISYM   = 0', 'LORBIT = 11');
-    } else {
-      lines.push('', '# Static SCF', 'ISMEAR = 0', 'SIGMA  = 0.05', 'LORBIT = 11');
-    }
-
-    if (state.incarPreset !== 'soc') {
-      if (state.magMode === 'noncollinear') {
-        lines.push('', '# Non-Collinear Magnetism', 'LNONCOLLINEAR = .TRUE.', 'ISYM   = 0', magLine);
-      } else if (hasMag) {
-        lines.push('', '# Collinear Spin Polarization', 'ISPIN  = 2', magLine);
-      } else {
-        lines.push('', '# Non-Spin-Polarized', 'ISPIN  = 1');
-      }
-    } else {
-      lines.push(magLine);
-    }
-
-    if (state.incarLdau) {
-      const spList = Array.from(getSpeciesOrder(s.atoms).keys());
-      const ldauL = spList.map(el => getElInfo(el).is3d ? 2 : -1).join(' ');
-      const ldauU = spList.map(el => getElInfo(el).is3d ? (getElInfo(el).defU || 4.0).toFixed(1) : '0.0').join(' ');
-      const ldauJ = spList.map(() => '0.0').join(' ');
-      lines.push(
-        '',
-        '# DFT+U (Dudarev)',
-        'LDAU      = .TRUE.',
-        'LDAUTYPE  = 2',
-        `LDAUL     = ${ldauL}   # ${spList.join(' ')}`,
-        `LDAUU     = ${ldauU}`,
-        `LDAUJ     = ${ldauJ}`,
-        'LMAXMIX   = 4'
-      );
-    }
-    return lines.join('\n') + '\n';
-  }
-
   // =========================================================================
   // 6. CLIENT-SIDE SYMMETRY & SPACE GROUP ANALYZER
   // =========================================================================
@@ -2407,10 +2330,8 @@
     const label = document.getElementById('vasp-file-label');
     const ta = document.getElementById('vasp-file-preview');
     label.textContent = state.activeVaspFile;
-    const S = window.Studio;
-    if (state.activeVaspFile === 'POSCAR') ta.value = generatePOSCAR();
-    else if (state.activeVaspFile === 'KPOINTS') ta.value = S ? S.getKpoints() : generateKPOINTS();
-    else ta.value = S ? S.getIncar() : generateINCAR();
+    // INCAR and KPOINTS are made in the Input Builder (D-108); this tab previews POSCAR.
+    ta.value = generatePOSCAR();
     notifyStudio();
   }
 
@@ -3145,7 +3066,7 @@
     btn.addEventListener('click', () => {
       state.activeVaspFile = btn.dataset.vaspFile;
       document.querySelectorAll('[data-vasp-file]').forEach(b => b.classList.toggle('v-btn-active', b === btn));
-      ['POSCAR','KPOINTS','INCAR'].forEach(f => {
+      ['POSCAR'].forEach(f => {
         document.getElementById(`vasp-opt-${f}`).classList.toggle('hidden', f !== state.activeVaspFile);
       });
       refreshVaspPreview();

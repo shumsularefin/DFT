@@ -6,12 +6,14 @@ import { parsePoscar, writePoscar } from '../../lib/crystal/poscar';
 import { readStructure } from '../../lib/crystal/io';
 import { check, composition, exportGate, withOverrideComment, type Issue } from '../../lib/chem/validity';
 import { gentleRelax, mergeDuplicates, wrap, type OpResult } from '../../lib/crystal/ops';
-import { parseIncar, expandRepeats } from '../../lib/vasp/incar';
+import { parseIncar, expandRepeats, writeIncar } from '../../lib/vasp/incar';
+import { entriesFromPreset, type Preset } from '../../lib/vasp/builder';
 import { validate } from '../../lib/vasp/validate';
 import { stashHandoff, takeHandoff, type Handoff } from '../../lib/handoff';
 import type { Structure } from '../../lib/crystal/types';
 import { CRYSTAL_TEMPLATES } from '../tools/builder/crystalTemplates';
 import { ALL_ELEMENTS } from '../ui/PeriodicTable';
+import presetsFile from '../../data/incar-presets.json';
 
 /** Site tools Studio can hand a structure to, with what each one adds over Studio. */
 export const SITE_TOOLS = [
@@ -19,7 +21,7 @@ export const SITE_TOOLS = [
     id: 'input-builder',
     url: '/tools/input-builder/',
     label: 'Input Builder',
-    why: 'INCAR checked by the 33 sourced validation rules, job scripts and a share link.',
+    why: 'INCAR, KPOINTS and the job script for any task, checked by the 35 sourced validation rules.',
   },
   {
     id: 'kpath',
@@ -137,6 +139,22 @@ function perovskiteFrom(h: Extract<Handoff, { kind: 'composition' }>): Incoming 
 export const SiteBridge = {
   tools: SITE_TOOLS,
   analyzers: SITE_ANALYZERS,
+  /** The Input Builder's tasks (its presets, S-042), so the Builder can open it on the right one (D-108). */
+  tasks: (presetsFile.presets as Preset[]).map((p) => ({ id: p.id, title: p.title })),
+  /**
+   * An Input Builder preset written as INCAR text (S-042), with ENCUT from ENMAX and an optional collinear MAGMOM.
+   * The Builder's k-point convergence test uses the convergence preset as its test INCAR (D-108).
+   */
+  presetIncar(id: string, enmax?: number, magmom?: string): string {
+    const p = (presetsFile.presets as Preset[]).find((x) => x.id === id);
+    if (!p) return '';
+    let entries = entriesFromPreset(p, p.variants[0]!.id, enmax && enmax > 0 ? { enmax } : {});
+    if (magmom?.trim()) {
+      entries = entries.filter((e) => e.name !== 'ISPIN' && e.name !== 'MAGMOM');
+      entries.push({ name: 'ISPIN', value: '2' }, { name: 'MAGMOM', value: magmom.trim() });
+    }
+    return writeIncar(entries);
+  },
   /** The site's starter templates (Material Builder M10.4), as POSCAR text. */
   templates: CRYSTAL_TEMPLATES.map((t) => ({
     id: t.id,
@@ -191,7 +209,7 @@ export const SiteBridge = {
       poscar: g.commentLine ? toPoscar(withOverrideComment(s, g)) : poscar,
     };
   },
-  /** The site's INCAR validation engine (33 sourced rules) on Studio's INCAR, POSCAR and optional ENMAX. */
+  /** The site's INCAR validation engine (35 sourced rules) on Studio's INCAR, POSCAR and optional ENMAX. */
   validateIncar(incar: string, poscar?: string, enmaxEv?: number) {
     const entries = parseIncar(incar).entries;
     let structure: Structure | undefined;
@@ -240,15 +258,27 @@ export const SiteBridge = {
     poscar: string,
     label: string,
     magmom?: string,
-    extra?: { enmax?: number; potcar?: string },
+    extra?: {
+      enmax?: number;
+      potcar?: string;
+      task?: string;
+      system?: 'slab' | 'molecule';
+      kpoints?: string;
+    },
   ): boolean {
     const t = SITE_TOOLS.find((x) => x.id === tool);
     if (!t) return false;
     const structure = readAny(poscar);
-    const mm = magmom && expandRepeats(magmom).length === structure.species.length ? magmom : undefined;
+    // One moment per atom (collinear) or three (non-collinear); anything else is not this structure's MAGMOM.
+    const nm = magmom ? expandRepeats(magmom).length : 0;
+    const mm =
+      magmom && (nm === structure.species.length || nm === 3 * structure.species.length) ? magmom : undefined;
     // The POTCAR choices from the Builder's POTCAR step go with the structure, so ENCUT needs no retyping (D-108).
     const enmax = extra?.enmax && Number.isFinite(extra.enmax) && extra.enmax > 0 ? extra.enmax : undefined;
     const potcar = extra?.potcar?.trim() || undefined;
+    const task = extra?.task && SiteBridge.tasks.some((p) => p.id === extra.task) ? extra.task : undefined;
+    const system = extra?.system === 'slab' || extra?.system === 'molecule' ? extra.system : undefined;
+    const kpoints = extra?.kpoints && extra.kpoints.length <= 200_000 ? extra.kpoints : undefined;
     const ok = stashHandoff({
       v: 1,
       kind: 'structure',
@@ -258,6 +288,9 @@ export const SiteBridge = {
       ...(mm ? { magmom: mm } : {}),
       ...(enmax ? { enmax } : {}),
       ...(potcar ? { potcar } : {}),
+      ...(task ? { task } : {}),
+      ...(system ? { system } : {}),
+      ...(kpoints ? { kpoints } : {}),
     });
     if (ok) window.location.assign(t.url);
     return ok;

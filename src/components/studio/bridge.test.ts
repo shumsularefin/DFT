@@ -60,4 +60,13 @@ describe('SiteBridge (DFT Studio to the site code)', () => {
     expect(Array.isArray(out)).toBe(true);
     for (const r of out) expect(r.rule).toMatch(/^[A-Z]+-?\d+/);
   });
+  it('lists the Input Builder tasks and writes a preset INCAR with ENCUT from ENMAX and MAGMOM (D-108)', () => {
+    expect(SiteBridge.tasks.map((t) => t.id)).toContain('convergence');
+    expect(SiteBridge.tasks.map((t) => t.id)).toContain('phonon-finite-displacement');
+    const inc = SiteBridge.presetIncar('convergence', 400, '2*4.0');
+    expect(inc).toMatch(/^ENCUT\s*=\s*\d+/m);
+    expect(inc).toMatch(/^ISPIN\s*=\s*2/m);
+    expect(inc).toMatch(/^MAGMOM\s*=\s*2\*4\.0/m);
+    expect(SiteBridge.presetIncar('no-such-task')).toBe('');
+  });
 });

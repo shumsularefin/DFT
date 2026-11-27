@@ -121,7 +121,7 @@ test.describe('Material Builder workspace (Studio)', () => {
 
   for (const theme of ['light', 'dark']) {
     test(`every workflow step and panel tab is axe clean, ${theme} theme`, async ({ page }) => {
-      test.setTimeout(240_000); // 7 steps + 10 panel tabs axe runs; CI runners are about 2x slower
+      test.setTimeout(240_000); // 5 steps + 10 panel tabs axe runs; CI runners are about 2x slower
       await page.emulateMedia({ colorScheme: 'light' });
       await openStudio(page, []);
       // The site's theme toggle drives the workspace (D-105).
@@ -129,7 +129,7 @@ test.describe('Material Builder workspace (Studio)', () => {
       await expect
         .poll(() => page.evaluate(() => document.documentElement.dataset.theme ?? 'light'))
         .toBe(theme);
-      for (const stage of ['structure', 'potcar', 'incar', 'kpoints', 'kconv', 'bundle', 'analyze']) {
+      for (const stage of ['structure', 'potcar', 'kconv', 'inputs', 'analyze']) {
         await page.evaluate((s) => (window as unknown as StudioWindow).StudioKit.go(s), stage);
         const r = await new AxeBuilder({ page }).analyze();
         expect(r.violations.map((v) => `${theme} ${stage} ${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
@@ -215,6 +215,22 @@ test.describe('Material Builder workspace (Studio)', () => {
     const facts = page.locator('.ib-facts');
     await expect(facts).toContainText('Cu');
     await expect(facts.locator('dt:has-text("Atoms") + dd')).toHaveText('1');
+  });
+
+  test('the Input files step opens the Input Builder on the chosen task, with the spins (D-108)', async ({
+    page,
+  }) => {
+    await openStudio(page, []);
+    await page.evaluate(() => (window as unknown as StudioWindow).StudioKit.go('inputs'));
+    await page.locator('#in-task').selectOption('dos');
+    await page.locator('#in-send').click();
+    await page.waitForURL('**/tools/input-builder/**');
+    // The first sample is antiferromagnetic NiO: the structure and its MAGMOM arrive, on the DOS task.
+    await expect(page.locator('.ib-facts')).toContainText('Ni');
+    await page.locator('nav[aria-label="Builder steps"] button', { hasText: 'Task' }).click();
+    await expect(page.locator('#ib-preset')).toHaveValue('dos');
+    await page.locator('nav[aria-label="Builder steps"] button', { hasText: 'Settings' }).click();
+    await expect(page.getByLabel('Value of MAGMOM')).not.toHaveValue('');
   });
 
   test('k-point convergence rows go to the convergence plotter', async ({ page }) => {

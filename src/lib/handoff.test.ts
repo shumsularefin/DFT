@@ -62,6 +62,7 @@ describe('handoff', () => {
       potcar: 'Fe_pv O',
       kpoints: 'path\n20\nLine-mode\nReciprocal\n',
       task: 'band',
+      system: 'slab' as const,
     };
     sendHandoff(h, '/tools/input-builder/', s, () => {});
     expect(takeHandoff(['structure'], s)).toEqual(h);
@@ -70,6 +71,7 @@ describe('handoff', () => {
     expect(validateHandoff({ ...h, potcar: 7 })).toBeNull();
     expect(validateHandoff({ ...h, kpoints: 'x'.repeat(200_001) })).toBeNull();
     expect(validateHandoff({ ...h, task: 'Band Structure!' })).toBeNull();
+    expect(validateHandoff({ ...h, system: 'metal' })).toBeNull();
   });
   it('series hand-off needs a string CSV of bounded size', () => {
     expect(validateHandoff({ ...series, csv: 5 })).toBeNull();
