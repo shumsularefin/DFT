@@ -388,31 +388,25 @@ main .topic-section > h2.card-h {
     grid-template-columns: minmax(0, 1fr);
   }
 }
-.pr-how {
-  margin-top: var(--space-4);
-}
-.pr-how .how-it-works > :last-child {
-  margin-bottom: 0;
-}
-.pr-how .how-it-works :is(p, dl) {
-  max-width: 90ch;
-}
-/* Two columns on wide screens: the overview on the left, the three pieces and the promises on the right. */
-.how-it-works .hw-col > :first-child {
+/* "How this works" and "The three pieces" sit under the session card and the mastery card (Practice.tsx). */
+.how-it-works > :first-child {
   margin-top: 0;
 }
-.how-it-works .hw-col > :last-child {
+.how-it-works > :last-child {
   margin-bottom: 0;
 }
-@media (min-width: 72rem) {
-  .how-it-works .hw-cols {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: var(--space-6);
-  }
-  .pr-how .how-it-works :is(p, dl) {
-    max-width: none;
-  }
+.how-it-works :is(p, dl) {
+  max-width: none;
+}
+.how-it-works dt {
+  margin-top: var(--space-3);
+  font-weight: 600;
+}
+.how-it-works dt:first-child {
+  margin-top: 0;
+}
+.how-it-works dd {
+  margin: var(--space-1) 0 0;
 }
 .topic-section .qc-options {
   max-width: none;

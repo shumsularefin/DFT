@@ -318,8 +318,22 @@
 .pr-layout {
   margin: 0;
 }
-.pr-layout > .pr {
+.pr-layout.grid {
+  align-items: stretch;
+}
+/* Each column stacks its cards; the last card in each grows so both columns end on one line. */
+.pr-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+.pr-col > .card {
   margin: 0;
+}
+.pr-col > :last-child,
+.pr-col > astro-slot > .card:last-child {
+  flex: 1 1 auto;
 }
 .pr .card-h,
 .pr-mastery .card-h {
