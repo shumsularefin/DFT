@@ -21,7 +21,7 @@ describe('contrast', () => {
   });
 
   it('flags a media block that drifts from the dark theme block', () => {
-    const drift = css.replace('--surface: #30302e;', '--surface: #161b24;');
+    const drift = css.replace('--surface: #21201e;', '--surface: #161b24;');
     expect(check(drift).failures.some((f) => f.includes('differ'))).toBe(true);
   });
 });
