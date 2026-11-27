@@ -24,13 +24,13 @@
       }
     ],
     "hints": [
-      "Inspect the perovskite octahedra figure.",
+      "Each oxygen sits between two B cations.",
       "Count how many octahedra meet at each oxygen corner."
     ],
     "difficulty": -0.5,
     "level": "beginner",
     "sources": [
-      "S-001"
+      "S-002"
     ],
     "visual": {
       "scene": "perovskite-octahedra",
@@ -64,13 +64,13 @@
     ],
     "hints": [
       "Compare the A-site cavity with the 6-fold B-site octahedron.",
-      "Check the CN policy in Module 10."
+      "Count the oxygen atoms at the cube edge midpoints around the A site at the corner of a cubic cell."
     ],
     "difficulty": -0.2,
     "level": "beginner",
     "sources": [
       "S-001",
-      "S-003"
+      "S-002"
     ],
     "visual": {
       "scene": "perovskite-octahedra",
@@ -87,9 +87,9 @@
     "prompt": "Why does shrinking the A-site cation across the lanthanide series in RCuO3 often require a larger supercell than the 5-atom cubic cell?",
     "options": [
       {
-        "text": "Smaller A-site ions drive cooperative octahedral tilting that doubles lattice vectors (for example Pnma)",
+        "text": "Smaller A-site ions drive cooperative octahedral tilting, and alternating tilts need a cell with more than one octahedron",
         "correct": true,
-        "why": "Cooperative BO6 rotations break cubic symmetry and enlarge the primitive cell."
+        "why": "Neighbouring octahedra rotate in opposite senses, so the repeat unit holds at least two of them; the five-atom cell cannot represent the tilt."
       },
       {
         "text": "VASP cannot simulate cells with fewer than 20 atoms",
@@ -104,13 +104,13 @@
     ],
     "hints": [
       "Think about what happens to BO6 octahedra when the A-site cavity is too large for a small R3+ ion.",
-      "Review the summary table and callouts on the topic page."
+      "Neighbouring octahedra in a tilt pattern rotate in opposite senses, so how many are in the repeat unit?"
     ],
     "difficulty": 0.2,
     "level": "intermediate",
     "sources": [
-      "S-001",
-      "S-002"
+      "S-002",
+      "S-101"
     ],
     "visual": {
       "scene": "perovskite-octahedra",
@@ -144,12 +144,12 @@
     ],
     "hints": [
       "Sum the stoichiometric subscripts in ABO3.",
-      "Review the summary table and callouts on the topic page."
+      "The cubic cell holds exactly one formula unit."
     ],
     "difficulty": -0.6,
     "level": "beginner",
     "sources": [
-      "S-001"
+      "S-002"
     ],
     "visual": {
       "scene": "perovskite-octahedra",
@@ -183,12 +183,11 @@
     ],
     "hints": [
       "Recall the geometric meaning of t = (r_A + r_X) / (sqrt(2) * (r_B + r_X)).",
-      "Review the summary table and callouts on the topic page."
+      "At t = 1 the cube edge fits both A-X and B-X bond lengths at once."
     ],
     "difficulty": -0.3,
     "level": "beginner",
     "sources": [
-      "S-001",
       "S-002"
     ],
     "visual": {
@@ -223,12 +222,12 @@
     ],
     "hints": [
       "Check where r_A sits in t = (r_A + r_X) / (sqrt(2) * (r_B + r_X)).",
-      "Review the summary table and callouts on the topic page."
+      "The denominator does not contain r_A at all."
     ],
     "difficulty": -0.4,
     "level": "beginner",
     "sources": [
-      "S-001"
+      "S-002"
     ],
     "visual": {
       "scene": "perovskite-octahedra",
@@ -262,12 +261,12 @@
     ],
     "hints": [
       "Look at which two radii appear in mu = r_B / r_X.",
-      "Review the summary table and callouts on the topic page."
+      "A cation that is too small rattles inside its octahedron."
     ],
     "difficulty": 0,
     "level": "intermediate",
     "sources": [
-      "S-002"
+      "S-022"
     ],
     "visual": {
       "scene": "perovskite-octahedra",
@@ -286,7 +285,7 @@
       {
         "text": "Geometric packing heuristics do not compute electronic energies or competing-phase decomposition",
         "correct": true,
-        "why": "A composition with favorable t or tau can still decompose into lower-energy competing phases."
+        "why": "t, mu and tau use only radii; they contain no electronic energy and no competing phases, so a composition that passes can still be unstable or decompose."
       },
       {
         "text": "Tolerance factors only apply to pure metals",
@@ -296,22 +295,45 @@
       {
         "text": "Shannon radii are always exact at finite temperature",
         "correct": false,
-        "why": "Shannon radii are empirical crystal-derived averages, and stability requires energy calculations."
+        "why": "Shannon radii are empirical averages from many crystals, and even exact radii would not give an energy; stability needs total-energy calculations."
       }
     ],
     "hints": [
-      "Compare a geometric descriptor with a full convex-hull energy calculation.",
-      "Review the summary table and callouts on the topic page."
+      "Compare a geometric descriptor with a total-energy calculation.",
+      "What information about the electrons goes into t?"
     ],
     "difficulty": 0.1,
     "level": "intermediate",
     "sources": [
-      "S-002"
+      "S-002",
+      "S-003",
+      "S-042"
     ],
     "visual": {
-      "scene": "perovskite-octahedra",
-      "caption": "From geometric descriptors to DFT stability verification.",
-      "alt": "Perovskite structure diagram."
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Geometric screen",
+            "note": "t, mu, tau"
+          },
+          {
+            "label": "DFT inputs"
+          },
+          {
+            "label": "Convergence"
+          },
+          {
+            "label": "Relaxation"
+          },
+          {
+            "label": "Electronic structure"
+          }
+        ],
+        "active": 0
+      },
+      "caption": "Screening is the first link of the chain, not the last. Illustrative.",
+      "alt": "A row of five boxes from geometric screening to electronic structure, with the first box highlighted."
     }
   },
   {
@@ -340,17 +362,15 @@
     ],
     "hints": [
       "Check what columns identify each entry in Shannon (1976).",
-      "Review the summary table and callouts on the topic page."
+      "The same element can appear many times in the table."
     ],
     "difficulty": -0.3,
     "level": "beginner",
     "sources": [
-      "S-003"
+      "S-001"
     ],
     "visual": {
-      "scene": "perovskite-octahedra",
-      "caption": "Coordination-dependent ionic radii in ABO3.",
-      "alt": "Perovskite structure showing coordination polyhedra."
+      "none": "A table lookup question: the answer is the key of a radius table, which no picture shows."
     }
   },
   {
@@ -379,17 +399,15 @@
     ],
     "hints": [
       "Recall how the Tolerance-factor explorer handles missing CN=12 entries.",
-      "Review the summary table and callouts on the topic page."
+      "A number that was never measured cannot be read from the table."
     ],
     "difficulty": 0.1,
     "level": "intermediate",
     "sources": [
-      "S-003"
+      "S-001"
     ],
     "visual": {
-      "scene": "perovskite-octahedra",
-      "caption": "Honest handling of missing Shannon radius entries.",
-      "alt": "Perovskite octahedra scene."
+      "none": "A question about reporting a missing table entry honestly; no plot or structure shows that."
     }
   },
   {
@@ -403,7 +421,7 @@
       {
         "text": "It decreases because higher positive charge pulls remaining electrons closer",
         "correct": true,
-        "why": "Removing valence electrons reduces electron-electron screening and contracts the ion."
+        "why": "At a higher charge the same nucleus holds fewer electrons, so the remaining shells are pulled in and the tabulated radius is smaller (compare Cu2+ and Cu3+ in Shannon)."
       },
       {
         "text": "It increases linearly with oxidation state",
@@ -418,17 +436,15 @@
     ],
     "hints": [
       "Compare Fe2+ and Fe3+ or Cu2+ and Cu3+.",
-      "Review the summary table and callouts on the topic page."
+      "Fewer electrons around the same nucleus: larger or smaller ion?"
     ],
     "difficulty": -0.2,
     "level": "beginner",
     "sources": [
-      "S-003"
+      "S-001"
     ],
     "visual": {
-      "scene": "perovskite-octahedra",
-      "caption": "Cation size trends in oxides.",
-      "alt": "Perovskite crystal structure."
+      "none": "A trend in a radius table; the question is answered by comparing table rows, not by a picture."
     }
   },
   {
@@ -457,17 +473,15 @@
     ],
     "hints": [
       "Think about ligand crowding around a 12-fold site versus a 6-fold site.",
-      "Review the summary table and callouts on the topic page."
+      "Compare the CN VI and CN XII rows for La3+ in the tolerance tool."
     ],
     "difficulty": 0,
     "level": "intermediate",
     "sources": [
-      "S-003"
+      "S-001"
     ],
     "visual": {
-      "scene": "perovskite-octahedra",
-      "caption": "Coordination number effect on effective ionic radius.",
-      "alt": "Perovskite octahedra."
+      "none": "A trend in a radius table; the question is answered by comparing table rows, not by a picture."
     }
   },
   {
@@ -481,22 +495,22 @@
       {
         "text": "Copy CONTCAR to POSCAR and run a static calculation (IBRION = -1, NSW = 0)",
         "correct": true,
-        "why": "A fresh static run rebuilds the plane-wave basis cleanly for the final relaxed cell."
+        "why": "The plane-wave set of a relaxation belongs to its starting cell; a static run on the final cell rebuilds the basis so the energy matches ENCUT."
       },
       {
         "text": "Lower ENCUT to 200 eV to speed up the last step",
         "correct": false,
-        "why": "Changing ENCUT invalidates energy comparisons."
+        "why": "The cutoff must stay at the converged value; a lower ENCUT gives an energy that cannot be compared with the other runs."
       },
       {
         "text": "Delete CHGCAR and stop without checking forces",
         "correct": false,
-        "why": "You need to verify force convergence and keep CHGCAR for DOS/bands."
+        "why": "You still need to check that the forces met EDIFFG, and the static run must write CHGCAR for the DOS and band runs."
       }
     ],
     "hints": [
       "Recall why a single ISIF = 3 run keeps its initial plane-wave basis.",
-      "Review the summary table and callouts on the topic page."
+      "Which run on the relaxation page gives the energy that is reported?"
     ],
     "difficulty": 0,
     "level": "intermediate",
@@ -505,9 +519,12 @@
       "S-042"
     ],
     "visual": {
-      "scene": "perovskite-octahedra",
-      "caption": "Relaxation followed by a static confirmation run.",
-      "alt": "Perovskite structure."
+      "plot": "restart-chain",
+      "params": {
+        "focus": "CONTCAR"
+      },
+      "caption": "The relaxed CONTCAR becomes the POSCAR of the static run.",
+      "alt": "Three stages in a row, relaxation then SCF in the same folder then a band or density-of-states run, with the file that travels along each arrow."
     }
   },
   {
@@ -536,7 +553,7 @@
     ],
     "hints": [
       "Look at the VASP file name that stores charge density.",
-      "Review the summary table and callouts on the topic page."
+      "The band run on the electronic-structure page copies one file from the SCF folder besides the inputs."
     ],
     "difficulty": -0.4,
     "level": "beginner",
@@ -545,9 +562,12 @@
       "S-042"
     ],
     "visual": {
-      "scene": "reciprocal-fcc",
-      "caption": "Reciprocal-space sampling using a converged CHGCAR.",
-      "alt": "Reciprocal space Brillouin zone."
+      "plot": "restart-chain",
+      "params": {
+        "focus": "CHGCAR"
+      },
+      "caption": "The band run reads the CHGCAR the SCF wrote.",
+      "alt": "Three stages in a row, relaxation then SCF in the same folder then a band or density-of-states run, with the file that travels along each arrow."
     }
   },
   {
@@ -576,7 +596,7 @@
     ],
     "hints": [
       "Compare the geometry of a 3D k-grid with a 1D high-symmetry line path.",
-      "Review the summary table and callouts on the topic page."
+      "Tetrahedra need k-points that fill a volume."
     ],
     "difficulty": 0.1,
     "level": "intermediate",
@@ -585,9 +605,15 @@
       "S-042"
     ],
     "visual": {
-      "scene": "reciprocal-fcc",
-      "caption": "High-symmetry path in the Brillouin zone.",
-      "alt": "Brillouin zone reciprocal-space view."
+      "plot": "smearing-curves",
+      "params": {
+        "series": "occupation",
+        "schemes": [
+          "gaussian"
+        ]
+      },
+      "caption": "Gaussian smearing (ISMEAR = 0) needs no mesh that fills the zone.",
+      "alt": "Curve of the occupation of a level against its energy from the Fermi level, falling from one to zero."
     }
   },
   {
@@ -601,7 +627,7 @@
       {
         "text": "Functional, POTCAR variants, ENCUT, and compatible k-point density",
         "correct": true,
-        "why": "Mismatched POTCARs, functionals, or ENCUTs shift raw energies by large unphysical offsets."
+        "why": "The functional, the POTCARs, ENCUT and the k-point density all enter the total energy; mismatches shift raw energies by amounts far larger than the differences you want."
       },
       {
         "text": "Only the job wall-time limit in the Slurm script",
@@ -615,8 +641,8 @@
       }
     ],
     "hints": [
-      "Check the reproducibility checklist in Module 10.",
-      "Review the summary table and callouts on the topic page."
+      "Which settings change the Hamiltonian or the basis?",
+      "The what-we-learned page lists what has to be redone when one setting changes."
     ],
     "difficulty": -0.2,
     "level": "beginner",
@@ -624,9 +650,774 @@
       "S-042"
     ],
     "visual": {
-      "scene": "fcc",
-      "caption": "Consistent settings across compared crystal calculations.",
-      "alt": "Crystal structure reference."
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "INCAR",
+          "POTCAR",
+          "KPOINTS"
+        ]
+      },
+      "caption": "The inputs that must match between runs whose energies you subtract.",
+      "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
+    }
+  },
+  {
+    "id": "q-m10-17",
+    "concepts": [
+      "dft-plus-u"
+    ],
+    "type": "single",
+    "prompt": "The structure page applies U to Cu 3d in LaCuO3. How should the value of U be chosen?",
+    "options": [
+      {
+        "text": "Scan a range (or compute U by linear response) and report how the results change",
+        "correct": true,
+        "why": "The common Materials Project list quoted in the protocol has no Cu value, so U must be scanned or computed, and conclusions shown across the range."
+      },
+      {
+        "text": "Copy U = 4 from the example INCAR, since it is the recommended value",
+        "correct": false,
+        "why": "The 4 in the example is a placeholder to be scanned, labelled as such on the page; it is not a recommendation."
+      },
+      {
+        "text": "Pick the value that opens the band gap you expect",
+        "correct": false,
+        "why": "Tuning U to an expected gap fits the model to a guess, and LaCuO3 is reported to be metallic, so this would go against experiment."
+      }
+    ],
+    "hints": [
+      "Does the database list of U values in the protocol include Cu?",
+      "Cococcioni and de Gironcoli describe a way to compute U rather than guess it."
+    ],
+    "difficulty": 0.2,
+    "level": "intermediate",
+    "sources": [
+      "S-034",
+      "S-042",
+      "S-095",
+      "S-096"
+    ],
+    "visual": {
+      "plot": "dftu-penalty",
+      "params": {
+        "U": 4
+      },
+      "caption": "The +U penalty on one orbital for an example U. Illustrative value.",
+      "alt": "Arch-shaped curve of the penalty energy against orbital occupation, zero at both ends of the range."
+    }
+  },
+  {
+    "id": "q-m10-18",
+    "concepts": [
+      "spin-polarized-dft",
+      "magnetic-ground-state"
+    ],
+    "type": "single",
+    "prompt": "Cu3+ is 3d8. Why does the structure page start LaCuO3 three ways (non-magnetic, MAGMOM 3 on Cu, MAGMOM 1 on Cu)?",
+    "options": [
+      {
+        "text": "The SCF can land in different spin solutions depending on the start, and both high-spin and low-spin d8 are possible, so each start is tried and the energies compared",
+        "correct": true,
+        "why": "In an octahedron d8 nominally has two unpaired eg electrons, but a distortion or strong Cu-O covalency can favour a smaller moment; the start decides which local minimum the SCF finds."
+      },
+      {
+        "text": "MAGMOM fixes the final moment, so the three runs give three exact moments",
+        "correct": false,
+        "why": "MAGMOM is only the starting guess; the moment relaxes during the SCF and must be read from OUTCAR."
+      },
+      {
+        "text": "VASP needs three runs before ISPIN = 2 is allowed",
+        "correct": false,
+        "why": "There is no such rule; one spin-polarized run is enough to run, but not enough to be sure you found the lowest state."
+      }
+    ],
+    "hints": [
+      "Draw the t2g and eg levels with eight electrons.",
+      "Is MAGMOM an input guess or a constraint?"
+    ],
+    "difficulty": 0.1,
+    "level": "intermediate",
+    "sources": [
+      "S-041",
+      "S-042",
+      "S-098",
+      "S-100"
+    ],
+    "visual": {
+      "plot": "spin-ladders",
+      "params": {
+        "levels": 5,
+        "up": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "down": [
+          1,
+          1,
+          1,
+          0,
+          0
+        ]
+      },
+      "caption": "Nominal high-spin d8: three t2g and two eg levels per spin. Illustrative.",
+      "alt": "Two ladders of five levels, spin up with five arrows and spin down with three, leaving two unpaired electrons."
+    }
+  },
+  {
+    "id": "q-m10-19",
+    "concepts": [
+      "cutoff-convergence"
+    ],
+    "type": "single",
+    "prompt": "In the ENCUT series for LaCuO3, what is held fixed between runs?",
+    "options": [
+      {
+        "text": "The cell, the k-mesh, the POTCARs and the spin start, in static runs; only ENCUT changes",
+        "correct": true,
+        "why": "Changing one setting at a time means every change in energy has one cause; static runs on the unrelaxed cell avoid adding geometry changes."
+      },
+      {
+        "text": "Nothing: the k-mesh is raised together with ENCUT to keep the cost balanced",
+        "correct": false,
+        "why": "If both change you cannot tell which one moved the energy."
+      },
+      {
+        "text": "Only the POTCARs; each run relaxes the cell at its own cutoff",
+        "correct": false,
+        "why": "Relaxing adds a second change (and Pulay stress) to every point; the protocol uses static runs on the same structure."
+      }
+    ],
+    "hints": [
+      "How would you tell which setting caused a change in energy?",
+      "Look at NSW in the series INCAR."
+    ],
+    "difficulty": -0.4,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "conv-series",
+      "params": {
+        "diff": [
+          20,
+          6,
+          2,
+          0.6,
+          0.2
+        ],
+        "threshold": 1,
+        "xlabel": "ENCUT (rising)"
+      },
+      "caption": "Change in energy per atom from each cutoff to the next. Illustrative numbers.",
+      "alt": "Curve of the change in energy from one setting to the next on a logarithmic axis, falling below a dashed threshold line."
+    }
+  },
+  {
+    "id": "q-m10-20",
+    "concepts": [
+      "kpoint-convergence"
+    ],
+    "type": "single",
+    "prompt": "Why can the k-mesh series for LaCuO3 oscillate before it settles, while an insulator usually converges smoothly?",
+    "options": [
+      {
+        "text": "The compound is reported metallic, and each mesh samples the Fermi surface differently, so the occupied states change from mesh to mesh",
+        "correct": true,
+        "why": "In a metal, bands cross the Fermi level and the occupations depend on where the k-points fall; smearing softens this but a coarse mesh still jumps."
+      },
+      {
+        "text": "More k-points always lower the energy, just as more plane waves do",
+        "correct": false,
+        "why": "The variational argument applies to the basis set, not to Brillouin-zone sampling; k-mesh energies can go up or down."
+      },
+      {
+        "text": "Oscillation means ENCUT is too low",
+        "correct": false,
+        "why": "ENCUT is fixed during the k-mesh series; the oscillation comes from the zone integration."
+      }
+    ],
+    "hints": [
+      "What is special about a metal at the Fermi level?",
+      "Does the variational principle say anything about k-point sampling?"
+    ],
+    "difficulty": 0.2,
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-042",
+      "S-049",
+      "S-096"
+    ],
+    "visual": {
+      "plot": "kmesh-grid",
+      "params": {
+        "n": 8,
+        "gamma": true,
+        "angle": 90,
+        "ratio": 1
+      },
+      "caption": "A Gamma-centred mesh in a cubic reciprocal cell.",
+      "alt": "Square reciprocal cell with a grid of dots for the k-points and a circle marking the Gamma point at the centre."
+    }
+  },
+  {
+    "id": "q-m10-21",
+    "concepts": [
+      "convergence-testing"
+    ],
+    "type": "single",
+    "prompt": "The Convergence Plotter accepts a series as converged at setting x_i when which condition holds?",
+    "options": [
+      {
+        "text": "Every later point stays within the tolerance of the energy per atom at x_i",
+        "correct": true,
+        "why": "The rule is the absolute value of (e_j - e_i) at or below the tolerance for all j > i, which a single flat stretch cannot fool."
+      },
+      {
+        "text": "The next point alone is within the tolerance",
+        "correct": false,
+        "why": "Two neighbouring points can agree by chance, especially in a metal; later points can still move."
+      },
+      {
+        "text": "The total energy matches the experimental cohesive energy",
+        "correct": false,
+        "why": "A total energy has no direct experimental counterpart; convergence is about how much it still changes with the setting."
+      }
+    ],
+    "hints": [
+      "Why is \"the next point is close\" not enough?",
+      "The page writes the rule with \"for all j > i\"."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "conv-series",
+      "params": {
+        "diff": [
+          20,
+          6,
+          0.5,
+          2,
+          0.3,
+          0.2
+        ],
+        "threshold": 1,
+        "xlabel": "k-mesh (rising)"
+      },
+      "caption": "A series with a flat stretch before a later jump. Illustrative numbers.",
+      "alt": "Curve of the change in energy from one setting to the next that dips below the threshold once, rises above it, then falls below it for good."
+    }
+  },
+  {
+    "id": "q-m10-22",
+    "concepts": [
+      "convergence-testing",
+      "magnetic-ground-state"
+    ],
+    "type": "single",
+    "prompt": "Why does the convergence page also converge the difference between the ferromagnetic and non-magnetic energies, not only the total energy?",
+    "options": [
+      {
+        "text": "It is the number the study reports, and errors common to both states cancel, so it may converge at a lower setting; that has to be checked, not assumed",
+        "correct": true,
+        "why": "Cancellation works only with the same cell, cutoff, mesh and POTCARs; testing the difference itself shows whether it has settled."
+      },
+      {
+        "text": "Energy differences never need testing because all errors cancel",
+        "correct": false,
+        "why": "Only errors that are the same for both states cancel; a difference can still change sign with an unconverged mesh in a metal."
+      },
+      {
+        "text": "The difference converges only if the two states use different k-meshes",
+        "correct": false,
+        "why": "Different meshes add an error to the difference instead of cancelling one."
+      }
+    ],
+    "hints": [
+      "Which number does the project actually care about?",
+      "When do errors cancel between two calculations?"
+    ],
+    "difficulty": 0.3,
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "conv-series",
+      "params": {
+        "diff": [
+          8,
+          3,
+          1.5,
+          0.4,
+          0.2
+        ],
+        "threshold": 1,
+        "xlabel": "ENCUT (rising)"
+      },
+      "caption": "Change in an energy difference per formula unit from each setting to the next. Illustrative numbers.",
+      "alt": "Curve of the change in an energy difference from one setting to the next on a logarithmic axis, falling below a dashed threshold line."
+    }
+  },
+  {
+    "id": "q-m10-23",
+    "concepts": [
+      "cutoff-convergence",
+      "forces-and-relaxation"
+    ],
+    "type": "single",
+    "prompt": "The energy test passes at a cutoff below 1.3 times ENMAX. Why does the relaxation still use at least 1.3 times ENMAX?",
+    "options": [
+      {
+        "text": "The stress converges more slowly with the cutoff than the energy (Pulay stress), and a variable-cell relaxation is driven by the stress",
+        "correct": true,
+        "why": "With too few plane waves the stress is biased, so ISIF = 3 finds the wrong volume even when the energy looks converged."
+      },
+      {
+        "text": "VASP refuses to run below 1.3 times ENMAX",
+        "correct": false,
+        "why": "VASP runs at lower cutoffs; the 1.3 factor is a protocol rule for reliable stress."
+      },
+      {
+        "text": "A higher cutoff makes the SCF converge in fewer steps",
+        "correct": false,
+        "why": "More plane waves make each step more expensive and do not speed up convergence; the reason is the stress."
+      }
+    ],
+    "hints": [
+      "Which quantity moves the cell in ISIF = 3?",
+      "Francis and Payne named the effect."
+    ],
+    "difficulty": 0.2,
+    "level": "intermediate",
+    "sources": [
+      "S-040",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "pw-count",
+      "params": {},
+      "caption": "The number of plane waves grows with the cutoff.",
+      "alt": "Curve of the number of plane waves in the basis against the cutoff energy, rising faster than a straight line."
+    }
+  },
+  {
+    "id": "q-m10-24",
+    "concepts": [
+      "relaxation-analysis",
+      "supercells"
+    ],
+    "type": "single",
+    "prompt": "You relax the ten-atom LaCuO3 cell starting exactly from the ideal cubic positions, and it stays cubic. What can you conclude?",
+    "options": [
+      {
+        "text": "Nothing yet about the tilt: symmetry makes the tilt forces zero, so displace the oxygen atoms in the tilt pattern and relax again",
+        "correct": true,
+        "why": "At the cubic positions the forces that would start a rotation vanish by symmetry, so the relaxation cannot leave them even if a tilted structure is lower."
+      },
+      {
+        "text": "The cubic structure is the ground state in this model",
+        "correct": false,
+        "why": "A run that cannot move away from a symmetric point says nothing about whether that point is a minimum."
+      },
+      {
+        "text": "The ionic optimizer failed and IBRION must be changed",
+        "correct": false,
+        "why": "The optimizer did its job: the forces were already zero. Changing it does not break the symmetry."
+      }
+    ],
+    "hints": [
+      "What are the forces on the oxygen atoms at the ideal positions?",
+      "How does the relaxation page make the tilt possible?"
+    ],
+    "difficulty": 0.3,
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-101"
+    ],
+    "visual": {
+      "plot": "dof-cell",
+      "params": {
+        "atoms": true,
+        "shape": true,
+        "volume": true
+      },
+      "caption": "ISIF = 3 lets atoms, shape and volume move, but only where forces and stress push.",
+      "alt": "Diagram of a cell with arrows showing atom positions, cell shape and volume all free to change."
+    }
+  },
+  {
+    "id": "q-m10-25",
+    "concepts": [
+      "relaxation-analysis"
+    ],
+    "type": "single",
+    "prompt": "Why is the energy of the last step of an ISIF = 3 relaxation unreliable after a large volume change?",
+    "options": [
+      {
+        "text": "The plane-wave set was built for the starting cell, so at the new volume the basis no longer matches ENCUT",
+        "correct": true,
+        "why": "VASP keeps the basis of the first step during the run; re-relaxing from CONTCAR and a static run on the final cell fix this."
+      },
+      {
+        "text": "VASP regenerates the k-mesh at every ionic step",
+        "correct": false,
+        "why": "The k-mesh in reciprocal coordinates stays the same during the run; the problem is the plane-wave basis."
+      },
+      {
+        "text": "MAGMOM is reset to its input value at every ionic step",
+        "correct": false,
+        "why": "The moments carry over from step to step; MAGMOM is only used at the start."
+      }
+    ],
+    "hints": [
+      "What part of the calculation depends on the cell size and is fixed at the start?",
+      "Why does the protocol restart from CONTCAR?"
+    ],
+    "difficulty": 0.1,
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-040",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "restart-chain",
+      "params": {
+        "focus": "CONTCAR"
+      },
+      "caption": "Restarting from CONTCAR rebuilds the basis for the new cell.",
+      "alt": "Three stages in a row, relaxation then SCF in the same folder then a band or density-of-states run, with the file that travels along each arrow."
+    }
+  },
+  {
+    "id": "q-m10-26",
+    "concepts": [
+      "forces-and-relaxation"
+    ],
+    "type": "single",
+    "prompt": "What does EDIFFG = -0.005 in the LaCuO3 relaxation INCAR mean?",
+    "options": [
+      {
+        "text": "Stop when every force is below 0.005 eV per angstrom",
+        "correct": true,
+        "why": "A negative EDIFFG sets a force criterion: the run stops when the largest force falls below its absolute value."
+      },
+      {
+        "text": "Stop when the total energy changes by less than 0.005 eV between ionic steps",
+        "correct": false,
+        "why": "That is what a positive EDIFFG means; the sign switches between an energy and a force criterion."
+      },
+      {
+        "text": "Stop when the stress is below 0.005 kB",
+        "correct": false,
+        "why": "EDIFFG does not set a stress threshold; with ISIF = 3 the stress is relaxed together with the forces, and you check the final pressure yourself."
+      }
+    ],
+    "hints": [
+      "What does the minus sign switch?",
+      "The relaxation page writes the criterion with an absolute value."
+    ],
+    "difficulty": -0.3,
+    "level": "beginner",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "force-band",
+      "params": {
+        "tol": 0.005
+      },
+      "caption": "Forces fall step by step; the run stops below the band.",
+      "alt": "Curve of the largest force falling over ionic steps on a logarithmic axis, with a horizontal band at the force tolerance."
+    }
+  },
+  {
+    "id": "q-m10-27",
+    "concepts": [
+      "magnetic-ground-state",
+      "magnetic-orderings"
+    ],
+    "type": "single",
+    "prompt": "Which comparison is sound for deciding whether G-type antiferromagnetic or ferromagnetic order is lower in LaCuO3?",
+    "options": [
+      {
+        "text": "Relax both in the same ten-atom cell, run a static SCF for each, compare energies per formula unit and check that the moments kept their pattern",
+        "correct": true,
+        "why": "The same cell cancels k-point and basis errors, static runs give clean energies, and the moment check confirms each energy belongs to the state it is named after."
+      },
+      {
+        "text": "Take the ferromagnetic energy from the five-atom cell and the G-type energy from the ten-atom cell, per atom",
+        "correct": false,
+        "why": "Different cells carry different k-point and basis errors, which can be as large as the difference."
+      },
+      {
+        "text": "Compare the energies of the first SCF before any relaxation",
+        "correct": false,
+        "why": "Each state can have its own relaxed volume; comparing unrelaxed energies ignores that."
+      }
+    ],
+    "hints": [
+      "Which errors cancel only within one cell?",
+      "What could a G-type start have turned into by the end of the run?"
+    ],
+    "difficulty": 0.2,
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-058"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Build the doubled cell"
+          },
+          {
+            "label": "Relax each state"
+          },
+          {
+            "label": "Static SCF each"
+          },
+          {
+            "label": "Check the moments"
+          },
+          {
+            "label": "Compare per formula unit"
+          }
+        ],
+        "active": 3
+      },
+      "caption": "The order of a sound magnetic comparison. Illustrative.",
+      "alt": "A row of five boxes from building the doubled cell to comparing energies, with the moment check highlighted."
+    }
+  },
+  {
+    "id": "q-m10-28",
+    "concepts": [
+      "dos-analysis"
+    ],
+    "type": "single",
+    "prompt": "With LORBIT = 11, what does the projected DOS show that the total DOS cannot?",
+    "options": [
+      {
+        "text": "Which orbitals carry the states near the Fermi level, for example Cu eg against O p",
+        "correct": true,
+        "why": "The projections weight each state by its overlap with spherical harmonics inside the sphere around each atom, which gives orbital character."
+      },
+      {
+        "text": "The exact number of electrons on each atom, because the projections add up to the total DOS",
+        "correct": false,
+        "why": "The spheres do not fill the cell, so the projections miss part of the density and do not sum to the total."
+      },
+      {
+        "text": "The measured photoemission spectrum",
+        "correct": false,
+        "why": "Kohn-Sham states are not quasiparticle energies, and the projections add orbital character, not a spectrum."
+      }
+    ],
+    "hints": [
+      "What does \"lm-decomposed\" mean?",
+      "Do the atomic spheres fill all of space?"
+    ],
+    "difficulty": -0.2,
+    "level": "beginner",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "band-gap",
+      "params": {
+        "dos": true
+      },
+      "caption": "Energy blocks and the DOS of a toy material. Toy model.",
+      "alt": "Energy blocks of a toy material with a density-of-states curve beside them."
+    }
+  },
+  {
+    "id": "q-m10-29",
+    "concepts": [
+      "dft-plus-u",
+      "band-structure-analysis"
+    ],
+    "type": "single",
+    "prompt": "Your PBE+U run of LaCuO3 shows a small gap that is absent at U = 0. How should you read it?",
+    "options": [
+      {
+        "text": "As a sign that this U may be too large for a compound reported to be metallic, so show the results across the U scan",
+        "correct": true,
+        "why": "Adding U pushes occupied and empty d states apart and can open a gap; for a reported metal that is a warning about the U value, not a prediction."
+      },
+      {
+        "text": "As proof that LaCuO3 is an insulator",
+        "correct": false,
+        "why": "The measured behaviour is metallic, and a gap that depends on an adjustable parameter cannot overturn that."
+      },
+      {
+        "text": "As the optical gap to compare directly with experiment",
+        "correct": false,
+        "why": "A Kohn-Sham gap is not an optical gap, and with or without U it is not measured the same way."
+      }
+    ],
+    "hints": [
+      "What do Bringley et al. report about the conductivity?",
+      "What does U do to occupied and empty d levels?"
+    ],
+    "difficulty": 0.4,
+    "level": "pro",
+    "sources": [
+      "S-042",
+      "S-096"
+    ],
+    "visual": {
+      "plot": "dftu-penalty",
+      "params": {
+        "U": 6
+      },
+      "caption": "A larger U means a larger penalty for fractional occupation. Illustrative value.",
+      "alt": "Arch-shaped curve of the penalty energy against orbital occupation, zero at both ends of the range."
+    }
+  },
+  {
+    "id": "q-m10-30",
+    "concepts": [
+      "band-structure-analysis",
+      "restart-files"
+    ],
+    "type": "single",
+    "prompt": "Why must LMAXMIX = 4 stay in the ICHARG = 11 band run of LaCuO3?",
+    "options": [
+      {
+        "text": "The band run reads the density from CHGCAR, and the on-site d components are written and read only up to LMAXMIX; with a smaller value they are dropped and the density changes",
+        "correct": true,
+        "why": "Products of two d orbitals contribute components up to l = 4; with the default the on-site part is cut, so the fixed density is not the converged one."
+      },
+      {
+        "text": "LMAXMIX sets the number of bands in the run",
+        "correct": false,
+        "why": "The number of bands is NBANDS; LMAXMIX controls the angular momentum kept in the on-site density."
+      },
+      {
+        "text": "LMAXMIX is only read during relaxations",
+        "correct": false,
+        "why": "It matters in every run that mixes or reads the density of d or f electrons, and the protocol names the ICHARG = 11 run explicitly."
+      }
+    ],
+    "hints": [
+      "Which file connects the SCF and the band run?",
+      "What is the largest l from a product of two d orbitals?"
+    ],
+    "difficulty": 0.3,
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-042"
+    ],
+    "visual": {
+      "plot": "restart-chain",
+      "params": {
+        "focus": "CHGCAR"
+      },
+      "caption": "The band run inherits its density, and its LMAXMIX, from the SCF.",
+      "alt": "Three stages in a row, relaxation then SCF in the same folder then a band or density-of-states run, with the file that travels along each arrow."
+    }
+  },
+  {
+    "id": "q-m10-31",
+    "concepts": [
+      "worked-example-workflow"
+    ],
+    "type": "single",
+    "prompt": "Which list belongs in the methods section of the LaCuO3 study?",
+    "options": [
+      {
+        "text": "PAW potentials from the TITEL lines, ENCUT and k-mesh with the tolerance they met, U and how it was chosen, and the magnetic configurations with their final moments",
+        "correct": true,
+        "why": "These are the settings a reader needs to repeat the runs, each copied from the archived files."
+      },
+      {
+        "text": "Only the functional name, since everything else is a default",
+        "correct": false,
+        "why": "The cutoff, mesh, potentials, U and spin setup are not defaults here, and each changes the energies."
+      },
+      {
+        "text": "The wall time and number of nodes of every job",
+        "correct": false,
+        "why": "Run times help planning but do not change the physics, and a reader cannot repeat the calculation from them."
+      }
+    ],
+    "hints": [
+      "What would someone need to get the same energies?",
+      "The what-we-learned page has a checklist table."
+    ],
+    "difficulty": -0.3,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "file-flow",
+      "params": {
+        "highlight": [
+          "INCAR",
+          "POTCAR",
+          "KPOINTS",
+          "POSCAR"
+        ]
+      },
+      "caption": "The methods record comes from the archived input files.",
+      "alt": "Boxes for the four input files on the left feeding a box called VASP, which feeds the output files on the right."
+    }
+  },
+  {
+    "id": "q-m10-32",
+    "concepts": [
+      "worked-example-workflow",
+      "dft-plus-u"
+    ],
+    "type": "single",
+    "prompt": "The example INCAR on these pages sets LDAUU = 0 4 0. How should that 4 be treated?",
+    "options": [
+      {
+        "text": "As an illustrative placeholder for a scan, labelled as such and never quoted as a result or a recommended value",
+        "correct": true,
+        "why": "The pages state that the value is a placeholder; presenting it as a finding would be an invented result."
+      },
+      {
+        "text": "As the converged U for Cu in LaCuO3",
+        "correct": false,
+        "why": "No U was derived on these pages; the value has to come from a scan or a linear-response calculation."
+      },
+      {
+        "text": "As the Materials Project value for Cu",
+        "correct": false,
+        "why": "The Materials Project list quoted in the protocol has no value for Cu."
+      }
+    ],
+    "hints": [
+      "Where on the structure page is this number introduced, and how is it labelled?",
+      "Does the database list include Cu?"
+    ],
+    "difficulty": -0.1,
+    "level": "beginner",
+    "sources": [
+      "S-034",
+      "S-042"
+    ],
+    "visual": {
+      "none": "The question is about labelling a number honestly, which no plot or structure can show."
     }
   }
 ]
