@@ -217,7 +217,10 @@ export function meshFor(c: LatticeCase, n: number, centering: Centering): MeshRe
   const pts: Vec3[] = [];
   for (let i = 0; i < m.count; i++)
     pts.push([
-      ...foldToZone([...qToCartesian([m.coords[3 * i]!, m.coords[3 * i + 1]!, m.coords[3 * i + 2]!], b)] as Vec3, rec),
+      ...foldToZone(
+        [...qToCartesian([m.coords[3 * i]!, m.coords[3 * i + 1]!, m.coords[3 * i + 2]!], b)] as Vec3,
+        rec,
+      ),
     ] as Vec3);
   const group = pointGroup(c);
   const red = irreducibleCount(div, centering, group);

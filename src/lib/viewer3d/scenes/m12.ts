@@ -440,11 +440,11 @@ const elastic: SceneDef = {
     const head: ('solid' | 'open')[] = [];
     for (let k = 0; k < 3; k++)
       for (const sgn of [1, -1]) {
-        const nrm = normalize(cross(lat[(k + 1) % 3], lat[(k + 2) % 3]));
-        const n = scale(nrm, dot(nrm, lat[k]) >= 0 ? sgn : -sgn);
+        const nrm = normalize(cross(lat[(k + 1) % 3]!, lat[(k + 2) % 3]!));
+        const n = scale(nrm, dot(nrm, lat[k]!) >= 0 ? sgn : -sgn);
         const tr = matVec(sig, n) as Vec3;
         if (norm(tr) < 1e-9) continue;
-        const face = add(ctr, scale(lat[k], 0.5 * sgn));
+        const face = add(ctr, scale(lat[k]!, 0.5 * sgn));
         from.push(face);
         vec.push(scale(tr, 0.45));
         const tension = dot(tr, n) >= 0;

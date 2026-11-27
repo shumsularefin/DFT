@@ -1137,7 +1137,7 @@ const relaxationLandscape: SceneDef = {
       layers.push(points(trials, 'muted', 0.05, 'trials', { name: 'Line-search trial points' }));
     const tags = l.stationary.map((s) => ({ text: s.kind, at: [s.x, s.y, s.energy + 0.45] as Vec3 }));
     const st = r.path[0]!;
-    tags.push({ text: 'start', at: [st.x, st.y, ez(st.x, st.y) + 0.45] });
+    (tags as { text: string; at: Vec3 }[]).push({ text: 'start', at: [st.x, st.y, ez(st.x, st.y) + 0.45] });
     layers.push(labels(tags, 'labels'), ...axesLayers([1.2, 1.2, 1.2], ['x', 'y', 'E'], [x0, y0, zf]));
     // what the reader is looking at
     const conv = r.convergedAt >= 0 && r.convergedAt <= n;
@@ -1414,7 +1414,7 @@ const errorCauses: SceneDef = {
       const cr = crystalLayers(s, { radiusScale: 0.45 });
       const pos = s.frac.map((f) => {
         const L = s.lattice;
-        return [0, 1, 2].map((c) => f[0] * L[0][c] + f[1] * L[1][c] + f[2] * L[2][c]) as Vec3;
+        return [0, 1, 2].map((c) => f[0] * L[0][c]! + f[1] * L[1][c]! + f[2] * L[2][c]!) as Vec3;
       });
       const nA = s.frac.length;
       const given = Math.min(m, nA);

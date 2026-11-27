@@ -30,7 +30,7 @@ import {
   model,
   windowIndices,
   windowOf,
-} from './model1d';
+} from './toy1d';
 
 const MODEL_BANNER =
   'A one-dimensional model atom with softened Coulomb forces, not a real atom: two electrons on a line, solved exactly on a 0.5 bohr grid.';

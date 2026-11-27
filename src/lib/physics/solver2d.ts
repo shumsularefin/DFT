@@ -90,7 +90,9 @@ function project(v: Float64Array, nx: number, sym: ExchangeSymmetry): void {
 /** Lowest eigenvalues and eigenvectors of a small symmetric matrix (row-major, size m <= 3) by Jacobi rotations. */
 function smallEigen(A: number[], m: number): { values: number[]; vectors: number[][] } {
   const a = A.slice();
-  const v = Array.from({ length: m }, (_, i) => Array.from({ length: m }, (_, j) => (i === j ? 1 : 0)));
+  const v = Array.from({ length: m }, (_, i) =>
+    Array.from({ length: m }, (_, j): number => (i === j ? 1 : 0)),
+  );
   for (let sweep = 0; sweep < 60; sweep++) {
     let off = 0;
     for (let p = 0; p < m; p++) for (let q = p + 1; q < m; q++) off += a[p * m + q]! ** 2;

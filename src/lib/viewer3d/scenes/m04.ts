@@ -9,7 +9,7 @@ import { lowestState2d, potentialFromDensity2d, type Grid2D } from '../../physic
 import { nonInteractingDensity, xcHole } from '../../physics/twoelectron1d';
 import { atoms, axesLayers, curve, fmt, labels, lines, points } from '../kit';
 import type { Layer, MeshLayer, Params, SceneDef, Vec3 } from '../types';
-import { dashedPolyline, gridSurface, kohnSham, model, windowIndices, windowOf } from './model1d';
+import { dashedPolyline, gridSurface, kohnSham, model, windowIndices, windowOf } from './toy1d';
 
 const MODEL_BANNER =
   'A one-dimensional model atom with softened Coulomb forces, not a real atom: two electrons on a line, solved exactly on a 0.5 bohr grid.';

@@ -4,7 +4,7 @@ import { binomial, formatBig } from '../../physics/combinatorics';
 import { runScf } from '../../physics/scf1d';
 import { withDefaults, type Params } from '../types';
 import { densityAtNucleus, modelEnergy, occupations, productState, scenes, shellDensity } from './m03';
-import { GRID, model } from './model1d';
+import { GRID, model } from './toy1d';
 
 const build = (id: string, p: Params = {}) => {
   const d = scenes[id]!;

@@ -4,7 +4,7 @@ import golden from '../../../../tests/reference/scf1d_reference.json';
 import { runScf } from '../../physics/scf1d';
 import { withDefaults, type Params } from '../types';
 import { densityCoordinates, helperSystem, landscapeState, scenes, scf } from './m04';
-import { kohnSham, model } from './model1d';
+import { kohnSham, model } from './toy1d';
 
 const build = (id: string, p: Params = {}) => {
   const d = scenes[id]!;

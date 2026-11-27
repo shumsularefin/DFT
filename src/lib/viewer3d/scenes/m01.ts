@@ -74,7 +74,7 @@ function cloudGrid(
           const dy = lo[1] + j * h[1]! - c.at[1];
           const dz = lo[2] + k * h[2]! - c.at[2];
           const r = Math.sqrt(dx * dx + dy * dy + dz * dz);
-          if (r < cut) values[i + n * (j + n * k)] += Math.exp(-r / c.rs);
+          if (r < cut) values[i + n * (j + n * k)] = values[i + n * (j + n * k)]! + Math.exp(-r / c.rs);
         }
   }
   const out = { values, grid, lo, hi };
@@ -573,7 +573,7 @@ const probes: SceneDef = {
         [2, 1],
         [1, 2],
       ] as const) {
-        const q = add(scale(gl[0], x), scale(gl[1], y));
+        const q = add(scale([...gl[0]] as Vec3, x), scale([...gl[1]] as Vec3, y));
         sp.push([
           [q[0], q[1], z1],
           [q[0], q[1], z2],

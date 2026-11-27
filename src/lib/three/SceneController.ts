@@ -144,7 +144,11 @@ export class SceneController {
 
     this.controls = this.options.createControls
       ? this.options.createControls(this.camera, this.renderer.domElement)
-      : (new ArcballControls(this.camera, this.renderer.domElement, () => new Vector3()) as unknown as ControlsLike);
+      : (new ArcballControls(
+          this.camera,
+          this.renderer.domElement,
+          () => new Vector3(),
+        ) as unknown as ControlsLike);
     this.controls.enableDamping = !this.reducedMotion;
     const onChange = () => this.requestRender();
     const onStart = () => (this.interacting = true);

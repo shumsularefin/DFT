@@ -127,7 +127,7 @@ export function slosh(o: SloshOptions): SloshResult {
   const gains = q.map((_, i) => 1 - K[i]! * eps[i]!);
   // state vector: [a_1..a_M, b_1..b_M]
   const start = lumpError(o.length, q);
-  let e = new Float64Array(2 * M);
+  let e: Float64Array = new Float64Array(2 * M);
   e.set(start.a, 0);
   e.set(start.b, M);
   const resid = (x: Float64Array) => x.map((v, i) => -eps[i % M]! * v);
@@ -151,7 +151,7 @@ export function slosh(o: SloshOptions): SloshResult {
       const c = pulayWeights(A);
       next = new Float64Array(2 * M);
       hist.forEach((h, j) => {
-        for (let i = 0; i < 2 * M; i++) next[i]! += c[j]! * (h.e[i]! + K[i % M]! * h.R[i]!);
+        for (let i = 0; i < 2 * M; i++) next[i] = next[i]! + c[j]! * (h.e[i]! + K[i % M]! * h.R[i]!);
       });
     }
     e = next;

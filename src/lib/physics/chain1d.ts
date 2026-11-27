@@ -34,7 +34,9 @@ export function chainHamiltonian(n: number, t: number, delta: number): number[][
 export function symmetricEigen(m: readonly (readonly number[])[]): { values: number[]; vectors: number[][] } {
   const n = m.length;
   const a = m.map((r) => [...r]);
-  const v = Array.from({ length: n }, (_, i) => Array.from({ length: n }, (__, j) => (i === j ? 1 : 0)));
+  const v = Array.from({ length: n }, (_, i) =>
+    Array.from({ length: n }, (__, j): number => (i === j ? 1 : 0)),
+  );
   for (let sweep = 0; sweep < 100; sweep++) {
     let off = 0;
     for (let p = 0; p < n; p++) for (let q = p + 1; q < n; q++) off += a[p]![q]! ** 2;
