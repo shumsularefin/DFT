@@ -8,6 +8,9 @@ describe('VESTA style (D-122)', () => {
     expect(elementColor('La')).toBe('#70d4ff');
     expect(elementColor('Fe1')).toBe(ELEMENT_COLORS.Fe);
     expect(elementColor('Xx')).toBe(UNKNOWN_ELEMENT_COLOR);
+    // a real two-letter element missing from the table is unknown, not the one-letter element (Po is not P)
+    expect(elementColor('Po')).toBe(UNKNOWN_ELEMENT_COLOR);
+    expect(elementColor('Ar 3')).toBe(ELEMENT_COLORS.Ar);
   });
   it('every colour is #rrggbb', () => {
     for (const c of Object.values(ELEMENT_COLORS)) expect(c).toMatch(/^#[0-9a-f]{6}$/i);

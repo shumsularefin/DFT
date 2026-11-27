@@ -81,9 +81,22 @@ export const ELEMENT_COLORS: Readonly<Record<string, string>> = {
   Tl: '#a6544d',
   Pb: '#575961',
   Bi: '#9e4fb5',
+  // three noble gases the Studio table leaves out, in the same Jmol convention
+  Ar: '#80d1e3',
+  Kr: '#5cb8d1',
+  Xe: '#429eb0',
   Th: '#00baff',
   U: '#008fff',
 };
+
+/** Two-letter element symbols, so a real element that the table lacks is not mistaken for a one-letter one. */
+const KNOWN_TWO_LETTER = new Set(
+  (
+    'He Li Be Ne Na Mg Al Si Cl Ar Ca Sc Ti Cr Mn Fe Co Ni Cu Zn Ga Ge As Se Br Kr Rb Sr Zr Nb Mo Tc Ru Rh Pd Ag Cd In Sn ' +
+    'Sb Te Xe Cs Ba La Ce Pr Nd Pm Sm Eu Gd Tb Dy Ho Er Tm Yb Lu Hf Ta Re Os Ir Pt Au Hg Tl Pb Bi Po At Rn Fr Ra Ac Th ' +
+    'Pa Np Pu Am Cm Bk Cf Es Fm Md No Lr'
+  ).split(' '),
+);
 
 /** Grey for an element the table does not list (as the Studio viewer does). */
 export const UNKNOWN_ELEMENT_COLOR = '#94a3b8';
@@ -91,7 +104,10 @@ export const UNKNOWN_ELEMENT_COLOR = '#94a3b8';
 /** Colour of an element symbol; a label such as "Fe1" or "Fe_up" uses the element's colour. */
 export function elementColor(symbol: string): string {
   const m = /^[A-Z][a-z]?/.exec(symbol.trim());
-  const el = m ? (ELEMENT_COLORS[m[0]] ? m[0] : m[0][0]!) : '';
+  // a one-letter symbol followed by a lower-case letter that is not an element (for example "Hx") falls back to the
+  // one-letter element; a real two-letter element missing from the table (for example Po) stays unknown grey
+  const two = m?.[0] ?? '';
+  const el = ELEMENT_COLORS[two] || two.length < 2 || KNOWN_TWO_LETTER.has(two) ? two : two[0]!;
   return ELEMENT_COLORS[el] ?? UNKNOWN_ELEMENT_COLOR;
 }
 
