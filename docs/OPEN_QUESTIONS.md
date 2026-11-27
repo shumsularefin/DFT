@@ -307,3 +307,4 @@ The Builder filled DFT+U with a per-element U table and FM starting moments from
 
 ## Q-073. Explicit k-mesh is not in the Input Builder share link
 The Input Builder's typed mesh (`meshOverride`, D-108) is not written to the share link, so a shared link falls back to the k-spacing mesh. **Close:** add the mesh to the share fragment with a round-trip test, or record that typed meshes are local only. **Owner: builder.**
+**Closed (2026-11-27, D-110 (4)).** The share fragment carries the typed mesh as `mesh: [N1, N2, N3]` (integers 1 to 200, anything else makes the link invalid). `applyShare` sets it after loading the shared POSCAR, since loading a structure clears the mesh, and ignores it for KSPACING and line mode. Round-trip tests in `src/lib/vasp/builder.test.ts` and `src/components/tools/input-builder/store.test.ts`. A link whose POSCAR was too long to include still carries the mesh, but pasting the structure afterwards clears it, as any new structure does.
