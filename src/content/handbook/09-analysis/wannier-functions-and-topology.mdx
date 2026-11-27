@@ -1,0 +1,167 @@
+---
+id: wannier-functions-and-topology
+title: Wannier functions and a first look at topology
+module: 9
+order: 7
+summary: How Bloch states become localized Wannier functions, why the result depends on a gauge choice and how maximal localization fixes it, how Wannier90 runs with VASP, and what Wannier functions are used for, from tight-binding models to Berry phases and topological invariants.
+concepts: [wannier-functions]
+requires: [band-structure-analysis]
+vaspTags: [LWANNIER90, NUM_WANN, NBANDS, ISYM, ICHARG]
+sources: [S-019, S-036, S-049, S-133, S-134]
+noLab: true
+status: draft
+updated: 2026-11-27
+---
+
+<Why>
+
+A plane-wave calculation describes electrons as Bloch waves spread through the whole crystal. Chemists think in local orbitals: an sp³ bond, a d orbital on a metal ion. <Term id="wannier-function">Wannier functions</Term> connect the two pictures. They are built from the Bloch states of a group of bands and are localized in space, one per band and per cell <Cite id="S-133" />. From them you get a small tight-binding model that reproduces the DFT bands, cheap interpolation of bands on fine k-meshes, the electric polarization, and the starting point for topological analysis and for DFT+DMFT <Cite id="S-133" />. This page is an introduction: it shows the ideas and the inputs, not every option.
+
+</Why>
+
+<Intuition>
+
+**From waves to orbitals.** A Bloch state $\psi_{n\mathbf{k}}$ is a periodic function times a plane wave. Adding up the Bloch states of one band over all $\mathbf{k}$ in the Brillouin zone, each with a phase factor, makes the waves cancel everywhere except near one cell. The result is a Wannier function centred on that cell <Cite id="S-036" /> <Cite id="S-049" />.
+
+**The catch: a free phase.** Every Bloch state is defined only up to a phase, and when bands cross or touch, only up to a mixing among them. That choice, the _gauge_, does not change any band energy, but it changes the Wannier functions completely: a bad choice gives spread-out, ugly functions. Marzari and Vanderbilt chose the gauge that makes the functions as compact as possible, the maximally localized Wannier functions (MLWFs) <Cite id="S-133" />.
+
+**Entangled bands.** The bands you want (say, the d bands of a metal) often cross other bands. Souza, Marzari and Vanderbilt's _disentanglement_ step first picks, at each k, the best subspace of the right size from a wider energy window, then localizes it. An inner _frozen_ window keeps the states you care about exactly <Cite id="S-133" />.
+
+**What they are good for.**
+
+- **Tight-binding models.** The Hamiltonian in the Wannier basis is a short list of hoppings between nearby orbitals. It reproduces the DFT bands in the chosen window and can be used to build models <Cite id="S-133" />.
+- **Band interpolation.** Diagonalizing that small Hamiltonian at any k is cheap, so properties that need dense meshes (Fermi surfaces, transport) become affordable <Cite id="S-133" />.
+- **Polarization.** The sum of the Wannier centres, times the electron charge, gives the electronic part of the polarization. This is the <Term id="berry-phase">Berry phase</Term> theory of polarization in real-space form <Cite id="S-133" />.
+- **Topology.** How the Wannier centres move as one k-component is swept around the zone reveals <Term id="topological-invariant">topological invariants</Term> such as the Z2 index and the Chern number <Cite id="S-133" />. WannierTools computes these and surface states from a Wannier tight-binding model <Cite id="S-134" />.
+
+</Intuition>
+
+<TheMath>
+
+For a lattice vector $\mathbf{R}$, cell volume $V$ and band $n$ <Cite id="S-133" />:
+
+$$
+w_n(\mathbf{r}-\mathbf{R}) = \frac{V}{(2\pi)^3}\int_{\text{BZ}} e^{-i\mathbf{k}\cdot\mathbf{R}}\,\psi_{n\mathbf{k}}(\mathbf{r})\,d\mathbf{k}
+$$
+
+In words: a Fourier transform from k back to real space.
+
+<Level min="intermediate">
+
+**Gauge freedom and spread.** For a group of $J$ bands any unitary mixing $\tilde\psi_{n\mathbf{k}} = \sum_m U_{mn}^{(\mathbf{k})}\psi_{m\mathbf{k}}$ is allowed. Marzari and Vanderbilt pick the $U^{(\mathbf{k})}$ that minimize the total spread <Cite id="S-133" />:
+
+$$
+\Omega = \sum_{n=1}^{J}\Big[\langle r^2\rangle_n - \lVert\langle\mathbf{r}\rangle_n\rVert^2\Big]
+$$
+
+where $\langle\cdot\rangle_n$ is an expectation value in $w_n$. In practice $\Omega$ is computed from overlaps $M_{mn}^{(\mathbf{k},\mathbf{b})} = \langle u_{m\mathbf{k}}\vert u_{n,\mathbf{k}+\mathbf{b}}\rangle$ between neighbouring k-points on a uniform mesh, which is what the DFT code has to provide.
+
+</Level>
+
+<Level min="pro">
+
+**Berry phase and polarization.** The change in electronic polarization between two states of an insulator equals $-e/V$ times the change in the sum of the centres of the occupied Wannier functions (each spin counted), defined modulo a lattice vector (the "quantum" of polarization) <Cite id="S-133" />. **Invariants.** A Chern number counts how many times a Berry phase winds as $\mathbf{k}$ crosses the zone; the Z2 index of a time-reversal-invariant insulator is the parity of a similar winding. Neither can change without the gap closing <Cite id="S-133" />.
+
+</Level>
+
+</TheMath>
+
+<InVasp>
+
+VASP talks to Wannier90 through `LWANNIER90 = .TRUE.`, in a VASP binary built with the Wannier90 interface. The run writes the inputs Wannier90 needs: the overlaps (`wannier90.mmn`), the projections onto trial orbitals (`wannier90.amn`), the band energies (`wannier90.eig`), and a template `wannier90.win` if none exists (from memory of the VASP wiki page LWANNIER90, Q-069) <Cite id="S-019" />. Wannier90 then runs on its own (`wannier90.x wannier90`) <Cite id="S-134" />.
+
+A non-self-consistent run from a converged `CHGCAR`, for diamond-structure Si:
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM     = Si to Wannier90
+ICHARG     = 11
+LWANNIER90 = .TRUE.
+NUM_WANN   = 8
+NBANDS     = 16
+ISYM       = -1
+ISMEAR     = 0
+SIGMA      = 0.05
+LWAVE      = .FALSE.`}
+  annotations={{
+    2: 'read the converged density, do not change it',
+    3: 'write the Wannier90 input files',
+    4: 'eight Wannier functions: sp3 on each of two Si',
+    5: 'more bands than Wannier functions, for disentanglement',
+    6: 'no symmetry: Wannier90 needs the full uniform k-mesh',
+  }}
+/>
+
+Wannier90 needs every point of a uniform mesh, so switch symmetry off; `ISYM = -1` is the cautious choice (check the LWANNIER90 page for your version, Q-069). A minimal `wannier90.win` <Cite id="S-134" />:
+
+```text
+num_wann     = 8
+num_bands    = 16
+dis_win_max  = 17.0
+dis_froz_max = 6.5
+num_iter     = 200
+begin projections
+Si:sp3
+end projections
+bands_plot   = true
+write_hr     = true
+```
+
+The two window energies are absolute band energies in eV and are illustrative: read them off your own band structure, with the frozen window just above the states you must keep. `write_hr` writes the tight-binding Hamiltonian (`wannier90_hr.dat`), which WannierTools reads <Cite id="S-134" />. In the output, check that the spread has converged and that the Wannier-interpolated bands lie on the DFT bands inside the frozen window.
+
+</InVasp>
+
+<WhatChanges>
+
+| If you change...        | ...what happens                                                             |
+| ----------------------- | --------------------------------------------------------------------------- |
+| Poor trial projections  | Slow or failed localization; Wannier functions centred in the wrong places  |
+| Frozen window too high  | Unwanted bands are forced in; interpolated bands wiggle                     |
+| Outer window too narrow | Not enough states to disentangle; bands drift from DFT                      |
+| Symmetry left on        | An incomplete k-mesh; Wannier90 stops or gives wrong overlaps               |
+| Coarse k-mesh           | Wannier functions overlap their periodic images; hoppings are less accurate |
+
+These rows follow from the method above; they are reasoning, not quoted values.
+
+Why Wannier functions: local orbitals turn a band structure into a model you can reason with. Why these settings: the method needs a full mesh and a sensible window. What happens if you skip the band comparison: a tight-binding model that does not reproduce the bands it came from.
+
+</WhatChanges>
+
+<Mistakes>
+
+<Callout variant="mistake" title="Not checking the interpolated bands">
+
+The spread alone does not tell you the model is right. Plot the Wannier-interpolated bands on top of the DFT bands; they must agree inside the frozen window <Cite id="S-133" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Running on a symmetry-reduced mesh">
+
+Wannier90 needs the overlaps between neighbouring points of the full uniform mesh. Switch symmetry off in the VASP run.
+
+</Callout>
+
+<Callout variant="mistake" title="Treating Wannier functions as unique orbitals">
+
+They depend on the windows, projections and number of functions. Report those choices with any result, and interpret orbital shapes with care <Cite id="S-133" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Calling a material topological from one band plot">
+
+A band inversion is a hint, not a proof. A topological claim needs an invariant computed from the bands, for example with WannierTools, and usually spin-orbit coupling <Cite id="S-134" />.
+
+</Callout>
+
+</Mistakes>
+
+<Check ids={['q-m9-wan-1', 'q-m9-wan-2', 'q-m9-wan-3', 'q-m9-wan-4']} />
+
+<GoDeeper>
+
+- Marzari and Vanderbilt on maximal localization; Souza, Marzari and Vanderbilt on disentanglement; the review by Marzari and co-workers <Cite id="S-133" />.
+- King-Smith and Vanderbilt on polarization as a Berry phase; Hasan and Kane on topological insulators <Cite id="S-133" />.
+- The Wannier90 and WannierTools papers <Cite id="S-134" />.
+- The [band structures](/handbook/09-analysis/band-structures/) page for the DFT bands to compare with.
+
+</GoDeeper>
