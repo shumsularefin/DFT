@@ -129,8 +129,14 @@ const quick = [
   .module-map > li {
     margin: 0;
   }
+  /* Every module box is the same height; a module with many topics scrolls inside its box. */
   .module-card {
-    height: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 21rem;
+  }
+  .module-card .card-title {
+    min-height: 2.6em;
   }
   .module-no {
     display: flex;
@@ -164,9 +170,15 @@ const quick = [
     margin: var(--space-1) 0 var(--space-1);
   }
   .module-topics {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-gutter: stable;
     list-style: none;
-    margin: var(--space-3) 0 0;
-    padding: var(--space-3) 0 0;
+    margin: var(--space-3) calc(-1 * var(--space-2)) 0 0;
+    padding: var(--space-2) var(--space-2) 0 0;
     border-top: 1px solid var(--border);
     font-size: var(--step--1);
   }
