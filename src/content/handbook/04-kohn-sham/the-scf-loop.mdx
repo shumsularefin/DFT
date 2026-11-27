@@ -6,10 +6,10 @@ order: 4
 summary: Why the Kohn-Sham equations are solved in a loop, what each step does, and a live toy lab where you can make the loop converge, crawl or oscillate.
 concepts: [scf-loop]
 requires: [kohn-sham-equations]
-vaspTags: [EDIFF, NELM, ICHARG]
-sources: [S-012, S-019, S-031, S-041, S-047, S-048, S-049]
+vaspTags: [EDIFF, NELM, ICHARG, ALGO]
+sources: [S-012, S-019, S-031, S-041, S-042, S-047, S-048, S-049]
 status: draft
-updated: 2026-11-18
+updated: 2026-11-27
 ---
 
 <Why>
@@ -81,6 +81,17 @@ The "loop behaviour" readout is a heuristic: it calls the loop oscillating when 
 - `NELM` is the most iterations VASP will do for one ionic step. Default 60 (VASP wiki page NELM) <Cite id="S-019" />. Hitting `NELM` means that step did not converge.
 - `ICHARG` sets the starting density: 2 builds it from atoms, 1 reads it from `CHGCAR` <Cite id="S-041" />.
 - VASP mixes with Pulay and Broyden methods (`IMIX = 4` by default), not with the simple linear step of the lab <Cite id="S-019" />. The next page covers what to do when the loop struggles.
+- `ALGO` chooses how the orbitals are improved inside each step (VASP wiki page ALGO) <Cite id="S-019" /> <Cite id="S-041" />:
+
+| `ALGO`     | What it does                                                 | When to use it                                                              |
+| ---------- | ------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| `Normal`   | Blocked Davidson; the default                                | Robust first choice, and the first thing to go back to when a run struggles |
+| `Fast`     | Davidson for the first steps, then RMM-DIIS                  | Faster for simple bulk work; avoid for magnetic or +U systems               |
+| `VeryFast` | RMM-DIIS only                                                | Fastest, but fragile; simple systems with a good start                      |
+| `All`      | All bands updated together (also written `Conjugate`)        | Hard metals, magnets, hybrids, meta-GGA, or when `Normal` stalls            |
+| `Damped`   | Damped dynamics of the orbitals, with the step set by `TIME` | Hybrid functionals and hard cases, often with `TIME = 0.4`                  |
+
+The order to try them in when the loop fails (`Normal`, then `All`, then `Damped`) is explained in [When the electronic loop will not converge](/handbook/08-convergence-and-errors/scf-trouble/) <Cite id="S-042" />.
 
 </InVasp>
 

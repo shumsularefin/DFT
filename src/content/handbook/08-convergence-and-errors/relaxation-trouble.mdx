@@ -27,6 +27,8 @@ A relaxation is a ball rolling into a valley. Three things go wrong. The ball ca
 
 <TheMath>
 
+A relaxation moves the atoms downhill on the energy surface, one step at a time, and stops when the forces on them are small enough. Each method differs only in how it chooses the next step <Cite id="S-019" />.
+
 <Level min="intermediate">
 
 `IBRION = 2` uses a conjugate-gradient search with a line minimization along each direction; the `ZBRENT` error means that line search could not bracket a minimum <Cite id="S-041" />. `IBRION = 1` is a quasi-Newton scheme that is often better close to the minimum, and `IBRION = 3` is a damped-dynamics option the Field Handbook suggests for poor starting structures <Cite id="S-019" /> <Cite id="S-041" />. A negative `EDIFFG` sets the force criterion in eV per angstrom, and a positive one sets an energy criterion <Cite id="S-019" />.
