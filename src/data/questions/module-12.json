@@ -1510,5 +1510,426 @@
       "caption": "The AIMD stability check.",
       "alt": "A three-step flow: set up the MD run, run thousands of steps, then check the structure and the energy trace."
     }
+  },
+  {
+    "id": "q-slab-1",
+    "concepts": [
+      "surface-slabs"
+    ],
+    "type": "numeric",
+    "prompt": "A symmetric, stoichiometric slab holds 8 bulk formula units. Illustrative energies: E_slab = -210.0 eV, E_bulk = -27.0 eV per formula unit, and one face has an area of 15 square angstrom. What is the surface energy in eV per square angstrom?",
+    "answer": 0.2,
+    "tolerance": 0.005,
+    "unit": "eV/A^2",
+    "hints": [
+      "Subtract 8 times the bulk energy from the slab energy.",
+      "A symmetric slab has two faces, so divide by twice the area."
+    ],
+    "difficulty": 0.3,
+    "level": "intermediate",
+    "sources": [
+      "S-018"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Relax the symmetric slab"
+          },
+          {
+            "label": "Subtract n times the bulk energy"
+          },
+          {
+            "label": "Divide by the area of both faces"
+          }
+        ],
+        "active": -1
+      },
+      "caption": "The surface energy from a symmetric slab.",
+      "alt": "A three-step flow: relax the slab, subtract the bulk energy of its formula units, divide by the area of both faces."
+    }
+  },
+  {
+    "id": "q-slab-2",
+    "concepts": [
+      "surface-slabs"
+    ],
+    "type": "single",
+    "prompt": "Your slab has its surface normal along the third lattice vector. Which k-mesh suits it?",
+    "options": [
+      {
+        "text": "8 x 8 x 1, Gamma-centred",
+        "correct": true,
+        "why": "The bands do not disperse across the vacuum, so one point along the normal is enough; the in-plane mesh matches the bulk sampling."
+      },
+      {
+        "text": "8 x 8 x 8",
+        "correct": false,
+        "why": "Tempting because it looks thorough, but points along the vacuum sample nothing and multiply the cost."
+      },
+      {
+        "text": "1 x 1 x 8",
+        "correct": false,
+        "why": "That samples the vacuum direction and leaves the periodic in-plane directions with a single point."
+      },
+      {
+        "text": "8 x 8 x 4, Monkhorst-Pack",
+        "correct": false,
+        "why": "Still wastes points along the vacuum, and a shifted mesh can break the in-plane symmetry."
+      }
+    ],
+    "hints": [
+      "Is there any dispersion across empty space?",
+      "Which directions of a slab are really periodic?"
+    ],
+    "difficulty": -0.5,
+    "level": "beginner",
+    "sources": [
+      "S-018",
+      "S-041"
+    ],
+    "visual": {
+      "plot": "kmesh-grid",
+      "params": {
+        "n": 8,
+        "m": 8,
+        "gamma": true
+      },
+      "caption": "An in-plane 8 by 8 Gamma-centred mesh of a slab.",
+      "alt": "Sixty-four k-points on a square grid in the plane of the surface, the centre point circled."
+    }
+  },
+  {
+    "id": "q-slab-3",
+    "concepts": [
+      "surface-slabs"
+    ],
+    "type": "single",
+    "prompt": "An asymmetric slab (bottom layers fixed at bulk positions, top relaxed) gives a planar-averaged potential that slopes across the vacuum instead of being flat. What should you add?",
+    "options": [
+      {
+        "text": "LDIPOL = .TRUE. and IDIPOL = 3",
+        "correct": true,
+        "why": "The net dipole of an asymmetric slab sets up an artificial field in the periodic cell; the dipole correction removes it so both vacuum regions are flat."
+      },
+      {
+        "text": "More k-points along the vacuum",
+        "correct": false,
+        "why": "The slope comes from electrostatics, not from k-point sampling."
+      },
+      {
+        "text": "ISIF = 3 so the cell can relax the field away",
+        "correct": false,
+        "why": "The vacuum would collapse, and the field is not a stress."
+      },
+      {
+        "text": "LVTOT instead of LVHAR",
+        "correct": false,
+        "why": "That changes which potential is written, not the field that causes the slope."
+      }
+    ],
+    "hints": [
+      "What does an asymmetric slab have that a symmetric one does not?",
+      "Which tags switch on a correction along the third lattice vector?"
+    ],
+    "difficulty": 0.3,
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-066",
+      "S-109"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Build the asymmetric slab"
+          },
+          {
+            "label": "Relax the top layers"
+          },
+          {
+            "label": "Write LOCPOT"
+          },
+          {
+            "label": "Average the potential over planes along the normal"
+          }
+        ],
+        "active": 3
+      },
+      "caption": "The steps that lead to the planar-averaged potential.",
+      "alt": "A four-step flow from building the slab to the planar-averaged potential, with the averaging step highlighted."
+    }
+  },
+  {
+    "id": "q-slab-4",
+    "concepts": [
+      "surface-slabs"
+    ],
+    "type": "single",
+    "prompt": "In rock-salt NaCl, which surface is polar (Tasker type 3)?",
+    "options": [
+      {
+        "text": "(111)",
+        "correct": true,
+        "why": "Along (111) the layers are alternately all Na and all Cl, so the repeat unit carries a dipole."
+      },
+      {
+        "text": "(100)",
+        "correct": false,
+        "why": "Each (100) layer holds equal numbers of Na and Cl, so it is neutral (type 1)."
+      },
+      {
+        "text": "(110)",
+        "correct": false,
+        "why": "The (110) layers of rock salt also hold Na and Cl in equal numbers and are neutral."
+      },
+      {
+        "text": "None: ionic crystals have no polar surfaces",
+        "correct": false,
+        "why": "Tasker type 3 surfaces are exactly the polar surfaces of ionic crystals."
+      }
+    ],
+    "hints": [
+      "Look at which atoms share a layer along each direction.",
+      "A polar surface alternates charged layers of opposite sign."
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-063"
+    ],
+    "visual": {
+      "scene": "rocksalt",
+      "caption": "Rock-salt NaCl in its cubic cell.",
+      "alt": "Sodium and chlorine atoms alternating on a cubic grid, each with six neighbours of the other kind."
+    }
+  },
+  {
+    "id": "q-slab-5",
+    "concepts": [
+      "surface-slabs"
+    ],
+    "type": "numeric",
+    "prompt": "The planar-averaged electrostatic potential of a symmetric slab is flat in the vacuum at 4.80 eV, and OUTCAR gives E-fermi = -0.35 eV. What is the work function in eV?",
+    "answer": 5.15,
+    "tolerance": 0.02,
+    "unit": "eV",
+    "hints": [
+      "The work function is the vacuum level minus the Fermi level.",
+      "Mind the sign of the Fermi level."
+    ],
+    "difficulty": -0.3,
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ],
+    "visual": {
+      "plot": "steps",
+      "params": {
+        "items": [
+          {
+            "label": "Write LOCPOT with LVHAR"
+          },
+          {
+            "label": "Average the potential over planes along the normal"
+          },
+          {
+            "label": "Read the vacuum level and E-fermi"
+          }
+        ],
+        "active": -1
+      },
+      "caption": "From LOCPOT to a work function.",
+      "alt": "A three-step flow: write LOCPOT, average it over planes, read the vacuum level and the Fermi level."
+    }
+  },
+  {
+    "id": "q-pdef-1",
+    "concepts": [
+      "point-defects"
+    ],
+    "type": "numeric",
+    "prompt": "A neutral vacancy supercell has NELECT = 864 in its OUTCAR. Which NELECT do you set for the same vacancy in charge state 2+?",
+    "answer": 862,
+    "tolerance": 0.5,
+    "hints": [
+      "A positive charge means electrons removed.",
+      "Subtract the charge q from the neutral count."
+    ],
+    "difficulty": -0.3,
+    "level": "beginner",
+    "sources": [
+      "S-042",
+      "S-019"
+    ],
+    "visual": {
+      "scene": "diamond",
+      "caption": "A diamond-structure Si cell; a defect supercell repeats it several times.",
+      "alt": "Diamond cubic cell in which each atom is bonded to four neighbours at the corners of a tetrahedron."
+    }
+  },
+  {
+    "id": "q-pdef-2",
+    "concepts": [
+      "point-defects"
+    ],
+    "type": "single",
+    "prompt": "How does the formation energy of a 2+ defect change when the Fermi level rises by 1 eV inside the gap?",
+    "options": [
+      {
+        "text": "It rises by 2 eV",
+        "correct": true,
+        "why": "The term q times E_F has slope q = +2: the two electrons the defect gave away are worth more when the Fermi level is higher."
+      },
+      {
+        "text": "It falls by 2 eV",
+        "correct": false,
+        "why": "That is the slope of a 2- defect; a positive charge has a positive slope."
+      },
+      {
+        "text": "It does not change",
+        "correct": false,
+        "why": "Only neutral defects have a formation energy independent of the Fermi level."
+      },
+      {
+        "text": "It rises by 1 eV",
+        "correct": false,
+        "why": "The slope is the charge, not 1."
+      }
+    ],
+    "hints": [
+      "Find the term in the formation energy that contains E_F.",
+      "The slope of a line E_f against E_F is the charge q."
+    ],
+    "difficulty": 0.3,
+    "level": "intermediate",
+    "sources": [
+      "S-067",
+      "S-115"
+    ],
+    "visual": {
+      "plot": "band-gap",
+      "params": {},
+      "caption": "Valence and conduction bands of a toy model, with the gap between them.",
+      "alt": "Filled lower band and empty upper band separated by an energy gap, on a vertical energy axis."
+    }
+  },
+  {
+    "id": "q-pdef-3",
+    "concepts": [
+      "point-defects"
+    ],
+    "type": "numeric",
+    "prompt": "Illustrative formation energies at E_F = 0 (the VBM): 1.0 eV for charge +1 and 1.6 eV for charge 0. At what Fermi level above the VBM is the (+/0) transition level, in eV?",
+    "answer": 0.6,
+    "tolerance": 0.02,
+    "unit": "eV",
+    "hints": [
+      "The +1 line rises with slope 1; the neutral line is flat.",
+      "Find where 1.0 + E_F equals 1.6."
+    ],
+    "difficulty": 0.6,
+    "level": "intermediate",
+    "sources": [
+      "S-115"
+    ],
+    "visual": {
+      "plot": "band-gap",
+      "params": {},
+      "caption": "A toy band gap; transition levels lie between the band edges.",
+      "alt": "Filled lower band and empty upper band separated by an energy gap, on a vertical energy axis."
+    }
+  },
+  {
+    "id": "q-pdef-4",
+    "concepts": [
+      "point-defects"
+    ],
+    "type": "single",
+    "prompt": "The leading Makov-Payne error of a charged defect falls as one over the supercell edge L. You double L. What happens to that error?",
+    "options": [
+      {
+        "text": "It halves",
+        "correct": true,
+        "why": "A 1/L term halves when L doubles, which is why charged defects converge slowly and need corrections."
+      },
+      {
+        "text": "It falls to a quarter",
+        "correct": false,
+        "why": "That would be a 1/L squared term."
+      },
+      {
+        "text": "It falls to an eighth",
+        "correct": false,
+        "why": "That is how the next, 1/L cubed, term falls, or how the volume grows."
+      },
+      {
+        "text": "It disappears",
+        "correct": false,
+        "why": "No finite supercell removes it; it has to be corrected or extrapolated."
+      }
+    ],
+    "hints": [
+      "Write the error as a constant divided by L.",
+      "Replace L by 2L."
+    ],
+    "difficulty": 0,
+    "level": "intermediate",
+    "sources": [
+      "S-106"
+    ],
+    "visual": {
+      "scene": "diamond",
+      "caption": "A Si cell; a larger supercell repeats it more times along each edge.",
+      "alt": "Diamond cubic cell in which each atom is bonded to four neighbours at the corners of a tetrahedron."
+    }
+  },
+  {
+    "id": "q-pdef-5",
+    "concepts": [
+      "point-defects"
+    ],
+    "type": "single",
+    "prompt": "How does the formation energy of an oxygen vacancy in an oxide compare between O-poor and O-rich conditions?",
+    "options": [
+      {
+        "text": "It is lower under O-poor conditions",
+        "correct": true,
+        "why": "The removed O goes to the reservoir, so the formation energy contains plus mu_O; O-poor conditions mean a lower mu_O and a lower cost."
+      },
+      {
+        "text": "It is lower under O-rich conditions",
+        "correct": false,
+        "why": "That reverses the sign: an O-rich reservoir already holds oxygen at a high chemical potential, so giving it more is costly."
+      },
+      {
+        "text": "It is the same in both",
+        "correct": false,
+        "why": "The chemical potential of the removed atom enters the formation energy directly."
+      },
+      {
+        "text": "It depends only on the Fermi level",
+        "correct": false,
+        "why": "The Fermi level matters for charged states, but the reservoir term is there for every charge."
+      }
+    ],
+    "hints": [
+      "For a removed atom n_O = -1, so what is the sign of the mu_O term?",
+      "Is mu_O higher or lower under O-poor conditions?"
+    ],
+    "difficulty": 0.3,
+    "level": "intermediate",
+    "sources": [
+      "S-111",
+      "S-067"
+    ],
+    "visual": {
+      "scene": "perovskite-octahedra",
+      "caption": "Cubic perovskite SrTiO3, an oxide in which oxygen vacancies form.",
+      "alt": "Strontium at the corners of a cube and titanium at the centre inside an octahedron of six oxygen atoms."
+    }
   }
 ]
