@@ -1,5 +1,29 @@
 ---
 id: crystal-structure-and-symmetry
+stage:
+  scene: m05b-symmetry
+  states:
+    - id: fourfold
+      section: why
+      params: { structure: perovskite, op: main, apply: 6, cell: conventional }
+      camera: iso
+      caption: 'Cubic SrTiO3 and its four-fold axis. Step Apply forward: every atom turns about the axis and lands on an atom of the same kind, so the crystal looks the same as before.'
+    - id: lattice-basis
+      section: intuition
+      params: { structure: rocksalt, op: none, apply: 0, cell: primitive }
+      caption: 'Rock salt is a face-centred cubic lattice with a basis of one Na and one Cl. The solid primitive cell holds one of each; the dashed cube is the conventional cell with four of each.'
+    - id: elements
+      section: intuition
+      params: { structure: perovskite, op: mirror, apply: 6, elements: true }
+      caption: 'All symmetry elements near the cell centre: rotation axes labelled with their order, mirror planes as translucent sheets and the inversion centre. Step Apply to reflect the atoms through the highlighted mirror.'
+    - id: bravais
+      section: math
+      params: { structure: cF, op: main, apply: 0, cell: primitive }
+      caption: 'The face-centred cubic Bravais lattice with its primitive vectors a/2 (0, 1, 1), a/2 (1, 0, 1) and a/2 (1, 1, 0): a cell a quarter of the cube. Pick other Bravais lattices from the list to compare their cells and axes.'
+    - id: screw
+      section: in-vasp
+      params: { structure: diamond, op: screw, apply: 6, cell: conventional }
+      caption: 'Silicon (Fd-3m) has no pure four-fold axis: its four-fold operations are screw axes that turn by 90 degrees and slide along the axis. VASP finds these too. Try the five-fold test turn, which no crystal survives.'
 title: Crystal structure and symmetry
 module: 5
 order: 0
