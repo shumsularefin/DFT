@@ -27,6 +27,15 @@ const mk = (species: string[], lattice = cubic): Structure => ({
 const rep = (el: string, n: number) => Array<string>(n).fill(el);
 const si2 = mk(['Si', 'Si']);
 const fe4o8 = mk([...rep('Fe', 4), ...rep('O', 8)]);
+/** Two Si atoms, the first fixed (F F F) and the second free (T T T). */
+const si2Sel: Structure = {
+  ...si2,
+  selective: [
+    [false, false, false],
+    [true, true, true],
+  ],
+};
+const relax = 'NSW = 50\nIBRION = 2\nISIF = 2';
 const mesh = (n: number, centering: 'gamma' | 'monkhorst-pack' = 'gamma'): ParsedKpoints => ({
   kind: 'mesh',
   centering,
@@ -254,13 +263,20 @@ const CASES: Case[] = [
   c('V039', 'error', { incar: inc('IMAGES = 3'), cores: 16 }, { incar: inc('IMAGES = 4'), cores: 16 }),
   c('V040', 'warn', { incar: inc('IMAGES = 3\nISIF = 3') }, { incar: inc('IMAGES = 3\nISIF = 2') }),
   c('V041', 'info', { incar: inc('LCLIMB = .TRUE.') }, { incar: inc('IMAGES = 3') }),
+  c('V042', 'info', { incar: inc('NSW = 0'), structure: si2Sel }, { incar: inc(relax), structure: si2Sel }),
+  c(
+    'V043',
+    'info',
+    { incar: inc(relax), structure: si2, systemType: 'slab' },
+    { incar: inc(relax), structure: si2Sel, systemType: 'slab' },
+  ),
 ];
 
 describe('rule table', () => {
-  it('has 41 unique, sorted, sourced rules', () => {
-    expect(ALL_RULES).toHaveLength(41);
+  it('has 43 unique, sorted, sourced rules', () => {
+    expect(ALL_RULES).toHaveLength(43);
     expect(ALL_RULES.map((r) => r.id)).toEqual(
-      Array.from({ length: 41 }, (_, i) => `V${String(i + 1).padStart(3, '0')}`),
+      Array.from({ length: 43 }, (_, i) => `V${String(i + 1).padStart(3, '0')}`),
     );
     for (const r of ALL_RULES) {
       expect(r.source.length, r.id).toBeGreaterThan(0);
@@ -488,4 +504,20 @@ describe('the NEB preset passes its own rules (D-110)', () => {
       expect(out.some((i) => i.rule === 'V041')).toBe(v.id === 'vtst-ci');
     },
   );
+});
+
+describe('selective dynamics (D-110, Q-071)', () => {
+  it('V042 fires for IBRION = -1 even with NSW > 0, and not without flags', () => {
+    expect(ids({ incar: inc('NSW = 50\nIBRION = -1'), structure: si2Sel }, 'V042')).toHaveLength(1);
+    expect(ids({ incar: inc('NSW = 0'), structure: si2 }, 'V042')).toHaveLength(0);
+  });
+  it('V042 warns when every coordinate is fixed in a relaxation', () => {
+    const allF: Structure = { ...si2, selective: si2.species.map(() => [false, false, false] as const) };
+    const hit = ids({ incar: inc(relax), structure: allF }, 'V042');
+    expect(hit.map((i) => i.severity)).toEqual(['warn']);
+  });
+  it('V043 stays quiet outside a slab and for a static run', () => {
+    expect(ids({ incar: inc(relax), structure: si2, systemType: 'semiconductor' }, 'V043')).toHaveLength(0);
+    expect(ids({ incar: inc('NSW = 0'), structure: si2, systemType: 'slab' }, 'V043')).toHaveLength(0);
+  });
 });
