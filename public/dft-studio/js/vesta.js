@@ -403,6 +403,7 @@
       lattice: s.lattice.map(r => [...r]),
       selectiveDynamics: !!s.selectiveDynamics,
       polyCenters: [...(s.polyCenters || [])],
+      bondOrders: { ...(s.bondOrders || {}) },
       atoms: s.atoms.map(a => ({
         el: a.el,
         frac: [...a.frac],
@@ -1551,10 +1552,28 @@
               const m = new THREE.LineBasicMaterial({ color: state.dark ? 0x94a3b8 : 0x475569 });
               rootGroup.add(new THREE.Line(g, m));
             } else {
-              // Two-tone half-bonds like VESTA!
-              const mid = p1.clone().lerp(p2, 0.5);
-              addCylinderSegment(p1, mid, state.bondRadius, ai.cfg.color);
-              addCylinderSegment(mid, p2, state.bondRadius, aj.cfg.color);
+              // Two-tone half-bonds like VESTA! Molecule mode can set a bond order (molecule.ts): a double
+              // bond is drawn as two thinner cylinders, a triple as three, an aromatic one as a full bond
+              // with a thin second line beside it.
+              const order = bondOrderOf(ai.origIdx, aj.origIdx);
+              if (order === 1) {
+                const mid = p1.clone().lerp(p2, 0.5);
+                addCylinderSegment(p1, mid, state.bondRadius, ai.cfg.color);
+                addCylinderSegment(mid, p2, state.bondRadius, aj.cfg.color);
+              } else {
+                const off = bondOffsetDir(dv, i, displayedAtoms);
+                const lines = order === 3 ? [-1, 0, 1] : order === 2 ? [-0.5, 0.5] : [0, 1];
+                const gap = state.bondRadius * (order === 3 ? 1.6 : 1.4);
+                lines.forEach((k, li) => {
+                  const r = order === 1.5 && li === 1 ? state.bondRadius * 0.35 : state.bondRadius * (order === 3 ? 0.5 : 0.62);
+                  const o = off.clone().multiplyScalar(k * gap);
+                  const a1 = p1.clone().add(o);
+                  const a2 = p2.clone().add(o);
+                  const mid = a1.clone().lerp(a2, 0.5);
+                  addCylinderSegment(a1, mid, r, ai.cfg.color);
+                  addCylinderSegment(mid, a2, r, aj.cfg.color);
+                });
+              }
             }
           }
         }
@@ -1683,6 +1702,37 @@
     });
 
     updateProjectedLabels();
+  }
+
+  // Bond orders set by molecule mode, keyed "i-j" (i < j, atom indices); every other bond is single.
+  function bondOrderOf(i, j) {
+    const k = i < j ? `${i}-${j}` : `${j}-${i}`;
+    const bo = state.structure && state.structure.bondOrders;
+    const o = bo ? bo[k] : undefined;
+    return o === 2 || o === 3 || o === 1.5 ? o : 1;
+  }
+  // The side a double bond's second line goes: in the plane of a neighbouring bond (so a ring's double bonds
+  // lie in the ring plane), else perpendicular to the bond and the z axis.
+  function bondOffsetDir(dv, i, atoms) {
+    const b = new THREE.Vector3(...dv).normalize();
+    const ai = atoms[i];
+    let ref = null;
+    for (const aj of atoms) {
+      if (aj === ai) continue;
+      const w = vSub(aj.cart, ai.cart);
+      const d = vNorm(w);
+      if (d < 0.35 || d > (getElInfo(ai.el).r + getElInfo(aj.el).r) * state.bondCutoff) continue;
+      const u = new THREE.Vector3(...w).normalize();
+      if (Math.abs(u.dot(b)) < 0.95) { ref = u; break; }
+    }
+    if (!ref) ref = Math.abs(b.z) < 0.9 ? new THREE.Vector3(0, 0, 1) : new THREE.Vector3(0, 1, 0);
+    const n = new THREE.Vector3().crossVectors(b, ref);
+    const off = new THREE.Vector3().crossVectors(n, b);
+    if (off.lengthSq() < 1e-10) return new THREE.Vector3(1, 0, 0);
+    off.normalize();
+    // Point toward the neighbour, so a ring's inner line sits inside the ring.
+    if (off.dot(ref) < 0) off.negate();
+    return off;
   }
 
   function addCylinderSegment(p1, p2, radius, colorHex) {
@@ -3431,6 +3481,10 @@
     },
     poscarToAtomIndex: (idxs) => { const o = poscarOrder(state.structure.atoms); return idxs.map(i => o[i]).filter(i => i !== undefined); },
     selectAtoms: (idxs) => { state.selectedAtomIndices = idxs.slice(); syncSelectionUI(); rebuildScene(); },
+    // Molecule mode: bond orders to draw, keyed "i-j" with i < j (atom indices). They live on the structure,
+    // so undo and redo bring them back; a new load or a rewritten POSCAR starts with none.
+    setBondOrders: (map, undoable) => { if (!state.structure) return; if (undoable) pushHistory(); state.structure.bondOrders = map && typeof map === 'object' ? { ...map } : {}; rebuildScene(); },
+    getBondOrders: () => ({ ...((state.structure && state.structure.bondOrders) || {}) }),
     undo: undoStep,
     redo: redoStep,
     loadSampleKey: loadSample,

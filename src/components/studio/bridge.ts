@@ -167,6 +167,7 @@ export const SiteBridge = {
     Z: e.Z,
     symbol: e.symbol,
     name: e.name,
+    category: e.category,
     row: e.Z >= 57 && e.Z <= 71 ? 9 : e.Z >= 89 && e.Z <= 103 ? 10 : e.period,
     col: e.Z >= 57 && e.Z <= 71 ? 4 + e.Z - 57 : e.Z >= 89 && e.Z <= 103 ? 4 + e.Z - 89 : (e.group ?? 1),
   })),

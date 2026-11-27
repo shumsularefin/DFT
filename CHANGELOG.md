@@ -7,6 +7,9 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- Molecule mode editing tools: a common-element row, a searchable periodic table tinted by element category, ring templates (benzene, pyridine, cyclohexane, cyclopentane, pyrrole, furan, thiophene) and groups (CH3, OH, NH2, COOH, CHO) that bond in place of a hydrogen, single, double, triple and aromatic bonds (drawn in the viewer and counted when hydrogens are added), set a distance, move, select linked atoms or hydrogens, remove hydrogens, undo and redo, live distance, angle and dihedral read-out, and a "Crystal or Molecule?" explainer by the mode switch (D-109).
+- The Material Builder's Input files step sends the structure, spins, ENMAX, POTCAR variants, task, system type and tested k-mesh to the Input Builder, which gains a typed N1 x N2 x N3 mesh and slab rules V034 and V035 (D-108).
+
 - One workspace from the owner's template: grouped sidebar (Study, Build, Calculate), a top bar with page title, reading level, search and theme, and card, tile, stepper and line-numbered code components on every page (D-105).
 - Topic pages show a Modules tree, "On this page", "First edition, updated <date>" and Mark complete; Progress shows tiles and module bars; the Input Builder shows a stepper and a Generated files card.
 - DFT Studio at `/dft-studio/`: a VESTA-style 3D crystal viewer and editor with the VASP workflow (POTCAR, INCAR, KPOINTS, k-point convergence, run bundle, analysis). It is now the Material Builder crystal mode, runs the site structure checks live, and hands structures and results to and from the Input Builder, k-path, magnetic and convergence tools (D-103).
@@ -15,6 +18,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Fixed
 
+- The benzene preset in molecule mode no longer puts its hydrogens inside the ring: the 3D start points every hydrogen away from the atom's neighbours.
 - The Material Builder no longer redraws its 3D scene every frame; it draws on demand and starts in short tasks, so an idle page uses no CPU.
 - The Material Builder structure picker no longer slides under the Open button at medium widths.
 - No thick one-sided borders: callouts, notes, feedback and review checks use the same thin border as cards.
@@ -28,6 +32,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Changed
 
+- The Material Builder stops at structure and POTCAR: its own INCAR presets, KPOINTS writer, job script and bundle are replaced by the Input Builder; band paths come from the k-path tool and magnetic orderings from the Magnetic tool. Unsourced default U and starting-moment tables are removed (D-108, Q-070 to Q-073).
 - The Material Builder (formerly DFT Studio) runs natively at `/builder/` with Crystal and Molecule modes; `/dft-studio/` redirects there.
 - The site is desktop only (1024 px and up); Lighthouse CI uses the desktop preset.
 - Heisenberg fit default convention is now H = E0 - sum J S_i.S_j, pairs once, unit spins (J > 0 ferromagnetic), as in the Workflow Handbook and the textbooks (Q-042 closed, D-087). The plus sign is still available.

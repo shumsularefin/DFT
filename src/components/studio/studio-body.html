@@ -19,6 +19,25 @@
       <a class="builder-mode-link" href="/builder/" aria-current="page">Crystal</a>
       <a class="builder-mode-link" href="/builder/molecule/">Molecule</a>
     </nav>
+    <details class="mode-help">
+      <summary title="Crystal or Molecule: which one?" aria-label="Crystal or Molecule: which one?">
+        ?
+      </summary>
+      <div class="mode-help-pop">
+        <p>
+          <b>Crystal</b> is a solid that repeats forever in every direction: a metal, an oxide, a 2D sheet or
+          a surface slab. You pick k-points. The periodic graphene sheet lives here.
+        </p>
+        <p>
+          <b>Molecule</b> is one molecule on its own, in a box of empty space so its copies do not touch. It
+          uses Gamma-only k-points. The graphene flake (coronene, C24H12) lives here.
+        </p>
+        <p>
+          Both use the same VASP steps. Not sure? If the material goes on forever, choose Crystal; if you can
+          count all its atoms, choose Molecule.
+        </p>
+      </div>
+    </details>
 
     <div class="h-5 w-px bg-[var(--st-border)] mx-1 hidden sm:block"></div>
 
@@ -612,41 +631,144 @@
           <span id="mol-formula" class="text-[10.5px] font-mono-code text-blue-500"></span>
         </div>
         <div id="mol-presets" class="mol-presets" role="group" aria-label="Starting molecules"></div>
+        <p class="text-[10.5px] text-sub leading-snug m-0">
+          The graphene flake is a molecule (C24H12, edges capped with hydrogen). For the endless, periodic
+          graphene sheet, switch to Crystal mode and pick "Graphene (2D Sheet + Vacuum)".
+        </p>
       </div>
 
       <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
         <div class="flex items-center justify-between gap-2">
-          <span class="text-[11px] font-bold text-main">Build with any element</span>
+          <span class="text-[11px] font-bold text-main">1. Pick an element</span>
           <span class="heur-badge">Heuristic</span>
         </div>
-        <div
-          id="mol-pt-grid"
-          class="pt-grid"
-          role="group"
-          aria-label="Periodic table: the element to add"
-        ></div>
+        <div id="mol-common" class="mol-common" role="group" aria-label="Common elements"></div>
+        <div id="mol-el-card" class="mol-el-card" aria-live="polite"></div>
+        <details id="mol-all-elements" class="mol-all">
+          <summary>All elements (periodic table)</summary>
+          <input
+            id="mol-el-search"
+            class="v-input w-full mt-1.5"
+            type="search"
+            placeholder="Find by symbol or name, for example Fe or iron"
+            aria-label="Find an element"
+          />
+          <div
+            id="mol-pt-grid"
+            class="pt-grid mol-pt mt-1.5"
+            role="group"
+            aria-label="Periodic table: the element to add"
+          ></div>
+          <div id="mol-pt-legend" class="mol-legend" aria-hidden="true"></div>
+        </details>
+      </div>
+
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
+        <span class="text-[11px] font-bold text-main block">2. Build</span>
         <p class="text-[10.5px] text-sub m-0">
-          Element: <b id="mol-picked" class="font-mono-code">C</b>.
           <span id="mol-selected">Pick an atom with the Select tool to build on it.</span>
         </p>
         <div class="grid grid-cols-2 gap-1.5">
           <button id="mol-add" class="v-btn v-btn-primary justify-center" type="button">Add atom</button>
           <button id="mol-swap" class="v-btn justify-center" type="button">Change element</button>
           <button id="mol-hydrogens" class="v-btn justify-center" type="button">Add hydrogens</button>
-          <button id="mol-delete" class="v-btn justify-center" type="button">Delete atom</button>
-          <button id="mol-single" class="v-btn justify-center col-span-2" type="button">
-            Start again from one atom of this element
+          <button id="mol-strip-h" class="v-btn justify-center" type="button">Remove hydrogens</button>
+          <button id="mol-delete" class="v-btn justify-center" type="button">Delete selected</button>
+          <button id="mol-single" class="v-btn justify-center" type="button">Start from one atom</button>
+        </div>
+        <div class="grid grid-cols-2 gap-1.5">
+          <button id="mol-undo" class="v-btn justify-center" type="button" title="Undo (Ctrl+Z)">Undo</button>
+          <button id="mol-redo" class="v-btn justify-center" type="button" title="Redo (Ctrl+Shift+Z)">
+            Redo
           </button>
         </div>
         <p class="text-[10.5px] text-sub leading-snug m-0">
           A new atom bonds to the selected atom (or, with none selected, the last atom that is not a hydrogen)
           at the sum of covalent radii, at the ideal angle to its other bonds. Hydrogens fill the usual
-          valence and assume single bonds. The geometry is a starting point: relax it in VASP with ISIF = 2.
+          valence, counting double and triple bonds you set below. The geometry is a starting point: relax it
+          in VASP with ISIF = 2.
         </p>
       </div>
 
       <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
-        <span class="text-[11px] font-bold text-main block">Vacuum box</span>
+        <span class="text-[11px] font-bold text-main block">3. Add a ring or a group</span>
+        <div id="mol-fragments" class="mol-frags" role="group" aria-label="Rings and groups"></div>
+        <p class="text-[10.5px] text-sub leading-snug m-0">
+          The ring or group bonds to the selected atom, taking the place of one of its hydrogens (or of the
+          selected hydrogen). With nothing on screen it starts a new molecule.
+        </p>
+      </div>
+
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
+        <span class="text-[11px] font-bold text-main block">4. Bonds</span>
+        <p id="mol-bond-info" class="text-[10.5px] text-sub m-0">
+          Select two bonded atoms to change their bond.
+        </p>
+        <div class="grid grid-cols-4 gap-1" role="group" aria-label="Bond order">
+          <button class="v-btn justify-center" type="button" data-bond-order="1">Single</button>
+          <button class="v-btn justify-center" type="button" data-bond-order="2">Double</button>
+          <button class="v-btn justify-center" type="button" data-bond-order="3">Triple</button>
+          <button class="v-btn justify-center" type="button" data-bond-order="1.5" title="Aromatic">
+            Arom.
+          </button>
+        </div>
+        <div class="flex items-end gap-2">
+          <div class="flex-1">
+            <label for="mol-bond-length" class="text-[10px] text-mut block mb-0.5"
+              >Distance between the two atoms (Å)</label
+            >
+            <input
+              id="mol-bond-length"
+              type="number"
+              min="0.5"
+              max="6"
+              step="0.01"
+              class="v-input w-full font-mono-code"
+            />
+          </div>
+          <button id="mol-set-length" class="v-btn" type="button">Set</button>
+        </div>
+        <p class="text-[10.5px] text-sub leading-snug m-0">
+          Setting a distance moves the second atom you picked, with everything bonded on its side. The bond
+          order sets how many hydrogens fit and what the MOL file says; bond lengths stay at the single-bond
+          covalent radii, so relax the molecule before you trust them.
+        </p>
+      </div>
+
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
+        <span class="text-[11px] font-bold text-main block">5. Select, move and measure</span>
+        <div class="grid grid-cols-4 gap-1" role="group" aria-label="Select">
+          <button id="mol-sel-all" class="v-btn justify-center" type="button">All</button>
+          <button
+            id="mol-sel-frag"
+            class="v-btn justify-center"
+            type="button"
+            title="Everything bonded to the selection"
+          >
+            Linked
+          </button>
+          <button id="mol-sel-h" class="v-btn justify-center" type="button">H only</button>
+          <button id="mol-sel-none" class="v-btn justify-center" type="button">None</button>
+        </div>
+        <div class="flex items-end gap-1.5">
+          <label class="flex-1 text-[10px] text-mut"
+            >x (Å)<input id="mol-dx" type="number" step="0.1" value="0" class="v-input w-full font-mono-code"
+          /></label>
+          <label class="flex-1 text-[10px] text-mut"
+            >y (Å)<input id="mol-dy" type="number" step="0.1" value="0" class="v-input w-full font-mono-code"
+          /></label>
+          <label class="flex-1 text-[10px] text-mut"
+            >z (Å)<input id="mol-dz" type="number" step="0.1" value="0" class="v-input w-full font-mono-code"
+          /></label>
+          <button id="mol-move" class="v-btn" type="button">Move</button>
+        </div>
+        <p id="mol-measure" class="mol-measure m-0" aria-live="polite">
+          Select 2 atoms for a distance, 3 for an angle, 4 for a dihedral (click them in order).
+        </p>
+      </div>
+
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
+        <span class="text-[11px] font-bold text-main block">6. Vacuum box</span>
         <div class="flex items-end gap-2">
           <div class="flex-1">
             <label for="mol-vacuum" class="text-[10px] text-mut block mb-0.5"
@@ -662,7 +784,7 @@
               class="v-input w-full font-mono-code"
             />
           </div>
-          <button id="mol-box" class="v-btn" type="button">Fit the box</button>
+          <button id="mol-box" class="v-btn" type="button">Centre in the box</button>
         </div>
         <p id="mol-box-info" class="text-[10.5px] text-sub m-0"></p>
       </div>
@@ -677,8 +799,8 @@
           </button>
         </div>
         <p class="text-[10.5px] text-sub leading-snug m-0">
-          POSCAR (the toolbar button) writes the molecule in its box. A periodic graphene sheet is a crystal:
-          pick it from the structure menu in Crystal mode. The graphene flake here is a molecule.
+          POSCAR (the toolbar button) writes the molecule in its box. Next step: the VASP steps above take it
+          to POTCAR and the Input Builder, with Gamma-only k-points.
         </p>
       </div>
       <p id="mol-status" class="text-[10.5px] text-sub m-0" role="status"></p>
