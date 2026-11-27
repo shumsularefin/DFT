@@ -1127,16 +1127,16 @@ const relaxation: SceneDef = {
 
 /**
  * Band gaps in eV: PBE, G0W0 and GW0 (all in VASP, PAW) and experiment, as tabulated by Shishkin and Kresse,
- * Phys. Rev. B 75, 235102 (2007), Table I (S-131). Quoted from memory, not yet checked against the paper.
+ * Phys. Rev. B 75, 235102 (2007), Table I (S-131), checked against the table on 2026-11-27 (columns PBE, G0W0, GW0, Expt.).
  */
 export const GW_GAPS: { id: string; pbe: number; g0w0: number; gw0: number; exp: number }[] = [
   { id: 'Si', pbe: 0.62, g0w0: 1.12, gw0: 1.2, exp: 1.17 },
-  { id: 'GaAs', pbe: 0.49, g0w0: 1.3, gw0: 1.52, exp: 1.52 },
+  { id: 'GaAs', pbe: 0.49, g0w0: 1.3, gw0: 1.42, exp: 1.52 },
   { id: 'ZnO', pbe: 0.67, g0w0: 2.12, gw0: 2.54, exp: 3.44 },
   { id: 'C', pbe: 4.12, g0w0: 5.5, gw0: 5.68, exp: 5.48 },
   { id: 'MgO', pbe: 4.76, g0w0: 7.25, gw0: 7.72, exp: 7.83 },
   { id: 'Ar', pbe: 8.69, g0w0: 13.28, gw0: 13.87, exp: 14.2 },
-  { id: 'LiF', pbe: 8.94, g0w0: 13.27, gw0: 14.0, exp: 14.2 },
+  { id: 'LiF', pbe: 9.2, g0w0: 13.27, gw0: 13.96, exp: 14.2 },
 ];
 const RUNGS = [
   { key: 'pbe', label: 'PBE', tone: 'c0' },
@@ -1180,7 +1180,7 @@ const beyond: SceneDef = {
   badge: 'sample',
   sources: ['S-131', 'S-130', 'S-049'],
   banner:
-    'Literature values: PBE, G0W0, GW0 and measured gaps of seven solids as tabulated by Shishkin and Kresse (2007), quoted from memory and not yet checked against the paper. Not computed on this site.',
+    'Literature values: PBE, G0W0, GW0 and measured gaps of seven solids from Shishkin and Kresse (2007), Table I. Not computed on this site.',
   params: [
     {
       kind: 'select',
