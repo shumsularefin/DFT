@@ -6,9 +6,11 @@ import Cite from '../../components/handbook/Cite.astro';
 import VaspFile from '../../components/handbook/VaspFile.astro';
 import Callout from '../../components/ui/Callout.astro';
 import PresetIncar from '../../components/workflow/PresetIncar.astro';
+import Protocol from '../../components/workflow/Protocol.astro';
 import sources from '../../data/sources.json';
 import { citeOrder } from '../../lib/topic';
 import { checklistRow } from '../../lib/workflow';
+import edition from '../../data/workflow.json';
 
 export async function getStaticPaths() {
   const entries = await getCollection('workflow');
@@ -19,7 +21,8 @@ const { entry } = Astro.props;
 const d = entry.data;
 const { Content } = await render(entry);
 const body = entry.body ?? '';
-Astro.locals.cites = citeOrder(body);
+// The protocol quote (rendered from workflow-protocol.json above the page body) cites S-042 first.
+Astro.locals.cites = citeOrder((d.protocolStep ? '<Cite id="S-042" />' : '') + body);
 const cites: string[] = Astro.locals.cites;
 const byId = new Map(sources.map((s) => [s.id, s]));
 for (const id of [...cites, ...d.sources]) {
@@ -28,6 +31,7 @@ for (const id of [...cites, ...d.sources]) {
 const others = d.sources.filter((id) => !cites.includes(id));
 const rows = d.checklist.map(checklistRow);
 const sections = [
+  ...(d.protocolStep ? [{ id: 'protocol', heading: 'The protocol step' }] : []),
   ...[...body.matchAll(/<Section\s+id="([^"]+)"\s+heading="([^"]+)"/g)].map((m) => ({
     id: m[1]!,
     heading: m[2]!,
@@ -88,7 +92,8 @@ const components = { Section, Cite, VaspFile, Callout, PresetIncar };
           <p class="topic-summary">{d.summary}</p>
           <p class="topic-meta">
             {d.protocolStep && <>Protocol step {d.protocolStep} of 5. </>}
-            {statusLabel}, updated <time datetime={d.updated}>{d.updated}</time>.
+            {statusLabel}, updated <time datetime={d.updated}>{d.updated}</time>. Workflow{' '}
+            <a href="/workflow/#revisions">version {edition.version}</a>.
           </p>
         </div>
       </div>
@@ -128,6 +133,7 @@ const components = { Section, Cite, VaspFile, Callout, PresetIncar };
           </div>
         </dl>
       </section>
+      {d.protocolStep && <Protocol step={d.protocolStep} />}
       <Content components={components} />
       {rows.length > 0 && (
         <Section id="before-you-submit" heading="Before you submit">

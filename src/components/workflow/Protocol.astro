@@ -1,0 +1,38 @@
+---
+// One step of the author's five-step protocol, word for word, with the notes the Workflow Handbook puts under
+// it (D-110). The text is not typed into the step pages: it is read from src/data/workflow-protocol.json,
+// which scripts/build/build-vasp-data.mjs writes from the handbook. docs/WORKFLOW_GUIDE.md says how to change it.
+import Section from '../handbook/Section.astro';
+import Cite from '../handbook/Cite.astro';
+import file from '../../data/workflow-protocol.json';
+
+interface Props {
+  step: number;
+}
+const { step } = Astro.props;
+const p = file.protocol.find((s) => s.step === step);
+if (!p) throw new Error(`workflow: no protocol step ${step} in workflow-protocol.json`);
+const LABELS: Record<string, string> = { verified: 'Checked', note: 'Note', 'wiki rule': 'VASP wiki rule' };
+const label = (kind: string) => {
+  const l = LABELS[kind];
+  if (!l) throw new Error(`workflow: protocol step ${step} has an unknown note kind "${kind}"`);
+  return l;
+};
+---
+
+<Section id="protocol" heading="The protocol step">
+  <blockquote>
+    <p>“{p.quote}”</p>
+  </blockquote>
+  <p>
+    This is step {p.step} of {file.protocol.length} of the author's protocol, “{p.title}”, quoted as written
+    <Cite id="S-042" />. The Workflow Handbook's notes on it:
+  </p>
+  <ul class="wf-protocol-notes">
+    {p.notes.map((n) => (
+      <li>
+        <strong>{label(n.kind)}:</strong> {n.text}
+      </li>
+    ))}
+  </ul>
+</Section>

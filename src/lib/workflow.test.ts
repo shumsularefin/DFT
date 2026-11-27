@@ -103,3 +103,28 @@ describe('workflow helpers', () => {
     expect(stepNeighbors(steps, 'zz')).toEqual({ prev: null, next: null });
   });
 });
+
+describe('workflow data files', () => {
+  it('workflow.json: the version and revised date are the newest history entry', async () => {
+    const edition = (await import('../data/workflow.json')).default;
+    expect(edition.history.length).toBeGreaterThan(0);
+    expect(edition.history[0]!.version).toBe(edition.version);
+    expect(edition.history[0]!.date).toBe(edition.revised);
+    expect(edition.revised).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+  it('workflow-protocol.json: five steps, each quote printed in S-042', async () => {
+    const file = (await import('../data/workflow-protocol.json')).default;
+    const text = unescape(html.replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ');
+    expect(file.protocol.map((p) => p.step)).toEqual([1, 2, 3, 4, 5]);
+    for (const p of file.protocol) {
+      expect(text, `step ${p.step}`).toContain(p.quote.slice(0, 40));
+      for (const n of p.notes) expect(['verified', 'note', 'wiki rule']).toContain(n.kind);
+    }
+  });
+  it('the fixed-volume relaxation (E-V scan) keeps the Workflow Handbook values', () => {
+    const tags = Object.fromEntries(
+      parseIncar(exampleIncar('relax', 'fixed-volume')).entries.map((e) => [e.name, e.value]),
+    );
+    expect(tags).toMatchObject({ ISIF: '4', IBRION: '2', NSW: '100', EDIFF: '1E-6', EDIFFG: '-0.005' });
+  });
+});

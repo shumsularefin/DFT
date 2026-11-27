@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import WorkflowLayout from '../../layouts/WorkflowLayout.astro';
 import { WORKFLOW_GROUPS, orderSteps } from '../../lib/workflow';
+import edition from '../../data/workflow.json';
 
 const steps = orderSteps(
   (await getCollection('workflow')).map((e) => ({
@@ -56,7 +57,9 @@ const tree = `Compound/
           </p>
           <p class="topic-meta">
             Follows the author's VASP Workflow Handbook and its five-step protocol (
-            <a href="/references/#S-042">S-042</a>). First edition.
+            <a href="/references/#S-042">S-042</a>). Version {edition.version}, revised{' '}
+            <time datetime={edition.revised}>{edition.revised}</time>. See{' '}
+            <a href="#revisions">what changed</a>.
           </p>
         </div>
       </div>
@@ -169,6 +172,23 @@ const tree = `Compound/
             <a href="/reference/units/">Units and conversions</a> and
             <a href="/reference/where-to-read/">where to read each number</a>.
           </li>
+        </ul>
+      </section>
+
+      <section class="topic-section card" id="revisions" aria-labelledby="revisions-h">
+        <h2 class="card-h" id="revisions-h">
+          Revisions
+        </h2>
+        <p>
+          This workflow follows a research group's protocol, so it changes as the protocol does. Each change
+          is listed here, newest first.
+        </p>
+        <ul>
+          {edition.history.map((h) => (
+            <li>
+              <strong>Version {h.version}</strong>, <time datetime={h.date}>{h.date}</time>: {h.change}
+            </li>
+          ))}
         </ul>
       </section>
     </div>
