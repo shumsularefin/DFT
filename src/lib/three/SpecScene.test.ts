@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { ControlsLike, Environment, RendererLike } from './SceneController';
 import { SpecScene } from './SpecScene';
 
-// SpecScene draws atoms with a lit material, so without a light every atom is a black disc (the learn path bug, D-106).
+// SpecScene draws atoms with a lit material, so without a light every atom is a black disc (the learn path bug, D-107).
 describe('SpecScene', () => {
   it('adds an ambient light and a camera light', () => {
     const env = {

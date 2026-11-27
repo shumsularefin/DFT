@@ -1,6 +1,6 @@
 // Guided path (M12.4): one station at a time. A station is one picture (a scene preset or a plot), three short sentences,
 // one thing to try and a link to the full topic. One Scene island is reused for every scene station, so at most one WebGL
-// canvas exists on the page (D-058). A scene station opens the free 3D view by itself (D-106); plot stations load no
+// canvas exists on the page (D-058). A scene station opens the free 3D view by itself (D-107); plot stations load no
 // three.js. If the reader goes back to the flat view, later stations stay flat until they press "View in 3D" again.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { markComplete, markVisited } from '../../stores/progress';
