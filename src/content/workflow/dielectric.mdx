@@ -1,0 +1,116 @@
+---
+id: dielectric
+title: Compute the dielectric tensor and Born charges
+short: Dielectric and Z*
+group: Lattice and response
+order: 4
+summary: Run one DFPT calculation on the relaxed unit cell to get the electronic and static dielectric tensors and the Born effective charges, then check the acoustic sum rule before you use them.
+folder: 09_dielectric/
+needs:
+  - 'The relaxed unit cell (<code>CONTCAR</code> from the relaxation)'
+  - 'An insulator or a semiconductor, never a metal'
+  - '<code>INCAR</code> from VASPkit 101 → EC, edited'
+run: '<code>LEPSILON = .TRUE.</code>, <code>IBRION = 8</code> (or <code>LCALCEPS</code> with <code>IBRION = 6</code>)'
+produces:
+  - 'ε∞, the ionic ε and ε<sub>0</sub>'
+  - 'Born effective charges Z* per atom, and the piezoelectric tensor'
+  - 'A <code>BORN</code> file for the phonopy non-analytical correction'
+learn:
+  - { href: '/handbook/12-properties/dielectric-tensor/', label: 'The dielectric tensor and Born charges' }
+  - { href: '/handbook/12-properties/phonons/', label: 'Phonons and the BORN file' }
+  - { href: '/handbook/12-properties/optical-properties/', label: 'Optics and ε1(0)' }
+tools:
+  - {
+      href: '/tools/input-builder/?preset=dielectric&variant=default',
+      label: 'Input Builder: dielectric (DFPT)',
+    }
+  - { href: '/tools/review/', label: 'Calculation Review (check the run)' }
+checklist: [Dielectric / Z*]
+sources: [S-042, S-020]
+status: draft
+updated: 2026-11-27
+---
+
+<Section id="why" heading="What you compute and why">
+
+This step measures how the crystal answers an electric field<Cite id="S-042" />.
+
+- **The Born effective charge Z\*.** Move one atom κ a little along direction β and watch how the
+  polarization of the crystal changes along direction α. That ratio is Z\*κ,αβ, a 3 × 3 tensor for each
+  atom. It is a dynamical charge, and in materials with strong covalent or ferroelectric character it can be
+  much larger than the nominal ionic charge.
+- **ε∞ (the high-frequency dielectric tensor).** The screening by the electrons alone.
+- **ε0 (the static dielectric tensor).** ε∞ plus the ionic contribution.
+
+The same run also gives the piezoelectric tensor. Use the relaxed unit cell, and only an insulator or a
+semiconductor: the dielectric tensor, Z\* and the polarization are not defined in a metal.
+
+</Section>
+
+<Section id="inputs" heading="The inputs">
+
+<PresetIncar preset="dielectric" caption="INCAR for the DFPT dielectric run (VASPkit 101 → EC, edited)" />
+
+| Tag           | Setting | Reason                                                                                                          |
+| ------------- | ------- | --------------------------------------------------------------------------------------------------------------- |
+| IBRION        | 8       | Density-functional perturbation theory (DFPT). One run also gives the ionic contribution and the Γ phonons.     |
+| LEPSILON      | .TRUE.  | Switches on the DFPT dielectric tensor and the Born charges.                                                    |
+| LRPA          | .FALSE. | Includes the local-field effects in DFT, so you get the "including local field effects in DFT" tensor.          |
+| EDIFF         | 1E-8    | A very tight electronic criterion. A loose EDIFF shows up as a broken acoustic sum rule (see the checks below). |
+| NSW           | 1       | As in the handbook template.                                                                                    |
+| LWAVE, LCHARG | .FALSE. | Not written: this run leaves no WAVECAR or CHGCAR.                                                              |
+| NCORE         | not set | DFPT needs NCORE = 1, so leave the tag out of this INCAR.                                                       |
+
+<Callout variant="warning" title="Hybrid or meta-GGA">
+
+With a hybrid functional or a meta-GGA, `IBRION = 8` with `LEPSILON` is the wrong route. Replace both by
+`IBRION = 6` and `LCALCEPS = .TRUE.`<Cite id="S-042" />.
+
+</Callout>
+
+Use a dense k-mesh: the same sum-rule check that catches a loose EDIFF also catches a k-mesh that is too
+coarse.
+
+</Section>
+
+<Section id="read" heading="Read the tensors">
+
+When the run has finished, these commands pull each result out of OUTCAR<Cite id="S-042" />:
+
+<VaspFile
+  name="shell"
+  code={`grep -A 5 "MACROSCOPIC STATIC DIELECTRIC TENSOR (including local field effects in DFT)" OUTCAR | tail -4  # ε∞
+grep -A 5 "MACROSCOPIC STATIC DIELECTRIC TENSOR IONIC CONTRIBUTION" OUTCAR                            # ionic part
+grep -A 40 "BORN EFFECTIVE CHARGES" OUTCAR | head -45                                                 # Z* per ion, 3×3
+phonopy-vasp-born vasprun.xml > BORN                                                               # for phonopy NAC`}
+/>
+
+- The first command prints ε∞, the electronic tensor with local-field effects.
+- The second prints the ionic contribution.
+- The third prints Z\* for every ion, one 3 × 3 block each.
+- The last one writes the `BORN` file that phonopy reads for the non-analytical correction (NAC) of polar
+  materials.
+
+To get the static tensor, add the two parts: **ε0 = ε∞ + εion**.
+
+</Section>
+
+<Section id="check" heading="Check before you move on">
+
+- **Acoustic sum rule.** Add up Z\* over all atoms κ, for each tensor component. The sum should be close to 0. A sum above about 0.1 means the k-mesh or EDIFF is too loose: tighten them and run again.
+- **Anomalous Z\* is a signal, not an error.** Titanium in BaTiO<sub>3</sub> has Z\* ≈ +7 against a
+  nominal +4. Values like that point to strong p–d hybridization and to a ferroelectric instability close by.
+- **Compare ε∞ with optics.** Compare ε∞ with ε1(0), the zero-frequency value from a LOPTICS run. LEPSILON
+  includes local-field effects and usually comes out slightly smaller.
+- **No metals.** If the state is metallic, ε, Z\* and the polarization are ill-defined: do not run this step
+  on it.
+
+</Section>
+
+<Section id="next" heading="Files for the next step">
+
+Keep the `BORN` file. For a polar material, phonopy reads it for the non-analytical correction (the
+LO–TO splitting), so a phonon calculation of that material needs it. Nothing else from this folder is
+reused: LWAVE and LCHARG are off.
+
+</Section>

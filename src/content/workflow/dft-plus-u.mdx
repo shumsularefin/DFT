@@ -1,0 +1,120 @@
+---
+id: dft-plus-u
+title: Add a Hubbard U
+short: DFT+U
+group: Beyond PBE
+order: 1
+summary: Add the same +U block to every step of a material with localized d or f electrons, choose U on purpose and say how you chose it, and never compare energies computed with different U.
+folder: 12_dftu/
+needs:
+  - 'A system with localized d or f electrons: transition-metal oxides and fluorides, rare earths'
+  - 'The <code>+U</code> block from VASPkit 101 → PU'
+run: 'The <code>LDAU</code> tags in every step: relax, SCF, DOS, bands'
+produces:
+  - 'Corrected localization of the d or f electrons'
+  - 'Corrected band gaps, moments and magnetic ordering'
+learn:
+  - { href: '/handbook/05-practical-choices/dft-plus-u/', label: 'DFT+U for localized electrons' }
+  - { href: '/handbook/05-practical-choices/functionals/', label: 'Choosing a functional' }
+  - { href: '/handbook/05-practical-choices/spin-polarized-calculations/', label: 'ISPIN and MAGMOM' }
+tools:
+  - { href: '/tools/input-builder/?preset=dftu&variant=default', label: 'Input Builder: DFT+U block' }
+  - { href: '/tools/magnetic/', label: 'Magnetic Orderings (several MAGMOM starts)' }
+  - { href: '/tools/review/', label: 'Calculation Review (check the LDAU tags)' }
+checklist: [DFT+U]
+sources: [S-042, S-014, S-081]
+status: draft
+updated: 2026-11-27
+---
+
+<Section id="why" heading="Why add U">
+
+Semilocal functionals such as PBE spread d and f electrons out too much. The cause is the self-interaction
+error: each electron partly repels itself. The result is often wrong in a visible way: a Mott insulator comes
+out as a metal, and magnetic moments come out too small<Cite id="S-042" />.
+
+The Hubbard U adds an energy penalty that favours whole-number (integer) occupation of the orbitals you pick.
+That pushes the d or f electrons back into localized states. VASP's Dudarev scheme (`LDAUTYPE = 2`) uses only
+the difference U<sub>eff</sub> = U − J<Cite id="S-014" />.
+
+</Section>
+
+<Section id="inputs" heading="The +U block">
+
+<PresetIncar
+  preset="dftu"
+  caption="The +U block (VASPkit 101 → PU), for a POSCAR with the species Fe and O"
+/>
+
+Add this block to the INCAR of **every** step of the material: the relaxation, the SCF, the DOS and the
+bands, with the same U everywhere<Cite id="S-042" />.
+
+| Tag           | Setting in the example | Reason                                                                                                   |
+| ------------- | ---------------------- | -------------------------------------------------------------------------------------------------------- |
+| LDAUTYPE      | 2                      | Dudarev scheme: only U − J enters.                                                                       |
+| LDAUL         | 2 −1                   | One value per species: 2 = d, 3 = f, −1 = no U. Here d on Fe, nothing on O.                              |
+| LDAUU         | 5.3 0.0                | U for each species, in POSCAR order. 5.3 eV is the Materials Project value for Fe (table below).         |
+| LDAUJ         | 0.0 0.0                | J for each species. With Dudarev only U − J matters, so J = 0 puts the whole U<sub>eff</sub> into LDAUU. |
+| LDAUPRINT     | 1                      | Prints the occupation matrices to OUTCAR, so you can check the d occupations.                            |
+| LMAXMIX       | 4                      | 6 for f elements. Set it in every ICHARG = 11 run as well.                                               |
+| ISPIN, MAGMOM | 2, `2*5.0 3*0.6`       | Spin-polarized, one starting moment per atom (2 Fe and 3 O in this example).                             |
+| ALGO          | Normal                 | Switch to All if the SCF struggles.                                                                      |
+| NELM          | 200                    | More electronic steps than the default 60, as +U runs often need.                                        |
+
+</Section>
+
+<Section id="choose-u" heading="Choosing U">
+
+These are the U<sub>eff</sub> values the Materials Project uses for oxides and fluorides<Cite id="S-042" />:
+
+| Element | U<sub>eff</sub> (eV), Materials Project |
+| ------- | --------------------------------------- |
+| Co      | 3.32                                    |
+| Cr      | 3.7                                     |
+| Fe      | 5.3                                     |
+| Mn      | 3.9                                     |
+| Mo      | 4.38                                    |
+| Ni      | 6.2                                     |
+| V       | 3.25                                    |
+| W       | 6.2                                     |
+
+There are four common ways to choose U. Whichever you use, say so when you report the result.
+
+1. **Literature or database values** (the table above). They keep your energies compatible with
+   Materials-Project-style phase diagrams.
+2. **Linear response** (the Cococcioni–de Gironcoli method). Compute how the d occupation responds to small
+   shifts of the potential (`LDAUTYPE = 3`) and derive U self-consistently for your own compound.
+3. **An empirical fit** to an experimental band gap, moment or oxidation enthalpy. State which property you
+   fitted.
+4. **A U scan**, for example from 0 to 7 eV. Report how your conclusions, such as the gap or the magnetic
+   ground state, depend on U.
+
+</Section>
+
+<Section id="check" heading="Check before you move on">
+
+- **One entry per species, in POSCAR order.** LDAUL, LDAUU and LDAUJ each need exactly one value for every
+  species. If one is missing, the values silently shift onto the wrong element.
+- **The d occupations and moments make chemical sense.** Read the occupation matrices (written because of
+  `LDAUPRINT = 1`) and the moments, and check them against the oxidation state you expect.
+- **You found the lowest state, not just a state.** +U creates metastable states: different MAGMOM values or
+  starting occupations can converge to different energies. Try several starts and keep the lowest.
+  Occupation-matrix control helps, and so does U ramping: go from 0 to the final U in steps, each run reading
+  the WAVECAR of the one before.
+
+<Callout variant="warning" title="Energies with different U do not compare">
+
+A total energy computed with one U cannot be compared with one computed with another U. A formation energy
+that mixes +U compounds and plain GGA compounds needs a correction scheme, such as MP2020<Cite id="S-081" />.
+
+</Callout>
+
+</Section>
+
+<Section id="next" heading="Files for the next step">
+
+There is no separate output to carry over: the +U block travels with the material. Every later run on it
+(SCF, DOS, bands, the magnetic configurations) keeps the same LDAU tags and the same U, and any ICHARG = 11
+run also keeps `LMAXMIX`.
+
+</Section>
