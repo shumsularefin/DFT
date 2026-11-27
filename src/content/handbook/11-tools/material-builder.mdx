@@ -1,5 +1,29 @@
 ---
 id: material-builder
+stage:
+  scene: m11-builder-tour
+  states:
+    - id: template
+      section: why
+      params: { step: 0, scale: 1 }
+      camera: iso
+      caption: 'Step 1, the template Cubic perovskite (SrTiO3): five sites in a 3.905 Å cube with the TiO6 octahedron. Turn the cell over to find the Ti at the centre of its six oxygens.'
+    - id: substitute
+      section: intuition
+      params: { step: 1, scale: 1 }
+      caption: 'Step 2, Sub La on the Sr row and Sub Cu on the Ti row: the outlined atoms changed species. The readout lists the validity messages B005, B006, B008 and B011, none of them an error.'
+    - id: supercell
+      section: math
+      params: { step: 2, scale: 1, compare: true }
+      caption: 'Step 3, Defect supercell: M = [[4, 0, 0], [2, 2, 0], [2, 0, 2]] holds 16 copies, 80 atoms, with a shortest vector of 11.05 Å. The red dashed cube is the 3x3x3 cell of 135 atoms. Rotate to see how slanted the chosen cell is.'
+    - id: vacancy
+      section: in-vasp
+      params: { step: 3, scale: 1 }
+      caption: 'Step 4, Vacancy on one O row: the cell becomes La16Cu16O47 with 79 atoms, so a ferromagnetic MAGMOM reads 16*0 16*3 47*0. Find the faint outlined sphere where the oxygen was.'
+    - id: overlap
+      section: what-changes
+      params: { step: 4, scale: 0.72, shells: true }
+      caption: 'The overlap test: solid spheres of 0.5 r and faint shells of 0.75 r. At scale 0.72 the shells of neighbouring La touch, the dashed B002 warnings. Drag the scale below 0.5 for solid B001 errors, or back to 1 where nothing is flagged.'
 title: Tour of the Material Builder
 module: 11
 order: 2

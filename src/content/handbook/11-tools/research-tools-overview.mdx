@@ -1,5 +1,28 @@
 ---
 id: research-tools-overview
+stage:
+  scene: m11-tools-overview
+  states:
+    - id: screen
+      section: why
+      params: { tool: studio }
+      caption: 'Step 1 of the project, the Screening Studio: the synthetic demo table filtered to Cu, O. Switch the Tool control to follow the project from screening to analysis.'
+    - id: build
+      section: intuition
+      params: { tool: builder, a: 3.905 }
+      caption: 'The Material Builder makes the cubic LaCuO3 cell from its template and checks it. Move the lattice parameter to rescale the cell, then pick the Magnetic configuration tool or the k-path tool for the same cell.'
+    - id: tolerance
+      section: math
+      params: { tool: tolerance, rsite: La }
+      caption: 'The tolerance factor as geometry: ions at their Shannon radii in the cube where Cu and O touch. For La the A ion just fills its cage (t = 1.006); pick Lu to open the gap that lets the octahedra tilt.'
+    - id: eos
+      section: in-vasp
+      params: { tool: eos, a: 3.905 }
+      caption: 'The equation-of-state fit on example data: E(V) in black, the enthalpy surface over volume and pressure, and an fcc cell at the current volume. Move the lattice slider and read the pressure.'
+    - id: magnetic
+      section: mistakes
+      params: { tool: magnetic, ordering: G }
+      caption: 'The Magnetic tool builds collinear orders only: G-type Cu moments, up with solid heads and down with open heads, in the smallest cell that holds them. Try A and C to see which planes or chains align.'
 title: Research tools overview
 module: 11
 order: 3
