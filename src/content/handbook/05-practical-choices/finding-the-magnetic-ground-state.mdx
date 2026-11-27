@@ -1,5 +1,27 @@
 ---
 id: finding-the-magnetic-ground-state
+stage:
+  scene: m05s-ground-state
+  states:
+    - id: g-lowest
+      section: why
+      params: { j1: -4, j2: 0 }
+      camera: front
+      caption: 'Four orderings on one 2 x 2 x 2 cell, each lifted by its energy per Mn. With antiferromagnetic J1 the G-type cell sits lowest; drag J1 above zero to send FM to the bottom.'
+    - id: a-lowest
+      section: intuition
+      params: { j1: 4, j2: -2 }
+      camera: front
+      caption: 'Ferromagnetic J1 with antiferromagnetic J2 puts A-type lowest. Small changes in J reorder the ladder, so every candidate has to be computed.'
+    - id: c-lowest
+      section: math
+      params: { j1: -4, j2: -2 }
+      caption: 'Each height is E0 plus c1 J1 plus c2 J2, with c counted from the parallel and antiparallel bonds of that ordering. Here C-type wins.'
+    - id: near-tie
+      section: mistakes
+      params: { j1: 2, j2: -0.5 }
+      camera: front
+      caption: 'FM and A-type are tied here. A gap below 1 meV per Mn is smaller than typical k-point or cell-shape errors, so this ranking cannot be trusted.'
 title: Finding the magnetic ground state
 module: 5
 order: 9
