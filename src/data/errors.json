@@ -413,7 +413,7 @@
           "text": "Check the geometry for very short distances."
         },
         {
-          "text": "Change ALGO (e.g. Normal → Fast, or All)."
+          "text": "Change ALGO to All, or back to Normal if it was Fast (the Workflow Handbook lists Fast as a cause of this error and avoids it for magnetic or +U systems)."
         },
         {
           "text": "Restart without WAVECAR (ISTART = 0).",
