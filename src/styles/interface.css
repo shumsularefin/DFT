@@ -347,16 +347,14 @@ tbody tr:last-child td {
 /* ------------------------------------------------------------------
    One page layout for every page in the main column.
    Container: the whole main column, 24px side padding. Grids and lists fill the row; running prose
-   keeps a readable measure (48rem on prose pages, 68ch for paragraphs). Tool pages keep 88rem.
+   keeps a readable measure (48rem on prose pages, 68ch for paragraphs). Tool pages fill the column too,
+   so their right margin matches every other page.
    ------------------------------------------------------------------ */
 main .container {
   width: auto;
   max-width: none;
   margin: 0;
   padding: var(--space-5) var(--space-5) var(--space-7);
-}
-[data-page-class='tool'] main .container {
-  max-width: 88rem;
 }
 .prose-page > *,
 .ref-page > :not(.ref-scroll) {
