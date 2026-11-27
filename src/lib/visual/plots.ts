@@ -1345,7 +1345,7 @@ function scfIterations(p: P): string {
   const yt = by(Math.log10(o.tol!));
   body +=
     line(x0, yt, x1, yt, 'vp-guide') +
-    text(x1 - 2, yt - 3, 'small enough: stop', 'vp-t vp-small vp-halo', 'end');
+    text((x0 + x1) / 2, yb0 + 14, 'dashed line: small enough, stop', 'vp-t vp-small', 'middle');
   body +=
     text(x0, yb0 + 14, 'step 1', 'vp-t vp-small', 'start') +
     text(x1, yb0 + 14, `step ${n}`, 'vp-t vp-small', 'end');
