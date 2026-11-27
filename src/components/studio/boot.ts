@@ -21,6 +21,12 @@ const SCRIPTS = [
   'js/site-link.js',
 ];
 
+// A script that throws while it runs still fires onload, so keep its first error to report it.
+let scriptError: string | null = null;
+window.addEventListener('error', (e) => {
+  if (scriptError === null && e.filename.includes(BASE)) scriptError = e.message;
+});
+
 function load(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const s = document.createElement('script');
@@ -30,6 +36,16 @@ function load(src: string): Promise<void> {
     s.onerror = () => reject(new Error(`could not load ${src}`));
     document.body.appendChild(s);
   });
+}
+
+/** Why the viewer did not start, in words a reader can act on. */
+function startError(): Error {
+  const msg = scriptError ?? 'the 3D viewer did not start';
+  return new Error(
+    /webgl/i.test(msg)
+      ? 'this browser could not start 3D graphics (WebGL). Turn on hardware acceleration, or try another browser'
+      : msg,
+  );
 }
 
 async function boot() {
@@ -45,7 +61,9 @@ async function boot() {
     // Yield between scripts so no single start-up task blocks input for long.
     await new Promise((r) => setTimeout(r, 0));
     if (src === 'js/vesta.js') {
-      (w.VESTA as { start: () => void }).start();
+      const vesta = w.VESTA as { start: () => void } | undefined;
+      if (!vesta) throw startError();
+      vesta.start();
       await new Promise((r) => setTimeout(r, 0));
     }
   }
