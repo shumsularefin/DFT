@@ -3,12 +3,12 @@
 //  * a stage whose scene id is not defined in src/lib/viewer3d/scenes/mXX.ts is reported;
 //  * a topic page that still shows a picture in place of the stage (an <img> standing for 3D) is reported.
 // The deep checks (parameters, layer groups, descriptions) run in vitest: src/lib/viewer3d/stages.test.ts.
-// STRICT is false while M16 is being built (warn only, exit 0); M16.15 sets it to true so a missing stage fails verify.
+// STRICT is true since M16.15: all 83 topics have a stage, so a missing or broken stage fails verify.
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, walk, rel, result } from './lib.mjs';
 
-export const STRICT = false;
+export const STRICT = true;
 
 const SCENE_ID = /^(m\d\d[a-z]?)-[a-z0-9]+(-[a-z0-9]+)*$/;
 
