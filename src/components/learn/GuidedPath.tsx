@@ -1,7 +1,7 @@
 // Guided path (M12.4): one station at a time. A station is one picture (a scene preset, a live scene of the 3D engine or a
 // plot), three short sentences, one thing to try and a link to the full topic. One Scene island is reused for every scene
 // station and one StageView for every stage station (M16.4), both on the shared engine, so at most one WebGL canvas exists
-// on the page (D-058). Scene and stage stations open the free 3D view by themselves (D-107); plot stations load no
+// on the page (D-058). Scene and stage stations open the free 3D view by themselves (D-112); plot stations load no
 // three.js. A stage station may keep its old plot as a small panel beside the 3D view. If the reader goes back to the
 // flat view, later stations stay flat until they press "View in 3D" again.
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';

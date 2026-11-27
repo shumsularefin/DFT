@@ -21,6 +21,35 @@
     scrollbar-width: thin;
   }
 }
+/* Wide screens: "On this page" moves to its own right column, so the article sits between two rails
+   instead of leaving the right side of the page empty. */
+@media (min-width: 100rem) {
+  .handbook-layout {
+    grid-template-columns: 18.75rem minmax(0, 1fr) 15rem;
+  }
+  .handbook-layout > .hb-rail {
+    display: contents;
+  }
+  .hb-rail > * {
+    grid-row: 1;
+    position: sticky;
+    top: calc(var(--topbar-h) + var(--space-5));
+    max-height: calc(100vh - var(--topbar-h) - var(--statusbar-h) - 2 * var(--space-5));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  .hb-rail > .sidebar {
+    grid-column: 1;
+  }
+  .hb-rail > :not(.sidebar) {
+    grid-column: 3;
+  }
+  .handbook-layout > .handbook-main {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
 .hb-rail {
   display: grid;
   gap: var(--space-4);
@@ -359,14 +388,25 @@ main .topic-section > h2.card-h {
     grid-template-columns: minmax(0, 1fr);
   }
 }
-.pr-how {
-  margin-top: var(--space-4);
+/* "How this works" and "The three pieces" sit under the session card and the mastery card (Practice.tsx). */
+.how-it-works > :first-child {
+  margin-top: 0;
 }
-.pr-how .how-it-works > :last-child {
+.how-it-works > :last-child {
   margin-bottom: 0;
 }
-.pr-how .how-it-works :is(p, dl) {
-  max-width: 90ch;
+.how-it-works :is(p, dl) {
+  max-width: none;
+}
+.how-it-works dt {
+  margin-top: var(--space-3);
+  font-weight: 600;
+}
+.how-it-works dt:first-child {
+  margin-top: 0;
+}
+.how-it-works dd {
+  margin: var(--space-1) 0 0;
 }
 .topic-section .qc-options {
   max-width: none;

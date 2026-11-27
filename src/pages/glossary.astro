@@ -41,10 +41,19 @@ const levelName = { beginner: 'Beginner', intermediate: 'Intermediate', pro: 'Pr
 </BaseLayout>
 
 <style is:global>
+  /* Terms in as many columns as fit, read across then down in alphabetical order. */
+  .glossary {
+    display: grid;
+    gap: var(--space-4) var(--space-6);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 26rem), 1fr));
+    margin: 0;
+  }
   .glossary-item {
-    margin-block: var(--space-4);
-    scroll-margin-top: var(--space-4);
-    max-width: var(--measure);
+    margin: 0;
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--border);
+    scroll-margin-top: calc(var(--topbar-h) + var(--space-4));
+    max-width: none;
   }
   .glossary-item dt {
     font-weight: 600;

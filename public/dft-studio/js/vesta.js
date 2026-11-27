@@ -256,6 +256,17 @@
         { el:'S',  frac:[0.66667,0.33333,0.59781], mag:[0,0,0], sel:[true,true,true] }
       ]
     },
+    graphene_2d: {
+      name: 'Graphene (2D Sheet + Vacuum)',
+      cifSG: 'P6/mmm (191)',
+      lattice: [[2.460,0,0],[-1.230,2.13042,0],[0,0,16.0]],
+      selectiveDynamics: false,
+      polyCenters: [],
+      atoms: [
+        { el:'C', frac:[0.33333,0.66667,0.5], mag:[0,0,0], sel:[true,true,true] },
+        { el:'C', frac:[0.66667,0.33333,0.5], mag:[0,0,0], sel:[true,true,true] }
+      ]
+    },
     fe2o3: {
       name: 'Fe2O3 (Corundum AFM)',
       cifSG: 'R-3c (167)',
@@ -1457,14 +1468,29 @@
   const orthoCam = new THREE.OrthographicCamera(-10, 10, 10, -10, -200, 500);
   let activeCam = orthoCam;
 
-  // Publication-grade VESTA lighting
-  scene.add(new THREE.AmbientLight(0xffffff, 0.58));
-  const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.72);
-  dirLight1.position.set(12, 18, 22);
+  // VESTA-style lighting: glossy Phong spheres with a crisp white highlight. A soft ambient fill keeps the
+  // far side readable, a key light from the upper left of the view gives the shading and the highlight,
+  // and a weak fill from the lower right lifts the shadowed side. The directional lights follow the
+  // camera (placeLights), so the lit side stays the same as the structure turns, as in VESTA.
+  scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+  const dirLight1 = new THREE.DirectionalLight(0xffffff, 2.0);
   scene.add(dirLight1);
-  const dirLight2 = new THREE.DirectionalLight(0xdbeafe, 0.35);
-  dirLight2.position.set(-16, -10, -14);
+  const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.35);
   scene.add(dirLight2);
+  const KEY_DIR = new THREE.Vector3(-0.5, 0.65, 0.8).normalize();
+  const FILL_DIR = new THREE.Vector3(0.6, -0.45, 0.5).normalize();
+  function placeLights() {
+    dirLight1.position.copy(KEY_DIR).applyQuaternion(activeCam.quaternion);
+    dirLight2.position.copy(FILL_DIR).applyQuaternion(activeCam.quaternion);
+  }
+  /** One glossy material, as VESTA draws atoms, bonds and arrows. */
+  function glossy(color, extra) {
+    return new THREE.MeshPhongMaterial(Object.assign({
+      color: new THREE.Color(color),
+      specular: 0x7a7a7a,
+      shininess: 70
+    }, extra || {}));
+  }
 
   // Custom Smooth Trackball / Orbit Camera State
   const camState = {
@@ -1535,9 +1561,9 @@
   // Render Cache for Raycasting & Labels
   let displayedAtoms = []; // { origIdx, el, frac, cart, mag, mesh }
   const atomMeshes = [];
-  const sphereGeo = new THREE.SphereGeometry(1, 28, 22);
-  const cylGeo = new THREE.CylinderGeometry(1, 1, 1, 14);
-  const coneGeo = new THREE.ConeGeometry(1, 1, 16);
+  const sphereGeo = new THREE.SphereGeometry(1, 40, 30);
+  const cylGeo = new THREE.CylinderGeometry(1, 1, 1, 20);
+  const coneGeo = new THREE.ConeGeometry(1, 1, 24);
 
   function clearGroup(g) {
     while (g.children.length > 0) {
@@ -1626,11 +1652,7 @@
     displayedAtoms.forEach((da, dIdx) => {
       const info = getElInfo(da.el);
       const rad = isSpace ? info.r * 1.15 : (isStick ? state.bondRadius * 1.05 : (isWire ? 0.08 : info.r * state.atomScale));
-      const mat = new THREE.MeshStandardMaterial({
-        color: new THREE.Color(da.cfg.color),
-        roughness: 0.34,
-        metalness: 0.14
-      });
+      const mat = glossy(da.cfg.color);
       const mesh = new THREE.Mesh(sphereGeo, mat);
       mesh.position.set(da.cart[0], da.cart[1], da.cart[2]);
       mesh.scale.setScalar(rad);
@@ -1700,12 +1722,10 @@
         const geo = new THREE.BufferGeometry();
         geo.setAttribute('position', new THREE.Float32BufferAttribute(posArr, 3));
         geo.computeVertexNormals();
-        const mat = new THREE.MeshStandardMaterial({
-          color: new THREE.Color(da.cfg.color),
+        const mat = glossy(da.cfg.color, {
           transparent: true,
           opacity: state.polyOpacity,
-          roughness: 0.4,
-          metalness: 0.05,
+          shininess: 30,
           side: THREE.DoubleSide,
           depthWrite: false
         });
@@ -1744,7 +1764,7 @@
         const tip = start.clone().addScaledVector(dir, totalLen);
 
         addCylinderSegment(start, shaftEnd, 0.095, col);
-        const coneMat = new THREE.MeshStandardMaterial({ color: new THREE.Color(col), roughness: 0.28, metalness: 0.12 });
+        const coneMat = glossy(col);
         const cone = new THREE.Mesh(coneGeo, coneMat);
         cone.position.copy(shaftEnd).lerp(tip, 0.5);
         cone.scale.set(0.24, headLen, 0.24);
@@ -1811,7 +1831,7 @@
     const dir = new THREE.Vector3().subVectors(p2, p1);
     const len = dir.length();
     if (len < 1e-5) return;
-    const mat = new THREE.MeshStandardMaterial({ color: new THREE.Color(colorHex), roughness: 0.38, metalness: 0.12 });
+    const mat = glossy(colorHex);
     const mesh = new THREE.Mesh(cylGeo, mat);
     mesh.position.copy(p1).lerp(p2, 0.5);
     mesh.scale.set(radius, len, radius);
@@ -1919,6 +1939,7 @@
       if (shadersPending) return;
     }
     dirtyFrames--;
+    placeLights();
     renderer.render(scene, activeCam);
   }
   var shadersReady = false, shadersPending = false;
@@ -2141,8 +2162,10 @@
     state.speciesConfig = nextCfg;
   }
 
+  const selectListeners = [];
   function syncSelectionUI() {
     const sel = state.selectedAtomIndices;
+    selectListeners.forEach(fn => { try { fn(sel.slice()); } catch (e) { console.error(e); } });
     document.getElementById('selection-badge').textContent = `${sel.length} selected`;
     const hud = document.getElementById('selection-hud');
     const infoEl = document.getElementById('sel-hud-info');
@@ -2727,8 +2750,9 @@
   document.querySelectorAll('[data-right-tab]').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('[data-right-tab]').forEach(b => b.classList.toggle('active', b === btn));
-      ['supercell','catalyst','symmetry','magnetic','atoms','vasp','checks'].forEach(t => {
-        document.getElementById(`right-tab-${t}`).classList.toggle('hidden', t !== btn.dataset.rightTab);
+      ['molecule','supercell','catalyst','symmetry','magnetic','atoms','vasp','checks'].forEach(t => {
+        const panel = document.getElementById(`right-tab-${t}`);
+        if (panel) panel.classList.toggle('hidden', t !== btn.dataset.rightTab);
       });
     });
   });
@@ -3817,6 +3841,21 @@
       state.magMode = 'collinear';
       state.structure.atoms.forEach(a => { a.mag = [0, 0, map[a.el] || 0]; });
       refreshAllUI(false);
+    },
+    // Molecule mode (molecule.ts): read the selection, keep one structure per mode, and load without undo steps.
+    getSelection: () => state.selectedAtomIndices.slice(),
+    onSelect: fn => selectListeners.push(fn),
+    snapshot: () => cloneStructure(state.structure),
+    restore: (s) => {
+      state.structure = cloneStructure(s);
+      state.history = []; state.future = []; syncHistoryButtons();
+      state.selectedAtomIndices = []; state.measurements = []; state.speciesConfig = {};
+      refreshAllUI(true);
+      fitCameraToStructure();
+    },
+    loadFresh: (text, name, displayName) => {
+      loadStructureText(text, name, displayName);
+      state.history = []; state.future = []; syncHistoryButtons();
     },
     openRightTab: t => { const b = document.querySelector(`[data-right-tab="${t}"]`); if (b) b.click(); },
     toast: showToast,

@@ -2,7 +2,7 @@
 // button that loads the engine (Viewer3D, free arcball camera, D-108) on demand, camera presets, keyboard rotation, reset
 // view and step controls. The preset becomes an engine frame through `fromSceneSpec` (D-121), drawn in the shared Studio
 // look (D-122). D-058: only one live canvas per page.
-// With `auto3D` (the guided path, D-107) the island opens the free 3D view by itself once it is on the page, when the browser
+// With `auto3D` (the guided path, D-112) the island opens the free 3D view by itself once it is on the page, when the browser
 // can draw WebGL and the reader has not asked for reduced motion; otherwise the flat view stays and can be turned by dragging
 // or with the arrow keys.
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';

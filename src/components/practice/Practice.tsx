@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import type { Concept } from '../../lib/learning/graph';
 import { choose, pickQuestion, MAX_WRONG_STREAK, type Arm, type Decision } from '../../lib/learning/policy';
 import type { Question } from '../../lib/learning/questions';
@@ -22,6 +22,10 @@ interface Props {
   concepts: Concept[];
   /** Concept id to the first topic page that teaches it. */
   topics: Record<string, TopicLink>;
+  /** "How this works", shown under the session card (Astro slot "how"). */
+  how?: ReactNode;
+  /** "The three pieces, in plain words", shown under the mastery card (Astro slot "pieces"). */
+  pieces?: ReactNode;
 }
 
 interface Current {
@@ -37,7 +41,7 @@ interface Suggestion {
   q: Question | null;
 }
 
-export default function Practice({ bank, concepts, topics }: Props) {
+export default function Practice({ bank, concepts, topics, how, pieces }: Props) {
   const { learner, persisted } = useLearner();
   const figures = useFigures(); // starts loading when the page opens, well before the first question
   const label = useMemo(() => Object.fromEntries(concepts.map((c) => [c.id, c.label])), [concepts]);
@@ -133,161 +137,169 @@ export default function Practice({ bank, concepts, topics }: Props) {
 
   return (
     <div className="pr-layout grid g2">
-      <div className="pr card" data-testid="practice">
-        {!persisted && (
-          <p className="pr-warn" role="note">
-            Your browser is blocking storage, so practice lasts only until you close this tab.
-          </p>
-        )}
-        {phase === 'start' && (
-          <div>
-            <h2 className="card-h">Start a session</h2>
-            <p className="ck-count pr-meta">
-              <span>{bank.length} questions</span>
-              <span aria-hidden="true">·</span>
-              <span>{concepts.length} ideas</span>
-              <span aria-hidden="true">·</span>
-              <span>Up to {SESSION_LENGTH} per session</span>
+      {/* Two columns that each stack their own cards, so a short session card leaves no hole under it. */}
+      <div className="pr-col">
+        <div className="pr card" data-testid="practice">
+          {!persisted && (
+            <p className="pr-warn" role="note">
+              Your browser is blocking storage, so practice lasts only until you close this tab.
             </p>
-            <div className="bar pr-bar" aria-hidden="true">
-              <span style={{ width: '0%' }} />
-            </div>
-            <p data-testid="due-count">
-              {due === 0
-                ? 'Nothing is due for review right now.'
-                : `${due} ${due === 1 ? 'question is' : 'questions are'} due for review.`}
-            </p>
-            <p>
-              A session is up to {SESSION_LENGTH} questions. Stop any time, there is no timer and no schedule
-              to keep.
-            </p>
-            <button type="button" className="btn btn-primary" onClick={start}>
-              Start a short session
-            </button>
-          </div>
-        )}
-
-        {phase === 'suggest' && suggest && (
-          <div data-testid="suggestion">
-            <h2 className="card-h">Ready for something new</h2>
-            <p className="pr-why">
-              Why this: you are ready for <strong>{label[suggest.concept] ?? suggest.concept}</strong>, which
-              comes next in the handbook.
-            </p>
-            {topics[suggest.concept] && (
-              <p>
-                Read <a href={topics[suggest.concept]!.href}>{topics[suggest.concept]!.title}</a> first if you
-                like.
+          )}
+          {phase === 'start' && (
+            <div>
+              <h2 className="card-h">Start a session</h2>
+              <p className="ck-count pr-meta">
+                <span>{bank.length} questions</span>
+                <span aria-hidden="true">·</span>
+                <span>{concepts.length} ideas</span>
+                <span aria-hidden="true">·</span>
+                <span>Up to {SESSION_LENGTH} per session</span>
               </p>
-            )}
-            <div className="ck-next">
-              {suggest.q && (
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={() => {
-                    setCur({
-                      q: suggest.q as Question,
-                      arm: 'suggest-topic',
-                      why: `A question on ${label[suggest.concept] ?? suggest.concept}, the idea you are ready for next.`,
-                      startHints: 0,
-                      n: done.length,
-                    });
-                    setPhase('asking');
-                  }}
-                >
-                  Try a question on it
-                </button>
-              )}
-              <button type="button" className="btn" onClick={() => next(true)}>
-                Show me something else
-              </button>
-              <button type="button" className="btn btn-ghost" onClick={stop}>
-                Stop for now
+              <div className="bar pr-bar" aria-hidden="true">
+                <span style={{ width: '0%' }} />
+              </div>
+              <p data-testid="due-count">
+                {due === 0
+                  ? 'Nothing is due for review right now.'
+                  : `${due} ${due === 1 ? 'question is' : 'questions are'} due for review.`}
+              </p>
+              <p>
+                A session is up to {SESSION_LENGTH} questions. Stop any time, there is no timer and no
+                schedule to keep.
+              </p>
+              <button type="button" className="btn btn-primary" onClick={start}>
+                Start a short session
               </button>
             </div>
-          </div>
-        )}
+          )}
 
-        {(phase === 'asking' || phase === 'between') && cur && (
-          <div>
-            <p className="ck-count pr-meta">
-              <span>
-                Question {shownNo} of up to {SESSION_LENGTH}
-              </span>
-              <span aria-hidden="true">·</span>
-              <span>{curConcept}</span>
-              <span aria-hidden="true">·</span>
-              <span>Due for review: {due}</span>
-            </p>
-            <div className="bar pr-bar" aria-hidden="true">
-              <span style={{ width: `${Math.round((shownNo / SESSION_LENGTH) * 100)}%` }} />
-            </div>
-            <p className="pr-why" data-testid="why">
-              Why this item: {cur.why} <span>(This is a rule of thumb, not a test.)</span>
-            </p>
-            <QuestionCard
-              key={`${cur.q.id}-${cur.n}`}
-              question={cur.q}
-              figure={figures?.[cur.q.id]}
-              onResult={onResult}
-              startHints={cur.startHints}
-            >
+          {phase === 'suggest' && suggest && (
+            <div data-testid="suggestion">
+              <h2 className="card-h">Ready for something new</h2>
+              <p className="pr-why">
+                Why this: you are ready for <strong>{label[suggest.concept] ?? suggest.concept}</strong>,
+                which comes next in the handbook.
+              </p>
+              {topics[suggest.concept] && (
+                <p>
+                  Read <a href={topics[suggest.concept]!.href}>{topics[suggest.concept]!.title}</a> first if
+                  you like.
+                </p>
+              )}
               <div className="ck-next">
-                {!atLimit && (
-                  <button type="button" className="btn btn-primary" onClick={() => next()}>
-                    Next question
+                {suggest.q && (
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() => {
+                      setCur({
+                        q: suggest.q as Question,
+                        arm: 'suggest-topic',
+                        why: `A question on ${label[suggest.concept] ?? suggest.concept}, the idea you are ready for next.`,
+                        startHints: 0,
+                        n: done.length,
+                      });
+                      setPhase('asking');
+                    }}
+                  >
+                    Try a question on it
                   </button>
                 )}
-                <button type="button" className={atLimit ? 'btn btn-primary' : 'btn'} onClick={stop}>
-                  {atLimit ? 'Finish the session' : 'Stop for now'}
+                <button type="button" className="btn" onClick={() => next(true)}>
+                  Show me something else
                 </button>
-              </div>
-            </QuestionCard>
-            {phase === 'asking' && (
-              <p className="ck-next">
                 <button type="button" className="btn btn-ghost" onClick={stop}>
                   Stop for now
                 </button>
-              </p>
-            )}
-          </div>
-        )}
+              </div>
+            </div>
+          )}
 
-        {phase === 'end' && (
-          <div className="pr-summary" role="status" data-testid="session-summary">
-            <h2 className="card-h">Session finished</h2>
-            {empty && done.length === 0 && <p>There is nothing to practise right now. Come back later.</p>}
-            {done.length > 0 && (
-              <>
-                <p>
-                  You answered {done.length}, and {done.filter((d) => d.correct).length}{' '}
-                  {done.filter((d) => d.correct).length === 1 ? 'was' : 'were'} right. Thanks for practising.
+          {(phase === 'asking' || phase === 'between') && cur && (
+            <div>
+              <p className="ck-count pr-meta">
+                <span>
+                  Question {shownNo} of up to {SESSION_LENGTH}
+                </span>
+                <span aria-hidden="true">·</span>
+                <span>{curConcept}</span>
+                <span aria-hidden="true">·</span>
+                <span>Due for review: {due}</span>
+              </p>
+              <div className="bar pr-bar" aria-hidden="true">
+                <span style={{ width: `${Math.round((shownNo / SESSION_LENGTH) * 100)}%` }} />
+              </div>
+              <p className="pr-why" data-testid="why">
+                Why this item: {cur.why} <span>(This is a rule of thumb, not a test.)</span>
+              </p>
+              <QuestionCard
+                key={`${cur.q.id}-${cur.n}`}
+                question={cur.q}
+                figure={figures?.[cur.q.id]}
+                onResult={onResult}
+                startHints={cur.startHints}
+              >
+                <div className="ck-next">
+                  {!atLimit && (
+                    <button type="button" className="btn btn-primary" onClick={() => next()}>
+                      Next question
+                    </button>
+                  )}
+                  <button type="button" className={atLimit ? 'btn btn-primary' : 'btn'} onClick={stop}>
+                    {atLimit ? 'Finish the session' : 'Stop for now'}
+                  </button>
+                </div>
+              </QuestionCard>
+              {phase === 'asking' && (
+                <p className="ck-next">
+                  <button type="button" className="btn btn-ghost" onClick={stop}>
+                    Stop for now
+                  </button>
                 </p>
-                <ul aria-label="Ideas you practised">
-                  {[...new Set(done.flatMap((d) => d.q.concepts))].map((c) => (
-                    <li key={c}>
-                      {label[c] ?? c}: {stateOf(learner, c) === 'mastered' ? 'mastered' : 'still learning'}
-                      {topics[c] ? (
-                        <>
-                          {' '}
-                          (<a href={topics[c]!.href}>{topics[c]!.title}</a>)
-                        </>
-                      ) : null}
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
-            <p>{due === 0 ? 'Nothing else is due.' : `${due} still due.`} Come back whenever you like.</p>
-            <button type="button" className="btn" onClick={() => setPhase('start')}>
-              Back to the start
-            </button>
-          </div>
-        )}
+              )}
+            </div>
+          )}
+
+          {phase === 'end' && (
+            <div className="pr-summary" role="status" data-testid="session-summary">
+              <h2 className="card-h">Session finished</h2>
+              {empty && done.length === 0 && <p>There is nothing to practise right now. Come back later.</p>}
+              {done.length > 0 && (
+                <>
+                  <p>
+                    You answered {done.length}, and {done.filter((d) => d.correct).length}{' '}
+                    {done.filter((d) => d.correct).length === 1 ? 'was' : 'were'} right. Thanks for
+                    practising.
+                  </p>
+                  <ul aria-label="Ideas you practised">
+                    {[...new Set(done.flatMap((d) => d.q.concepts))].map((c) => (
+                      <li key={c}>
+                        {label[c] ?? c}: {stateOf(learner, c) === 'mastered' ? 'mastered' : 'still learning'}
+                        {topics[c] ? (
+                          <>
+                            {' '}
+                            (<a href={topics[c]!.href}>{topics[c]!.title}</a>)
+                          </>
+                        ) : null}
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+              <p>{due === 0 ? 'Nothing else is due.' : `${due} still due.`} Come back whenever you like.</p>
+              <button type="button" className="btn" onClick={() => setPhase('start')}>
+                Back to the start
+              </button>
+            </div>
+          )}
+        </div>
+        {how}
       </div>
 
-      <MasteryCard concepts={concepts} learner={learner} due={due} />
+      <div className="pr-col">
+        <MasteryCard concepts={concepts} learner={learner} due={due} />
+        {pieces}
+      </div>
     </div>
   );
 }

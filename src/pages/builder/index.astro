@@ -1,15 +1,9 @@
 ---
 // @source S-021, S-034, S-042, S-067
-// Material Builder, crystal mode: the VESTA-style viewer and editor with the VASP workflow (DFT Studio code,
-// public/dft-studio/js), hosted natively in the site shell (D-105). The markup is studio-body.html; boot.ts
-// loads three.js and the Studio scripts after the page is interactive. Studio CSS is page-only and scoped
-// under .studio-root, so it cannot restyle the shell.
+// Material Builder, crystal mode: the VESTA-style viewer and editor with the VASP workflow (D-105). Molecule
+// mode (/builder/molecule/) is the same workspace with the Molecule tab (D-107).
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import body from '../../components/studio/studio-body.html?raw';
-import '../../components/studio/css/workspace.css';
-import '../../components/studio/css/tailwind.css';
-import '../../components/studio/css/studio.css';
-import '../../components/tools/builder/mode-switch.css';
+import StudioWorkspace from '../../components/studio/StudioWorkspace.astro';
 ---
 
 <BaseLayout
@@ -17,20 +11,5 @@ import '../../components/tools/builder/mode-switch.css';
   description="Build, view and edit crystals in a VESTA-style 3D workspace (supercells, slabs, defects, symmetry, magnetism, structure checks) and set up the VASP run (POTCAR, INCAR, KPOINTS, k-point convergence, run bundle, analysis), locally in your browser."
   pageClass="workspace"
 >
-  <div id="studio-root" class="studio-root" data-stage="structure">
-    <a class="studio-skip" href="#viewport-wrap">
-      Skip to the 3D viewer
-    </a>
-    <div id="studio-boot-error" class="studio-boot-error" role="alert" hidden></div>
-    <noscript>
-      <p class="studio-boot-error">
-        The Material Builder needs JavaScript. The handbook pages work without it.
-      </p>
-    </noscript>
-    <Fragment set:html={body} />
-  </div>
+  <StudioWorkspace mode="crystal" />
 </BaseLayout>
-
-<script>
-  import '../../components/studio/boot';
-</script>

@@ -37,11 +37,11 @@ const links = Object.fromEntries(
       <p>Practice needs JavaScript. The handbook pages list their questions with the answers hidden.</p>
     </noscript>
     <div class="js-only stack">
-      <Practice client:load bank={bank} concepts={concepts} topics={links} />
+      <Practice client:load bank={bank} concepts={concepts} topics={links}>
+        <HowThisWorks slot="how" part="how" />
+        <HowThisWorks slot="pieces" part="pieces" />
+      </Practice>
       {syncEnabled && <SyncPanel compact client:idle />}
-    </div>
-    <div class="pr-how">
-      <HowThisWorks />
     </div>
   </div>
 </BaseLayout>

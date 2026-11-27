@@ -22,8 +22,8 @@
 
     <div class="h-5 w-px bg-[var(--st-border)] mx-1 hidden sm:block"></div>
 
-    <!-- Sample Library Selector -->
-    <div class="flex items-center gap-1.5 min-w-0">
+    <!-- Sample Library Selector (crystal mode; molecule mode starts from the Molecule tab) -->
+    <div class="flex items-center gap-1.5 min-w-0" data-mode-only="crystal">
       <label for="sample-select" class="text-[11px] font-medium text-sub hidden xl:inline shrink-0"
         >Structure:</label
       >
@@ -37,6 +37,7 @@
           <option value="batio3">BaTiO3 (Tetragonal Perovskite)</option>
           <option value="fe_bcc">Fe (BCC Ferromagnetic)</option>
           <option value="mos2_2d">MoS2 (2D Monolayer + Vacuum)</option>
+          <option value="graphene_2d">Graphene (2D Sheet + Vacuum)</option>
           <option value="fe2o3">Fe2O3 (Corundum AFM)</option>
           <option value="si_diamond">Si (Diamond Cubic)</option>
         </optgroup>
@@ -50,7 +51,12 @@
       <i data-lucide="folder-open" class="w-3.5 h-3.5 text-blue-500"></i>
       <span class="hidden sm:inline">Open</span>
     </button>
-    <button id="btn-library" class="v-btn" title="Browse the 350-structure crystal library">
+    <button
+      id="btn-library"
+      class="v-btn"
+      data-mode-only="crystal"
+      title="Browse the 350-structure crystal library"
+    >
       <i data-lucide="library" class="w-3.5 h-3.5 text-blue-500"></i>
       <span class="hidden md:inline">Library</span>
     </button>
@@ -202,7 +208,7 @@
   >
     <div class="flex border-b border-theme header-bg px-1 shrink-0">
       <button class="tab-btn active flex-1" data-left-tab="style">Style</button>
-      <button class="tab-btn flex-1" data-left-tab="objects">Boundary</button>
+      <button class="tab-btn flex-1" data-left-tab="objects" data-mode-only="crystal">Boundary</button>
       <button class="tab-btn flex-1" data-left-tab="lattice">Lattice</button>
     </div>
 
@@ -573,6 +579,9 @@
       </div>
       <div
         id="console-log"
+        role="log"
+        aria-label="Console"
+        tabindex="0"
         class="flex-1 overflow-y-auto px-2.5 py-1 font-mono-code text-[10.5px] leading-snug space-y-0.5 selectable-text"
       ></div>
     </div>
@@ -585,13 +594,94 @@
     class="panel-bg border-l border-theme w-[328px] flex flex-col shrink-0 min-h-0"
   >
     <div class="flex border-b border-theme header-bg px-1 shrink-0 overflow-x-auto">
-      <button class="tab-btn active flex-1" data-right-tab="supercell">Cell</button>
-      <button class="tab-btn flex-1" data-right-tab="catalyst">Catalyst</button>
-      <button class="tab-btn flex-1" data-right-tab="symmetry">Symmetry</button>
-      <button class="tab-btn flex-1" data-right-tab="magnetic">Magnetic</button>
+      <button class="tab-btn flex-1" data-right-tab="molecule" data-mode-only="molecule">Molecule</button>
+      <button class="tab-btn active flex-1" data-right-tab="supercell" data-mode-only="crystal">Cell</button>
+      <button class="tab-btn flex-1" data-right-tab="catalyst" data-mode-only="crystal">Catalyst</button>
+      <button class="tab-btn flex-1" data-right-tab="symmetry" data-mode-only="crystal">Symmetry</button>
+      <button class="tab-btn flex-1" data-right-tab="magnetic" data-mode-only="crystal">Magnetic</button>
       <button class="tab-btn flex-1" data-right-tab="atoms">Atoms</button>
       <button class="tab-btn flex-1" data-right-tab="vasp">VASP</button>
       <button class="tab-btn flex-1" data-right-tab="checks">Checks</button>
+    </div>
+
+    <!-- RIGHT TAB 0: MOLECULE MODE (molecule.ts builds and edits an isolated molecule in a vacuum box) -->
+    <div id="right-tab-molecule" class="p-2.5 overflow-y-auto flex-1 space-y-3 hidden">
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-[11px] font-bold text-main">Start from</span>
+          <span id="mol-formula" class="text-[10.5px] font-mono-code text-blue-500"></span>
+        </div>
+        <div id="mol-presets" class="mol-presets" role="group" aria-label="Starting molecules"></div>
+      </div>
+
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-[11px] font-bold text-main">Build with any element</span>
+          <span class="heur-badge">Heuristic</span>
+        </div>
+        <div
+          id="mol-pt-grid"
+          class="pt-grid"
+          role="group"
+          aria-label="Periodic table: the element to add"
+        ></div>
+        <p class="text-[10.5px] text-sub m-0">
+          Element: <b id="mol-picked" class="font-mono-code">C</b>.
+          <span id="mol-selected">Pick an atom with the Select tool to build on it.</span>
+        </p>
+        <div class="grid grid-cols-2 gap-1.5">
+          <button id="mol-add" class="v-btn v-btn-primary justify-center" type="button">Add atom</button>
+          <button id="mol-swap" class="v-btn justify-center" type="button">Change element</button>
+          <button id="mol-hydrogens" class="v-btn justify-center" type="button">Add hydrogens</button>
+          <button id="mol-delete" class="v-btn justify-center" type="button">Delete atom</button>
+          <button id="mol-single" class="v-btn justify-center col-span-2" type="button">
+            Start again from one atom of this element
+          </button>
+        </div>
+        <p class="text-[10.5px] text-sub leading-snug m-0">
+          A new atom bonds to the selected atom (or, with none selected, the last atom that is not a hydrogen)
+          at the sum of covalent radii, at the ideal angle to its other bonds. Hydrogens fill the usual
+          valence and assume single bonds. The geometry is a starting point: relax it in VASP with ISIF = 2.
+        </p>
+      </div>
+
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
+        <span class="text-[11px] font-bold text-main block">Vacuum box</span>
+        <div class="flex items-end gap-2">
+          <div class="flex-1">
+            <label for="mol-vacuum" class="text-[10px] text-mut block mb-0.5"
+              >Vacuum to each image (Å, at least 10)</label
+            >
+            <input
+              id="mol-vacuum"
+              type="number"
+              min="10"
+              max="40"
+              step="1"
+              value="10"
+              class="v-input w-full font-mono-code"
+            />
+          </div>
+          <button id="mol-box" class="v-btn" type="button">Fit the box</button>
+        </div>
+        <p id="mol-box-info" class="text-[10.5px] text-sub m-0"></p>
+      </div>
+
+      <div class="card-bg border border-subtle rounded-md p-2.5 space-y-2">
+        <span class="text-[11px] font-bold text-main block">Save and hand on</span>
+        <div class="grid grid-cols-2 gap-1.5">
+          <button id="mol-xyz" class="v-btn justify-center" type="button">XYZ file</button>
+          <button id="mol-mol" class="v-btn justify-center" type="button">MOL file</button>
+          <button id="mol-to-crystal" class="v-btn justify-center col-span-2" type="button">
+            Open this molecule in Crystal mode
+          </button>
+        </div>
+        <p class="text-[10.5px] text-sub leading-snug m-0">
+          POSCAR (the toolbar button) writes the molecule in its box. A periodic graphene sheet is a crystal:
+          pick it from the structure menu in Crystal mode. The graphene flake here is a molecule.
+        </p>
+      </div>
+      <p id="mol-status" class="text-[10.5px] text-sub m-0" role="status"></p>
     </div>
 
     <!-- RIGHT TAB 7: SITE CHECKS AND CLEAN-UP (the Material Builder's validity rules, D-100) -->

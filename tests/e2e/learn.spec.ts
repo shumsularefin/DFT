@@ -207,7 +207,7 @@ test.describe('guided path (M12.4)', () => {
   // the SVG default black and every label at the default 16 px, where the labels ran into each other and off the edge.
   for (const theme of ['light', 'dark'] as const) {
     test(`every station picture is styled and its labels do not collide (${theme})`, async ({ page }) => {
-      // Scene and stage stations open the live 3D view by themselves (D-107), which replaces the flat picture; with
+      // Scene and stage stations open the live 3D view by themselves (D-112), which replaces the flat picture; with
       // reduced motion they keep it, so every flat picture is checked here. The live views are checked by the 3D tests.
       await page.emulateMedia({ reducedMotion: 'reduce' });
       await open(page);

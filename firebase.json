@@ -62,6 +62,15 @@
         ]
       },
       {
+        "source": "/dft-studio/**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=0, must-revalidate"
+          }
+        ]
+      },
+      {
         "source": "/sw.js",
         "headers": [
           {
@@ -124,7 +133,7 @@
         ]
       },
       {
-        "source": "!/builder{,/,/index.html}",
+        "source": "!/builder{,/,/index.html,/molecule,/molecule/,/molecule/index.html}",
         "headers": [
           {
             "key": "X-Frame-Options",
@@ -137,7 +146,7 @@
         ]
       },
       {
-        "source": "/builder{,/,/index.html}",
+        "source": "/builder{,/,/index.html,/molecule,/molecule/,/molecule/index.html}",
         "headers": [
           {
             "key": "X-Frame-Options",

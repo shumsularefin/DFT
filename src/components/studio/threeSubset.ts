@@ -15,7 +15,7 @@ export {
   Matrix4,
   Mesh,
   MeshBasicMaterial,
-  MeshStandardMaterial,
+  MeshPhongMaterial,
   OrthographicCamera,
   PerspectiveCamera,
   Quaternion,

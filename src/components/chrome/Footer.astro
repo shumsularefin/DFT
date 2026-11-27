@@ -19,8 +19,8 @@ import { FOOTER_LINKS, SITE } from '../../lib/site';
       </ul>
     </nav>
     <p class="footer-note">
-      {SITE.name} is learning material, not a substitute for the VASP manual or the published literature. It
-      is under construction: pages marked Draft have not yet been checked against their sources.
+      {SITE.name} is learning material, not a substitute for the VASP manual or the published literature.
+      Pages marked Draft are not yet checked against their sources.
     </p>
     <dialog class="help-dialog" aria-labelledby="help-title" data-help-dialog>
       <h2 id="help-title">Keyboard shortcuts</h2>
@@ -87,11 +87,17 @@ import { FOOTER_LINKS, SITE } from '../../lib/site';
 </footer>
 
 <style is:global>
+  /* Two short lines: the links, then the note. Lined up with the page content, not centred. */
   .site-footer {
-    margin-top: var(--space-8);
-    padding-block: var(--space-5);
+    padding-block: var(--space-2) var(--space-3);
     border-top: 1px solid var(--border);
     background: var(--surface);
+  }
+  .site-footer > .container {
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding-inline: var(--space-5);
   }
   .footer-links {
     display: flex;
@@ -100,6 +106,7 @@ import { FOOTER_LINKS, SITE } from '../../lib/site';
     list-style: none;
     margin: 0;
     padding: 0;
+    font-size: var(--step--1);
   }
   .footer-links a,
   .link-btn {
@@ -118,8 +125,10 @@ import { FOOTER_LINKS, SITE } from '../../lib/site';
     cursor: pointer;
   }
   .footer-note {
+    max-width: none;
+    margin: 0;
     color: var(--text-muted);
-    font-size: var(--step--1);
+    font-size: 0.75rem;
   }
   .help-dialog {
     max-width: min(32rem, 100vw - 2rem);

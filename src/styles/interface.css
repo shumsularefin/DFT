@@ -346,18 +346,51 @@ tbody tr:last-child td {
 
 /* ------------------------------------------------------------------
    One page layout for every page in the main column.
-   Container: 72rem wide, centred, 24px side padding (16px on phones).
-   Reading pages keep prose at 46rem, left-aligned to the same edge.
+   Container: the whole main column, 24px side padding. Grids and lists fill the row; running prose
+   keeps a readable measure (48rem on prose pages, 68ch for paragraphs). Tool pages fill the column too,
+   so their right margin matches every other page.
    ------------------------------------------------------------------ */
 main .container {
   width: auto;
-  max-width: 88rem;
+  max-width: none;
   margin: 0;
   padding: var(--space-5) var(--space-5) var(--space-7);
 }
 .prose-page > *,
 .ref-page > :not(.ref-scroll) {
   max-width: 48rem;
+}
+/* Changelog: each list of entries fills the column as a grid of readable-width entries, so the page has no
+   empty right half on wide screens. Headings and the intro keep the prose measure. */
+.changelog > ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 30rem), 1fr));
+  column-gap: var(--space-7);
+  max-width: none;
+}
+.changelog > ul > li p {
+  margin-top: 0;
+}
+/* Short reading pages (About, Privacy) set their sections in two columns on wide screens, so the
+   right half of the page is not empty. Title and lede span both columns. */
+@media (min-width: 90rem) {
+  .prose-columns {
+    columns: 2;
+    column-gap: var(--space-7);
+    max-width: calc(96rem + var(--space-7) + 2 * var(--space-5));
+  }
+  .prose-columns > :is(h1, h1 + p) {
+    column-span: all;
+  }
+  .prose-columns :is(p, li) {
+    break-inside: avoid;
+  }
+  .prose-columns > h2 {
+    break-after: avoid;
+  }
+  .prose-columns > h2:first-of-type {
+    margin-top: 0;
+  }
 }
 
 /* Page header: modest h1, one muted lede, 24px before the content. */

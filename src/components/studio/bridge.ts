@@ -91,12 +91,22 @@ function readAny(text: string, name = 'POSCAR'): Structure {
 }
 
 const issuesCache = new Map<string, Issue[]>();
+/** The workspace's mode: molecule mode checks an isolated molecule, without the crystal-only rules. */
+function workspaceMode(): 'crystal' | 'molecule' {
+  return typeof document !== 'undefined' &&
+    document.getElementById('studio-root')?.dataset.mode === 'molecule'
+    ? 'molecule'
+    : 'crystal';
+}
+
 function issuesFor(poscar: string): Issue[] {
-  let out = issuesCache.get(poscar);
+  const mode = workspaceMode();
+  const key = `${mode}\n${poscar}`;
+  let out = issuesCache.get(key);
   if (!out) {
-    out = check(readAny(poscar), 'crystal');
+    out = check(readAny(poscar), mode);
     issuesCache.clear();
-    issuesCache.set(poscar, out);
+    issuesCache.set(key, out);
   }
   return out;
 }

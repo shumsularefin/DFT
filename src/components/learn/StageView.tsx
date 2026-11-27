@@ -1,7 +1,7 @@
 // A live scene of the 3D engine on the guided path (M16.4, D-121): a viewer3d scene (src/lib/viewer3d/scenes) built from
 // the station's parameters, drawn by the shared engine with the same free camera, keys and readout as the Scene island.
 // The scene module and its flat poster load lazily (no three.js); the engine loads only when the view goes live. Like a
-// scene station it opens by itself (D-107) unless the reader chose the flat view, asked for reduced motion or has no
+// scene station it opens by itself (D-112) unless the reader chose the flat view, asked for reduced motion or has no
 // WebGL; then the poster (the same layers, projected) and the text description stay. One canvas at a time (D-058).
 import { useEffect, useRef, useState } from 'react';
 import Badge from '../ui/Badge';

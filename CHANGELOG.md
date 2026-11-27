@@ -23,7 +23,7 @@ All notable changes to the DFT Handbook are listed here. The format follows
 - Guided path figures are no longer solid black: the plot styles now load on `/learn/`, labels no longer collide, and 3D stations use an angled camera.
 - Buttons, text fields, menus and file pickers on the labs, 3D scenes, periodic table and tools pages have the site look instead of browser grey.
 - No sideways scroll at 360 px on the k-path, EOS and progress pages or in open equation sections; React hydration error 418 on handbook, practice and progress pages.
-- Guided path: scene stations open a free 3D view by themselves (drag to turn, scroll to zoom, right-drag to move, with keyboard equivalents), atoms in 3D views are lit instead of black, and the flat fallback turns under a drag (D-107).
+- Guided path: scene stations open a free 3D view by themselves (drag to turn, scroll to zoom, right-drag to move, with keyboard equivalents), atoms in 3D views are lit instead of black, and the flat fallback turns under a drag (D-112).
 - Deploy runs only after CI succeeds on main (D-089).
 - Crystal and molecule builder, and the Input Builder Task step, no longer overflow the page at 360 px wide.
 - Tolerance-factor element buttons now start their accessible name with the visible symbol (axe `label-content-name-mismatch`).

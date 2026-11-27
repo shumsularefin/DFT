@@ -11,6 +11,20 @@ interface Props {
 const { code, lang = 'text', filename, annotations = {} } = Astro.props;
 const raw = code.replace(/\n$/, '');
 const lines = highlight(lang, raw);
+// Lines are joined into one string so no template whitespace lands inside <pre>: each line is exactly its
+// tokens, an optional note and one newline, which keeps lines tight and the CSS line numbers beside them.
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const html = lines
+  .map((tokens, i) => {
+    const body = tokens
+      .map((t) => (t.type === 'plain' ? esc(t.text) : `<span class="tok-${t.type}">${esc(t.text)}</span>`))
+      .join('');
+    const note = annotations[i + 1]
+      ? `<span class="cl-note">${esc(`  <- ${annotations[i + 1]}`)}</span>`
+      : '';
+    return `<span class="cl">${body}${note}\n</span>`;
+  })
+  .join('');
 ---
 
 <figure class="codeblock" data-codeblock>
@@ -21,15 +35,7 @@ const lines = highlight(lang, raw);
     </button>
     <span class="sr-only" role="status" aria-live="polite" data-copy-status></span>
   </figcaption>
-  <pre tabindex="0" aria-label={`${filename ?? lang} code`}><code>{
-    lines.map((tokens, i) => (
-      <span class="cl">
-        {tokens.map((t) => (t.type === 'plain' ? t.text : <span class={`tok-${t.type}`}>{t.text}</span>))}
-        {annotations[i + 1] && <span class="cl-note">{`  <- ${annotations[i + 1]}`}</span>}
-        {'\n'}
-      </span>
-    ))
-  }</code></pre>
+  <pre tabindex="0" aria-label={`${filename ?? lang} code`}><code set:html={html} /></pre>
 </figure>
 
 <script>

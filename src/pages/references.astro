@@ -51,16 +51,27 @@ const statuses = [...new Set(sources.map((s) => s.status))];
 </BaseLayout>
 
 <style is:global>
+  /* Sources as cards in as many columns as fit (two or three on a wide screen), so the page uses its
+     width; each card keeps a readable line length. */
   .refs {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 30rem), 1fr));
     list-style: none;
+    margin: 0;
     padding: 0;
-    max-width: var(--measure);
+    max-width: none;
   }
   .refs li {
-    margin-block: var(--space-4);
-    padding-bottom: var(--space-3);
-    border-bottom: 1px solid var(--border);
-    scroll-margin-top: var(--space-4);
+    margin: 0;
+    padding: var(--space-4);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    scroll-margin-top: calc(var(--topbar-h) + var(--space-4));
+  }
+  .refs li:target {
+    border-color: var(--accent);
   }
   .refs p {
     margin: var(--space-1) 0 0;

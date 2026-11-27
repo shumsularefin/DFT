@@ -4,8 +4,11 @@ import { createIcons } from './iconShim';
 import { MiniPlotly } from './miniPlot';
 import { MiniZip } from './zipShim';
 import { SiteBridge } from './bridge';
+import { initMolecule } from './molecule';
 
 const BASE = '/dft-studio/';
+// A hash of the Studio files (astro.config.mjs), so a new build never runs next to an old cached script.
+const VERSION = typeof __STUDIO_VERSION__ === 'string' ? __STUDIO_VERSION__ : 'dev';
 const SCRIPTS = [
   'data/crystals_index.js',
   'data/pp_index.js',
@@ -20,15 +23,33 @@ const SCRIPTS = [
   'js/site-link.js',
 ];
 
+// A script that throws while it runs still fires onload, so keep the first error raised during start-up
+// to report it. Not only errors from the Studio files: WebGL fails inside the three.js chunk.
+let scriptError: string | null = null;
+const keepError = (e: ErrorEvent) => {
+  if (scriptError === null) scriptError = e.message;
+};
+window.addEventListener('error', keepError);
+
 function load(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const s = document.createElement('script');
-    s.src = BASE + src;
+    s.src = `${BASE}${src}?v=${VERSION}`;
     s.async = false;
     s.onload = () => resolve();
     s.onerror = () => reject(new Error(`could not load ${src}`));
     document.body.appendChild(s);
   });
+}
+
+/** Why the viewer did not start, in words a reader can act on. */
+function startError(): Error {
+  const msg = scriptError ?? 'the 3D viewer did not start';
+  return new Error(
+    /webgl/i.test(msg)
+      ? 'this browser could not start 3D graphics (WebGL). Turn on hardware acceleration, or try another browser'
+      : msg,
+  );
 }
 
 async function boot() {
@@ -44,10 +65,15 @@ async function boot() {
     // Yield between scripts so no single start-up task blocks input for long.
     await new Promise((r) => setTimeout(r, 0));
     if (src === 'js/vesta.js') {
-      (w.VESTA as { start: () => void }).start();
+      const vesta = w.VESTA as { start: () => void } | undefined;
+      if (!vesta) throw startError();
+      vesta.start();
       await new Promise((r) => setTimeout(r, 0));
     }
   }
+  // Crystal | Molecule: the Molecule tab, and the switch between the two modes of this one workspace.
+  initMolecule();
+  window.removeEventListener('error', keepError);
   document.documentElement.dataset.studioReady = 'true';
 }
 
