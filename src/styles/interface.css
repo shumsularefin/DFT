@@ -14,8 +14,8 @@ h1,
 h2,
 h3,
 h4 {
-  font-weight: 650;
-  letter-spacing: -0.015em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 /* Clean sans-serif for interface chrome; tabular monospace for numbers and code. */
@@ -71,7 +71,7 @@ table.numeric,
   background: var(--surface-2);
 }
 
-/* Crisp white rounded panels with subtle elevation */
+/* Panels: surface, one 1px border, 10px radius. Only floating popovers keep a shadow. */
 .card,
 .callout,
 .readout,
@@ -82,7 +82,19 @@ table.numeric,
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-1);
+}
+.search-results,
+.progress-pop,
+.help-dialog {
+  box-shadow: var(--shadow-2);
+}
+.card {
+  padding: var(--space-4);
+}
+.card-title {
+  margin: 0 0 var(--space-2);
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 /* Form controls: crisp macOS rounded inputs and selects */
@@ -170,9 +182,6 @@ tbody tr:last-child td {
 }
 
 /* Landing workspace: macOS search bar + crisp white card grid */
-.session {
-  padding-block: var(--space-6);
-}
 .session-prompt {
   display: flex;
   align-items: center;
@@ -188,7 +197,6 @@ tbody tr:last-child td {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-1);
   cursor: pointer;
   transition:
     border-color var(--dur-fast),
@@ -196,7 +204,6 @@ tbody tr:last-child td {
 }
 .session-prompt:hover {
   border-color: var(--accent);
-  box-shadow: var(--shadow-2);
 }
 .session-prompt .prompt-mark {
   color: var(--accent);
@@ -212,48 +219,6 @@ tbody tr:last-child td {
   border-radius: var(--radius-sm);
   color: var(--text-muted);
 }
-.starts {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
-  gap: var(--space-3);
-  list-style: none;
-  padding: 0;
-  margin: var(--space-5) 0;
-  max-width: none;
-}
-.starts li {
-  margin: 0;
-}
-.starts a {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  min-height: 100%;
-  padding: var(--space-3) var(--space-4);
-  color: var(--text);
-  text-decoration: none;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-1);
-  transition:
-    border-color var(--dur-fast),
-    box-shadow var(--dur-fast);
-}
-.starts a:hover {
-  border-color: var(--accent);
-  box-shadow: var(--shadow-2);
-}
-.starts a span {
-  font-weight: 600;
-  color: var(--text);
-}
-.starts small {
-  color: var(--text-muted);
-  font-family: var(--font-sans);
-  font-size: var(--step--1);
-}
-
 /* Command palette (macOS Spotlight style) */
 .palette {
   width: min(40rem, 100vw - 1.5rem);
@@ -358,4 +323,176 @@ tbody tr:last-child td {
   vertical-align: top;
   padding: 0.4rem 0.6rem;
   border-bottom: 1px solid var(--border);
+}
+
+/* ------------------------------------------------------------------
+   One page layout for every page in the main column.
+   Container: 72rem wide, centred, 24px side padding (16px on phones).
+   Reading pages keep prose at 46rem, left-aligned to the same edge.
+   ------------------------------------------------------------------ */
+main .container {
+  width: min(100% - 2rem, 72rem);
+  margin-inline: auto;
+  padding-block: var(--space-5) var(--space-7);
+}
+@media (min-width: 48rem) {
+  main .container {
+    width: min(100% - 3rem, 72rem);
+  }
+}
+.prose-page > *,
+.ref-page > :not(.ref-scroll) {
+  max-width: 46rem;
+}
+
+/* Page header: modest h1, one muted lede, 24px before the content. */
+main h1 {
+  font-size: clamp(1.4rem, 1.3rem + 0.4vw, 1.6rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--space-2);
+}
+main h1 + p {
+  margin-top: 0;
+  margin-bottom: var(--space-5);
+  color: var(--text-muted);
+}
+main h2 {
+  font-size: var(--step-1);
+  margin: var(--space-6) 0 var(--space-3);
+}
+main h3 {
+  font-size: var(--step-0);
+}
+.page-head {
+  margin-bottom: var(--space-5);
+}
+.page-head h1 + p,
+.page-lede {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+/* Small muted section label (no uppercase). */
+.section-label {
+  margin: var(--space-6) 0 var(--space-3);
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--text-muted);
+  max-width: none;
+}
+
+/* Quiet notice: thin border, surface-2 fill, no side stripe. */
+.notice {
+  margin: 0 0 var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  color: var(--text-muted);
+  font-size: var(--step--1);
+  max-width: none;
+}
+.notice > :first-child {
+  margin-top: 0;
+}
+.notice > :last-child {
+  margin-bottom: 0;
+}
+
+/* Card grid: one gap (16px) everywhere. */
+.card-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+}
+.card-grid > li {
+  margin: 0;
+}
+
+/* Feature cards: 4, 2 or 1 columns by the width of the area they sit in. */
+.feature-area {
+  container-type: inline-size;
+}
+.feature-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: 1fr;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+}
+@container (min-width: 34rem) {
+  .feature-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container (min-width: 56rem) {
+  .feature-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.feature-grid > li {
+  margin: 0;
+}
+.feature {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  height: 100%;
+  padding: var(--space-4);
+  color: var(--text);
+  text-decoration: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: border-color var(--dur-fast);
+}
+a.feature:hover {
+  border-color: var(--accent);
+}
+.feature-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+  font-size: var(--step-0);
+}
+.feature-title svg {
+  flex: none;
+  color: var(--accent);
+}
+.feature-meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.feature-text {
+  margin: var(--space-1) 0 0;
+  font-size: var(--step--1);
+  color: var(--text-muted);
+}
+
+/* Metric tile: muted label, mono value. */
+.tile {
+  padding: var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.tile-label {
+  margin: 0;
+  font-size: var(--step--1);
+  color: var(--text-muted);
+}
+.tile-value {
+  margin: var(--space-1) 0 0;
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
 }

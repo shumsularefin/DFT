@@ -46,7 +46,7 @@ export default function StudioTool() {
         }
         const [mRes, iRes] = await Promise.all([fetch(`${base}manifest.json`), fetch(`${base}index.json`)]);
         if (!mRes.ok || !iRes.ok) {
-          throw new Error('Screening Studio dataset is not available yet (offline or not deployed).');
+          throw new Error('Materials Screening dataset is not available yet (offline or not deployed).');
         }
         const [mData, iData] = (await Promise.all([mRes.json(), iRes.json()])) as [MpManifest, MpIndex];
         if (!cancelled) {

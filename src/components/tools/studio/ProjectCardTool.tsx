@@ -141,7 +141,7 @@ export default function ProjectCardTool() {
                 Generate k-path
               </a>
               <a className="st-btn" href="/studio/" style={{ display: 'inline-flex', alignItems: 'center' }}>
-                Back to Screening Studio
+                Back to Materials Screening
               </a>
             </div>
           </section>

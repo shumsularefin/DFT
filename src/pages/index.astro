@@ -1,95 +1,231 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Callout from '../components/ui/Callout.astro';
-import { SITE } from '../lib/site';
+import { MODULES, SITE } from '../lib/site';
+import stations from '../content/learn/stations.json';
+import { conceptGraph, questionBank } from '../lib/learning/loadBank';
+import { HAS_MOLECULE_PAGE, TOOL_COUNT } from '../lib/workspace';
 
-const starts = [
+// Every count below is computed at build time from the data the pages use. None is typed in by hand.
+const topicCount = (await getCollection('handbook')).length;
+const published = new Set(
+  conceptGraph()
+    .filter((c) => c.status === 'published')
+    .map((c) => c.id),
+);
+const questionCount = questionBank().filter((q) => q.concepts.some((c) => published.has(c))).length;
+const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+
+// Small line icons (24 x 24 grid, stroke only), drawn in the accent colour.
+const ICONS = {
+  path: '<circle cx="5" cy="18" r="2"/><circle cx="19" cy="6" r="2"/><path d="M7 18h6a3 3 0 0 0 0-6h-2a3 3 0 0 1 0-6h6"/>',
+  book: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/><path d="M8 7h7"/>',
+  check: '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="m8 12 3 3 5-6"/>',
+  chart:
+    '<path d="M4 20V4"/><path d="M4 20h16"/><path d="M8 16v-4"/><path d="M12 16V8"/><path d="M16 16v-6"/>',
+  cube: '<path d="M12 3 4 7.5v9L12 21l8-4.5v-9z"/><path d="M4 7.5 12 12l8-4.5"/><path d="M12 12v9"/>',
+  molecule:
+    '<circle cx="6" cy="17" r="2.5"/><circle cx="18" cy="17" r="2.5"/><circle cx="12" cy="6" r="2.5"/><path d="m7.3 14.8 3.5-6.4"/><path d="m16.7 14.8-3.5-6.4"/><path d="M8.5 17h7"/>',
+  file: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 12h6"/><path d="M9 16h6"/>',
+  filter: '<path d="M4 5h16l-6 7v6l-4 2v-8z"/>',
+  converge: '<path d="M3 6c4 0 4 12 9 12s5-6 9-6"/><path d="M3 12h18" stroke-dasharray="2 3"/>',
+  route:
+    '<circle cx="6" cy="6" r="2"/><circle cx="18" cy="18" r="2"/><path d="M8 6h6a4 4 0 0 1 0 8h-4a4 4 0 0 0 0 8"/>',
+  magnet: '<path d="M6 3v8a6 6 0 0 0 12 0V3"/><path d="M6 7h4"/><path d="M14 7h4"/>',
+  alert: '<path d="M12 3 2 20h20z"/><path d="M12 10v4"/><path d="M12 17h.01"/>',
+  plan: '<rect x="4" y="4" width="16" height="17" rx="2"/><path d="M9 2v4"/><path d="M15 2v4"/><path d="M8 11h8"/><path d="M8 15h5"/>',
+  review: '<circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5"/><path d="m8.5 11 2 2 3.5-4"/>',
+  ruler: '<path d="m3 17 14-14 4 4L7 21z"/><path d="m7 13 2 2"/><path d="m10 10 2 2"/><path d="m13 7 2 2"/>',
+  grid: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+} as const;
+
+type Feature = { href: string; label: string; meta: string; text: string; icon: keyof typeof ICONS };
+const groups: { name: string; items: Feature[] }[] = [
   {
-    href: '/learn/',
-    label: 'Guided path',
-    note: '14 interactive stations from one atom to your first VASP run',
-  },
-  { href: '/handbook/', label: 'Handbook', note: '12 modules, 72 topics, three reading levels' },
-  {
-    href: '/tools/input-builder/',
-    label: 'VASP Input Builder',
-    note: 'INCAR, KPOINTS, POSCAR, convergence series and job scripts',
-  },
-  {
-    href: '/builder/',
-    label: 'Material Builder',
-    note: 'VESTA-style crystal editor (DFT Studio) and RDKit molecule builder',
-  },
-  {
-    href: '/dft-studio/',
-    label: 'DFT Studio',
-    note: '3D viewer, VASP inputs, k-point convergence and output analysis in one workspace',
-  },
-  {
-    href: '/studio/',
-    label: 'Screening Studio',
-    note: 'Filter Materials Project structures and check DFT feasibility',
-  },
-  {
-    href: '/tools/planner/',
-    label: 'Research Planner',
-    note: 'Goal-to-workflow protocols with downloadable project zips',
-  },
-  {
-    href: '/tools/magnetic/',
-    label: 'Magnetic orderings',
-    note: 'Collinear FM/AFM supercells, MAGMOM and Heisenberg J fit',
+    name: 'Study',
+    items: [
+      {
+        href: '/learn/',
+        label: 'Guided path',
+        meta: plural(stations.length, 'station'),
+        text: 'Short interactive stations from one atom to your first VASP run.',
+        icon: 'path',
+      },
+      {
+        href: '/handbook/',
+        label: 'Handbook',
+        meta: `${plural(MODULES.length, 'module')}, ${plural(topicCount, 'topic')}`,
+        text: 'Every topic in plain language first, with Intermediate and Pro depth.',
+        icon: 'book',
+      },
+      {
+        href: '/practice/',
+        label: 'Practice',
+        meta: plural(questionCount, 'question'),
+        text: 'Visual questions that adapt to you, with reviews at spaced intervals.',
+        icon: 'check',
+      },
+      {
+        href: '/progress/',
+        label: 'Progress',
+        meta: 'Stored on this device',
+        text: 'See which concepts you have mastered and what is due for review.',
+        icon: 'chart',
+      },
+    ],
   },
   {
-    href: '/tools/kpath/',
-    label: 'k-path & Brillouin zone',
-    note: 'HPKOT and Setyawan-Curtarolo band paths in 3D',
+    name: 'Build',
+    items: [
+      {
+        href: '/builder/',
+        label: 'Material Builder',
+        meta: 'Crystals in 3D',
+        text: 'View and edit a crystal, then run the VASP workflow: POTCAR, INCAR, KPOINTS, k-point convergence, run bundle and analysis.',
+        icon: 'cube',
+      },
+      {
+        href: HAS_MOLECULE_PAGE ? '/builder/molecule/' : '/builder/',
+        label: 'Molecule builder',
+        meta: 'Molecules',
+        text: 'Draw a molecule, clean it up in 3D and export XYZ, MOL or a POSCAR in a box.',
+        icon: 'molecule',
+      },
+      {
+        href: '/tools/input-builder/',
+        label: 'Input Builder',
+        meta: 'INCAR, KPOINTS, POSCAR',
+        text: 'Prepare input files with plain-language reasons, convergence series and job scripts.',
+        icon: 'file',
+      },
+      {
+        href: '/studio/',
+        label: 'Materials Screening',
+        meta: 'Materials Project data',
+        text: 'Filter candidate structures and check whether DFT on them is feasible.',
+        icon: 'filter',
+      },
+    ],
   },
   {
-    href: '/tools/convergence/',
-    label: 'Convergence & EOS',
-    note: 'Plot ENCUT/k-mesh tests and Birch-Murnaghan fits',
+    name: 'Calculate',
+    items: [
+      {
+        href: '/tools/convergence/',
+        label: 'Convergence and EOS',
+        meta: 'ENCUT, k-mesh, Birch-Murnaghan',
+        text: 'Plot convergence tests and fit energy-volume curves.',
+        icon: 'converge',
+      },
+      {
+        href: '/tools/kpath/',
+        label: 'k-path and Brillouin zone',
+        meta: 'HPKOT, Setyawan-Curtarolo',
+        text: 'See the Brillouin zone in 3D and export a band-structure path.',
+        icon: 'route',
+      },
+      {
+        href: '/tools/magnetic/',
+        label: 'Magnetic orderings',
+        meta: 'FM, AFM, MAGMOM',
+        text: 'Build collinear supercells, MAGMOM lines and a Heisenberg J fit.',
+        icon: 'magnet',
+      },
+      {
+        href: '/errors/',
+        label: 'Error finder',
+        meta: 'VASP messages and symptoms',
+        text: 'Paste an error or describe a symptom and see likely causes and fixes.',
+        icon: 'alert',
+      },
+    ],
   },
   {
-    href: '/tools/tolerance-factor/',
-    label: 'Tolerance factors',
-    note: 'Goldschmidt t, octahedral mu, Bartel tau and family maps',
+    name: 'Plan and review',
+    items: [
+      {
+        href: '/tools/planner/',
+        label: 'Research Planner',
+        meta: 'Goal to workflow',
+        text: 'Turn a calculation goal into a sourced protocol and a downloadable project zip.',
+        icon: 'plan',
+      },
+      {
+        href: '/tools/review/',
+        label: 'Calculation review',
+        meta: 'Pre-flight and post-flight',
+        text: 'Drop inputs and outputs for sourced sanity checks before and after a run.',
+        icon: 'review',
+      },
+      {
+        href: '/tools/tolerance-factor/',
+        label: 'Tolerance factors',
+        meta: 'Goldschmidt t, mu, Bartel tau',
+        text: 'Check whether a set of ions is likely to form a perovskite.',
+        icon: 'ruler',
+      },
+      {
+        href: '/tools/',
+        label: 'All tools',
+        meta: plural(TOOL_COUNT, 'tool'),
+        text: 'Every tool in one place, ordered by the stage of a calculation.',
+        icon: 'grid',
+      },
+    ],
   },
-  {
-    href: '/tools/review/',
-    label: 'Calculation review',
-    note: 'Pre-flight and post-flight VASP sanity checks',
-  },
-  { href: '/practice/', label: 'Adaptive practice', note: '316 visual questions with spaced repetition' },
 ];
 ---
 
 <BaseLayout>
   <div class="container session">
-    <h1 class="sr-only">{SITE.name}</h1>
-    <div class="session-head">
-      <p class="session-name">{SITE.name}</p>
-      <p class="session-tagline">{SITE.tagline}</p>
+    <div class="hero">
+      <h1>{SITE.name}</h1>
+      <p class="hero-tagline">{SITE.tagline}</p>
+      <button type="button" class="session-prompt js-only" data-palette-open>
+        <span class="prompt-mark" aria-hidden="true">
+          &#8981;
+        </span>
+        <span>Search topics, INCAR tags, glossary, or jump to a tool...</span>
+        <kbd aria-hidden="true">Ctrl K</kbd>
+        <span class="sr-only">Open the command palette</span>
+      </button>
     </div>
-    <button type="button" class="session-prompt js-only" data-palette-open>
-      <span class="prompt-mark" aria-hidden="true">
-        &#8981;
-      </span>
-      <span>Search topics, INCAR tags, glossary, or jump to a tool...</span>
-      <kbd aria-hidden="true">Ctrl K</kbd>
-      <span class="sr-only">Open the command palette</span>
-    </button>
-    <p class="section-kicker">WORKSPACE MODULES &amp; TOOLS</p>
-    <ul class="starts" aria-label="Starting points">
-      {starts.map((x) => (
-        <li>
-          <a href={x.href}>
-            <span>{x.label}</span>
-            <small>{x.note}</small>
-          </a>
-        </li>
+    <nav class="feature-area" aria-label="Starting points">
+      {groups.map((g) => (
+        <section aria-labelledby={`group-${g.name.toLowerCase().replace(/\s+/g, '-')}`}>
+          <h2 class="section-label" id={`group-${g.name.toLowerCase().replace(/\s+/g, '-')}`}>
+            {g.name}
+          </h2>
+          <ul class="feature-grid">
+            {g.items.map((x) => (
+              <li>
+                <a class="feature" href={x.href}>
+                  <span class="feature-title">
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="18"
+                      height="18"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.6"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                      focusable="false"
+                      set:html={ICONS[x.icon]}
+                    />
+                    {x.label}
+                  </span>
+                  <span class="feature-meta">{x.meta}</span>
+                  <span class="feature-text">{x.text}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
       ))}
-    </ul>
+    </nav>
     <Callout variant="note" title="Runs locally in your browser">
       All twelve handbook modules and interactive tools run client-side with zero uploads. Pages marked
       <code>draft</code> await independent source verification.
@@ -98,27 +234,30 @@ const starts = [
 </BaseLayout>
 
 <style is:global>
-  .session-head {
-    margin-bottom: var(--space-4);
+  .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    padding-block: var(--space-6) var(--space-4);
+    text-align: center;
   }
-  .session-name {
+  .hero h1 {
     margin: 0;
-    font-size: var(--step-3);
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: var(--text);
+    font-size: clamp(1.5rem, 1.3rem + 0.8vw, 1.9rem);
   }
-  .session-tagline {
-    margin: var(--space-1) 0 0;
+  .hero .hero-tagline {
+    margin: 0 0 var(--space-3);
     color: var(--text-muted);
-    font-size: var(--step-0);
   }
-  .section-kicker {
-    margin: var(--space-5) 0 var(--space-2);
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: var(--text-muted);
+  .hero .session-prompt {
+    max-width: 40rem;
+  }
+  .session .feature-area .section-label {
+    margin-top: var(--space-5);
+  }
+  .session .callout {
+    max-width: none;
+    margin-top: var(--space-6);
   }
 </style>

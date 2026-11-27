@@ -115,7 +115,9 @@ test.describe('status line', () => {
 
 test('landing page is a session: prompt line and starting points', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('list', { name: 'Starting points' }).getByRole('link')).toHaveCount(13); // 12 plus DFT Studio (D-103)
+  // four groups (Study, Build, Calculate, Plan and review) of four feature cards each
+  await expect(page.getByRole('navigation', { name: 'Starting points' }).getByRole('link')).toHaveCount(16);
+  await expect(page.locator('main [data-palette-open]')).toHaveCount(1);
   await page.locator('[data-palette-open]').click();
   await expect(page.getByRole('dialog', { name: 'Command palette' })).toBeVisible();
 });
