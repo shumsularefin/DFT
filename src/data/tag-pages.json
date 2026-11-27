@@ -1,0 +1,986 @@
+{
+  "ADDGRID": [
+    {
+      "href": "/handbook/12-properties/phonons/",
+      "title": "Phonons and vibrational properties"
+    }
+  ],
+  "AEXX": [
+    {
+      "href": "/handbook/05-practical-choices/functionals/",
+      "title": "Choosing a functional"
+    }
+  ],
+  "AGGAC": [
+    {
+      "href": "/handbook/05-practical-choices/vdw-corrections/",
+      "title": "van der Waals corrections"
+    }
+  ],
+  "ALGO": [
+    {
+      "href": "/handbook/05-practical-choices/beyond-dft/",
+      "title": "When DFT is not enough"
+    },
+    {
+      "href": "/handbook/08-convergence-and-errors/scf-trouble/",
+      "title": "When the electronic loop will not converge"
+    },
+    {
+      "href": "/handbook/08-convergence-and-errors/common-errors/",
+      "title": "Common errors and how to read them"
+    }
+  ],
+  "AMIX": [
+    {
+      "href": "/handbook/04-kohn-sham/when-scf-goes-wrong/",
+      "title": "When the SCF loop goes wrong"
+    },
+    {
+      "href": "/handbook/08-convergence-and-errors/scf-trouble/",
+      "title": "When the electronic loop will not converge"
+    }
+  ],
+  "BMIX": [
+    {
+      "href": "/handbook/04-kohn-sham/when-scf-goes-wrong/",
+      "title": "When the SCF loop goes wrong"
+    },
+    {
+      "href": "/handbook/08-convergence-and-errors/scf-trouble/",
+      "title": "When the electronic loop will not converge"
+    }
+  ],
+  "BPARAM": [
+    {
+      "href": "/handbook/05-practical-choices/vdw-corrections/",
+      "title": "van der Waals corrections"
+    },
+    {
+      "href": "/handbook/05-practical-choices/functionals/",
+      "title": "Choosing a functional"
+    }
+  ],
+  "CHGCAR": [
+    {
+      "href": "/handbook/03-many-electrons/electron-density/",
+      "title": "Electron density"
+    }
+  ],
+  "CPARAM": [
+    {
+      "href": "/handbook/05-practical-choices/vdw-corrections/",
+      "title": "van der Waals corrections"
+    }
+  ],
+  "CSHIFT": [
+    {
+      "href": "/handbook/12-properties/optical-properties/",
+      "title": "Optical properties"
+    }
+  ],
+  "DIPOL": [
+    {
+      "href": "/handbook/12-properties/surfaces-and-slabs/",
+      "title": "Surfaces and slabs"
+    }
+  ],
+  "EDIFF": [
+    {
+      "href": "/handbook/07-running/reading-oszicar-and-outcar/",
+      "title": "Reading OSZICAR and OUTCAR"
+    },
+    {
+      "href": "/handbook/04-kohn-sham/the-scf-loop/",
+      "title": "The self-consistency loop"
+    },
+    {
+      "href": "/handbook/06-vasp-files/incar/",
+      "title": "INCAR, the instruction file"
+    }
+  ],
+  "EDIFFG": [
+    {
+      "href": "/handbook/07-running/reading-oszicar-and-outcar/",
+      "title": "Reading OSZICAR and OUTCAR"
+    },
+    {
+      "href": "/handbook/08-convergence-and-errors/relaxation-trouble/",
+      "title": "When a relaxation misbehaves"
+    },
+    {
+      "href": "/handbook/12-properties/phonons/",
+      "title": "Phonons and vibrational properties"
+    }
+  ],
+  "EINT": [
+    {
+      "href": "/handbook/09-analysis/charge-density/",
+      "title": "Charge density and volumetric files"
+    }
+  ],
+  "EMAX": [
+    {
+      "href": "/handbook/09-analysis/density-of-states/",
+      "title": "Reading a density of states (DOS)"
+    }
+  ],
+  "EMIN": [
+    {
+      "href": "/handbook/09-analysis/density-of-states/",
+      "title": "Reading a density of states (DOS)"
+    }
+  ],
+  "ENCUT": [
+    {
+      "href": "/handbook/06-vasp-files/the-potcar-file/",
+      "title": "POTCAR, the pseudopotential file"
+    },
+    {
+      "href": "/handbook/05-practical-choices/plane-waves-and-encut/",
+      "title": "Plane waves and the cutoff energy"
+    },
+    {
+      "href": "/handbook/05-practical-choices/pseudopotentials-and-paw/",
+      "title": "Pseudopotentials and PAW"
+    }
+  ],
+  "ENCUTGW": [
+    {
+      "href": "/handbook/05-practical-choices/beyond-dft/",
+      "title": "When DFT is not enough"
+    }
+  ],
+  "GGA": [
+    {
+      "href": "/handbook/03-many-electrons/what-we-still-have-to-approximate/",
+      "title": "What we still have to approximate"
+    },
+    {
+      "href": "/handbook/04-kohn-sham/exchange-and-correlation/",
+      "title": "Exchange and correlation, the one approximation"
+    },
+    {
+      "href": "/handbook/01-why-dft/the-ladder-of-methods/",
+      "title": "The ladder of methods"
+    }
+  ],
+  "HFSCREEN": [
+    {
+      "href": "/handbook/05-practical-choices/functionals/",
+      "title": "Choosing a functional"
+    }
+  ],
+  "IBAND": [
+    {
+      "href": "/handbook/09-analysis/charge-density/",
+      "title": "Charge density and volumetric files"
+    }
+  ],
+  "IBRION": [
+    {
+      "href": "/handbook/08-convergence-and-errors/relaxation-trouble/",
+      "title": "When a relaxation misbehaves"
+    },
+    {
+      "href": "/handbook/12-properties/phonons/",
+      "title": "Phonons and vibrational properties"
+    },
+    {
+      "href": "/handbook/05-practical-choices/relaxation/",
+      "title": "Geometry relaxation"
+    }
+  ],
+  "ICHAIN": [
+    {
+      "href": "/handbook/12-properties/transition-states-and-neb/",
+      "title": "Transition states and the nudged elastic band"
+    }
+  ],
+  "ICHARG": [
+    {
+      "href": "/handbook/09-analysis/band-structures/",
+      "title": "Reading a band structure"
+    },
+    {
+      "href": "/handbook/07-running/restarts-istart-icharg/",
+      "title": "Restarts with ISTART and ICHARG"
+    },
+    {
+      "href": "/handbook/07-running/the-workflow/",
+      "title": "The five-step protocol and the project folder"
+    }
+  ],
+  "IDIPOL": [
+    {
+      "href": "/handbook/12-properties/surfaces-and-slabs/",
+      "title": "Surfaces and slabs"
+    },
+    {
+      "href": "/handbook/12-properties/other-calculations/",
+      "title": "Other calculations for a complete picture"
+    }
+  ],
+  "IMAGES": [
+    {
+      "href": "/handbook/12-properties/transition-states-and-neb/",
+      "title": "Transition states and the nudged elastic band"
+    }
+  ],
+  "IMIX": [
+    {
+      "href": "/handbook/04-kohn-sham/when-scf-goes-wrong/",
+      "title": "When the SCF loop goes wrong"
+    }
+  ],
+  "IOPT": [
+    {
+      "href": "/handbook/12-properties/transition-states-and-neb/",
+      "title": "Transition states and the nudged elastic band"
+    }
+  ],
+  "ISIF": [
+    {
+      "href": "/handbook/11-tools/material-builder/",
+      "title": "Tour of the Material Builder"
+    },
+    {
+      "href": "/handbook/11-tools/what-next/",
+      "title": "Where to go next"
+    },
+    {
+      "href": "/handbook/12-properties/equation-of-state/",
+      "title": "Energy-volume curves and the equation of state"
+    }
+  ],
+  "ISMEAR": [
+    {
+      "href": "/handbook/05-practical-choices/smearing/",
+      "title": "Smearing and the Fermi level"
+    },
+    {
+      "href": "/handbook/09-analysis/energies-and-forces/",
+      "title": "Reading energies and forces"
+    },
+    {
+      "href": "/handbook/11-tools/screening-studio/",
+      "title": "Tour of Materials Screening"
+    }
+  ],
+  "ISPIN": [
+    {
+      "href": "/handbook/02-quantum-basics/spin-and-the-pauli-principle/",
+      "title": "Spin and the Pauli principle"
+    },
+    {
+      "href": "/handbook/05-practical-choices/magnetic-orderings/",
+      "title": "Magnetic orderings"
+    },
+    {
+      "href": "/handbook/05-practical-choices/spin-and-magnetism/",
+      "title": "Spin and magnetism"
+    }
+  ],
+  "ISTART": [
+    {
+      "href": "/handbook/07-running/restarts-istart-icharg/",
+      "title": "Restarts with ISTART and ICHARG"
+    },
+    {
+      "href": "/handbook/07-running/the-workflow/",
+      "title": "The five-step protocol and the project folder"
+    },
+    {
+      "href": "/handbook/10-worked-example/electronic-structure/",
+      "title": "Electronic structure of RCuO3"
+    }
+  ],
+  "ISYM": [
+    {
+      "href": "/handbook/05-practical-choices/crystal-structure-and-symmetry/",
+      "title": "Crystal structure and symmetry"
+    },
+    {
+      "href": "/handbook/08-convergence-and-errors/common-errors/",
+      "title": "Common errors and how to read them"
+    },
+    {
+      "href": "/handbook/09-analysis/bonding-analysis-cohp/",
+      "title": "Bonding analysis with COHP and LOBSTER"
+    }
+  ],
+  "IVDW": [
+    {
+      "href": "/handbook/05-practical-choices/vdw-corrections/",
+      "title": "van der Waals corrections"
+    },
+    {
+      "href": "/handbook/12-properties/other-calculations/",
+      "title": "Other calculations for a complete picture"
+    }
+  ],
+  "KPAR": [
+    {
+      "href": "/handbook/07-running/performance-and-parallelisation/",
+      "title": "Performance and parallelisation"
+    },
+    {
+      "href": "/handbook/07-running/job-scripts/",
+      "title": "Job scripts and parallel settings"
+    }
+  ],
+  "KPOINTS": [
+    {
+      "href": "/handbook/08-convergence-and-errors/kpoint-convergence/",
+      "title": "Convergence of the k-point mesh"
+    },
+    {
+      "href": "/handbook/08-convergence-and-errors/why-converge/",
+      "title": "Why you must test convergence"
+    },
+    {
+      "href": "/handbook/10-worked-example/convergence/",
+      "title": "Convergence testing on RCuO3"
+    }
+  ],
+  "KPOINTS_OPT": [
+    {
+      "href": "/handbook/09-analysis/band-structures/",
+      "title": "Reading a band structure"
+    },
+    {
+      "href": "/handbook/10-worked-example/electronic-structure/",
+      "title": "Electronic structure of RCuO3"
+    }
+  ],
+  "KPUSE": [
+    {
+      "href": "/handbook/09-analysis/charge-density/",
+      "title": "Charge density and volumetric files"
+    }
+  ],
+  "KSPACING": [
+    {
+      "href": "/handbook/05-practical-choices/kpoints-and-the-brillouin-zone/",
+      "title": "k-points and the Brillouin zone"
+    },
+    {
+      "href": "/handbook/06-vasp-files/kpoints/",
+      "title": "KPOINTS, the sampling file"
+    },
+    {
+      "href": "/handbook/11-tools/research-tools-overview/",
+      "title": "Research tools overview"
+    }
+  ],
+  "LAECHG": [
+    {
+      "href": "/handbook/12-properties/bader-charges/",
+      "title": "Bader charges"
+    },
+    {
+      "href": "/handbook/09-analysis/charge-density/",
+      "title": "Charge density and volumetric files"
+    }
+  ],
+  "LASPH": [
+    {
+      "href": "/handbook/05-practical-choices/pseudopotentials-and-paw/",
+      "title": "Pseudopotentials and PAW"
+    },
+    {
+      "href": "/handbook/05-practical-choices/functionals/",
+      "title": "Choosing a functional"
+    },
+    {
+      "href": "/handbook/10-worked-example/structure-and-inputs/",
+      "title": "Structure and starting inputs"
+    }
+  ],
+  "LCALCEPS": [
+    {
+      "href": "/handbook/12-properties/dielectric-tensor/",
+      "title": "Dielectric tensor and Born effective charges"
+    }
+  ],
+  "LCHARG": [
+    {
+      "href": "/handbook/09-analysis/charge-density/",
+      "title": "Charge density and volumetric files"
+    },
+    {
+      "href": "/handbook/06-vasp-files/output-files/",
+      "title": "The output files, a field guide"
+    },
+    {
+      "href": "/handbook/12-properties/bader-charges/",
+      "title": "Bader charges"
+    }
+  ],
+  "LCLIMB": [
+    {
+      "href": "/handbook/12-properties/transition-states-and-neb/",
+      "title": "Transition states and the nudged elastic band"
+    }
+  ],
+  "LDAU": [
+    {
+      "href": "/handbook/05-practical-choices/dft-plus-u/",
+      "title": "DFT+U for localized electrons"
+    },
+    {
+      "href": "/handbook/12-properties/formation-energy-and-convex-hull/",
+      "title": "Formation energy and the convex hull"
+    },
+    {
+      "href": "/handbook/10-worked-example/structure-and-inputs/",
+      "title": "Structure and starting inputs"
+    }
+  ],
+  "LDAUJ": [
+    {
+      "href": "/handbook/05-practical-choices/dft-plus-u/",
+      "title": "DFT+U for localized electrons"
+    }
+  ],
+  "LDAUL": [
+    {
+      "href": "/handbook/05-practical-choices/dft-plus-u/",
+      "title": "DFT+U for localized electrons"
+    }
+  ],
+  "LDAUPRINT": [
+    {
+      "href": "/handbook/05-practical-choices/dft-plus-u/",
+      "title": "DFT+U for localized electrons"
+    }
+  ],
+  "LDAUTYPE": [
+    {
+      "href": "/handbook/05-practical-choices/dft-plus-u/",
+      "title": "DFT+U for localized electrons"
+    },
+    {
+      "href": "/handbook/11-tools/what-next/",
+      "title": "Where to go next"
+    }
+  ],
+  "LDAUU": [
+    {
+      "href": "/handbook/05-practical-choices/dft-plus-u/",
+      "title": "DFT+U for localized electrons"
+    },
+    {
+      "href": "/handbook/10-worked-example/structure-and-inputs/",
+      "title": "Structure and starting inputs"
+    },
+    {
+      "href": "/handbook/10-worked-example/what-we-learned/",
+      "title": "What the worked example teaches"
+    }
+  ],
+  "LDIPOL": [
+    {
+      "href": "/handbook/12-properties/surfaces-and-slabs/",
+      "title": "Surfaces and slabs"
+    }
+  ],
+  "LELF": [
+    {
+      "href": "/handbook/12-properties/other-calculations/",
+      "title": "Other calculations for a complete picture"
+    },
+    {
+      "href": "/handbook/09-analysis/charge-density/",
+      "title": "Charge density and volumetric files"
+    }
+  ],
+  "LEPSILON": [
+    {
+      "href": "/handbook/12-properties/dielectric-tensor/",
+      "title": "Dielectric tensor and Born effective charges"
+    }
+  ],
+  "LHFCALC": [
+    {
+      "href": "/handbook/01-why-dft/the-ladder-of-methods/",
+      "title": "The ladder of methods"
+    },
+    {
+      "href": "/handbook/05-practical-choices/beyond-dft/",
+      "title": "When DFT is not enough"
+    },
+    {
+      "href": "/handbook/05-practical-choices/functionals/",
+      "title": "Choosing a functional"
+    }
+  ],
+  "LMAXMIX": [
+    {
+      "href": "/handbook/05-practical-choices/finding-the-magnetic-ground-state/",
+      "title": "Finding the magnetic ground state"
+    },
+    {
+      "href": "/handbook/10-worked-example/electronic-structure/",
+      "title": "Electronic structure of RCuO3"
+    },
+    {
+      "href": "/handbook/09-analysis/band-structures/",
+      "title": "Reading a band structure"
+    }
+  ],
+  "LMIXTAU": [
+    {
+      "href": "/handbook/05-practical-choices/functionals/",
+      "title": "Choosing a functional"
+    }
+  ],
+  "LNONCOLLINEAR": [
+    {
+      "href": "/handbook/05-practical-choices/noncollinear-and-spin-orbit/",
+      "title": "Non-collinear magnetism and spin-orbit coupling"
+    }
+  ],
+  "LOCPOT": [
+    {
+      "href": "/handbook/11-tools/research-tools-overview/",
+      "title": "Research tools overview"
+    }
+  ],
+  "LOPTICS": [
+    {
+      "href": "/handbook/12-properties/optical-properties/",
+      "title": "Optical properties"
+    },
+    {
+      "href": "/handbook/05-practical-choices/beyond-dft/",
+      "title": "When DFT is not enough"
+    }
+  ],
+  "LORBIT": [
+    {
+      "href": "/handbook/09-analysis/density-of-states/",
+      "title": "Reading a density of states (DOS)"
+    },
+    {
+      "href": "/handbook/05-practical-choices/reading-magnetic-output/",
+      "title": "Reading magnetic output"
+    },
+    {
+      "href": "/handbook/05-practical-choices/spin-and-magnetism/",
+      "title": "Spin and magnetism"
+    }
+  ],
+  "LPARD": [
+    {
+      "href": "/handbook/09-analysis/charge-density/",
+      "title": "Charge density and volumetric files"
+    }
+  ],
+  "LREAL": [
+    {
+      "href": "/handbook/07-running/performance-and-parallelisation/",
+      "title": "Performance and parallelisation"
+    }
+  ],
+  "LRPA": [
+    {
+      "href": "/handbook/12-properties/dielectric-tensor/",
+      "title": "Dielectric tensor and Born effective charges"
+    }
+  ],
+  "LSEPB": [
+    {
+      "href": "/handbook/09-analysis/charge-density/",
+      "title": "Charge density and volumetric files"
+    }
+  ],
+  "LSEPK": [
+    {
+      "href": "/handbook/09-analysis/charge-density/",
+      "title": "Charge density and volumetric files"
+    }
+  ],
+  "LSORBIT": [
+    {
+      "href": "/handbook/05-practical-choices/noncollinear-and-spin-orbit/",
+      "title": "Non-collinear magnetism and spin-orbit coupling"
+    },
+    {
+      "href": "/handbook/12-properties/other-calculations/",
+      "title": "Other calculations for a complete picture"
+    }
+  ],
+  "LUSE_VDW": [
+    {
+      "href": "/handbook/05-practical-choices/vdw-corrections/",
+      "title": "van der Waals corrections"
+    },
+    {
+      "href": "/handbook/05-practical-choices/functionals/",
+      "title": "Choosing a functional"
+    }
+  ],
+  "LVHAR": [
+    {
+      "href": "/handbook/12-properties/other-calculations/",
+      "title": "Other calculations for a complete picture"
+    },
+    {
+      "href": "/handbook/12-properties/point-and-charged-defects/",
+      "title": "Point and charged defects"
+    },
+    {
+      "href": "/handbook/12-properties/surfaces-and-slabs/",
+      "title": "Surfaces and slabs"
+    }
+  ],
+  "LVTOT": [
+    {
+      "href": "/handbook/12-properties/surfaces-and-slabs/",
+      "title": "Surfaces and slabs"
+    }
+  ],
+  "LWANNIER90": [
+    {
+      "href": "/handbook/09-analysis/wannier-functions-and-topology/",
+      "title": "Wannier functions and a first look at topology"
+    }
+  ],
+  "LWAVE": [
+    {
+      "href": "/handbook/06-vasp-files/output-files/",
+      "title": "The output files, a field guide"
+    },
+    {
+      "href": "/handbook/09-analysis/bonding-analysis-cohp/",
+      "title": "Bonding analysis with COHP and LOBSTER"
+    }
+  ],
+  "MAGMOM": [
+    {
+      "href": "/handbook/05-practical-choices/magnetic-orderings/",
+      "title": "Magnetic orderings"
+    },
+    {
+      "href": "/handbook/11-tools/material-builder/",
+      "title": "Tour of the Material Builder"
+    },
+    {
+      "href": "/handbook/05-practical-choices/spin-and-magnetism/",
+      "title": "Spin and magnetism"
+    }
+  ],
+  "MDALGO": [
+    {
+      "href": "/handbook/12-properties/molecular-dynamics-and-mlff/",
+      "title": "Molecular dynamics and machine-learned force fields"
+    },
+    {
+      "href": "/handbook/12-properties/other-calculations/",
+      "title": "Other calculations for a complete picture"
+    }
+  ],
+  "METAGGA": [
+    {
+      "href": "/handbook/05-practical-choices/functionals/",
+      "title": "Choosing a functional"
+    },
+    {
+      "href": "/handbook/01-why-dft/what-dft-can-and-cannot-tell-you/",
+      "title": "What DFT can and cannot tell you"
+    },
+    {
+      "href": "/handbook/05-practical-choices/vdw-corrections/",
+      "title": "van der Waals corrections"
+    }
+  ],
+  "ML_LMLFF": [
+    {
+      "href": "/handbook/12-properties/molecular-dynamics-and-mlff/",
+      "title": "Molecular dynamics and machine-learned force fields"
+    }
+  ],
+  "ML_MODE": [
+    {
+      "href": "/handbook/12-properties/molecular-dynamics-and-mlff/",
+      "title": "Molecular dynamics and machine-learned force fields"
+    }
+  ],
+  "NBANDS": [
+    {
+      "href": "/handbook/04-kohn-sham/the-kohn-sham-idea/",
+      "title": "The Kohn-Sham idea"
+    },
+    {
+      "href": "/handbook/12-properties/optical-properties/",
+      "title": "Optical properties"
+    },
+    {
+      "href": "/handbook/09-analysis/band-structures/",
+      "title": "Reading a band structure"
+    }
+  ],
+  "NBANDSO": [
+    {
+      "href": "/handbook/05-practical-choices/beyond-dft/",
+      "title": "When DFT is not enough"
+    }
+  ],
+  "NBANDSV": [
+    {
+      "href": "/handbook/05-practical-choices/beyond-dft/",
+      "title": "When DFT is not enough"
+    }
+  ],
+  "NBLOCK": [
+    {
+      "href": "/handbook/12-properties/molecular-dynamics-and-mlff/",
+      "title": "Molecular dynamics and machine-learned force fields"
+    }
+  ],
+  "NBMOD": [
+    {
+      "href": "/handbook/09-analysis/charge-density/",
+      "title": "Charge density and volumetric files"
+    }
+  ],
+  "NCORE": [
+    {
+      "href": "/handbook/07-running/job-scripts/",
+      "title": "Job scripts and parallel settings"
+    },
+    {
+      "href": "/handbook/07-running/performance-and-parallelisation/",
+      "title": "Performance and parallelisation"
+    }
+  ],
+  "NEDOS": [
+    {
+      "href": "/handbook/09-analysis/density-of-states/",
+      "title": "Reading a density of states (DOS)"
+    },
+    {
+      "href": "/handbook/05-practical-choices/reading-magnetic-output/",
+      "title": "Reading magnetic output"
+    },
+    {
+      "href": "/handbook/12-properties/optical-properties/",
+      "title": "Optical properties"
+    }
+  ],
+  "NELECT": [
+    {
+      "href": "/handbook/12-properties/point-and-charged-defects/",
+      "title": "Point and charged defects"
+    }
+  ],
+  "NELM": [
+    {
+      "href": "/handbook/04-kohn-sham/the-scf-loop/",
+      "title": "The self-consistency loop"
+    },
+    {
+      "href": "/handbook/08-convergence-and-errors/scf-trouble/",
+      "title": "When the electronic loop will not converge"
+    },
+    {
+      "href": "/handbook/07-running/reading-oszicar-and-outcar/",
+      "title": "Reading OSZICAR and OUTCAR"
+    }
+  ],
+  "NELMDL": [
+    {
+      "href": "/handbook/08-convergence-and-errors/scf-trouble/",
+      "title": "When the electronic loop will not converge"
+    }
+  ],
+  "NFREE": [
+    {
+      "href": "/handbook/12-properties/elastic-constants/",
+      "title": "Elastic constants and mechanical stability"
+    },
+    {
+      "href": "/handbook/09-analysis/relaxations/",
+      "title": "Judging a geometry relaxation"
+    }
+  ],
+  "NGXF": [
+    {
+      "href": "/handbook/12-properties/bader-charges/",
+      "title": "Bader charges"
+    },
+    {
+      "href": "/handbook/09-analysis/charge-density/",
+      "title": "Charge density and volumetric files"
+    }
+  ],
+  "NOMEGA": [
+    {
+      "href": "/handbook/05-practical-choices/beyond-dft/",
+      "title": "When DFT is not enough"
+    }
+  ],
+  "NPAR": [
+    {
+      "href": "/handbook/07-running/performance-and-parallelisation/",
+      "title": "Performance and parallelisation"
+    }
+  ],
+  "NSIM": [
+    {
+      "href": "/handbook/07-running/performance-and-parallelisation/",
+      "title": "Performance and parallelisation"
+    }
+  ],
+  "NSW": [
+    {
+      "href": "/handbook/12-properties/equation-of-state/",
+      "title": "Energy-volume curves and the equation of state"
+    },
+    {
+      "href": "/handbook/12-properties/molecular-dynamics-and-mlff/",
+      "title": "Molecular dynamics and machine-learned force fields"
+    },
+    {
+      "href": "/handbook/08-convergence-and-errors/relaxation-trouble/",
+      "title": "When a relaxation misbehaves"
+    }
+  ],
+  "NUM_WANN": [
+    {
+      "href": "/handbook/09-analysis/wannier-functions-and-topology/",
+      "title": "Wannier functions and a first look at topology"
+    }
+  ],
+  "NUPDOWN": [
+    {
+      "href": "/handbook/05-practical-choices/spin-polarized-calculations/",
+      "title": "Spin-polarized calculations"
+    },
+    {
+      "href": "/handbook/12-properties/formation-energy-and-convex-hull/",
+      "title": "Formation energy and the convex hull"
+    },
+    {
+      "href": "/handbook/05-practical-choices/finding-the-magnetic-ground-state/",
+      "title": "Finding the magnetic ground state"
+    }
+  ],
+  "PARAM1": [
+    {
+      "href": "/handbook/05-practical-choices/vdw-corrections/",
+      "title": "van der Waals corrections"
+    }
+  ],
+  "PARAM2": [
+    {
+      "href": "/handbook/05-practical-choices/vdw-corrections/",
+      "title": "van der Waals corrections"
+    }
+  ],
+  "POTIM": [
+    {
+      "href": "/handbook/08-convergence-and-errors/relaxation-trouble/",
+      "title": "When a relaxation misbehaves"
+    },
+    {
+      "href": "/handbook/09-analysis/relaxations/",
+      "title": "Judging a geometry relaxation"
+    },
+    {
+      "href": "/handbook/12-properties/molecular-dynamics-and-mlff/",
+      "title": "Molecular dynamics and machine-learned force fields"
+    }
+  ],
+  "PREC": [
+    {
+      "href": "/handbook/05-practical-choices/plane-waves-and-encut/",
+      "title": "Plane waves and the cutoff energy"
+    },
+    {
+      "href": "/handbook/08-convergence-and-errors/encut-convergence/",
+      "title": "Convergence of the cutoff energy"
+    },
+    {
+      "href": "/handbook/10-worked-example/structure-and-inputs/",
+      "title": "Structure and starting inputs"
+    }
+  ],
+  "PSTRESS": [
+    {
+      "href": "/handbook/09-analysis/energies-and-forces/",
+      "title": "Reading energies and forces"
+    }
+  ],
+  "RWIGS": [
+    {
+      "href": "/handbook/09-analysis/density-of-states/",
+      "title": "Reading a density of states (DOS)"
+    }
+  ],
+  "SAXIS": [
+    {
+      "href": "/handbook/05-practical-choices/noncollinear-and-spin-orbit/",
+      "title": "Non-collinear magnetism and spin-orbit coupling"
+    }
+  ],
+  "SIGMA": [
+    {
+      "href": "/handbook/05-practical-choices/smearing/",
+      "title": "Smearing and the Fermi level"
+    },
+    {
+      "href": "/handbook/09-analysis/energies-and-forces/",
+      "title": "Reading energies and forces"
+    },
+    {
+      "href": "/handbook/08-convergence-and-errors/kpoint-convergence/",
+      "title": "Convergence of the k-point mesh"
+    }
+  ],
+  "SMASS": [
+    {
+      "href": "/handbook/12-properties/molecular-dynamics-and-mlff/",
+      "title": "Molecular dynamics and machine-learned force fields"
+    },
+    {
+      "href": "/handbook/09-analysis/relaxations/",
+      "title": "Judging a geometry relaxation"
+    }
+  ],
+  "SPRING": [
+    {
+      "href": "/handbook/12-properties/transition-states-and-neb/",
+      "title": "Transition states and the nudged elastic band"
+    }
+  ],
+  "SYMPREC": [
+    {
+      "href": "/handbook/05-practical-choices/crystal-structure-and-symmetry/",
+      "title": "Crystal structure and symmetry"
+    },
+    {
+      "href": "/handbook/08-convergence-and-errors/common-errors/",
+      "title": "Common errors and how to read them"
+    }
+  ],
+  "TEBEG": [
+    {
+      "href": "/handbook/12-properties/molecular-dynamics-and-mlff/",
+      "title": "Molecular dynamics and machine-learned force fields"
+    }
+  ],
+  "TEEND": [
+    {
+      "href": "/handbook/12-properties/molecular-dynamics-and-mlff/",
+      "title": "Molecular dynamics and machine-learned force fields"
+    }
+  ],
+  "TIME": [
+    {
+      "href": "/handbook/08-convergence-and-errors/scf-trouble/",
+      "title": "When the electronic loop will not converge"
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import tagsFile from '../../../data/vasp-tags.json';
+import tagPagesFile from '../../../data/tag-pages.json';
 import type { Level } from '../../../lib/levels';
 import type { Structure } from '../../../lib/crystal/types';
 import TagVisual from './TagVisual';
@@ -21,6 +22,9 @@ export interface TagInfo {
 export const TAGS = tagsFile.tags as unknown as TagInfo[];
 export const tagByName = (n: string): TagInfo | undefined => TAGS.find((t) => t.name === n);
 export const GROUPS = [...new Set(TAGS.map((t) => t.group))].sort();
+/** Handbook topics that list each tag in their vaspTags, most focused first (scripts/build/build-tag-pages.mjs, D-125). */
+const TAG_PAGES = tagPagesFile as Record<string, { href: string; title: string }[]>;
+export const handbookPagesFor = (n: string): { href: string; title: string }[] => TAG_PAGES[n] ?? [];
 
 function summaryAt(t: TagInfo, level: Level): string {
   if (level === 'pro') return [t.summary.intermediate, t.summary.pro].filter(Boolean).join(' ');
@@ -64,6 +68,7 @@ export default function TagCard({
         </p>
       </aside>
     );
+  const pages = handbookPagesFor(t.name);
   return (
     <aside className="ib-card" aria-label={`Explanation of ${t.name}`}>
       <h3>{t.name}</h3>
@@ -97,8 +102,20 @@ export default function TagCard({
           </>
         )}
       </dl>
+      {pages.length > 0 && (
+        <p className="ib-small">
+          In the Handbook:{' '}
+          {pages.map((p, i) => (
+            <span key={p.href}>
+              {i > 0 && (i === pages.length - 1 ? ' and ' : ', ')}
+              <a href={p.href}>{p.title}</a>
+            </span>
+          ))}
+          .
+        </p>
+      )}
       <p className="ib-small">
-        Handbook page: coming soon. Sources: {t.sources.join(', ')}. VASP version: {t.vaspVersion}. {t.notes}
+        Sources: {t.sources.join(', ')}. VASP version: {t.vaspVersion}. {t.notes}
       </p>
     </aside>
   );
