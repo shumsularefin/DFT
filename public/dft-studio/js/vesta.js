@@ -256,6 +256,17 @@
         { el:'S',  frac:[0.66667,0.33333,0.59781], mag:[0,0,0], sel:[true,true,true] }
       ]
     },
+    graphene_2d: {
+      name: 'Graphene (2D Sheet + Vacuum)',
+      cifSG: 'P6/mmm (191)',
+      lattice: [[2.460,0,0],[-1.230,2.13042,0],[0,0,16.0]],
+      selectiveDynamics: false,
+      polyCenters: [],
+      atoms: [
+        { el:'C', frac:[0.33333,0.66667,0.5], mag:[0,0,0], sel:[true,true,true] },
+        { el:'C', frac:[0.66667,0.33333,0.5], mag:[0,0,0], sel:[true,true,true] }
+      ]
+    },
     fe2o3: {
       name: 'Fe2O3 (Corundum AFM)',
       cifSG: 'R-3c (167)',
@@ -2151,8 +2162,10 @@
     state.speciesConfig = nextCfg;
   }
 
+  const selectListeners = [];
   function syncSelectionUI() {
     const sel = state.selectedAtomIndices;
+    selectListeners.forEach(fn => { try { fn(sel.slice()); } catch (e) { console.error(e); } });
     document.getElementById('selection-badge').textContent = `${sel.length} selected`;
     const hud = document.getElementById('selection-hud');
     const infoEl = document.getElementById('sel-hud-info');
@@ -2737,8 +2750,9 @@
   document.querySelectorAll('[data-right-tab]').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('[data-right-tab]').forEach(b => b.classList.toggle('active', b === btn));
-      ['supercell','catalyst','symmetry','magnetic','atoms','vasp','checks'].forEach(t => {
-        document.getElementById(`right-tab-${t}`).classList.toggle('hidden', t !== btn.dataset.rightTab);
+      ['molecule','supercell','catalyst','symmetry','magnetic','atoms','vasp','checks'].forEach(t => {
+        const panel = document.getElementById(`right-tab-${t}`);
+        if (panel) panel.classList.toggle('hidden', t !== btn.dataset.rightTab);
       });
     });
   });
@@ -3827,6 +3841,21 @@
       state.magMode = 'collinear';
       state.structure.atoms.forEach(a => { a.mag = [0, 0, map[a.el] || 0]; });
       refreshAllUI(false);
+    },
+    // Molecule mode (molecule.ts): read the selection, keep one structure per mode, and load without undo steps.
+    getSelection: () => state.selectedAtomIndices.slice(),
+    onSelect: fn => selectListeners.push(fn),
+    snapshot: () => cloneStructure(state.structure),
+    restore: (s) => {
+      state.structure = cloneStructure(s);
+      state.history = []; state.future = []; syncHistoryButtons();
+      state.selectedAtomIndices = []; state.measurements = []; state.speciesConfig = {};
+      refreshAllUI(true);
+      fitCameraToStructure();
+    },
+    loadFresh: (text, name, displayName) => {
+      loadStructureText(text, name, displayName);
+      state.history = []; state.future = []; syncHistoryButtons();
     },
     openRightTab: t => { const b = document.querySelector(`[data-right-tab="${t}"]`); if (b) b.click(); },
     toast: showToast,
