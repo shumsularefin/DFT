@@ -1,5 +1,28 @@
 ---
 id: what-we-learned
+stage:
+  scene: m10-pipeline
+  states:
+    - id: chain
+      section: why
+      params: { station: 0, loops: false }
+      caption: 'The worked example as five stations on one path, each with the LaCuO3 cell it works on. Step through them in order and read the check done at each.'
+    - id: links
+      section: intuition
+      params: { station: 2, loops: false }
+      caption: 'Convergence sits between the inputs and the relaxation: its tests decide whether the relaxation energies can be compared at all.'
+    - id: difference
+      section: math
+      params: { station: 3, loops: false }
+      caption: 'The relaxation station uses the doubled cell with the G-type start, the cell in which both energy differences of the study are taken.'
+    - id: record
+      section: in-vasp
+      params: { station: 4, loops: false }
+      caption: 'The last station, the electronic structure, reads the density of the static SCF. The methods record is the INCAR of that run.'
+    - id: go-back
+      section: mistakes
+      params: { station: 4, loops: true }
+      caption: 'The loops back: a moment that jumps or flips sends you back to the spin starts, and a wide gap in a reported metal sends you back to U.'
 title: What the worked example teaches
 module: 10
 order: 6

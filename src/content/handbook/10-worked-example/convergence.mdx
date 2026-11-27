@@ -1,5 +1,28 @@
 ---
 id: convergence
+stage:
+  scene: m10-convergence
+  states:
+    - id: basis
+      section: why
+      params: { view: basis, encut: 400 }
+      caption: 'Every dot is a plane wave of the LaCuO3 basis at ENCUT 400 eV, inside the cutoff sphere. Drag ENCUT towards 700 eV and watch the count grow with the volume of the sphere.'
+    - id: plan
+      section: intuition
+      params: { view: series, encut: 520 }
+      caption: 'The plan of the series on the plane of settings: ENCUT at a fixed 8 x 8 x 8 mesh, then the mesh at the chosen ENCUT. The stems are empty on purpose: the energies are awaiting results.'
+    - id: kspacing
+      section: math
+      params: { view: mesh, kspacing: 0.2 }
+      caption: 'KSPACING sets the mesh through N = ceil(|b| / KSPACING). Lower the spacing and the zone fills with points; the larger dots are the irreducible ones that VASP actually computes.'
+    - id: relax-cutoff
+      section: in-vasp
+      params: { view: basis, encut: 520 }
+      caption: 'ENCUT = 520, the 1.3 times ENMAX of the relaxation INCAR: the sphere and the plane-wave count the runs will use. Compare the count with the 400 eV start of the series.'
+    - id: coarse
+      section: mistakes
+      params: { view: mesh, kspacing: 0.4 }
+      caption: 'A coarse spacing leaves few k-points in the zone. When the cell grows, keep the spacing and not the mesh numbers, so both cells are sampled alike.'
 title: Convergence testing on RCuO3
 module: 10
 order: 3

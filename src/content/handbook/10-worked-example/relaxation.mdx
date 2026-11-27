@@ -1,5 +1,28 @@
 ---
 id: relaxation
+stage:
+  scene: m10-relaxation
+  states:
+    - id: cubic
+      section: why
+      params: { cell: cubic, isif: '3', start: fm }
+      caption: 'Stage 1: in the cubic cell every force is zero by symmetry, so ISIF = 3 can only change the lattice parameter. Try ISIF = 2 and 4: then nothing can move at all.'
+    - id: doubled
+      section: intuition
+      params: { cell: doubled, isif: '3', start: g, seed: 0.02 }
+      caption: 'Stage 2: the ten-atom cell holds two octahedra and two Cu. The oxygen arrows are the seed in the a-a-a- pattern, the push that lets a tilt grow; the Cu carry the G-type start.'
+    - id: no-seed
+      section: math
+      params: { cell: doubled, isif: '3', start: g, seed: 0 }
+      caption: 'Without a seed the forces that would start a tilt vanish by symmetry, and the cell stays cubic. Raise the seed slider and watch the octahedra turn.'
+    - id: same-cell
+      section: in-vasp
+      params: { cell: doubled, isif: '3', start: fm, seed: 0.02 }
+      caption: 'The ferromagnetic start MAGMOM = 2*0 2*3 6*0 in the same ten-atom cell, so every configuration shares one cell and its k-point and basis errors cancel.'
+    - id: fixed-volume
+      section: what-changes
+      params: { cell: doubled, isif: '4', start: g, seed: 0.02 }
+      caption: 'ISIF = 4 frees the ions and the cell shape but holds the volume: the handles lie along the faces only. Switch to ISIF = 2 to hold the cell fixed.'
 title: Structural relaxation of RCuO3
 module: 10
 order: 4

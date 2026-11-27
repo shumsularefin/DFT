@@ -1,5 +1,28 @@
 ---
 id: choosing-the-system
+stage:
+  scene: m10-tolerance
+  states:
+    - id: overview
+      section: why
+      params: { r: La, policy: cn12, tilt: 0 }
+      caption: 'LaCuO3 as the stage builds it: eight corner-sharing CuO6 octahedra with La in the cavity between them, drawn at its Shannon radius. The wire sphere is the room the cavity offers. Turn the block over to see La fill it.'
+    - id: contraction
+      section: intuition
+      params: { r: Lu, policy: cn9, tilt: 0 }
+      caption: 'Lu under the uniform CN 9 policy: the ion is much smaller than the room around it, so t falls well below 1. Step R from La to Lu and watch the gap open along the lanthanide contraction.'
+    - id: policy
+      section: math
+      params: { r: La, policy: cn9, tilt: 0 }
+      caption: 't compares the R ion with the room in its cavity: at t = 1 the ion just touches its twelve oxygens. Switch the policy between CN 12, 9 and 8 and watch the La radius, and t, shift by a few hundredths.'
+    - id: tilting
+      section: what-changes
+      params: { r: Sm, policy: cn9, tilt: 10 }
+      caption: 'A picture of a-a-a- tilting: neighbouring octahedra turn in opposite senses about the body diagonal, the Cu-O-Cu angle bends and the cavity closes around the small R. Drag the tilt slider; the angle is your choice, not a prediction.'
+    - id: missing
+      section: mistakes
+      params: { r: Gd, policy: cn12, tilt: 0 }
+      caption: 'Gd has no CN 12 radius, so the strict policy gives no t at all. Taking a CN 9 value for Gd beside CN 12 for La would exaggerate the trend; switch the policy for the whole series instead.'
 title: Choosing the RCuO3 system
 module: 10
 order: 1
