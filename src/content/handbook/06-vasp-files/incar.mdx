@@ -154,7 +154,7 @@ Why each line: it either says what to calculate or how accurately. Why this valu
 
 <Callout variant="mistake" title="A MAGMOM list with the wrong number of entries">
 
-`MAGMOM` takes one value per atom in `POSCAR` order. A short list is padded by VASP, so the run starts with the wrong moments <Cite id="S-041" />.
+`MAGMOM` takes one value per atom in `POSCAR` order, and the count must equal the number of atoms. A list with the wrong count stops the run with an error that the number of `MAGMOM` items does not match the number of ions, and even a list of the right length in the wrong order starts the run with the wrong moments <Cite id="S-042" />. Fix: count against the species line of `POSCAR`, and check the echo of `MAGMOM` in `OUTCAR`.
 
 </Callout>
 

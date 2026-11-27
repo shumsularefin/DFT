@@ -3,19 +3,19 @@ id: convergence
 title: Convergence testing on RCuO3
 module: 10
 order: 3
-summary: Running systematic ENCUT and k-mesh convergence series for RCuO3 and inspecting total-energy settling in the Convergence Plotter.
-concepts: [worked-example-workflow]
+summary: The ENCUT, k-mesh and energy-difference series for LaCuO3, what to plot, which tolerance to accept and how to read the curves, with the Convergence Plotter doing the bookkeeping.
+concepts: [worked-example-workflow, cutoff-convergence, kpoint-convergence]
 requires: [cutoff-convergence, kpoint-convergence]
-vaspTags: [ENCUT, KSPACING, EDIFF]
-sources: [S-019, S-042]
+vaspTags: [ENCUT, KPOINTS, KSPACING, EDIFF, ISMEAR, SIGMA]
+sources: [S-019, S-040, S-042, S-049, S-096]
 noLab: true
 status: draft
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 <Why>
 
-Perovskite oxides contain oxygen with a hard PAW potential, so running at an unconverged plane-wave cutoff or sparse k-mesh biases lattice constants, tilt angles, and relative phase energies <Cite id="S-042" />.
+The questions this project asks are about energy differences: magnetic against non-magnetic, cubic against tilted, one rare earth against the next. Such differences can be a few meV per atom, so the numerical error of each calculation has to be well below that. Two settings control most of that error: the plane-wave cutoff `ENCUT` and the k-point mesh. $\mathrm{LaCuO}_3$ is demanding on both counts. Oxygen has one of the harder PAW potentials, and a compound that is reported to be metallic <Cite id="S-096" /> needs a denser k-mesh than an insulator. This page runs the tests before the relaxation, so every later run stands on settings you can defend.
 
 </Why>
 
@@ -27,58 +27,160 @@ This page lays out the convergence testing protocol for `RCuO3`. Converged `ENCU
 
 </Callout>
 
-Hold the cell fixed and run a clean single-point (`IBRION = -1`, `NSW = 0`) sweep over `ENCUT` first, then sweep the Gamma-centered k-point mesh at the chosen cutoff <Cite id="S-042" />. Paste the resulting `OSZICAR` energies into the <a href="/tools/convergence/">Convergence Plotter</a> to check when the energy per atom settles below your target threshold.
+**The rule of the game.** The total energy itself never "converges" to a physical value. What converges is how much it still changes when you improve a setting. The author's rule is to pick the smallest setting at which the energy changes by less than 1 meV per atom from the next step up, tested with static runs on the unrelaxed structure <Cite id="S-042" />. Change one setting at a time and keep everything else fixed, so that each change in energy has one cause.
 
-<Scene id="reciprocal-fcc" />
+**Three series, in this order.**
 
-Always test convergence on the quantity you care about most: energy differences between polymorphs or magnetic orderings often converge faster than raw total energies, while stresses require higher cutoffs <Cite id="S-019" />.
+1. **ENCUT series.** Fixed cell (the cubic POSCAR of the previous page), fixed 8×8×8 mesh, static runs (`NSW = 0`), `ENCUT` from 400 to 700 eV in steps of 50, the same ferromagnetic start as the relaxation.
+2. **k-mesh series.** Fixed cell, `ENCUT` at the value series 1 chose, Gamma-centred meshes $n \times n \times n$ with $n$ = 4, 6, 8, 10, 12, 14 and 16.
+3. **Energy-difference series.** At each `ENCUT` and each mesh, also run the non-magnetic start, and track $\Delta E = E_\mathrm{FM} - E_\mathrm{NM}$ per formula unit. This is the number the project cares about, and it is the one to converge.
+
+**What the curves should look like.** At a fixed cell, more plane waves can only lower the energy, because the basis grows <Cite id="S-049" />. So the ENCUT curve falls and flattens. The k-mesh curve behaves differently: in a metal it can oscillate before it settles, because the Fermi surface is sampled differently by each mesh, so do not stop at the first flat-looking pair. The pressure (from `OUTCAR`) converges more slowly than the energy with `ENCUT`; that is the Pulay stress, and it is why the relaxation uses 1.3 times `ENMAX` whatever the energy test says <Cite id="S-040" /> <Cite id="S-042" />.
+
+**Watch the moment too.** In each ferromagnetic run, read the Cu moment from `OUTCAR`. If the moment jumps between settings, the run is landing on different solutions, and the energies are not comparable. That is a sign to fix the spin state first.
 
 </Intuition>
 
 <TheMath>
 
-Convergence is tracked by the energy difference per atom relative to the tightest tested setting:
+Write $E_i$ for the total energy of the run with the $i$-th setting (cutoff or mesh, sorted from cheapest to most expensive) and $N$ for the number of atoms in the cell. The quantity to plot is the energy per atom $e_i = E_i / N$. The Convergence Plotter accepts a series as converged at the smallest setting $x_i$ for which every later point stays within the tolerance $\delta$:
 
-$$\Delta E_i = \frac{|E_i - E_{\mathrm{ref}}|}{N_{\mathrm{atoms}}}$$
+$$\left|\, e_j - e_i \,\right| \le \delta \quad \text{for all } j > i, \qquad \delta = 1\ \text{meV per atom by default}.$$
 
-A common research target for bulk oxides is $\Delta E_i < 1\text{ meV/atom}$, verified explicitly rather than assumed <Cite id="S-042" />.
+This is stricter than "the next point is close", which can be fooled by a flat stretch (site decision D-014). For the energy difference, apply the same test to $\Delta E_i = (E_{\mathrm{FM},i} - E_{\mathrm{NM},i}) / N_\mathrm{fu}$, with $N_\mathrm{fu}$ formula units per cell.
+
+<Level min="intermediate">
+
+**Meshes for other cells.** VASP can build the mesh from a spacing with `KSPACING`: along each reciprocal lattice vector $\mathbf b_i$ it uses $N_i = \max\left(1, \lceil\, \lvert\mathbf b_i\rvert / \mathrm{KSPACING} \,\rceil\right)$ points, where $\lvert\mathbf b_i\rvert$ includes the factor $2\pi$ (VASP wiki page KSPACING <Cite id="S-019" />). For the cubic cell $\lvert\mathbf b\rvert = 2\pi/a$. A cell that is $n$ times longer along one direction needs about $n$ times fewer k-points along it <Cite id="S-042" />, so the doubled cell of the relaxation page gets a mesh chosen for the same spacing, not the same numbers.
+
+**Smearing belongs to the test.** With `ISMEAR = 0` and `SIGMA = 0.05` the smearing entropy term `EENTRO` should stay below about 1 meV per atom <Cite id="S-042" />. If the compound comes out metallic and `EENTRO` is larger, reduce `SIGMA` and repeat the k-mesh series, because narrower smearing needs more k-points.
+
+</Level>
+
+<Level min="pro">
+
+Converging $\Delta E$ rather than $E$ usually allows a lower setting, because errors that depend on the potentials and the cell cancel between the two magnetic states. That cancellation only works if both runs use the same cell, the same `ENCUT`, the same mesh and the same POTCARs. It does not cover quantities that come from derivatives (stress, elastic constants, phonons), which need their own tests <Cite id="S-042" />.
+
+</Level>
 
 </TheMath>
 
 <InVasp>
 
-- Generate the `ENCUT` and k-mesh series folders directly from the <a href="/tools/input-builder/">Input Builder</a>.
-- Keep `EDIFF = 1E-6` or tighter so electronic noise does not mask small convergence steps <Cite id="S-042" />.
-- Plot the series in <a href="/tools/convergence/">Convergence Plotter</a> and record the chosen parameters in your lab notebook.
+**The static INCAR for the series.** The relaxation INCAR of the previous page with the ionic loop switched off; the scripts replace the `ENCUT` line.
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM  = LaCuO3 convergence, FM start
+PREC    = Accurate
+ENCUT   = 400
+EDIFF   = 1E-6
+ALGO    = Normal
+NELM    = 120
+ISMEAR  = 0
+SIGMA   = 0.05
+NSW     = 0
+ISPIN   = 2
+MAGMOM  = 0 3 3*0
+LORBIT  = 11
+LASPH   = .TRUE.
+LMAXMIX = 4
+LREAL   = .FALSE.`}
+  annotations={{
+    3: 'replaced by the script in each folder',
+    4: 'tight, so electronic noise does not hide small steps',
+    9: 'a single point: no ionic steps',
+    11: 'the same start in every run of the series',
+  }}
+/>
+
+**The ENCUT loop.** One folder per value, named after it, so the plotter can read the setting from the folder name.
+
+<VaspFile
+  name="shell"
+  code={`for e in 400 450 500 550 600 650 700; do
+  d=encut_$e; mkdir -p $d
+  cp POSCAR POTCAR KPOINTS $d/
+  sed "s/^ *ENCUT.*/ENCUT   = $e/" INCAR > $d/INCAR
+  (cd $d && mpirun vasp_std > vasp.out)
+done
+grep "energy(sigma->0)" encut_*/OUTCAR | awk '{print $1, $NF}'`}
+/>
+
+For the k-mesh series, fix `ENCUT`, loop over $n$ and write `n n n` on line 4 of `KPOINTS` in each folder. For the energy-difference series, repeat both loops with `ISPIN = 1` and no `MAGMOM`.
+
+**On this site.**
+
+1. The <a href="/tools/input-builder/">Input Builder</a> has a "Convergence series" panel that writes the folders and a run script for you.
+2. Drop the `OUTCAR` (or `OSZICAR`) files of one series into the <a href="/tools/convergence/">Convergence Plotter</a>, enter 5 atoms per cell and the largest `ENMAX`, and keep the threshold at 1 meV per atom. It plots the energy per atom, marks the first converged setting under the rule above and plots the pressure where `OUTCAR` has it.
+3. Keep a record like the one below in your notebook. The rows are empty on purpose: fill them from your own runs.
+
+| `ENCUT` (eV) | Energy per atom | Change from the next row | Cu moment (`OUTCAR`) | Pressure (kB) |
+| ------------ | --------------- | ------------------------ | -------------------- | ------------- |
+| 400          | your run        | your run                 | your run             | your run      |
+| 450          | your run        | your run                 | your run             | your run      |
+| ...          |                 |                          |                      |               |
+| 700          | your run        | (reference)              | your run             | your run      |
+
+**How to judge the result.** Accept the series when the curve flattens below the threshold and stays there, the moment is the same in every run, `EENTRO` is small and the energy difference has also settled. Then take the larger of the energy-converged `ENCUT` and 1.3 times `ENMAX` for the relaxation <Cite id="S-042" />.
 
 </InVasp>
 
 <WhatChanges>
 
-| Parameter swept | What it controls                    | Sign of convergence                                   |
-| --------------- | ----------------------------------- | ----------------------------------------------------- |
-| `ENCUT`         | Plane-wave basis completeness       | Energy per atom and pressure plateau smoothly         |
-| k-mesh density  | Brillouin-zone integration accuracy | Energy per atom settles and stays flat on finer grids |
+| Setting raised             | What changes in the run                   | What you look for                                      |
+| -------------------------- | ----------------------------------------- | ------------------------------------------------------ |
+| `ENCUT`                    | More plane waves, more memory and time    | Energy falls and flattens; pressure settles later      |
+| k-mesh $n$                 | More k-points in the irreducible zone     | Energy settles, possibly after oscillating in a metal  |
+| Tolerance $\delta$ tighter | A larger setting is accepted              | Use it when the differences you compare are small      |
+| `SIGMA` smaller            | Less smearing error, slower k convergence | `EENTRO` per atom below the threshold                  |
+| `EDIFF` looser             | Faster runs, noisier energies             | Steps smaller than the noise can no longer be resolved |
 
-Why sweep one at a time: changing `ENCUT` and k-mesh simultaneously hides which parameter caused an energy shift.
+Why test: an unconverged energy difference can have the wrong sign. Why this tolerance: 1 meV per atom is the author's default and well below typical magnetic and structural energy differences you want to resolve <Cite id="S-042" />. What happens if you skip it: every later number carries an unknown error.
 
 </WhatChanges>
 
 <Mistakes>
 
-<Callout variant="mistake" title="Using different k-meshes for competing phases">
+<Callout variant="mistake" title="Changing ENCUT and the mesh together">
 
-When comparing cubic and orthorhombic supercells, scale the k-mesh inversely with each lattice vector length so the reciprocal-space spacing stays matched across cells.
+If both change between two runs, you cannot tell which one moved the energy. Fix: sweep one setting while the other is held at a generous value, then sweep the other.
+
+</Callout>
+
+<Callout variant="mistake" title="Converging only the non-magnetic state">
+
+A non-magnetic run is quicker, but the project compares magnetic states. Fix: run the series with the spin start you will use, and converge the energy difference as well.
+
+</Callout>
+
+<Callout variant="mistake" title="Stopping at the first flat pair of k-meshes">
+
+In a metal two neighbouring meshes can agree by chance. Fix: go at least two meshes past the point you accept, and use the plotter's rule that every later point stays within the tolerance.
+
+</Callout>
+
+<Callout variant="mistake" title="Reusing the same mesh numbers for a bigger cell">
+
+The doubled cell with an 8×8×8 mesh is sampled much more densely than the cubic cell with the same numbers, and the comparison carries a hidden k-point error. Fix: keep the spacing, not the numbers, for example through `KSPACING`.
+
+</Callout>
+
+<Callout variant="mistake" title="Using the tetrahedron method in a coarse series">
+
+`ISMEAR = -5` needs a mesh of at least four k-points and is not meant for forces in metals <Cite id="S-042" />. Fix: keep `ISMEAR = 0` with a small `SIGMA` for the series, as here.
 
 </Callout>
 
 </Mistakes>
 
-<Check ids={['q-m10-9', 'q-m10-10', 'q-m10-11', 'q-m10-12']} />
+<Check ids={['q-m10-19', 'q-m10-20', 'q-m10-21', 'q-m10-22', 'q-m10-23']} />
 
 <GoDeeper>
 
-- VASP wiki on `ENCUT` and k-point integration <Cite id="S-019" />.
-- The author's VASP Workflow Handbook on convergence protocols <Cite id="S-042" />.
+- VASP wiki pages ENCUT, KPOINTS, KSPACING and ISMEAR (by page name) <Cite id="S-019" />.
+- Francis and Payne on the finite-basis (Pulay) stress <Cite id="S-040" />.
+- Martin's textbook on plane-wave basis sets and k-point sampling <Cite id="S-049" />.
+- The author's Workflow Handbook, section Convergence tests <Cite id="S-042" />.
 
 </GoDeeper>

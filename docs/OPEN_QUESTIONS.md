@@ -64,6 +64,7 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-058 | open | author |
 | Q-069 | open | builder (needs vasp.at) or author |
 | Q-070 | open | builder (needs the LOBSTER, VTST and Science Advances pages) |
+| Q-064 | open | builder |
 
 ## Release triage (M11.3)
 
@@ -293,3 +294,5 @@ The pages on molecular dynamics and MLFF, beyond DFT and Wannier functions name 
 
 ## Q-070. Non-VASP documentation behind the new module 9 and 12 topics (M16)
 Three outside sources were cited from memory: the LOBSTER manual (the exact ISYM rule; the page follows pymatgen Lobsterin, which writes ISYM = 0 or -1), the VTST Tools pages (default `SPRING = -5`, `LCLIMB`, the `IOPT` numbering with 1 = LBFGS, 2 = CG, 3 = quick-min, 7 = FIRE, and the script names `nebmake.pl`, `nebbarrier.pl`), and the abstract of Sun et al. 2016 (S-120: median metastability of about 15 meV/atom, 90th percentile about 67 meV/atom). **Close:** read the three pages and upgrade S-120, S-124 and S-129 to `read`, or correct the topics. Owner: builder with web access.
+## Q-064. What VASP does with a MAGMOM list of the wrong length
+`06-vasp-files/incar.mdx` said that VASP pads a short `MAGMOM` list, citing S-041, which does not say so; `05-practical-choices/spin-and-magnetism.mdx` says the count must equal the number of atoms and that a wrong count is an error. S-042 supports the second reading (the count must equal NIONS, and its error index lists the message that the MAGMOM count does not match NIONS), so both pages now say that, citing S-042. The VASP wiki page MAGMOM (S-065) could not be reached from the builder session (M16, 2026-11-27) to check whether some versions or input forms behave differently. **Close:** a builder reads the VASP wiki page MAGMOM and confirms the behaviour for a list that is too short and one that is too long, or the author confirms it from a run. **Owner: builder.**

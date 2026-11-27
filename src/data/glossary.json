@@ -279,6 +279,15 @@
     ]
   },
   {
+    "id": "exchange",
+    "label": "Exchange",
+    "short": "The energy that comes from the Pauli principle: electrons with the same spin cannot share a state, so they keep apart and repel each other less than a plain average would suggest. It has no classical counterpart.",
+    "level": "intermediate",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
     "id": "exchange-correlation",
     "label": "Exchange and correlation",
     "short": "The parts of the electron-electron interaction that come from the Pauli principle (exchange) and from electrons avoiding each other (correlation). Density functional theory has to approximate them.",
@@ -443,6 +452,43 @@
     "level": "beginner",
     "sources": [
       "S-049"
+    ]
+  },
+  {
+    "id": "perovskite",
+    "label": "Perovskite",
+    "short": "A crystal family with formula ABX3: small B cations sit inside corner-sharing octahedra of X anions, and large A cations fill the gaps between the octahedra. Many oxides, such as SrTiO3, have this structure.",
+    "level": "beginner",
+    "sources": [
+      "S-002"
+    ]
+  },
+  {
+    "id": "octahedral-tilting",
+    "label": "Octahedral tilting",
+    "short": "A cooperative rotation of the corner-sharing BX6 octahedra of a perovskite, which happens when the A cation is too small for its cavity. It lowers the symmetry and enlarges the repeating cell.",
+    "level": "intermediate",
+    "sources": [
+      "S-101"
+    ]
+  },
+  {
+    "id": "tolerance-factor",
+    "label": "Tolerance factor",
+    "short": "A number made from ionic radii that says how well the A, B and X ions of a perovskite fit together. Goldschmidt's t near 1 suits the ideal cubic structure; lower values point to tilted octahedra. It is a rule of thumb, not a stability calculation.",
+    "level": "intermediate",
+    "sources": [
+      "S-002",
+      "S-003"
+    ]
+  },
+  {
+    "id": "ionic-radius",
+    "label": "Ionic radius",
+    "short": "A tabulated size for an ion, chosen so that sums of radii reproduce measured bond lengths. It depends on the charge of the ion, how many neighbours it has and, for some ions, its spin state.",
+    "level": "intermediate",
+    "sources": [
+      "S-001"
     ]
   },
   {
@@ -928,6 +974,25 @@
     "level": "beginner",
     "sources": [
       "S-042"
+    ]
+  },
+  {
+    "id": "crystal-field-splitting",
+    "label": "Crystal-field splitting",
+    "short": "The way the five d levels of a metal ion split in energy when the ion is surrounded by neighbours. In an octahedron they split into three lower t2g levels and two higher eg levels.",
+    "level": "intermediate",
+    "sources": [
+      "S-100"
+    ]
+  },
+  {
+    "id": "charge-transfer-energy",
+    "label": "Charge-transfer energy",
+    "short": "The energy needed to move an electron from a ligand, such as oxygen, onto the metal ion. When it is small or negative, the holes of a highly charged metal ion sit largely on the ligands instead of on the metal.",
+    "level": "pro",
+    "sources": [
+      "S-098",
+      "S-099"
     ]
   },
   {
