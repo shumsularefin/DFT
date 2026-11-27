@@ -7,12 +7,17 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- One workspace from the owner's template: grouped sidebar (Study, Build, Calculate), a top bar with page title, reading level, search and theme, and card, tile, stepper and line-numbered code components on every page (D-105).
+- Topic pages show a Modules tree, "On this page", "First edition, updated <date>" and Mark complete; Progress shows tiles and module bars; the Input Builder shows a stepper and a Generated files card.
 - DFT Studio at `/dft-studio/`: a VESTA-style 3D crystal viewer and editor with the VASP workflow (POTCAR, INCAR, KPOINTS, k-point convergence, run bundle, analysis). It is now the Material Builder crystal mode, runs the site structure checks live, and hands structures and results to and from the Input Builder, k-path, magnetic and convergence tools (D-103).
 - Calm app layout: a left sidebar with icon navigation, search, reading level, progress and theme on wide screens, a top bar and drawer on phones, and a warm palette with one accent (D-104).
 - Tests for the Material Builder: crystal templates, molecule export, and an end-to-end keyboard and axe spec at 360 px (M15.3).
 
 ### Fixed
 
+- The Material Builder no longer redraws its 3D scene every frame; it draws on demand and starts in short tasks, so an idle page uses no CPU.
+- The Material Builder structure picker no longer slides under the Open button at medium widths.
+- No thick one-sided borders: callouts, notes, feedback and review checks use the same thin border as cards.
 - Guided path figures are no longer solid black: the plot styles now load on `/learn/`, labels no longer collide, and 3D stations use an angled camera.
 - Buttons, text fields, menus and file pickers on the labs, 3D scenes, periodic table and tools pages have the site look instead of browser grey.
 - No sideways scroll at 360 px on the k-path, EOS and progress pages or in open equation sections; React hydration error 418 on handbook, practice and progress pages.
@@ -23,6 +28,8 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Changed
 
+- The Material Builder (formerly DFT Studio) runs natively at `/builder/` with Crystal and Molecule modes; `/dft-studio/` redirects there.
+- The site is desktop only (1024 px and up); Lighthouse CI uses the desktop preset.
 - Heisenberg fit default convention is now H = E0 - sum J S_i.S_j, pairs once, unit spins (J > 0 ferromagnetic), as in the Workflow Handbook and the textbooks (Q-042 closed, D-087). The plus sign is still available.
 
 ### Added
