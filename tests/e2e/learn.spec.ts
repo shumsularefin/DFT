@@ -90,6 +90,7 @@ test.describe('guided path (M12.4)', () => {
 
     // pointer drag: the camera moves and the drawn pixels change (a real 3D render, not a picture)
     const home = await stage.getAttribute('data-camera');
+    await canvas.scrollIntoViewIfNeeded();
     const before = await canvas.screenshot();
     const box = (await canvas.boundingBox())!;
     const cx = box.x + box.width / 2;
@@ -151,6 +152,8 @@ test.describe('guided path (M12.4)', () => {
     const flat = page.locator('.scene-flat');
     await expect(flat.locator('svg')).toBeVisible();
     const view = await flat.getAttribute('data-view');
+    // the mouse works in viewport coordinates, so the picture has to be on screen first
+    await flat.scrollIntoViewIfNeeded();
     const box = (await flat.boundingBox())!;
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
     await page.mouse.down();
