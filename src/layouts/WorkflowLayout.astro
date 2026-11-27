@@ -1,0 +1,51 @@
+---
+// Workflow section (D-110): the step list on the left, the step on the right. Reuses the handbook layout
+// classes so the rails stick and scroll the same way.
+import { getCollection } from 'astro:content';
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumbs from '../components/chrome/Breadcrumbs.astro';
+import PrevNext from '../components/chrome/PrevNext.astro';
+import WorkflowNav from '../components/workflow/WorkflowNav.astro';
+import { WORKFLOW_GROUPS, orderSteps, stepNeighbors } from '../lib/workflow';
+import '../styles/learning.css';
+import '../styles/workflow.css';
+
+interface Props {
+  id?: string;
+  title: string;
+  description: string;
+  group?: string;
+}
+const { id, title, description, group } = Astro.props;
+const ordered = orderSteps(
+  (await getCollection('workflow')).map((e) => ({
+    id: e.id,
+    title: e.data.title,
+    short: e.data.short,
+    group: e.data.group,
+    order: e.data.order,
+  })),
+);
+const groups = WORKFLOW_GROUPS.map((name) => ({
+  name,
+  steps: ordered.filter((s) => s.group === name),
+})).filter((g) => g.steps.length > 0);
+const { prev, next } = id ? stepNeighbors(ordered, id) : { prev: null, next: ordered[0] ?? null };
+const crumbs = id
+  ? [{ label: 'Workflow', href: '/workflow/' }, { label: group ?? '' }, { label: title }]
+  : [{ label: 'Workflow' }];
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="container handbook-layout wf-layout">
+    <div class="hb-rail">
+      <WorkflowNav groups={groups} currentId={id} />
+      <slot name="rail" />
+    </div>
+    <div class="handbook-main" data-workflow-step={id}>
+      <Breadcrumbs items={crumbs} />
+      <slot />
+      <PrevNext prev={prev} next={next} base="/workflow/" label="Previous and next step" />
+    </div>
+  </div>
+</BaseLayout>

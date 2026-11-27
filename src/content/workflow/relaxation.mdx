@@ -1,0 +1,113 @@
+---
+id: relaxation
+title: Relax the structure
+short: Relaxation
+group: Geometry
+order: 3
+protocolStep: 1
+summary: Move the atoms and the cell to the DFT minimum, then re-run from CONTCAR until it settles in one to three steps. Every later property is computed on this geometry.
+folder: 01_relax/
+needs:
+  - '<code>POSCAR</code> from your CIF (VASPkit 105)'
+  - '<code>POTCAR</code> (103 or 104)'
+  - '<code>KPOINTS</code> from 102 at 0.03 to 0.04'
+  - '<code>INCAR</code> from 101 → SR (SRMG with spin)'
+run: '<code>IBRION = 2</code>, <code>ISIF = 3</code>, then repeat from <code>CONTCAR</code>'
+produces:
+  - '<code>CONTCAR</code>: the equilibrium cell'
+  - '<code>WAVECAR</code> and <code>CHGCAR</code> for the SCF in the same folder'
+learn:
+  - { href: '/handbook/09-analysis/relaxations/', label: 'How a relaxation works' }
+  - { href: '/handbook/05-practical-choices/plane-waves-and-encut/', label: 'ENCUT and Pulay stress' }
+  - {
+      href: '/handbook/08-convergence-and-errors/relaxation-trouble/',
+      label: 'When a relaxation will not converge',
+    }
+  - { href: '/handbook/05-practical-choices/spin-polarized-calculations/', label: 'ISPIN and MAGMOM' }
+tools:
+  - { href: '/tools/input-builder/?preset=relax&variant=default', label: 'Input Builder: relaxation' }
+  - { href: '/builder/', label: 'Material Builder (make the POSCAR)' }
+  - { href: '/tools/review/', label: 'Calculation Review (read the OUTCAR)' }
+checklist: [Relax]
+sources: [S-042, S-019, S-020]
+status: draft
+updated: 2026-11-27
+---
+
+<Section id="protocol" heading="The protocol step">
+  > "Prepare four INPUT files and changes it as it requires. Run relaxation with encut of 1.3 of Enmax.
+  > Ediff, ISPIN, Magmom. INCAR can be prepared from VASPKIT."
+
+This is step 1 of the author's five-step protocol, quoted as written<Cite id="S-042" />. What the
+references say about it:
+
+- **ENCUT = 1.3 × ENMAX.** The default cutoff often has to be raised by about 30% before the stress
+  tensor converges (Pulay stress)<Cite id="S-019" />. Take the largest ENMAX of your species:
+  `grep ENMAX POTCAR`.
+- **EDIFFG = −0.005 or −0.001 eV/Å.** A negative EDIFFG stops the run when every force is below
+  |EDIFFG|<Cite id="S-019" />.
+- **ISPIN = 2 with one MAGMOM value per atom, in POSCAR order.** VASPkit writes the template with
+  101 → SR, or SRMG to add the spin tags<Cite id="S-020" />.
+  </Section>
+
+<Section id="why" heading="Why this step comes first">
+  Every later property is evaluated at this geometry, so an error here propagates everywhere. Experimental
+  lattice constants are not the DFT minimum: PBE typically overestimates them by 1 to 2%. If you skip the
+  relaxation and use the experimental cell, the residual stress spoils the elastic and phonon results.
+</Section>
+
+<Section id="inputs" heading="The inputs">
+  <PresetIncar preset="relax" caption="INCAR for the relaxation" />
+
+| Tag    | Setting                                  | Reason                                                                                                                                     |
+| ------ | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| ENCUT  | 1.3 × ENMAX                              | Changing the cell changes the number of plane waves at a fixed cutoff. The 30% margin keeps the Pulay stress small.                        |
+| ISIF   | 3                                        | Full equilibrium: ions, cell shape and volume. Use 2 for slabs and defects (cell fixed) and 4 for the fixed-volume points of an E–V curve. |
+| EDIFFG | −0.005 or −0.001 eV/Å                    | Stops when every force is below \|EDIFFG\|. −0.001 also suits elastic and phonon work.                                                     |
+| EDIFF  | 1E-6 (1E-7 to 1E-8 with EDIFFG = −0.001) | Forces are only as accurate as the SCF, so a tight force criterion needs a tight EDIFF.                                                    |
+| IBRION | 2, then 1                                | Conjugate gradient (2) is robust far from the minimum. RMM-DIIS (1) is faster close to it but can diverge from a bad start.                |
+
+Use the KPOINTS from your k-point test (VASPkit 102 at a resolution of 0.03 to 0.04) and the POTCAR you
+checked in [Prepare the inputs](/workflow/prepare-inputs/).
+
+</Section>
+
+<Section id="run" heading="Run and re-run">
+  <VaspFile
+    name="shell"
+    code={`mpirun -np 32 vasp_std > vasp.out
+grep "reached required accuracy" OUTCAR      # must appear
+grep -c "F=" OSZICAR                         # number of ionic steps taken
+grep "external pressure" OUTCAR | tail -1    # should be within ±1-2 kB
+cp POSCAR POSCAR.0; cp CONTCAR POSCAR         # repeat until it converges in 1-3 steps`}
+  />
+
+Keep the first structure as `POSCAR.0` so you can compare against it later. Copy CONTCAR to POSCAR and
+run again until a run converges in one to three ionic steps.
+
+</Section>
+
+<Section id="check" heading="Check before you move on">
+  - **Lattice constants against experiment.** PBE overestimates by about 1 to 2%, LDA underestimates by about
+  1 to 2%, and PBEsol and r2SCAN sit closer. A deviation above about 3% points to a wrong magnetic state,
+  missing van der Waals forces (layered materials) or a wrong POTCAR. - **Symmetry is preserved.** Compare the
+  space groups of `POSCAR.0` and `CONTCAR`: VASPkit 601 on the POSCAR and 608 on the relaxed structure, or
+  `phonopy --symmetry -c CONTCAR`. - **Moments.** `grep "mag=" OSZICAR | tail -1` and the `magnetization (x)`
+  table in OUTCAR.
+</Section>
+
+<Section id="next" heading="Files for the next step">
+  Stay in this folder. The static SCF runs in the same folder (protocol step 2) and reads the WAVECAR this
+  run left. Before it starts, back up what it would overwrite:
+
+<VaspFile
+  name="shell"
+  code={`cp CONTCAR POSCAR
+cp OUTCAR OUTCAR.relax
+cp CONTCAR CONTCAR.relax`}
+/>
+
+Calculations in the lattice and response lane (elastic, E–V, phonons, dielectric, magnetic) start from
+this relaxed CONTCAR in their own folders.
+
+</Section>

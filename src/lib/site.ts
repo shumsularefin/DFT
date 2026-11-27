@@ -42,6 +42,7 @@ export const NAV_GROUPS: readonly { label: string; items: readonly NavItem[] }[]
     items: [
       { label: 'Learn', href: '/learn/', icon: 'path' },
       { label: 'Handbook', href: '/handbook/', icon: 'book' },
+      { label: 'Workflow', href: '/workflow/', icon: 'flow' },
       { label: 'Practice', href: '/practice/', icon: 'check' },
       { label: 'Progress', href: '/progress/', icon: 'trend' },
     ],

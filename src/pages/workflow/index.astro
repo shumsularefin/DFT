@@ -1,0 +1,176 @@
+---
+import { getCollection } from 'astro:content';
+import WorkflowLayout from '../../layouts/WorkflowLayout.astro';
+import { WORKFLOW_GROUPS, orderSteps } from '../../lib/workflow';
+
+const steps = orderSteps(
+  (await getCollection('workflow')).map((e) => ({
+    id: e.id,
+    title: e.data.title,
+    short: e.data.short,
+    group: e.data.group,
+    order: e.data.order,
+    needs: e.data.needs,
+    protocolStep: e.data.protocolStep,
+  })),
+);
+const number = new Map(steps.map((s, i) => [s.id, i + 1]));
+// What each lane depends on, from the workflow map of the Workflow Handbook (S-042).
+const laneNote: Record<string, string> = {
+  Geometry: 'Run once, in this order',
+  Electronic: 'Needs the CHGCAR of a static SCF',
+  'Lattice and response': 'Needs the relaxed structure only',
+  'Beyond PBE': 'Changes the functional, then repeat the lanes',
+};
+const lanes = WORKFLOW_GROUPS.map((name) => ({ name, steps: steps.filter((s) => s.group === name) })).filter(
+  (l) => l.steps.length > 0,
+);
+const tree = `Compound/
+├── 00_conv/       encut_400 … encut_700/   kpt_0.05 … kpt_0.02/
+├── 01_relax/      relax → cp CONTCAR POSCAR → SCF in the same folder (ISTART = 1)
+│                  → CHGCAR, WAVECAR, DOSCAR (DOS via LORBIT = 11)
+├── 04_band/       SCF without ICHARG = 11 + KPATH.in (303) as the band path
+├── 05_optics/     LOPTICS, NBANDS ≈ 3 × default
+├── 06_elastic/    IBRION = 6, ISIF = 3
+├── 07_eos/        s_0.97 … s_1.03/
+├── 08_phonon/     SPOSCAR, disp-001 …   (phonopy)
+├── 09_dielectric/ LEPSILON, IBRION = 8  → Born charges, ε∞, ε0
+├── 10_bader/      LAECHG → AECCAR0, AECCAR2
+├── 11_magnetic/   NM/ FM/ AFM1/ AFM2/   (same supercell)
+└── 12_hse/        or 12_dftu/, 12_r2scan/`;
+---
+
+<WorkflowLayout
+  title="Workflow"
+  description="Run a VASP project step by step, from a CIF file to every property: what to run, which files carry over and what to check before moving on."
+>
+  <div class="topic" data-pagefind-body data-pagefind-meta="module:Workflow">
+    <header class="topic-head">
+      <div class="page-h">
+        <div>
+          <h1>Workflow</h1>
+          <p class="topic-summary">
+            Follow a VASP project from a CIF file to every property, one step at a time. Each step says what
+            to run, gives the exact INCAR, KPOINTS and commands, says which files carry over and what to check
+            before you move on. The theory behind each step is in the Handbook, linked from every page.
+          </p>
+          <p class="topic-meta">
+            Follows the author's VASP Workflow Handbook and its five-step protocol (
+            <a href="/references/#S-042">S-042</a>). First edition.
+          </p>
+        </div>
+      </div>
+    </header>
+    <div class="prose">
+      <section class="topic-section card" id="map" aria-labelledby="map-h">
+        <h2 class="card-h" id="map-h">
+          The workflow map
+        </h2>
+        <p>
+          Every property depends on one of two things: the relaxed structure, or the converged charge density
+          of a static SCF run on that structure. Knowing which one a step needs tells you which files to copy
+          into its folder.
+        </p>
+        <div class="wf-map">
+          {lanes.map((l) => (
+            <section class="wf-lane" aria-labelledby={`lane-${l.name.replace(/\W+/g, '-')}`}>
+              <h3 id={`lane-${l.name.replace(/\W+/g, '-')}`}>
+                {l.name}
+                <br />
+                <small>{laneNote[l.name]}</small>
+              </h3>
+              <ol>
+                {l.steps.map((s) => (
+                  <li>
+                    <a href={`/workflow/${s.id}/`}>
+                      <span class="wf-n" aria-hidden="true">
+                        {number.get(s.id)}
+                      </span>
+                      <span>
+                        {s.short}
+                        {s.protocolStep && <small>Protocol step {s.protocolStep}</small>}
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ))}
+        </div>
+      </section>
+
+      <section class="topic-section card" id="layout" aria-labelledby="layout-h">
+        <h2 class="card-h" id="layout-h">
+          Suggested project layout
+        </h2>
+        <p>
+          The relaxation and the SCF share one folder (protocol step 2). Back up the relaxation's OUTCAR and
+          CONTCAR before the SCF overwrites them. Every other calculation gets its own folder with copies of
+          the files it needs.
+        </p>
+        <pre class="wf-tree" tabindex="0" aria-label="Folder tree of a project">{tree}</pre>
+      </section>
+
+      <section class="topic-section card" id="how" aria-labelledby="how-h">
+        <h2 class="card-h" id="how-h">
+          How to use this section
+        </h2>
+        <ol>
+          <li>
+            Start at <a href="/workflow/prepare-inputs/">Prepare the inputs</a> and go down the Geometry lane
+            in order. The relaxed structure is the base of everything else.
+          </li>
+          <li>
+            Then pick the properties you need. Each page starts with a card that says which folder to work in,
+            which files it needs and what it leaves for the next step.
+          </li>
+          <li>
+            Use the <strong>Open in the Input Builder</strong> link under each INCAR to fill in your own
+            structure and download the files. The INCARs shown are the handbook's worked example; the values
+            to replace are listed under each one.
+          </li>
+          <li>
+            Before every submission read the step's checklist, or the full
+            <a href="/reference/checklist/">pre-submit checklist</a>.
+          </li>
+        </ol>
+        <p>
+          Planning a single property instead of the whole sequence? The
+          <a href="/tools/planner/">Research Planner</a> lists the shortest chain of runs for one goal.
+        </p>
+      </section>
+
+      <section class="topic-section card" id="toolbox" aria-labelledby="toolbox-h">
+        <h2 class="card-h" id="toolbox-h">
+          When you need more
+        </h2>
+        <ul>
+          <li>
+            <a href="/handbook/07-running/vaspkit-in-practice/">VASPkit command map</a>: every task code used
+            in this workflow, with the files it reads and writes.
+          </li>
+          <li>
+            <a href="/handbook/07-running/restarts-istart-icharg/">ISTART and ICHARG</a>: what each run reads
+            from the folder and what it keeps.
+          </li>
+          <li>
+            <a href="/handbook/06-vasp-files/output-files/">Output files</a>: what each file holds and which
+            step reads it.
+          </li>
+          <li>
+            <a href="/handbook/08-convergence-and-errors/scf-trouble/">Troubleshooting convergence</a> and the
+            <a href="/errors/">error finder</a> for VASP error messages.
+          </li>
+          <li>
+            <a href="/handbook/12-properties/other-calculations/">Other calculations</a>: work function,
+            charge density differences, ELF, effective masses, molecular dynamics and more.
+          </li>
+          <li>
+            <a href="/reference/units/">Units and conversions</a> and
+            <a href="/reference/where-to-read/">where to read each number</a>.
+          </li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</WorkflowLayout>
