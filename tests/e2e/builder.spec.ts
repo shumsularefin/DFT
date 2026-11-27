@@ -3,7 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 
 // M15.3: keyboard path and axe for the Material Builder. Crystal mode (/builder/) is the Studio workspace,
 // hosted natively in the page (D-105); molecule mode (/builder/molecule/) is the same workspace with the
-// Molecule tab, and Crystal | Molecule switches between them in place (D-106).
+// Molecule tab, and Crystal | Molecule switches between them in place (D-107).
 // Each test also checks there is no sideways scroll.
 const overflow = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);

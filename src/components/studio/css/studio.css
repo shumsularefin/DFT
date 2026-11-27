@@ -1133,7 +1133,7 @@
   }
 }
 
-/* Crystal | Molecule (D-106): one workspace, two modes. Controls that only make sense in one mode carry
+/* Crystal | Molecule (D-107): one workspace, two modes. Controls that only make sense in one mode carry
    data-mode-only and are hidden in the other. */
 .studio-root[data-mode='molecule'] [data-mode-only='crystal'],
 .studio-root:not([data-mode='molecule']) [data-mode-only='molecule'] {

@@ -51,7 +51,7 @@ for (const [h, v] of [
   check(`security header ${h}`, home.headers.get(h) === v, `got ${home.headers.get(h)}`);
 }
 
-// D-105, D-106: the Material Builder pages (/builder/ and /builder/molecule/, the two modes of the Studio
+// D-105, D-107: the Material Builder pages (/builder/ and /builder/molecule/, the two modes of the Studio
 // workspace) have their own CSP (Pyodide from cdn.jsdelivr.net) and are never framed; every other page keeps
 // the strict site CSP. /dft-studio/ is a 301 to /builder/.
 const csp = (r) => r.headers.get('content-security-policy') ?? '';
