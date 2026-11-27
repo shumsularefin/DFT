@@ -1447,10 +1447,6 @@
   const container = document.getElementById('three-container');
   const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  // Soft shadows give the atoms depth. The shadow map is drawn only with a frame, and frames are drawn on
-  // demand (see invalidate), so an idle viewer still costs nothing.
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFShadowMap;
   container.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
@@ -1461,50 +1457,28 @@
   const orthoCam = new THREE.OrthographicCamera(-10, 10, 10, -10, -200, 500);
   let activeCam = orthoCam;
 
-  // VESTA-style lighting with depth: a sky/ground fill so no side is black, a key light from the upper
-  // left of the view that casts soft shadows, and a weak cool rim light from behind. Both directional
-  // lights follow the camera (placeLights), so the lit side stays the same as the structure turns.
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x6b7280, 0.85));
-  const dirLight1 = new THREE.DirectionalLight(0xffffff, 2.1);
-  dirLight1.castShadow = true;
-  dirLight1.shadow.mapSize.set(2048, 2048);
-  dirLight1.shadow.bias = -0.0004;
-  dirLight1.shadow.normalBias = 0.03;
-  dirLight1.shadow.radius = 3;
+  // VESTA-style lighting: glossy Phong spheres with a crisp white highlight. A soft ambient fill keeps the
+  // far side readable, a key light from the upper left of the view gives the shading and the highlight,
+  // and a weak fill from the lower right lifts the shadowed side. The directional lights follow the
+  // camera (placeLights), so the lit side stays the same as the structure turns, as in VESTA.
+  scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+  const dirLight1 = new THREE.DirectionalLight(0xffffff, 2.0);
   scene.add(dirLight1);
-  scene.add(dirLight1.target);
-  const dirLight2 = new THREE.DirectionalLight(0xdbeafe, 0.45);
+  const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.35);
   scene.add(dirLight2);
-  scene.add(dirLight2.target);
-  const KEY_DIR = new THREE.Vector3(-0.45, 0.75, 0.6).normalize();
-  const RIM_DIR = new THREE.Vector3(0.5, -0.35, -0.8).normalize();
-  const sceneSphere = new THREE.Sphere(new THREE.Vector3(), 8);
-  const _lightDir = new THREE.Vector3();
+  const KEY_DIR = new THREE.Vector3(-0.5, 0.65, 0.8).normalize();
+  const FILL_DIR = new THREE.Vector3(0.6, -0.45, 0.5).normalize();
   function placeLights() {
-    const c = sceneSphere.center;
-    const r = Math.max(1, sceneSphere.radius);
-    _lightDir.copy(KEY_DIR).applyQuaternion(activeCam.quaternion);
-    dirLight1.position.copy(c).addScaledVector(_lightDir, r * 3);
-    dirLight1.target.position.copy(c);
-    const sc = dirLight1.shadow.camera;
-    sc.left = -r; sc.right = r; sc.top = r; sc.bottom = -r;
-    sc.near = r * 0.5; sc.far = r * 5.5;
-    sc.updateProjectionMatrix();
-    _lightDir.copy(RIM_DIR).applyQuaternion(activeCam.quaternion);
-    dirLight2.position.copy(c).addScaledVector(_lightDir, r * 3);
-    dirLight2.target.position.copy(c);
+    dirLight1.position.copy(KEY_DIR).applyQuaternion(activeCam.quaternion);
+    dirLight2.position.copy(FILL_DIR).applyQuaternion(activeCam.quaternion);
   }
-  // Opaque atoms, bonds and arrows cast and receive shadows; see-through polyhedra only receive them.
-  // Very large scenes skip shadows, so the extra shadow pass never doubles a heavy draw.
-  const MAX_SHADOW_MESHES = 3000;
-  function updateShadows() {
-    const lit = rootGroup.children.length <= MAX_SHADOW_MESHES;
-    rootGroup.traverse(function (o) {
-      if (!o.isMesh || !o.material || !o.material.isMeshStandardMaterial) return;
-      o.receiveShadow = lit;
-      o.castShadow = lit && !o.material.transparent;
-    });
-    if (rootGroup.children.length) new THREE.Box3().setFromObject(rootGroup).getBoundingSphere(sceneSphere);
+  /** One glossy material, as VESTA draws atoms, bonds and arrows. */
+  function glossy(color, extra) {
+    return new THREE.MeshPhongMaterial(Object.assign({
+      color: new THREE.Color(color),
+      specular: 0x7a7a7a,
+      shininess: 70
+    }, extra || {}));
   }
 
   // Custom Smooth Trackball / Orbit Camera State
@@ -1576,9 +1550,9 @@
   // Render Cache for Raycasting & Labels
   let displayedAtoms = []; // { origIdx, el, frac, cart, mag, mesh }
   const atomMeshes = [];
-  const sphereGeo = new THREE.SphereGeometry(1, 28, 22);
-  const cylGeo = new THREE.CylinderGeometry(1, 1, 1, 14);
-  const coneGeo = new THREE.ConeGeometry(1, 1, 16);
+  const sphereGeo = new THREE.SphereGeometry(1, 40, 30);
+  const cylGeo = new THREE.CylinderGeometry(1, 1, 1, 20);
+  const coneGeo = new THREE.ConeGeometry(1, 1, 24);
 
   function clearGroup(g) {
     while (g.children.length > 0) {
@@ -1667,11 +1641,7 @@
     displayedAtoms.forEach((da, dIdx) => {
       const info = getElInfo(da.el);
       const rad = isSpace ? info.r * 1.15 : (isStick ? state.bondRadius * 1.05 : (isWire ? 0.08 : info.r * state.atomScale));
-      const mat = new THREE.MeshStandardMaterial({
-        color: new THREE.Color(da.cfg.color),
-        roughness: 0.34,
-        metalness: 0.14
-      });
+      const mat = glossy(da.cfg.color);
       const mesh = new THREE.Mesh(sphereGeo, mat);
       mesh.position.set(da.cart[0], da.cart[1], da.cart[2]);
       mesh.scale.setScalar(rad);
@@ -1741,12 +1711,10 @@
         const geo = new THREE.BufferGeometry();
         geo.setAttribute('position', new THREE.Float32BufferAttribute(posArr, 3));
         geo.computeVertexNormals();
-        const mat = new THREE.MeshStandardMaterial({
-          color: new THREE.Color(da.cfg.color),
+        const mat = glossy(da.cfg.color, {
           transparent: true,
           opacity: state.polyOpacity,
-          roughness: 0.4,
-          metalness: 0.05,
+          shininess: 30,
           side: THREE.DoubleSide,
           depthWrite: false
         });
@@ -1785,7 +1753,7 @@
         const tip = start.clone().addScaledVector(dir, totalLen);
 
         addCylinderSegment(start, shaftEnd, 0.095, col);
-        const coneMat = new THREE.MeshStandardMaterial({ color: new THREE.Color(col), roughness: 0.28, metalness: 0.12 });
+        const coneMat = glossy(col);
         const cone = new THREE.Mesh(coneGeo, coneMat);
         cone.position.copy(shaftEnd).lerp(tip, 0.5);
         cone.scale.set(0.24, headLen, 0.24);
@@ -1845,7 +1813,6 @@
       });
     });
 
-    updateShadows();
     updateProjectedLabels();
   }
 
@@ -1853,7 +1820,7 @@
     const dir = new THREE.Vector3().subVectors(p2, p1);
     const len = dir.length();
     if (len < 1e-5) return;
-    const mat = new THREE.MeshStandardMaterial({ color: new THREE.Color(colorHex), roughness: 0.38, metalness: 0.12 });
+    const mat = glossy(colorHex);
     const mesh = new THREE.Mesh(cylGeo, mat);
     mesh.position.copy(p1).lerp(p2, 0.5);
     mesh.scale.set(radius, len, radius);
