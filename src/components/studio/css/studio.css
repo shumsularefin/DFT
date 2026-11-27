@@ -1132,3 +1132,15 @@
     gap: 0.375rem;
   }
 }
+
+/* Crystal | Molecule (D-106): one workspace, two modes. Controls that only make sense in one mode carry
+   data-mode-only and are hidden in the other. */
+.studio-root[data-mode='molecule'] [data-mode-only='crystal'],
+.studio-root:not([data-mode='molecule']) [data-mode-only='molecule'] {
+  display: none !important;
+}
+.studio-root .mol-presets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.375rem;
+}

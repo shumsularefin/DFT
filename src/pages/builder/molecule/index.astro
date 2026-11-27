@@ -1,33 +1,15 @@
 ---
 // @source S-021, S-034, S-042, S-067
-// Material Builder, molecule mode (M10.5): 2D canvas, rough 3D clean-up, XYZ, MOL, POSCAR in a box.
-// Crystal mode is /builder/ (D-105); the Crystal | Molecule links join the two pages.
+// Material Builder, molecule mode: the same VESTA-style workspace as crystal mode (D-105), with the Molecule
+// tab to build an isolated molecule from any element and put it in a vacuum box for VASP (D-106).
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import MoleculeBuilder from '../../../components/tools/builder/MoleculeBuilder';
-import '../../../components/tools/builder/mode-switch.css';
+import StudioWorkspace from '../../../components/studio/StudioWorkspace.astro';
 ---
 
 <BaseLayout
   title="Molecule Builder"
-  description="Draw a molecule on a 2D canvas, clean it up in 3D, export XYZ or MOL, or put it in a box as a POSCAR for VASP, locally in your browser."
-  pageClass="tool"
+  description="Build a molecule atom by atom from any element in the VESTA-style 3D workspace, add hydrogens, put it in a vacuum box as a POSCAR for VASP, or export XYZ or MOL, locally in your browser."
+  pageClass="workspace"
 >
-  <div class="container">
-    <div class="builder-mode-bar">
-      <h1>Material Builder: molecules</h1>
-      <nav class="builder-mode" aria-label="Builder mode">
-        <a class="builder-mode-link" href="/builder/">
-          Crystal
-        </a>
-        <a class="builder-mode-link" href="/builder/molecule/" aria-current="page">
-          Molecule
-        </a>
-      </nav>
-    </div>
-    <p>
-      Draw a molecule, clean it up in 3D, then export XYZ or MOL, or put it in a vacuum box as a POSCAR. Send
-      it to the Input Builder, or open it in Crystal mode to look at it in the 3D workspace.
-    </p>
-    <MoleculeBuilder client:load />
-  </div>
+  <StudioWorkspace mode="molecule" />
 </BaseLayout>

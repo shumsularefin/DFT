@@ -10,8 +10,14 @@ const fb = JSON.parse(readFileSync('firebase.json', 'utf8')) as {
 };
 const header = (source: string, key: string) =>
   fb.hosting.headers.find((h) => h.source === source)!.headers.find((h) => h.key === key)!.value;
-const STUDIO_CSP = header('/builder{,/,/index.html}', 'Content-Security-Policy');
-const SITE_CSP = header('!/builder{,/,/index.html}', 'Content-Security-Policy');
+const STUDIO_CSP = header(
+  '/builder{,/,/index.html,/molecule,/molecule/,/molecule/index.html}',
+  'Content-Security-Policy',
+);
+const SITE_CSP = header(
+  '!/builder{,/,/index.html,/molecule,/molecule/,/molecule/index.html}',
+  'Content-Security-Policy',
+);
 
 /** Serve every page with the CSP Firebase sends in production (the local server sends none). */
 async function withProductionCsp(page: Page) {
@@ -20,7 +26,7 @@ async function withProductionCsp(page: Page) {
     if (req.resourceType() !== 'document') return route.continue();
     const resp = await route.fetch();
     const path = new URL(req.url()).pathname;
-    const csp = path === '/builder/' ? STUDIO_CSP : SITE_CSP;
+    const csp = path === '/builder/' || path === '/builder/molecule/' ? STUDIO_CSP : SITE_CSP;
     await route.fulfill({ response: resp, headers: { ...resp.headers(), 'content-security-policy': csp } });
   });
 }

@@ -124,7 +124,7 @@
         ]
       },
       {
-        "source": "!/builder{,/,/index.html}",
+        "source": "!/builder{,/,/index.html,/molecule,/molecule/,/molecule/index.html}",
         "headers": [
           {
             "key": "X-Frame-Options",
@@ -137,7 +137,7 @@
         ]
       },
       {
-        "source": "/builder{,/,/index.html}",
+        "source": "/builder{,/,/index.html,/molecule,/molecule/,/molecule/index.html}",
         "headers": [
           {
             "key": "X-Frame-Options",

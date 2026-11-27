@@ -4,6 +4,7 @@ import { createIcons } from './iconShim';
 import { MiniPlotly } from './miniPlot';
 import { MiniZip } from './zipShim';
 import { SiteBridge } from './bridge';
+import { initMolecule } from './molecule';
 
 const BASE = '/dft-studio/';
 const SCRIPTS = [
@@ -48,6 +49,8 @@ async function boot() {
       await new Promise((r) => setTimeout(r, 0));
     }
   }
+  // Crystal | Molecule: the Molecule tab, and the switch between the two modes of this one workspace.
+  initMolecule();
   document.documentElement.dataset.studioReady = 'true';
 }
 

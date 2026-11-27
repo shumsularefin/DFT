@@ -1,0 +1,47 @@
+---
+// The Material Builder workspace (DFT Studio code, public/dft-studio/js), hosted natively in the site shell
+// (D-105). Crystal and Molecule are two modes of this one workspace: the same viewer, tool strip and panels,
+// with data-mode switching the controls that only make sense for one of them (D-106). The markup is
+// studio-body.html; boot.ts loads three.js and the Studio scripts after the page is interactive. Studio CSS
+// is page-only and scoped under .studio-root, so it cannot restyle the shell.
+import body from './studio-body.html?raw';
+import './css/workspace.css';
+import './css/tailwind.css';
+import './css/studio.css';
+import '../tools/builder/mode-switch.css';
+
+interface Props {
+  mode: 'crystal' | 'molecule';
+}
+const { mode } = Astro.props;
+// The markup marks Crystal as the current mode; the molecule page marks Molecule instead.
+const html =
+  mode === 'molecule'
+    ? body
+        .replace(
+          '<a class="builder-mode-link" href="/builder/" aria-current="page">',
+          '<a class="builder-mode-link" href="/builder/">',
+        )
+        .replace(
+          '<a class="builder-mode-link" href="/builder/molecule/">',
+          '<a class="builder-mode-link" href="/builder/molecule/" aria-current="page">',
+        )
+    : body;
+---
+
+<div id="studio-root" class="studio-root" data-stage="structure" data-mode={mode}>
+  <a class="studio-skip" href="#viewport-wrap">
+    Skip to the 3D viewer
+  </a>
+  <div id="studio-boot-error" class="studio-boot-error" role="alert" hidden></div>
+  <noscript>
+    <p class="studio-boot-error">
+      The Material Builder needs JavaScript. The handbook pages work without it.
+    </p>
+  </noscript>
+  <Fragment set:html={html} />
+</div>
+
+<script>
+  import './boot';
+</script>

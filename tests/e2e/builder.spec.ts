@@ -2,7 +2,8 @@ import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 // M15.3: keyboard path and axe for the Material Builder. Crystal mode (/builder/) is the Studio workspace,
-// hosted natively in the page (D-105); molecule mode (M10.5) is its own page, /builder/molecule/.
+// hosted natively in the page (D-105); molecule mode (/builder/molecule/) is the same workspace with the
+// Molecule tab, and Crystal | Molecule switches between them in place (D-106).
 // Each test also checks there is no sideways scroll.
 const overflow = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
@@ -76,27 +77,74 @@ test.describe('material builder: crystal mode', () => {
 });
 
 test.describe('material builder: molecule mode', () => {
-  test('keyboard: add an atom from the toolbar, undo with the button; no overflow; axe clean', async ({
+  test('the same workspace with the Molecule tab: presets, any element, hydrogens, undo; axe clean', async ({
     page,
   }) => {
+    test.setTimeout(90_000);
     await page.goto('/builder/molecule/');
-    await page.waitForFunction(() => document.querySelectorAll('astro-island[ssr]').length === 0);
-    const toolbar = page.getByRole('toolbar', { name: 'Molecule editing operations' });
-    await expect(toolbar).toBeVisible();
-    const summary = page.getByText(/heavy\/explicit atom/);
-    await expect(summary).toBeVisible();
-    const before = await summary.innerText();
+    await page.locator('html[data-studio-ready="true"]').waitFor({ timeout: 30_000 });
+    // The crystal workspace, not a separate tool: the same viewer and toolbar, crystal-only controls hidden.
+    await expect(page.locator('iframe')).toHaveCount(0);
+    await expect(page.locator('#viewport-wrap canvas').first()).toBeVisible();
+    await expect(page.locator('#sample-select')).toBeHidden();
+    await expect(page.locator('[data-right-tab="supercell"]')).toBeHidden();
+    if (!(await page.locator('#right-workbench').isVisible())) {
+      await page.locator('#btn-toggle-right').focus();
+      await page.keyboard.press('Enter');
+    }
+    await expect(page.locator('#right-tab-molecule')).toBeVisible();
+    // It starts from ethanol in a vacuum box.
+    await expect(page.locator('#mol-formula')).toHaveText('C2H6O, 9 atoms');
+    await expect.poll(() => atomCount(page)).toBe(9);
 
-    const add = toolbar.getByRole('button', { name: /^Add .* \(keyboard\)$/ });
-    await add.focus();
+    // Any element from the periodic table, added with the keyboard; then undo with the shortcut.
+    await page.locator('#mol-pt-grid [data-el="Si"]').focus();
     await page.keyboard.press('Enter');
-    await expect(summary).not.toHaveText(before);
+    await expect(page.locator('#mol-add')).toHaveText('Add Si');
+    await page.locator('#mol-add').focus();
+    await page.keyboard.press('Enter');
+    await expect.poll(() => atomCount(page)).toBe(10);
+    await expect(page.locator('#mol-formula')).toHaveText('C2H6OSi, 10 atoms');
+    await page.keyboard.press('Control+z');
+    await expect.poll(() => atomCount(page)).toBe(9);
 
-    await toolbar.getByRole('button', { name: 'Undo' }).focus();
+    // One carbon, then hydrogens: methane.
+    await page.locator('#mol-pt-grid [data-el="C"]').focus();
     await page.keyboard.press('Enter');
-    await expect(summary).toHaveText(before);
+    await page.locator('#mol-single').focus();
+    await page.keyboard.press('Enter');
+    await page.locator('#mol-hydrogens').focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#mol-formula')).toHaveText('CH4, 5 atoms');
+
+    // A graphene flake (coronene) from the presets.
+    await page
+      .getByRole('group', { name: 'Starting molecules' })
+      .getByRole('button', { name: 'Graphene flake' })
+      .click();
+    await expect(page.locator('#mol-formula')).toHaveText('C24H12, 36 atoms');
 
     expect(await overflow(page)).toBeLessThanOrEqual(0);
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  });
+
+  test('Crystal | Molecule switches in place and each mode keeps its own structure', async ({ page }) => {
+    test.setTimeout(90_000);
+    await openCrystal(page);
+    await expect.poll(() => atomCount(page)).toBe(8);
+    const modes = page.getByRole('navigation', { name: 'Builder mode' });
+    await modes.getByRole('link', { name: 'Molecule' }).click();
+    await page.waitForURL('**/builder/molecule/');
+    await expect.poll(() => atomCount(page)).toBe(9);
+    await expect(page.locator('#sample-select')).toBeHidden();
+    await modes.getByRole('link', { name: 'Crystal' }).click();
+    await page.waitForURL('**/builder/');
+    await expect(modes.getByRole('link', { name: 'Crystal' })).toHaveAttribute('aria-current', 'page');
+    await expect(page.locator('#sample-select')).toBeVisible();
+    await expect.poll(() => atomCount(page)).toBe(8);
+    // The back button returns to the molecule.
+    await page.goBack();
+    await expect.poll(() => atomCount(page)).toBe(9);
+    await expect(modes.getByRole('link', { name: 'Molecule' })).toHaveAttribute('aria-current', 'page');
   });
 });
