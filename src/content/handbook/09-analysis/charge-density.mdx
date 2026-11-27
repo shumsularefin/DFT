@@ -1,5 +1,38 @@
 ---
 id: charge-density
+stage:
+  scene: m09-density
+  states:
+    - id: isosurface
+      section: why
+      params: { show: total, bond: 1.4, level: 0.15, slice: none }
+      layers: [isosurface, atoms]
+      camera: iso
+      caption: 'The electron density of an H2-like molecule, stored on a grid in a box as in a CHGCAR, drawn as the surface where it equals 15 percent of its peak. The grid holds 2.00 electrons.'
+    - id: slice
+      section: intuition
+      params: { show: total, bond: 1.4, level: 0.15, slice: along, offset: 0 }
+      layers: [slice, isosurface]
+      camera: iso
+      caption: 'A colour slice through the bond axis shows the values one isosurface hides: the density peaks at the two nuclei and stays high in the bond between them.'
+    - id: difference
+      section: lab
+      params: { show: difference, bond: 1.4, level: 0.15, slice: none }
+      layers: [isosurface]
+      camera: iso
+      caption: 'The molecule minus two free atoms. Charge gathers in the bond and leaves the outer sides of the atoms; about 0.11 electrons move in all, and the difference integrates to zero.'
+    - id: stretched
+      section: what-changes
+      params: { show: difference, bond: 2.5, level: 0.15, slice: along }
+      layers: [isosurface, slice]
+      camera: iso
+      caption: 'Stretched to 2.5 a0, the overlap of the two orbitals drops from 0.66 to 0.33 and the gain at the bond midpoint falls from 0.044 to 0.028 e/a0^3.'
+    - id: high-isovalue
+      section: mistakes
+      params: { show: total, bond: 1.4, level: 0.6, slice: none }
+      layers: [isosurface]
+      camera: iso
+      caption: 'At 60 percent of the peak the surface splits into two blobs around the nuclei and the bond seems to vanish. The isovalue shapes the picture, so state it and compare plots drawn at the same value.'
 title: Charge density and volumetric files
 module: 9
 order: 5

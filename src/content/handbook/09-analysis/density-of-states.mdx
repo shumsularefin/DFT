@@ -1,5 +1,38 @@
 ---
 id: density-of-states
+stage:
+  scene: m09-dos
+  states:
+    - id: bands-and-dos
+      section: why
+      params: { model: fcc-indirect, method: gaussian, sigma: 0.1, kmesh: 12, energy: 0 }
+      layers: [surface, dos]
+      camera: iso
+      caption: 'The density of states counts how many states of the whole zone sit at each energy. Left, the two bands over the kz = 0 plane; right, their DOS from a 12 x 12 x 12 k-mesh on the same energy axis.'
+    - id: energy-cut
+      section: intuition
+      params: { model: fcc-indirect, method: gaussian, energy: -2 }
+      layers: [cut, dos]
+      camera: iso
+      caption: 'A cut at -2 eV through the valence band. D(E) there counts the k-points of the whole zone whose band energy falls in a narrow window around the cut, so flat parts of a band give tall peaks.'
+    - id: wide-smearing
+      section: lab
+      params: { model: fcc-indirect, method: gaussian, sigma: 0.5, energy: 0 }
+      layers: [dos, reference]
+      camera: front
+      caption: 'Gaussian smearing of SIGMA = 0.5 eV washes the band edges out: the 1.20 eV gap now looks about 0.5 eV wide. Use a small SIGMA, or tetrahedra, before reading a gap off a DOS.'
+    - id: tetrahedra
+      section: in-vasp
+      params: { model: fcc-indirect, method: tetra, nedos: 2001, energy: 0 }
+      layers: [dos]
+      camera: front
+      caption: 'Tetrahedra (ISMEAR = -5) on NEDOS = 2001 energies: sharp band edges and no Gaussian tails. The edges rise slowly from zero, so a gap read at 1 percent of the peak still comes out a little too wide.'
+    - id: coarse-mesh
+      section: mistakes
+      params: { model: fcc-indirect, method: gaussian, sigma: 0.02, kmesh: 4, energy: 0 }
+      layers: [dos]
+      camera: front
+      caption: 'A 4 x 4 x 4 mesh with only 0.02 eV of smearing breaks the DOS into spikes, one per group of k-points. Spikes like these mean the mesh is too coarse for the smearing, not that the material has sharp features.'
 title: Reading a density of states (DOS)
 module: 9
 order: 3

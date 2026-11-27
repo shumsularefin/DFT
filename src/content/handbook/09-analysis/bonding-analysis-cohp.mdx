@@ -1,5 +1,32 @@
 ---
 id: bonding-analysis-cohp
+stage:
+  scene: m09-cohp
+  states:
+    - id: bond
+      section: why
+      params: { electrons: '2', hop: 2.5, delta: 0 }
+      layers: [bonding, levels, cohp]
+      camera: front
+      caption: 'Two orbitals mix into a bonding level at -2.5 eV and an antibonding one at +2.5 eV. With two electrons only the bonding level fills, -COHP is positive there, and the ICOHP is -5.0 eV: one full bond.'
+    - id: filled-antibonding
+      section: intuition
+      params: { electrons: '4', hop: 2.5, delta: 0 }
+      layers: [antibonding, electrons, cohp]
+      camera: front
+      caption: 'With four electrons the antibonding level fills too. Its COHP cancels the bonding part exactly, so the ICOHP is 0 eV and the bond order 0, as for He2.'
+    - id: polar
+      section: math
+      params: { electrons: '2', hop: 2.5, delta: 2 }
+      layers: [bonding, levels]
+      camera: front
+      caption: 'On-site energies 2 eV apart make the bond polar: the bonding orbital leans toward the lower atom, the levels move to plus and minus 2.69 eV, and the ICOHP shrinks to -4.64 eV because cA cB gets smaller.'
+    - id: fermi-level
+      section: mistakes
+      params: { electrons: '3', hop: 3.5, delta: 0 }
+      layers: [electrons, fermi, cohp]
+      camera: front
+      caption: 'Three electrons put one in the antibonding level: ICOHP -3.5 eV, bond order 0.5. The same two levels give a full bond, half a bond or none, so a COHP means little until you know where the Fermi level sits.'
 title: Bonding analysis with COHP and LOBSTER
 module: 9
 order: 6

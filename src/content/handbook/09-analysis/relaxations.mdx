@@ -1,5 +1,38 @@
 ---
 id: relaxations
+stage:
+  scene: m09-relax
+  states:
+    - id: start
+      section: why
+      params: { step: 0, method: sd, potim: 0.5, ediffg: 0.02 }
+      layers: [forces, vacancy]
+      camera: iso
+      caption: 'A 31-atom cell with a vacancy, started from rattled positions. Every atom feels a force, the largest 1.32 eV/Å; a relaxation moves the atoms downhill until the largest force falls below |EDIFFG|.'
+    - id: steepest-descent
+      section: intuition
+      params: { step: 10, method: sd, potim: 0.5, ediffg: 0.02 }
+      layers: [trails, trace]
+      camera: iso
+      caption: 'After 10 steepest descent steps the trails show each atom sliding toward its new site. The log10 Fmax trace falls steadily and crosses |EDIFFG| = 0.02 eV/Å at step 9.'
+    - id: bfgs
+      section: lab
+      params: { step: 10, method: bfgs, potim: 0.5, ediffg: 0.02 }
+      layers: [trace, atoms]
+      camera: iso
+      caption: 'BFGS (like IBRION = 1) learns the curvature from the force history and meets the same criterion at step 6, with the energy already within 0.1 meV of the lowest one reached.'
+    - id: energy-before-forces
+      section: in-vasp
+      params: { step: 40, method: damped, potim: 1, ediffg: 0.02 }
+      layers: [trace, forces]
+      camera: iso
+      caption: 'Damped dynamics (like IBRION = 3) with POTIM = 1 after 40 steps: the energy is within 0.1 meV of its lowest value, yet the largest force is still 0.08 eV/Å. The energy settles before the forces do, so a force criterion (EDIFFG < 0) is the safer stop.'
+    - id: overshoot
+      section: mistakes
+      params: { step: 20, method: sd, potim: 2, ediffg: 0.02 }
+      layers: [trace, forces]
+      camera: iso
+      caption: 'Steepest descent with POTIM = 2: every step overshoots, the atoms rattle back and forth, and the largest force never falls below 0.02 eV/Å in 40 steps. A run that stops at NSW like this is not relaxed.'
 title: Judging a geometry relaxation
 module: 9
 order: 2
