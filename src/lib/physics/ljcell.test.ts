@@ -57,8 +57,8 @@ describe('evaluate', () => {
       for (let c = 0; c < 3; c++) {
         const plus = structuredClone(cell);
         const minus = structuredClone(cell);
-        plus.positions[i]![c] += h;
-        minus.positions[i]![c] -= h;
+        plus.positions[i]![c] = plus.positions[i]![c]! + h;
+        minus.positions[i]![c] = minus.positions[i]![c]! - h;
         const g = (evaluate(plus).energy - evaluate(minus).energy) / (2 * h);
         expect(res.forces[i]![c]).toBeCloseTo(-g, 6);
       }

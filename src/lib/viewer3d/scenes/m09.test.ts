@@ -11,8 +11,8 @@ const frame = (id: string, p: Params = {}): SceneFrame => {
   return def.build({ ...withDefaults(def), ...p });
 };
 const readout = (f: SceneFrame, start: string): string => {
-  const r = f.readouts.find((x) => x.label.startsWith(start));
-  if (!r) throw new Error(`no readout "${start}" in ${f.readouts.map((x) => x.label).join(' | ')}`);
+  const r = (f.readouts ?? []).find((x) => x.label.startsWith(start));
+  if (!r) throw new Error(`no readout "${start}" in ${(f.readouts ?? []).map((x) => x.label).join(' | ')}`);
   return r.value;
 };
 const num = (s: string, i = 0): number => Number((s.match(/-?\d+(\.\d+)?/g) ?? [])[i]);

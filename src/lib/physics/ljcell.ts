@@ -67,7 +67,7 @@ export function evaluate(cell: Cell, p: LJ = TOY_LJ): EFS {
   for (let a = -1; a <= 1; a++)
     for (let b = -1; b <= 1; b++)
       for (let c = -1; c <= 1; c++)
-        shifts.push([0, 1, 2].map((k) => a * L[0][k] + b * L[1][k] + c * L[2][k]) as V3);
+        shifts.push([0, 1, 2].map((k) => a * L[0][k]! + b * L[1][k]! + c * L[2][k]!) as V3);
   for (let i = 0; i < n; i++)
     for (let j = i; j < n; j++)
       for (const t of shifts) {
@@ -79,12 +79,13 @@ export function evaluate(cell: Cell, p: LJ = TOY_LJ): EFS {
         const { e, de } = ljPair(p, r);
         const w = i === j ? 0.5 : 1; // a self-image pair is met twice (t and -t)
         energy += w * e;
-        for (let a = 0; a < 3; a++) for (let b = 0; b < 3; b++) S[3 * a + b] += (w * de * d[a]! * d[b]!) / r;
+        for (let a = 0; a < 3; a++)
+          for (let b = 0; b < 3; b++) S[3 * a + b] = S[3 * a + b]! + (w * de * d[a]! * d[b]!) / r;
         if (i !== j)
           for (let a = 0; a < 3; a++) {
             const f = (de * d[a]!) / r; // dE/dR_j along a
-            forces[j]![a] -= f;
-            forces[i]![a] += f;
+            forces[j]![a] = forces[j]![a]! - f;
+            forces[i]![a] = forces[i]![a]! + f;
           }
       }
   const volume = Math.abs(det(L));
