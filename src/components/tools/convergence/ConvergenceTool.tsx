@@ -56,13 +56,15 @@ export default function ConvergenceTool() {
     if (r.kind) setKind(r.kind);
     setNotes(r.warnings);
   };
-  // A series handed over by another tool (DFT Studio step 5 sends its kpoint_convergence.csv rows).
+  // A series handed over by another tool (the Material Builder step 5 sends its kpoint_convergence.csv rows).
   useEffect(() => {
     const h = takeHandoff(['series']);
     if (!h || h.kind !== 'series') return;
     try {
       add(ingestCsv(h.csv));
-      setMsg(`Loaded ${h.label ?? 'a series'} from ${h.from === 'dft-studio' ? 'DFT Studio' : h.from}.`);
+      setMsg(
+        `Loaded ${h.label ?? 'a series'} from ${h.from === 'dft-studio' ? 'the Material Builder' : h.from}.`,
+      );
     } catch (e) {
       setNotes([(e as Error).message]);
     }

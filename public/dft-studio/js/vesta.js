@@ -1838,8 +1838,8 @@
         el.className = 'absolute text-[10px] font-mono-code font-bold px-1 rounded shadow-xs';
         el.style.left = `${p.x + 6}px`;
         el.style.top = `${p.y - 10}px`;
-        el.style.background = state.dark ? 'rgba(15,19,26,0.78)' : 'rgba(255,255,255,0.82)';
-        el.style.color = state.dark ? '#f1f5f9' : '#0f172a';
+        el.style.background = state.dark ? 'rgba(38,38,36,0.8)' : 'rgba(250,249,245,0.85)';
+        el.style.color = state.dark ? '#f5f4ef' : '#141413';
         el.textContent = `${da.el}${da.origIdx + 1}`;
         overlay.appendChild(el);
       });
@@ -2284,7 +2284,7 @@
 
     sym.orbits.forEach((o) => {
       const d = document.createElement('div');
-      d.className = 'flex items-center justify-between px-1.5 py-1 rounded border border-subtle hover:bg-[var(--bg-hover)] cursor-pointer';
+      d.className = 'flex items-center justify-between px-1.5 py-1 rounded border border-subtle hover:bg-[var(--st-bg-hover)] cursor-pointer';
       d.innerHTML = `
         <span class="font-mono-code font-semibold text-main">${o.wyckoff} <b>${o.el}</b> <span class="text-mut font-normal">[×${o.siteSymOrder}]</span></span>
         <span class="font-mono-code text-sub">(${o.repFrac.map(x=>x.toFixed(4)).join(', ')})</span>
@@ -2317,7 +2317,7 @@
     const nnEl = document.getElementById('nn-pairs-list');
     const nnPairs = computePairwiseNNBonds();
     nnEl.innerHTML = nnPairs.map(x =>
-      `<div class="flex justify-between px-1 py-0.5 rounded hover:bg-[var(--bg-hover)]"><span class="font-semibold text-main">${x.pair}</span><span>${x.d.toFixed(4)} Å</span></div>`
+      `<div class="flex justify-between px-1 py-0.5 rounded hover:bg-[var(--st-bg-hover)]"><span class="font-semibold text-main">${x.pair}</span><span>${x.d.toFixed(4)} Å</span></div>`
     ).join('') || '<div class="text-mut">No pairs within range</div>';
 
     // Multi-Tolerance Symmetry Breaking Scan (like spglib/pymatgen symprec scan)
@@ -2377,7 +2377,7 @@
       const mLen = vNorm(a.mag);
       if (mLen < 0.01 && s.atoms.length > 24) return;
       const row = document.createElement('div');
-      row.className = 'flex items-center justify-between px-1.5 py-0.5 rounded hover:bg-[var(--bg-hover)]';
+      row.className = 'flex items-center justify-between px-1.5 py-0.5 rounded hover:bg-[var(--st-bg-hover)]';
       const colorCls = a.mag[2] > 0.05 ? 'text-rose-500 font-semibold' : (a.mag[2] < -0.05 ? 'text-sky-500 font-semibold' : 'text-mut');
       row.innerHTML = `
         <span>#${i+1} <b>${a.el}</b></span>
@@ -2412,7 +2412,7 @@
       if (filter && !a.el.toLowerCase().includes(filter) && !String(i+1).includes(filter)) return;
       const isSel = state.selectedAtomIndices.includes(i);
       const row = document.createElement('div');
-      row.className = `flex items-center justify-between py-1 px-1 cursor-pointer ${isSel ? 'bg-[var(--bg-active)] font-semibold' : 'hover:bg-[var(--bg-hover)]'}`;
+      row.className = `flex items-center justify-between py-1 px-1 cursor-pointer ${isSel ? 'bg-[var(--st-bg-active)] font-semibold' : 'hover:bg-[var(--st-bg-hover)]'}`;
       row.innerHTML = `
         <span class="w-12">#${i+1} <b>${a.el}</b></span>
         <span class="flex-1 text-sub">${a.frac.map(x=>x.toFixed(3)).join(' ')}</span>
@@ -2622,16 +2622,23 @@
     showToast('Saved PNG snapshot');
   });
 
-  // Theme Toggle
-  document.getElementById('btn-theme').addEventListener('click', () => {
-    state.dark = !state.dark;
-    document.documentElement.classList.toggle('dark', state.dark);
-    const ic = document.getElementById('theme-icon');
-    ic.setAttribute('data-lucide', state.dark ? 'sun' : 'moon');
-    if (window.lucide) lucide.createIcons();
+  // Theme: follow the site (html[data-theme], or prefers-color-scheme when unset). The site shell owns the
+  // switch; the viewer only redraws its lines and labels when the theme changes.
+  const darkQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  function siteIsDark() {
+    const t = document.documentElement.dataset.theme;
+    if (t === 'dark' || t === 'light') return t === 'dark';
+    return !!(darkQuery && darkQuery.matches);
+  }
+  function syncTheme() {
+    const dark = siteIsDark();
+    if (dark === state.dark) return;
+    state.dark = dark;
     rebuildScene();
     notifyStudio();
-  });
+  }
+  new MutationObserver(syncTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  if (darkQuery && darkQuery.addEventListener) darkQuery.addEventListener('change', syncTheme);
 
   // Sidebar Toggles
   document.getElementById('btn-toggle-left').addEventListener('click', () => {
@@ -2898,10 +2905,10 @@
     // Tab 1: Cell & Wyckoff
     document.getElementById('rep-tab-overview').innerHTML = `
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        <div class="border border-subtle rounded p-2" style="background:var(--console-bg);"><div class="text-[9.5px] text-mut">Space Group</div><div class="font-mono-code font-bold text-blue-500">${sym.estSG}</div></div>
-        <div class="border border-subtle rounded p-2" style="background:var(--console-bg);"><div class="text-[9.5px] text-mut">Formula / Atoms</div><div class="font-mono-code font-bold text-main">${formula} (${s.atoms.length})</div></div>
-        <div class="border border-subtle rounded p-2" style="background:var(--console-bg);"><div class="text-[9.5px] text-mut">Volume / V per Atom</div><div class="font-mono-code font-bold text-main">${p.vol.toFixed(2)} Å³ (${(p.vol/s.atoms.length).toFixed(2)})</div></div>
-        <div class="border border-subtle rounded p-2" style="background:var(--console-bg);"><div class="text-[9.5px] text-mut">Density · APF</div><div class="font-mono-code font-bold text-main">${density.toFixed(2)} g/cm³ · ${apf.toFixed(1)}%</div></div>
+        <div class="border border-subtle rounded p-2" style="background:var(--st-console-bg);"><div class="text-[9.5px] text-mut">Space Group</div><div class="font-mono-code font-bold text-blue-500">${sym.estSG}</div></div>
+        <div class="border border-subtle rounded p-2" style="background:var(--st-console-bg);"><div class="text-[9.5px] text-mut">Formula / Atoms</div><div class="font-mono-code font-bold text-main">${formula} (${s.atoms.length})</div></div>
+        <div class="border border-subtle rounded p-2" style="background:var(--st-console-bg);"><div class="text-[9.5px] text-mut">Volume / V per Atom</div><div class="font-mono-code font-bold text-main">${p.vol.toFixed(2)} Å³ (${(p.vol/s.atoms.length).toFixed(2)})</div></div>
+        <div class="border border-subtle rounded p-2" style="background:var(--st-console-bg);"><div class="text-[9.5px] text-mut">Density · APF</div><div class="font-mono-code font-bold text-main">${density.toFixed(2)} g/cm³ · ${apf.toFixed(1)}%</div></div>
       </div>
       <div class="border border-subtle rounded p-2.5 font-mono-code text-[10.5px] grid grid-cols-3 gap-1.5">
         <span>a = ${p.a.toFixed(5)} Å</span><span>b = ${p.b.toFixed(5)} Å</span><span>c = ${p.c.toFixed(5)} Å</span>
@@ -2974,7 +2981,7 @@
     }
     const topPeaks = [...xrd].sort((a,b) => b.relI - a.relI).slice(0, 6);
     const xrdSvg = `
-      <svg viewBox="0 0 ${svgW} ${svgH}" class="w-full h-36 rounded border border-subtle" style="background:var(--console-bg);">
+      <svg viewBox="0 0 ${svgW} ${svgH}" class="w-full h-36 rounded border border-subtle" style="background:var(--st-console-bg);">
         <line x1="${padL}" y1="${padT+plotH}" x2="${svgW-padR}" y2="${padT+plotH}" stroke="currentColor" stroke-opacity="0.3" />
         <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT+plotH}" stroke="currentColor" stroke-opacity="0.3" />
         ${[10,20,30,40,50,60,70,80].map(t => `<text x="${xMap(t)}" y="${svgH-6}" font-size="9" text-anchor="middle" fill="currentColor" opacity="0.6">${t}°</text>`).join('')}
@@ -2996,7 +3003,7 @@
               <td>${pk.mult}</td>
               <td>
                 <div class="flex items-center gap-2">
-                  <div class="w-24 h-2 rounded bg-[var(--border-subtle)] overflow-hidden"><div class="h-full bg-blue-500" style="width:${pk.relI.toFixed(1)}%"></div></div>
+                  <div class="w-24 h-2 rounded bg-[var(--st-border-subtle)] overflow-hidden"><div class="h-full bg-blue-500" style="width:${pk.relI.toFixed(1)}%"></div></div>
                   <span>${pk.relI.toFixed(1)}%</span>
                 </div>
               </td>
@@ -3033,8 +3040,8 @@
   // Magnetic Controls
   const updateMagModeBtns = () => {
     const isCol = state.magMode === 'collinear';
-    document.getElementById('btn-mag-col').className = `px-2 py-0.5 text-[10.5px] font-semibold cursor-pointer ${isCol ? 'bg-blue-600 text-white' : 'text-sub'}`;
-    document.getElementById('btn-mag-ncol').className = `px-2 py-0.5 text-[10.5px] font-semibold cursor-pointer ${!isCol ? 'bg-blue-600 text-white' : 'text-sub'}`;
+    document.getElementById('btn-mag-col').className = `px-2 py-0.5 text-[10.5px] font-semibold cursor-pointer ${isCol ? 'bg-blue-600 text-on-accent' : 'text-sub'}`;
+    document.getElementById('btn-mag-ncol').className = `px-2 py-0.5 text-[10.5px] font-semibold cursor-pointer ${!isCol ? 'bg-blue-600 text-on-accent' : 'text-sub'}`;
     renderMagneticUI();
     refreshVaspPreview();
   };
@@ -3795,16 +3802,13 @@
   // 12. INITIALIZE APP
   // =========================================================================
   if (window.lucide) lucide.createIcons();
-  if (window.innerWidth < 1024) {
+  // Narrow workspace (the site sidebar takes part of the window): the side panels start closed, as drawers.
+  const ws = document.querySelector('.studio-root');
+  if ((ws ? ws.clientWidth : window.innerWidth) <= 1000) {
     document.getElementById('left-sidebar').classList.add('hidden');
     document.getElementById('right-workbench').classList.add('hidden');
   }
-  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    state.dark = true;
-    document.documentElement.classList.add('dark');
-    document.getElementById('theme-icon').setAttribute('data-lucide', 'sun');
-    if (window.lucide) lucide.createIcons();
-  }
+  state.dark = siteIsDark();
   loadSample('nio_afm');
   if (animId) cancelAnimationFrame(animId);
   animate();

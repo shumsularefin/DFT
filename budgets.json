@@ -12,6 +12,10 @@
     "tool": {
       "initialJsKB": 200,
       "cssKB": 30
+    },
+    "workspace": {
+      "initialJsKB": 200,
+      "cssKB": 30
     }
   },
   "lazyChunks": {

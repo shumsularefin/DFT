@@ -10,7 +10,7 @@ const ROUTES = [
   '/tools/tolerance-factor/',
   '/studio/',
   '/builder/',
-  '/dft-studio/',
+  '/builder/molecule/',
   '/practice/',
 ];
 

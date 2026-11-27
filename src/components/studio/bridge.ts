@@ -200,7 +200,7 @@ export const SiteBridge = {
 
   sendSeries: (csv: string, label: string) => sendSeries(csv, label),
 
-  /** Read (and clear) a hand-off addressed to the builder or Studio. */
+  /** Read (and clear) a hand-off addressed to the Material Builder. */
   takeIncoming(): Incoming | null {
     const h = takeHandoff(['structure', 'composition', 'molecule']);
     if (!h) return null;
@@ -222,8 +222,8 @@ export const SiteBridge = {
     };
   },
   /**
-   * Hand the structure to a site tool and go there. In the builder page Studio runs in a frame,
-   * so navigation goes to the top window. MAGMOM is passed only if it matches the atom count.
+   * Hand the structure to a site tool and go there. The Studio runs in the builder page itself (D-105),
+   * so this window navigates. MAGMOM is passed only if it matches the atom count.
    */
   sendTo(tool: SiteToolId, poscar: string, label: string, magmom?: string): boolean {
     const t = SITE_TOOLS.find((x) => x.id === tool);
@@ -231,7 +231,7 @@ export const SiteBridge = {
     const structure = readAny(poscar);
     const mm = magmom && expandRepeats(magmom).length === structure.species.length ? magmom : undefined;
     const ok = stashHandoff({ v: 1, kind: 'structure', from: 'dft-studio', structure, label, magmom: mm });
-    if (ok) (window.top ?? window).location.assign(t.url);
+    if (ok) window.location.assign(t.url);
     return ok;
   },
 };
@@ -239,7 +239,7 @@ export const SiteBridge = {
 /** Hand a convergence table (plotter CSV columns) to /tools/convergence/. */
 export function sendSeries(csv: string, label: string): boolean {
   const ok = stashHandoff({ v: 1, kind: 'series', from: 'dft-studio', csv, label });
-  if (ok) (window.top ?? window).location.assign('/tools/convergence/');
+  if (ok) window.location.assign('/tools/convergence/');
   return ok;
 }
 

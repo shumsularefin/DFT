@@ -53,22 +53,23 @@ for (const theme of ['light', 'dark'] as const) {
       }
     });
 
-    test('the builder poster has a primary start button and says what Studio is', async ({ page }) => {
+    test('the builder workspace is the Material Builder and its primary action uses the site accent', async ({
+      page,
+    }) => {
       await open(page, '/builder/', theme);
-      await expect(page.getByRole('heading', { name: /DFT Studio, the 3D crystal editor/ })).toBeVisible();
-      const start = page.getByRole('button', { name: 'Start the 3D crystal editor' });
-      // The button eases its colour when the theme changes, so poll until it has settled.
+      await page.locator('html[data-studio-ready="true"]').waitFor({ timeout: 30_000 });
+      await expect(page.getByRole('heading', { level: 1, name: 'Material Builder' })).toBeAttached();
+      await expect(page.getByText('DFT Studio')).toHaveCount(0);
+      const primary = page.locator('#btn-export-poscar');
+      // Buttons may ease their colour when the theme changes, so poll until it has settled.
       const look = () =>
-        start.evaluate((b) => {
-          const s = getComputedStyle(b);
-          const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+        primary.evaluate((b) => {
           const probe = document.createElement('span');
-          probe.style.color = accent;
+          probe.style.color = 'var(--accent)';
           document.body.append(probe);
           const accentRgb = getComputedStyle(probe).color;
           probe.remove();
-          const r = b.getBoundingClientRect();
-          return { bg: s.backgroundColor, accentRgb, h: r.height };
+          return { bg: getComputedStyle(b).backgroundColor, accentRgb };
         });
       await expect
         .poll(async () => {
@@ -76,25 +77,25 @@ for (const theme of ['light', 'dark'] as const) {
           return l.bg === l.accentRgb;
         })
         .toBe(true);
-      expect((await look()).h).toBeGreaterThanOrEqual(44);
     });
   });
 }
 
-test('builder mode tabs: the selected tab is marked and the arrow keys switch modes', async ({ page }) => {
+test('builder mode links: the current mode is marked and links to the other mode', async ({ page }) => {
   await open(page, '/builder/');
-  const crystal = page.getByRole('tab', { name: /Crystal mode/ });
-  const molecule = page.getByRole('tab', { name: /Molecule mode/ });
-  await expect(crystal).toHaveAttribute('aria-selected', 'true');
+  const modes = page.getByRole('navigation', { name: 'Builder mode' });
+  const crystal = modes.getByRole('link', { name: 'Crystal' });
+  const molecule = modes.getByRole('link', { name: 'Molecule' });
+  await expect(crystal).toHaveAttribute('aria-current', 'page');
+  await expect(molecule).not.toHaveAttribute('aria-current', 'page');
   const bg = (l: typeof crystal) => l.evaluate((b) => getComputedStyle(b).backgroundColor);
   expect(await bg(crystal)).not.toBe(await bg(molecule));
-  await crystal.focus();
-  await page.keyboard.press('ArrowRight');
-  await expect(molecule).toHaveAttribute('aria-selected', 'true');
-  await expect(molecule).toBeFocused();
-  await expect(page.getByRole('tabpanel')).toBeVisible();
-  await page.keyboard.press('Home');
-  await expect(crystal).toHaveAttribute('aria-selected', 'true');
+  await molecule.focus();
+  await page.keyboard.press('Enter');
+  await page.waitForURL('**/builder/molecule/');
+  await expect(
+    page.getByRole('navigation', { name: 'Builder mode' }).getByRole('link', { name: 'Molecule' }),
+  ).toHaveAttribute('aria-current', 'page');
 });
 
 test('pages with learner state hydrate without a React mismatch and show no storage warning', async ({

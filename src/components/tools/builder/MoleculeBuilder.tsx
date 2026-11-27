@@ -438,11 +438,11 @@ export default function MoleculeBuilder() {
                         structure: boxed.structure,
                         label: `${smiles} in box`,
                       },
-                      '/dft-studio/',
+                      '/builder/',
                     )
                   }
                 >
-                  Open in DFT Studio
+                  Open in Crystal mode
                 </button>
               </div>
             </>

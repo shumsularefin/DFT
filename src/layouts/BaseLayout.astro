@@ -15,7 +15,7 @@ import StatusLine from '../components/chrome/StatusLine.astro';
 interface Props {
   title?: string;
   description?: string;
-  pageClass?: 'content' | 'island' | 'tool';
+  pageClass?: 'content' | 'island' | 'tool' | 'workspace';
 }
 const { title, description = SITE.tagline, pageClass = 'content' } = Astro.props;
 const fullTitle = title ? `${title} | ${SITE.name}` : SITE.name;

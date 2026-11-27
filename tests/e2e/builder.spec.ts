@@ -1,81 +1,77 @@
 import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
-// M15.3: keyboard path and axe for the Material Builder (crystal mode is DFT Studio, M10.5 molecule mode).
-// The project runs at 360 px (mobile-360) and desktop; each test also checks there is no sideways scroll.
-const URL = '/builder/';
-
-async function open(page: Page) {
-  await page.goto(URL);
-  await page.waitForFunction(() => document.querySelectorAll('astro-island[ssr]').length === 0);
-}
+// M15.3: keyboard path and axe for the Material Builder. Crystal mode (/builder/) is the Studio workspace,
+// hosted natively in the page (D-105); molecule mode (M10.5) is its own page, /builder/molecule/.
+// Each test also checks there is no sideways scroll.
 const overflow = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
 
-// Crystal mode is DFT Studio in a same-origin frame (D-103), started from a poster; the frame's own keyboard and checks are tested here.
-const studio = (page: Page) => page.frameLocator('iframe.mb-studio-frame');
+async function openCrystal(page: Page) {
+  await page.goto('/builder/');
+  await page.locator('html[data-studio-ready="true"]').waitFor({ timeout: 30_000 });
+}
 const atomCount = (page: Page) =>
-  page
-    .frames()
-    .find((f) => f.url().includes('/dft-studio/'))!
-    .evaluate(
-      () =>
-        (window as unknown as { VESTA: { getStructure(): { atoms: unknown[] } } }).VESTA.getStructure().atoms
-          .length,
-    );
+  page.evaluate(
+    () =>
+      (window as unknown as { VESTA: { getStructure(): { atoms: unknown[] } } }).VESTA.getStructure().atoms
+        .length,
+  );
 
-test.describe('material builder: crystal mode (DFT Studio)', () => {
+test.describe('material builder: crystal mode', () => {
   test('keyboard: supercell, undo and redo shortcuts, structure checks; no overflow; axe clean', async ({
     page,
   }) => {
-    test.setTimeout(90_000); // Studio boots three.js and the editor in the frame
-    await open(page);
-    // 3D loads lazily: no Studio frame until the poster's button is pressed (here with the keyboard).
-    await expect(page.locator('iframe.mb-studio-frame')).toHaveCount(0);
-    await page.getByRole('button', { name: 'Start the 3D crystal editor' }).focus();
-    await page.keyboard.press('Enter');
-    const f = studio(page);
-    await f.locator('html[data-studio-ready="true"]').waitFor();
+    test.setTimeout(90_000); // the workspace boots three.js and the editor
+    await openCrystal(page);
+    // Native, not framed: the workspace is part of the page.
+    await expect(page.locator('iframe')).toHaveCount(0);
     await expect.poll(() => atomCount(page)).toBe(8);
 
-    // On narrow frames the workbench is a drawer that starts closed; open it from the header with the keyboard.
-    if (!(await f.locator('#right-workbench').isVisible())) {
-      await f.locator('#btn-toggle-right').focus();
+    // On narrow workspaces the workbench is a drawer that starts closed; open it from the toolbar with the keyboard.
+    if (!(await page.locator('#right-workbench').isVisible())) {
+      await page.locator('#btn-toggle-right').focus();
       await page.keyboard.press('Enter');
     }
-    await f.locator('#sc-na').fill('2');
-    await f.locator('#sc-nb').fill('2');
-    await f.locator('#sc-nc').fill('2');
-    await f.locator('#btn-apply-supercell').focus();
+    await page.locator('#sc-na').fill('2');
+    await page.locator('#sc-nb').fill('2');
+    await page.locator('#sc-nc').fill('2');
+    await page.locator('#btn-apply-supercell').focus();
     await page.keyboard.press('Enter');
     await expect.poll(() => atomCount(page)).toBe(64);
 
-    // Focus stays on the Apply button (outside a text field), where Studio's shortcuts apply.
+    // Focus stays on the Apply button (outside a text field), where the workspace shortcuts apply.
     await page.keyboard.press('Control+z');
     await expect.poll(() => atomCount(page)).toBe(8);
     await page.keyboard.press('Control+Shift+z');
     await expect.poll(() => atomCount(page)).toBe(64);
 
-    // The site's B001 to B012 checks run on every change and show in the header badge and the Checks tab.
-    await expect(f.locator('#site-checks-count')).toHaveText('0');
-    await f.locator('#btn-site-checks').focus();
+    // The site's B001 to B012 checks run on every change and show in the toolbar badge and the Checks tab.
+    await expect(page.locator('#site-checks-count')).toHaveText('0');
+    await page.locator('#btn-site-checks').focus();
     await page.keyboard.press('Enter');
-    await expect(f.locator('#checks-summary')).toContainText(/all clear|^0 error/);
+    await expect(page.locator('#checks-summary')).toContainText(/all clear|^0 error/);
 
     expect(await overflow(page)).toBeLessThanOrEqual(0);
-    // The builder page around the frame; every step and tab inside Studio is axe tested in dft-studio.spec.ts.
-    expect((await new AxeBuilder({ page }).exclude('iframe.mb-studio-frame').analyze()).violations).toEqual(
-      [],
-    );
+    // The whole page, shell and workspace; every step and tab is axe tested in builder-studio.spec.ts.
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   });
 
   test('the handbook templates are in the structure menu', async ({ page }) => {
-    await open(page);
-    await page.getByRole('button', { name: 'Start the 3D crystal editor' }).click();
-    const f = studio(page);
-    await f.locator('html[data-studio-ready="true"]').waitFor();
-    await f.locator('#sample-select').selectOption('site:perovskite');
+    await openCrystal(page);
+    await page.locator('#sample-select').selectOption('site:perovskite');
     await expect.poll(() => atomCount(page)).toBe(5);
+  });
+
+  test('Crystal | Molecule links join the two modes', async ({ page }) => {
+    await openCrystal(page);
+    const modes = page.getByRole('navigation', { name: 'Builder mode' });
+    await expect(modes.getByRole('link', { name: 'Crystal' })).toHaveAttribute('aria-current', 'page');
+    await modes.getByRole('link', { name: 'Molecule' }).click();
+    await page.waitForURL('**/builder/molecule/');
+    const back = page.getByRole('navigation', { name: 'Builder mode' });
+    await expect(back.getByRole('link', { name: 'Molecule' })).toHaveAttribute('aria-current', 'page');
+    await expect(back.getByRole('link', { name: 'Crystal' })).toHaveAttribute('href', '/builder/');
   });
 });
 
@@ -83,8 +79,8 @@ test.describe('material builder: molecule mode', () => {
   test('keyboard: add an atom from the toolbar, undo with the button; no overflow; axe clean', async ({
     page,
   }) => {
-    await open(page);
-    await page.getByRole('tab', { name: /Molecule mode/ }).click();
+    await page.goto('/builder/molecule/');
+    await page.waitForFunction(() => document.querySelectorAll('astro-island[ssr]').length === 0);
     const toolbar = page.getByRole('toolbar', { name: 'Molecule editing operations' });
     await expect(toolbar).toBeVisible();
     const summary = page.getByText(/heavy\/explicit atom/);
