@@ -1,5 +1,24 @@
 ---
 id: the-exponential-wall
+stage:
+  scene: m03-exponential-wall
+  states:
+    - id: one-electron
+      section: why
+      params: { count: grid, electrons: 1, points: 10 }
+      caption: 'One electron on a grid of 10 points per axis needs 1000 numbers, the small cube of dots. The surface shows how that count grows with more electrons and finer grids.'
+    - id: ten-electrons
+      section: intuition
+      params: { count: grid, electrons: 10, points: 10 }
+      caption: 'Ten electrons on the same grid need 10^30 numbers: the marker stands far above the one-terabyte plane. Each extra electron multiplies the count by another 1000.'
+    - id: determinants
+      section: lab
+      params: { count: determinants, electrons: 10, orbitals: 20 }
+      caption: 'Counting Slater determinants instead: C(M, N) ways to place N electrons in M spin orbitals. Slide the electrons and the spin orbitals and watch the marker climb the ridge of the surface.'
+    - id: terabyte
+      section: math
+      params: { count: determinants, electrons: 20, orbitals: 40 }
+      caption: 'C(40, 20) = 137 846 528 820 determinants, about 1.1 TB at 8 bytes each: the marker pokes through the terabyte plane for only 20 electrons.'
 title: The exponential wall
 module: 3
 order: 2

@@ -1,5 +1,25 @@
 ---
 id: what-we-still-have-to-approximate
+stage:
+  scene: m03-approximations
+  states:
+    - id: independent
+      section: why
+      params: { Z: '2', approx: independent, wire: true }
+      caption: 'The exact wavefunction (surface) against independent electrons that ignore the repulsion (wire mesh). Orange marks where the exact one is higher, blue where it is lower; the energy error is in the readouts.'
+    - id: hartree-fock
+      section: intuition
+      params: { Z: '2', approx: hartree-fock, wire: true }
+      caption: 'Hartree-Fock lets each electron feel the smooth cloud of the other and treats exchange exactly. What is left, correlation, is the faint orange and blue pattern around the diagonal.'
+    - id: densities
+      section: math
+      params: { Z: '2', approx: hartree-fock, wire: false }
+      layers: [exact, densities, axes, labels]
+      caption: 'Compare only the densities on the wall: the Hartree-Fock one (dashed) is close to the exact one but not equal. The readout gives the exact exchange-correlation energy of this model, the one term DFT approximates.'
+    - id: weak-binding
+      section: what-changes
+      params: { Z: '1', approx: hartree-fock, wire: true }
+      caption: 'For the weakly bound Z = 1 atom correlation matters more: the energy error and the density error of Hartree-Fock both grow.'
 title: What we still have to approximate
 module: 3
 order: 5
