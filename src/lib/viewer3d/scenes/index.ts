@@ -6,7 +6,7 @@ import type { SceneDef, SceneModule } from '../types';
 
 export const SCENE_ID = /^(m\d\d[a-z]?)-[a-z0-9]+(-[a-z0-9]+)*$/;
 
-const lazy = import.meta.glob<SceneModule>(['./m[0-9][0-9].ts', './m[0-9][0-9][a-z].ts']);
+const lazy = import.meta.glob<SceneModule>(['./m*.ts', '!./m*.test.ts']);
 
 export const moduleFileOf = (id: string): string => {
   const m = SCENE_ID.exec(id);

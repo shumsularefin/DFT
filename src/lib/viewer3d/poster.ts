@@ -37,6 +37,11 @@ function paint(c: Color, attr: 'fill' | 'stroke'): string {
   return `${attr}="${resolveColor(c, 'light')}"`;
 }
 
+function atomPaint(c: Color): string {
+  const p = paint(c, 'fill');
+  return p.startsWith('class="') ? p.replace('class="', 'class="v3p-atom ') : `${p} class="v3p-atom"`;
+}
+
 function shade(hex: string, k: number): string {
   const [r, g, b] = hexToRgb01(hex);
   const f = (x: number) =>
@@ -92,7 +97,7 @@ export function posterSVG(frame: SceneFrame, opts: PosterOptions = {}): string {
           const op = l.opacity !== undefined && l.opacity < 1 ? ` fill-opacity="${n1(l.opacity)}"` : '';
           items.push({
             depth: z,
-            svg: `<circle cx="${n1(x)}" cy="${n1(y)}" r="${n1(Math.max(r, 0.8))}" ${paint(c, 'fill')}${op} class="v3p-atom"/>`,
+            svg: `<circle cx="${n1(x)}" cy="${n1(y)}" r="${n1(Math.max(r, 0.8))}" ${atomPaint(c)}${op}/>`,
           });
         }
         break;

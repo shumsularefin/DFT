@@ -139,20 +139,20 @@ function patternLayers(kind: NamedKind, axisIdx: number, at: Vec3[], signs: numb
   const key = (x: number) => Math.round(x * 100) / 100;
   const groups = new Map<string, { pts: Vec3[]; sign: number }>();
   at.forEach((p, n) => {
-    const id = kind === 'A' ? `${key(p[k])}` : `${key(p[i])},${key(p[j])}`;
+    const id = kind === 'A' ? `${key(p[k]!)}` : `${key(p[i]!)},${key(p[j]!)}`;
     const g = groups.get(id) ?? { pts: [], sign: signs[n]! };
     g.pts.push(p);
     groups.set(id, g);
   });
   const out: Layer[] = [];
-  const lo = (pts: Vec3[], d: number) => Math.min(...pts.map((p) => p[d])) - pad;
-  const hi = (pts: Vec3[], d: number) => Math.max(...pts.map((p) => p[d])) + pad;
+  const lo = (pts: Vec3[], d: number) => Math.min(...pts.map((p) => p[d]!)) - pad;
+  const hi = (pts: Vec3[], d: number) => Math.max(...pts.map((p) => p[d]!)) + pad;
   if (kind === 'A') {
     for (const g of groups.values()) {
       const o: Vec3 = [0, 0, 0];
       o[i] = lo(g.pts, i);
       o[j] = lo(g.pts, j);
-      o[k] = g.pts[0]![k];
+      o[k] = g.pts[0]![k]!;
       const u: Vec3 = [0, 0, 0];
       const v: Vec3 = [0, 0, 0];
       u[i] = hi(g.pts, i) - o[i];
