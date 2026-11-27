@@ -1,5 +1,28 @@
 ---
 id: scf-trouble
+stage:
+  scene: m08-charge-sloshing
+  states:
+    - id: sloshing
+      section: why
+      params: { mixer: linear, amix: 0.4, bmix: 0, length: 40, iter: 3 }
+      caption: 'A 40 Å metallic cell with plain mixing at AMIX 0.4. The slab is the error in the input density. Step through the iterations: the extra charge jumps from one end of the cell to the other and grows. That is charge sloshing.'
+    - id: damped
+      section: intuition
+      params: { mixer: linear, amix: 0.02, bmix: 0, length: 40, iter: 12 }
+      caption: 'With AMIX 0.02 the slosh still swaps ends every step but shrinks a little each time. The waterfall behind the slab shows the swing, and the residual path at the right end creeps down.'
+    - id: kerker
+      section: math
+      params: { mixer: linear, amix: 0.4, bmix: 1, length: 40, iter: 6 }
+      caption: 'Kerker mixing with BMIX 1.0 mixes long waves gently and short waves fully, so the longest wave is now multiplied by 0.11 per step instead of about -36. The slab flattens within a few iterations.'
+    - id: pulay
+      section: in-vasp
+      params: { mixer: pulay, amix: 0.1, bmix: 0, length: 40, iter: 10 }
+      caption: 'The recovery settings AMIX 0.1 and BMIX near zero. Simple mixing would still run away here, but VASP mixes with a history of earlier steps (Pulay), and that history removes the slosh in about ten iterations.'
+    - id: short-cell
+      section: what-changes
+      params: { mixer: linear, amix: 0.4, bmix: 0, length: 10, iter: 4 }
+      caption: 'Shorten the cell to 10 Å: the longest wave is four times shorter, the safe AMIX is more than ten times larger, and the slosh grows far more slowly. Long cells and slabs are where sloshing bites.'
 title: When the electronic loop will not converge
 module: 8
 order: 4
