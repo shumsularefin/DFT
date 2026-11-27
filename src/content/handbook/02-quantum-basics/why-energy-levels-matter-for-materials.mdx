@@ -1,5 +1,24 @@
 ---
 id: why-energy-levels-matter-for-materials
+stage:
+  scene: m02-chain
+  states:
+    - id: two-atoms
+      section: why
+      params: { atoms: 2, distance: 2.5 }
+      caption: 'Two atoms: one level splits into a bonding level (lower) and an antibonding level (upper). Drag the distance and the split grows as the atoms come closer.'
+    - id: band
+      section: intuition
+      params: { atoms: 20 }
+      caption: 'Twenty atoms: the levels crowd into a band. The curves on the left show how every level spreads further as the distance shrinks.'
+    - id: gap
+      section: math
+      params: { atoms: 20, delta: 0.6 }
+      caption: 'Make the atoms alternate, A and B, and a gap opens in the middle of the band. With one electron per atom the lower band is full: an insulator.'
+    - id: metal
+      section: what-changes
+      params: { atoms: 20, delta: 0 }
+      caption: 'With equal atoms the filled and empty levels almost touch in the middle of one band, and the gap closes as the chain grows, so the chain behaves like a metal.'
 title: Why energy levels matter for materials
 module: 2
 order: 6
