@@ -32,3 +32,15 @@ What the redesign alone would have fixed: on Workflow steps, most of the short t
 | e2e (Playwright, axe), Lighthouse, Firestore rules, preview deploy | pass in CI on the pull request (this cloud session has no Chromium, so they run there) |
 
 New tests: `tests/e2e/layout-width.spec.ts` (text fills its card on two Workflow and two handbook pages, rail cards and entries do not overlap, the buttons' colours and rule, the stage beside the text on three Workflow pages, no word split over two lines in a table cell on every handbook topic and Workflow step that has a table) and `tests/e2e/ui-shots.spec.ts` (review screenshots, printed by CI).
+
+## Screenshots
+
+1650 by 900, light theme, taken by `tests/e2e/ui-shots.spec.ts` in CI: before on the first commit of this branch, after on the last.
+
+| | Before | After |
+| --- | --- | --- |
+| Workflow step, top | ![](img/workflow-design/before-workflow-1-top.png) | ![](img/workflow-design/after-workflow-1-top.png) |
+| Workflow step, body and rail | ![](img/workflow-design/before-workflow-2-body.png) | ![](img/workflow-design/after-workflow-2-body.png) |
+| Workflow step, previous and next | ![](img/workflow-design/before-workflow-3-prevnext.png) | ![](img/workflow-design/after-workflow-3-prevnext.png) |
+| Handbook topic, top | ![](img/workflow-design/before-handbook-1-top.png) | ![](img/workflow-design/after-handbook-1-top.png) |
+| Handbook topic, previous and next | ![](img/workflow-design/before-handbook-2-prevnext.png) | ![](img/workflow-design/after-handbook-2-prevnext.png) |
