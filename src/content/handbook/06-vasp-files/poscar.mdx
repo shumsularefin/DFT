@@ -10,7 +10,7 @@ vaspTags: []
 sources: [S-019, S-041, S-042]
 noLab: true
 status: draft
-updated: 2026-11-19
+updated: 2026-11-27
 ---
 
 <Why>
@@ -68,7 +68,7 @@ Line 4 of an old-style `POSCAR` is the second lattice vector. The element symbol
 - **Line by line:** 1 comment; 2 scaling factor; 3 to 5 the three lattice vectors; 6 element symbols; 7 atoms per element; an optional `Selective dynamics` line; `Direct` or `Cartesian`; then one line per atom <Cite id="S-041" />.
 - **Species order.** The element symbols on line 6 must follow the same order as the datasets in `POTCAR`, and the `MAGMOM` list follows the atom order of this file <Cite id="S-041" />.
 - **Selective dynamics.** Only the first letter of the keyword is read. Each atom line then ends with three flags, `T` (may move) or `F` (frozen), one for each direction <Cite id="S-041" />.
-- **Where it comes from.** VASPkit task 105 makes a `POSCAR` from a CIF file (it does not accept fractional occupancy), 602 writes a standardised primitive cell and 401 builds a supercell <Cite id="S-042" />. This site's input builder and structure tools write the same format.
+- **Where it comes from.** VASPkit task 105 makes a `POSCAR` from a CIF file (it does not accept fractional occupancy), 602 writes a standardised primitive cell and 401 builds a supercell. A `POSCAR` can also be exported from VESTA or taken from the Materials Project <Cite id="S-042" />. This site's input builder and structure tools write the same format.
 - **After a run.** `CONTCAR` has the same format and holds the latest geometry <Cite id="S-041" />.
 
 <VaspFile
@@ -134,6 +134,6 @@ It works, but it costs several times more. Standardise to the primitive cell fir
 
 - VASP wiki page POSCAR (by page name) <Cite id="S-019" />.
 - The author's Field Handbook entries for `POSCAR` and `CONTCAR` <Cite id="S-041" />.
-- VASPkit structure tools, codes 105, 400 to 403 and 601 to 608 <Cite id="S-042" />.
+- VASPkit structure tools, codes 105, 400 to 403 and 601 to 608; the full list is in [VASPKIT in practice](/handbook/07-running/vaspkit-in-practice/) <Cite id="S-042" />.
 
 </GoDeeper>

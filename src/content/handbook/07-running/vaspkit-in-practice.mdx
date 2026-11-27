@@ -3,14 +3,14 @@ id: vaspkit-in-practice
 title: VASPKIT in practice
 module: 7
 order: 5
-summary: A map of the VASPKIT menu codes the author uses for inputs, k-paths, structures and analysis, how to protect hand-edited files, and why menu numbers must be checked against your release.
+summary: The full VASPKIT 1.5 command map from the author's Workflow Handbook, with five ways to run a task, the ~/.vaspkit settings that matter, every input, structure, DOS, band, charge, elastic and optics code with its output files, and why menu numbers must be checked against your release.
 concepts: [vaspkit]
 requires: [vasp-workflow]
 vaspTags: []
 sources: [S-019, S-020, S-042]
 noLab: true
 status: draft
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 <Why>
@@ -21,11 +21,11 @@ VASPKIT is a free command-line helper that prepares VASP inputs and processes ou
 
 <Intuition>
 
-VASPKIT is a menu: you run `vaspkit`, type a number, and answer a few prompts. Codes group by purpose, and the author's workflow touches a handful of them <Cite id="S-042" />.
+VASPKIT is a menu. You type `vaspkit`, then a group number, then a three-digit task, and answer a few prompts <Cite id="S-042" />. The codes group by purpose (inputs, structures, k-paths, density of states, bands, charge and potential, elastic constants, optics), and the tables on this page follow those groups. This page is the site's single list of the codes; other pages link here.
 
 <Callout variant="warning" title="Menu numbers change between releases">
 
-The codes below are the ones in the author's Workflow Handbook (VASPKIT 1.5 era). Menus are renumbered and extended between releases, so confirm a code in your installed version's menu before you rely on it <Cite id="S-042" />.
+Every code below is the one in the author's Workflow Handbook, which takes them from the VASPKIT 1.5 tutorials and feature list. Menus are renumbered and extended between releases, so if a number does nothing, check the menu of your installed version before you rely on it <Cite id="S-042" />.
 
 </Callout>
 
@@ -35,7 +35,13 @@ The codes below are the ones in the author's Workflow Handbook (VASPKIT 1.5 era)
 
 <Level min="intermediate">
 
-VASPKIT does not change the physics. It writes files from rules (templates, resolutions in 2 pi per angstrom, symmetry from the structure) and reads files you could read yourself. The settings that matter are in `~/.vaspkit`, for example where your POTCAR library lives (`PBE_PATH`), whether recommended datasets are used (`RECOMMENDED_POTCAR`), and `SET_FERMI_ENERGY_ZERO`, which shifts plotted DOS and bands so the Fermi level is at 0 <Cite id="S-042" />.
+VASPKIT does not change the physics. It writes files from rules (templates, k-mesh resolutions, symmetry from the structure) and reads files you could read yourself.
+
+The one number worth converting is the k-mesh resolution $r$ that task 102 asks for. VASPKIT gives it in units of $2\pi$/Å. VASP's own `KSPACING` tag is in Å⁻¹ and already includes the $2\pi$, so
+
+$$\text{KSPACING} \approx 2\pi r.$$
+
+A VASPKIT resolution of 0.03 is therefore a `KSPACING` of about 0.19 Å⁻¹ <Cite id="S-042" />. The [units reference](/reference/units/) converts other values.
 
 </Level>
 
@@ -43,67 +49,170 @@ VASPKIT does not change the physics. It writes files from rules (templates, reso
 
 <InVasp>
 
-The command map, from the Workflow Handbook <Cite id="S-042" />:
+The full command map, from the Workflow Handbook <Cite id="S-042" />. "Output" is what VASPKIT prints or writes in the folder.
 
-| Code       | What it does                                                                                                                                                                 |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 101        | `INCAR` template from task codes (ST static, SR relax, LR lattice, MG magnetic, H6 HSE06, PU +U, OP optics, DC elastic, BD Bader, and others); codes combine, such as `SRMG` |
-| 102        | `KPOINTS` for an SCF run: asks Monkhorst-Pack or Gamma, then the resolution in 2 pi per angstrom                                                                             |
-| 103 / 104  | `POTCAR` from default or user-chosen datasets (needs `~/.vaspkit` paths)                                                                                                     |
-| 105 / 106  | `POSCAR` from a CIF (no fractional occupancy) or a Materials Studio file                                                                                                     |
-| 107        | Reorder the elements of `POSCAR`                                                                                                                                             |
-| 108 / 109  | Generate all inputs / check all input files before submitting                                                                                                                |
-| 601 / 602  | Space group of `POSCAR` / standardised primitive cell (run before relaxing)                                                                                                  |
-| 603 / 604  | Conventional cell / standardised crystal cell (use for elastic constants)                                                                                                    |
-| 303        | `KPATH.in`: the k-path for a band run                                                                                                                                        |
-| 251        | `KPOINTS` for hybrid-functional bands                                                                                                                                        |
-| 111 / 113  | Density of states from the SCF run                                                                                                                                           |
-| 211        | Band structure data from the run on the path                                                                                                                                 |
-| 203        | Elastic moduli read from `OUTCAR`                                                                                                                                            |
-| 311 to 314 | `CHGCAR` analysis                                                                                                                                                            |
-| 426        | Work function from `LOCPOT`                                                                                                                                                  |
-| 711        | Optical properties from `vasprun.xml`                                                                                                                                        |
+**Five ways to run a task.** The interactive menu is the easiest way to learn. The other four let you script a task, here with 102 as the example <Cite id="S-042" />:
 
-More codes the Workflow Handbook uses, with what each reads, what it writes and where this site explains it <Cite id="S-042" />:
+<VaspFile
+  name="shell"
+  code={`vaspkit                                   # interactive menus
+vaspkit -task 102 -kpr 0.04               # command-line mode (vaspkit -help lists options)
+echo -e "102\\n2\\n0.04\\n" | vaspkit         # piped answers, in menu order
+(echo 102; echo 2; echo 0.04) | vaspkit
+vaspkit < cmd.in                          # answers stored one per line in a file
+# batch over sub-folders, e.g. print every band gap
+for d in */; do (cd \$d && echo -e "911\\n" | vaspkit | sed -n '40p' | awk '{print \$4}'); done`}
+/>
 
-| Code       | Reads                                                                                                | Writes                                                                 | Explained in                                                      |
-| ---------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| 911        | The finished run                                                                                     | Printed: gap, VBM and CBM energies, their k-points, direct or indirect | [Functionals](/handbook/05-practical-choices/functionals/)        |
-| 912        | A fine k-grid around a band edge                                                                     | m\*/mₑ                                                                 | [Other calculations](/handbook/12-properties/other-calculations/) |
-| 252        | A hybrid run with `KPATH.in` in the folder                                                           | Same files as 211                                                      | [Functionals](/handbook/05-practical-choices/functionals/)        |
-| 253 to 255 | The same hybrid run                                                                                  | `PBAND` files: selected atoms, each element, a sum                     | [Functionals](/handbook/05-practical-choices/functionals/)        |
-| 261 / 262  | The primitive cell (261 writes a dense `KPOINTS`, resolution about 0.01); 262 reads the finished run | `FERMISURFACE.bxsf` for XCrySDen                                       | [Other calculations](/handbook/12-properties/other-calculations/) |
-| 312 / 313  | A spin-polarized `CHGCAR`                                                                            | `SPIN.vasp`; `SPIN_UP.vasp` and `SPIN_DW.vasp`                         | [Other calculations](/handbook/12-properties/other-calculations/) |
-| 314        | `CHGCAR` of AB, A and B (also `LOCPOT`, `ELFCAR`, `PARCHG`)                                          | `CHGDIFF.vasp`                                                         | [Other calculations](/handbook/12-properties/other-calculations/) |
-| 427        | `LOCPOT` of a heterostructure                                                                        | `PLANAR_AVERAGE.dat`, `MACROSCOPIC_AVERAGE.dat`                        | [Other calculations](/handbook/12-properties/other-calculations/) |
-| 501 / 502  | A frequency run: adsorbate (temperature) / gas molecule (temperature, pressure, spin multiplicity)   | ZPE, TS and G corrections                                              | [Other calculations](/handbook/12-properties/other-calculations/) |
-| 503        | A `LORBIT = 11` DOS run and an energy window                                                         | `D_BAND_CENTER`, relative to E_F                                       | [Other calculations](/handbook/12-properties/other-calculations/) |
-| 511        | `WAVECAR`, one band at one k-point                                                                   | `RWAV_*.vasp` (real part), `IWAV_*` (imaginary part)                   | [Other calculations](/handbook/12-properties/other-calculations/) |
-| 712 / 713  | `WAVECAR`: at one k-point / along a band path                                                        | `TDM.dat` (Debye²)                                                     | [Optical properties](/handbook/12-properties/optical-properties/) |
-| 721 / 722  | A molecular dynamics run                                                                             | `MSD.dat` (mean squared displacement), RDF data                        | [Other calculations](/handbook/12-properties/other-calculations/) |
-| 926        | A 2D structure (the handbook names the task only)                                                    | 2D elastic constants                                                   | Not on this site yet                                              |
-| 203        | `OUTCAR` of an `IBRION = 6` run                                                                      | Cij, Sij, moduli (Voigt, Reuss, Hill), Born criteria, `ELASTIC_TENSOR` | [Elastic constants](/handbook/12-properties/elastic-constants/)   |
-| 201        | `VPKIT.in`: step 1 makes strain folders, step 2 fits their energies                                  | Same analysis as 203                                                   | [Elastic constants](/handbook/12-properties/elastic-constants/)   |
-| 200 / 202  | 200: VASPKIT's own stress-strain workflow; 202: a tensor you supply in `ELASTIC_TENSOR.in`           | Same analysis as 203                                                   | [Elastic constants](/handbook/12-properties/elastic-constants/)   |
-| 205        | Energy-volume points                                                                                 | E0, V0, B0, B′                                                         | [Equation of state](/handbook/12-properties/equation-of-state/)   |
+- **Piped answers and `cmd.in`** give the answers in the order the menu asks for them: 102, then 2 (Gamma-centred), then 0.04 (the resolution).
+- **The batch line** runs 911 in every sub-folder and prints one band gap per folder. `sed -n '40p'` and `awk '{print $4}'` pick one line and one column of the printed summary, so compare them with the 911 output of your own release before you trust the list.
+
+**The `~/.vaspkit` settings that matter** <Cite id="S-042" />:
+
+| Setting                                         | Effect                                                                                                                                                               |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PBE_PATH`, `POTCAR_TYPE`, `RECOMMENDED_POTCAR` | Where your POTCAR library lives, which functional, and whether VASP's recommended datasets (`_pv`, `_sv` and so on) are used. Required for 102 and 103.              |
+| `SET_INCAR_WRITE_MODE`                          | The default, `OVERRIDE`, replaces an existing `INCAR` when you run 101. Set `BACK-UP-OLD` or `BACK-UP-NEW` (which writes `INCAR.new`) to protect a hand-edited file. |
+| `MINI_INCAR`                                    | `.TRUE.` writes INCARs without the explanatory comments.                                                                                                             |
+| `SET_FERMI_ENERGY_ZERO`                         | `.TRUE.` (the default) shifts DOS and band energies so that the Fermi level is at 0.                                                                                 |
+| `FERMI_ENERGY.in` (a file, not a setting)       | VASPKIT reads the Fermi level from `DOSCAR` unless this file exists in the folder; put your value on its second line to override it.                                 |
+| `PYTHON_BIN`, `PLOT_MATPLOTLIB`                 | Let 211 and 252 draw `band.png` automatically.                                                                                                                       |
+| `GW_POTCAR`                                     | `.TRUE.` picks the `_GW` datasets.                                                                                                                                   |
+
+**Input generation (group 01).**
+
+| Code      | What it does                                                                                                     | Output and notes                                                                                                                                      |
+| --------- | ---------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 101       | `INCAR` template for one or more task codes (next table)                                                         | `INCAR`. Codes join into one string: `STMG`, `SRPU`, `STH6D3` (static HSE06 plus D3)                                                                  |
+| 102       | `KPOINTS` for an SCF run: asks 1 (Monkhorst-Pack) or 2 (Gamma-centred), then the resolution in 2π/Å              | `KPOINTS`, and also `POTCAR`. Resolution 0 means Gamma only; low 0.06 to 0.04, medium 0.04 to 0.03, fine 0.02 to 0.01. 0.03 to 0.04 is usually enough |
+| 103 / 104 | `POTCAR` with the default datasets / with datasets you choose (104 asks per element, for example `Ti_sv`, `O_h`) | `POTCAR`                                                                                                                                              |
+| 105 / 106 | `POSCAR` from a CIF (no fractional occupancy) / from a Materials Studio `.xsd` file (keeps fixed atoms)          | `POSCAR`                                                                                                                                              |
+| 107       | Reorder the elements in `POSCAR`                                                                                 | `POSCAR_REV`                                                                                                                                          |
+| 108 / 109 | Generate all inputs in one go / check all input files                                                            | 109 fixes the `INCAR` and `POSCAR` format and checks that `POTCAR` matches `POSCAR`. Run it before every submission                                   |
+
+**The 101 task codes** (the full list in VASPKIT 1.5):
+
+| Code | Template                                              | Code | Template                   |
+| ---- | ----------------------------------------------------- | ---- | -------------------------- |
+| ST   | Static calculation                                    | SR   | Standard relaxation        |
+| LR   | Lattice relaxation (`ISIF = 3`, a commented template) | MG   | Magnetic properties        |
+| SO   | Spin-orbit coupling                                   | D3   | DFT-D3 (zero damping)      |
+| H6   | HSE06                                                 | PU   | DFT+U                      |
+| OP   | Optical properties                                    | EC   | Static dielectric constant |
+| DC   | Elastic constants                                     | BD   | Bader charge               |
+| FD   | Phonons, finite displacement                          | DT   | Phonons, DFPT              |
+| FQ   | Frequency calculation                                 | EL   | ELF                        |
+| PC   | Decomposed (partial) charge density                   | MD   | Molecular dynamics         |
+| GW   | GW0                                                   | BS   | BSE                        |
+| NE   | NEB                                                   | DM   | Dimer method               |
+
+**What the templates leave to you.** There is no meta-GGA code: add the `METAGGA` tags to an ST or SR template by hand (see [functionals](/handbook/05-practical-choices/functionals/)). The templates start from conservative defaults; the LR template, for example, has `PREC = Normal`, `LREAL = Auto` and `ENCUT` commented out. So always set `ENCUT`, `EDIFF`, `ISMEAR` and the spin (`ISPIN`, `MAGMOM`) yourself <Cite id="S-042" />. The handbook says the same of every INCAR it shows: the values are starting points, to be converged for your material.
+
+**Structure and symmetry (groups 04, 06 and 92).**
+
+| Code         | What it does                                                                                            | Output                                                   |
+| ------------ | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| 601          | Space group, lattice and density of `POSCAR`                                                            | Printed summary                                          |
+| 602          | Standardised primitive cell. Run it before relaxing so that later k-paths match your cell               | `PRIMCELL.vasp`                                          |
+| 603 / 604    | Conventional cell / standardised crystal cell (use it for elastic constants)                            | A structure file                                         |
+| 608          | Symmetry summary of the relaxed structure (`CONTCAR`)                                                   | Printed: check that the symmetry survived the relaxation |
+| 609          | Point group of a molecule or cluster                                                                    | Printed                                                  |
+| 400 / 401    | New lattice from an integer matrix / supercell, for example 2 2 1                                       | `SC221.vasp` for that 401 example                        |
+| 402 / 403    | Fix atoms by layers / by a z-range (selective dynamics)                                                 | `POSCAR_FIX`                                             |
+| 407          | Swap two lattice axes                                                                                   | Not given in the handbook                                |
+| 4061 to 4069 | Convert `POSCAR` to Cartesian or fractional coordinates, CIF, xsf, Quantum ESPRESSO, Elk, SIESTA or PDB | The converted file                                       |
+| 921 to 923   | 2D structures: centre the layer at z = 0.5, resize the vacuum, standardise the 2D cell                  | `POSCAR_NEW`                                             |
+| 926 / 927    | 2D elastic constants / band edges relative to the vacuum level                                          | Not given in the handbook                                |
+
+**Density of states (111 to 115, and 503).** These read `DOSCAR`. The projected codes need a run with `LORBIT` set: `LORBIT = 11` resolves px, dxy and the other orbitals, `LORBIT = 10` only s, p, d and f.
+
+| Code | What it does                                                                      | Output                                                |
+| ---- | --------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| 111  | Total DOS                                                                         | `TDOS.dat`                                            |
+| 112  | PDOS of selected atoms, one file per atom                                         | One PDOS file per atom                                |
+| 113  | PDOS of every element                                                             | `PDOS_<El>.dat` (`_UP` and `_DW` when spin-polarized) |
+| 114  | Sum of the PDOS over selected atoms (for example atoms 6 and 7 for a CO molecule) | One summed file                                       |
+| 115  | Sum over chosen atoms and orbitals (for example O-s, O-p, Ni-d)                   | `PDOS_USER.dat`                                       |
+| 503  | d-band centre per atom, in an energy window you choose                            | `D_BAND_CENTER` (relative to the Fermi level)         |
+
+**K-paths and band structures (groups 03 and 2xx).** 211 reads `EIGENVAL`, `KPOINTS` and the Fermi level from `DOSCAR`; the projected-band codes 212 to 214 read `PROCAR` from a `LORBIT = 11` run.
+
+| Code            | What it does                                                                                | Output                                                                                |
+| --------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| 301 / 302 / 303 | k-path for a 1D / 2D / bulk structure (the same algorithm as SeeK-path)                     | `KPATH.in` (20 points per segment), `PRIMCELL.vasp`, `HIGH_SYMMETRY_POINTS`           |
+| 211             | Band structure                                                                              | `BAND.dat`, `BAND_REFORMATTED.dat`, `KLINES.dat`, `KLABELS`, `BAND_GAP`, `band.png`   |
+| 212             | Projected bands for selected atoms, one file each                                           | `PBAND_A1.dat`, `PBAND_A2.dat` and so on (columns s, py, pz, px, the d orbitals, tot) |
+| 213             | Projected bands for each element                                                            | `PBAND_<El>.dat`                                                                      |
+| 214             | Sum of projected bands over selected atoms (for example surface against bulk layers)        | `PBAND_SUM.dat`                                                                       |
+| 251             | `KPOINTS` for hybrid bands: the weighted SCF mesh plus a zero-weight path from `KPATH.in`   | `KPOINTS`. Path resolution 0.02 to 0.04 (DFT), 0.04 to 0.06 (hybrid)                  |
+| 252             | Hybrid band structure (needs `KPATH.in` in the folder)                                      | The same files as 211                                                                 |
+| 253 to 255      | Projected hybrid bands: selected atoms / each element / a sum                               | `PBAND` files                                                                         |
+| 261 / 262       | Fermi surface: a dense `KPOINTS` (resolution about 0.01) / extraction from the finished run | `FERMISURFACE.bxsf` for XCrySDen                                                      |
+| 281 / 282       | Band unfolding of a supercell: `KPOINTS` / the effective band structure                     | EBS data                                                                              |
+
+**Band gap, effective mass and wavefunctions (911, 912, 511).** 911 and 912 read `EIGENVAL`; 511 reads `WAVECAR`.
+
+| Code | What it does                                                       | Output                                                      |
+| ---- | ------------------------------------------------------------------ | ----------------------------------------------------------- |
+| 911  | Band gap, VBM and CBM energies, their k-points, direct or indirect | Printed summary                                             |
+| 912  | Effective masses, from a fine k-grid around a band edge            | m\*/mₑ                                                      |
+| 511  | Real-space wavefunction of one band at one k-point                 | `RWAV_B*_K*_UP.vasp` (real part), `IWAV_*` (imaginary part) |
+
+**Elastic constants and equation of state (200 to 205).**
+
+| Code      | What it does                                                                                      | Output                                                                                                                                                                                                                                                                                                                                            |
+| --------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 203       | Elastic analysis of the `OUTCAR` of VASP's `IBRION = 6` run (the author's route)                  | Cij and Sij; B, E, G and ν (Voigt, Reuss, Hill), each with its minimum and maximum (anisotropy); P-wave modulus; Pugh ratio; two Vickers hardness models (Chen, Tian); Cauchy pressure; Kleinman parameter; universal and Chung-Buessem anisotropy; wave velocities; Debye temperature; stiffness eigenvalues and Born criteria; `ELASTIC_TENSOR` |
+| 201       | Energy-strain method with `VPKIT.in`: step 1 makes the strain folders, step 2 fits their energies | The same analysis as 203                                                                                                                                                                                                                                                                                                                          |
+| 200 / 202 | VASPKIT's own stress-strain workflow / analysis of a tensor you supply in `ELASTIC_TENSOR.in`     | The same analysis as 203                                                                                                                                                                                                                                                                                                                          |
+| 205       | Equation-of-state fit to energy-volume points                                                     | E0, V0, B0, B′                                                                                                                                                                                                                                                                                                                                    |
+
+**Optics (711 to 713).**
+
+| Code      | What it does                                                                                          | Output                       |
+| --------- | ----------------------------------------------------------------------------------------------------- | ---------------------------- |
+| 711       | Linear optics from `vasprun.xml` (or from `REAL.in` and `IMAG.in`); asks for eV, nm or THz. Bulk only | Files of n, k, α, R and L(ω) |
+| 712 / 713 | Transition dipole moment at one k-point / along a band path (needs `WAVECAR`)                         | `TDM.dat` (Debye²)           |
+
+**Charge, spin and potential (311 to 319, 426, 427).**
+
+| Code            | What it does                                                                             | Output                                                        |
+| --------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| 311 / 312 / 313 | Charge density / spin density / spin-up and spin-down densities from `CHGCAR`            | `CHARGE.vasp`; `SPIN.vasp`; `SPIN_UP.vasp` and `SPIN_DW.vasp` |
+| 314             | Density difference AB − A − B (or A − B); also works for `LOCPOT`, `ELFCAR` and `PARCHG` | `CHGDIFF.vasp`                                                |
+| 318 / 319       | `CHGCAR` or `PARCHG` to `.xsf` / `.cube`                                                 | An `.xsf` / `.cube` file                                      |
+| 426             | Planar-averaged potential from `LOCPOT`; prints the vacuum level                         | `POTPAVG.dat`                                                 |
+| 427             | Planar and macroscopic average (band offsets in heterostructures)                        | `PLANAR_AVERAGE.dat`, `MACROSCOPIC_AVERAGE.dat`               |
+
+**Thermochemistry, Bader and molecular dynamics (501, 502, 508, 721, 722).**
+
+| Code      | What it does                                                                                                                           | Output                    |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| 501 / 502 | Thermal free-energy correction from a frequency run: adsorbate (temperature) / gas molecule (temperature, pressure, spin multiplicity) | ZPE, TS and G corrections |
+| 508       | Bader results to `.pqr`                                                                                                                | A `.pqr` file             |
+| 721 / 722 | MD analysis: mean squared displacement / radial distribution function                                                                  | `MSD.dat`, RDF data       |
+
+**Where the site explains these tasks.** K-paths and meshes: [KPOINTS](/handbook/06-vasp-files/kpoints/). DOS and bands: [density of states](/handbook/09-analysis/density-of-states/) and [band structures](/handbook/09-analysis/band-structures/). Hybrid bands (251 to 255) and 911: [functionals](/handbook/05-practical-choices/functionals/). 200 to 203: [elastic constants](/handbook/12-properties/elastic-constants/). 205: [equation of state](/handbook/12-properties/equation-of-state/). 711 to 713: [optical properties](/handbook/12-properties/optical-properties/). Bader: [Bader charges](/handbook/12-properties/bader-charges/). 261, 262, 312 to 314, 426, 427, 501 to 503, 511, 721, 722 and 912: [other calculations](/handbook/12-properties/other-calculations/).
 
 Habits that protect you:
 
 - **Run 109 before every submission.** It fixes the `INCAR` and `POSCAR` format and checks that `POTCAR` matches `POSCAR` <Cite id="S-042" />.
-- **Set `SET_INCAR_WRITE_MODE`.** By default 101 overrides an existing `INCAR`. Set `BACK-UP-OLD` or `BACK-UP-NEW` in `~/.vaspkit` to protect a hand-edited file.
-- **Read what it wrote.** A template is a starting point: check `ENCUT` against your `POTCAR` and add `MAGMOM` yourself.
+- **Set `SET_INCAR_WRITE_MODE`.** The default, `OVERRIDE`, replaces an existing `INCAR` when you run 101. Set `BACK-UP-OLD` or `BACK-UP-NEW` in `~/.vaspkit` to protect a hand-edited file <Cite id="S-042" />.
+- **Read what it wrote.** A template is a starting point: check `ENCUT` against your `POTCAR`, and set `EDIFF`, `ISMEAR`, `ISPIN` and `MAGMOM` yourself.
 - **VASPKIT never replaces your licence.** It reads your POTCAR library; it does not provide one.
 
 </InVasp>
 
 <WhatChanges>
 
-| If you change...        | ...in VASPKIT's output     | ...what to expect                                 |
-| ----------------------- | -------------------------- | ------------------------------------------------- |
-| The resolution in 102   | The mesh density           | Denser means slower; 0.03 to 0.04 is often enough |
-| The task code in 101    | A different template       | Different tags: check them against your job       |
-| `SET_FERMI_ENERGY_ZERO` | Energies on a shifted axis | Plots are relative to the Fermi level             |
-| Your VASPKIT release    | Menu numbers               | The same task may have another code               |
+| If you change...         | ...in VASPKIT's output              | ...what to expect                                     |
+| ------------------------ | ----------------------------------- | ----------------------------------------------------- |
+| The resolution in 102    | The mesh density                    | Denser means slower; 0.03 to 0.04 is often enough     |
+| The task code in 101     | A different template                | Different tags: check them against your job           |
+| `SET_FERMI_ENERGY_ZERO`  | Energies on a shifted axis          | Plots are relative to the Fermi level                 |
+| A `FERMI_ENERGY.in` file | The Fermi level comes from the file | Plots shift to your value instead of the `DOSCAR` one |
+| `MINI_INCAR = .TRUE.`    | Templates without comments          | Shorter files, without the built-in explanations      |
+| Your VASPKIT release     | Menu numbers and printed layout     | The same task may have another code                   |
 
 Why use it: fewer typing errors. Why check the output: templates do not know your system. What happens if you skip the check: a tag left over from another task, such as `IBRION = 6` in a DOS run.
 
@@ -113,7 +222,7 @@ Why use it: fewer typing errors. Why check the output: templates do not know you
 
 <Callout variant="mistake" title="Overwriting a hand-edited INCAR with 101">
 
-The default write mode replaces the file. Change `SET_INCAR_WRITE_MODE` first.
+The default write mode, `OVERRIDE`, replaces the file. Change `SET_INCAR_WRITE_MODE` first <Cite id="S-042" />.
 
 </Callout>
 
@@ -125,7 +234,13 @@ Check the code in your own release's menu <Cite id="S-042" />.
 
 <Callout variant="mistake" title="Running a template without reading it">
 
-A leftover tag from another task is a common cause of a wrong run <Cite id="S-042" />.
+A leftover tag from another task is a common cause of a wrong run, and the templates leave `ENCUT`, `EDIFF`, `ISMEAR` and the spin to you <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Looking for a meta-GGA task code">
+
+101 has none. Start from an ST or SR template and add the `METAGGA` tags by hand <Cite id="S-042" />.
 
 </Callout>
 
@@ -136,7 +251,7 @@ A leftover tag from another task is a common cause of a wrong run <Cite id="S-04
 <GoDeeper>
 
 - The VASPKIT paper <Cite id="S-020" />.
-- The Workflow Handbook's VASPkit sections <Cite id="S-042" />.
+- The Workflow Handbook's VASPkit command map and `~/.vaspkit` settings <Cite id="S-042" />.
 - The VASP wiki for the tags a template sets <Cite id="S-019" />.
 
 </GoDeeper>

@@ -28,6 +28,8 @@ The standard recipe has four steps:
 3. **Verify that every run kept its intended pattern** by checking the final per-site moments in `OUTCAR`. If an AFM run collapsed to non-magnetic or flipped into FM, its energy does not represent the intended state.
 4. **Compare total energies per magnetic ion** (typically in meV per magnetic ion relative to FM or the lowest state).
 
+The author's Workflow Handbook compares the **energy without entropy** (from `OUTCAR`) **per formula unit** instead, and calls differences below a few meV per formula unit within DFT uncertainty <Cite id="S-042" />. Both give the same ranking, because they divide the same energies by different counts. Say which one you use when you report the numbers. The [magnetic step of the Workflow](/workflow/magnetic/) follows the per-formula-unit convention.
+
 <Scene id="afm-g" />
 
 Once you have verified energies for enough distinct orderings, you can also map them onto a Heisenberg spin model to extract nearest-neighbour exchange constants $J_1, J_2$ in the Analyse tab of the [Magnetic configuration tool](/tools/magnetic/) <Cite id="S-060" />.

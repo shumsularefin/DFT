@@ -9,7 +9,7 @@ requires: [vasp-workflow]
 vaspTags: [EDIFF, EDIFFG, NELM]
 sources: [S-019, S-041, S-042]
 status: draft
-updated: 2026-11-19
+updated: 2026-11-27
 ---
 
 <Why>
@@ -58,6 +58,8 @@ grep -A 10 "TOTAL-FORCE" OUTCAR | tail -10       # last forces (NIONS+2 lines)
 grep NBANDS OUTCAR                               # bands, for the optics step
 grep "reached required accuracy" OUTCAR          # ionic convergence`}
 />
+
+When a run misbehaves, five more commands from the Workflow Handbook (steps used per ionic step, the forces for any number of atoms, the pressure trend in an `ISIF = 3` run) are in [when the electronic loop will not converge](/handbook/08-convergence-and-errors/scf-trouble/) <Cite id="S-042" />.
 
 A few signals, in the author's order of use:
 
