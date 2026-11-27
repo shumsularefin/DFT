@@ -10,6 +10,27 @@ vaspTags: []
 sources: [S-047, S-031]
 status: draft
 updated: 2026-11-03
+stage:
+  scene: m02-orbital
+  states:
+    - id: shapes
+      section: why
+      params: { orbital: 2p_z, level: 0.2 }
+      camera: iso
+      caption: 'A 2p_z orbital: two lobes of opposite sign along z, with a flat node between them. Turn it over to see the node from below.'
+    - id: nodes
+      section: intuition
+      params: { orbital: 3s, level: 0.12, nodes: true }
+      caption: '3s has two spherical radial nodes, drawn as wire shells. Lower the surface level to see the inner shells appear.'
+    - id: d-orbital
+      section: lab
+      params: { orbital: 3d_xy, level: 0.25 }
+      camera: top
+      caption: '3d_xy seen from above: four lobes between the x and y axes, two angular nodes along the axes.'
+    - id: cloud
+      section: math
+      params: { orbital: 2p_z, cloud: true, level: 0.3 }
+      caption: 'The same orbital as a cloud of samples from the probability density. Dots crowd where the surface is.'
 ---
 
 <Why>
