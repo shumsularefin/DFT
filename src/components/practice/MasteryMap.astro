@@ -104,7 +104,8 @@ const mid = FLOW_NODE_H / 2;
               <text x="0" y={lines.length === 1 ? mid + 4 : mid - 3} class="node-label">
                 {lines.map((line, i) => (
                   <tspan x="0" dy={i === 0 ? 0 : 14}>
-                    {line}
+                    {/* the trailing space keeps the words apart in the link's visible text (axe label-content-name-mismatch) */}
+                    {i + 1 < lines.length ? `${line} ` : line}
                   </tspan>
                 ))}
               </text>
