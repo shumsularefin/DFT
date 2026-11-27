@@ -1,0 +1,94 @@
+---
+id: dos
+title: Read the DOS and PDOS
+short: DOS and PDOS
+group: Electronic
+order: 2
+summary: Read the total and projected density of states from the DOSCAR of the static SCF with VASPkit 111, 113 and 115. There is no extra VASP run.
+folder: 01_relax/
+needs:
+  - 'The SCF run of step 2, with <code>LORBIT = 11</code> (its <code>DOSCAR</code>)'
+run: 'No extra VASP run: VASPkit 111, 113 and 115 read <code>DOSCAR</code>'
+produces:
+  - '<code>TDOS.dat</code>: the total DOS'
+  - '<code>PDOS_&lt;El&gt;.dat</code>: the DOS projected on each element'
+learn:
+  - { href: '/handbook/09-analysis/density-of-states/', label: 'What the density of states shows' }
+  - { href: '/handbook/05-practical-choices/smearing/', label: 'Smearing and the broadened DOS' }
+  - { href: '/handbook/05-practical-choices/spin-polarized-calculations/', label: 'Spin up and spin down' }
+  - { href: '/handbook/07-running/vaspkit-in-practice/', label: 'VASPkit in practice' }
+tools:
+  - { href: '/tools/input-builder/?preset=dos&variant=default', label: 'Input Builder: SCF with projections' }
+checklist: [DOS]
+sources: [S-042, S-020]
+status: draft
+updated: 2026-11-27
+---
+
+<Section id="why" heading="Where the DOS comes from">
+
+The DOS needs no run of its own. With LORBIT = 11, the [static SCF](/workflow/static-scf/) already wrote
+the total DOS and the DOS projected on each site and orbital into DOSCAR. You only read it out with
+VASPkit, in the same folder<Cite id="S-042" />.
+
+- **NEDOS = 3001** in the SCF INCAR gives a fine energy grid. The default of 301 points is too coarse for a
+  clean PDOS.
+- **For a smoother DOS,** use a denser k-mesh in the SCF: VASPkit 102 with a smaller value, for example
+  0.02.
+
+<Callout variant="note" title="Optional: a denser non-self-consistent run">
+
+If you want a denser mesh without repeating the SCF, a run with ICHARG = 11 can read the SCF CHGCAR and
+keep it fixed. It inherits its physics from that CHGCAR, so keep ENCUT, ISPIN, MAGMOM, LMAXMIX, the
+functional, any LDAU tags and the cell identical to the SCF. See
+[Restarts: ISTART and ICHARG](/handbook/07-running/restarts-istart-icharg/).
+
+</Callout>
+
+</Section>
+
+<Section id="run" heading="Read the DOS with VASPkit">
+
+Run these in the SCF folder:
+
+<VaspFile
+  name="shell"
+  code={`printf "111\\n" | vaspkit              # TDOS.dat
+printf "113\\n" | vaspkit              # PDOS_<El>.dat, s p d (f) columns
+printf "115\\n" | vaspkit              # chosen atoms + orbitals → PDOS_USER.dat`}
+/>
+
+| Task | What it writes                                                                                                                                                                   |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 111  | `TDOS.dat`: the total DOS.                                                                                                                                                       |
+| 113  | One `PDOS_<El>.dat` file per element, with s, p, d (and f) columns. With spin polarization the files come in pairs, `_UP` and `_DW`.                                             |
+| 115  | `PDOS_USER.dat`: the sum over the atoms and orbitals you choose (for example O-s, O-p, Ni-d). LORBIT = 11 allows single orbitals such as px or dxy; LORBIT = 10 only s, p, d, f. |
+
+The `printf` lines type the menu answer for you, so the commands also work in a script<Cite id="S-020" />.
+Plot the `.dat` files with any plotting program.
+
+</Section>
+
+<Section id="read" heading="Reading the DOS and PDOS">
+
+What to look for, from the Workflow Handbook<Cite id="S-042" />:
+
+- **Energy zero.** VASPkit shifts the energies so that EF = 0. In an insulator VASP places EF near the
+  valence band maximum, so the gap appears just above 0.
+- **The gap.** Gaussian broadening (SIGMA) blurs the edges of a gap in the DOS. Take the number from
+  VASPkit 911 or from the band structure, not from the DOS.
+- **Metal, half-metal or semiconductor.** A finite DOS at EF in both spin channels means a metal. A finite
+  DOS in one channel and a gap in the other means a half-metal.
+- **Bonding character.** PDOS peaks of two species that overlap in the same energy range (for example TM-d
+  with O-p) indicate hybridization. Well-separated peaks indicate ionic character.
+- **Band edges.** The species and orbital that dominate the valence band maximum (VBM) and the conduction
+  band minimum (CBM) tell you which states govern absorption and doping.
+
+</Section>
+
+<Section id="next" heading="Files for the next step">
+
+Nothing new is written for VASP. The CHGCAR of the SCF in this folder is what the
+[band structure step](/workflow/band-structure/) (protocol step 3) needs.
+
+</Section>

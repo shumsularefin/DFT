@@ -1,0 +1,114 @@
+---
+id: bader
+title: Run a Bader charge analysis
+short: Bader charges
+group: Electronic
+order: 5
+summary: Run a static calculation with LAECHG to write the all-electron reference density, then let the Henkelman bader program count the electrons in each atom's region. Net charges follow from ZVAL in the POTCAR.
+folder: 10_bader/
+needs:
+  - 'Relaxed structure'
+  - 'Henkelman <code>bader</code> code and <code>chgsum.pl</code> (VTST scripts)'
+run: 'Static run with <code>LAECHG = .TRUE.</code>'
+produces:
+  - '<code>ACF.dat</code>: electrons per atom → net atomic charges'
+learn:
+  - { href: '/handbook/12-properties/bader-charges/', label: 'Bader charges: the method and its checks' }
+  - { href: '/handbook/09-analysis/charge-density/', label: 'Reading charge densities' }
+  - { href: '/handbook/05-practical-choices/pseudopotentials-and-paw/', label: 'PAW and the pseudo density' }
+tools:
+  - { href: '/tools/input-builder/?preset=bader&variant=default', label: 'Input Builder: Bader' }
+checklist: [Bader]
+sources: [S-042, S-020, S-029, S-084]
+status: draft
+updated: 2026-11-27
+---
+
+<Section id="why" heading="What a Bader analysis does">
+
+Bader analysis splits space along the zero-flux surfaces of the charge density and counts the electrons in
+each atom's region (its basin)<Cite id="S-029" /><Cite id="S-084" />. A PAW CHGCAR holds only the pseudo
+valence density, which has no maxima at the nuclei. So the regions are drawn on the all-electron
+reference density (core plus valence), and the valence charge is counted inside those
+regions<Cite id="S-042" />. The [Bader charges topic](/handbook/12-properties/bader-charges/) explains the
+method.
+
+</Section>
+
+<Section id="inputs" heading="The inputs">
+
+Make the INCAR with VASPkit 101 → BD, then edit it to match the one below<Cite id="S-020" />. Use the
+relaxed structure in a new folder (`10_bader/`).
+
+<PresetIncar preset="bader" caption="INCAR for the Bader run (101 → BD, edited)" />
+
+- `LAECHG = .TRUE.` writes `AECCAR0` (the core density) and `AECCAR2` (the valence density).
+- `LCHARG = .TRUE.` writes the `CHGCAR` that `bader` reads.
+- **For accurate charges, refine the FFT grid**: set `NGXF`, `NGYF` and `NGZF` to about twice the default
+  (the default values are printed in OUTCAR)<Cite id="S-042" />.
+
+</Section>
+
+<Section id="run" heading="Run the analysis">
+
+After the VASP run, sum the two AECCAR files into the reference density and run `bader` on the CHGCAR
+with that reference. The tools are the Henkelman group's `bader` program and the VTST script
+`chgsum.pl`<Cite id="S-084" />.
+
+<VaspFile
+  name="shell"
+  code={`chgsum.pl AECCAR0 AECCAR2           # → CHGCAR_sum (reference density)
+bader CHGCAR -ref CHGCAR_sum        # → ACF.dat, BCF.dat, AVF.dat
+grep ZVAL POTCAR                    # valence electrons per species
+cat ACF.dat                         # columns: # X Y Z CHARGE MIN_DIST ATOMIC_VOL
+# net charge of atom i  =  ZVAL(species of i) − CHARGE(i)`}
+/>
+
+What each line does:
+
+1. `chgsum.pl` adds `AECCAR0` and `AECCAR2` into `CHGCAR_sum`, the all-electron reference.
+2. `bader` draws the regions on `CHGCAR_sum` and counts the charge of `CHGCAR` in them. It writes
+   `ACF.dat`, `BCF.dat` and `AVF.dat`.
+3. `grep ZVAL POTCAR` lists the valence electrons of each species, in POTCAR order.
+4. `ACF.dat` has one row per atom with the columns X, Y, Z, CHARGE, MIN_DIST and ATOMIC_VOL.
+5. The net charge of atom i is ZVAL of its species minus its CHARGE.
+
+VASPkit 508 converts the Bader results to a `.pqr` file<Cite id="S-020" />.
+
+</Section>
+
+<Section id="check" heading="Check before you move on">
+
+- **The electrons add up.** The total of the CHARGE column equals the total number of valence electrons.
+- **No charge in the vacuum.** For a bulk crystal, the vacuum charge at the bottom of `ACF.dat` should be
+  about 0.
+- **The grid is converged.** Repeat with a finer FFT grid. The charges should change by less than
+  0.01 e<Cite id="S-042" />.
+
+<Callout variant="mistake" title="Running bader on CHGCAR alone">
+
+Without `-ref CHGCAR_sum` the regions are drawn on the pseudo density, which has no maxima at the
+nuclei. Write the AECCAR files with `LAECHG = .TRUE.` and sum them first<Cite id="S-042" />.
+
+</Callout>
+
+</Section>
+
+<Section id="read" heading="Reading the charges">
+
+- **Sign.** A positive net charge means the atom lost electrons (cation-like).
+- **Size.** Bader charges are always smaller than formal oxidation states. Oxygen in an oxide, for
+  example, is about −1.0 to −1.3, not −2. Compare trends, not absolute values.
+- **Charge transfer at interfaces and adsorbates.** Sum the Bader charges of each fragment and compare
+  with the isolated fragments. Combine this with charge-density difference plots,
+  Δρ = ρ<sub>AB</sub> − ρ<sub>A</sub> − ρ<sub>B</sub>, computed on the same grid and in the same
+  cell<Cite id="S-042" />.
+
+</Section>
+
+<Section id="next" heading="Files for the next step">
+
+The result is `ACF.dat`: electrons per atom, from which the net charges follow. Keep `CHGCAR_sum` and
+the AECCAR files if you will repeat the analysis on a finer grid.
+
+</Section>

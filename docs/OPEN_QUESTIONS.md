@@ -307,3 +307,18 @@ The Builder filled DFT+U with a per-element U table and FM starting moments from
 
 ## Q-073. Explicit k-mesh is not in the Input Builder share link
 The Input Builder's typed mesh (`meshOverride`, D-108) is not written to the share link, so a shared link falls back to the k-spacing mesh. **Close:** add the mesh to the share fragment with a round-trip test, or record that typed meshes are local only. **Owner: builder.**
+
+## Q-074. The soc preset and the Workflow Handbook's anisotropy run
+The Workflow Handbook's magnetocrystalline anisotropy (MAE) section lists ICHARG = 11 and LORBMOM but prints no INCAR; the Input Builder's `soc` preset adds SAXIS = 0 0 1 and has neither tag. The Workflow magnetic step lists the handbook's tags as text and does not show the preset. **Close:** decide whether the `soc` preset should gain an MAE variant with the handbook's tags. **Owner: author.**
+
+## Q-075. NSW = 1 in the DFPT phonon preset
+The `phonon-dfpt` preset sets NSW = 1 ("1 for IBRION 5 to 8"); the Workflow Handbook gives IBRION = 8, EDIFF = 1E-8 and no NCORE, and does not state NSW. The Workflow phonon step shows the preset. **Close:** confirm NSW for IBRION 8 from the VASP wiki and keep or drop the line. **Owner: author.**
+
+## Q-076. Band route A and the ISTART comment
+Route A of the band structure step reuses the SCF INCAR, whose comment says ISTART = 1 reads the WAVECAR from the relaxation in the same folder. In the new `04_band/` folder no WAVECAR is copied, so VASP starts from scratch; the page says so in a sentence. **Close:** decide whether the handbook's route A should copy the WAVECAR, or set ISTART = 0 for the band folder. **Owner: author.**
+
+## Q-077. "A hybrid functional" in the dielectric checklist row
+The pre-submit checklist lists "A hybrid functional" under must-not for Dielectric / Z*. The Workflow Handbook's point is narrower: with a hybrid, use IBRION = 6 with LCALCEPS instead of LEPSILON. The row can read as "never compute ε with a hybrid". **Close:** reword the row in `src/lib/reference/tables.ts` and S-042 together. **Owner: author.**
+
+## Q-078. Two recipes whose text and preset differ, and the first EDIFF rung
+Found while building the Workflow section, not changed by it: the phonons-at-Gamma recipe's text says IBRION = 5 while its preset has no IBRION; the DOS recipe's optional denser-mesh step says ICHARG = 11 but uses the `dos` preset, which has no ICHARG; and the troubleshooting page's EDIFF ladder starts at 1E-4, while the Workflow Handbook's "converge repeatedly" starts at 1E-5 and uses 1E-4 only if the energy oscillates. **Close:** align each recipe with its preset (a preset variant or a step note), and decide which first rung the ladder uses. **Owner: author.**

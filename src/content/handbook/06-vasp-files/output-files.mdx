@@ -7,10 +7,10 @@ summary: What each of the sixteen files VASP can write contains, which ones you 
 concepts: [output-file-reference]
 requires: [vasp-workflow]
 vaspTags: [LWAVE, LCHARG, LORBIT]
-sources: [S-019, S-041]
+sources: [S-019, S-041, S-042]
 noLab: true
 status: draft
-updated: 2026-11-19
+updated: 2026-11-27
 ---
 
 <Why>
@@ -97,6 +97,27 @@ The sixteen entries of the Field Handbook, shortened <Cite id="S-041" />:
 
 Three of the large files are controlled by tags: `LWAVE` and `LCHARG` decide whether `WAVECAR` and `CHGCAR` are written, and `LORBIT` decides whether `PROCAR` and the projected `DOSCAR` are <Cite id="S-041" />.
 
+**Who reads each file.** The Workflow Handbook lists, for the files of a normal project, what is in each one and which program or VASPKIT task reads it <Cite id="S-042" />. The task codes are explained in [VASPKIT in practice](/handbook/07-running/vaspkit-in-practice/).
+
+| File                 | What it holds                                                                                                                                 | Read by                                                         |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `OUTCAR`             | The full log: energies, forces, stress, magnetization per site, E-fermi, `NBANDS`, elastic and dielectric tensors, Born charges, phonon modes | `grep`, VASPKIT 203, almost everything                          |
+| `OSZICAR`            | One line per electronic step (dE, d eps) and per ionic step (F, E0, `mag=`)                                                                   | A quick convergence check                                       |
+| `CONTCAR`            | The final structure, in the same format as `POSCAR`                                                                                           | The next calculation's `POSCAR`                                 |
+| `CHGCAR`             | The charge density (and the magnetization density if `ISPIN = 2`) plus the PAW occupancies                                                    | `ICHARG = 1` or `11` restarts, Bader, VESTA, VASPKIT 311 to 314 |
+| `WAVECAR`            | The wavefunctions (large)                                                                                                                     | `ISTART = 1` restarts, hybrid runs started from PBE             |
+| `DOSCAR`             | The total DOS and, with `LORBIT`, the site-projected DOS                                                                                      | VASPKIT 111 and 113                                             |
+| `PROCAR`             | Band- and k-resolved orbital projections (`LORBIT = 11`)                                                                                      | VASPKIT 212 to 214 (projected bands)                            |
+| `EIGENVAL`           | The eigenvalues at each k-point                                                                                                               | VASPKIT 211, 911 and 912                                        |
+| `vasprun.xml`        | Everything in XML: DOS, eigenvalues, dielectric function, forces                                                                              | phonopy, pymatgen, VASPKIT 711, p4vasp                          |
+| `IBZKPT`             | The irreducible k-points actually used                                                                                                        | Checking which k-points VASP used                               |
+| `AECCAR0`, `AECCAR2` | The core and valence all-electron densities (written with `LAECHG`)                                                                           | The Bader reference density                                     |
+| `LOCPOT`             | The local potential (written with `LVHAR` or `LVTOT`)                                                                                         | Work function, VASPKIT 426                                      |
+| `ELFCAR`             | The electron localization function (written with `LELF`)                                                                                      | VESTA, bonding analysis                                         |
+| `XDATCAR`            | The trajectory: every ionic step                                                                                                              | Inspecting a relaxation that wandered                           |
+
+For a work function the handbook prefers `LVHAR`, which writes the electrostatic potential: it reaches the vacuum level faster than the total potential that `LVTOT` writes <Cite id="S-042" />.
+
 </InVasp>
 
 <WhatChanges>
@@ -140,6 +161,7 @@ The band step reads the charge density the SCF wrote. Keep `LCHARG = .TRUE.` in 
 
 - The Field Handbook file reference <Cite id="S-041" />.
 - VASP wiki pages for each file name, for example OUTCAR and WAVECAR <Cite id="S-019" />.
+- The Workflow Handbook's output-file table <Cite id="S-042" />.
 - `vasprun.xml` and `vaspout.h5` for scripted analysis (pymatgen, py4vasp) <Cite id="S-041" />.
 
 </GoDeeper>

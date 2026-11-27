@@ -1,0 +1,135 @@
+---
+id: optics
+title: Compute the optical properties
+short: Optics
+group: Electronic
+order: 4
+protocolStep: 5
+summary: Re-run the SCF to a tight EDIFF, read its NBANDS, then run LOPTICS with about three times as many bands on a denser k-mesh. VASPkit 711 turns the dielectric function into the refractive index, absorption, reflectivity and loss spectra.
+folder: 05_optics/
+needs:
+  - 'Relaxed structure'
+  - 'Converged SCF (<code>EDIFF</code> 1E-6 → 1E-8) for the <code>NBANDS</code> reference and the <code>WAVECAR</code>'
+run: '<code>LOPTICS = .TRUE.</code>, <code>NBANDS</code> ≈ 3× default, dense k-mesh'
+produces:
+  - 'ε<sub>1</sub>(ω), ε<sub>2</sub>(ω) in <code>vasprun.xml</code> / <code>OUTCAR</code> → 711'
+learn:
+  - { href: '/handbook/12-properties/optical-properties/', label: 'Optical properties: theory and traps' }
+  - { href: '/handbook/12-properties/dielectric-tensor/', label: 'The static dielectric tensor (LEPSILON)' }
+  - { href: '/handbook/09-analysis/density-of-states/', label: 'The projected DOS (to assign peaks)' }
+tools:
+  - { href: '/tools/input-builder/?preset=optics&variant=default', label: 'Input Builder: optics' }
+checklist: [Optics]
+sources: [S-042, S-019, S-020, S-082]
+status: draft
+updated: 2026-11-27
+---
+
+<Section id="why" heading="What the run computes">
+
+VASP computes the imaginary part of the dielectric function, ε<sub>2</sub>(ω), from transitions between
+occupied and empty states. It then gets the real part, ε<sub>1</sub>(ω), by a Kramers-Kronig transform.
+Transitions need empty bands, which is why NBANDS is raised well above the default<Cite id="S-042" />.
+
+This is the independent-particle picture: no excitons and no local-field effects. The
+[optical properties topic](/handbook/12-properties/optical-properties/) explains the theory.
+
+</Section>
+
+<Section id="run" heading="The sequence">
+
+1. Run a static SCF with tight convergence. EDIFF = 1E-8 is ideal for smooth spectra.
+2. Read the default band count from that run: `grep NBANDS OUTCAR`.
+3. Set NBANDS to about three times that, rounded up to a multiple of the MPI ranks (script below).
+4. Make the INCAR with VASPkit 101 → OP, then edit it: NBANDS, LOPTICS, CSHIFT, NEDOS, and ISPIN and
+   MAGMOM for a magnetic system. Use a denser k-mesh than the SCF (0.02 or finer).
+5. Run, then read the spectra with `printf "711\n1\n" | vaspkit`. The second answer picks the unit: 1 for
+   eV, 2 for nm, 3 for THz. 711 reads ε(ω) straight from `vasprun.xml`<Cite id="S-020" />.
+
+The script below reads the default NBANDS from the SCF OUTCAR and prints 3 × NBANDS rounded up to a
+multiple of the MPI ranks of the optics run. Set `np` to your own number of ranks.
+
+<VaspFile
+  name="shell"
+  code={`nb=\$(grep -m1 "NBANDS=" OUTCAR | awk '{print \$NF}')
+np=32                                    # MPI ranks of the optics run
+echo \$(( ( (3*nb + np - 1) / np ) * np ))   # e.g. nb=48 → 144; nb=50 → 160`}
+/>
+
+<PresetIncar preset="optics" caption="INCAR for the optics run (101 → OP, edited)" />
+
+<Callout variant="warning" title="Bulk only">
+
+VASPkit warns that 711 is not suitable for low-dimensional materials, where the vacuum dilutes ε<Cite id="S-020" />.
+
+</Callout>
+
+</Section>
+
+<Section id="derived" heading="What 711 derives from ε1 and ε2">
+
+From ε<sub>1</sub> and ε<sub>2</sub>, with $|\varepsilon| = \sqrt{\varepsilon_1^2 + \varepsilon_2^2}$, VASPkit
+711 computes<Cite id="S-042" /><Cite id="S-082" />:
+
+| Quantity                             | Formula                                                                                             |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------- |
+| Refractive index                     | $n(\omega) = \sqrt{(\lvert\varepsilon\rvert + \varepsilon_1)/2}$                                    |
+| Extinction coefficient               | $k(\omega) = \sqrt{(\lvert\varepsilon\rvert - \varepsilon_1)/2}$                                    |
+| Absorption coefficient (cm⁻¹)        | $\alpha(\omega) = 2\omega k/c = \sqrt{2}\,(\omega/c)\sqrt{\lvert\varepsilon\rvert - \varepsilon_1}$ |
+| Normal-incidence reflectivity        | $R(\omega) = \dfrac{(n-1)^2 + k^2}{(n+1)^2 + k^2}$                                                  |
+| Energy-loss function (plasmon peaks) | $L(\omega) = \varepsilon_2 / (\varepsilon_1^2 + \varepsilon_2^2)$                                   |
+| Optical conductivity (real part)     | $\sigma(\omega) = \omega\,\varepsilon_0\,\varepsilon_2$                                             |
+
+The VASPkit codes for optics<Cite id="S-020" />:
+
+| VASPkit code | What it does                                                                                   | Main outputs           |
+| ------------ | ---------------------------------------------------------------------------------------------- | ---------------------- |
+| 711          | Linear optics from `vasprun.xml` (or `REAL.in` / `IMAG.in`); asks for eV, nm or THz. Bulk only | n, k, α, R, L(ω) files |
+| 712 / 713    | Transition dipole moment at one k-point / along a band path (needs WAVECAR)                    | `TDM.dat` (Debye²)     |
+
+</Section>
+
+<Section id="read" heading="Reading the spectra">
+
+How to read the result<Cite id="S-042" />:
+
+- **Absorption onset ≈ optical gap.** If the onset sits at the PBE gap, it is underestimated. Either apply
+  a scissor shift (shift ε<sub>2</sub> rigidly by Δ = E<sub>g</sub>(HSE or experiment) − E<sub>g</sub>(PBE),
+  then redo the Kramers-Kronig transform) or run the optics with HSE or mBJ<Cite id="S-042" />.
+- **ε<sub>1</sub>(0) is ε<sub>∞</sub>**, the electronic (high-frequency) dielectric constant, and
+  n(0) = √ε<sub>1</sub>(0). Cross-check it with a LEPSILON run, which includes local-field effects.
+- **Peaks in ε<sub>2</sub>** are interband transitions. Assign them with the projected DOS (for example
+  O-2p → TM-3d, oxygen 2p to transition-metal 3d).
+- **Is the band-edge transition allowed?** A direct gap can still absorb weakly if the transition is
+  dipole-forbidden. VASPkit 713 computes the transition dipole moment between two bands (for example the
+  VBM and CBM band indices) along the band path. For this, run the band calculation with
+  `LWAVE = .TRUE.` so the WAVECAR is there<Cite id="S-042" />.
+- **Anisotropy.** Non-cubic crystals have different xx, yy and zz components. Report them separately, or
+  say that you averaged them.
+- **Metals.** LOPTICS lacks the intraband (Drude) term, so the low-energy spectra of metals are incomplete.
+
+<Callout variant="mistake" title="CSHIFT is not a scissor">
+
+CSHIFT is a broadening of the spectrum, not a scissor shift. It does not correct an underestimated
+gap<Cite id="S-042" />.
+
+</Callout>
+
+</Section>
+
+<Section id="check" heading="Check before you move on">
+
+- NBANDS is about three times the SCF default and a multiple of your core count.
+- The k-mesh is denser than the SCF mesh (0.02 or finer).
+- **NBANDS is converged.** Raise NBANDS until the spectra up to your plotted energy stop
+  changing<Cite id="S-042" />.
+
+</Section>
+
+<Section id="next" heading="Files for the next step">
+
+The results are the 711 files (n, k, α, R, L(ω)) and the dielectric function in `vasprun.xml`. For the
+static dielectric constant with local-field effects, the LEPSILON run in the lattice and response lane
+starts from the relaxed CONTCAR in its own folder.
+
+</Section>

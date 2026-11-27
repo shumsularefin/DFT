@@ -1,0 +1,169 @@
+---
+id: band-structure
+title: Compute the band structure
+short: Band structure
+group: Electronic
+order: 3
+protocolStep: 3
+summary: Converge the density on a uniform k-mesh, then evaluate the bands along the KPATH.in path from VASPkit 303, either in the same run (KPOINTS_OPT) or in a second run that reads the SCF CHGCAR. Read the result with VASPkit 211.
+folder: 04_band/
+needs:
+  - 'Relaxed structure in the standardized primitive cell (602 / <code>PRIMCELL.vasp</code>)'
+run: 'SCF without <code>ICHARG = 11</code>; <code>KPATH.in</code> from 303 as the band k-path'
+produces:
+  - 'Eigenvalues on the path → 211: <code>BAND.dat</code>, <code>KLABELS</code>, <code>BAND_GAP</code>'
+learn:
+  - { href: '/handbook/09-analysis/band-structures/', label: 'How to read a band structure' }
+  - {
+      href: '/handbook/05-practical-choices/kpoints-and-the-brillouin-zone/',
+      label: 'k-points and the Brillouin zone',
+    }
+  - { href: '/handbook/07-running/restarts-istart-icharg/', label: 'Restarts: ISTART and ICHARG' }
+  - { href: '/handbook/07-running/vaspkit-in-practice/', label: 'VASPkit in practice' }
+tools:
+  - { href: '/tools/kpath/', label: 'K-path tool (see the path, download KPATH.in or KPOINTS_OPT)' }
+  - { href: '/tools/input-builder/?preset=band&variant=route-a', label: 'Input Builder: bands, route A' }
+  - { href: '/tools/input-builder/?preset=band&variant=route-b', label: 'Input Builder: bands, route B' }
+checklist: [Bands]
+sources: [S-042, S-019, S-020, S-033]
+status: draft
+updated: 2026-11-27
+---
+
+<Section id="why" heading="Why the density comes from a uniform mesh">
+
+The SCF density must come from a uniform k-mesh that covers the whole Brillouin zone. Points along a path
+do not sample the zone, which is why the VASP wiki calls the line-mode mesh "not suitable for
+self-consistent calculations"<Cite id="S-019" />. So the plan is always the same: converge the density on
+the uniform mesh, then evaluate the `KPATH.in` points with that fixed density. The wiki documents two ways
+to do that, route A and route B below<Cite id="S-042" />.
+
+</Section>
+
+<Section id="inputs" heading="Common start">
+
+1. Make a new folder (`04_band/`). Copy in the relaxed POSCAR (the standardized primitive cell), the
+   POTCAR, the uniform-mesh KPOINTS and the SCF INCAR of step 2 (no ICHARG = 11).
+2. Make the k-path with VASPkit 303 (use 302 for a 2D material). It writes `KPATH.in`, `PRIMCELL.vasp`
+   and `HIGH_SYMMETRY_POINTS`.
+3. If `PRIMCELL.vasp` differs from your POSCAR, use it as the POSCAR: the path is defined for that cell.
+
+<VaspFile
+  name="shell"
+  code={`printf "303\\n" | vaspkit      # bulk; for a 2D material use 302
+cp PRIMCELL.vasp POSCAR        # only if PRIMCELL.vasp differs from your POSCAR`}
+/>
+
+| VASPkit code    | What it does                                                        | Main outputs                                                                |
+| --------------- | ------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| 301 / 302 / 303 | k-path for a 1D / 2D / bulk structure (same algorithm as SeeK-path) | `KPATH.in` (20 points per segment), `PRIMCELL.vasp`, `HIGH_SYMMETRY_POINTS` |
+
+The path uses the same algorithm as SeeK-path<Cite id="S-020" /><Cite id="S-033" />. The site's
+[k-path tool](/tools/kpath/) shows the path in the Brillouin zone for your cell and can download
+`KPATH.in` or `KPOINTS_OPT` for it.
+
+</Section>
+
+<Section id="route-a" heading="Route A: one SCF run with KPOINTS_OPT (VASP 6.3 or newer)">
+
+1. Keep the uniform mesh in `KPOINTS` and copy the path to `KPOINTS_OPT`.
+2. Run the SCF without ICHARG = 11. The VASP wiki says that after the SCF has converged, VASP computes the
+   band energies for the k-points in `KPOINTS_OPT` in the same job<Cite id="S-019" />.
+
+<VaspFile
+  name="shell"
+  code={`cp KPATH.in KPOINTS_OPT
+mpirun -np 32 vasp_std > vasp.out`}
+/>
+
+<PresetIncar
+  preset="band"
+  variant="route-a"
+  caption="INCAR for route A: the SCF INCAR of step 2, without ICHARG = 11"
+/>
+
+The common start copies no WAVECAR into this folder, so the `ISTART = 1` comment refers to the SCF
+folder of step 2.
+
+<Callout variant="warning" title="Reading route A with VASPkit">
+
+The path eigenvalues are written to `vasprun.xml` (and `vaspout.h5`). VASPkit 211 needs `EIGENVAL_OPT` and
+`PROCAR_OPT` for this route, and whether VASP writes them depends on how VASP was compiled. See the VASPkit
+tutorial "Single-shot band structure" (VASPkit 1.3.2 or newer)<Cite id="S-020" />.
+
+</Callout>
+
+</Section>
+
+<Section id="route-b" heading="Route B: KPATH.in as KPOINTS, reading the SCF density">
+
+1. Run the SCF of the common start until it has converged, and keep its CHGCAR in the folder.
+2. Copy the path over the KPOINTS file.
+3. Run with the INCAR below. `ICHARG = 11` reads that CHGCAR and keeps it fixed. This is the band INCAR in
+   the VASPkit tutorial<Cite id="S-020" /> and the procedure on the VASP wiki<Cite id="S-019" />.
+4. Read the result with VASPkit 211, then 213 (projected bands), 911 (gap) and 912 (effective masses).
+
+<VaspFile
+  name="shell"
+  code={`cp KPATH.in KPOINTS
+mpirun -np 32 vasp_std > vasp.out
+printf "211\\n" | vaspkit`}
+/>
+
+<PresetIncar preset="band" variant="route-b" caption="INCAR for route B, run on KPATH.in" />
+
+</Section>
+
+<Section id="read" heading="Reading the result">
+
+Before you run 211, set the Fermi level. The VASP wiki notes that a Fermi energy computed from path
+k-points is unreliable<Cite id="S-019" />. Take the value from the SCF run and put it on line 2 of a file
+called `FERMI_ENERGY.in`; VASPkit then uses it instead of the one in DOSCAR<Cite id="S-020" />.
+
+<VaspFile
+  name="shell"
+  code={`grep E-fermi OUTCAR      # in the SCF folder: the Fermi energy for line 2 of FERMI_ENERGY.in`}
+/>
+
+| VASPkit code | What it does                                                          | Main outputs                                                                        |
+| ------------ | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| 211          | Band structure (reads EIGENVAL, KPOINTS, and EF from DOSCAR)          | `BAND.dat`, `BAND_REFORMATTED.dat`, `KLINES.dat`, `KLABELS`, `BAND_GAP`, `band.png` |
+| 212          | Projected bands for selected atoms, one file each                     | `PBAND_A1.dat`, `PBAND_A2.dat` … (s, py, pz, px, d…, tot)                           |
+| 213          | Projected bands for each element                                      | `PBAND_<El>.dat`                                                                    |
+| 214          | Sum of projected bands over selected atoms (surface vs bulk layers)   | `PBAND_SUM.dat`                                                                     |
+| 911          | Band gap, VBM and CBM energies, their k-locations, direct or indirect | Printed summary                                                                     |
+| 912          | Effective masses                                                      | `m*/me` (in units of the electron mass)                                             |
+
+How to read the plot<Cite id="S-042" />:
+
+- **Labels.** Keep the point labels after the coordinates in KPOINTS (`KPATH.in` has them). Without them,
+  `KLABELS` shows "Undefined".
+- **Direct or indirect gap.** If the VBM (valence band maximum) and the CBM (conduction band minimum)
+  sit at the same k-point, the gap is direct. If they sit at different k-points, it is indirect.
+- **Dispersion.** Steep bands mean light carriers. Flat bands mean localized states and heavy masses.
+- **Gap accuracy.** PBE underestimates band gaps. Use HSE06 or mBJ for quantitative gaps.
+
+</Section>
+
+<Section id="check" heading="Check before you move on">
+
+- The density came from the uniform mesh: either route A, or route B reading the CHGCAR of that SCF.
+- `FERMI_ENERGY.in` holds the SCF Fermi energy on line 2.
+- `KLABELS` shows the point names, not "Undefined".
+
+<Callout variant="mistake" title="Jagged bands or a wrong gap">
+
+These usually mean the path eigenvalues were computed self-consistently on the path itself, or from a
+CHGCAR of another cell or another spin setting<Cite id="S-042" />.
+
+</Callout>
+
+</Section>
+
+<Section id="next" heading="Files for the next step">
+
+The [optics step](/workflow/optics/) (protocol step 5) starts from a converged SCF, not from the band run. If you plan to check
+whether the band-edge transition is allowed with VASPkit 713 (transition dipole moment along the band
+path), run the band calculation with `LWAVE = .TRUE.`, because 713 needs the WAVECAR<Cite id="S-042" />.
+
+</Section>

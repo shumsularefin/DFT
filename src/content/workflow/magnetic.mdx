@@ -1,0 +1,180 @@
+---
+id: magnetic
+title: Find the magnetic ground state
+short: Magnetic order
+group: Lattice and response
+order: 5
+summary: Compute the non-magnetic, ferromagnetic and several antiferromagnetic orders in one supercell, relax each, and compare their energies per formula unit. The lowest one is your magnetic ground state.
+folder: 11_magnetic/
+needs:
+  - 'The relaxed structure (<code>CONTCAR</code> from the relaxation)'
+  - 'A supercell that can hold every AFM order you want to test'
+run: 'NM, FM and several AFM configurations, each relaxed (<code>ISIF = 3</code>), same cell and settings'
+produces:
+  - 'The ground-state magnetic order and its moments'
+  - 'Energy differences for exchange constants'
+  - 'The magnetocrystalline anisotropy energy (MAE), with SOC'
+learn:
+  - {
+      href: '/handbook/05-practical-choices/finding-the-magnetic-ground-state/',
+      label: 'Finding the magnetic ground state',
+    }
+  - { href: '/handbook/05-practical-choices/magnetic-orderings/', label: 'FM, A-, C- and G-type orders' }
+  - { href: '/handbook/05-practical-choices/spin-polarized-calculations/', label: 'ISPIN and MAGMOM' }
+  - { href: '/handbook/05-practical-choices/reading-magnetic-output/', label: 'Reading magnetic output' }
+  - {
+      href: '/handbook/05-practical-choices/noncollinear-and-spin-orbit/',
+      label: 'Spin-orbit coupling and the MAE',
+    }
+tools:
+  - { href: '/tools/magnetic/', label: 'Magnetic Orderings (POSCAR and MAGMOM)' }
+  - { href: '/tools/input-builder/?preset=spin&variant=fm', label: 'Input Builder: magnetic configurations' }
+  - { href: '/tools/review/', label: 'Calculation Review (check each run)' }
+sources: [S-042, S-059, S-060, S-070]
+status: draft
+updated: 2026-11-27
+---
+
+<Section id="why" heading="Why you must try every order">
+
+A spin-polarized run does not search for the ground state. It slides into the local minimum closest to the
+starting MAGMOM, and that is not necessarily the ground state<Cite id="S-042" />.
+
+So you find the ground state by brute force: compute every plausible order explicitly and compare their
+energies per formula unit. The lowest energy wins. The handbook page
+[Finding the magnetic ground state](/handbook/05-practical-choices/finding-the-magnetic-ground-state/)
+explains why the comparison has to be this careful, and
+[Magnetic orderings](/handbook/05-practical-choices/magnetic-orderings/) shows what each order looks like.
+
+</Section>
+
+<Section id="configurations" heading="Build the configurations">
+
+1. **Build a supercell that can hold each order.** Double the cell along c for a layered A-type
+   antiferromagnet. Use √2 × √2 or 2 × 2 × 2 for a checkerboard G-type order.
+2. **Use the same supercell for every configuration, FM and NM included.** The k-point and basis errors are
+   then the same in every run and cancel in the energy differences.
+3. **Give each configuration its own folder** inside `11_magnetic/`: `NM/`, `FM/`, `AFM1/`, `AFM2/`, all with
+   the same supercell<Cite id="S-042" />.
+
+The [Magnetic Orderings tool](/tools/magnetic/) builds these supercells and writes the matching POSCAR and
+MAGMOM for you.
+
+</Section>
+
+<Section id="inputs" heading="The MAGMOM lines">
+
+The handbook's example is a supercell with 4 transition-metal (TM) atoms and 8 oxygen atoms, 12 atoms in
+POSCAR order: the 4 TM atoms first, then the 8 O<Cite id="S-042" />. Every magnetic configuration uses
+`ISPIN = 2`. Only the MAGMOM line changes, and it holds one value per atom. The rest of the INCAR is the
+relaxation INCAR from [Relax the structure](/workflow/relaxation/).
+
+<PresetIncar preset="spin" variant="nm" caption="NM: non-magnetic, so spin polarization is switched off" />
+
+<PresetIncar preset="spin" variant="fm" caption="FM: all four TM moments point up, O starts at zero" />
+
+<PresetIncar
+  preset="spin"
+  variant="afm-1"
+  caption="AFM-1 (layered): two TM moments up, two down, grouped in layers"
+/>
+
+<PresetIncar preset="spin" variant="afm-2" caption="AFM-2 (checkerboard): up and down moments alternate" />
+
+</Section>
+
+<Section id="run" heading="Relax, then a static run, for each configuration">
+
+1. **Relax each configuration with `ISIF = 3`.** Magnetic order changes the volume, so every order needs its
+   own relaxed cell<Cite id="S-042" />.
+2. **Run a static SCF for each relaxed configuration.**
+3. **Compare the "energy without entropy" per formula unit.** Divide each total energy by the number of
+   formula units in the supercell before you compare.
+4. **Check that each run kept its pattern.** If an AFM start ended ferromagnetic, that configuration is
+   unstable, or the starting MAGMOM was poor.
+
+<Callout variant="note" title="Per formula unit or per magnetic ion">
+
+The handbook compares energies per formula unit. The [Magnetic tool](/tools/magnetic/) reports them per
+magnetic ion. The two are the same when the formula unit holds one magnetic ion; otherwise divide by the
+number of magnetic ions per formula unit to go from one to the other.
+
+</Callout>
+
+</Section>
+
+<Section id="read" heading="Read the moments">
+
+<VaspFile
+  name="shell"
+  code={`grep "mag=" OSZICAR | tail -1                 # total cell moment (μB)
+N=12                                           # number of atoms
+grep -A $((N+6)) "magnetization (x)" OUTCAR | tail -$((N+6))
+                                               # per-site s p d tot (LORBIT=11)
+grep "number of electron" OUTCAR | tail -1     # electrons and magnetization`}
+/>
+
+- The first line prints the total moment of the cell in μB, from the last step.
+- `N` is the number of atoms in your cell (12 in the example). The next command uses it to print the
+  `magnetization (x)` table: the s, p, d and total moment of every site. The table is written with
+  `LORBIT = 11`.
+- The last line prints the number of electrons and the magnetization from OUTCAR.
+
+</Section>
+
+<Section id="interpret" heading="Reading the result">
+
+- **The sign of ΔE.** Take ΔE = E<sub>AFM</sub> − E<sub>FM</sub> per formula unit. Positive means the
+  ferromagnet is the ground state, negative means the antiferromagnet is. Differences below a few meV per
+  formula unit are within the uncertainty of DFT and depend strongly on U<Cite id="S-042" />.
+- **Site moments look a little small, and that is normal.** VASP integrates each moment inside the PAW
+  sphere, so it comes out slightly below the formal value: high-spin Fe<sup>3+</sup> gives about 4.2 to
+  4.3 μB against a formal 5 μB.
+- **The total moment of the cell** is an integer for half-metals and insulators.
+- **Exchange constants.** Map the energies of three or more configurations onto a Heisenberg model,
+  E = E<sub>0</sub> − Σ J<sub>ij</sub> S<sub>i</sub>·S<sub>j</sub>, and solve for J<sub>1</sub>,
+  J<sub>2</sub> and so on<Cite id="S-060" /><Cite id="S-059" />. Count the bonds of each type carefully in
+  every configuration.
+- **A quick Curie temperature.** The author's mean-field estimate is
+  k<sub>B</sub>T<sub>C</sub> ≈ (2/3)(E<sub>AFM</sub> − E<sub>FM</sub>), per magnetic atom<Cite id="S-042" />.
+  It overestimates T<sub>C</sub>. Monte Carlo on the fitted J values is more reliable.
+- **Half-metals.** In the spin-resolved DOS one spin channel has a gap at E<sub>F</sub> and the other does
+  not, and the total moment is an integer.
+
+<Callout variant="note" title="The Magnetic tool uses a different reference">
+
+The [Magnetic tool](/tools/magnetic/) does not use the AFM energy in this formula. It uses the fitted energy of
+the paramagnetic (disordered) state instead<Cite id="S-070" />. For a simple antiferromagnet that gives about
+half the value of the author's quick estimate, so expect the two numbers to differ.
+
+</Callout>
+
+</Section>
+
+<Section id="anisotropy" heading="Magnetocrystalline anisotropy with spin-orbit coupling">
+
+The magnetocrystalline anisotropy energy (MAE) is the energy cost of turning the moments from one crystal
+direction to another. It needs spin-orbit coupling (SOC) and takes one collinear run followed by one
+non-collinear run per direction<Cite id="S-042" />.
+
+1. **Collinear SCF with `vasp_std`.** Set `LMAXMIX = 4` (6 for f elements) and a tight EDIFF. Keep the
+   CHGCAR and the WAVECAR.
+2. **Non-collinear runs with `vasp_ncl`**, one run per spin direction, each starting from that CHGCAR. Add:
+   - `LSORBIT = .TRUE.` (spin-orbit coupling on)
+   - `ICHARG = 11` (read the collinear charge density)
+   - `ISYM = -1` (symmetry off)
+   - `LORBMOM = .TRUE.` (write the orbital moments)
+   - MAGMOM with three components per atom: `MAGMOM = 0 0 4 …` for [001], `MAGMOM = 4 0 0 …` for [100]
+3. **Take the difference:** MAE = E[100] − E[001]. It is small, from μeV to meV per atom.
+
+Converge the k-mesh hard before you trust the MAE: it needs very dense sampling.
+
+</Section>
+
+<Section id="next" heading="Files for the next step">
+
+Keep the relaxed CONTCAR and the MAGMOM line of the lowest-energy configuration: that is the magnetic
+ground state. Because small energy differences depend strongly on U, the [DFT+U step](/workflow/dft-plus-u/)
+shows how to scan U and report whether the ground state changes.
+
+</Section>

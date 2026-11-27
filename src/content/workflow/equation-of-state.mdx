@@ -1,0 +1,157 @@
+---
+id: equation-of-state
+title: Fit an energy–volume curve
+short: E–V curve
+group: Lattice and response
+order: 2
+summary: Relax the structure at 7 to 11 fixed volumes around the minimum, then fit a third-order Birch–Murnaghan curve to get E0, V0, B0 and B′0 without relying on the stress tensor.
+folder: 07_eos/
+needs:
+  - 'Relaxed structure (<code>CONTCAR</code> of the relaxation)'
+run: '7 to 11 fixed-volume calculations (<code>ISIF = 4</code> or <code>2</code>), ±5 to 10% in volume'
+produces:
+  - '<code>E(V)</code> → E₀, V₀, B₀, B′₀'
+  - 'Phase stability against pressure'
+learn:
+  - { href: '/handbook/12-properties/equation-of-state/', label: 'The equation of state explained' }
+  - { href: '/handbook/05-practical-choices/plane-waves-and-encut/', label: 'ENCUT and Pulay stress' }
+  - {
+      href: '/handbook/12-properties/elastic-constants/',
+      label: 'Elastic constants (the other bulk modulus)',
+    }
+tools:
+  - { href: '/tools/eos/', label: 'Equation of state fit (paste ev.dat)' }
+checklist: []
+sources: [S-042, S-061, S-062, S-020, S-034]
+status: draft
+updated: 2026-11-27
+---
+
+<Section id="why" heading="Why fit an energy–volume curve">
+
+An E–V curve gives the equilibrium volume and the bulk modulus without using the stress tensor. So it
+is free of Pulay stress at a fixed cutoff<Cite id="S-042" />. It is also how you compare polymorphs or
+magnetic states over a range of volumes, and how you get transition pressures.
+
+The idea: you choose the volume instead of letting VASP change it. You make several copies of the
+relaxed cell, each scaled a little, relax everything except the volume, and record the final energy
+and volume of each. The points trace a bowl, and a fitted curve gives the bottom of the bowl (V0, E0)
+and how steep it is (B0).
+
+</Section>
+
+<Section id="inputs" heading="The inputs">
+
+Each point is a fixed-volume relaxation. Use one INCAR for all of them, starting from your
+[relaxation](/workflow/relaxation/) INCAR and changing these tags<Cite id="S-042" />:
+
+| Tag            | Setting                 | Reason                                                                                                                 |
+| -------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| ISIF           | 4 (2 for cubic)         | 4 relaxes the ions and the cell shape at fixed volume. A cubic cell has no shape to relax, so 2 (ions only) is enough. |
+| IBRION         | 2                       | Relax the ions (and shape) at each volume.                                                                             |
+| NSW            | 100                     | Up to 100 ionic steps per point.                                                                                       |
+| EDIFF          | 1E-6                    | The SCF criterion at every point.                                                                                      |
+| EDIFFG         | −0.005                  | Force criterion, as in the relaxation.                                                                                 |
+| ENCUT, KPOINTS | The same at every point | The points are compared with each other, so nothing else may change between them.                                      |
+
+Scan 7 to 11 volumes covering about ±5 to 10% in volume.
+
+<PresetIncar
+  preset="relax"
+  variant="fixed-volume"
+  caption="INCAR for each volume (a fixed-volume relaxation)"
+/>
+
+</Section>
+
+<Section id="run" heading="Run the volume scan">
+
+The author's script `ev_scan.sh` scales the lattice constant (line 2 of POSCAR) from 0.97 to 1.03, which
+is roughly ±9% in volume. For each scale it makes a folder `s_0.97`, `s_0.98`, and so on, copies the
+inputs in, runs VASP, and appends the final volume and the "energy without entropy" to `ev.dat`:
+
+<VaspFile
+  name="shell"
+  code={`#!/bin/bash
+# INCAR: ISIF = 4 (shape + ions relax at fixed volume; use ISIF = 2 for cubic), IBRION = 2,
+#        NSW = 100, EDIFF = 1E-6, EDIFFG = -0.005, same ENCUT and k-mesh everywhere
+for s in 0.97 0.98 0.99 1.00 1.01 1.02 1.03; do        # lattice scale → ≈ ±9% volume
+  d=s_$s; mkdir -p $d; cp INCAR KPOINTS POTCAR $d/
+  awk -v s=$s 'NR==2{print $1*s; next}1' POSCAR > $d/POSCAR
+  (cd $d && mpirun -np 32 vasp_std > vasp.out)
+  V=$(grep "volume of cell" $d/OUTCAR | tail -1 | awk '{print $NF}')
+  E=$(grep "energy  without entropy" $d/OUTCAR | tail -1 | awk '{print $NF}')
+  echo "$V $E" >> ev.dat
+done`}
+/>
+
+The `awk` line multiplies the scale factor on line 2 of POSCAR, so the whole cell grows or shrinks
+evenly. `ev.dat` ends up with one line per point: volume in Å³, energy in eV per cell.
+
+</Section>
+
+<Section id="fit" heading="Fit the Birch–Murnaghan curve (3rd order)">
+
+The third-order Birch–Murnaghan equation of state<Cite id="S-061" /><Cite id="S-062" />, as the author
+writes it<Cite id="S-042" />:
+
+- `E(V) = E₀ + (9V₀B₀/16) { [(V₀/V)^(2/3) − 1]³ B′₀ + [(V₀/V)^(2/3) − 1]² [6 − 4(V₀/V)^(2/3)] }`
+- `B₀ [GPa] = B₀ [eV/Å³] × 160.2177`
+
+E₀ is the minimum energy, V₀ the equilibrium volume, B₀ the bulk modulus and B′₀ its pressure
+derivative. With E in eV and V in Å³ the fit gives B₀ in eV/Å³, so multiply by 160.2177 for GPa.
+
+Save this script as `fit_eos.py` next to `ev.dat` and run it with Python. It fits a parabola first to get
+starting guesses, then fits the Birch–Murnaghan curve:
+
+<VaspFile
+  name="shell"
+  code={`import numpy as np
+from scipy.optimize import curve_fit
+V, E = np.loadtxt("ev.dat", unpack=True)          # Å^3, eV (per cell)
+def bm3(V, E0, V0, B0, Bp):
+    x = (V0 / V) ** (2.0 / 3.0)
+    return E0 + 9.0 * V0 * B0 / 16.0 * ((x - 1) ** 3 * Bp + (x - 1) ** 2 * (6 - 4 * x))
+a, b, c = np.polyfit(V, E, 2)                     # parabola for initial guesses
+V0g = -b / (2 * a)
+p, _ = curve_fit(bm3, V, E, p0=[E.min(), V0g, 2 * a * V0g, 4.0])
+E0, V0, B0, Bp = p
+print(f"E0 = {E0:.5f} eV  V0 = {V0:.3f} A^3  B0 = {B0 * 160.2177:.1f} GPa  B' = {Bp:.2f}")`}
+/>
+
+Other ways to fit the same data<Cite id="S-042" />:
+
+- **VASPkit 205** fits the equation of state directly and prints E0, V0, B0 and B′<Cite id="S-020" />.
+- **pymatgen:** `EOS(eos_name="birch_murnaghan")`<Cite id="S-034" />.
+- **ASE:** its `EquationOfState` class.
+- **This site:** paste `ev.dat` into the [Equation of state fit](/tools/eos/) tool.
+
+</Section>
+
+<Section id="check" heading="Check before you move on">
+
+- **The minimum lies inside the scanned range.** If the lowest point is at an edge, extend the scan
+  to smaller or larger scales.
+- **B′0 is usually 3.5 to 5.** Values far outside suggest too few points, too narrow a range or noisy
+  energies.
+- **B0 agrees with the elastic constants.** B_H from the Cij of the [elastic step](/workflow/elastic/)
+  should match B0 within a few percent. A large difference points to an unconverged ENCUT or k-mesh, or
+  to residual stress<Cite id="S-042" />.
+
+</Section>
+
+<Section id="polymorphs" heading="Polymorphs and pressure">
+
+To compare phases, run the scan for each polymorph (or each magnetic state) and plot all the E(V)
+curves together. The common tangent between two curves gives the transition pressure. Equivalently,
+compare the enthalpies `H = E + PV`, with the pressure from `P = −dE/dV`<Cite id="S-042" />.
+
+</Section>
+
+<Section id="next" heading="Files for the next step">
+
+This step runs in `07_eos/`, with one subfolder per scale, `s_0.97` to `s_1.03`. Keep `ev.dat` and the
+fit output: B0 is the cross-check for the [elastic constants](/workflow/elastic/). The
+[phonons](/workflow/phonons/) start again from the relaxed CONTCAR, in `08_phonon/`.
+
+</Section>

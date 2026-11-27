@@ -6,14 +6,17 @@ interface Item {
 interface Props {
   prev: Item | null;
   next: Item | null;
+  /** Section the ids live under, for example '/workflow/'. */
+  base?: string;
+  label?: string;
 }
-const { prev, next } = Astro.props;
+const { prev, next, base = '/handbook/', label = 'Previous and next topic' } = Astro.props;
 ---
 
 {(prev || next) && (
-  <nav class="prev-next" aria-label="Previous and next topic">
+  <nav class="prev-next" aria-label={label}>
     {prev ? (
-      <a rel="prev" href={`/handbook/${prev.id}/`}>
+      <a rel="prev" href={`${base}${prev.id}/`}>
         <span class="pn-dir">Previous</span>
         {prev.title}
       </a>
@@ -21,7 +24,7 @@ const { prev, next } = Astro.props;
       <span />
     )}
     {next && (
-      <a rel="next" href={`/handbook/${next.id}/`} class="pn-next">
+      <a rel="next" href={`${base}${next.id}/`} class="pn-next">
         <span class="pn-dir">Next</span>
         {next.title}
       </a>

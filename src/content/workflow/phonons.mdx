@@ -1,0 +1,195 @@
+---
+id: phonons
+title: Compute the phonons
+short: Phonons
+group: Lattice and response
+order: 3
+summary: Re-relax tightly, displace atoms in a supercell with phonopy (or run DFPT with IBRION = 8), and read the phonon bands, DOS and thermal properties. No imaginary modes means the structure is dynamically stable.
+folder: 08_phonon/
+needs:
+  - 'Tightly relaxed structure (<code>EDIFFG ≈ −0.001</code>, <code>EDIFF = 1E-8</code>)'
+run: 'Phonopy finite displacements in a supercell, or DFPT (<code>IBRION = 8</code>)'
+produces:
+  - 'Phonon dispersion and phonon DOS'
+  - 'Free energy, heat capacity and entropy'
+learn:
+  - { href: '/handbook/12-properties/phonons/', label: 'Phonons explained' }
+  - {
+      href: '/handbook/12-properties/dielectric-tensor/',
+      label: 'Dielectric tensor and Born charges (LO–TO)',
+    }
+  - { href: '/handbook/09-analysis/energies-and-forces/', label: 'Energies and forces' }
+tools:
+  - {
+      href: '/tools/input-builder/?preset=phonon-finite-displacement&variant=default',
+      label: 'Input Builder: phonon displacement',
+    }
+  - { href: '/tools/input-builder/?preset=phonon-dfpt&variant=default', label: 'Input Builder: phonon DFPT' }
+checklist: [Phonon]
+sources: [S-042, S-083, S-020]
+status: draft
+updated: 2026-11-27
+---
+
+<Section id="why" heading="Why compute phonons">
+
+Phonons test dynamical stability: if no mode is imaginary, the structure is a local minimum of the
+energy. They also give the vibrational thermodynamics (free energy, heat capacity,
+entropy)<Cite id="S-042" />.
+
+The force constants come from the forces on the atoms when one atom is displaced. You need a supercell
+so that the displaced atom does not interact with its own periodic images<Cite id="S-083" />.
+
+</Section>
+
+<Section id="route-a" heading="Route A: phonopy with finite displacements (recommended)">
+
+The five steps<Cite id="S-042" />:
+
+1. **Re-relax tightly**, with `EDIFF = 1E-8` and `EDIFFG = −0.001`. Leftover forces show up as spurious
+   imaginary modes.
+2. **Generate the displacements:** `phonopy -d --dim 2 2 2 -c POSCAR`. This writes `SPOSCAR` (the
+   perfect supercell), one `POSCAR-001`, `POSCAR-002`, ... per displaced structure, and
+   `phonopy_disp.yaml`. Choose DIM so that each supercell edge is at least about 10 Å.
+3. **Run one static VASP job per displacement**, with the INCAR below and a k-mesh reduced in proportion
+   to the supercell.
+4. **Collect the forces:** `phonopy -f disp-*/vasprun.xml` writes `FORCE_SETS`.
+5. **Compute the dispersion and the DOS** with `band.conf` and `mesh.conf`, then the thermal properties.
+
+<PresetIncar preset="phonon-finite-displacement" caption="INCAR for each displacement" />
+
+For a magnetic system, keep ISPIN = 2 and give MAGMOM for the supercell, not for the unit cell.
+
+The whole pipeline, from the displacements to the plots:
+
+<VaspFile
+  name="shell"
+  code={`phonopy -d --dim 2 2 2 -c POSCAR
+for f in POSCAR-*; do
+  n=\${f#POSCAR-}; mkdir -p disp-$n
+  cp $f disp-$n/POSCAR
+  cp INCAR KPOINTS POTCAR disp-$n/
+  (cd disp-$n && mpirun -np 32 vasp_std > vasp.out)
+done
+phonopy -f disp-*/vasprun.xml        # FORCE_SETS
+phonopy -p -s band.conf              # band.yaml, band.pdf
+phonopy-bandplot --gnuplot band.yaml > phonon_band.dat
+phonopy -t -p -s mesh.conf           # DOS + thermal_properties.yaml`}
+/>
+
+What each line does:
+
+- The loop makes a folder `disp-001`, `disp-002`, ... for each `POSCAR-001`, ..., copies the inputs in and
+  runs VASP there.
+- `phonopy -f` reads the forces from every `vasprun.xml` and writes `FORCE_SETS`.
+- `phonopy -p -s band.conf` computes the phonon bands along the path in `band.conf`, writing
+  `band.yaml` and the plot `band.pdf`.
+- `phonopy-bandplot --gnuplot` turns `band.yaml` into plain columns, `phonon_band.dat`, for your own
+  plots.
+- `phonopy -t -p -s mesh.conf` computes the phonon DOS on the mesh and the thermal properties,
+  `thermal_properties.yaml`.
+
+`band.conf`, written here for an FCC path:
+
+<VaspFile
+  name="shell"
+  code={`DIM = 2 2 2
+PRIMITIVE_AXES = AUTO
+BAND = 0 0 0  0.5 0 0.5  0.5 0.25 0.75  0.375 0.375 0.75  0 0 0  0.5 0.5 0.5
+BAND_LABELS = $\\Gamma$ X W K $\\Gamma$ L
+BAND_POINTS = 101
+# BAND = AUTO   (needs seekpath installed)
+# NAC = .TRUE.  (polar crystals, needs BORN file)`}
+/>
+
+`DIM` must match the supercell you displaced. `BAND` lists the high-symmetry points of the path (here
+Γ X W K Γ L), `BAND_LABELS` names them and `BAND_POINTS` sets how many points each segment gets.
+`BAND = AUTO` chooses the path for you if seekpath is installed. `NAC` is for polar crystals (see LO–TO
+splitting below).
+
+`mesh.conf`:
+
+<VaspFile
+  name="shell"
+  code={`DIM = 2 2 2
+PRIMITIVE_AXES = AUTO
+MP = 24 24 24
+TPROP = .TRUE.
+TMIN = 0
+TMAX = 1000
+TSTEP = 10
+# PDOS = 1 2, 3 4 5   (atom indices grouped per species)`}
+/>
+
+`MP` is the q-point mesh for the DOS, `TPROP = .TRUE.` turns on the thermal properties from `TMIN` to
+`TMAX` in steps of `TSTEP`, and the commented `PDOS` line groups atom indices per species for a
+projected phonon DOS.
+
+</Section>
+
+<Section id="route-b" heading="Route B: DFPT force constants (IBRION = 8)">
+
+Instead of one job per displacement, run one VASP job on the perfect supercell (`cp SPOSCAR POSCAR`)
+with `IBRION = 8`, `EDIFF = 1E-8` and NCORE removed<Cite id="S-042" />:
+
+<PresetIncar preset="phonon-dfpt" caption="INCAR for the DFPT run on the supercell" />
+
+Then `phonopy --fc vasprun.xml` writes `FORCE_CONSTANTS`. Add `FORCE_CONSTANTS = READ` to both
+`band.conf` and `mesh.conf`, and run the same `phonopy -p -s band.conf` and `phonopy -t -p -s mesh.conf`
+lines as in Route A.
+
+DFPT is one job instead of many. But it does not support every functional (no hybrids, limited +U
+support) and it scales poorly for large supercells.
+
+</Section>
+
+<Section id="lo-to" heading="Polar materials: LO–TO splitting">
+
+In ionic insulators the long-range dipole field splits the longitudinal and transverse optical modes at
+Γ. Without a correction, the optical branches at Γ are wrong<Cite id="S-042" />.
+
+The fix: compute ε∞ and the Born effective charges in the unit cell (the dielectric step, see
+[Dielectric tensor and Born charges](/handbook/12-properties/dielectric-tensor/)). Then write the BORN
+file and switch on the correction in `band.conf`:
+
+<VaspFile name="shell" code={`phonopy-vasp-born vasprun.xml > BORN`} />
+
+and set `NAC = .TRUE.` (uncomment the line in `band.conf`).
+
+</Section>
+
+<Section id="gamma" heading="Γ-point modes only">
+
+For IR or Raman assignment you only need the frequencies at Γ. Run `IBRION` = 5 to 8 on the unit cell;
+VASPkit 101 → FQ writes the template<Cite id="S-020" />. OUTCAR lists each mode as `f` (real) or `f/i`
+(imaginary), in THz, 2πTHz, cm⁻¹ and meV. Three modes near zero are the acoustic translations (the whole
+crystal moving)<Cite id="S-042" />.
+
+</Section>
+
+<Section id="check" heading="Check before you move on: reading the phonons">
+
+- **No imaginary branches:** the structure is dynamically stable at 0 K.
+- **A small imaginary acoustic dip near Γ (a few cm⁻¹):** numerical noise. Tighten EDIFF, add ADDGRID,
+  increase ENCUT, the k-mesh or the supercell, and re-relax more tightly.
+- **Large imaginary modes at a zone-boundary point:** a genuine instability. Displace the atoms along
+  that mode's eigenvector in the matching supercell and re-relax to find the lower-symmetry phase.
+- **The gap between the acoustic and optical branches** follows from the contrast in atomic masses.
+  Flat, low-lying optical modes ("rattlers") suppress the thermal conductivity.
+- **Thermal properties:** the heat capacity `C_V` approaches `3Nk_B` per cell at high temperature
+  (Dulong–Petit). The vibrational free energy `F_vib(T)` adds to `E_DFT` when you compare phases at
+  finite temperature. The quasi-harmonic approximation (`phonopy-qha`) adds thermal
+  expansion<Cite id="S-042" />.
+
+</Section>
+
+<Section id="next" heading="Files and folders">
+
+This step runs in `08_phonon/`: the supercell `SPOSCAR`, the displacement folders `disp-001`, ... and the
+phonopy files (`phonopy_disp.yaml`, `FORCE_SETS` or `FORCE_CONSTANTS`, `band.yaml`, `band.pdf`,
+`phonon_band.dat`, `thermal_properties.yaml`).
+
+For a polar crystal, the BORN file comes from the dielectric calculation in `09_dielectric/`
+(LEPSILON, IBRION = 8), which runs on the relaxed unit cell.
+
+</Section>
