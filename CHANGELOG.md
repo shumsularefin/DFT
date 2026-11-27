@@ -7,6 +7,8 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- The 3D handbook (M16): every topic has a live 3D stage beside the text that turns freely (no pole lock), follows the reading position and has VESTA-style views, orthographic, layers and parameters; eleven new topics; module 9 deepened, module 10 as a results-free method walkthrough, module 11 guided builds (D-106 to D-111, D-120).
+- One VESTA-style look for every 3D view: the Studio viewer's lights, finish, element colours, two-tone bonds and a lettered axes marker (D-122).
 - Tests for the Material Builder: crystal templates, molecule export, and an end-to-end keyboard and axe spec at 360 px (M15.3).
 
 ### Fixed
