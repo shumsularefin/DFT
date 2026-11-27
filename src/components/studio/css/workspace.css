@@ -1,0 +1,144 @@
+/* Material Builder workspace (DFT Studio code, D-105): hosted natively in BaseLayout, pageClass 'workspace'.
+   Everything here is scoped under .studio-root so nothing restyles the site shell, and the Studio's own
+   colour names are --st-* aliases of the site tokens (tokens.css), so the workspace follows the site theme
+   (html[data-theme], or prefers-color-scheme when unset) with no theme switch of its own.
+   Load order on the page: site CSS, then this file, tailwind.css (utilities, no preflight), studio.css. */
+
+.studio-root {
+  --st-bg-app: var(--bg);
+  --st-bg-panel: var(--surface);
+  --st-bg-card: var(--surface);
+  --st-bg-header: var(--surface);
+  --st-bg-input: var(--surface);
+  --st-bg-hover: var(--surface-2);
+  --st-bg-active: var(--accent-soft);
+  --st-border: var(--border);
+  --st-border-subtle: color-mix(in srgb, var(--border) 70%, var(--surface));
+  --st-text-primary: var(--text);
+  --st-text-secondary: var(--text-muted);
+  --st-text-muted: var(--text-muted);
+  --st-accent: var(--accent);
+  --st-accent-hover: color-mix(in srgb, var(--accent) 85%, var(--text));
+  --st-accent-text: var(--accent);
+  --st-console-bg: var(--bg);
+  --st-viewport-bg: var(--bg);
+  /* Two data colours the site palette has no token for (Tailwind 700 light, 400 dark: AA on the panels). */
+  --st-sky: #0369a1;
+  --st-purple: #7e22ce;
+
+  container: studio / inline-size;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: calc(100dvh - var(--topbar-h, 3rem));
+  min-height: 32rem;
+  overflow: hidden;
+  background: var(--st-bg-app);
+  color: var(--st-text-primary);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 1.5;
+  user-select: none;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .studio-root {
+    --st-sky: #38bdf8;
+    --st-purple: #c084fc;
+  }
+}
+:root[data-theme='dark'] .studio-root {
+  --st-sky: #38bdf8;
+  --st-purple: #c084fc;
+}
+
+/* The workspace fills the main column: no page padding or max-width; footer and status line sit below. */
+html[data-page-class='workspace'] main {
+  padding: 0;
+  max-width: none;
+}
+
+/* Scoped reset (the parts of Tailwind's preflight the Studio markup relies on). Specificity 0,1,1 beats the
+   site's element rules (base.css, interface.css) and stays below the Studio's own class rules (0,2,0). */
+.studio-root *,
+.studio-root ::before,
+.studio-root ::after {
+  box-sizing: border-box;
+  border: 0 solid var(--st-border-subtle);
+}
+.studio-root :is(h1, h2, h3, h4, h5, h6) {
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  margin: 0;
+}
+.studio-root :is(p, ul, ol, dl, dd, figure, pre, blockquote, hr) {
+  margin: 0;
+  max-width: none;
+}
+.studio-root :is(ul, ol) {
+  list-style: none;
+  padding: 0;
+}
+.studio-root a {
+  color: inherit;
+  text-decoration: inherit;
+}
+.studio-root :is(button, input, select, textarea, optgroup) {
+  font: inherit;
+  font-family: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+}
+.studio-root :is(button, [role='button']) {
+  cursor: pointer;
+}
+.studio-root :disabled {
+  cursor: default;
+}
+.studio-root textarea {
+  resize: vertical;
+}
+.studio-root :is(input, textarea)::placeholder {
+  color: var(--st-text-muted);
+  opacity: 1;
+}
+.studio-root :is(code, kbd, samp, pre) {
+  font-family: var(--font-mono);
+  font-size: 1em;
+}
+.studio-root :is(img, svg, video, canvas) {
+  display: block;
+  vertical-align: middle;
+}
+.studio-root :is(img, video) {
+  max-width: 100%;
+  height: auto;
+}
+.studio-root table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  background: none;
+  border-radius: 0;
+  overflow: visible;
+  text-indent: 0;
+}
+.studio-root tbody tr td,
+.studio-root thead tr th {
+  border: 0 solid var(--st-border-subtle);
+  background: none;
+  font-size: inherit;
+  font-weight: inherit;
+}
+.studio-root [hidden] {
+  display: none;
+}
+.studio-root :focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}

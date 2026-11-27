@@ -2,15 +2,16 @@ import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 
-// DFT Studio (D-103): boots under the production headers from firebase.json, is axe clean on every step,
+// Material Builder workspace (DFT Studio code, D-103, hosted natively since D-105): boots in the site shell under
+// the production headers from firebase.json (no iframe), follows the site theme, is axe clean on every step,
 // runs the site's structure checks, and hands structures and results to and from the site tools.
 const fb = JSON.parse(readFileSync('firebase.json', 'utf8')) as {
   hosting: { headers: { source: string; headers: { key: string; value: string }[] }[] };
 };
 const header = (source: string, key: string) =>
   fb.hosting.headers.find((h) => h.source === source)!.headers.find((h) => h.key === key)!.value;
-const STUDIO_CSP = header('/dft-studio{,/**}', 'Content-Security-Policy');
-const SITE_CSP = header('!/dft-studio{,/**}', 'Content-Security-Policy');
+const STUDIO_CSP = header('/builder{,/,/index.html}', 'Content-Security-Policy');
+const SITE_CSP = header('!/builder{,/,/index.html}', 'Content-Security-Policy');
 
 /** Serve every page with the CSP Firebase sends in production (the local server sends none). */
 async function withProductionCsp(page: Page) {
@@ -19,7 +20,7 @@ async function withProductionCsp(page: Page) {
     if (req.resourceType() !== 'document') return route.continue();
     const resp = await route.fetch();
     const path = new URL(req.url()).pathname;
-    const csp = path.startsWith('/dft-studio') ? STUDIO_CSP : SITE_CSP;
+    const csp = path === '/builder/' ? STUDIO_CSP : SITE_CSP;
     await route.fulfill({ response: resp, headers: { ...resp.headers(), 'content-security-policy': csp } });
   });
 }
@@ -40,7 +41,7 @@ async function openStudio(page: Page, errors: string[]) {
       console.error(`CSP ${e.violatedDirective} blocked ${e.blockedURI}`),
     );
   });
-  await page.goto('/dft-studio/');
+  await page.goto('/builder/');
   await page.locator('html[data-studio-ready="true"]').waitFor({ timeout: 30_000 });
 }
 
@@ -49,7 +50,7 @@ const atoms = (page: Page) =>
 
 const TWO_NA = 'two Na\n1.0\n10 0 0\n0 10 0\n0 0 10\nNa\n2\nDirect\n0.2 0.2 0.2\n0.24 0.2 0.2\n';
 
-test.describe('DFT Studio', () => {
+test.describe('Material Builder workspace (Studio)', () => {
   test('boots under the production CSP with a sized 3D canvas, no errors and no sideways scroll', async ({
     page,
   }) => {
@@ -67,14 +68,61 @@ test.describe('DFT Studio', () => {
       await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth),
     ).toBeLessThanOrEqual(0);
     expect(errors).toEqual([]);
+    // Native, not framed (D-105): one page, the site shell around the workspace, one main landmark.
+    await expect(page.locator('iframe')).toHaveCount(0);
+    await expect(page.locator('main')).toHaveCount(1);
+    await expect(page.locator('main .studio-root #three-container canvas')).toBeVisible();
+    // The workspace has no theme switch or home link of its own; the site shell provides them.
+    await expect(page.locator('#btn-theme, #site-home')).toHaveCount(0);
+  });
+
+  test('follows the site theme: the site toggle changes the panels and the 3D viewer', async ({ page }) => {
+    await openStudio(page, []);
+    const panelBg = () =>
+      page.locator('#right-workbench').evaluate((el) => getComputedStyle(el).backgroundColor);
+    const siteSurface = () =>
+      page.evaluate(() => {
+        const probe = document.createElement('span');
+        probe.style.color = 'var(--surface)';
+        document.body.append(probe);
+        const c = getComputedStyle(probe).color;
+        probe.remove();
+        return c;
+      });
+    const viewerDark = () =>
+      page.evaluate(() => (window as unknown as { VESTA: { isDark(): boolean } }).VESTA.isDark());
+    const before = await panelBg();
+    expect(before).toBe(await siteSurface());
+    const wasDark = await viewerDark();
+    await page.locator('[data-theme-toggle]').first().click();
+    await expect.poll(panelBg).not.toBe(before);
+    expect(await panelBg()).toBe(await siteSurface());
+    await expect.poll(viewerDark).toBe(!wasDark);
+    await page.locator('[data-theme-toggle]').first().click();
+    await expect.poll(panelBg).toBe(before);
+    await expect.poll(viewerDark).toBe(wasDark);
+  });
+
+  test('Ctrl+K opens the site palette; the tool finder is the "Find a tool" button', async ({ page }) => {
+    await openStudio(page, []);
+    await page.keyboard.press('Control+k');
+    await expect(page.getByRole('dialog', { name: 'Command palette' })).toBeVisible();
+    await expect(page.locator('#cmd-modal')).toBeHidden();
+    await page.keyboard.press('Escape');
+    await page.getByRole('button', { name: 'Find a tool' }).click();
+    await expect(page.locator('#cmd-modal')).toBeVisible();
   });
 
   for (const theme of ['light', 'dark']) {
     test(`every workflow step and panel tab is axe clean, ${theme} theme`, async ({ page }) => {
       test.setTimeout(240_000); // 7 steps + 10 panel tabs axe runs; CI runners are about 2x slower
+      await page.emulateMedia({ colorScheme: 'light' });
       await openStudio(page, []);
-      if (theme === 'dark') await page.locator('#btn-theme').click();
-      await expect(page.locator('html')).toHaveClass(new RegExp(theme));
+      // The site's theme toggle drives the workspace (D-105).
+      if (theme === 'dark') await page.locator('[data-theme-toggle]').first().click();
+      await expect
+        .poll(() => page.evaluate(() => document.documentElement.dataset.theme ?? 'light'))
+        .toBe(theme);
       for (const stage of ['structure', 'potcar', 'incar', 'kpoints', 'kconv', 'bundle', 'analyze']) {
         await page.evaluate((s) => (window as unknown as StudioWindow).StudioKit.go(s), stage);
         const r = await new AxeBuilder({ page }).analyze();
@@ -127,7 +175,7 @@ test.describe('DFT Studio', () => {
     await expect.poll(() => atoms(page)).toBe(2);
   });
 
-  test('a structure handed over by a site tool opens in Studio, and Studio sends it on', async ({ page }) => {
+  test('a structure handed over by a site tool opens in the workspace, and the workspace sends it on', async ({ page }) => {
     await page.addInitScript(() => {
       if (sessionStorage.getItem('test:sent')) return;
       sessionStorage.setItem('test:sent', '1');
@@ -170,6 +218,6 @@ test.describe('DFT Studio', () => {
       ),
     );
     await page.waitForURL('**/tools/convergence/**');
-    await expect(page.getByText('Loaded k-point convergence from DFT Studio.')).toBeVisible();
+    await expect(page.getByText('Loaded k-point convergence from the Material Builder.')).toBeVisible();
   });
 });

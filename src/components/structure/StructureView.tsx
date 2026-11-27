@@ -22,7 +22,7 @@ interface Props {
   onSelect?: (site: number | null) => void;
   /** Stable id used for element ids; defaults to "sv". */
   id?: string;
-  /** The tool showing this view; adds "Open in DFT Studio" (full VESTA-style viewer) when given. */
+  /** The tool showing this view; adds "Open in the Material Builder" (full VESTA-style viewer) when given. */
   from?: ToolId;
 }
 
@@ -135,11 +135,11 @@ export default function StructureView({
                   label: s.comment || label,
                   ...(magmom && expandRepeats(magmom).length === s.species.length ? { magmom } : {}),
                 },
-                '/dft-studio/',
+                '/builder/',
               )
             }
           >
-            Open in DFT Studio
+            Open in the Material Builder
           </button>
         )}
         {measure && (

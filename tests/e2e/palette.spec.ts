@@ -115,7 +115,7 @@ test.describe('status line', () => {
 
 test('landing page is a session: prompt line and starting points', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('list', { name: 'Starting points' }).getByRole('link')).toHaveCount(13); // 12 plus DFT Studio (D-103)
+  await expect(page.getByRole('list', { name: 'Starting points' }).getByRole('link')).toHaveCount(12); // DFT Studio is the Material Builder now (D-105)
   await page.locator('[data-palette-open]').click();
   await expect(page.getByRole('dialog', { name: 'Command palette' })).toBeVisible();
 });

@@ -1,21 +1,34 @@
 ---
 // @source S-021, S-034, S-042, S-067
+// Material Builder, crystal mode: the VESTA-style viewer and editor with the VASP workflow (DFT Studio code,
+// public/dft-studio/js), hosted natively in the site shell (D-105). The markup is studio-body.html; boot.ts
+// loads three.js and the Studio scripts after the page is interactive. Studio CSS is page-only and scoped
+// under .studio-root, so it cannot restyle the shell.
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import MaterialBuilder from '../../components/tools/builder/MaterialBuilder';
+import body from '../../components/studio/studio-body.html?raw';
+import '../../components/studio/css/workspace.css';
+import '../../components/studio/css/tailwind.css';
+import '../../components/studio/css/studio.css';
+import '../../components/tools/builder/mode-switch.css';
 ---
 
 <BaseLayout
   title="Material Builder"
-  description="Build, view and edit crystals in DFT Studio (VESTA-style 3D viewer, supercells, slabs, defects, symmetry, magnetism, structure checks) and molecules (2D canvas, rough 3D clean-up, XYZ, MOL, POSCAR in a box), locally in your browser."
-  pageClass="tool"
+  description="Build, view and edit crystals in a VESTA-style 3D workspace (supercells, slabs, defects, symmetry, magnetism, structure checks) and set up the VASP run (POTCAR, INCAR, KPOINTS, k-point convergence, run bundle, analysis), locally in your browser."
+  pageClass="workspace"
 >
-  <div class="container">
-    <h1>Material Builder</h1>
-    <p>
-      Crystal mode is DFT Studio, a VESTA-style viewer and editor: build or import a crystal, check it live
-      against B001 to B012, export POSCAR or CIF, or send it to the Input Builder, k-path tool or magnetic
-      tool. Molecule mode (loaded lazily) draws molecules and puts them in a box for VASP.
-    </p>
-    <MaterialBuilder client:load />
+  <div id="studio-root" class="studio-root" data-stage="structure">
+    <a class="studio-skip" href="#viewport-wrap">Skip to the 3D viewer</a>
+    <div id="studio-boot-error" class="studio-boot-error" role="alert" hidden></div>
+    <noscript>
+      <p class="studio-boot-error">
+        The Material Builder needs JavaScript. The handbook pages work without it.
+      </p>
+    </noscript>
+    <Fragment set:html={body} />
   </div>
 </BaseLayout>
+
+<script>
+  import '../../components/studio/boot';
+</script>

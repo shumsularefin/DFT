@@ -845,11 +845,11 @@ export default function MagneticTool() {
                         label: activeOut.config.label,
                         magmom: activeOut.result.magmom,
                       },
-                      '/dft-studio/',
+                      '/builder/',
                     )
                   }
                 >
-                  Open in DFT Studio (3D spins)
+                  Open in the Material Builder (3D spins)
                 </button>
               )}
             </div>

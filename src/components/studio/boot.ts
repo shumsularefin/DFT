@@ -1,5 +1,5 @@
-// Boots DFT Studio under the site CSP ('self' scripts only): provides the globals the Studio scripts expect
-// (THREE, lucide, Plotly, JSZip) from local code, exposes the site bridge, then loads the scripts in order.
+// Boots the Material Builder workspace (DFT Studio code) under the site CSP ('self' scripts only): provides
+// the globals the Studio scripts expect (THREE, lucide, Plotly, JSZip) from local code, exposes the site bridge, then loads the scripts in order.
 import { createIcons } from './iconShim';
 import { MiniPlotly } from './miniPlot';
 import { MiniZip } from './zipShim';
@@ -39,8 +39,6 @@ async function boot() {
   w.Plotly = MiniPlotly;
   w.JSZip = MiniZip;
   w.SiteBridge = SiteBridge;
-  w.STUDIO_EMBED = new URLSearchParams(location.search).has('embed');
-  if (w.STUDIO_EMBED) document.documentElement.classList.add('studio-embed');
   for (const src of SCRIPTS) await load(src);
   document.documentElement.dataset.studioReady = 'true';
 }
@@ -49,6 +47,6 @@ boot().catch((e: unknown) => {
   const el = document.getElementById('studio-boot-error');
   if (el) {
     el.hidden = false;
-    el.textContent = `DFT Studio could not start: ${e instanceof Error ? e.message : String(e)}. Reload the page.`;
+    el.textContent = `The Material Builder could not start: ${e instanceof Error ? e.message : String(e)}. Reload the page.`;
   }
 });

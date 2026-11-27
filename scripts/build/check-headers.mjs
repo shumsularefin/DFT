@@ -51,10 +51,11 @@ for (const [h, v] of [
   check(`security header ${h}`, home.headers.get(h) === v, `got ${home.headers.get(h)}`);
 }
 
-// D-103: DFT Studio has its own CSP (Pyodide from cdn.jsdelivr.net, frameable by the builder page only);
-// every other page keeps the strict site CSP and X-Frame-Options DENY.
+// D-105: the Material Builder page (/builder/, the Studio workspace) has its own CSP (Pyodide from
+// cdn.jsdelivr.net) and is never framed; every other page, /builder/molecule/ included, keeps the strict site
+// CSP. /dft-studio/ is a 301 to /builder/.
 const csp = (r) => r.headers.get('content-security-policy') ?? '';
-for (const p of ['/', '/builder/', '/tools/convergence/']) {
+for (const p of ['/', '/builder/molecule/', '/tools/convergence/', '/dft-studio/js/vesta.js']) {
   const r = await get(p);
   check(
     `${p} strict CSP (no CDN)`,
@@ -67,14 +68,22 @@ for (const p of ['/', '/builder/', '/tools/convergence/']) {
     r.headers.get('x-frame-options'),
   );
 }
-for (const p of ['/dft-studio/', '/dft-studio/js/vesta.js']) {
-  const r = await get(p);
-  check(`${p} Studio CSP allows Pyodide`, csp(r).includes('https://cdn.jsdelivr.net'), csp(r));
-  check(`${p} framed by the site only`, csp(r).includes("frame-ancestors 'self'"), csp(r));
+{
+  const r = await get('/builder/');
+  check('/builder/ workspace CSP allows Pyodide', csp(r).includes('https://cdn.jsdelivr.net'), csp(r));
+  check('/builder/ is never framed', csp(r).includes("frame-ancestors 'none'"), csp(r));
   check(
-    `${p} X-Frame-Options SAMEORIGIN`,
-    r.headers.get('x-frame-options') === 'SAMEORIGIN',
+    '/builder/ X-Frame-Options DENY',
+    r.headers.get('x-frame-options') === 'DENY',
     r.headers.get('x-frame-options'),
+  );
+}
+for (const p of ['/dft-studio', '/dft-studio/']) {
+  const r = await get(p);
+  check(
+    `${p} redirects to /builder/`,
+    r.status === 301 && (r.headers.get('location') ?? '').endsWith('/builder/'),
+    `got ${r.status} ${r.headers.get('location')}`,
   );
 }
 

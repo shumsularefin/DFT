@@ -10,7 +10,6 @@
   if (!B || !V || !T) return;
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
-  const embed = !!window.STUDIO_EMBED;
   const name = () => (V.getStructure() && V.getStructure().name) || 'structure';
 
   // ---------------------------------------------------------------- handbook templates in the structure menu
@@ -142,7 +141,6 @@
   function closeMenu() { menu.classList.add('hidden'); sendBtn.setAttribute('aria-expanded', 'false'); }
   if (menu && sendBtn) {
     const items = B.tools.map((t) => `<button type="button" role="menuitem" class="send-item" data-tool="${t.id}"><b>${esc(t.label)}</b><span>${esc(t.why)}</span></button>`);
-    if (embed) items.push('<a role="menuitem" class="send-item" href="/dft-studio/" target="_top"><b>Open DFT Studio full screen</b><span>The same structure, without the page around it.</span></a>');
     menu.innerHTML = items.join('');
     sendBtn.onclick = (e) => {
       e.stopPropagation();
@@ -153,7 +151,6 @@
     menu.onclick = (e) => {
       const b = e.target.closest('[data-tool]');
       if (!b) return;
-      if (embed && b.tagName === 'A') return;
       const mm = V.hasMagnetism() ? V.getMAGMOM().replace(/^\s*MAGMOM\s*=\s*/i, '') : undefined;
       if (!B.sendTo(b.dataset.tool, V.getPOSCAR(), name(), mm)) V.toast('Browser storage is unavailable, so the hand-off could not be made.');
     };
@@ -166,24 +163,9 @@
     };
     document.addEventListener('click', (e) => { if (!menu.contains(e.target) && e.target !== sendBtn) closeMenu(); });
   }
-  // In the builder frame the full-screen link should keep the structure: hand it over first.
-  if (embed && menu) {
-    menu.addEventListener('click', (e) => {
-      const a = e.target.closest('a[href="/dft-studio/"]');
-      if (!a) return;
-      try { sessionStorage.setItem('dft:studio-carry', V.getPOSCAR()); } catch (err) { /* storage off: open the default */ }
-    }, true);
-  }
-  if (!embed) {
-    try {
-      const carry = sessionStorage.getItem('dft:studio-carry');
-      if (carry) { sessionStorage.removeItem('dft:studio-carry'); if (!inc) V.loadText(carry, 'POSCAR', 'Structure from the builder'); }
-    } catch (err) { /* storage off */ }
-  }
-
   // ---------------------------------------------------------------- workflow steps link to the verified site tools
   const card = (title, html) => `<div class="sp-card site-card"><div class="sp-card-title">${esc(title)}</div>${html}</div>`;
-  const link = (url, label, why) => `<a class="site-link" href="${url}" target="_top"><b>${esc(label)}</b><span>${esc(why)}</span></a>`;
+  const link = (url, label, why) => `<a class="site-link" href="${url}"><b>${esc(label)}</b><span>${esc(why)}</span></a>`;
   const toolBtn = (id, label, why) => `<button type="button" class="site-link" data-send="${id}"><b>${esc(label)}</b><span>${esc(why)}</span></button>`;
   function bindSend(root) {
     root.querySelectorAll('[data-send]').forEach((b) => {
@@ -215,7 +197,7 @@
       : '<p class="sp-note">No problems found by the site rules.</p>';
     return card('Handbook validation rules (V001 and up)', `<p class="sp-note">The handbook's INCAR engine checked this INCAR against the structure: each rule is sourced and unit tested. Studio presets are VASPKIT-style starting points; these rules are the cross-check.</p>${list}<div class="site-links">${toolBtn('input-builder', 'Continue in the Input Builder', tool('input-builder').why)}</div>`);
   });
-  wrap('kpoints', () => card('Verified k-path', `<p class="sp-note">Studio's built-in paths are quick look-ups. The handbook k-path tool computes HPKOT or Setyawan-Curtarolo paths with golden tests on 39 structures and shows the exact Brillouin zone.</p><div class="site-links">${toolBtn('kpath', 'Open this structure in the k-path tool', tool('kpath').why)}${link('/handbook/', 'Why the mesh and path matter', 'Handbook modules on k-points and band structures.')}</div>`));
+  wrap('kpoints', () => card('Verified k-path', `<p class="sp-note">The built-in paths here are quick look-ups. The handbook k-path tool computes HPKOT or Setyawan-Curtarolo paths with golden tests on 39 structures and shows the exact Brillouin zone.</p><div class="site-links">${toolBtn('kpath', 'Open this structure in the k-path tool', tool('kpath').why)}${link('/handbook/', 'Why the mesh and path matter', 'Handbook modules on k-points and band structures.')}</div>`));
   wrap('kconv', () => card('Plot the series on the site', `<p class="sp-note">After the run, load kpoint_convergence.csv above, then send the rows to the convergence plotter for the energy and pressure plots with a threshold you choose.</p><div class="site-links"><button type="button" class="site-link" id="kc-send-plot"><b>Send results to the convergence plotter</b><span>Needs the CSV loaded above.</span></button>${link('/tools/convergence/', 'Open the convergence plotter', 'Drop OSZICAR or OUTCAR files from any series.')}</div><p id="kc-send-st" class="sp-note" role="status"></p>`));
   function bindKconv(root) {
     const b = root.querySelector('#kc-send-plot');
@@ -235,7 +217,7 @@
     };
   }
   wrap('bundle', () => card('Before you submit', `<p class="sp-note">The Input Builder adds sourced job-script templates, a share link and the full rule check; the planner estimates the cost.</p><div class="site-links">${toolBtn('input-builder', 'Build the inputs in the Input Builder', tool('input-builder').why)}${toolBtn('planner', 'Estimate cost in the planner', tool('planner').why)}${toolBtn('magnetic', 'Enumerate magnetic orderings', tool('magnetic').why)}</div>`));
-  wrap('analyze', () => card('Verified analysis on the site', `<p class="sp-note">Studio's analyzers are quick looks, not yet checked against golden references (marked Heuristic). The tools below read the same files with parsers tested against pymatgen or numpy.</p><div class="site-links">${B.analyzers.map((a) => link(a.url, a.label, a.why)).join('')}</div>`));
+  wrap('analyze', () => card('Verified analysis on the site', `<p class="sp-note">These analyzers are quick looks, not yet checked against golden references (marked Heuristic). The tools below read the same files with parsers tested against pymatgen or numpy.</p><div class="site-links">${B.analyzers.map((a) => link(a.url, a.label, a.why)).join('')}</div>`));
 
   // Label Studio's own analyzers honestly.
   const origAnalyze = T.stageRenderers.analyze;
@@ -248,20 +230,12 @@
   }
   window.dispatchEvent(new Event('studio-site-linked'));
 
-  // ---------------------------------------------------------------- one main landmark at every step
-  // On the Analyze step (and every step on narrow screens) the 3D viewer's <main> is hidden, so the step pane
-  // becomes the page's main region; otherwise it is a labelled region beside the viewer.
+  // ---------------------------------------------------------------- the step pane is a labelled region
+  // The page (BaseLayout) has the one main landmark; the step pane and the 3D viewer are regions inside it.
   const pane = $('stage-pane');
-  const center = $('center-main');
-  if (pane && center) {
-    const syncMain = () => {
-      const viewerHidden = getComputedStyle(center).display === 'none';
-      pane.setAttribute('role', viewerHidden ? 'main' : 'region');
-      pane.setAttribute('aria-label', 'Workflow step');
-    };
-    new MutationObserver(syncMain).observe(document.body, { attributes: true, attributeFilter: ['data-stage'] });
-    window.addEventListener('resize', syncMain);
-    syncMain();
+  if (pane) {
+    pane.setAttribute('role', 'region');
+    pane.setAttribute('aria-label', 'Workflow step');
   }
 
   // ---------------------------------------------------------------- accessible names for form controls

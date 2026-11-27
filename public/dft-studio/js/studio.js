@@ -190,9 +190,11 @@
       r.readAsText(f);
     });
   }
-  function cssVar(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  // The workspace root carries the step (data-stage) and the --st-* colours; document.body when run standalone.
+  function stageRoot() { return document.querySelector('.studio-root') || document.body; }
+  function cssVar(name) { return getComputedStyle(stageRoot()).getPropertyValue(name).trim(); }
   function plotLayout(extra = {}) {
-    const fg = cssVar('--text-secondary') || '#4b5563', bg = cssVar('--bg-card') || '#fff', grid = cssVar('--border-subtle') || '#e5e7eb';
+    const fg = cssVar('--st-text-secondary') || '#4b5563', bg = cssVar('--st-bg-card') || '#fff', grid = cssVar('--st-border-subtle') || '#e5e7eb';
     return Object.assign({
       paper_bgcolor: bg, plot_bgcolor: bg, font: { color: fg, family: 'IBM Plex Sans, sans-serif', size: 11 },
       margin: { t: 34, r: 14, b: 42, l: 54 },
@@ -291,7 +293,7 @@
     const vars = elements().map((el) => S.potSel[el] || el);
     return `#!/bin/bash
 # make_potcar.sh: build POTCAR from your own licensed VASP pseudopotential library.
-# POTCAR files are licensed by VASP Software GmbH and are never shipped with DFT Studio.
+# POTCAR files are licensed by VASP Software GmbH and are never shipped with the Material Builder.
 #   export VASP_PP_PATH=/path/to/your/pp/library   (the folder that contains ${lib}/)
 #   bash make_potcar.sh
 # Species order (must match POSCAR line 6): ${elements().join(' ')}
@@ -383,7 +385,7 @@ echo "POTCAR written:"; grep TITEL POTCAR
     const preset = D.INCAR_PRESETS[S.preset] || D.INCAR_PRESETS.ST;
     const st = V().getStructure();
     const tags = buildIncarTags();
-    const lines = [`# DFT Studio INCAR: ${preset.name}`, `SYSTEM = ${(st && st.name) || 'VASP_job'}`, ''];
+    const lines = [`# Material Builder INCAR: ${preset.name}`, `SYSTEM = ${(st && st.name) || 'VASP_job'}`, ''];
     Object.entries(tags).forEach(([k, v]) => lines.push(`${k.padEnd(13)} = ${String(v)}`));
     return lines.join('\n') + '\n';
   }
@@ -417,7 +419,7 @@ echo "POTCAR written:"; grep TITEL POTCAR
     }
     const m = currentMesh();
     const why = S.kpt.mode === 'manual' ? 'explicit mesh' : `k-spacing ${S.kpt.spacing} x 2pi/A`;
-    return `DFT Studio ${S.kpt.scheme} mesh (${why})\n0\n${S.kpt.scheme}\n  ${m.join('  ')}\n  0  0  0\n`;
+    return `Material Builder ${S.kpt.scheme} mesh (${why})\n0\n${S.kpt.scheme}\n  ${m.join('  ')}\n  0  0  0\n`;
   }
 
   // ---------------------------------------------------------------------------
@@ -490,7 +492,7 @@ echo "POTCAR written:"; grep TITEL POTCAR
     S.stage = stage;
     S.visited.add(stage);
     if (stage === 'potcar' || stage === 'incar') ensurePotSelection();
-    document.body.dataset.stage = stage;
+    stageRoot().dataset.stage = stage;
     if (opts.tab && stage === 'structure') V().openRightTab(opts.tab);
     if (opts.tab && stage === 'analyze') S.analyzeTab = opts.tab;
     if (opts.kmode) S.kpt.mode = opts.kmode;
@@ -783,7 +785,7 @@ echo "POTCAR written:"; grep TITEL POTCAR
   function readmeText() {
     const st = V().getStructure();
     const c = checks();
-    return `DFT Studio job bundle: ${B.name}
+    return `Material Builder job bundle: ${B.name}
 Structure : ${st.name} (${st.atoms.length} atoms)
 POTCAR    : ${S.potFunc}: ${elements().map((el) => S.potSel[el]).join(' ')}
 INCAR     : ${(D.INCAR_PRESETS[S.preset] || {}).name}, ENCUT = ${buildIncarTags().ENCUT} eV
@@ -920,7 +922,7 @@ ${c.length ? c.map((x) => `- [${x.level}] ${x.msg}`).join('\n') : '- none'}
   }
 
   // ---------------------------------------------------------------------------
-  // Command palette (Ctrl+K): every VASPKIT menu group, every step, every viewer tab
+  // Tool finder ("Find a tool"; the site keeps Ctrl+K for its own palette): every VASPKIT menu group, every step, every viewer tab
   // ---------------------------------------------------------------------------
   const COMMANDS = [
     ...STEPS.map((s) => ({ code: String(s.n), name: `Step ${s.n}: ${s.label}`, cat: s.sub, target: { stage: s.id } })),
@@ -955,7 +957,7 @@ ${c.length ? c.map((x) => `- [${x.level}] ${x.msg}`).join('\n') : '- none'}
   // ---------------------------------------------------------------------------
   function init() {
     if (!window.VESTA) { console.error('VESTA bridge missing'); return; }
-    document.body.dataset.stage = 'structure';
+    stageRoot().dataset.stage = 'structure';
     ensurePotSelection();
     V().onChange(() => {
       ensurePotSelection();
@@ -980,11 +982,10 @@ ${c.length ? c.map((x) => `- [${x.level}] ${x.msg}`).join('\n') : '- none'}
     document.querySelectorAll('[data-close]').forEach((b) => { b.onclick = () => closeModal(b.dataset.close); });
     ['cmd-modal', 'lib-modal', 'help-modal'].forEach((id) => { $(id).addEventListener('click', (e) => { if (e.target.id === id) closeModal(id); }); });
     document.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openCmd(); }
       if (e.key === 'Escape') ['cmd-modal', 'lib-modal', 'help-modal'].forEach(closeModal);
     });
     $('wasm-pill').onclick = () => window.WasmEngine.ensureReady(updateWasmPill).catch((e) => V().toast(e.message));
-    $('btn-guide').onclick = () => showHelp('How DFT Studio works', { meaning: 'Work left to right along the steps at the top. 1 Structure: load a sample, the 350-crystal library, or your own POSCAR/CIF; build supercells, slabs and defects; set spins in the Magnetic tab. 2 POTCAR: pick variants, ENCUT follows. 3 INCAR: choose a preset, add magnetism, DFT+U, SOC. 4 KPOINTS: mesh or band path. 5 (optional) k-point convergence test. 6 Run bundle: checks plus a ready-to-submit .zip. 7 Analyze: plot DOS, bands, EOS, phonons and MD.', when: 'Every step reads the live 3D structure, so going back and editing the structure updates all files. Press Ctrl+K to jump to any VASPKIT function by number or name.' });
+    $('btn-guide').onclick = () => showHelp('How the Material Builder works', { meaning: 'Work left to right along the steps at the top. 1 Structure: load a sample, the 350-crystal library, or your own POSCAR/CIF; build supercells, slabs and defects; set spins in the Magnetic tab. 2 POTCAR: pick variants, ENCUT follows. 3 INCAR: choose a preset, add magnetism, DFT+U, SOC. 4 KPOINTS: mesh or band path. 5 (optional) k-point convergence test. 6 Run bundle: checks plus a ready-to-submit .zip. 7 Analyze: plot DOS, bands, EOS, phonons and MD.', when: 'Every step reads the live 3D structure, so going back and editing the structure updates all files. Use Find a tool in the toolbar to jump to any VASPKIT function by number or name.' });
     ppRestore().then((n) => {
       if (n) { S.ppLibrary = true; renderStepbar(); if (S.stage === 'potcar' || S.stage === 'bundle') renderStage(); }
       else probeLocalLibrary();
