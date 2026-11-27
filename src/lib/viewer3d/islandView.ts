@@ -70,11 +70,13 @@ export class IslandView {
   }
 
   /**
-   * Draw a frame. `camera`: true resets to the frame's own camera and projection, false keeps the view (a new step of the
-   * same picture), a camera spec moves there without a tween.
+   * Draw a frame. `camera`: true resets to the frame's own camera and projection, false keeps the view exactly, 'refit'
+   * keeps the reader's direction and zoom but frames the new picture with a short tween (a new option of the same
+   * picture, M16.5), a camera spec moves there without a tween.
    */
-  show(frame: SceneFrame, camera: boolean | CameraSpec = true): void {
-    if (camera === true) {
+  show(frame: SceneFrame, camera: boolean | CameraSpec | 'refit' = true): void {
+    if (camera === 'refit') this.viewer.setFrame(frame, null, 'refit', true);
+    else if (camera === true) {
       // a frame that names no projection is drawn in perspective, whatever the previous frame asked for
       if (frame.ortho === undefined) this.viewer.setOrtho(false);
       this.viewer.setFrame(frame, null, true);

@@ -17,6 +17,8 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Fixed
 
+- Guided path and topic stages: changing an option (n = 1 to 3, the orbital, the number of periodic copies, any stage parameter) keeps the 3D view framed on the new picture, so Reset view is no longer needed; the Try this box no longer spills out of its card (D-124).
+- Guided path pictures explain themselves: the self-consistency loop is shown step by step until the density settles, the density map, cutoff sphere and bands beside the DOS are new pictures, each station says how to read its picture, and a new station and handbook subsection compare real space with reciprocal space (D-124).
 - The Material Builder no longer redraws its 3D scene every frame; it draws on demand and starts in short tasks, so an idle page uses no CPU.
 - The Material Builder structure picker no longer slides under the Open button at medium widths.
 - No thick one-sided borders: callouts, notes, feedback and review checks use the same thin border as cards.

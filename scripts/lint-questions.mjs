@@ -48,6 +48,11 @@ export const PLOT_IDS = [
   'oszicar-trace',
   'parallel-split',
   'conv-series',
+  'scf-iterations',
+  'density-map',
+  'pw-sphere',
+  'bands-dos',
+  'real-reciprocal',
 ];
 
 function walk(dir) {

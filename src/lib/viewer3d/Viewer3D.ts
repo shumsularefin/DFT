@@ -108,6 +108,8 @@ export class Viewer3D {
   private home: CameraState = cameraFrom(ISO_EYE, [0, 0, 0], 10);
   private bounds = { center: [0, 0, 0] as Vec3, radius: 5 };
   private orthoHalf = 5;
+  /** The camera spec of the last goTo: a refit frames it on the new bounds as the reset view. */
+  private lastSpec: CameraSpec | undefined;
   private useOrtho = false;
   private tween:
     { from: CameraState; to: CameraState; t0: number; fromHalf: number; toHalf: number } | undefined;
@@ -365,12 +367,20 @@ export class Viewer3D {
     this.changed();
   }
 
-  /** Show a frame. `groups` limits the visible layer groups (null: all). `cameraSpec` moves the camera (undefined: keep). */
+  /**
+   * Show a frame. `groups` limits the visible layer groups (null: all). `resetCamera`: true goes to the frame's own
+   * camera, false keeps the camera exactly, a spec moves there, and 'refit' keeps the reader's direction and zoom but
+   * frames the new picture (M16.5): a new option that makes the picture bigger or smaller never leaves it cut off or tiny,
+   * so the reader does not have to press Reset view after every change. The refit tweens unless reduced motion.
+   */
   setFrame(
     frame: SceneFrame,
     groups: string[] | null = null,
-    resetCamera: boolean | CameraSpec = true,
+    resetCamera: boolean | CameraSpec | 'refit' = true,
+    animate = false,
   ): void {
+    const before = { ...this.bounds, center: [...this.bounds.center] as Vec3 };
+    const had = !!this.frame;
     if (!this.renderer) this.start();
     const theme = this.themeOf();
     this.lastTheme = theme;
@@ -386,12 +396,34 @@ export class Viewer3D {
       this.controls.minDistance = this.bounds.radius * 0.05;
       this.controls.maxDistance = this.bounds.radius * 40;
     }
-    if (resetCamera !== false) {
+    if (resetCamera === 'refit') {
+      if (had) this.refit(before, animate);
+      else this.goTo(frame.camera, false);
+    } else if (resetCamera !== false) {
       const spec = resetCamera === true ? frame.camera : resetCamera;
       if (frame.ortho !== undefined && resetCamera === true) this.setOrtho(frame.ortho);
       this.goTo(spec, false);
     } else this.syncOrtho();
     this.loop.invalidate();
+  }
+
+  /**
+   * Frame the current bounds again after they changed from `before`: same direction, same zoom relative to a full view,
+   * centred on the new picture. The reset view becomes the last requested camera spec, framed on the new bounds.
+   */
+  private refit(before: { center: Vec3; radius: number }, animate: boolean): void {
+    const s = this.state;
+    const fit = (r: number) => (r / Math.sin((FOV * Math.PI) / 360)) * 1.04;
+    // how far in or out the reader had zoomed against a full view of the old picture, kept within sensible limits
+    const rel = Math.min(4, Math.max(0.25, this.apparentDistance / fit(before.radius)));
+    const off = s.target.map((t, i) => (t - before.center[i]!) / before.radius) as Vec3;
+    const near = Math.hypot(...off) < 0.5;
+    const target = (
+      near ? this.bounds.center.map((c, i) => c + off[i]! * this.bounds.radius) : [...this.bounds.center]
+    ) as Vec3;
+    const to: CameraState = { q: s.q, dist: fit(this.bounds.radius) * rel, target };
+    this.home = this.stateFor(this.lastSpec);
+    this.moveTo(to, animate);
   }
 
   /** The camera a spec asks for, framed on the current bounds. */
@@ -403,6 +435,7 @@ export class Viewer3D {
 
   /** Move to a camera spec; tweened unless reduced motion (or `animate` is false). Also sets the reset view. */
   goTo(spec: CameraSpec | undefined, animate = true): void {
+    this.lastSpec = spec;
     const to = this.stateFor(spec);
     this.home = to;
     this.moveTo(to, animate);

@@ -124,8 +124,9 @@ export class StageApp {
     const ms = performance.now() - t0;
     this.root.setAttribute('data-build-ms', ms.toFixed(1));
     const vis = groups === undefined ? (this.viewer.groupList.length ? this.currentGroups() : null) : groups;
+    // a parameter change keeps the reader's direction and zoom but frames the new picture (M16.5)
     if (camera === false || camera === true)
-      this.viewer.setFrame(this.frame, vis, camera === true ? true : false);
+      this.viewer.setFrame(this.frame, vis, camera === true ? true : 'refit', true);
     else {
       this.viewer.setFrame(this.frame, vis, false);
       if (this.frame.ortho !== undefined) this.viewer.setOrtho(this.frame.ortho);

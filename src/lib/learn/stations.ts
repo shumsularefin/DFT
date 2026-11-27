@@ -100,6 +100,8 @@ export interface Station {
   /** Text alternative of the picture. For a scene the preset's own description is shown as well. */
   alt: string;
   sentences: [string, string, string];
+  /** Optional "how to read the picture" points (M16.5): what each mark on the picture means, one short line each. */
+  read?: string[];
   visual: StationVisual;
   try: StationTry;
   /** Handbook topic id, "NN-module/slug". */
@@ -208,6 +210,11 @@ export function validateStations(list: unknown, known: Known): StationIssue[] {
     if (!nonEmpty(s.alt)) bad('alt (text alternative) is required');
     if (!Array.isArray(s.sentences) || s.sentences.length !== 3 || !s.sentences.every(nonEmpty))
       bad('exactly three non-empty sentences are required');
+    if (
+      s.read !== undefined &&
+      (!Array.isArray(s.read) || s.read.length < 1 || s.read.length > 4 || !s.read.every(nonEmpty))
+    )
+      bad('read, when given, must be one to four non-empty lines');
     if (!nonEmpty(s.topic)) bad('topic link is required');
     else if (!known.topicIds.includes(s.topic)) bad(`topic "${s.topic}" does not exist`);
     if (!Array.isArray(s.sources) || s.sources.length === 0) bad('at least one source id is required');

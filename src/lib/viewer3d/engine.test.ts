@@ -178,6 +178,79 @@ describe('Viewer3D', () => {
     expect(b.v.isReducedMotion).toBe(true);
   });
 
+  it('refits a bigger or smaller picture: same direction and relative zoom, centred, with a reset view framed on it', () => {
+    const { v } = setup({ reduced: true });
+    v.setFrame(cube);
+    v.rotate(30, 15);
+    v.zoom(0.8);
+    const dir = dirOf(v);
+    const d1 = v.state.dist;
+    const big: SceneFrame = {
+      layers: [
+        atoms(
+          [
+            [0, 0, 0],
+            [20, 0, 0],
+            [0, 20, 0],
+            [0, 0, 20],
+          ],
+          0.5,
+          ['c0', 'c1', 'c1', 'c2'],
+          'atoms',
+        ),
+      ],
+      describe: 'Four atoms, ten times further apart.',
+    };
+    v.setFrame(big, null, 'refit');
+    expect(angleBetween(dirOf(v), dir)).toBeLessThan(1e-9);
+    // about ten times further, so the bigger picture fills the view as the small one did
+    expect(v.state.dist / d1).toBeGreaterThan(7);
+    expect(v.state.dist / d1).toBeLessThan(12);
+    // centred on the new picture: the same point the reset view turns about
+    const centre = [...v.state.target];
+    v.reset(false);
+    expect(Math.hypot(...v.state.target.map((t, i) => t - centre[i]!))).toBeLessThan(1e-9);
+    v.setFrame(cube, null, 'refit');
+    v.setFrame(big, null, 'refit');
+    v.setFrame(cube, null, 'refit');
+    // reset at the big picture gives a full view of it, so back on the cube the zoom is the full-view zoom again
+    expect(v.state.dist).toBeGreaterThan(d1);
+    // the reset view is the frame's own camera framed on the new bounds, not the old one
+    v.setFrame(big, null, 'refit');
+    v.reset(false);
+    expect(v.state.dist / d1).toBeGreaterThan(7);
+    // false still keeps the camera exactly
+    const kept = v.state.dist;
+    v.setFrame(cube, null, false);
+    expect(v.state.dist).toBe(kept);
+  });
+
+  it('refits with a tween unless reduced motion', () => {
+    const a = setup();
+    a.v.setFrame(cube);
+    a.drain();
+    a.v.setFrame(
+      {
+        ...cube,
+        layers: [
+          atoms(
+            [
+              [0, 0, 0],
+              [9, 0, 0],
+            ],
+            0.5,
+            ['c0', 'c1'],
+            'atoms',
+          ),
+        ],
+      },
+      null,
+      'refit',
+      true,
+    );
+    expect(a.drain()).toBeGreaterThan(5);
+  });
+
   it('switches projection and keeps the apparent size', () => {
     const { v, container } = setup({ reduced: true });
     v.setFrame(cube);

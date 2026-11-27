@@ -126,11 +126,12 @@ export default function StageView({
     const cameraChanged = shownCamera.current !== ck;
     shownView.current = v;
     shownCamera.current = ck;
-    // a new station or scene starts from its own view; a new parameter value keeps the reader's view; a new camera
-    // word from the try-this control moves there
+    // a new station or scene starts from its own view; a new parameter value keeps the reader's direction and zoom but
+    // frames the new picture (M16.5: an n = 3 orbital is nine times wider than n = 1, and without the refit it filled
+    // the view or shrank to a dot until Reset view); a new camera word from the try-this control moves there
     if (fresh) c.show(b.frame, (cam as CameraSpec | undefined) ?? true);
     else {
-      c.show(b.frame, false);
+      c.show(b.frame, cameraChanged && cam ? false : 'refit');
       if (cameraChanged && cam) c.goTo(cam as CameraSpec);
     }
   };
