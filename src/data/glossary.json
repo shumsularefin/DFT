@@ -802,6 +802,15 @@
     ]
   },
   {
+    "id": "damping-function",
+    "label": "Damping function",
+    "short": "A factor that switches a dispersion correction off at short distances, where the functional already describes the bonding, so the correction acts only between atoms that are far apart.",
+    "level": "intermediate",
+    "sources": [
+      "S-028"
+    ]
+  },
+  {
     "id": "magnetic-moment",
     "label": "Magnetic moment",
     "short": "The difference between the up and down electron counts around an atom or in the cell, in units of the Bohr magneton.",

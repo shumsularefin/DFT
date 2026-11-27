@@ -2296,17 +2296,17 @@
       {
         "text": "Semilocal functionals barely describe the weak dispersion attraction between neutral layers",
         "correct": true,
-        "why": "A dispersion correction adds it back."
+        "why": "PBE sees only the density and its gradient at each point, so it cannot couple charge fluctuations on two layers several angstrom apart. That coupling is the dispersion attraction, and a correction adds it back."
       },
       {
         "text": "Because graphite has no electrons between layers",
         "correct": false,
-        "why": "The attraction comes from correlated fluctuations, not from a charge between layers."
+        "why": "Tempting, because there is little density between the layers. But dispersion does not need charge between them: it comes from correlated fluctuations on the two layers themselves."
       },
       {
         "text": "Because the cutoff was too high",
         "correct": false,
-        "why": "A high cutoff does not change the physics of the missing term."
+        "why": "A higher cutoff only makes the PBE answer more precise. It cannot add a physical term that the functional does not contain."
       }
     ],
     "hints": [
@@ -2336,17 +2336,17 @@
       {
         "text": "11 (D3), 12 (D3-BJ) and 20 (TS)",
         "correct": true,
-        "why": "Use one consistently for every run you compare."
+        "why": "11 is D3 with zero damping, 12 is D3 with Becke-Johnson damping and 20 is Tkatchenko-Scheffler. Pick one and use it for every run you compare."
       },
       {
         "text": "0, 1 and 2",
         "correct": false,
-        "why": "Those are not the listed values."
+        "why": "0 means no correction at all; 1 and 2 are older aliases for D2 and TS, not the values the dictionary recommends."
       },
       {
         "text": "1 for PBE and 2 for LDA",
         "correct": false,
-        "why": "IVDW is about dispersion corrections, not about the functional."
+        "why": "IVDW chooses a dispersion correction, not the functional. The functional is set by GGA or METAGGA."
       }
     ],
     "hints": [
@@ -2376,17 +2376,17 @@
       {
         "text": "In the relaxation, so the structure sees it",
         "correct": true,
-        "why": "The correction changes forces and therefore the structure."
+        "why": "The correction adds forces and stress, so the relaxed interlayer distance depends on it. Relaxing without it gives the wrong structure."
       },
       {
         "text": "Only in a final single point",
         "correct": false,
-        "why": "Then the structure would not have been relaxed with it."
+        "why": "Then the structure was relaxed without the attraction, and the layers sit where plain PBE put them, too far apart."
       },
       {
         "text": "Never: it only changes the printed energy",
         "correct": false,
-        "why": "It changes forces too."
+        "why": "The correction contributes to the forces and the stress tensor as well as the energy, which is why it moves the atoms."
       }
     ],
     "hints": [
@@ -2413,17 +2413,17 @@
       {
         "text": "A small attractive term that falls off with distance and is damped at short range",
         "correct": true,
-        "why": "D3 and D3(BJ) differ in the damping."
+        "why": "Each pair gets an attraction that falls with distance (as the sixth power in the leading term), and a damping function removes it at short range where the functional already describes bonding. D3 and D3(BJ) differ only in that damping."
       },
       {
         "text": "A repulsive term that grows with distance",
         "correct": false,
-        "why": "The dispersion term is attractive and decays."
+        "why": "Dispersion is an attraction, and it weakens as atoms move apart, so it cannot grow with distance."
       },
       {
         "text": "A new electron",
         "correct": false,
-        "why": "It adds energy and forces, not electrons."
+        "why": "A pairwise correction depends only on the atomic positions. It adds energy, forces and stress, and leaves the electrons untouched."
       }
     ],
     "hints": [
@@ -2439,6 +2439,165 @@
       "scene": "graphite",
       "caption": "Layers of graphite. Illustrative.",
       "alt": "Graphite: hexagonal layers of carbon atoms stacked along one axis."
+    }
+  },
+  {
+    "id": "q-vdw-5",
+    "concepts": [
+      "van-der-waals"
+    ],
+    "type": "single",
+    "prompt": "An INCAR sets GGA = MK, PARAM1 = 0.1234, PARAM2 = 1.0, LUSE_VDW = .TRUE., AGGAC = 0.0 and also IVDW = 12. What is wrong?",
+    "options": [
+      {
+        "text": "Dispersion is counted twice: the optB86b-vdW functional already contains it, and IVDW = 12 adds a D3(BJ) term on top",
+        "correct": true,
+        "why": "The nonlocal correlation term is the dispersion. A pairwise correction on top adds the same attraction again, so layers and molecules overbind."
+      },
+      {
+        "text": "Nothing: IVDW is needed to switch on the nonlocal kernel",
+        "correct": false,
+        "why": "Tempting, because both tags mention vdW. The kernel is switched on by LUSE_VDW; IVDW selects a separate pairwise method."
+      },
+      {
+        "text": "AGGAC must be 1.0 for a vdW-DF functional",
+        "correct": false,
+        "why": "The opposite: vdW-DF uses LDA correlation plus the nonlocal term, so the gradient correction to correlation is removed with AGGAC = 0.0."
+      }
+    ],
+    "hints": [
+      "Which tags each add an attraction between distant atoms?",
+      "A nonlocal functional and a pairwise correction are two ways to do the same job."
+    ],
+    "difficulty": 1.0,
+    "level": "intermediate",
+    "sources": [
+      "S-019",
+      "S-137"
+    ],
+    "visual": {
+      "scene": "graphite",
+      "caption": "Layers of graphite. Illustrative.",
+      "alt": "Graphite: hexagonal layers of carbon atoms stacked along one axis."
+    }
+  },
+  {
+    "id": "q-vdw-6",
+    "concepts": [
+      "van-der-waals"
+    ],
+    "type": "single",
+    "prompt": "You relax graphite (ISIF = 3) with plain PBE and no correction. The layers end up far apart, much more than the measured 3.35 angstrom. What is the most likely reason?",
+    "options": [
+      {
+        "text": "PBE gives little or no binding between the layers, so nothing holds them at the measured spacing",
+        "correct": true,
+        "why": "Benchmarks over many layered compounds find that PBE barely binds them; the interlayer attraction is dispersion, which PBE lacks. With a correction the layers come back close to experiment."
+      },
+      {
+        "text": "The k-point mesh was too dense along c",
+        "correct": false,
+        "why": "A denser mesh makes the PBE answer more precise; it does not create or remove an attraction."
+      },
+      {
+        "text": "ISIF = 3 always expands the cell",
+        "correct": false,
+        "why": "ISIF = 3 lets the cell relax in whichever direction lowers the energy. The layers drift apart because PBE gives them no reason to stay close."
+      }
+    ],
+    "hints": [
+      "What holds graphite layers together?",
+      "Does PBE contain that interaction?"
+    ],
+    "difficulty": 0.0,
+    "level": "beginner",
+    "sources": [
+      "S-139",
+      "S-042"
+    ],
+    "visual": {
+      "scene": "graphite",
+      "caption": "Layers of graphite. Illustrative.",
+      "alt": "Graphite: hexagonal layers of carbon atoms stacked along one axis."
+    }
+  },
+  {
+    "id": "q-vdw-7",
+    "concepts": [
+      "van-der-waals"
+    ],
+    "type": "single",
+    "prompt": "Which of these corrections takes its pair coefficients from the computed electron density, rather than from the positions of the atoms alone?",
+    "options": [
+      {
+        "text": "Tkatchenko-Scheffler (IVDW = 20)",
+        "correct": true,
+        "why": "TS scales free-atom reference values by how much each atom's share of the density is compressed in the system, so the coefficients follow the computed density."
+      },
+      {
+        "text": "DFT-D2 (IVDW = 10)",
+        "correct": false,
+        "why": "D2 uses one fixed coefficient per element from a table, whatever the bonding or the density."
+      },
+      {
+        "text": "DFT-D3 (IVDW = 11)",
+        "correct": false,
+        "why": "Tempting, because D3 coefficients do change with environment. But they change with the coordination number, which is computed from the atomic positions, not from the density."
+      }
+    ],
+    "hints": [
+      "D2 uses a table and D3 counts neighbours.",
+      "One method uses a partition of the density into atoms."
+    ],
+    "difficulty": 1.0,
+    "level": "intermediate",
+    "sources": [
+      "S-136",
+      "S-135",
+      "S-028"
+    ],
+    "visual": {
+      "scene": "graphite",
+      "caption": "Layers of graphite. Illustrative.",
+      "alt": "Graphite: hexagonal layers of carbon atoms stacked along one axis."
+    }
+  },
+  {
+    "id": "q-vdw-8",
+    "concepts": [
+      "van-der-waals"
+    ],
+    "type": "single",
+    "prompt": "You compute an adsorption energy as E(slab with molecule) minus E(slab) minus E(molecule). The first two runs use IVDW = 12; the isolated molecule was run without it. What is the problem?",
+    "options": [
+      {
+        "text": "The difference mixes two energy models, so it contains part of the correction instead of only the adsorption",
+        "correct": true,
+        "why": "Each total energy includes its own dispersion term, including the attraction within the molecule. Leaving it out of one run means the terms do not cancel. Use the same correction in all three."
+      },
+      {
+        "text": "None: the correction only matters between the molecule and the surface",
+        "correct": false,
+        "why": "Tempting, but the correction also acts between atoms inside the molecule and inside the slab. Those parts cancel only if every run includes them."
+      },
+      {
+        "text": "IVDW = 12 cannot be used for an isolated molecule",
+        "correct": false,
+        "why": "It can: the correction is a sum over atom pairs, and a molecule has pairs too."
+      }
+    ],
+    "hints": [
+      "An energy difference is only meaningful if each term uses the same model.",
+      "Does the molecule have atom pairs of its own?"
+    ],
+    "difficulty": 1.0,
+    "level": "intermediate",
+    "sources": [
+      "S-041",
+      "S-028"
+    ],
+    "visual": {
+      "none": "The question is about which runs share one setting, and no crystal picture would show that."
     }
   },
   {
@@ -3230,6 +3389,46 @@
     }
   },
   {
+    "id": "q-mgs-1",
+    "concepts": [
+      "magnetic-ground-state"
+    ],
+    "type": "single",
+    "prompt": "In one common supercell, E(AFM) minus E(FM) is +12 meV per formula unit, with U = 4 eV. FM and one AFM ordering were tested. What can you conclude?",
+    "options": [
+      {
+        "text": "FM is lower than that AFM ordering at this U; check other orderings and how the ranking changes with U before calling FM the ground state",
+        "correct": true,
+        "why": "A positive difference means FM is lower. But only two orderings were tested, and differences of a few meV per formula unit can change with U, so the conclusion is limited to what you computed."
+      },
+      {
+        "text": "The AFM ordering is the ground state, because its energy difference is positive",
+        "correct": false,
+        "why": "The sign convention is AFM minus FM: positive means the AFM energy is higher, so FM is lower."
+      },
+      {
+        "text": "FM is certainly the ground state of the material",
+        "correct": false,
+        "why": "Tempting, but the lowest of two candidates is only the lowest of those two. Other orderings, or another U, can change the answer."
+      }
+    ],
+    "hints": [
+      "Which energy is subtracted from which?",
+      "How many orderings were actually compared?"
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-014"
+    ],
+    "visual": {
+      "scene": "afm-c",
+      "caption": "One candidate antiferromagnetic ordering in a supercell.",
+      "alt": "C-type antiferromagnetic supercell with up and down arrows."
+    }
+  },
+  {
     "id": "q-mag-25",
     "concepts": [
       "magnetic-output"
@@ -3267,6 +3466,46 @@
       "scene": "fm-cubic",
       "caption": "Exchange splitting in a ferromagnetic crystal.",
       "alt": "Ferromagnetic cubic lattice with aligned spin arrows."
+    }
+  },
+  {
+    "id": "q-mout-1",
+    "concepts": [
+      "magnetic-output"
+    ],
+    "type": "single",
+    "prompt": "High-spin Fe3+ has five unpaired d electrons. In the last magnetization (x) table of your OUTCAR, each Fe site shows a total of about 4.2. What does this mean?",
+    "options": [
+      {
+        "text": "Nothing is wrong: the site moment is integrated inside a sphere around the atom, so part of the moment lies outside and the value is below the formal 5",
+        "correct": true,
+        "why": "The handbook notes that high-spin Fe3+ typically shows about 4.2 to 4.3 Bohr magnetons. The rest sits between the spheres and on the neighbours."
+      },
+      {
+        "text": "The run converged to a low-spin state",
+        "correct": false,
+        "why": "Low-spin Fe3+ would have one unpaired electron, so a moment near 1, not near 4."
+      },
+      {
+        "text": "LORBIT = 11 rounds the moments down",
+        "correct": false,
+        "why": "LORBIT controls what is written, not how the moment is computed. The shortfall comes from the finite sphere."
+      }
+    ],
+    "hints": [
+      "Where exactly is the site moment measured?",
+      "Does the sphere around an atom capture all of its spin density?"
+    ],
+    "difficulty": 0.0,
+    "level": "beginner",
+    "sources": [
+      "S-042",
+      "S-065"
+    ],
+    "visual": {
+      "scene": "rocksalt",
+      "caption": "A rock-salt oxide with magnetic cations.",
+      "alt": "Rock-salt crystal lattice with cation and anion sites."
     }
   },
   {
