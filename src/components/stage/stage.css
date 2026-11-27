@@ -154,23 +154,6 @@
 .stage-canvas canvas.v3d-canvas:active {
   cursor: grabbing;
 }
-.v3d-labels {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-.v3d-label {
-  position: absolute;
-  left: 0;
-  top: 0;
-  padding: 0 0.3em;
-  border-radius: 0.3em;
-  font: 600 var(--step--1) / 1.3 var(--font-sans);
-  color: var(--text);
-  background: color-mix(in srgb, var(--surface) 72%, transparent);
-  white-space: nowrap;
-}
 .stage-loading {
   position: absolute;
   right: var(--space-2);
@@ -315,48 +298,8 @@
   margin-right: var(--space-3);
 }
 
-/* Poster colours that follow the theme */
-.v3p-ink-fill {
-  fill: var(--text);
-}
-.v3p-ink-stroke {
-  stroke: var(--text);
-}
-.v3p-muted-fill {
-  fill: var(--border-strong);
-}
-.v3p-muted-stroke {
-  stroke: var(--border-strong);
-}
-.v3p-label {
-  fill: var(--text);
-  font: 600 13px var(--font-sans);
-  paint-order: stroke;
-  stroke: var(--surface);
-  stroke-width: 3px;
-}
-.v3p-atom {
-  stroke: color-mix(in srgb, var(--text) 35%, transparent);
-  stroke-width: 0.6;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .stage-state {
     transition: none;
   }
-}
-.v3d-gizmo {
-  position: absolute;
-  left: var(--space-1, 0.5rem);
-  bottom: var(--space-1, 0.5rem);
-  pointer-events: none;
-  line-height: 0;
-}
-/* letters in the text colour for contrast; the line beside each carries the axis colour */
-.v3d-gizmo text {
-  fill: var(--text);
-  font-family: var(--font-sans);
-  paint-order: stroke;
-  stroke: var(--surface);
-  stroke-width: 3px;
 }

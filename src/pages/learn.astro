@@ -9,7 +9,9 @@ import type { Station } from '../lib/learn/stations';
 const list = stations as unknown as Station[];
 const ids = new Set<string>();
 for (const s of list) {
-  if (s.visual.kind === 'scene') ids.add(s.visual.scene);
+  // stage stations name scenes of the 3D engine, which the island loads itself (lazy chunks)
+  if (s.visual.kind !== 'scene') continue;
+  ids.add(s.visual.scene);
   if (s.try.kind === 'choice') for (const o of s.try.options) if (o.scene) ids.add(o.scene);
 }
 const scenes = Object.fromEntries(

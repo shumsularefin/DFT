@@ -1,5 +1,7 @@
-// Scene island (M12.2): the flat SVG projection first (no three.js on load), a "View in 3D" button that loads the renderer
-// on demand, camera presets, keyboard rotation, reset view and step controls. D-058: only one live canvas per page.
+// Scene island (M12.2, on the shared engine since M16.4): the flat SVG projection first (no three.js on load), a "View in 3D"
+// button that loads the engine (Viewer3D, free arcball camera, D-108) on demand, camera presets, keyboard rotation, reset
+// view and step controls. The preset becomes an engine frame through `fromSceneSpec` (D-121), drawn in the shared Studio
+// look (D-122). D-058: only one live canvas per page.
 // With `auto3D` (the guided path, D-107) the island opens the free 3D view by itself once it is on the page, when the browser
 // can draw WebGL and the reader has not asked for reduced motion; otherwise the flat view stays and can be turned by dragging
 // or with the arrow keys.
@@ -11,8 +13,11 @@ import { resolveScene } from '../../lib/scene/resolve';
 import type { Camera, SceneSpec } from '../../lib/scene/spec';
 import { projectionToSvg } from '../../lib/scene/svg';
 import { hasWebGL, prefersReducedMotion, shouldStart3D } from '../../lib/three/capabilities';
-import type { SpecScene } from '../../lib/three/SpecScene';
+import type { IslandView } from '../../lib/viewer3d/islandView';
+import '../stage/v3d.css';
 import './scene.css';
+
+type Engine = typeof import('../../lib/viewer3d/islandView');
 
 interface Props {
   /** A spec whose structure is inline (the Astro wrapper resolves named structures at build time). */
@@ -25,13 +30,6 @@ interface Props {
   onLiveChange?: (live: boolean) => void;
 }
 
-const css = (name: string, fallback: string): string => {
-  try {
-    return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
-  } catch {
-    return fallback;
-  }
-};
 const never = (): undefined => undefined;
 const NO_WEBGL =
   'This browser cannot draw 3D, so the flat view stays. You can still turn it by dragging or with the arrow keys.';
@@ -47,8 +45,11 @@ export default function Scene({ spec, initialLive = false, auto3D = false, onLiv
   const [live, setLive] = useState(false);
   const [loading, setLoading] = useState(false);
   const [note, setNote] = useState('');
+  const [picked, setPicked] = useState('');
+  const view = useRef<HTMLDivElement>(null);
   const host = useRef<HTMLDivElement>(null);
-  const ctl = useRef<SpecScene | null>(null);
+  const ctl = useRef<IslandView | null>(null);
+  const engine = useRef<Engine | null>(null);
   const lastCam = useRef('');
 
   const resolved = useMemo(() => resolveScene(spec, never, step), [spec, step]);
@@ -103,33 +104,27 @@ export default function Scene({ spec, initialLive = false, auto3D = false, onLiv
     onLiveChange?.(live);
   }, [live]);
 
+  // the same resolved geometry as the flat view, as engine layers; a new step keeps the reader's view unless its camera changed
   const draw = useCallback(
     (reset: boolean) => {
-      ctl.current?.setResolved(
-        resolved,
-        lattice,
-        {
-          ink: css('--text', '#222222'),
-          accent: css('--accent', '#a2431f'),
-          muted: css('--border-strong', '#7b8494'),
-        },
-        reset,
-      );
-      if (!reset && camera) ctl.current?.setCamera(camera, resolved.extent, lattice);
+      const m = engine.current;
+      if (!ctl.current || !m) return;
+      ctl.current.show(m.frameFromResolved(resolved, spec.alt), reset);
     },
-    [resolved, lattice, camera],
+    [resolved, spec.alt],
   );
 
   // the live canvas exists exactly as long as `live`; closing, unmounting or another scene claiming the slot disposes it
   useEffect(() => {
-    if (!live || !host.current) return;
+    if (!live || !host.current || !view.current) return;
     let dead = false;
     let give: (() => void) | undefined;
     setLoading(true);
-    import('../../lib/three/SpecScene')
-      .then(({ createScene }) => {
-        if (dead || !host.current) return;
-        const c = createScene(host.current);
+    import('../../lib/viewer3d/islandView')
+      .then((m) => {
+        if (dead || !host.current || !view.current) return;
+        engine.current = m;
+        const c = new m.IslandView(view.current, host.current, { onPick: setPicked });
         c.start();
         ctl.current = c;
         give = claimCanvas(() => setLive(false));
@@ -148,17 +143,18 @@ export default function Scene({ spec, initialLive = false, auto3D = false, onLiv
       give?.();
       ctl.current?.dispose();
       ctl.current = null;
+      setPicked('');
     };
   }, [live]);
 
-  // follow step and camera changes while live
+  // follow step changes while live (a step with its own camera moves the view; the others keep it)
   useEffect(() => {
     if (!ctl.current) return;
     const key = JSON.stringify(resolved.camera);
     const changed = key !== lastCam.current;
     lastCam.current = key;
     draw(changed);
-  }, [resolved, camera, draw]);
+  }, [resolved, draw]);
 
   const open3D = () => {
     if (!hasWebGL()) {
@@ -170,13 +166,15 @@ export default function Scene({ spec, initialLive = false, auto3D = false, onLiv
   };
   const preset = (c: Camera) => {
     setCamera(c);
-    if (ctl.current) ctl.current.setCamera(c, resolved.extent, lattice);
+    const m = engine.current;
+    if (ctl.current && m) ctl.current.goTo(m.cameraOfPreset(c, lattice));
   };
   const reset = () => {
     setCamera(undefined);
-    if (ctl.current) ctl.current.setCamera(resolved.camera, resolved.extent, lattice);
+    const m = engine.current;
+    if (ctl.current && m) ctl.current.goTo(m.cameraOfPreset(resolved.camera, lattice), false);
   };
-  const zoom = (f: number) => ctl.current?.zoomView(f);
+  const zoom = (f: number) => ctl.current?.zoom(f);
 
   // the flat view turns under a drag too, so it never behaves like a still picture. Native listeners: the move and up
   // listeners sit on the window while a drag lasts, so the drag keeps going when the SVG under the pointer is redrawn.
@@ -244,7 +242,9 @@ export default function Scene({ spec, initialLive = false, auto3D = false, onLiv
         <Badge variant={spec.badge} />
       </div>
       {live ? (
-        <div className="scene-stage" ref={host} data-testid="scene-3d" />
+        <div className="scene-stage" ref={view} data-testid="scene-3d">
+          <div className="scene-host" ref={host} />
+        </div>
       ) : (
         <div
           className="scene-stage scene-flat"
@@ -294,8 +294,14 @@ export default function Scene({ spec, initialLive = false, auto3D = false, onLiv
       </div>
       {live && !loading && (
         <p className="scene-help">
-          Drag to turn it any way. Scroll or pinch to zoom. Right-drag or Shift-drag to move it. With the
-          picture focused: arrow keys turn, plus and minus zoom, W A S D move, R resets.
+          Drag to turn it any way, with no stop at the poles. Scroll or pinch to zoom. Shift-drag to move it,
+          right-drag to roll it. Click an atom to read it. With the picture focused: arrow keys turn, plus and
+          minus zoom, W A S D move, Q and E roll, P switches the projection, R resets.
+        </p>
+      )}
+      {live && (
+        <p className="scene-pick" aria-live="polite">
+          {picked}
         </p>
       )}
       {note && (
