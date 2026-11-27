@@ -137,7 +137,7 @@ window.StudioData = (() => {
       ['205', 'Equation of state (Birch-Murnaghan)', { stage: 'analyze', tab: 'eos' }],
     ]},
     { cat: '03 K-path', items: [
-      ['301-303', 'Band k-path for 1D / 2D / 3D structures', { stage: 'kpoints', kmode: 'line' }],
+      ['301-303', 'Band k-path for 1D / 2D / 3D structures (k-path tool)', { send: 'kpath' }],
       ['-', 'k-point convergence test (L series + script)', { stage: 'kconv' }],
     ]},
     { cat: '04-08 Structure, symmetry and models', items: [
@@ -146,7 +146,8 @@ window.StudioData = (() => {
       ['501-509', 'Catalysis: slabs, adsorbates, ZPE and Gibbs', { stage: 'structure', tab: 'catalyst' }],
       ['601-609', 'Symmetry, space group, Wyckoff, primitive cell', { stage: 'structure', tab: 'symmetry' }],
       ['800-827', 'Slabs, vacuum, heterostructures, defects', { stage: 'structure', tab: 'catalyst' }],
-      ['-', 'Magnetic orderings (FM, AFM-A/C/G/II, 120 deg)', { stage: 'structure', tab: 'magnetic' }],
+      ['-', 'Magnetic orderings FM, AFM-A/C/G/II (Magnetic tool)', { send: 'magnetic' }],
+      ['-', 'Per-atom moments, non-collinear 120 deg start', { stage: 'structure', tab: 'magnetic' }],
       ['-', 'Atoms, substitution, vacancies, interstitials', { stage: 'structure', tab: 'atoms' }],
       ['-', 'Sample crystal library (350 structures)', { stage: 'structure', library: true }],
     ]},

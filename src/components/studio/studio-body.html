@@ -1214,19 +1214,17 @@
         ></div>
       </div>
 
-      <!-- High-Symmetry k-Path -->
+      <!-- Band k-path: computed by the site's k-path tool on the standardized cell (D-108) -->
       <div class="card-bg border border-subtle rounded-md p-2.5 space-y-1.5">
-        <div class="flex items-center justify-between">
-          <span class="text-[11px] font-bold text-main">Recommended Band k-Path</span>
-          <button id="btn-send-kpath" class="text-[10.5px] text-blue-500 font-semibold hover:underline">
-            Use in KPOINTS →
-          </button>
-        </div>
-        <div id="sym-kpath-str" class="font-mono-code text-[10.5px] font-semibold text-blue-500"></div>
-        <div
-          id="sym-kpoints-table"
-          class="font-mono-code text-[10px] text-sub space-y-0.5 max-h-24 overflow-y-auto"
-        ></div>
+        <span class="text-[11px] font-bold text-main">Band structure k-path</span>
+        <p class="text-[10px] leading-snug text-sub">
+          A band path is only right for the standardized cell it was made for. The k-path tool standardizes
+          this structure, gives the HPKOT or Setyawan-Curtarolo path (tested on 39 structures) and writes the
+          matching POSCAR and KPOINTS.
+        </p>
+        <button type="button" id="btn-send-kpath" class="v-btn w-full text-[10.5px] py-1">
+          Get the band path in the k-path tool
+        </button>
       </div>
     </div>
 

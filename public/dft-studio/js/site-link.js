@@ -176,13 +176,15 @@
     });
   }
   // The Magnetic tab hands the structure to the site's Magnetic tool, which owns FM / AFM orderings (D-108).
-  const magBtn = $('btn-mag-to-tool');
-  if (magBtn) {
-    magBtn.onclick = () => {
+  // The Symmetry tab hands the structure to the k-path tool, which owns band paths (D-108).
+  [['btn-mag-to-tool', 'magnetic'], ['btn-send-kpath', 'kpath']].forEach(([id, tool]) => {
+    const b = $(id);
+    if (!b) return;
+    b.onclick = () => {
       const mm = V.hasMagnetism() ? V.getMAGMOM().replace(/^\s*MAGMOM\s*=\s*/i, '') : undefined;
-      if (!B.sendTo('magnetic', V.getPOSCAR(), name(), mm)) V.toast('Browser storage is unavailable, so the hand-off could not be made.');
+      if (!B.sendTo(tool, V.getPOSCAR(), name(), mm)) V.toast('Browser storage is unavailable, so the hand-off could not be made.');
     };
-  }
+  });
   function wrap(stage, extra) {
     const orig = T.stageRenderers[stage];
     if (!orig) return;
@@ -205,7 +207,7 @@
       : '<p class="sp-note">No problems found by the site rules.</p>';
     return card('Handbook validation rules (V001 and up)', `<p class="sp-note">The handbook's INCAR engine checked this INCAR against the structure: each rule is sourced and unit tested. Studio presets are VASPKIT-style starting points; these rules are the cross-check.</p>${list}<div class="site-links">${toolBtn('input-builder', 'Continue in the Input Builder', tool('input-builder').why)}</div>`);
   });
-  wrap('kpoints', () => card('Verified k-path', `<p class="sp-note">The built-in paths here are quick look-ups. The handbook k-path tool computes HPKOT or Setyawan-Curtarolo paths with golden tests on 39 structures and shows the exact Brillouin zone.</p><div class="site-links">${toolBtn('kpath', 'Open this structure in the k-path tool', tool('kpath').why)}${link('/handbook/', 'Why the mesh and path matter', 'Handbook modules on k-points and band structures.')}</div>`));
+  wrap('kpoints', () => card('Verified k-path', `<p class="sp-note">This step writes the k-point mesh. Band paths come from the k-path tool: it standardizes the cell, computes the HPKOT or Setyawan-Curtarolo path (golden tests on 39 structures) and shows the Brillouin zone.</p><div class="site-links">${toolBtn('kpath', 'Get the band path in the k-path tool', tool('kpath').why)}${link('/handbook/', 'Why the mesh and path matter', 'Handbook modules on k-points and band structures.')}</div>`));
   wrap('kconv', () => card('Plot the series on the site', `<p class="sp-note">After the run, load kpoint_convergence.csv above, then send the rows to the convergence plotter for the energy and pressure plots with a threshold you choose.</p><div class="site-links"><button type="button" class="site-link" id="kc-send-plot"><b>Send results to the convergence plotter</b><span>Needs the CSV loaded above.</span></button>${link('/tools/convergence/', 'Open the convergence plotter', 'Drop OSZICAR or OUTCAR files from any series.')}</div><p id="kc-send-st" class="sp-note" role="status"></p>`));
   function bindKconv(root) {
     const b = root.querySelector('#kc-send-plot');

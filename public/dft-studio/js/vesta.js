@@ -154,49 +154,6 @@
     return ELEMENTS[el] || { z:0, mass:50.0, r:1.2, color:'#94a3b8' };
   }
 
-  // Standard High-Symmetry k-Paths (Setyawan & Curtarolo 2010)
-  const KPATHS = {
-    'Cubic-P': {
-      path: 'Γ → X → M → Γ → R → X | M → R',
-      segments: [['G','X'],['X','M'],['M','G'],['G','R'],['R','X'],['M','R']],
-      pts: { G:[0,0,0], X:[0,0.5,0], M:[0.5,0.5,0], R:[0.5,0.5,0.5] }
-    },
-    'Cubic-F': {
-      path: 'Γ → X → W → K → Γ → L → U → W → L → K',
-      segments: [['G','X'],['X','W'],['W','K'],['K','G'],['G','L'],['L','U'],['U','W'],['W','L'],['L','K']],
-      pts: { G:[0,0,0], X:[0.5,0,0.5], W:[0.5,0.25,0.75], K:[0.375,0.375,0.75], L:[0.5,0.5,0.5], U:[0.625,0.25,0.625] }
-    },
-    'Cubic-I': {
-      path: 'Γ → H → N → Γ → P → H | P → N',
-      segments: [['G','H'],['H','N'],['N','G'],['G','P'],['P','H'],['P','N']],
-      pts: { G:[0,0,0], H:[0.5,-0.5,0.5], N:[0,0,0.5], P:[0.25,0.25,0.25] }
-    },
-    'Tetragonal': {
-      path: 'Γ → X → M → Γ → Z → R → A → Z',
-      segments: [['G','X'],['X','M'],['M','G'],['G','Z'],['Z','R'],['R','A'],['A','Z']],
-      pts: { G:[0,0,0], X:[0,0.5,0], M:[0.5,0.5,0], Z:[0,0,0.5], R:[0,0.5,0.5], A:[0.5,0.5,0.5] }
-    },
-    'Hexagonal': {
-      path: 'Γ → M → K → Γ → A → L → H → A',
-      segments: [['G','M'],['M','K'],['K','G'],['G','A'],['A','L'],['L','H'],['H','A']],
-      pts: { G:[0,0,0], M:[0.5,0,0], K:[0.333333,0.333333,0], A:[0,0,0.5], L:[0.5,0,0.5], H:[0.333333,0.333333,0.5] }
-    },
-    'Orthorhombic': {
-      path: 'Γ → X → S → Y → Γ → Z → U → R → T → Z',
-      segments: [['G','X'],['X','S'],['S','Y'],['Y','G'],['G','Z'],['Z','U'],['U','R'],['R','T'],['T','Z']],
-      pts: { G:[0,0,0], X:[0.5,0,0], S:[0.5,0.5,0], Y:[0,0.5,0], Z:[0,0,0.5], U:[0.5,0,0.5], R:[0.5,0.5,0.5], T:[0,0.5,0.5] }
-    },
-    'Monoclinic': {
-      path: 'Γ → Y → H → C → E → M1 → A → X → Γ',
-      segments: [['G','Y'],['Y','C'],['C','E'],['E','A'],['A','X'],['X','G']],
-      pts: { G:[0,0,0], Y:[0,0.5,0], C:[0,0.5,0.5], E:[-0.5,0.5,0.5], A:[-0.5,0,0], X:[0.5,0,0] }
-    },
-    'Triclinic': {
-      path: 'Γ → X → Y → Γ → Z → R',
-      segments: [['G','X'],['X','Y'],['Y','G'],['G','Z'],['Z','R']],
-      pts: { G:[0,0,0], X:[0.5,0,0], Y:[0,0.5,0], Z:[0,0,0.5], R:[0.5,0.5,0.5] }
-    }
-  };
 
   // =========================================================================
   // 2. BUILT-IN VASP SAMPLE STRUCTURES
@@ -432,7 +389,6 @@
     activeVaspFile: 'POSCAR',
     kptsMode: 'Gamma',
     kptsSpacing: 0.04,
-    kptsNseg: 25,
     poscarCoord: 'Direct',
     incarPreset: 'scf',
     incarEncut: 520,
@@ -804,35 +760,15 @@
   }
 
   function generateKPOINTS() {
-    if (state.kptsMode === 'Line-mode') {
-      const kkey = state.symmetryResult ? state.symmetryResult.kpathKey : 'Cubic-P';
-      const kp = KPATHS[kkey] || KPATHS['Cubic-P'];
-      const lines = [
-        `High-symmetry k-path (${kkey})`,
-        `${state.kptsNseg}`,
-        'Line-mode',
-        'Reciprocal'
-      ];
-      kp.segments.forEach(([a, b]) => {
-        const pa = kp.pts[a], pb = kp.pts[b];
-        const la = a === 'G' ? 'Gamma' : a;
-        const lb = b === 'G' ? 'Gamma' : b;
-        lines.push(`  ${pa[0].toFixed(5)}  ${pa[1].toFixed(5)}  ${pa[2].toFixed(5)}  ! ${la}`);
-        lines.push(`  ${pb[0].toFixed(5)}  ${pb[1].toFixed(5)}  ${pb[2].toFixed(5)}  ! ${lb}`);
-        lines.push('');
-      });
-      return lines.join('\n');
-    } else {
-      const [kx, ky, kz] = computeAutoKMesh();
-      const kb = document.getElementById('kpts-grid-badge'); if (kb) kb.textContent = `${kx}×${ky}×${kz}`;
-      return [
-        `Automatic mesh (k-spacing = ${state.kptsSpacing} 2pi/A)`,
-        '0',
-        state.kptsMode,
-        `  ${kx}  ${ky}  ${kz}`,
-        '  0  0  0'
-      ].join('\n') + '\n';
-    }
+    const [kx, ky, kz] = computeAutoKMesh();
+    const kb = document.getElementById('kpts-grid-badge'); if (kb) kb.textContent = `${kx}×${ky}×${kz}`;
+    return [
+      `Automatic mesh (k-spacing = ${state.kptsSpacing} 2pi/A)`,
+      '0',
+      state.kptsMode,
+      `  ${kx}  ${ky}  ${kz}`,
+      '  0  0  0'
+    ].join('\n') + '\n';
   }
 
   function generateINCAR() {
@@ -2398,12 +2334,6 @@
       brkBox.classList.add('hidden');
     }
 
-    const kp = KPATHS[sym.kpathKey] || KPATHS['Cubic-P'];
-    document.getElementById('sym-kpath-str').textContent = kp.path;
-    const kt = document.getElementById('sym-kpoints-table');
-    kt.innerHTML = Object.entries(kp.pts).map(([k, v]) =>
-      `<div class="flex justify-between"><span>${k === 'G' ? 'Γ (Gamma)' : k}</span><span>(${v.map(x=>x.toFixed(3)).join(', ')})</span></div>`
-    ).join('');
   }
 
   function renderMagneticUI() {
@@ -3073,10 +3003,6 @@
     downloadTextFile(fn, buildFullContcarReportText('md'));
   });
 
-  document.getElementById('btn-send-kpath').addEventListener('click', () => {
-    if (window.Studio) window.Studio.useBandPath();
-    showToast('High-symmetry k-path sent to step 4 (KPOINTS)');
-  });
 
   // Magnetic Controls
   const updateMagModeBtns = () => {
@@ -3560,8 +3486,6 @@
     getReciprocal: () => getReciprocalLattice(state.structure.lattice),
     getSymmetry: () => state.symmetryResult,
     getElementInfo: el => getElInfo(el),
-    bandPathKPOINTS: nseg => { const m = state.kptsMode, n = state.kptsNseg; state.kptsMode = 'Line-mode'; state.kptsNseg = nseg; const t = generateKPOINTS(); state.kptsMode = m; state.kptsNseg = n; return t; },
-    bandPathLabel: () => { const k = state.symmetryResult ? state.symmetryResult.kpathKey : 'Cubic-P'; const kp = KPATHS[k] || KPATHS['Cubic-P']; return { key: k, path: kp.segments.map(([x, y]) => x + '-' + y).join(' | ') }; },
     loadText: loadStructureText,
     // Replace the structure with edited POSCAR text (site checks and operations). Undo-able; keeps the
     // species colours, and keeps the moments when the atom count is unchanged.

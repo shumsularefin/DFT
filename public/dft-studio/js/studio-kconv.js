@@ -36,7 +36,6 @@
       poscar: src.poscar, incarTags, cmd: C.cmd, meshes, ediff: ed.nums, tries: tr.nums,
       invalidCustom: series.invalidCustom, invalidTol: tol.invalid, invalidEdiff: ed.invalid, invalidTries: tr.invalid,
     });
-    if (S.kpt.mode === 'line') w.infos.push('KPOINTS (step 4) is in band-path mode: the convergence test always writes its own Gamma-centred meshes.');
     if (/ICHARG\s*=\s*11/.test(src.incarText)) w.warnings.push('INCAR is a non-SCF (ICHARG = 11) run: use an SCF preset (for example ST or MG) in step 3 for the convergence test.');
     const opts = { meshes, cmd: C.cmd.trim() || 'mpirun -np 12 vasp', tol: tol.nums.length ? tol.nums : [1, 0.1], ed: ed.nums.length ? ed.nums : [1e-4, 1e-6, 1e-8], tr: tr.nums.length ? tr.nums : [2, 3, 5] };
     let script = K.buildScript(opts);

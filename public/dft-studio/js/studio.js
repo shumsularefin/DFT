@@ -255,7 +255,7 @@
     ldau: false, uMap: {},
     soc: false, vdw: 0, dipole: false,
     tagEdits: {}, extraTags: '', incarManual: null,
-    kpt: { mode: 'spacing', spacing: 0.03, manual: [4, 4, 4], scheme: 'Gamma', nseg: 30, force2D: false, lineOverride: null, lineNote: '' },
+    kpt: { mode: 'spacing', spacing: 0.03, manual: [4, 4, 4], scheme: 'Gamma', force2D: false },
     bundleDone: false,
     analyzeTab: 'elec',
   };
@@ -413,10 +413,6 @@ echo "POTCAR written:"; grep TITEL POTCAR
     return m;
   }
   function getKpoints() {
-    if (S.kpt.mode === 'line') {
-      if (S.kpt.lineOverride) return S.kpt.lineOverride;
-      return V().bandPathKPOINTS(S.kpt.nseg);
-    }
     const m = currentMesh();
     const why = S.kpt.mode === 'manual' ? 'explicit mesh' : `k-spacing ${S.kpt.spacing} x 2pi/A`;
     return `Material Builder ${S.kpt.scheme} mesh (${why})\n0\n${S.kpt.scheme}\n  ${m.join('  ')}\n  0  0  0\n`;
@@ -441,17 +437,15 @@ echo "POTCAR written:"; grep TITEL POTCAR
     if (tags.MAGMOM && !tags.ISPIN && !isTrue(tags.LNONCOLLINEAR)) add('warn', 'MAGMOM set but ISPIN is not 2.', 'incar');
     if (isTrue(tags.LDAU) && !tags.LMAXMIX) add('warn', 'DFT+U without LMAXMIX.', 'incar');
     if (String(tags.ICHARG) === '11' && elements().some((e) => D.D_BLOCK.has(e) || D.F_BLOCK.has(e)) && !tags.LMAXMIX) add('warn', 'ICHARG = 11 on a d/f system needs LMAXMIX (4 or 6) to reproduce the SCF density.', 'incar');
-    const line = S.kpt.mode === 'line';
-    if (S.preset === 'BS' && !line) add('warn', 'Band-structure preset but KPOINTS is a mesh. Switch KPOINTS to the band path.', 'kpoints');
-    if (line && S.preset !== 'BS' && S.preset !== 'SO') add('warn', 'Line-mode KPOINTS is only meant for non-SCF band runs (ICHARG = 11).', 'kpoints');
-    if (String(tags.ISMEAR) === '-5' && !line && currentMesh().reduce((a, b) => a * b, 1) < 4) add('warn', 'ISMEAR = -5 (tetrahedron) needs at least 4 k-points.', 'kpoints');
+    if (S.preset === 'BS') add('warn', 'Band-structure preset: the band path KPOINTS (and its standardized POSCAR) comes from the k-path tool.', 'kpoints');
+    if (String(tags.ISMEAR) === '-5' && currentMesh().reduce((a, b) => a * b, 1) < 4) add('warn', 'ISMEAR = -5 (tetrahedron) needs at least 4 k-points.', 'kpoints');
     if (String(tags.ISIF) === '3' && looks2D()) add('warn', 'ISIF = 3 on a cell with vacuum will shrink the vacuum. Use ISIF = 2 (or ISIF = 4 with care) for slabs.', 'incar');
-    if (looks2D() && !line && currentMesh()[2] > 1) add('info', 'Cell looks like a slab or 2D layer: consider forcing N3 = 1 in KPOINTS.', 'kpoints');
+    if (looks2D() && currentMesh()[2] > 1) add('info', 'Cell looks like a slab or 2D layer: consider forcing N3 = 1 in KPOINTS.', 'kpoints');
     if (looks2D() && !S.dipole) add('info', 'Slab detected: consider the dipole correction (LDIPOL, IDIPOL = 3) for polar or adsorbate-covered surfaces.', 'incar');
     if (V().isSelective() && !['SR', 'LR', 'NE', 'MD'].includes(S.preset)) add('info', 'POSCAR has selective dynamics but the preset does not move ions.', 'incar');
     if (nat > 40 && String(tags.LREAL).toUpperCase() === '.FALSE.') add('info', `${nat} atoms with LREAL = .FALSE.: LREAL = Auto is usually much faster at this size.`, 'incar');
     const lp = V().getLatticeParams();
-    if (!line && S.kpt.scheme === 'Monkhorst-Pack' && Math.abs(lp.gamma - 120) < 1 && currentMesh().slice(0, 2).some((n) => n % 2 === 0)) add('warn', 'Hexagonal cell with an even Monkhorst-Pack mesh breaks the hexagonal symmetry. Use a Gamma-centred mesh.', 'kpoints');
+    if (S.kpt.scheme === 'Monkhorst-Pack' && Math.abs(lp.gamma - 120) < 1 && currentMesh().slice(0, 2).some((n) => n % 2 === 0)) add('warn', 'Hexagonal cell with an even Monkhorst-Pack mesh breaks the hexagonal symmetry. Use a Gamma-centred mesh.', 'kpoints');
     if (needsNoncollinear()) add('info', 'Non-collinear / SOC run: use the vasp_ncl executable.', 'bundle');
     if (S.ppLibrary !== true) add('info', 'No POTCAR library loaded yet. Load it in the POTCAR step to generate POTCAR here; otherwise make_potcar.sh builds it on your cluster.', 'potcar');
     return out;
@@ -626,7 +620,7 @@ echo "POTCAR written:"; grep TITEL POTCAR
         <div class="sp-note">Moments come from the 3D model (Structure > Magnetic tab), so INCAR always matches the spins you see. ${mm ? '' : 'No atom carries a moment yet.'}</div>
         ${mm ? `<pre class="code-area sp-pre">MAGMOM = ${esc(mm)}</pre>` : ''}
         <div class="sp-row wrap">
-          <button id="in-open-mag" class="v-btn">Edit spins in 3D (FM / AFM presets)</button>
+          <button id="in-open-mag" class="v-btn">Edit spins in 3D</button>
           <button id="in-default-mag" class="v-btn">Apply default FM moments</button>
           <span class="text-mut text-[10.5px]">Viewer mode: ${esc(magMode)}</span>
         </div>
@@ -685,14 +679,11 @@ echo "POTCAR written:"; grep TITEL POTCAR
     const B = recipLengths();
     const m = currentMesh();
     const lp = V().getLatticeParams();
-    const bp = V().bandPathLabel();
-    const sym = V().getSymmetry();
     body.innerHTML = `
       <div class="sp-card">
         <div class="sp-card-title">KPOINTS type</div>
-        <div class="seg">${[['spacing', 'Mesh from k-spacing'], ['manual', 'Explicit N1 x N2 x N3'], ['line', 'Band path (line mode)']].map(([v, l]) => `<button class="${k.mode === v ? 'on' : ''}" data-kmode="${v}">${l}</button>`).join('')}</div>
+        <div class="seg">${[['spacing', 'Mesh from k-spacing'], ['manual', 'Explicit N1 x N2 x N3']].map(([v, l]) => `<button class="${k.mode === v ? 'on' : ''}" data-kmode="${v}">${l}</button>`).join('')}</div>
       </div>
-      ${k.mode !== 'line' ? `
       <div class="sp-card">
         <div class="sp-grid2">
           ${k.mode === 'spacing' ? `<label class="sp-field"><span>k-spacing (2pi/A) ${helpBtn('k-spacing', 'VASPKIT convention: N_i = max(1, ceil(|b_i| / (2 pi x spacing))), with |b_i| including the 2 pi factor. 0.04 is a quick test, 0.03 is accurate, 0.02 is very accurate. Confirm with the k-convergence test (step 5).')}</span>
@@ -709,24 +700,7 @@ echo "POTCAR written:"; grep TITEL POTCAR
           <div><span>a, b, c (A) | gamma</span><b class="font-mono-code">${[lp.a, lp.b, lp.c].map((x) => x.toFixed(3)).join(', ')} | ${lp.gamma.toFixed(1)}</b></div>
         </div>
         <div class="sp-row wrap"><button id="kp-to-conv" class="v-btn">Not sure? Run a k-convergence test (step 5)</button></div>
-      </div>` : `
-      <div class="sp-card">
-        <div class="sp-card-title">High-symmetry path ${helpBtn('Band path', 'The path follows Setyawan and Curtarolo (2010) for the Bravais lattice found by the Symmetry tab. For publication-quality paths on low-symmetry cells you can run SeekPath (HPKOT convention, same as VASPKIT 303) in the browser.')}</div>
-        <div class="sp-stats">
-          <div><span>Lattice key</span><b class="font-mono-code">${esc(bp.key)}</b></div>
-          <div><span>Space group</span><b class="font-mono-code">${sym && sym.estSG ? esc(sym.estSG) + ' (estimate)' : 'run Symmetry'}</b></div>
-        </div>
-        <div class="font-mono-code text-[11px] text-blue-500" style="margin:6px 0">${esc(S.kpt.lineOverride ? S.kpt.lineNote : bp.path)}</div>
-        <div class="sp-row wrap">
-          <label class="sp-inline">Points per segment <input id="kp-nseg" type="number" min="5" step="5" class="v-input w-16 font-mono-code text-center" value="${k.nseg}"/></label>
-          <button id="kp-seek" class="v-btn">SeekPath (WebAssembly)</button>
-          ${S.kpt.lineOverride ? '<button id="kp-seek-clear" class="v-btn">Use built-in path</button>' : ''}
-          <button id="kp-sym" class="v-btn">Open Symmetry tab</button>
-        </div>
-        ${!S.kpt.lineOverride && /-(F|I|C|A)\b|^(FCC|BCC|ORC[FIC]|BCT|MCLC)/i.test(bp.key) ? '<div class="sp-note warn">Centred lattice: these path coordinates are for the primitive cell. If the viewer shows the conventional cell, convert it first (Structure &gt; Cell &gt; Conv to Prim) or use SeekPath.</div>' : ''}
-        <div id="kp-msg" class="sp-note"></div>
-        ${S.preset !== 'BS' && S.preset !== 'SO' ? '<div class="sp-note warn">A band path needs a non-SCF run. <button id="kp-set-bs" class="sp-link">Switch INCAR to the band-structure preset</button></div>' : ''}
-      </div>`}
+      </div>
       ${checkList('kpoints')}
       ${filePreview('KPOINTS', getKpoints())}
     `;
@@ -736,22 +710,6 @@ echo "POTCAR written:"; grep TITEL POTCAR
     const sch = $('kp-scheme'); if (sch) sch.onchange = () => { S.kpt.scheme = sch.value; rerenderBody(); };
     const d2 = $('kp-2d'); if (d2) d2.onchange = () => { S.kpt.force2D = d2.checked; rerenderBody(); };
     const tc = $('kp-to-conv'); if (tc) tc.onclick = () => go('kconv');
-    const ns = $('kp-nseg'); if (ns) ns.onchange = () => { S.kpt.nseg = Math.max(5, parseInt(ns.value, 10) || 30); rerenderBody(); };
-    const sy = $('kp-sym'); if (sy) sy.onclick = () => go('structure', { tab: 'symmetry' });
-    const bs = $('kp-set-bs'); if (bs) bs.onclick = () => { S.preset = 'BS'; S.tagEdits = {}; rerenderBody(); V().toast('INCAR preset set to band structure'); };
-    const sc = $('kp-seek-clear'); if (sc) sc.onclick = () => { S.kpt.lineOverride = null; rerenderBody(); };
-    const sk = $('kp-seek');
-    if (sk) sk.onclick = async () => {
-      const msg = $('kp-msg');
-      msg.textContent = 'Loading Python (Pyodide) and SeekPath in the browser. The first run downloads about 30 MB...';
-      try {
-        await window.WasmEngine.ensureReady(updateWasmPill);
-        const res = await window.WasmEngine.seekpath(V().getPOSCAR(), S.kpt.nseg);
-        S.kpt.lineOverride = res.kpoints_text;
-        S.kpt.lineNote = `SeekPath ${res.bravais} (SG #${res.spacegroup_number}): ${res.path_string}. Note: SeekPath may standardize the cell; use its primitive cell for the band run.`;
-        rerenderBody();
-      } catch (e) { msg.textContent = 'SeekPath failed: ' + e.message; }
-    };
     const ta = body.querySelector('textarea[data-file="KPOINTS"]');
     bindFileButtons(body, () => ta.value);
   };
@@ -763,7 +721,7 @@ echo "POTCAR written:"; grep TITEL POTCAR
   function vaspExe() {
     if (B.exe !== 'auto') return B.exe;
     if (needsNoncollinear()) return 'vasp_ncl';
-    if (S.kpt.mode !== 'line' && currentMesh().every((n) => n === 1) && S.kpt.scheme === 'Gamma') return 'vasp_gam';
+    if (currentMesh().every((n) => n === 1) && S.kpt.scheme === 'Gamma') return 'vasp_gam';
     return 'vasp_std';
   }
   function jobScript() {
@@ -789,7 +747,7 @@ echo "POTCAR written:"; grep TITEL POTCAR
 Structure : ${st.name} (${st.atoms.length} atoms)
 POTCAR    : ${S.potFunc}: ${elements().map((el) => S.potSel[el]).join(' ')}
 INCAR     : ${(D.INCAR_PRESETS[S.preset] || {}).name}, ENCUT = ${buildIncarTags().ENCUT} eV
-KPOINTS   : ${S.kpt.mode === 'line' ? 'band path (line mode)' : currentMesh().join('x') + ' ' + S.kpt.scheme}
+KPOINTS   : ${currentMesh().join('x') + ' ' + S.kpt.scheme}
 Executable: ${vaspExe()}
 
 How to run
@@ -813,7 +771,7 @@ ${c.length ? c.map((x) => `- [${x.level}] ${x.msg}`).join('\n') : '- none'}
           ${[['structure', 'POSCAR', `${V().getStructure().name}, ${V().getStructure().atoms.length} atoms${V().isSelective() ? ', selective dynamics' : ''}`],
              ['potcar', 'POTCAR', `${S.potFunc}: ${elements().map((el) => S.potSel[el]).join(' ')}`],
              ['incar', 'INCAR', `${(D.INCAR_PRESETS[S.preset] || {}).name}, ENCUT ${buildIncarTags().ENCUT} eV`],
-             ['kpoints', 'KPOINTS', S.kpt.mode === 'line' ? 'band path' : `${currentMesh().join('x')} ${S.kpt.scheme}`],
+             ['kpoints', 'KPOINTS', `${currentMesh().join('x')} ${S.kpt.scheme}`],
              ['kconv', 'k-convergence', kc ? `${kc.meshes.length} meshes ready` : 'not set up (optional)']]
             .map(([st, l, v]) => `<button class="sp-sum-row" data-goto="${st}"><span>${l}</span><b>${esc(v)}</b><i>edit</i></button>`).join('')}
         </div>
@@ -936,7 +894,14 @@ ${c.length ? c.map((x) => `- [${x.level}] ${x.msg}`).join('\n') : '- none'}
     const q = $('cmd-input').value.trim().toLowerCase();
     return COMMANDS.filter((c) => !q || `${c.code} ${c.name} ${c.cat}`.toLowerCase().includes(q)).slice(0, 14);
   }
-  function runCmd(c) { closeModal('cmd-modal'); go(c.target.stage, c.target); }
+  // A target with send opens the structure in a site tool (k-path, Magnetic, Input Builder); others are Builder steps.
+  function sendSite(tool) {
+    const B = window.SiteBridge;
+    if (!B) return;
+    const mm = V().hasMagnetism() ? V().getMAGMOM().replace(/^\s*MAGMOM\s*=\s*/i, '') : undefined;
+    if (!B.sendTo(tool, V().getPOSCAR(), (V().getStructure() && V().getStructure().name) || 'structure', mm)) V().toast('Browser storage is unavailable, so the hand-off could not be made.');
+  }
+  function runCmd(c) { closeModal('cmd-modal'); if (c.target.send) { sendSite(c.target.send); return; } go(c.target.stage, c.target); }
   function renderCmd() {
     const hits = cmdHits();
     cmdSel = Math.min(cmdSel, Math.max(0, hits.length - 1));
@@ -994,7 +959,7 @@ ${c.length ? c.map((x) => `- [${x.level}] ${x.msg}`).join('\n') : '- none'}
     V().refresh();
   }
 
-  window.Studio = { getIncar, getKpoints, useBandPath: () => { S.kpt.mode = 'line'; go('kpoints'); }, go, setMesh: (m) => { S.kpt.mode = 'manual'; S.kpt.manual = m.slice(); S.visited.add('kpoints'); } };
+  window.Studio = { getIncar, getKpoints, go, setMesh: (m) => { S.kpt.mode = 'manual'; S.kpt.manual = m.slice(); S.visited.add('kpoints'); } };
   window.StudioKit = { importPotcarFiles, maxEnmax, S, V, $, esc, helpBtn, filePreview, bindFileButtons, downloadText, downloadBlob, readFileText, plot, plotLayout, getIncar, getKpoints, currentMesh, go, rerenderBody, renderStepbar, stageRenderers, updateWasmPill, copyText, elements };
   setTimeout(init, 0);
 })();
