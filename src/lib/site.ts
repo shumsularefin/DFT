@@ -29,8 +29,14 @@ export const MODULES = [
 
 export const moduleName = (n: number): string => MODULES[n - 1] ?? `Module ${n}`;
 
+export interface NavItem {
+  label: string;
+  href: string;
+  icon: string;
+}
+
 /** Sidebar navigation, grouped as in the app shell (D-105). The first link must stay "Learn" (keyboard order test). */
-export const NAV_GROUPS = [
+export const NAV_GROUPS: readonly { label: string; items: readonly NavItem[] }[] = [
   {
     label: 'Study',
     items: [
@@ -58,10 +64,10 @@ export const NAV_GROUPS = [
       { label: 'All tools', href: '/tools/', icon: 'grid' },
     ],
   },
-] as const;
+];
 
 /** Flat list of the sidebar links. */
-export const NAV = NAV_GROUPS.flatMap((g) => g.items);
+export const NAV: readonly NavItem[] = NAV_GROUPS.flatMap((g) => g.items);
 
 export const FOOTER_LINKS = [
   { label: 'About', href: '/about/' },

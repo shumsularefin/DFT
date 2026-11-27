@@ -13,7 +13,7 @@ interface Props {
 const { topicIds, title } = Astro.props;
 const path = Astro.url.pathname;
 // The current link is the longest href the path starts with, so /tools/kpath/ marks k-path, not All tools.
-const currentHref = NAV.map((i) => i.href as string)
+const currentHref = NAV.map((i) => i.href)
   .filter((h) => path.startsWith(h))
   .sort((a, b) => b.length - a.length)[0];
 const section = NAV_GROUPS.find((g) => g.items.some((i) => i.href === currentHref))?.label;
