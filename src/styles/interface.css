@@ -346,18 +346,42 @@ tbody tr:last-child td {
 
 /* ------------------------------------------------------------------
    One page layout for every page in the main column.
-   Container: 72rem wide, centred, 24px side padding (16px on phones).
-   Reading pages keep prose at 46rem, left-aligned to the same edge.
+   Container: the whole main column, 24px side padding. Grids and lists fill the row; running prose
+   keeps a readable measure (48rem on prose pages, 68ch for paragraphs). Tool pages keep 88rem.
    ------------------------------------------------------------------ */
 main .container {
   width: auto;
-  max-width: 88rem;
+  max-width: none;
   margin: 0;
   padding: var(--space-5) var(--space-5) var(--space-7);
+}
+[data-page-class='tool'] main .container {
+  max-width: 88rem;
 }
 .prose-page > *,
 .ref-page > :not(.ref-scroll) {
   max-width: 48rem;
+}
+/* Short reading pages (About, Privacy) set their sections in two columns on wide screens, so the
+   right half of the page is not empty. Title and lede span both columns. */
+@media (min-width: 90rem) {
+  .prose-columns {
+    columns: 2;
+    column-gap: var(--space-7);
+    max-width: calc(96rem + var(--space-7) + 2 * var(--space-5));
+  }
+  .prose-columns > :is(h1, h1 + p) {
+    column-span: all;
+  }
+  .prose-columns :is(p, li) {
+    break-inside: avoid;
+  }
+  .prose-columns > h2 {
+    break-after: avoid;
+  }
+  .prose-columns > h2:first-of-type {
+    margin-top: 0;
+  }
 }
 
 /* Page header: modest h1, one muted lede, 24px before the content. */

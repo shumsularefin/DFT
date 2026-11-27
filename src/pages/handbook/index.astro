@@ -111,6 +111,9 @@ const quick = [
 </BaseLayout>
 
 <style is:global>
+  .card-grid.quick-ref {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  }
   .quick-ref .feature {
     gap: 0;
   }

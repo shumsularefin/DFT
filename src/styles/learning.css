@@ -21,6 +21,35 @@
     scrollbar-width: thin;
   }
 }
+/* Wide screens: "On this page" moves to its own right column, so the article sits between two rails
+   instead of leaving the right side of the page empty. */
+@media (min-width: 100rem) {
+  .handbook-layout {
+    grid-template-columns: 18.75rem minmax(0, 1fr) 15rem;
+  }
+  .handbook-layout > .hb-rail {
+    display: contents;
+  }
+  .hb-rail > * {
+    grid-row: 1;
+    position: sticky;
+    top: calc(var(--topbar-h) + var(--space-5));
+    max-height: calc(100vh - var(--topbar-h) - var(--statusbar-h) - 2 * var(--space-5));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  .hb-rail > .sidebar {
+    grid-column: 1;
+  }
+  .hb-rail > :not(.sidebar) {
+    grid-column: 3;
+  }
+  .handbook-layout > .handbook-main {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
 .hb-rail {
   display: grid;
   gap: var(--space-4);
