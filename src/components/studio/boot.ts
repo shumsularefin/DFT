@@ -7,6 +7,8 @@ import { SiteBridge } from './bridge';
 import { initMolecule } from './molecule';
 
 const BASE = '/dft-studio/';
+// A hash of the Studio files (astro.config.mjs), so a new build never runs next to an old cached script.
+const VERSION = typeof __STUDIO_VERSION__ === 'string' ? __STUDIO_VERSION__ : 'dev';
 const SCRIPTS = [
   'data/crystals_index.js',
   'data/pp_index.js',
@@ -32,7 +34,7 @@ window.addEventListener('error', keepError);
 function load(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const s = document.createElement('script');
-    s.src = BASE + src;
+    s.src = `${BASE}${src}?v=${VERSION}`;
     s.async = false;
     s.onload = () => resolve();
     s.onerror = () => reject(new Error(`could not load ${src}`));
