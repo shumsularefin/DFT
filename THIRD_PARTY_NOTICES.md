@@ -12,7 +12,7 @@ Code or data derived from other projects is recorded here with its licence. Port
 | Materials Project data (via `mp-api`) | see Q-009 | Screening Studio dataset, attribution required | M9.1 |
 | Fontsource: IBM Plex Sans, JetBrains Mono | SIL OFL 1.1 | Fonts (npm dependency) | M1.1 |
 | lucide-static 0.460.0 | ISC | Icon paths copied into `src/components/studio/icons.generated.ts` (full text below) | D-103 |
-| Tailwind CSS 3.4.17 | MIT | Generated utility CSS `public/dft-studio/css/tailwind.css` (full text below) | D-103 |
+| Tailwind CSS 3.4.17 | MIT | Generated utility CSS `src/components/studio/css/tailwind.css` (full text below) | D-103 |
 | VESTA-Web, VASPKIT Studio, k-point convergence kit (the author's own tools) | author's | DFT Studio (`public/dft-studio/`); VESTA-Web is a browser tool styled after VESTA (Momma and Izumi), not VESTA itself | D-103 |
 
 When you port code, add: project, version, file ported, copyright line, and the licence text, below this line.

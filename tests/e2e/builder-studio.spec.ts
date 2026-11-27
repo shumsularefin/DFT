@@ -175,7 +175,9 @@ test.describe('Material Builder workspace (Studio)', () => {
     await expect.poll(() => atoms(page)).toBe(2);
   });
 
-  test('a structure handed over by a site tool opens in the workspace, and the workspace sends it on', async ({ page }) => {
+  test('a structure handed over by a site tool opens in the workspace, and the workspace sends it on', async ({
+    page,
+  }) => {
     await page.addInitScript(() => {
       if (sessionStorage.getItem('test:sent')) return;
       sessionStorage.setItem('test:sent', '1');

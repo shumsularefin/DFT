@@ -20,7 +20,7 @@ The step bar under the header runs left to right. Every step reads the live stru
 | 6 Run bundle | Review the pre-flight checks, then pick a scheduler and an optional ENCUT sweep. | `<job>.zip` |
 | 7 Analyze (optional) | Plot DOS, bands and gap, energy convergence, planar average, phonons, EOS, elastic moduli, thermochemistry and MD diffusion. | plots and numbers |
 
-- Press **Ctrl+K** to jump to any VASPKIT function by number (for example 303) or by name.
+- Press **Find a tool** in the toolbar to jump to any VASPKIT function by number (for example 303) or by name. (Ctrl+K opens the site command palette.)
 - The "?" buttons explain each choice.
 
 ## Conventions (stated in the UI)
@@ -40,19 +40,20 @@ POTCAR files are licensed by VASP Software GmbH. They are **never shipped** with
 
 ## Running it (inside the DFT Handbook)
 
-DFT Studio is part of the site build (decision D-100). The page is `src/pages/dft-studio/index.astro`, its markup is
-`src/components/studio/studio-body.html`, and `src/components/studio/boot.ts` loads these scripts in order. Run
-`npm run dev` or `npm run build` from the repository root and open `/dft-studio/`. The Material Builder embeds the
-same page at `/builder/` (crystal mode).
+DFT Studio is part of the site build (decisions D-100, D-105). It is shown as the Material Builder and renders
+natively inside the site layout at `/builder/` (no iframe): the page is `src/pages/builder/index.astro`, its markup is
+`src/components/studio/studio-body.html`, and `src/components/studio/boot.ts` loads these scripts in order. It has no
+brand, theme switch or Ctrl+K of its own; it follows the site theme and tokens. All its CSS lives in
+`src/components/studio/css/` and is scoped under `.studio-root`. `/dft-studio/` redirects to `/builder/`.
 
 Network use:
 
 - Nothing loads from a CDN. three.js comes from the site bundle (only the classes the viewer uses), the icons are
   inline SVG (`src/components/studio/icons.generated.ts`, lucide-static, ISC), plots are drawn by a small SVG plotter
-  (`miniPlot.ts`), zip files use fflate (`zipShim.ts`), and the Tailwind classes are prebuilt in `css/tailwind.css`
+  (`miniPlot.ts`), zip files use fflate (`zipShim.ts`), and the Tailwind classes are prebuilt in `src/components/studio/css/tailwind.css`
   (`scripts/studio/build-tailwind.sh`).
 - The optional Python engine (Pyodide with spglib, SeekPath and phonopy) downloads about 30 MB from cdn.jsdelivr.net
-  and PyPI the first time it is used. Only `/dft-studio/` allows those hosts (firebase.json). It runs in the browser.
+  and PyPI the first time it is used. Only `/builder/` allows those hosts (firebase.json). It runs in the browser.
 
 ## Links to the rest of the site (`js/site-link.js`, `src/components/studio/bridge.ts`)
 
@@ -68,11 +69,10 @@ Network use:
 
 ```
 (page markup now lives in src/components/studio/studio-body.html)
-css/vesta.css         VESTA-Web theme and tokens
-css/studio.css        workflow layer, built on the same tokens
+(styles now live in src/components/studio/css/: workspace.css, tailwind.css, studio.css, all under .studio-root)
 js/vesta.js           viewer and structure editor; exposes window.VESTA (bridge)
 js/studio-data.js     presets, tag help, POTCAR suffix guide, VASPKIT catalog
-js/studio.js          step bar, POTCAR, INCAR, KPOINTS, run bundle, library, Ctrl+K
+js/studio.js          step bar, POTCAR, INCAR, KPOINTS, run bundle, library, tool finder
 js/kconv-core.js      k-point convergence generator (unchanged logic)
 js/studio-kconv.js    step 5 UI and CSV results reader
 js/studio-analyze.js  step 7 analyzers

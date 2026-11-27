@@ -19,9 +19,9 @@ module.exports = {
   content: ['./src/components/studio/studio-body.html', './public/dft-studio/js/*.js'],
   theme: {
     extend: {
-      // The site sidebar (--sidebar-w, 16.5rem) sits beside the workspace from 64rem up, so the wide breakpoints
+      // The site sidebar (--sidebar-w, 15.5rem) sits beside the workspace from 64rem up, so the wide breakpoints
       // move out by its width: lg and xl apply when the workspace itself is about 1024 and 1280 px wide.
-      screens: { lg: '1288px', xl: '1544px', '2xl': '1800px' },
+      screens: { lg: '1272px', xl: '1528px', '2xl': '1800px' },
       colors: {
         blue: { 500: token('--accent'), 600: token('--accent') },
         amber: { 400: token('--warn'), 500: token('--warn'), 600: token('--warn') },

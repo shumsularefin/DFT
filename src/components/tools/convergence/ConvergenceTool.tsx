@@ -62,7 +62,9 @@ export default function ConvergenceTool() {
     if (!h || h.kind !== 'series') return;
     try {
       add(ingestCsv(h.csv));
-      setMsg(`Loaded ${h.label ?? 'a series'} from ${h.from === 'dft-studio' ? 'the Material Builder' : h.from}.`);
+      setMsg(
+        `Loaded ${h.label ?? 'a series'} from ${h.from === 'dft-studio' ? 'the Material Builder' : h.from}.`,
+      );
     } catch (e) {
       setNotes([(e as Error).message]);
     }

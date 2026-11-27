@@ -98,7 +98,6 @@ test('builder mode links: the current mode is marked and links to the other mode
   ).toHaveAttribute('aria-current', 'page');
 });
 
-
 test('pages with learner state hydrate without a React mismatch and show no storage warning', async ({
   page,
 }) => {
