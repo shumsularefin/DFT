@@ -19,6 +19,7 @@ import {
   Vector3,
   Color,
 } from 'three';
+import { VESTA_MATERIAL, VESTA_SIZES } from './vestaStyle';
 import { cellAtoms, cellOrigins } from '../crystal/cellAtoms';
 import { bondPairs, covalentRadius } from '../crystal/covalent';
 import type { Structure, Vec3 } from '../crystal/types';
@@ -61,6 +62,8 @@ export class CellScene extends ViewScene {
 
   constructor(container: HTMLElement, options?: ControllerOptions) {
     super(container, options);
+    // atoms use a lit material; without a light they render as black discs
+    this.addHeadlight();
   }
 
   /** Draw the structure. Positions are centred on the middle of the block so orbiting turns about it. */
@@ -110,10 +113,10 @@ export class CellScene extends ViewScene {
       const { radius, tabulated } = covalentRadius(symbol);
       legend.push({ symbol, color, tabulated });
       const mine = atoms.filter((a) => a.species === symbol);
-      const geo = new SphereGeometry(radius * o.atomScale, 24, 16);
+      const geo = new SphereGeometry(radius * o.atomScale, ...VESTA_SIZES.sphereSegments);
       const body = new InstancedMesh(
         geo,
-        new MeshStandardMaterial({ color: new Color(color), roughness: 0.5 }),
+        new MeshStandardMaterial({ color: new Color(color), ...VESTA_MATERIAL.atom }),
         mine.length,
       );
       const rim = new InstancedMesh(

@@ -1,74 +1,204 @@
 ---
 id: research-tools-overview
+stage:
+  scene: m11-tools-overview
+  states:
+    - id: screen
+      section: why
+      params: { tool: studio }
+      caption: 'Step 1 of the project, the Screening Studio: the synthetic demo table filtered to Cu, O. Switch the Tool control to follow the project from screening to analysis.'
+    - id: build
+      section: intuition
+      params: { tool: builder, a: 3.905 }
+      caption: 'The Material Builder makes the cubic LaCuO3 cell from its template and checks it. Move the lattice parameter to rescale the cell, then pick the Magnetic configuration tool or the k-path tool for the same cell.'
+    - id: tolerance
+      section: math
+      params: { tool: tolerance, rsite: La }
+      caption: 'The tolerance factor as geometry: ions at their Shannon radii in the cube where Cu and O touch. For La the A ion just fills its cage (t = 1.006); pick Lu to open the gap that lets the octahedra tilt.'
+    - id: eos
+      section: in-vasp
+      params: { tool: eos, a: 3.905 }
+      caption: 'The equation-of-state fit on example data: E(V) in black, the enthalpy surface over volume and pressure, and an fcc cell at the current volume. Move the lattice slider and read the pressure.'
+    - id: magnetic
+      section: mistakes
+      params: { tool: magnetic, ordering: G }
+      caption: 'The Magnetic tool builds collinear orders only: G-type Cu moments, up with solid heads and down with open heads, in the smallest cell that holds them. Try A and C to see which planes or chains align.'
 title: Research tools overview
 module: 11
 order: 3
-summary: A map of every browser tool on this site and how they connect across a real VASP research workflow.
-concepts: [material-builder, screening]
+summary: Every browser tool on this site placed on the path of one real project, the LaCuO3 example of module 10, with what each tool reads, what it writes and the formula it uses.
+concepts: [material-builder, screening, convergence-testing]
 requires: [material-builder, screening]
-vaspTags: []
-sources: [S-041, S-042]
+vaspTags: [KSPACING, LOCPOT]
+sources: [S-002, S-005, S-006, S-019, S-042, S-061, S-062, S-065, S-068]
 noLab: true
 status: draft
-updated: 2026-11-24
+updated: 2026-11-27
 ---
 
 <Why>
 
-Real DFT projects move back and forth between structure building, input preparation, convergence checks, diagnostics, and post-processing; knowing which tool handles each stage keeps your workflow fast and consistent <Cite id="S-042" />.
+A project moves back and forth between building a structure, writing inputs, testing settings, running, checking and analysing. The site has a tool for most of these steps, and each one does a single job with a formula you can check. Knowing which tool belongs where, and what it does not do, saves time and keeps you from trusting a number for the wrong reason. This page follows the $\mathrm{LaCuO}_3$ project of module 10 from start to finish and names the tool at each step.
 
 </Why>
 
 <Intuition>
 
-Every tool on the <a href="/tools/">Tools</a> page runs 100% locally in your browser with zero file uploads to any server. They share a common structure hand-off format so you can move a crystal from screening to building, input generation, k-path selection, magnetic ordering, and calculation review without re-typing coordinates <Cite id="S-041" />.
+**How the tools work.** They run in your browser; the files you load are read on your machine. Most of them can pass a structure to the next one ("Send to Input Builder", "Send to k-path tool", "Magnetic orderings"), so coordinates are not retyped. Results carry a badge: computed from your input, heuristic (a rule of thumb) or toy model.
 
-<Scene id="reciprocal-fcc" />
+**The project, step by step.**
 
-Use the <a href="/tools/planner/">Research Planner</a> whenever you start a new calculation goal: it connects the right presets, checks, pitfalls, and calculators into a downloadable starter zip.
+1. **Is the compound plausible?** The <a href="/tools/tolerance-factor/">Tolerance-factor explorer</a> takes A, B and X ions (mixed sites allowed) and computes $t$, $\mu$ and Bartel's $\tau$ from Shannon radii; its lanthanide sweep runs the whole $R$ series under a stated coordination policy. The <a href="/studio/">Screening Studio</a> filters a materials table (synthetic demo data for now) and opens a Project Card.
+2. **Build the cell.** The <a href="/builder/">Material Builder</a> makes the cubic cell from a template, checks it (B001 to B012) and exports a POSCAR.
+3. **Magnetic cells.** The <a href="/tools/magnetic/">Magnetic configuration tool</a> builds ferromagnetic, A-, C- and G-type cells (and custom ones), finds the smallest supercell that holds the order, and writes POSCAR, `MAGMOM` and an INCAR fragment. Collinear only.
+4. **Write the inputs.** The <a href="/tools/input-builder/">Input Builder</a> goes Structure, Task, Settings (with `MAGMOM` and DFT+U helpers per species), Check, K-points, Job script; its series panel writes a whole convergence or equation-of-state series as a zip. The <a href="/tools/planner/">Research Planner</a> starts from a goal instead and adds checks, pitfalls and a methods checklist.
+5. **Test the settings.** The <a href="/tools/convergence/">Convergence Plotter</a> reads `OSZICAR` or `OUTCAR` files (or a pasted table) and marks the first converged point.
+6. **Paths for bands.** The <a href="/tools/kpath/">k-path tool</a> finds the space group and writes a line-mode `KPOINTS`, `KPATH.in` and `KPOINTS_OPT` in the HPKOT or Setyawan-Curtarolo convention <Cite id="S-005" /> <Cite id="S-006" />.
+7. **Check every run.** <a href="/tools/review/">Calculation Review</a> takes a dropped folder or zip and runs pre-flight checks on the inputs and post-flight checks on the outputs, with a Markdown report. The <a href="/errors/">Error finder</a> explains VASP error messages.
+8. **Analyse.** The <a href="/tools/eos/">Equation-of-state fit</a> fits energy against volume; the <a href="/tools/work-function/">Work function tool</a> averages `LOCPOT` for slabs and subtracts `CHGCAR` files. DOS, band, density and relaxation viewers sit on the module 9 pages.
+
+**What the tools do not do.** None runs VASP, none decides $U$ for you, and none replaces reading `OUTCAR`. The Studio shows database fields; it does not compute a hull.
 
 </Intuition>
 
 <TheMath>
 
-Every quantitative tool on this site separates **exact/computed** results (evaluated directly from your uploaded files or exact constants) from **heuristics** (such as tolerance factors or runtime buckets) and **toy models** (educational 1D/2D labs), marked with explicit badges.
+Each tool rests on one or two formulas, and knowing them lets you check its output by hand.
+
+**Tolerance explorer.** Goldschmidt's factor from ionic radii <Cite id="S-002" />:
+
+$$t = \frac{r_A + r_X}{\sqrt 2\,(r_B + r_X)}.$$
+
+**Convergence Plotter.** With energies per atom $e_i$ for settings sorted from cheapest to dearest, the first converged setting is the smallest $x_i$ with
+
+$$\lvert e_j - e_i \rvert \le \delta \quad \text{for all } j > i,$$
+
+with $\delta$ = 1 meV per atom by default <Cite id="S-042" />.
+
+**Input Builder, k-points.** A spacing becomes a mesh as $N_i = \max(1, \lceil \lvert\mathbf b_i\rvert / \mathrm{KSPACING} \rceil)$, with $\lvert\mathbf b_i\rvert$ including the factor $2\pi$ <Cite id="S-019" />.
+
+<Level min="intermediate">
+
+**Equation-of-state fit.** The third-order Birch-Murnaghan form, with $x = (V_0/V)^{2/3}$,
+
+$$E(V) = E_0 + \frac{9 V_0 B_0}{16}\left[(x - 1)^3 B_0' + (x - 1)^2 (6 - 4x)\right],$$
+
+is fitted by Levenberg-Marquardt least squares to give $E_0$, $V_0$, $B_0$ and $B_0'$ <Cite id="S-061" /> <Cite id="S-068" />; the Murnaghan form is offered too <Cite id="S-062" />. For a cubic crystal the lattice constant follows as $a = (n V_0)^{1/3}$, where $n$ is the number of chosen cells in the conventional cube (1 for simple cubic, as for the five-atom perovskite; 2 for a bcc and 4 for an fcc primitive cell). The tool warns when the minimum lies outside the sampled volumes.
+
+</Level>
+
+<Level min="pro">
+
+**Work function.** From the plane-averaged electrostatic potential of a slab in `LOCPOT`, the work function is
+
+$$\Phi = V_\mathrm{vac} - E_F,$$
+
+where $V_\mathrm{vac}$ is the flat value in the vacuum and $E_F$ the Fermi energy from `OUTCAR` <Cite id="S-065" />. For an asymmetric or polar slab the two vacuum sides differ, which is the sign that a dipole correction is needed.
+
+</Level>
 
 </TheMath>
 
 <InVasp>
 
-- Pre-run: <a href="/tools/tolerance-factor/">Tolerance-factor explorer</a>, <a href="/builder/">Material Builder</a>, <a href="/tools/planner/">Research Planner</a>, <a href="/tools/input-builder/">Input Builder</a>, <a href="/tools/kpath/">k-path tool</a>, and <a href="/tools/magnetic/">Magnetic tool</a>.
-- During/post-run: <a href="/tools/convergence/">Convergence plotter</a>, <a href="/tools/eos/">Equation of state fit</a>, <a href="/tools/review/">Calculation review</a>, <a href="/tools/work-function/">Work function &amp; charge difference</a>, and <a href="/errors/">Error finder</a>.
+**One project, the files that travel.** For the $\mathrm{LaCuO}_3$ example the hand-offs look like this:
+
+| Step              | Tool                  | Reads                           | Writes                                       |
+| ----------------- | --------------------- | ------------------------------- | -------------------------------------------- |
+| Plausibility      | Tolerance explorer    | Ions and oxidation states       | $t$, $\mu$, $\tau$, a sweep CSV              |
+| Cell              | Material Builder      | Template or POSCAR/CIF          | POSCAR, CIF                                  |
+| G-type cell       | Magnetic tool         | POSCAR or CIF                   | POSCAR, `MAGMOM`, INCAR fragment             |
+| Inputs and series | Input Builder         | POSCAR, your choices            | INCAR, KPOINTS, job script, series zip       |
+| Settings          | Convergence Plotter   | `OSZICAR` or `OUTCAR` per point | Converged setting, plot                      |
+| Run check         | Calculation Review    | Folder or zip of one run        | Pre- and post-flight checks, report          |
+| Lattice constant  | Equation-of-state fit | Volume and energy table         | $V_0$, $B_0$, $B_0'$, $a$                    |
+| Bands             | k-path tool           | Relaxed POSCAR                  | Line-mode KPOINTS, `KPATH.in`, `KPOINTS_OPT` |
+
+**An equation-of-state series instead of `ISIF = 3`.** For the cubic cell you can scan the volume with static runs (in the cubic cell the atoms sit on positions fixed by symmetry, so there is nothing to relax at each volume) and fit the energies. In a cell with free positions, use `ISIF = 2` at each volume instead. The Input Builder's series panel writes the folders; each uses an INCAR like this, with the POSCAR scale changed per folder:
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM  = LaCuO3 E(V) point, FM start
+PREC    = Accurate
+ENCUT   = 520
+EDIFF   = 1E-6
+ALGO    = Normal
+ISMEAR  = 0
+SIGMA   = 0.05
+IBRION  = -1
+NSW     = 0
+ISPIN   = 2
+MAGMOM  = 0 3 3*0
+LORBIT  = 11
+LASPH   = .TRUE.
+LMAXMIX = 4
+LREAL   = .FALSE.`}
+  annotations={{
+    3: 'the converged cutoff; at fixed ENCUT the basis changes with volume, so keep the cutoff generous',
+    8: 'single points: the volume is set by the POSCAR scale',
+    11: 'La, Cu, three O: five entries',
+  }}
+/>
+
+Paste the volumes and energies (`energy(sigma->0)` or energy without entropy, as the tool asks) into the fit, enter the number of atoms, and compare $a$ with the `ISIF = 3` result. Agreement between the two routes is a useful check on Pulay stress <Cite id="S-042" />.
 
 </InVasp>
 
 <WhatChanges>
 
-| Stage             | Primary tool                                                                                            | Output                                               |
-| ----------------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| Plan & inputs     | <a href="/tools/planner/">Research Planner</a> &amp; <a href="/tools/input-builder/">Input Builder</a>  | Validated `INCAR`, `KPOINTS`, `POSCAR`, `PLAN.md`    |
-| Convergence & EOS | <a href="/tools/convergence/">Convergence</a> &amp; <a href="/tools/eos/">EOS fit</a>                   | Settling curves, $V_0$, $B_0$                        |
-| Audit & analysis  | <a href="/tools/review/">Calculation Review</a> &amp; <a href="/tools/work-function/">Work Function</a> | Markdown lab report, $\Phi = V_{\mathrm{vac}} - E_F$ |
+| Badge or setting                | Meaning                                        | What to do with it                          |
+| ------------------------------- | ---------------------------------------------- | ------------------------------------------- |
+| Computed                        | Exact arithmetic on your input                 | Trust the arithmetic, check the input       |
+| Heuristic                       | A rule of thumb (tolerance, cost, feasibility) | Use for decisions, not as a result          |
+| Toy model                       | A teaching model                               | Never quote as a material property          |
+| Convergence threshold           | Sets the accepted setting                      | Tighten for small energy differences        |
+| EOS points not bracketing $V_0$ | The fit extrapolates                           | Add points on the other side of the minimum |
 
-Why use local browser tools: your unpublished research structures and outputs never leave your machine.
+Why use the tools: each removes a step where typing errors creep in. Why know their formulas: you can check any output by hand. What happens if you skip the checks: a run that finished without an error can still be wrong.
 
 </WhatChanges>
 
 <Mistakes>
 
-<Callout variant="mistake" title="Skipping post-flight checks because VASP exited without crashing">
+<Callout variant="mistake" title="Skipping the post-flight check because VASP exited normally">
 
-A VASP run can finish with exit code 0 while still hitting `NELM`, having large smearing entropy, or collapsing an antiferromagnetic state to ferromagnetic. Always inspect `OUTCAR` and `OSZICAR` in Calculation Review.
+A run can end cleanly after hitting `NELM` at every ionic step or after an antiferromagnetic start turned ferromagnetic. Fix: drop every run into Calculation Review and read the moments yourself.
+
+</Callout>
+
+<Callout variant="mistake" title="Treating a heuristic badge as a result">
+
+Feasibility verdicts, cost estimates and tolerance factors are rules of thumb. Fix: use them to choose what to run, and report only what VASP computed.
+
+</Callout>
+
+<Callout variant="mistake" title="Fitting an equation of state to one side of the minimum">
+
+Points that do not bracket $V_0$ make the fit extrapolate, and $B_0'$ in particular becomes unreliable. Fix: scan a few percent on both sides of the expected volume.
+
+</Callout>
+
+<Callout variant="mistake" title="Mixing conventions between the k-path tool and a paper">
+
+HPKOT and Setyawan-Curtarolo can label the same point differently and use different cells <Cite id="S-005" /> <Cite id="S-006" />. Fix: state the convention with the band plot.
+
+</Callout>
+
+<Callout variant="mistake" title="Expecting the Magnetic tool to handle spirals">
+
+The tool builds collinear orders only. Fix: for non-collinear states, set them up by hand with the noncollinear build of VASP (module 5).
 
 </Callout>
 
 </Mistakes>
 
-<Check ids={['q-m11-1', 'q-m11-3', 'q-m11-5', 'q-m11-7']} />
+<Check ids={['q-m11-10', 'q-m11-11', 'q-m11-12', 'q-m11-13']} />
 
 <GoDeeper>
 
-- Browse the full directory on the <a href="/tools/">Tools</a> page.
-- Practice key concepts anytime on <a href="/practice/">Practice</a>.
+- Birch <Cite id="S-061" /> and Murnaghan <Cite id="S-062" /> on equations of state; Numerical Recipes on Levenberg-Marquardt <Cite id="S-068" />.
+- Hinuma et al. <Cite id="S-006" /> and Setyawan and Curtarolo <Cite id="S-005" /> on k-paths.
+- The VASP wiki page LOCPOT (by page name) <Cite id="S-065" />.
+- The full list on the <a href="/tools/">Tools</a> page, and practice questions on <a href="/practice/">Practice</a>.
 
 </GoDeeper>

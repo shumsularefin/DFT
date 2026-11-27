@@ -65,6 +65,11 @@ export const PLOT_IDS = [
   'oszicar-trace',
   'parallel-split',
   'conv-series',
+  'scf-iterations',
+  'density-map',
+  'pw-sphere',
+  'bands-dos',
+  'real-reciprocal',
 ] as const;
 export type PlotId = (typeof PLOT_IDS)[number];
 
@@ -489,6 +494,23 @@ function expWall(p: P): string {
       [ymax, `10^${ymax}`],
     ],
   });
+  let labels = '';
+  if (p.labels === true && nMax > 1) {
+    // the count at the end of the curve and how much the last electron multiplied it, both read off the curve itself
+    const last = ys[nMax - 1]!;
+    const factor = Math.round(10 ** (last - ys[nMax - 2]!));
+    const sup = (k: number) => `10<tspan class="vp-sup" dy="-4">${k}</tspan>`;
+    labels +=
+      `<circle class="vp-node vp-solid" cx="${r1(c.sx(nMax))}" cy="${r1(c.sy(last))}" r="3"/>` +
+      `<text class="vp-t vp-small" x="${r1(c.x0 + 8)}" y="${r1(c.y1 + 10)}">${nMax} electrons: about ${sup(Math.round(last))} ways</text>` +
+      text(
+        c.x0 + 8,
+        c.y1 + 24,
+        `The last electron multiplied the count by ${factor}`,
+        'vp-t vp-small',
+        'start',
+      );
+  }
   return wrap(
     p.alt as string,
     c.h,
@@ -496,7 +518,8 @@ function expWall(p: P): string {
       path(
         ns.map((n, i) => [c.sx(n), c.sy(ys[i]!)]),
         'vp-curve',
-      ),
+      ) +
+      labels,
   );
 }
 
@@ -629,6 +652,17 @@ function scfDensity(p: P): string {
       idx.map((i) => [c.sx(x[i]!), c.sy((v[i]! / Math.abs(vmin)) * 1.0 * (dmax / 1.1) * 0.9)]),
       'vp-curve2',
     );
+    if (p.labels === true) {
+      // name the two curves where they are, so no legend is needed
+      const dpeak = Math.max(...idx.map((i) => dens[0]![i]!));
+      body += text(c.sx(0), c.sy(dpeak) - 5, 'density of the electrons', 'vp-t vp-small vp-halo');
+      body += text(
+        c.sx(0),
+        c.sy(-0.9 * (dmax / 1.1)) + 14,
+        'the potential they all move in',
+        'vp-t vp-small vp-halo',
+      );
+    }
   }
   if (runs.length > 1)
     body += legend(
@@ -1220,6 +1254,383 @@ function parallelSplit(p: P): string {
   return wrap(p.alt as string, h, body);
 }
 
+/* ---- guided path pictures that explain themselves (M16.5) ---- */
+// @source S-048 and S-049 (toy SCF loop, tight-binding bands), S-047 (box), S-049 (plane waves), S-036 and S-050 (reciprocal lattice)
+
+/** A positive number as "1.4 × 10" with a raised power, as SVG markup (the digits come from the number itself). */
+const fmtE = (x: number): string => {
+  if (!(x > 0)) return '0';
+  const e = Math.floor(Math.log10(x));
+  return `${(x / 10 ** e).toFixed(1)} × 10<tspan class="vp-sup" dy="-4">${e}</tspan>`;
+};
+
+/**
+ * The self-consistency loop as it happens: the density that goes into each step of the toy SCF loop (scf1d), earlier steps
+ * faint, the chosen step bold, the converged answer dashed; underneath, one bar per step for how much the density still
+ * changed, on a log scale, the chosen step highlighted. The bars shrink until the change is below the tolerance.
+ */
+function scfIterations(p: P): string {
+  const o: ScfOptions = { Z: num(p, 'Z', 2), alpha: num(p, 'alpha', 0.3), tol: num(p, 'tol', 1e-6) };
+  const r = scf(o);
+  const its = r.iterations;
+  const n = its.length;
+  const step = Math.min(n, Math.max(1, Math.round(num(p, 'step', 1))));
+  const half = num(p, 'half', 6);
+  const idx = Array.from(r.x.keys()).filter((i) => Math.abs(r.x[i]!) <= half);
+  const dmax =
+    Math.max(...its.flatMap((it) => idx.map((i) => it.densityIn[i]!)), ...idx.map((i) => r.density[i]!)) *
+    1.08;
+  const h = 300;
+  const x0 = 46;
+  const x1 = W - 14;
+  const ya0 = 150; // bottom of the density panel
+  const ya1 = 30;
+  const sx = (x: number) => x0 + ((x + half) / (2 * half)) * (x1 - x0);
+  const sy = (d: number) => ya0 - (d / dmax) * (ya0 - ya1);
+  const curve = (d: Float64Array) => idx.map((i) => [sx(r.x[i]!), sy(d[i]!)] as [number, number]);
+  let body = line(x0, ya0, x1, ya0, 'vp-axis') + line(x0, ya0, x0, ya1, 'vp-axis');
+  body += `<text class="vp-t" transform="translate(14 ${r1((ya0 + ya1) / 2)}) rotate(-90)" text-anchor="middle">density</text>`;
+  body += text((x0 + x1) / 2, ya0 + 14, 'position along the toy atom', 'vp-t vp-small');
+  for (let k = 0; k < step - 1; k++) body += path(curve(its[k]!.densityIn), 'vp-curve3');
+  body += path(curve(r.density), 'vp-curve2');
+  const cur = curve(its[step - 1]!.densityIn);
+  body += path([[sx(-half), ya0], ...cur, [sx(half), ya0]], 'vp-fill', true) + path(cur, 'vp-curve vp-heavy');
+  body += text(x0, 14, `Step ${step} of ${n}: the density going in (bold)`, 'vp-t vp-b', 'start');
+  body +=
+    line(x1 - 96, ya1 + 4, x1 - 80, ya1 + 4, 'vp-curve2') +
+    text(x1 - 76, ya1 + 8, 'final answer', 'vp-t vp-small', 'start');
+  body +=
+    line(x1 - 96, ya1 + 18, x1 - 80, ya1 + 18, 'vp-curve3') +
+    text(x1 - 76, ya1 + 22, 'earlier steps', 'vp-t vp-small', 'start');
+  // residual bars
+  const yb0 = h - 34;
+  const yb1 = 188;
+  const logs = its.map((it) => Math.log10(Math.max(it.residual, 1e-16)));
+  const top = Math.ceil(Math.max(...logs));
+  const bottom = Math.floor(Math.min(Math.log10(o.tol!), ...logs)) - 0.5;
+  const by = (v: number) => yb0 - ((v - bottom) / (top - bottom)) * (yb0 - yb1);
+  const bw = (x1 - x0) / n;
+  body += line(x0, yb0, x1, yb0, 'vp-axis') + line(x0, yb0, x0, yb1, 'vp-axis');
+  body += text(x0, yb1 - 8, 'Change in density at each step', 'vp-t vp-b', 'start');
+  its.forEach((_, k) => {
+    const y = by(logs[k]!);
+    const cls = k === step - 1 ? 'vp-bar vp-hot' : k < step ? 'vp-bar' : 'vp-bar vp-later';
+    body += `<rect class="${cls}" x="${r1(x0 + k * bw + 1)}" y="${r1(y)}" width="${r1(Math.max(1, bw - 2))}" height="${r1(Math.max(0, yb0 - y))}"/>`;
+  });
+  const yt = by(Math.log10(o.tol!));
+  body +=
+    line(x0, yt, x1, yt, 'vp-guide') +
+    text((x0 + x1) / 2, yb0 + 14, 'dashed line: small enough, stop', 'vp-t vp-small', 'middle');
+  body +=
+    text(x0, yb0 + 14, 'step 1', 'vp-t vp-small', 'start') +
+    text(x1, yb0 + 14, `step ${n}`, 'vp-t vp-small', 'end');
+  const res = fmtE(its[step - 1]!.residual);
+  const verdict = step === n ? 'Settled, the loop stops.' : 'Not settled yet.';
+  body += `<text class="vp-t" x="${r1((x0 + x1) / 2)}" y="${h - 4}" text-anchor="middle">${verdict} Change at step ${step}: ${res}</text>`;
+  return wrap(p.alt as string, h, body);
+}
+
+/**
+ * Electron density in a box, drawn two ways: as a curve (how much charge at each place) and as a shaded strip under it,
+ * the same numbers as a map (darker where there is more charge), with the walls marked. The density is the sum of the
+ * occupied levels, two electrons per level (box.ts).
+ */
+function densityMap(p: P): string {
+  const L = num(p, 'L', 5);
+  const N = Math.max(1, Math.round(num(p, 'electrons', 2)));
+  const full = Math.floor(N / 2);
+  const dens = (x: number) => {
+    let s = 0;
+    for (let k = 1; k <= full; k++) s += 2 * boxPsi(k, L, x) ** 2;
+    if (N % 2) s += boxPsi(full + 1, L, x) ** 2;
+    return s;
+  };
+  const xs = sample(0, L, 160);
+  const ys = xs.map(dens);
+  const ymax = Math.max(...ys) * 1.15;
+  const h = 262;
+  const x0 = 46;
+  const x1 = W - 14;
+  const y0 = 140;
+  const y1 = 26;
+  const sx = (x: number) => x0 + (x / L) * (x1 - x0);
+  const sy = (d: number) => y0 - (d / ymax) * (y0 - y1);
+  let body = line(x0, y0, x1, y0, 'vp-axis') + line(x0, y0, x0, y1, 'vp-axis');
+  body += `<text class="vp-t" transform="translate(14 ${r1((y0 + y1) / 2)}) rotate(-90)" text-anchor="middle">density</text>`;
+  body += text(x0, 14, `${N} electron${N === 1 ? '' : 's'} in a box ${L} Å long`, 'vp-t vp-b', 'start');
+  const pts = xs.map((x, i) => [sx(x), sy(ys[i]!)] as [number, number]);
+  body += path([[sx(0), y0], ...pts, [sx(L), y0]], 'vp-fill', true) + path(pts, 'vp-curve');
+  // where the curve peaks, say so
+  const imax = ys.indexOf(Math.max(...ys));
+  body += text(sx(xs[imax]!), sy(ys[imax]!) - 5, 'most charge', 'vp-t vp-small');
+  // the map strip
+  const ms0 = 172;
+  const ms1 = 206;
+  body += text(x0, ms0 - 8, 'Same numbers as a map: darker = more charge', 'vp-t vp-b', 'start');
+  const cells = 48;
+  for (let c = 0; c < cells; c++) {
+    const xm = ((c + 0.5) / cells) * L;
+    const op = Math.min(1, dens(xm) / (ymax / 1.15));
+    body += `<rect class="vp-heat" x="${r1(sx((c / cells) * L))}" y="${ms0}" width="${r1((x1 - x0) / cells + 0.4)}" height="${ms1 - ms0}" fill-opacity="${op.toFixed(2)}"/>`;
+  }
+  body += `<rect class="vp-frame" x="${x0}" y="${ms0}" width="${x1 - x0}" height="${ms1 - ms0}"/>`;
+  body += line(x0, ms0 - 2, x0, ms1 + 2, 'vp-heavyline') + line(x1, ms0 - 2, x1, ms1 + 2, 'vp-heavyline');
+  body +=
+    text(x0, ms1 + 14, 'wall: no charge', 'vp-t vp-small', 'start') +
+    text(x1, ms1 + 14, 'wall: no charge', 'vp-t vp-small', 'end');
+  body += text(
+    (x0 + x1) / 2,
+    h - 10,
+    'One number per point stands in for all the electrons',
+    'vp-t vp-small',
+  );
+  return wrap(p.alt as string, h, body);
+}
+
+/**
+ * The plane-wave cutoff as a circle: every dot is one plane wave of a square toy cell (a reciprocal lattice vector G, in
+ * a 2D slice of the 3D grid). A plane wave of vector G has kinetic energy (hbar^2 / 2m) G^2, so the waves below the cutoff
+ * are exactly the dots inside a circle (a sphere in 3D) of radius sqrt(cutoff / (hbar^2 / 2m)). Kept dots are filled.
+ */
+function pwSphere(p: P): string {
+  const ecut = num(p, 'cutoff', 200);
+  const a = num(p, 'a', 4);
+  const m = Math.max(2, Math.round(num(p, 'span', 7)));
+  const g = (2 * Math.PI) / a;
+  const gc = Math.sqrt(ecut / HBAR2_OVER_2M_EV_A2);
+  const h = 260;
+  const size = 186;
+  const cx0 = 14 + size / 2;
+  const cy0 = 36 + size / 2;
+  const step = size / (2 * m + 1);
+  const px = (i: number) => cx0 + i * step;
+  const py = (j: number) => cy0 - j * step;
+  let kept = 0;
+  let body = text(14, 14, `Cutoff ${r1(ecut)} eV, toy cell a = ${a} Å`, 'vp-t vp-b', 'start');
+  body += `<rect class="vp-frame" x="${14}" y="${36}" width="${size}" height="${size}"/>`;
+  const rpx = (gc / g) * step;
+  body += `<circle class="vp-cut" cx="${r1(cx0)}" cy="${r1(cy0)}" r="${r1(rpx)}"/>`;
+  for (let i = -m; i <= m; i++)
+    for (let j = -m; j <= m; j++) {
+      const inside = Math.hypot(i, j) * g <= gc;
+      if (inside) kept++;
+      body += `<circle class="${inside ? 'vp-node vp-solid' : 'vp-node'}" cx="${r1(px(i))}" cy="${r1(py(j))}" r="${inside ? 2.6 : 2}"/>`;
+    }
+  body += text(cx0, 36 + size + 16, `${kept} waves kept`, 'vp-t vp-small');
+  // the key, on the right
+  const kx = 14 + size + 14;
+  const wave = (y: number, cycles: number, cls: string) =>
+    path(
+      sample(0, 1, 60).map((t) => [kx + t * (W - 14 - kx), y - 7 * Math.sin(2 * Math.PI * cycles * t)]),
+      cls,
+    );
+  body += text(kx, 46, 'Each dot is one wave.', 'vp-t vp-small', 'start');
+  body += text(kx, 60, 'Centre: long, slow wave.', 'vp-t vp-small', 'start');
+  body += wave(80, 1, 'vp-curve');
+  body += text(kx, 106, 'Far out: short wave,', 'vp-t vp-small', 'start');
+  body += text(kx, 119, 'high energy.', 'vp-t vp-small', 'start');
+  body += wave(140, 5, 'vp-curve3');
+  body += text(kx, 170, 'Circle = cutoff (ENCUT).', 'vp-t vp-small', 'start');
+  body += text(kx, 184, 'Filled dots: kept.', 'vp-t vp-small', 'start');
+  body += text(kx, 198, 'Open dots: dropped.', 'vp-t vp-small', 'start');
+  body += text(kx, 220, 'Higher cutoff: bigger', 'vp-t vp-small', 'start');
+  body += text(kx, 233, 'circle, more waves,', 'vp-t vp-small', 'start');
+  body += text(kx, 246, 'slower, more accurate.', 'vp-t vp-small', 'start');
+  return wrap(p.alt as string, h, body);
+}
+
+/**
+ * Bands and the density of states of a toy chain with two atoms per cell (alternating hoppings t1 = 1 and t2): two bands
+ * E(k) = +-|t1 + t2 e^{ik}|, side by side with the DOS on the same energy axis. Where a band is flat, many k share one
+ * energy, so the DOS is tall there. Unequal hoppings open a gap (an insulator); equal ones close it (a metal at half
+ * filling). The lower band is filled up to the Fermi level, which sits in the middle (E = 0).
+ */
+function bandsDos(p: P): string {
+  const t2 = num(p, 't2', 0.6);
+  const t1 = 1;
+  const e = (k: number) => Math.hypot(t1 + t2 * Math.cos(k), t2 * Math.sin(k));
+  const emax = t1 + t2;
+  const gap = 2 * Math.abs(t1 - t2);
+  const h = 264;
+  const y0 = 206;
+  const y1 = 26;
+  const ey = (E: number) => y0 - ((E + emax * 1.08) / (2 * emax * 1.08)) * (y0 - y1);
+  const bx0 = 40;
+  const bx1 = 196;
+  const dx0 = 216;
+  const dx1 = W - 14;
+  const ks = sample(-Math.PI, Math.PI, 120);
+  const kx = (k: number) => bx0 + ((k + Math.PI) / (2 * Math.PI)) * (bx1 - bx0);
+  let body = text(bx0, 14, 'Bands: energy against k', 'vp-t vp-b', 'start');
+  body += text(dx0, 14, 'DOS: how many states', 'vp-t vp-b', 'start');
+  body += line(bx0, y0, bx1, y0, 'vp-axis') + line(bx0, y0, bx0, y1, 'vp-axis');
+  body += line(dx0, y0, dx1, y0, 'vp-axis') + line(dx0, y0, dx0, y1, 'vp-axis');
+  body += `<text class="vp-t" transform="translate(14 ${r1((y0 + y1) / 2)}) rotate(-90)" text-anchor="middle">energy</text>`;
+  const lower = ks.map((k) => [kx(k), ey(-e(k))] as [number, number]);
+  const upper = ks.map((k) => [kx(k), ey(e(k))] as [number, number]);
+  body += path([[bx0, y0], ...lower, [bx1, y0]], 'vp-fill', true);
+  body += path(lower, 'vp-curve vp-heavy') + path(upper, 'vp-curve');
+  body +=
+    text(bx0, y0 + 14, '-π/a', 'vp-t vp-small', 'start') +
+    text((bx0 + bx1) / 2, y0 + 14, '0', 'vp-t vp-small');
+  body += text(bx1, y0 + 14, 'π/a', 'vp-t vp-small', 'end');
+  body += text((bx0 + bx1) / 2, y0 + 30, 'wave vector k', 'vp-t vp-small');
+  // DOS: histogram of both bands over a fine k grid, same energy axis
+  const bins = 40;
+  const counts = new Array<number>(bins).fill(0);
+  const fine = sample(-Math.PI, Math.PI, 4000);
+  for (const k of fine)
+    for (const E of [-e(k), e(k)])
+      counts[Math.min(bins - 1, Math.floor(((E + emax) / (2 * emax)) * bins))]!++;
+  const cmax = Math.max(...counts);
+  counts.forEach((cnt, b) => {
+    if (!cnt) return;
+    const ya = ey(-emax + (2 * emax * (b + 1)) / bins);
+    const yb = ey(-emax + (2 * emax * b) / bins);
+    const filled = -emax + (2 * emax * (b + 0.5)) / bins < 0;
+    body += `<rect class="${filled ? 'vp-bar' : 'vp-bar vp-later'}" x="${dx0 + 1}" y="${r1(ya)}" width="${r1((cnt / cmax) * (dx1 - dx0 - 4))}" height="${r1(Math.max(0.5, yb - ya - 0.6))}"/>`;
+  });
+  body += text((dx0 + dx1) / 2, y0 + 14, 'number of states', 'vp-t vp-small');
+  // Fermi level across both panels
+  body += line(bx0, ey(0), dx1, ey(0), 'vp-guide');
+  body += text(dx1, ey(0) - 4, 'Fermi level', 'vp-t vp-small', 'end');
+  // flat band edge: the band is flattest at k = 0 (top of the upper band) and k = pi/a (edges of the gap)
+  const yEdge = ey(emax);
+  body += line(kx(0), yEdge, dx0 + 8, yEdge, 'vp-curve3');
+  body += text(kx(0) + 8, yEdge - 4, 'flat band: tall DOS', 'vp-t vp-small vp-halo', 'start');
+  body += text(
+    W / 2,
+    h - 4,
+    gap > 1e-6 ? 'A gap at the Fermi level: an insulator' : 'No gap at the Fermi level: a metal',
+    'vp-t',
+  );
+  return wrap(p.alt as string, h, body);
+}
+
+/**
+ * Real space and reciprocal space side by side for a 2D lattice: left, the lattice points with the cell vectors a1, a2;
+ * right, the reciprocal lattice with b1, b2 (b_i . a_j = 2 pi delta_ij) and the first Brillouin zone (the points closer to
+ * the origin than to any other reciprocal lattice point). A long real direction gives a short reciprocal one.
+ */
+function realReciprocal(p: P): string {
+  const kind = typeof p.lattice === 'string' ? p.lattice : 'square';
+  const a = num(p, 'a', 4);
+  const ratio = kind === 'rect' ? num(p, 'ratio', 2) : 1;
+  const a1: [number, number] = [a, 0];
+  const a2: [number, number] = kind === 'hex' ? [a / 2, (a * Math.sqrt(3)) / 2] : [0, a * ratio];
+  const det = a1[0] * a2[1] - a1[1] * a2[0];
+  const tp = 2 * Math.PI;
+  const b1: [number, number] = [(tp * a2[1]) / det, (-tp * a2[0]) / det];
+  const b2: [number, number] = [(-tp * a1[1]) / det, (tp * a1[0]) / det];
+  const h = 270;
+  const pw = 160;
+  const L0 = 14;
+  const R0 = W - 14 - pw;
+  const top = 40;
+  const cy = top + pw / 2;
+  const scaleR = pw / 2 / (2.2 * Math.max(Math.hypot(...a1), Math.hypot(...a2)));
+  const scaleK = pw / 2 / (2.2 * Math.max(Math.hypot(...b1), Math.hypot(...b2)));
+  let body = text(L0, 14, 'Real space: atoms', 'vp-t vp-b', 'start');
+  body += text(R0, 14, 'Reciprocal space: waves', 'vp-t vp-b', 'start');
+  body +=
+    text(L0, 28, 'distances in Å', 'vp-t vp-small', 'start') +
+    text(R0, 28, 'wave vectors in 1/Å', 'vp-t vp-small', 'start');
+  body += `<rect class="vp-frame" x="${L0}" y="${top}" width="${pw}" height="${pw}"/>`;
+  body += `<rect class="vp-frame" x="${R0}" y="${top}" width="${pw}" height="${pw}"/>`;
+  const lx = (v: [number, number]) => L0 + pw / 2 + v[0] * scaleR;
+  const ly = (v: [number, number]) => cy - v[1] * scaleR;
+  const rx = (v: [number, number]) => R0 + pw / 2 + v[0] * scaleK;
+  const ry = (v: [number, number]) => cy - v[1] * scaleK;
+  const inBox = (x: number, y: number, x0: number) =>
+    x > x0 + 3 && x < x0 + pw - 3 && y > top + 3 && y < top + pw - 3;
+  // unit cell (parallelogram) in real space
+  const o: [number, number] = [0, 0];
+  const cell = [o, a1, [a1[0] + a2[0], a1[1] + a2[1]] as [number, number], a2].map(
+    (v) => [lx(v), ly(v)] as [number, number],
+  );
+  body += path(cell, 'vp-fill', true);
+  for (let i = -6; i <= 6; i++)
+    for (let j = -6; j <= 6; j++) {
+      const v: [number, number] = [i * a1[0] + j * a2[0], i * a1[1] + j * a2[1]];
+      if (inBox(lx(v), ly(v), L0))
+        body += `<circle class="vp-node vp-solid" cx="${r1(lx(v))}" cy="${r1(ly(v))}" r="3"/>`;
+      const g: [number, number] = [i * b1[0] + j * b2[0], i * b1[1] + j * b2[1]];
+      if (inBox(rx(g), ry(g), R0))
+        body += `<circle class="vp-node" cx="${r1(rx(g))}" cy="${r1(ry(g))}" r="2.6"/>`;
+    }
+  // first Brillouin zone: clip a large square by the perpendicular bisectors of the nearest reciprocal points
+  let poly: [number, number][] = [
+    [-50, -50],
+    [50, -50],
+    [50, 50],
+    [-50, 50],
+  ];
+  for (let i = -2; i <= 2; i++)
+    for (let j = -2; j <= 2; j++) {
+      if (!i && !j) continue;
+      const g: [number, number] = [i * b1[0] + j * b2[0], i * b1[1] + j * b2[1]];
+      const c = (g[0] * g[0] + g[1] * g[1]) / 2;
+      const out: [number, number][] = [];
+      for (let k = 0; k < poly.length; k++) {
+        const P1 = poly[k]!;
+        const P2 = poly[(k + 1) % poly.length]!;
+        const f1 = P1[0] * g[0] + P1[1] * g[1] - c;
+        const f2 = P2[0] * g[0] + P2[1] * g[1] - c;
+        if (f1 <= 0) out.push(P1);
+        if (f1 * f2 < 0) {
+          const t = f1 / (f1 - f2);
+          out.push([P1[0] + t * (P2[0] - P1[0]), P1[1] + t * (P2[1] - P1[1])]);
+        }
+      }
+      poly = out;
+    }
+  body += path(
+    poly.map((v) => [rx(v), ry(v)] as [number, number]),
+    'vp-fill',
+    true,
+  );
+  body += path(
+    poly.map((v) => [rx(v), ry(v)] as [number, number]),
+    'vp-curve',
+    true,
+  );
+  const arrow = (x0: number, y0: number, x1: number, y1: number) => {
+    const ang = Math.atan2(y1 - y0, x1 - x0);
+    const hx = x1 - 7 * Math.cos(ang);
+    const hy = y1 - 7 * Math.sin(ang);
+    return (
+      line(x0, y0, hx, hy, 'vp-arrow') +
+      `<path class="vp-arrowhead" d="M${r1(x1)} ${r1(y1)}L${r1(hx - 3.5 * Math.sin(ang))} ${r1(hy + 3.5 * Math.cos(ang))}L${r1(hx + 3.5 * Math.sin(ang))} ${r1(hy - 3.5 * Math.cos(ang))}Z"/>`
+    );
+  };
+  body += arrow(lx(o), ly(o), lx(a1), ly(a1)) + arrow(lx(o), ly(o), lx(a2), ly(a2));
+  body += arrow(rx(o), ry(o), rx(b1), ry(b1)) + arrow(rx(o), ry(o), rx(b2), ry(b2));
+  const lab = (x: number, y: number, s: string) =>
+    `<text class="vp-t vp-b vp-halo" x="${r1(x)}" y="${r1(y)}" text-anchor="middle">${esc(s)}</text>`;
+  body += lab(lx(a1) + 4, ly(a1) + 14, 'a1') + lab(lx(a2) - 12, ly(a2) + 2, 'a2');
+  body += lab(rx(b1) + 4, ry(b1) + 14, 'b1') + lab(rx(b2) - 12, ry(b2) + 2, 'b2');
+  const la1 = Math.hypot(...a1);
+  const la2 = Math.hypot(...a2);
+  const lb1 = Math.hypot(...b1);
+  const lb2 = Math.hypot(...b2);
+  const yb = top + pw + 16;
+  body += text(L0, yb, `|a1| = ${la1.toFixed(1)} Å, |a2| = ${la2.toFixed(1)} Å`, 'vp-t vp-small', 'start');
+  body += text(R0, yb, `|b1| = ${lb1.toFixed(2)}, |b2| = ${lb2.toFixed(2)} 1/Å`, 'vp-t vp-small', 'start');
+  body += text(L0, yb + 14, 'shaded: the unit cell', 'vp-t vp-small', 'start');
+  body += text(R0, yb + 14, 'shaded: the Brillouin zone', 'vp-t vp-small', 'start');
+  body += text(
+    W / 2,
+    h - 6,
+    kind === 'rect'
+      ? 'a2 is twice as long, so b2 is half as long'
+      : kind === 'hex'
+        ? '60 degree cell: the zone is a hexagon'
+        : 'Equal sides: a square cell and a square zone',
+    'vp-t',
+  );
+  return wrap(p.alt as string, h, body);
+}
+
 const RENDER: Record<PlotId, { fn: (p: P) => string; badge: PlotBadge }> = {
   'box-levels': { fn: boxLevels, badge: 'computed' },
   'box-wave': { fn: boxWave, badge: 'computed' },
@@ -1258,6 +1669,11 @@ const RENDER: Record<PlotId, { fn: (p: P) => string; badge: PlotBadge }> = {
   'oszicar-trace': { fn: oszicarTrace, badge: 'illustrative' },
   'parallel-split': { fn: parallelSplit, badge: 'computed' },
   'conv-series': { fn: convSeries, badge: 'illustrative' },
+  'scf-iterations': { fn: scfIterations, badge: 'toy-model' },
+  'density-map': { fn: densityMap, badge: 'computed' },
+  'pw-sphere': { fn: pwSphere, badge: 'computed' },
+  'bands-dos': { fn: bandsDos, badge: 'toy-model' },
+  'real-reciprocal': { fn: realReciprocal, badge: 'computed' },
 };
 
 export function isPlotId(id: string): id is PlotId {

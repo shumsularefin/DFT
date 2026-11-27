@@ -1,5 +1,28 @@
 ---
 id: plane-waves-and-encut
+stage:
+  scene: m05-encut
+  states:
+    - id: sphere
+      section: why
+      params: { encut: 200, cell: fcc, space: reciprocal, outside: true }
+      caption: 'Each orange ball is a reciprocal lattice vector G inside the cutoff sphere of fcc copper at ENCUT = 200 eV: 65 plane waves. Grey dots are the vectors a 400 eV cutoff would add.'
+    - id: grow
+      section: intuition
+      params: { encut: 400, cell: fcc, space: reciprocal, outside: true }
+      caption: 'At 400 eV the sphere radius has grown by the square root of 2 and the count to 181. Drag ENCUT: the radius goes as its square root, the count roughly as its 1.5 power.'
+    - id: real-space
+      section: lab
+      params: { encut: 200, cell: fcc, space: real }
+      caption: 'The same basis in real space: the sharpest bump it can build at the Cu site. Raise ENCUT and the half-height surface shrinks; the blue ripples are what a finite basis cannot cancel.'
+    - id: bigger-cell
+      section: in-vasp
+      params: { encut: 300, cell: sc, space: reciprocal, outside: false }
+      caption: 'Simple cubic Po has a cell three times larger, so its G vectors sit closer together and the same 300 eV holds 461 plane waves instead of 137. ENCUT sets the accuracy; the cost also depends on the cell.'
+    - id: too-low
+      section: mistakes
+      params: { encut: 50, cell: fcc, space: reciprocal, outside: true }
+      caption: 'At 50 eV only 15 plane waves survive, far too few to describe the wavefunction near the nucleus. Converge ENCUT before you trust an energy.'
 title: Plane waves and the cutoff energy
 module: 5
 order: 1

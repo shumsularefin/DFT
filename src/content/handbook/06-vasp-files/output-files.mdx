@@ -1,5 +1,28 @@
 ---
 id: output-files
+stage:
+  scene: m06-outputs
+  states:
+    - id: shelves
+      section: why
+      params: { nsw: 4 }
+      caption: 'One run and its files on three shelves: restart from, read to judge, plot and analyse. The arrows show what the next run can read.'
+    - id: growing
+      section: intuition
+      params: { nsw: 10 }
+      caption: 'XDATCAR and OSZICAR grow with every ionic step (one slab per step), while CONTCAR only ever holds the latest geometry. Drag the ionic steps.'
+    - id: projections
+      section: in-vasp
+      params: { nsw: 4, lorbit: true }
+      caption: 'LORBIT = 11 adds PROCAR to the plot shelf, the file behind projected (fat) bands.'
+    - id: switched-off
+      section: what-changes
+      params: { nsw: 4, lwave: false, lcharg: false }
+      caption: 'LWAVE and LCHARG off: no WAVECAR and no CHGCAR (wire ghosts), so the next run can read only CONTCAR.'
+    - id: no-chgcar
+      section: mistakes
+      params: { nsw: 4, lcharg: false }
+      caption: 'LCHARG off before a band calculation: the CHGCAR that an ICHARG = 11 run must read is never written.'
 title: The output files, a field guide
 module: 6
 order: 5
@@ -7,10 +30,10 @@ summary: What each of the sixteen files VASP can write contains, which ones you 
 concepts: [output-file-reference]
 requires: [vasp-workflow]
 vaspTags: [LWAVE, LCHARG, LORBIT]
-sources: [S-019, S-041]
+sources: [S-019, S-041, S-042]
 noLab: true
 status: draft
-updated: 2026-11-19
+updated: 2026-11-27
 ---
 
 <Why>
@@ -63,6 +86,8 @@ RMM:   9    -0.108706468020E+02   -0.11384E-04   -0.13017E-05  1021   0.309E-02
 </Intuition>
 
 <TheMath>
+
+Most energies in the output are for the whole cell, in eV. Divide by the number of atoms before you compare cells of different size, and use that per-atom value for the 1 meV rule of thumb <Cite id="S-042" />.
 
 <Level min="intermediate">
 

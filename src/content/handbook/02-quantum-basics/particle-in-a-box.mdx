@@ -1,5 +1,28 @@
 ---
 id: particle-in-a-box
+stage:
+  scene: m02-box
+  states:
+    - id: ground
+      section: why
+      params: { nx: 1, ny: 1, nz: 1, lz: 5 }
+      caption: 'One electron in a 5 A cube, state (1, 1, 1): a single blob with no nodes and energy 4.51 eV. The ladder on the right shows the levels above it.'
+    - id: nodes
+      section: intuition
+      params: { nx: 2, ny: 1, nz: 1, nodes: true }
+      caption: 'State (2, 1, 1) has one nodal plane, where psi changes sign from orange to blue. Each extra node costs energy, so the arrow climbs the ladder.'
+    - id: degenerate
+      section: lab
+      params: { nx: 1, ny: 1, nz: 2 }
+      caption: '(1, 1, 2) shares its energy with (1, 2, 1) and (2, 1, 1): three dots on one rung of the ladder. Now stretch the box along z.'
+    - id: split
+      section: math
+      params: { nx: 1, ny: 1, nz: 2, lz: 7 }
+      caption: 'With Lz = 7 A the threefold level splits: (1, 1, 2) drops and the other two stay paired, because the energy is a sum of nx^2/Lx^2, ny^2/Ly^2 and nz^2/Lz^2 terms.'
+    - id: squeeze
+      section: what-changes
+      params: { nx: 1, ny: 1, nz: 1, lz: 3 }
+      caption: 'Squeeze the box to Lz = 3 A and the ground state climbs: confinement costs energy, the same reason a smaller cell changes a result.'
 title: The particle in a box
 module: 2
 order: 3

@@ -1,5 +1,28 @@
 ---
 id: kpoint-convergence
+stage:
+  scene: m08-kmesh-error
+  states:
+    - id: metal
+      section: why
+      params: { system: metal, mesh: 4, sigma: 0 }
+      caption: 'A 4 x 4 mesh samples the band of a 2D metal. Orange dots on the floor are filled states, blue ones empty, and the diamond is the Fermi line. The posts on the wall are the energy error of every mesh from 2 x 2 to 24 x 24.'
+    - id: insulator
+      section: intuition
+      params: { system: insulator, mesh: 4, sigma: 0 }
+      caption: 'Switch to the insulator: the filled band is smooth and full everywhere, so a coarse mesh is already close and the error falls fast. In the metal it falls slowly and in steps.'
+    - id: smearing
+      section: math
+      params: { system: metal, mesh: 12, sigma: 0.2 }
+      caption: 'Smearing softens the Fermi line (the middle-sized dots are partly filled) and the mesh error falls faster, but the readout shows the smearing itself moving the converged energy. Test the mesh and SIGMA as a pair.'
+    - id: scan
+      section: in-vasp
+      params: { system: metal, mesh: 16, sigma: 0 }
+      caption: 'Raise the mesh step by step, as in the scan. Stop where the marker on the wall stays under the dashed line for the meshes after it, not at the first post that dips below it.'
+    - id: wide-smearing
+      section: mistakes
+      params: { system: metal, mesh: 8, sigma: 0.4 }
+      caption: 'A wide smearing makes a coarse mesh look converged, but the smearing shift in the readouts is now larger than the mesh error. Do not let smearing hide a mesh that is too coarse.'
 title: Convergence of the k-point mesh
 module: 8
 order: 3
@@ -10,7 +33,7 @@ vaspTags: [KPOINTS, KSPACING, ISMEAR, SIGMA]
 sources: [S-019, S-041, S-042]
 noLab: true
 status: draft
-updated: 2026-11-19
+updated: 2026-11-27
 ---
 
 <Why>
@@ -30,6 +53,8 @@ approximation. It does not rescue a mesh that is too coarse, so test the mesh an
 </Intuition>
 
 <TheMath>
+
+A k-point mesh averages over the crystal by sampling a finite set of points, and more points give a better average. In a metal the quantity being averaged has a sharp edge at the Fermi level, which is why metals need denser meshes and a little smearing <Cite id="S-042" />.
 
 <Level min="intermediate">
 

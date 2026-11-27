@@ -1,21 +1,45 @@
 ---
 id: structure-and-inputs
+stage:
+  scene: m10-inputs
+  states:
+    - id: cell
+      section: why
+      params: { input: poscar }
+      camera: iso
+      caption: 'The POSCAR of this page on the stage: La on the corner, Cu at the body centre, O on the face centres. The outlined atoms are the five lines of the file; the others are copies that complete the octahedron.'
+    - id: spin-start
+      section: intuition
+      params: { input: magmom, start: fm-high }
+      caption: 'MAGMOM = 0 3 3*0 gives one value per atom in POSCAR order, so only Cu starts with a moment, above the dashed mark of the nominal high-spin d8 moment. Switch the spin start to compare the three runs.'
+    - id: plus-u
+      section: math
+      params: { input: ldau, eg: true }
+      caption: 'LDAUL = -1 2 -1 puts U on the Cu d shell only, drawn as a sphere, with the two e_g shapes pointing at the oxygens. The LDAUU value on Cu is one point of a scan, not a recommendation.'
+    - id: mesh
+      section: in-vasp
+      params: { input: kpoints }
+      caption: 'The KPOINTS file as points: a Gamma-centred 8 x 8 x 8 mesh in the cubic Brillouin zone. The larger dots are the irreducible points left after the cubic symmetry joins the rest.'
+    - id: low-moment
+      section: mistakes
+      params: { input: magmom, start: fm-low }
+      caption: 'The low-moment start MAGMOM = 0 1 3*0. Writing 3 0 3*0 instead would put the moment on La, so read the list against the species line before you submit.'
 title: Structure and starting inputs
 module: 10
 order: 2
-summary: Preparing the RCuO3 POSCAR, choosing matching PAW POTCARs, and assembling a validator-clean starting INCAR and KPOINTS.
-concepts: [worked-example-workflow]
+summary: The complete POSCAR, POTCAR choice, KPOINTS and relaxation INCAR for LaCuO3, with the reasons behind the cell, the spin starts, DFT+U for Cu 3d, LMAXMIX and ENCUT.
+concepts: [worked-example-workflow, dft-plus-u, spin-polarization]
 requires: [perovskite-structure, poscar-file, incar-file]
-vaspTags: [ENCUT, PREC, ISPIN, MAGMOM]
-sources: [S-019, S-042]
+vaspTags: [ENCUT, PREC, ISPIN, MAGMOM, LDAU, LDAUU, LMAXMIX, LASPH]
+sources: [S-001, S-002, S-014, S-019, S-034, S-040, S-042, S-095, S-096, S-098, S-099, S-100, S-101]
 noLab: true
 status: draft
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 <Why>
 
-Every downstream comparison in a perovskite study depends on starting from a clean, symmetry-checked `POSCAR` and consistent `POTCAR` and `INCAR` settings <Cite id="S-042" />.
+Every number a calculation produces is a property of its inputs. The cell decides which distortions are possible, the potentials decide which electrons are treated, and the starting moments decide which magnetic state the run can reach. For $\mathrm{LaCuO}_3$ each of these choices is a real decision, so this page writes out all four input files in full and gives the reason for every line <Cite id="S-042" />.
 
 </Why>
 
@@ -27,59 +51,214 @@ This page presents the input-preparation protocol for `RCuO3`. Author-computed l
 
 </Callout>
 
-Start by loading or building the candidate perovskite cell in the <a href="/builder/">Material Builder</a> so that bond lengths, minimum interatomic distances, and space-group symmetry are verified before exporting `POSCAR`. Next, concatenate the licensed PAW `POTCAR` files on your cluster in the exact species order printed on line 6 of `POSCAR` <Cite id="S-019" />.
+**The cell: start simple, on purpose.** The fully oxidized compound is reported as rhombohedral <Cite id="S-096" />, which means tilted octahedra and a cell of two formula units. The worked example still starts from the ideal cubic five-atom cell, for two reasons. It is the cheapest cell, so the convergence tests and the spin tests on the next pages run quickly. And it is the reference against which the tilted structure is measured: the energy gained by tilting is the difference between the two. The tilted cell comes in on the relaxation page.
 
-<Scene id="perovskite-octahedra" />
+**The lattice parameter is a starting guess.** This page uses no measured lattice parameter, because none is quoted here from a source we could check. Instead, the starting edge comes from the same radii as the tolerance factor: the ideal cubic edge along Cu-O-Cu is $a = 2(r_\mathrm{Cu} + r_\mathrm{O})$ with Shannon's radii <Cite id="S-001" /> <Cite id="S-002" />, which gives 3.88 Å. It is labelled as a guess in the file, and the relaxation will move it.
 
-Because copper oxides can carry unpaired $d$ electrons, keep `ISPIN = 2` ready and check whether rare-earth $4f$ electrons are treated in the core (using the VASP `_3` PAW potentials for trivalent lanthanides) or explicitly in valence <Cite id="S-042" />.
+**The potentials.** VASP's recommended PAW set for these elements is `La`, `Cu_pv` and `O` <Cite id="S-019" />. `Cu_pv` treats the copper 3p shell as valence as well as 3d and 4s. Lanthanum's 4f shell is empty in $\mathrm{La}^{3+}$, so the standard `La` potential is fine; for Pr to Lu the recommended `_3` potentials freeze the 4f electrons in the core.
+
+**Spin: why there are three starts.** In an octahedron the five $d$ levels split into three lower $t_{2g}$ levels and two higher $e_g$ levels, the <Term id="crystal-field-splitting">crystal-field splitting</Term> <Cite id="S-100" />. Eight $d$ electrons fill the $t_{2g}$ levels (six) and put two in the $e_g$ pair. In a regular octahedron the two $e_g$ orbitals have the same energy, so Hund's rule puts one electron in each with parallel spins: spin $S = 1$, a nominal moment of $2\,\mu_B$. A spin-zero ("low-spin") $d^8$ state needs the two $e_g$ levels split apart, as in an elongated or square-planar site <Cite id="S-100" />, which the cubic cell does not allow. On top of that, strong Cu-O mixing <Cite id="S-098" /> <Cite id="S-099" /> may wash the local moment out entirely in a metal. Because nobody can tell in advance which of these wins in DFT, you run three starts and compare energies:
+
+- non-magnetic (`ISPIN = 1`),
+- ferromagnetic from a moment above the nominal value (`MAGMOM` of 3 on Cu),
+- ferromagnetic from a small moment (`MAGMOM` of 1 on Cu), to see whether a low-moment solution exists.
+
+An antiferromagnetic start needs two copper atoms; it comes with the doubled cell.
+
+**DFT+U: whether, and how much.** The Materials Project's $U$ list for oxides covers Co, Cr, Fe, Mn, Mo, Ni, V and W, and not Cu <Cite id="S-042" /> <Cite id="S-034" />, so Materials-Project-compatible energies for copper oxides use plain GGA on Cu. For the physics of $\mathrm{Cu}^{3+}$ you may still want a $U$, but there is no single right value to copy. The honest routes are: run plain PBE as the baseline, then scan $U$ and report how the conclusions change, or compute $U$ by linear response for this compound <Cite id="S-042" /> <Cite id="S-095" />. Keep in mind that a $U$ acts on Cu 3d only, while in a negative charge-transfer compound much of the hole sits on oxygen <Cite id="S-099" />.
 
 </Intuition>
 
 <TheMath>
 
-When combining multiple elements in one `POTCAR`, the starting plane-wave cutoff for variable-cell relaxations follows the maximum `ENMAX` across all species <Cite id="S-042" />:
+**Starting lattice parameter.** From the $B$-site contact and from the $A$-site contact <Cite id="S-002" />:
 
-$$E_{\mathrm{cut}} \ge 1.3 \times \max_{s} \mathrm{ENMAX}_s$$
+$$a_B = 2\,(r_\mathrm{Cu} + r_\mathrm{O}) = 2\,(0.54 + 1.40)\ \text{Å} = 3.88\ \text{Å}, \qquad a_A = \sqrt{2}\,(r_\mathrm{La} + r_\mathrm{O}) \approx 3.90\ \text{Å},$$
 
-Holding this same `ENCUT` fixed across every stage of the project ensures clean energy differences.
+using $r_\mathrm{La} = 1.36$ Å (CN 12) <Cite id="S-001" />. Their ratio is the tolerance factor of the previous page. The two estimates differ by about half a percent, which is why the cubic cell is a sensible starting point for La; both are geometry, not predictions.
+
+**Electron count.** The valence electrons per formula unit follow from the POTCAR valences: 11 for `La`, 17 for `Cu_pv` and 6 for each `O`, so $11 + 17 + 3 \times 6 = 46$ <Cite id="S-019" />. VASP reads the counts from the POTCAR files itself; you check the `NELECT` line in `OUTCAR` against this sum.
+
+**The DFT+U energy.** In Dudarev's form (`LDAUTYPE = 2`) only $U_\mathrm{eff} = U - J$ matters, and the correction for each site and spin is <Cite id="S-014" />
+
+$$E_U = \frac{U - J}{2}\sum_{\sigma}\mathrm{Tr}\left[\mathbf n^{\sigma}\left(1 - \mathbf n^{\sigma}\right)\right],$$
+
+where $\mathbf n^\sigma$ is the occupation matrix of the Cu 3d orbitals for spin $\sigma$. The term is zero when every orbital is either full or empty and positive for fractional occupations, so it pushes the $d$ orbitals towards integer filling.
+
+<Level min="intermediate">
+
+**Why LMAXMIX = 4.** VASP keeps the one-centre densities inside each PAW sphere only up to angular momentum `LMAXMIX` when it mixes densities and when it writes `CHGCAR`. The default of 2 drops the $l = 3$ and $l = 4$ components that products of two $d$ orbitals contribute, which matters for DFT+U and for any `ICHARG = 11` run that reads the charge density back. Set 4 for $d$ elements, 6 for $f$ elements <Cite id="S-042" /> (VASP wiki page LMAXMIX <Cite id="S-019" />). Lanthanum sits in the $f$ block of the periodic table, so the site's INCAR check suggests 6 once `LDAU` is on; here $U$ acts only on Cu $3d$ and the La $4f$ shell is empty, so this page keeps 4. Setting 6 costs little, and it is the value to use from Ce onwards or whenever $U$ acts on $f$ states.
+
+**Why ENCUT = 1.3 times ENMAX.** A variable-cell relaxation follows the stress, and at a fixed cutoff the stress carries the Pulay error <Cite id="S-040" />. The author's protocol sets `ENCUT` to 1.3 times the largest `ENMAX` among the POTCARs <Cite id="S-042" />. Read the values with `grep ENMAX POTCAR`; in oxides the standard O potential usually has the largest. The INCAR below uses 520, which is 1.3 times 400; recompute it from your own POTCAR.
+
+</Level>
+
+<Level min="pro">
+
+Dudarev's $E_U$ is not the same functional for different $U$, so total energies with different $U$ cannot be subtracted, and a phase diagram that mixes $U$ and no-$U$ compounds needs a correction scheme <Cite id="S-042" />. DFT+U also has metastable solutions: different starting moments or occupations can converge to different energies. Check the occupation matrices (`LDAUPRINT = 1`) and keep the lowest-energy solution <Cite id="S-042" />.
+
+</Level>
 
 </TheMath>
 
 <InVasp>
 
-- Verify species order in `POSCAR` matches `grep TITEL POTCAR` on your cluster <Cite id="S-019" />.
-- Build the initial `INCAR` and Gamma-centered `KPOINTS` using the <a href="/tools/input-builder/">Input Builder</a>.
-- Run the pre-flight check in <a href="/tools/review/">Calculation Review</a> before submitting the first job <Cite id="S-042" />.
+**POSCAR.** The ideal cubic cell, species in the order La, Cu, O. The scale factor carries the lattice parameter; the first line says it is a guess.
+
+<VaspFile
+  name="POSCAR"
+  code={`LaCuO3 ideal cubic; a is a starting guess, 2(r_Cu + r_O) from Shannon radii
+3.88
+1.0 0.0 0.0
+0.0 1.0 0.0
+0.0 0.0 1.0
+La Cu O
+1 1 3
+Direct
+0.0 0.0 0.0
+0.5 0.5 0.5
+0.5 0.5 0.0
+0.5 0.0 0.5
+0.0 0.5 0.5`}
+  annotations={{
+    2: 'scale factor: the cubic edge in angstrom',
+    6: 'species order; the POTCAR must follow it',
+    9: 'La at the cube corner (A site)',
+    10: 'Cu at the body centre (B site)',
+    11: 'the three O at the face centres around Cu',
+  }}
+/>
+
+**POTCAR.** Concatenate your own licensed files in the same order as line 6, then check the titles. Never share the POTCAR itself.
+
+<VaspFile
+  name="shell"
+  code={`cat La/POTCAR Cu_pv/POTCAR O/POTCAR > POTCAR
+grep TITEL POTCAR     # La, Cu_pv, O in this order
+grep ENMAX POTCAR     # ENCUT = 1.3 x the largest value`}
+/>
+
+**KPOINTS.** A Gamma-centred mesh as a starting point; the convergence page tests it.
+
+<VaspFile
+  name="KPOINTS"
+  code={`Gamma-centred 8x8x8, starting mesh for the 5-atom cubic cell
+0
+Gamma
+8 8 8
+0 0 0`}
+/>
+
+**INCAR, relaxation with the high-moment ferromagnetic start.**
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM  = LaCuO3 cubic relax, FM start
+PREC    = Accurate
+ENCUT   = 520
+EDIFF   = 1E-6
+ALGO    = Normal
+NELM    = 120
+ISMEAR  = 0
+SIGMA   = 0.05
+IBRION  = 2
+ISIF    = 3
+NSW     = 100
+EDIFFG  = -0.005
+ISPIN   = 2
+MAGMOM  = 0 3 3*0
+LORBIT  = 11
+LASPH   = .TRUE.
+LMAXMIX = 4
+LREAL   = .FALSE.`}
+  annotations={{
+    3: '1.3 x the largest ENMAX; recompute from your POTCAR',
+    7: 'Gaussian smearing, safe for metals and insulators alike',
+    10: 'cell shape, volume and positions all relax',
+    12: 'stop when every force is below 0.005 in eV per angstrom',
+    14: 'one value per atom in POSCAR order: La 0, Cu 3, three O at 0',
+    16: 'recommended for d elements',
+    17: 'keeps the d part of the density',
+  }}
+/>
+
+For the other two starts, change only the spin lines: `ISPIN = 1` and no `MAGMOM` for the non-magnetic run, `MAGMOM = 0 1 3*0` for the low-moment start. For a DFT+U run, add the block below, one entry per species in POSCAR order (La, Cu, O). The value 4 is one point of a scan, not a recommendation.
+
+<VaspFile
+  name="INCAR"
+  code={`LDAU      = .TRUE.
+LDAUTYPE  = 2
+LDAUL     = -1 2 -1
+LDAUU     = 0 4 0
+LDAUJ     = 0 0 0
+LDAUPRINT = 1`}
+  annotations={{
+    2: 'Dudarev: only U - J enters',
+    3: 'per species: no correction on La and O, d electrons on Cu',
+    4: 'scan this value; do not copy it',
+  }}
+/>
+
+**On this site.** Import the POSCAR into the <a href="/builder/">Material Builder</a> (Crystal mode, "Import POSCAR/CIF") and read the validity panel before you use it. Paste the INCAR into the <a href="/tools/input-builder/">Input Builder</a>, whose MAGMOM and DFT+U helpers write one entry per species, and whose check step flags a wrong `MAGMOM` count. Then run the folder through the pre-flight check of <a href="/tools/review/">Calculation Review</a>.
 
 </InVasp>
 
 <WhatChanges>
 
-| Input file | Key check before submission                            | Tool on this site                                 |
-| ---------- | ------------------------------------------------------ | ------------------------------------------------- |
-| `POSCAR`   | No overlapping atoms; expected symmetry                | <a href="/builder/">Material Builder</a>          |
-| `INCAR`    | No conflicting tags; `ENCUT >= 1.3 x ENMAX`            | <a href="/tools/input-builder/">Input Builder</a> |
-| `KPOINTS`  | Gamma-centered mesh proportional to reciprocal lengths | <a href="/tools/kpath/">k-path and mesh tool</a>  |
+| If you change...               | ...what happens                                                          | Why                                                        |
+| ------------------------------ | ------------------------------------------------------------------------ | ---------------------------------------------------------- |
+| `ISPIN = 2` to `ISPIN = 1`     | No moment can form                                                       | Both spin channels are forced equal                        |
+| Cu `MAGMOM` 3 to 1             | The run may land on a different, lower-moment solution                   | Spin-polarized runs find the nearest local minimum         |
+| `LDAUU` on Cu from 0 upwards   | The d occupations become more integer; energies are no longer comparable | $E_U$ changes the functional itself                        |
+| `LMAXMIX` left at the default  | A later `ICHARG = 11` run starts from a density missing its d part       | The default keeps only $l \le 2$ in the mixer and `CHGCAR` |
+| Cubic cell to the doubled cell | Tilts and antiferromagnetic order become possible                        | The 5-atom cell has one Cu and no room for rotations       |
+| `ENCUT` below 1.3 times ENMAX  | The stress, and therefore the relaxed volume, is biased                  | Pulay stress at fixed cutoff                               |
 
-Why check inputs first: catching a species-order mismatch or missing tag locally saves hours of wasted queue time.
+Why each choice: the cell sets what can happen, the potentials set which electrons count, the spin starts set where the run can go. Why these values: they follow the author's protocol and VASP's recommended potentials. What happens if you skip the spin starts: you get one local minimum and no way to know whether it is the lowest.
 
 </WhatChanges>
 
 <Mistakes>
 
-<Callout variant="mistake" title="Switching POTCAR variants mid-project">
+<Callout variant="mistake" title="A MAGMOM list that does not follow the POSCAR order">
 
-Never compare total energies between a standard `Cu` potential and `Cu_pv`, or between different lanthanide `f`-in-core potentials. Keep the exact same `POTCAR` set for every calculation you compare.
+`MAGMOM = 3 0 3*0` puts the moment on La. Fix: write one value per atom in the POSCAR order (La, Cu, O, O, O) and read it back against the species line before you submit.
+
+</Callout>
+
+<Callout variant="mistake" title="LDAU tags in the wrong species order">
+
+`LDAUL`, `LDAUU` and `LDAUJ` take one entry per species in POSCAR order. A shifted list silently puts $U$ on the wrong element <Cite id="S-042" />. Fix: write them under the species line and check `LDAUPRINT` output for Cu.
+
+</Callout>
+
+<Callout variant="mistake" title="Comparing energies made with different U">
+
+A run at one $U$ and a run at another describe different functionals, so their energy difference means nothing <Cite id="S-042" />. Fix: compare magnetic states and structures at the same $U$, and scan $U$ only to see whether conclusions change.
+
+</Callout>
+
+<Callout variant="mistake" title="Mixing Cu and Cu_pv between runs">
+
+Energies from different POTCAR variants of the same element do not subtract. Fix: choose `Cu_pv` once and use it in every run of the project, including the reference compounds.
+
+</Callout>
+
+<Callout variant="mistake" title="Using the starting guess as a result">
+
+The 3.88 Å in the POSCAR comes from ionic radii. Fix: quote only the relaxed lattice parameter from a converged run, and say which functional and $U$ produced it.
 
 </Callout>
 
 </Mistakes>
 
-<Check ids={['q-m10-5', 'q-m10-6', 'q-m10-7', 'q-m10-8']} />
+<Check ids={['q-m10-2', 'q-m10-4', 'q-m10-9', 'q-m10-12', 'q-m10-17', 'q-m10-18']} />
 
 <GoDeeper>
 
-- VASP wiki on PAW potentials and `POTCAR` selection <Cite id="S-019" />.
-- The author's VASP Workflow Handbook <Cite id="S-042" />.
+- VASP wiki pages Choosing pseudopotentials, MAGMOM, LMAXMIX, LDAU and LDAUTYPE (by page name) <Cite id="S-019" />.
+- Dudarev and co-workers on the rotationally invariant DFT+U form <Cite id="S-014" />; Cococcioni and de Gironcoli on linear-response $U$ <Cite id="S-095" />.
+- Khomskii on crystal fields and spin states of $d^8$ ions <Cite id="S-100" />.
+- The author's Workflow Handbook, sections DFT+U and Magnetism <Cite id="S-042" />.
 
 </GoDeeper>

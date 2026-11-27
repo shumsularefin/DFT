@@ -68,16 +68,40 @@
   min-height: 12rem;
   color: var(--text-muted);
 }
+/* M16.5: a fieldset keeps its legend on the top border and refuses to shrink below its widest content, so a long
+   "Try this" label sat across the border and long option labels pushed past the box. The legend is drawn inside the
+   box as an ordinary heading (float keeps it a real legend for screen readers), the box may shrink with its column,
+   and every label wraps. */
 .lp-try {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: var(--space-3);
   margin: var(--space-4) 0;
+  min-inline-size: 0;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 .lp-try-head {
   font-weight: 600;
   margin: 0 0 var(--space-2);
-  padding: 0 var(--space-1);
+  padding: 0;
+}
+fieldset.lp-try > legend.lp-try-head {
+  float: left;
+  width: 100%;
+}
+fieldset.lp-try > legend.lp-try-head + * {
+  clear: both;
+}
+.lp-try .slider,
+.lp-try .slider-row {
+  min-width: 0;
+  max-width: 100%;
+}
+.lp-try .slider-row input[type='range'] {
+  min-width: 0;
+  flex: 1 1 auto;
 }
 .lp-choices {
   display: flex;
@@ -85,6 +109,7 @@
   gap: var(--space-2);
 }
 .lp-choice {
+  max-width: 100%;
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
@@ -121,4 +146,67 @@
     transition: none !important;
     animation: none !important;
   }
+}
+/* Stage stations (M16.4): the live 3D view, its flat poster while it loads, its readouts and the small plot beside it */
+.lp-stage {
+  margin: 0;
+}
+.lp-poster-svg svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.lp-readouts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+  font-size: var(--step--1);
+}
+.lp-readouts dt {
+  color: var(--text-muted);
+}
+.lp-readouts dd {
+  margin: 0;
+  font-family: var(--font-mono);
+}
+.lp-panel {
+  margin: var(--space-3) 0 0;
+  max-width: 22rem;
+}
+.lp-panel-cap {
+  font-size: var(--step--1);
+  color: var(--text-muted);
+}
+.lp-panel-svg svg {
+  width: 100%;
+  height: auto;
+  max-height: 16rem;
+}
+.lp-panel .lp-wait {
+  min-height: 4rem;
+}
+
+/* M16.5: what each mark on the picture means, beside the three sentences */
+.lp-read {
+  margin-block: var(--space-3, 0.75rem);
+  padding: 0.6rem 0.8rem;
+  border-inline-start: 3px solid var(--accent);
+  background: var(--surface);
+  border-radius: 0 var(--radius-sm, 6px) var(--radius-sm, 6px) 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.lp-read-head {
+  margin: 0 0 0.3rem;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+.lp-read ul {
+  margin: 0;
+  padding-inline-start: 1.1rem;
+  font-size: 0.92rem;
+}
+.lp-read li + li {
+  margin-block-start: 0.25rem;
 }

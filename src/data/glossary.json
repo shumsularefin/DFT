@@ -279,6 +279,15 @@
     ]
   },
   {
+    "id": "exchange",
+    "label": "Exchange",
+    "short": "The energy that comes from the Pauli principle: electrons with the same spin cannot share a state, so they keep apart and repel each other less than a plain average would suggest. It has no classical counterpart.",
+    "level": "intermediate",
+    "sources": [
+      "S-048"
+    ]
+  },
+  {
     "id": "exchange-correlation",
     "label": "Exchange and correlation",
     "short": "The parts of the electron-electron interaction that come from the Pauli principle (exchange) and from electrons avoiding each other (correlation). Density functional theory has to approximate them.",
@@ -446,6 +455,43 @@
     ]
   },
   {
+    "id": "perovskite",
+    "label": "Perovskite",
+    "short": "A crystal family with formula ABX3: small B cations sit inside corner-sharing octahedra of X anions, and large A cations fill the gaps between the octahedra. Many oxides, such as SrTiO3, have this structure.",
+    "level": "beginner",
+    "sources": [
+      "S-002"
+    ]
+  },
+  {
+    "id": "octahedral-tilting",
+    "label": "Octahedral tilting",
+    "short": "A cooperative rotation of the corner-sharing BX6 octahedra of a perovskite, which happens when the A cation is too small for its cavity. It lowers the symmetry and enlarges the repeating cell.",
+    "level": "intermediate",
+    "sources": [
+      "S-101"
+    ]
+  },
+  {
+    "id": "tolerance-factor",
+    "label": "Tolerance factor",
+    "short": "A number made from ionic radii that says how well the A, B and X ions of a perovskite fit together. Goldschmidt's t near 1 suits the ideal cubic structure; lower values point to tilted octahedra. It is a rule of thumb, not a stability calculation.",
+    "level": "intermediate",
+    "sources": [
+      "S-002",
+      "S-003"
+    ]
+  },
+  {
+    "id": "ionic-radius",
+    "label": "Ionic radius",
+    "short": "A tabulated size for an ion, chosen so that sums of radii reproduce measured bond lengths. It depends on the charge of the ion, how many neighbours it has and, for some ions, its spin state.",
+    "level": "intermediate",
+    "sources": [
+      "S-001"
+    ]
+  },
+  {
     "id": "property",
     "label": "Property",
     "short": "Anything you can measure or compute about a material, such as its energy, its shape, its band gap or how much it conducts.",
@@ -570,6 +616,117 @@
     "sources": [
       "S-050",
       "S-036"
+    ]
+  },
+  {
+    "id": "effective-mass",
+    "label": "Effective mass",
+    "short": "The mass an electron or hole seems to have when it moves through a crystal, set by how sharply its band curves near an extremum: a strongly curved band means a light carrier.",
+    "level": "intermediate",
+    "sources": [
+      "S-036"
+    ]
+  },
+  {
+    "id": "projected-dos",
+    "label": "Projected density of states",
+    "short": "The density of states split into contributions from each atom and orbital (s, p, d, f), found by projecting the states onto spheres around the atoms.",
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "tetrahedron-method",
+    "label": "Tetrahedron method",
+    "short": "A way to integrate over the Brillouin zone that splits it into small tetrahedra and interpolates the bands inside each, giving sharp densities of states from a uniform k-point mesh.",
+    "level": "intermediate",
+    "sources": [
+      "S-017"
+    ]
+  },
+  {
+    "id": "d-band-center",
+    "label": "d-band center",
+    "short": "The average energy of the d states of an atom, the first moment of its d-projected density of states; on transition-metal surfaces it tracks how strongly adsorbates bind.",
+    "level": "pro",
+    "sources": [
+      "S-085"
+    ]
+  },
+  {
+    "id": "charge-density-difference",
+    "label": "Charge density difference",
+    "short": "The density of a combined system minus the densities of its separate parts on the same grid; it shows where bonding moved electrons to and from.",
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "electron-localization-function",
+    "label": "Electron localization function (ELF)",
+    "short": "A number between 0 and 1 at each point in space; values near 1 mark localized electron pairs such as bonds and lone pairs, and 0.5 is the value of a uniform electron gas.",
+    "level": "intermediate",
+    "sources": [
+      "S-086",
+      "S-087"
+    ]
+  },
+  {
+    "id": "formation-energy",
+    "label": "Formation energy",
+    "short": "The energy of a compound minus the energies of its elements in their reference states, usually per atom; a negative value means the compound is lower in energy than the elements.",
+    "level": "beginner",
+    "sources": [
+      "S-080"
+    ]
+  },
+  {
+    "id": "convex-hull",
+    "label": "Convex hull",
+    "short": "The lowest convex envelope of formation energy plotted against composition. A phase on it is stable at 0 K against every mixture of the other phases.",
+    "level": "intermediate",
+    "sources": [
+      "S-034",
+      "S-080"
+    ]
+  },
+  {
+    "id": "energy-above-hull",
+    "label": "Energy above the hull",
+    "short": "How far, in energy per atom, a phase sits above the convex hull. Zero means stable; a positive value is the energy it would release by splitting into the hull phases below it.",
+    "level": "intermediate",
+    "sources": [
+      "S-034",
+      "S-042"
+    ]
+  },
+  {
+    "id": "metastable",
+    "label": "Metastable",
+    "short": "Higher in energy than the most stable arrangement, but held in place by a barrier, so it can still be made and can last.",
+    "level": "beginner",
+    "sources": [
+      "S-120"
+    ]
+  },
+  {
+    "id": "stress-tensor",
+    "label": "Stress tensor",
+    "short": "Nine numbers (six independent) that say how the energy of a cell changes when it is stretched or sheared; its average diagonal value gives the pressure.",
+    "level": "intermediate",
+    "sources": [
+      "S-092"
+    ]
+  },
+  {
+    "id": "selective-dynamics",
+    "label": "Selective dynamics",
+    "short": "A POSCAR option that marks each coordinate of each atom as free to move or frozen during a relaxation or molecular dynamics run.",
+    "level": "beginner",
+    "sources": [
+      "S-041"
     ]
   },
   {
@@ -802,12 +959,40 @@
     ]
   },
   {
+    "id": "damping-function",
+    "label": "Damping function",
+    "short": "A factor that switches a dispersion correction off at short distances, where the functional already describes the bonding, so the correction acts only between atoms that are far apart.",
+    "level": "intermediate",
+    "sources": [
+      "S-028"
+    ]
+  },
+  {
     "id": "magnetic-moment",
     "label": "Magnetic moment",
     "short": "The difference between the up and down electron counts around an atom or in the cell, in units of the Bohr magneton.",
     "level": "beginner",
     "sources": [
       "S-042"
+    ]
+  },
+  {
+    "id": "crystal-field-splitting",
+    "label": "Crystal-field splitting",
+    "short": "The way the five d levels of a metal ion split in energy when the ion is surrounded by neighbours. In an octahedron they split into three lower t2g levels and two higher eg levels.",
+    "level": "intermediate",
+    "sources": [
+      "S-100"
+    ]
+  },
+  {
+    "id": "charge-transfer-energy",
+    "label": "Charge-transfer energy",
+    "short": "The energy needed to move an electron from a ligand, such as oxygen, onto the metal ion. When it is small or negative, the holes of a highly charged metal ion sit largely on the ligands instead of on the metal.",
+    "level": "pro",
+    "sources": [
+      "S-098",
+      "S-099"
     ]
   },
   {
@@ -1177,6 +1362,471 @@
     "level": "pro",
     "sources": [
       "S-042"
+    ]
+  },
+  {
+    "id": "bravais-lattice",
+    "label": "Bravais lattice",
+    "short": "An infinite grid of points in which every point has the same surroundings; there are 14 kinds in three dimensions.",
+    "level": "intermediate",
+    "sources": [
+      "S-036"
+    ]
+  },
+  {
+    "id": "crystal-basis",
+    "label": "Basis (of a crystal)",
+    "short": "The group of atoms attached to every lattice point; lattice plus basis gives the crystal.",
+    "level": "beginner",
+    "sources": [
+      "S-036"
+    ]
+  },
+  {
+    "id": "primitive-cell",
+    "label": "Primitive cell",
+    "short": "The smallest repeating cell of a crystal, holding exactly one lattice point.",
+    "level": "beginner",
+    "sources": [
+      "S-036"
+    ]
+  },
+  {
+    "id": "conventional-cell",
+    "label": "Conventional cell",
+    "short": "A larger repeating cell chosen so that its edges follow the symmetry axes, such as the cube of face-centred cubic.",
+    "level": "intermediate",
+    "sources": [
+      "S-036"
+    ]
+  },
+  {
+    "id": "fractional-coordinates",
+    "label": "Fractional coordinates",
+    "short": "Atom positions given as fractions of the three lattice vectors; POSCAR calls them Direct.",
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "symmetry-operation",
+    "label": "Symmetry operation",
+    "short": "A rotation, mirror, inversion, screw, glide or translation that maps the crystal onto itself.",
+    "level": "intermediate",
+    "sources": [
+      "S-105"
+    ]
+  },
+  {
+    "id": "point-group",
+    "label": "Point group",
+    "short": "The set of rotations, mirrors and inversions that leave a crystal looking the same about one point; crystals have 32.",
+    "level": "intermediate",
+    "sources": [
+      "S-105"
+    ]
+  },
+  {
+    "id": "space-group",
+    "label": "Space group",
+    "short": "The full set of symmetry operations of a crystal, translations included; there are 230 in three dimensions.",
+    "level": "intermediate",
+    "sources": [
+      "S-105"
+    ]
+  },
+  {
+    "id": "wyckoff-position",
+    "label": "Wyckoff position",
+    "short": "A set of sites that the space group maps onto each other, labelled by a multiplicity and a letter such as 4a.",
+    "level": "pro",
+    "sources": [
+      "S-105"
+    ]
+  },
+  {
+    "id": "irreducible-brillouin-zone",
+    "label": "Irreducible Brillouin zone",
+    "short": "The part of the Brillouin zone left after symmetry-equivalent k-points are merged; VASP computes only these points, with weights.",
+    "level": "intermediate",
+    "sources": [
+      "S-007",
+      "S-041"
+    ]
+  },
+  {
+    "id": "geometry-relaxation",
+    "label": "Geometry relaxation",
+    "short": "A calculation that moves the atoms, and optionally the cell, until the forces and stress are small.",
+    "level": "beginner",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "potential-energy-surface",
+    "label": "Potential energy surface",
+    "short": "The ground-state energy as a function of the positions of all nuclei; relaxations roll downhill on it.",
+    "level": "intermediate",
+    "sources": [
+      "S-049"
+    ]
+  },
+  {
+    "id": "fft-grid",
+    "label": "FFT grid",
+    "short": "The real-space grid that VASP uses to switch each wavefunction between plane waves and real space with fast Fourier transforms.",
+    "level": "intermediate",
+    "sources": [
+      "S-010",
+      "S-041"
+    ]
+  },
+  {
+    "id": "parallel-efficiency",
+    "label": "Parallel efficiency",
+    "short": "The speed-up from using p times the resources divided by p; 1 means doubling the cores halves the time.",
+    "level": "intermediate",
+    "sources": [
+      "S-041"
+    ]
+  },
+  {
+    "id": "slab-model",
+    "label": "Slab model",
+    "short": "A few layers of crystal with vacuum above and below, repeated periodically, used to model a surface.",
+    "level": "beginner",
+    "sources": [
+      "S-018"
+    ]
+  },
+  {
+    "id": "miller-indices",
+    "label": "Miller indices",
+    "short": "Three whole numbers (hkl) that name a crystal plane through the inverse of its intercepts with the cell axes.",
+    "level": "beginner",
+    "sources": [
+      "S-036"
+    ]
+  },
+  {
+    "id": "surface-termination",
+    "label": "Surface termination",
+    "short": "Which atomic layer a slab ends on, when a crystal has more than one kind of layer along a direction.",
+    "level": "intermediate",
+    "sources": [
+      "S-064"
+    ]
+  },
+  {
+    "id": "dipole-correction",
+    "label": "Dipole correction",
+    "short": "A compensating dipole layer placed in the vacuum of an asymmetric slab so that the potential on both sides is flat.",
+    "level": "intermediate",
+    "sources": [
+      "S-066",
+      "S-109"
+    ]
+  },
+  {
+    "id": "surface-energy",
+    "label": "Surface energy",
+    "short": "The energy needed to make a unit area of surface, from slab and bulk energies.",
+    "level": "intermediate",
+    "sources": [
+      "S-018"
+    ]
+  },
+  {
+    "id": "planar-average",
+    "label": "Planar average",
+    "short": "A quantity averaged over planes parallel to the surface, leaving a curve along the normal.",
+    "level": "intermediate",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "work-function",
+    "label": "Work function",
+    "short": "The energy needed to take an electron from the Fermi level to the vacuum just outside a surface.",
+    "level": "beginner",
+    "sources": [
+      "S-042"
+    ]
+  },
+  {
+    "id": "point-defect",
+    "label": "Point defect",
+    "short": "A defect at one site of a crystal: a vacancy, an interstitial, a substitution or an antisite.",
+    "level": "beginner",
+    "sources": [
+      "S-067"
+    ]
+  },
+  {
+    "id": "vacancy",
+    "label": "Vacancy",
+    "short": "A site of the crystal where an atom is missing.",
+    "level": "beginner",
+    "sources": [
+      "S-067"
+    ]
+  },
+  {
+    "id": "interstitial",
+    "label": "Interstitial",
+    "short": "An extra atom placed between the regular sites of a crystal.",
+    "level": "beginner",
+    "sources": [
+      "S-067"
+    ]
+  },
+  {
+    "id": "antisite-defect",
+    "label": "Antisite",
+    "short": "A defect in which a host atom sits on the site of a different host element, such as Ga on an As site.",
+    "level": "intermediate",
+    "sources": [
+      "S-067"
+    ]
+  },
+  {
+    "id": "defect-formation-energy",
+    "label": "Defect formation energy",
+    "short": "The energy to create a defect from the perfect crystal and reservoirs of atoms and electrons.",
+    "level": "intermediate",
+    "sources": [
+      "S-067"
+    ]
+  },
+  {
+    "id": "chemical-potential",
+    "label": "Chemical potential",
+    "short": "The energy per atom of a reservoir that atoms are taken from or given to, set by the growth conditions.",
+    "level": "intermediate",
+    "sources": [
+      "S-111"
+    ]
+  },
+  {
+    "id": "minimum-energy-path",
+    "label": "Minimum energy path",
+    "short": "The lowest-energy route between two minima of the energy surface. At every point on it the force points along the path.",
+    "level": "intermediate",
+    "sources": [
+      "S-121"
+    ]
+  },
+  {
+    "id": "saddle-point",
+    "label": "Saddle point",
+    "short": "A point on the energy surface that is a maximum along the reaction path and a minimum in every other direction. It is the transition state.",
+    "level": "intermediate",
+    "sources": [
+      "S-121"
+    ]
+  },
+  {
+    "id": "activation-energy",
+    "label": "Activation energy",
+    "short": "The energy of the saddle point minus the energy of the starting minimum: the barrier a process has to cross.",
+    "level": "beginner",
+    "sources": [
+      "S-122"
+    ]
+  },
+  {
+    "id": "nudged-elastic-band",
+    "label": "Nudged elastic band",
+    "short": "A method that finds a minimum energy path by relaxing a chain of images joined by springs, keeping only the perpendicular part of the true force and the parallel part of the spring force.",
+    "level": "intermediate",
+    "sources": [
+      "S-121"
+    ]
+  },
+  {
+    "id": "climbing-image",
+    "label": "Climbing image",
+    "short": "The highest image of a nudged elastic band, freed from the springs and pushed uphill along the path so that it ends exactly on the saddle point.",
+    "level": "pro",
+    "sources": [
+      "S-121"
+    ]
+  },
+  {
+    "id": "molecular-dynamics",
+    "label": "Molecular dynamics",
+    "short": "Moving the atoms forward in time step by step with Newton's equations, using forces from a model or from DFT.",
+    "level": "beginner",
+    "sources": [
+      "S-125"
+    ]
+  },
+  {
+    "id": "thermostat",
+    "label": "Thermostat",
+    "short": "An algorithm that adds or removes kinetic energy during a simulation so that the temperature fluctuates around a target value.",
+    "level": "intermediate",
+    "sources": [
+      "S-125",
+      "S-126"
+    ]
+  },
+  {
+    "id": "statistical-ensemble",
+    "label": "Ensemble",
+    "short": "The set of quantities a simulation holds fixed, such as particle number, volume and energy (NVE) or particle number, volume and temperature (NVT).",
+    "level": "intermediate",
+    "sources": [
+      "S-125"
+    ]
+  },
+  {
+    "id": "mean-squared-displacement",
+    "label": "Mean squared displacement",
+    "short": "The average of the squared distance the atoms have moved after a time t. Its slope at long times gives the diffusion coefficient.",
+    "level": "intermediate",
+    "sources": [
+      "S-125"
+    ]
+  },
+  {
+    "id": "radial-distribution-function",
+    "label": "Radial distribution function",
+    "short": "How the density of neighbours changes with distance from an atom, relative to a uniform gas. Its peaks mark the coordination shells.",
+    "level": "intermediate",
+    "sources": [
+      "S-125"
+    ]
+  },
+  {
+    "id": "machine-learned-force-field",
+    "label": "Machine-learned force field",
+    "short": "A force field fitted to DFT energies, forces and stresses that predicts them for new structures far faster than DFT, within the range of structures it was trained on.",
+    "level": "intermediate",
+    "sources": [
+      "S-127"
+    ]
+  },
+  {
+    "id": "cohp",
+    "label": "COHP",
+    "short": "Crystal orbital Hamilton population: the density of states of an atom pair split into bonding and antibonding parts by weighting it with their Hamiltonian matrix element.",
+    "level": "pro",
+    "sources": [
+      "S-128"
+    ]
+  },
+  {
+    "id": "icohp",
+    "label": "ICOHP",
+    "short": "The COHP integrated up to the Fermi level. Its size is a relative measure of how strongly two atoms bond covalently.",
+    "level": "pro",
+    "sources": [
+      "S-128",
+      "S-129"
+    ]
+  },
+  {
+    "id": "charge-spilling",
+    "label": "Charge spilling",
+    "short": "The fraction of the electron density that a projection onto local orbitals fails to reproduce. LOBSTER prints it as a quality check of the projection.",
+    "level": "pro",
+    "sources": [
+      "S-129"
+    ]
+  },
+  {
+    "id": "quasiparticle",
+    "label": "Quasiparticle",
+    "short": "An added electron or hole together with the response of the electrons around it. Its energy is what photoemission and inverse photoemission measure.",
+    "level": "pro",
+    "sources": [
+      "S-130"
+    ]
+  },
+  {
+    "id": "gw-approximation",
+    "label": "GW approximation",
+    "short": "A many-body method that computes quasiparticle energies from the one-electron Green's function G and the screened Coulomb interaction W.",
+    "level": "pro",
+    "sources": [
+      "S-130",
+      "S-131"
+    ]
+  },
+  {
+    "id": "exciton",
+    "label": "Exciton",
+    "short": "A bound pair of an excited electron and the hole it left behind. Excitons pull optical absorption below the quasiparticle gap.",
+    "level": "intermediate",
+    "sources": [
+      "S-132"
+    ]
+  },
+  {
+    "id": "bethe-salpeter-equation",
+    "label": "Bethe-Salpeter equation",
+    "short": "An equation for electron-hole pairs built on quasiparticle energies, used to compute optical spectra that include excitons.",
+    "level": "pro",
+    "sources": [
+      "S-132"
+    ]
+  },
+  {
+    "id": "dmft",
+    "label": "DMFT",
+    "short": "Dynamical mean-field theory: treats strong local correlation by mapping each correlated site onto an impurity problem that is solved self-consistently.",
+    "level": "pro",
+    "sources": [
+      "S-132"
+    ]
+  },
+  {
+    "id": "wannier-function",
+    "label": "Wannier function",
+    "short": "A localized orbital made by Fourier transforming the Bloch states of a group of bands. There is one per band and lattice cell.",
+    "level": "pro",
+    "sources": [
+      "S-133"
+    ]
+  },
+  {
+    "id": "berry-phase",
+    "label": "Berry phase",
+    "short": "A geometric phase that Bloch states pick up around a closed loop in k-space. It gives the electric polarization and the topological invariants of the bands.",
+    "level": "pro",
+    "sources": [
+      "S-133"
+    ]
+  },
+  {
+    "id": "topological-invariant",
+    "label": "Topological invariant",
+    "short": "An integer, such as a Chern number or a Z2 index, that describes a set of bands as a whole and cannot change unless the gap closes.",
+    "level": "pro",
+    "sources": [
+      "S-133"
+    ]
+  },
+  {
+    "id": "charge-state",
+    "label": "Charge state",
+    "short": "The net charge q of a defect after it has given electrons to, or taken them from, the Fermi level.",
+    "level": "intermediate",
+    "sources": [
+      "S-067"
+    ]
+  },
+  {
+    "id": "charge-transition-level",
+    "label": "Charge transition level",
+    "short": "The Fermi level at which two charge states of a defect have the same formation energy.",
+    "level": "pro",
+    "sources": [
+      "S-115"
     ]
   }
 ]

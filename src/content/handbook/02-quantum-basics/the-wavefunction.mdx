@@ -1,5 +1,24 @@
 ---
 id: the-wavefunction
+stage:
+  scene: m02-helix
+  states:
+    - id: helix
+      section: why
+      params: { k: 2, width: 1.5 }
+      caption: 'psi drawn in 3D: along x, the real part sideways and the imaginary part up. The curve twists once per wavelength, and its distance from the axis is |psi|.'
+    - id: density
+      section: intuition
+      params: { k: 2, probe: 1 }
+      caption: 'The band on the floor is the probability density |psi|^2. The dashed probe reads it at one point; move the probe and watch the chance change.'
+    - id: reverse
+      section: math
+      params: { k: -2 }
+      caption: 'With k = -2 per A the twist runs the other way, yet the density band is the same: the phase of psi is not measurable on its own.'
+    - id: wide
+      section: what-changes
+      params: { k: 1, width: 3 }
+      caption: 'A wider packet spreads its probability over more space and lowers the peak, so the total stays at one: that is normalization.'
 title: The wavefunction and probability
 module: 2
 order: 2

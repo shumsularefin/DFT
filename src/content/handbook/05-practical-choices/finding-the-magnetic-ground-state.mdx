@@ -1,79 +1,154 @@
 ---
 id: finding-the-magnetic-ground-state
+stage:
+  scene: m05s-ground-state
+  states:
+    - id: g-lowest
+      section: why
+      params: { j1: -4, j2: 0 }
+      camera: front
+      caption: 'Four orderings on one 2 x 2 x 2 cell, each lifted by its energy per Mn. With antiferromagnetic J1 the G-type cell sits lowest; drag J1 above zero to send FM to the bottom.'
+    - id: a-lowest
+      section: intuition
+      params: { j1: 4, j2: -2 }
+      camera: front
+      caption: 'Ferromagnetic J1 with antiferromagnetic J2 puts A-type lowest. Small changes in J reorder the ladder, so every candidate has to be computed.'
+    - id: c-lowest
+      section: math
+      params: { j1: -4, j2: -2 }
+      caption: 'Each height is E0 plus c1 J1 plus c2 J2, with c counted from the parallel and antiparallel bonds of that ordering. Here C-type wins.'
+    - id: near-tie
+      section: mistakes
+      params: { j1: 2, j2: -0.5 }
+      camera: front
+      caption: 'FM and A-type are tied here. A gap below 1 meV per Mn is smaller than typical k-point or cell-shape errors, so this ranking cannot be trusted.'
 title: Finding the magnetic ground state
 module: 5
 order: 9
-summary: How to compare candidate magnetic orderings fairly in one common cell, normalize energies per magnetic ion, and avoid common pitfalls like moment collapse or DFT+U shifts.
+summary: How to compare candidate magnetic orderings fairly in one common cell, normalize energies per formula unit or magnetic ion, and avoid moment collapse, symmetry traps and DFT+U surprises.
 concepts: [magnetic-ground-state]
 requires: [magnetic-orderings]
-vaspTags: [ISPIN, MAGMOM, LDAU, LORBIT]
+vaspTags: [ISPIN, MAGMOM, LORBIT, LMAXMIX, NUPDOWN, LDAU, ISIF]
 sources: [S-014, S-042, S-059, S-060, S-065]
 noLab: true
 status: draft
-updated: 2026-11-24
+updated: 2026-11-27
 ---
 
 <Why>
 
-Magnetic energy differences between FM, A-, C- and G-type states are often only a few to a few tens of meV per magnetic ion <Cite id="S-060" />. That is smaller than the k-point sampling error between two differently shaped cells, and small enough that a collapsed moment or an inconsistent `ENCUT` can flip the ranking completely. A reliable ground-state search needs strict apples-to-apples comparisons.
+A spin-polarized calculation does not search for the magnetic ground state. It slides into the nearest stable solution to the starting `MAGMOM` and stops there <Cite id="S-042" />. If you seed a ferromagnet, you get the best ferromagnet; whether an antiferromagnet would be lower, the run never asks. You find the ground state only by computing every plausible ordering yourself and comparing their energies.
+
+That comparison is delicate. The energy differences between FM, A-, C- and G-type states are often only a few to a few tens of meV per magnetic ion <Cite id="S-060" />, and the handbook warns that differences below a few meV per formula unit are within DFT uncertainty and depend strongly on `U` <Cite id="S-042" />. That is comparable to the error from sampling two differently shaped cells with different k-meshes, so a careless comparison can rank the states by numerical noise.
 
 </Why>
 
 <Intuition>
 
-The standard recipe has four steps:
+Picture the energy as a landscape with several valleys, one for each magnetic arrangement. `MAGMOM` decides which valley the calculation starts in, and the SCF loop rolls downhill to the bottom of that valley. To know which valley is deepest, you start one run in each valley and compare the bottoms, measured with the same ruler.
 
-1. **Use one common supercell** that hosts every ordering you plan to compare, with the exact same atom order, `ENCUT`, functional, smearing and k-point mesh.
-2. **Run each ordering** from its own `MAGMOM` line (all other tags identical) with `LORBIT = 11`.
-3. **Verify that every run kept its intended pattern** by checking the final per-site moments in `OUTCAR`. If an AFM run collapsed to non-magnetic or flipped into FM, its energy does not represent the intended state.
-4. **Compare total energies per magnetic ion** (typically in meV per magnetic ion relative to FM or the lowest state).
+The author's recipe has five steps <Cite id="S-042" />:
+
+1. **Build one common supercell** that can hold every ordering you plan to compare. A layered A-type order needs the cell doubled along c; a checkerboard G-type order needs a $\sqrt2 \times \sqrt2$ or a $2 \times 2 \times 2$ cell. Use this same cell for FM and non-magnetic (NM) too, so k-point and basis errors cancel.
+2. **Write one `MAGMOM` per ordering**, with every other tag identical.
+3. **Relax each ordering** (`ISIF = 3`), because the magnetic order changes the volume.
+4. **Run a static SCF for each** and take the energy without entropy.
+5. **Check that each run kept its pattern**, then compare energies per formula unit. If an AFM start ended as FM, that ordering is unstable or the start was poor.
 
 <Scene id="afm-g" />
 
-Once you have verified energies for enough distinct orderings, you can also map them onto a Heisenberg spin model to extract nearest-neighbour exchange constants $J_1, J_2$ in the Analyse tab of the [Magnetic configuration tool](/tools/magnetic/) <Cite id="S-060" />.
+Two more ideas help.
+
+- **You only find what you test.** The lowest of your candidates is the ground state among those candidates. A spiral or a larger-period order that does not fit your cell cannot appear.
+- **Symmetry follows the moments.** VASP lowers the symmetry to match `MAGMOM` <Cite id="S-065" />. A start that does not break the symmetry the way the ordering needs (for example two sites that should be opposite but carry the same starting value) cannot reach that ordering.
+
+Once you have verified energies for enough orderings, you can map them onto a Heisenberg model to extract exchange constants, for example in the Analyse tab of the [Magnetic configuration tool](/tools/magnetic/) <Cite id="S-060" />.
 
 </Intuition>
 
 <TheMath>
 
-For a cell containing $N_{\text{mag}}$ magnetic ions, the energy difference relative to the ferromagnetic state is:
+The number to compare is the energy difference between an ordering and the ferromagnet, divided by the number of magnetic ions (or formula units) in the cell, so that cells of different size give comparable numbers <Cite id="S-042" />.
+
+<Level min="intermediate">
+
+For a cell with $N_{\text{mag}}$ magnetic ions,
 
 $$\Delta E_{\text{mag}} = \frac{E_{\text{ordering}} - E_{\text{FM}}}{N_{\text{mag}}}$$
 
-When fitting a classical Heisenberg Hamiltonian, the energy of each configuration is linear in the exchange constants $J_n$:
+A positive value means FM is lower than that ordering; a negative value means the ordering is lower than FM <Cite id="S-042" />.
 
-$$E_{\text{config}} = E_0 + \sum_n c_n(\text{config})\,J_n$$
+To extract exchange constants, write a Heisenberg model and count bonds. In the convention
 
-where $c_n$ is determined by the parallel and antiparallel neighbour counts in shell $n$ <Cite id="S-060" />. Because different papers use different sign conventions, pair-counting factors (once vs twice) and spin normalization (unit vectors vs $|S|$), always write out the exact Hamiltonian convention alongside every reported $J_n$.
+$$E = E_0 - \sum_{\langle ij \rangle} J_{ij}\, \mathbf S_i \cdot \mathbf S_j$$
+
+with each pair counted once, a positive $J$ favours parallel spins <Cite id="S-059" />. Each configuration gives one linear equation, $E_{\text{config}} = E_0 + \sum_n c_n(\text{config})\,J_n$, where $c_n$ comes from the parallel and antiparallel bond counts in shell $n$; three or more configurations fix $E_0$, $J_1$ and $J_2$ <Cite id="S-060" /> <Cite id="S-042" />.
+
+A worked case, derived here in this convention: magnetic ions on a simple cubic sublattice with nearest neighbours only. Each ion has 6 neighbours, so there are 3 bonds per ion. In FM all bonds are parallel, so $E_{\text{FM}} = E_0 - 3JS^2$ per ion; in G-type all are antiparallel, so $E_{\text{G}} = E_0 + 3JS^2$. Then $E_{\text{G}} - E_{\text{FM}} = 6JS^2$ per ion, and $J = \Delta E / (6S^2)$. Counting each pair twice, or using unit spins, changes this by a factor of 2 or $S^2$, which is why every reported $J$ needs its Hamiltonian.
+
+</Level>
+
+<Level min="pro">
+
+The handbook gives a mean-field estimate of the ordering temperature, $k_B T_C \approx \tfrac{2}{3}\,\Delta E$ per magnetic atom, and warns that it overestimates; Monte Carlo on the fitted $J$ is more reliable <Cite id="S-042" />. Different mean-field derivations give different prefactors, so treat it as an order of magnitude.
+
+</Level>
 
 </TheMath>
 
 <InVasp>
 
-```incar
-ISPIN = 2
-MAGMOM = 2*4.0 2*-4.0 16*0.0
-LORBIT = 11
-LMAXMIX = 4
-```
+For a supercell with 4 transition-metal ions followed by 8 oxygens, the handbook writes the candidates as <Cite id="S-042" />:
 
-- Keep `ENCUT`, `KPOINTS`, `ISMEAR`, `SIGMA`, `PREC`, `LASPH` and `LDAU*` identical across every ordering in the comparison <Cite id="S-042" />.
-- Set `LMAXMIX = 4` for 3d transition metals (and `6` for f-electrons) so charge-density mixing handles localized orbitals properly <Cite id="S-042" />.
-- Remember that `DFT+U` (`LDAUU`) often changes both the magnitude of the moments and the preferred magnetic ordering; report the $U_{\text{eff}}$ used <Cite id="S-014" />.
-- Do not mix relaxed cells from one ordering with unrelaxed cells from another unless you are deliberately comparing fully relaxed energies at matched convergence <Cite id="S-065" />.
+- NM: `ISPIN = 1`
+- FM: `MAGMOM = 4*4.0 8*0.0`
+- AFM-1 (layered): `MAGMOM = 4.0 4.0 -4.0 -4.0 8*0.0`
+- AFM-2 (checkerboard): `MAGMOM = 4.0 -4.0 -4.0 4.0 8*0.0`
+
+Which pattern is "layered" depends on where the four ions sit in your cell, so draw it before you trust the label. One relaxation for the checkerboard ordering:
+
+<VaspFile
+  name="INCAR"
+  code={`ENCUT   = 520
+ISPIN   = 2
+MAGMOM  = 4.0 -4.0 -4.0 4.0 8*0.0
+LORBIT  = 11
+LMAXMIX = 4
+LASPH   = .TRUE.
+ISMEAR  = 0
+SIGMA   = 0.05
+EDIFF   = 1E-6
+NELM    = 120
+IBRION  = 2
+ISIF    = 3
+NSW     = 100
+EDIFFG  = -0.01`}
+  annotations={{
+    3: 'one value per atom in POSCAR order: 4 metal ions, then 8 oxygens',
+    4: 'site moments in OUTCAR, to check the pattern afterwards',
+    5: '4 for d elements, 6 for f',
+    12: 'relax the cell too: the volume depends on the ordering',
+  }}
+/>
+
+- Keep `ENCUT`, `KPOINTS`, `ISMEAR`, `SIGMA`, `PREC`, `LASPH` and every `LDAU` tag identical across all orderings <Cite id="S-042" />.
+- Start the moments above the expected value, 3 to 5 for 3d ions <Cite id="S-042" />; the MAGMOM page suggests about 1.2 to 1.5 times the experimental moment <Cite id="S-065" />.
+- Hard cases: `AMIX_MAG = 0.4`, `BMIX_MAG = 0.0001`, `ALGO = All`. To force a spin state for comparison, set `NUPDOWN` to the moment you want, then remove it for the final ground state <Cite id="S-042" />.
+- With DFT+U, different starts can converge to different energies (metastable states). Try several starts and keep the lowest; ramping `U` from 0 in steps, reading the `WAVECAR`, also helps <Cite id="S-042" /> <Cite id="S-014" />.
 
 </InVasp>
 
 <WhatChanges>
 
-| Pitfall                      | Symptom in output                        | Fix                                                                          |
-| ---------------------------- | ---------------------------------------- | ---------------------------------------------------------------------------- |
-| Different cells per ordering | Spurious meV shifts from k-mesh mismatch | Run all orderings in one `commonSupercell`                                   |
-| Moment collapse              | `OUTCAR` site moments near $0\,\mu_B$    | Increase initial `MAGMOM` (e.g. 4 to 5 $\mu_B$) or check `LDAU`              |
-| Symmetry trap                | SCF stays in a higher-symmetry state     | Check that `MAGMOM` actually breaks symmetry; verify final signs             |
-| Changing $U_{\text{eff}}$    | Ordering preference flips (e.g. FM to G) | Test sensitivity to $U_{\text{eff}}$ and cite the choice <Cite id="S-014" /> |
+| Pitfall or change            | Symptom in output                             | Fix                                                                   |
+| ---------------------------- | --------------------------------------------- | --------------------------------------------------------------------- |
+| Different cells per ordering | Spurious meV shifts from k-mesh mismatch      | Run all orderings, FM and NM included, in one supercell               |
+| Moment collapse              | `OUTCAR` site moments near 0                  | Start higher (3 to 5 for 3d ions); compare with the NM energy         |
+| Symmetry trap                | SCF stays in a higher-symmetry state          | Check that `MAGMOM` breaks the symmetry the ordering needs            |
+| Raising $U_{\text{eff}}$     | Moments grow; the preferred ordering can flip | Scan `U` and report how the ranking depends on it <Cite id="S-014" /> |
+| Fixed-cell comparison        | Energies of unrelaxed orderings               | Relax each ordering, then compare static energies                     |
 
-Why compare in one cell: cancels k-point and basis-set differences down to the sub-meV level. What happens if you skip it: numerical noise can masquerade as a magnetic phase transition.
+Why compare in one cell: k-point and basis errors cancel. What happens if you skip it: numerical noise can look like a magnetic phase transition.
 
 </WhatChanges>
 
@@ -81,24 +156,45 @@ Why compare in one cell: cancels k-point and basis-set differences down to the s
 
 <Callout variant="mistake" title="Ranking energies without checking final site moments">
 
-A calculation seeded as G-type AFM can converge to FM or non-magnetic. Always inspect the `magnetization (x)` table in `OUTCAR` before accepting an energy into the ranking.
+Cause: a run seeded as G-type can converge to FM or to non-magnetic, and its energy then belongs to another state. Fix: read the last `magnetization (x)` table in `OUTCAR` before an energy enters the ranking.
+
+</Callout>
+
+<Callout variant="mistake" title="Comparing orderings in different cells">
+
+Cause: FM in the primitive cell, AFM in a supercell, each with its own k-mesh. The sampling error can rival the magnetic energy. Fix: one supercell for every candidate, with the matching k-mesh <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Testing one AFM order and declaring it the ground state">
+
+Cause: FM and a single AFM run. The lower of two is not the ground state of the material, only of the pair. Fix: test every ordering the cell allows (FM, NM and the AFM types), and say which ones you tested.
+
+</Callout>
+
+<Callout variant="mistake" title="Trusting one DFT+U start">
+
+Cause: with `U` the SCF can settle in a metastable state with the wrong orbital occupation. Fix: several starts per ordering, keep the lowest, and report the `U` and how the ranking changes with it <Cite id="S-042" />.
 
 </Callout>
 
 <Callout variant="mistake" title="Reporting a Heisenberg J without its Hamiltonian">
 
-Two papers on the same crystal can report $J$ values that differ in sign and by a factor of 2 or $S^2$. Always state the Hamiltonian form explicitly.
+Cause: sign, pair counting and spin normalization differ between papers, so the same crystal can carry $J$ values that differ in sign and by a factor of 2 or $S^2$. Fix: write the Hamiltonian next to every $J$ <Cite id="S-059" />.
 
 </Callout>
 
 </Mistakes>
 
-<Check ids={['q-mag-11', 'q-mag-12', 'q-mag-13']} />
+<Check ids={['q-mag-11', 'q-mag-12', 'q-mag-13', 'q-mag-24', 'q-mgs-1']} />
 
 <GoDeeper>
 
-- Xiang, Lee, Koo, Gong and Whangbo, Magnetic properties and energy-mapping analysis <Cite id="S-060" />.
-- Dudarev et al., Electron-energy-loss spectra and the structural stability of nickel oxide (DFT+U) <Cite id="S-014" />.
+- Xiang, Kan, Wei, Whangbo and Gong on predicting spin order from first principles, the energy-mapping method <Cite id="S-060" />.
+- Blundell, Magnetism in Condensed Matter, for Heisenberg conventions <Cite id="S-059" />.
+- Dudarev and co-workers on DFT+U <Cite id="S-014" />.
+- The Workflow Handbook section on magnetic properties and the ground-state search <Cite id="S-042" />.
+- VASP wiki pages MAGMOM, ISPIN and NUPDOWN (by page name) <Cite id="S-065" />.
 - Analyse tab of the [Magnetic configuration tool](/tools/magnetic/).
 
 </GoDeeper>

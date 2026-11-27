@@ -1,5 +1,28 @@
 ---
 id: spin-and-the-pauli-principle
+stage:
+  scene: m02-pauli
+  states:
+    - id: fill
+      section: why
+      params: { electrons: 2 }
+      caption: 'Two electrons in the lowest level: one up (solid head), one down (open head). Step the electron count up and watch the levels fill two at a time.'
+    - id: shells
+      section: intuition
+      params: { electrons: 7 }
+      caption: 'Seven electrons fill three levels and start a fourth. Toggle the exclusion principle off and they all fall into the lowest level.'
+    - id: antisymmetric
+      section: math
+      params: { electrons: 2, kind: antisymmetric, pair: 1-2 }
+      caption: 'The surface is psi(x1, x2) for two electrons of the same spin in levels 1 and 2. It is zero along the dashed diagonal, so they are never at the same place.'
+    - id: swap
+      section: what-changes
+      params: { pair: 1-2, swap: true }
+      caption: 'Swap the two electrons and every height of the antisymmetric surface changes sign. Switch to bosons and the swap changes nothing.'
+    - id: forbidden
+      section: mistakes
+      params: { pair: 1-1 }
+      caption: 'Both electrons in level 1 with the same spin: the antisymmetric wavefunction is zero everywhere, so the state does not exist. That is the Pauli principle.'
 title: Spin and the Pauli principle
 module: 2
 order: 5

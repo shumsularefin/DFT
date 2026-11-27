@@ -7,10 +7,15 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- The 3D handbook (M16): every topic has a live 3D stage beside the text that turns freely (no pole lock), follows the reading position and has VESTA-style views, orthographic, layers and parameters; eleven new topics; module 9 deepened, module 10 as a results-free method walkthrough, module 11 guided builds (D-106 to D-111, D-120).
+- One VESTA-style look for every 3D view: the Studio viewer's lights, finish, element colours, two-tone bonds and a lettered axes marker (D-122).
 - Tests for the Material Builder: crystal templates, molecule export, and an end-to-end keyboard and axe spec at 360 px (M15.3).
 
 ### Fixed
 
+- Guided path and topic stages: changing an option (n = 1 to 3, the orbital, the number of periodic copies, any stage parameter) keeps the 3D view framed on the new picture, so Reset view is no longer needed; the Try this box no longer spills out of its card (D-124).
+- Guided path pictures explain themselves: the self-consistency loop is shown step by step until the density settles, the density map, cutoff sphere and bands beside the DOS are new pictures, each station says how to read its picture, and a new station and handbook subsection compare real space with reciprocal space (D-124).
+- Guided path: scene stations open a free 3D view by themselves (drag to turn, scroll to zoom, right-drag to move, with keyboard equivalents), atoms in 3D views are lit instead of black, and the flat fallback turns under a drag (D-107).
 - Deploy runs only after CI succeeds on main (D-089).
 - Crystal and molecule builder, and the Input Builder Task step, no longer overflow the page at 360 px wide.
 - Tolerance-factor element buttons now start their accessible name with the visible symbol (axe `label-content-name-mismatch`).

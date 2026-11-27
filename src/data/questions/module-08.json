@@ -185,6 +185,57 @@
     }
   },
   {
+    "id": "q-cv-5",
+    "concepts": [
+      "convergence-testing"
+    ],
+    "type": "single",
+    "prompt": "How do you check that the vacuum in a slab calculation is thick enough?",
+    "options": [
+      {
+        "text": "Keep the slab fixed and repeat the run with more vacuum until the quantity you report (surface energy, work function) changes by less than your tolerance",
+        "correct": true,
+        "why": "Too little vacuum lets the slab feel its periodic image across the gap. Adding vacuum at fixed slab thickness isolates that one effect, the same one-change-at-a-time rule as for ENCUT and k-points."
+      },
+      {
+        "text": "Raise ENCUT until the energy stops changing",
+        "correct": false,
+        "why": "ENCUT converges the basis, not the separation between periodic images. A slab with too little vacuum stays wrong at any cutoff."
+      },
+      {
+        "text": "Add more k-points along the direction normal to the slab",
+        "correct": false,
+        "why": "Tempting, but with a thick vacuum the cell is long in that direction and one k-point along it is the usual choice; more points there do not separate the images."
+      }
+    ],
+    "hints": [
+      "What does the vacuum separate the slab from?",
+      "Change one thing at a time and watch the quantity you report."
+    ],
+    "difficulty": 0.5,
+    "level": "intermediate",
+    "sources": [
+      "S-042",
+      "S-064"
+    ],
+    "visual": {
+      "plot": "conv-series",
+      "params": {
+        "diff": [
+          30,
+          8,
+          2,
+          0.5,
+          0.1
+        ],
+        "threshold": 1,
+        "xlabel": "vacuum thickness (rising)"
+      },
+      "caption": "The shape of a convergence test: the change in the result between neighbouring settings falls below the threshold. Illustrative numbers, not a computed series.",
+      "alt": "Change between neighbouring vacuum settings on a logarithmic axis, falling below a horizontal threshold line as the vacuum grows."
+    }
+  },
+  {
     "id": "q-ec-1",
     "concepts": [
       "cutoff-convergence"
@@ -585,7 +636,7 @@
       "params": {
         "Z": 2,
         "alpha": 0.1,
-        "tol": 1e-08,
+        "tol": 1e-8,
         "show": 40
       },
       "caption": "The toy loop with a smaller mixing fraction.",
@@ -994,8 +1045,8 @@
           10,
           0.1,
           0.001,
-          1e-05,
-          1e-07
+          0.00001,
+          1e-7
         ],
         "ediff": 0.0001
       },

@@ -1,5 +1,24 @@
 ---
 id: particles-and-waves
+stage:
+  scene: m02-packet
+  states:
+    - id: packet
+      section: why
+      params: { energy: 10, width: 1.5, time: 0 }
+      caption: 'An electron as a wave packet: the surface is |psi|^2 over position (across) and time (back). Press play and the packet moves and spreads.'
+    - id: duality
+      section: intuition
+      params: { energy: 10, time: 0.5 }
+      caption: 'The ball rides at the centre of the wave at the group velocity, about 19 A per fs at 10 eV. The thin ripples of the real part have the de Broglie wavelength.'
+    - id: fast
+      section: math
+      params: { energy: 40, time: 0.3 }
+      caption: 'At 40 eV the wavelength drops to about 1.9 A and the packet runs twice as fast, as lambda = h/p and E = hbar^2 k^2 / 2m say.'
+    - id: narrow
+      section: what-changes
+      params: { energy: 10, width: 0.6, time: 0.6 }
+      caption: 'A narrower start spreads much faster: squeezing the wave in space widens its spread of momenta. Try widths from 0.5 to 3 A.'
 title: Particles and waves
 module: 2
 order: 1

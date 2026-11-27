@@ -1033,5 +1033,130 @@
     ],
     "level": "intermediate",
     "status": "published"
+  },
+  {
+    "id": "formation-energy-hull",
+    "label": "Formation energy and the convex hull",
+    "module": 12,
+    "summary": "Formation energies per atom from consistent references and corrections, the convex hull, and the energy above it as a stability measure.",
+    "prerequisites": [
+      "dft-energies-forces"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "transition-states",
+    "label": "Transition states and NEB",
+    "module": 12,
+    "summary": "Minimum energy paths, saddle points and barriers from the nudged elastic band method, checked by a frequency calculation.",
+    "prerequisites": [
+      "relaxation-analysis",
+      "phonons"
+    ],
+    "level": "pro",
+    "status": "published"
+  },
+  {
+    "id": "molecular-dynamics",
+    "label": "Molecular dynamics and MLFF",
+    "module": 12,
+    "summary": "Ab initio MD with thermostats and ensembles, diffusion from the mean squared displacement, and on-the-fly machine-learned force fields.",
+    "prerequisites": [
+      "relaxation-analysis"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "bonding-analysis",
+    "label": "Bonding analysis with COHP",
+    "module": 9,
+    "summary": "Projected crystal orbital Hamilton populations from LOBSTER: bonding and antibonding states, ICOHP and the charge spilling.",
+    "prerequisites": [
+      "dos-analysis"
+    ],
+    "level": "pro",
+    "status": "published"
+  },
+  {
+    "id": "beyond-dft-methods",
+    "label": "Methods beyond DFT",
+    "module": 5,
+    "summary": "When semilocal DFT is not enough: Hartree-Fock, hybrids, GW, BSE, DMFT and RPA, what each fixes and what it costs.",
+    "prerequisites": [
+      "hybrid-functionals"
+    ],
+    "level": "pro",
+    "status": "published"
+  },
+  {
+    "id": "wannier-functions",
+    "label": "Wannier functions",
+    "module": 9,
+    "summary": "Localized orbitals from Bloch states, maximal localization and disentanglement, Wannier90 with VASP, and Berry phase ideas.",
+    "prerequisites": [
+      "band-structure-analysis"
+    ],
+    "level": "pro",
+    "status": "published"
+  },
+  {
+    "id": "crystal-symmetry",
+    "label": "Crystal structure and symmetry",
+    "module": 5,
+    "summary": "Lattices, cells, space groups and Wyckoff positions, and how symmetry reduces the k-points VASP computes.",
+    "prerequisites": [
+      "materials-from-atoms"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "geometry-relaxation",
+    "label": "Geometry relaxation",
+    "module": 5,
+    "summary": "Moving the atoms and the cell down the energy surface until forces and stress are small.",
+    "prerequisites": [
+      "scf-loop"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "parallel-performance",
+    "label": "Performance and parallelisation",
+    "module": 7,
+    "summary": "What a plane-wave run spends its time and memory on, and how KPAR, NCORE and LREAL change it.",
+    "prerequisites": [
+      "job-scripts",
+      "k-points"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "surface-slabs",
+    "label": "Surfaces and slabs",
+    "module": 12,
+    "summary": "Slab models of surfaces, their convergence, the dipole correction, surface energies and work functions.",
+    "prerequisites": [
+      "geometry-relaxation",
+      "k-points"
+    ],
+    "level": "intermediate",
+    "status": "published"
+  },
+  {
+    "id": "point-defects",
+    "label": "Point and charged defects",
+    "module": 12,
+    "summary": "Defect supercells, formation energies with chemical potentials and Fermi level, corrections and transition levels.",
+    "prerequisites": [
+      "geometry-relaxation",
+      "fermi-level"
+    ],
+    "level": "pro",
+    "status": "published"
   }
 ]

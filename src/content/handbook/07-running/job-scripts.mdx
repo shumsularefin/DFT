@@ -1,5 +1,28 @@
 ---
 id: job-scripts
+stage:
+  scene: m07-parallel
+  states:
+    - id: one-group
+      section: why
+      params: { nodes: 2, tpn: '16', kpar: 1, ncore: 1, nkpts: 10 }
+      caption: 'The 32 cores of a two-node job with KPAR = 1 and NCORE = 1: one k-point group, every rank on its own band. Raise KPAR to split the cores into groups.'
+    - id: split
+      section: math
+      params: { nodes: 2, tpn: '16', kpar: 4, ncore: 4, nkpts: 10 }
+      caption: 'The example of the math section: KPAR = 4 gives four colours of 8 ranks, NCORE = 4 the dark bars, two band groups per colour. The k-points stack above their group in rounds.'
+    - id: big-job
+      section: in-vasp
+      params: { nodes: 4, tpn: '32', kpar: 8, ncore: 8, nkpts: 24 }
+      caption: 'A larger job: 128 ranks, KPAR = 8 and NCORE = 8. Every core belongs to a full group, and 24 k-points fill three rounds with none idle.'
+    - id: idle
+      section: what-changes
+      params: { nodes: 2, tpn: '16', kpar: 4, ncore: 4, nkpts: 13 }
+      caption: '13 k-points over 4 groups need four rounds, and three groups sit idle in the last one. Try a k-point count that KPAR divides.'
+    - id: bad-kpar
+      section: mistakes
+      params: { nodes: 2, tpn: '16', kpar: 3, ncore: 4 }
+      caption: 'KPAR = 3 does not divide 32 ranks: the groups would differ in size and VASP stops. Choose KPAR from the divisors of the core count.'
 title: Job scripts and parallel settings
 module: 7
 order: 2
@@ -10,7 +33,7 @@ vaspTags: [NCORE, KPAR]
 sources: [S-019, S-041, S-042]
 noLab: true
 status: draft
-updated: 2026-11-19
+updated: 2026-11-27
 ---
 
 <Why>
@@ -63,6 +86,8 @@ Submit with `sbatch job.sh` or `qsub job.sh`. Use `vasp_std` for general runs, `
 </Intuition>
 
 <TheMath>
+
+A parallel run splits one calculation into pieces that run at the same time on different cores. The pieces have to divide evenly: the number of cores you request must be a whole multiple of `KPAR`, because each k-point group gets the same number of cores <Cite id="S-041" />.
 
 <Level min="intermediate">
 

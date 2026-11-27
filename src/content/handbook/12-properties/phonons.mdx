@@ -1,5 +1,31 @@
 ---
 id: phonons
+stage:
+  scene: m12-phonon-chain
+  states:
+    - id: chain
+      section: why
+      params: { branch: acoustic, q: 0.3, ratio: 2 }
+      camera: iso
+      caption: 'Two kinds of ball joined by springs, vibrating in an acoustic wave. Press play to watch neighbors move together; behind the chain the blue and orange surfaces are the two branches of frequency over q and the mass ratio.'
+    - id: optical
+      section: intuition
+      params: { branch: optical, q: 0, ratio: 2 }
+      caption: 'At q = 0 the optical mode moves the two kinds of atom against each other while the center of mass stays put. Play it, then switch to the acoustic branch, which at q = 0 is a rigid shift with zero frequency.'
+    - id: gap
+      section: math
+      params: { branch: acoustic, q: 1, ratio: 3 }
+      camera: front
+      caption: 'Seen from the front the surfaces read as the dispersion along q. At the zone boundary only the heavy atoms move in the acoustic mode; raise the mass ratio and watch the gap between the branches open.'
+    - id: transverse
+      section: in-vasp
+      params: { branch: acoustic, q: 0.5, ratio: 1.5, polarization: transverse }
+      caption: 'Displacements across the chain give a transverse branch; a 3D crystal has two of them for each longitudinal one. phonopy finds every branch from the forces in displaced supercells.'
+    - id: equal-masses
+      section: what-changes
+      params: { branch: optical, q: 1, ratio: 1 }
+      camera: front
+      caption: 'With equal masses the gap closes and the two branches meet at the zone boundary: the chain is then a simple chain with half the cell, folded back.'
 title: Phonons and vibrational properties
 module: 12
 order: 3

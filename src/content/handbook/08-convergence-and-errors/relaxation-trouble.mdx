@@ -1,5 +1,28 @@
 ---
 id: relaxation-trouble
+stage:
+  scene: m08-relaxation-landscape
+  states:
+    - id: zigzag
+      section: why
+      params: { landscape: valley, method: sd, potim: 0.15, noise: 0, step: 12 }
+      caption: 'A relaxation as a ball on an energy landscape. With a fixed step of 0.15 the ball zig-zags across the narrow valley while it creeps along the floor. Press play or step through the ionic steps.'
+    - id: overshoot
+      section: intuition
+      params: { landscape: valley, method: sd, potim: 0.18, noise: 0, step: 8 }
+      caption: 'Raise the step to 0.18: each step now overshoots the steep walls by more than it corrects, and the ball is thrown out of the valley. This is the overshoot that a smaller POTIM fixes.'
+    - id: line-search
+      section: math
+      params: { landscape: valley, method: cg, potim: 0.15, noise: 0, step: 2 }
+      caption: 'Conjugate gradient (IBRION = 2) searches along a line for its lowest point (grey trial points), then turns to a new direction. On this valley it reaches the minimum in two steps.'
+    - id: noisy-forces
+      section: in-vasp
+      params: { landscape: valley, method: cg, potim: 0.15, noise: 0.2, step: 30 }
+      caption: 'Add force noise, as from a loosely converged density: the ball reaches the floor but wanders there, and the force never drops below 0.01 eV/Å. A tighter EDIFF gives cleaner forces.'
+    - id: saddle
+      section: what-changes
+      params: { landscape: double-well, method: cg, potim: 0.15, noise: 0, rattle: false, step: 20 }
+      caption: 'A start on the mirror line between two wells: the force across it is exactly zero, so the relaxation ends on the saddle and looks converged. Turn on Rattle the start and the ball rolls into a well.'
 title: When a relaxation misbehaves
 module: 8
 order: 5
@@ -26,6 +49,8 @@ A relaxation is a ball rolling into a valley. Three things go wrong. The ball ca
 </Intuition>
 
 <TheMath>
+
+A relaxation moves the atoms downhill on the energy surface, one step at a time, and stops when the forces on them are small enough. Each method differs only in how it chooses the next step <Cite id="S-019" />.
 
 <Level min="intermediate">
 
@@ -126,7 +151,7 @@ The first round measures the volume at one basis set. Rerun from `CONTCAR` until
 
 <GoDeeper>
 
-- The relaxation topic in module 5 and the output-reading topic in module 7 <Cite id="S-042" />.
+- The [geometry relaxation topic](/handbook/05-practical-choices/relaxation/) in module 5 and the output-reading topic in module 7 <Cite id="S-042" />.
 - The Field Handbook ionic relaxation entries <Cite id="S-041" />.
 - VASP wiki pages IBRION, POTIM, EDIFFG and ISIF <Cite id="S-019" />.
 

@@ -1,6 +1,9 @@
-// Guided path (M12.4): one station at a time. A station is one picture (a scene preset or a plot), three short sentences,
-// one thing to try and a link to the full topic. One Scene island is reused for every scene station, so at most one WebGL
-// canvas exists on the page (D-058), and it exists only after the reader presses "View in 3D".
+// Guided path (M12.4): one station at a time. A station is one picture (a scene preset, a live scene of the 3D engine or a
+// plot), three short sentences, one thing to try and a link to the full topic. One Scene island is reused for every scene
+// station and one StageView for every stage station (M16.4), both on the shared engine, so at most one WebGL canvas exists
+// on the page (D-058). Scene and stage stations open the free 3D view by themselves (D-107); plot stations load no
+// three.js. A stage station may keep its old plot as a small panel beside the 3D view. If the reader goes back to the
+// flat view, later stations stay flat until they press "View in 3D" again.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { markComplete, markVisited } from '../../stores/progress';
 import { resolveStation, topicHref, type Station } from '../../lib/learn/stations';
@@ -8,6 +11,7 @@ import type { SceneSpec } from '../../lib/scene/spec';
 import Badge from '../ui/Badge';
 import Slider from '../ui/Slider';
 import Scene from '../scene/Scene';
+import StageView from './StageView';
 import './learn.css';
 
 interface Props {
@@ -30,16 +34,23 @@ const fromHash = (stations: Station[]): number => {
 
 export default function GuidedPath({ stations, scenes }: Props) {
   const [index, setIndex] = useState(0);
+  // false until the station in the address is known: the server render (and the first client render) is always station
+  // 1, and a 3D station must not start the engine for a station the reader did not open (no three.js on plot stations)
+  const [ready, setReady] = useState(false);
   const [tries, setTries] = useState<Record<string, number>>({});
   const [svg, setSvg] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
-  const [want3D, setWant3D] = useState(false);
+  // undefined: the reader has not chosen yet, so scene stations open 3D by themselves
+  const [want3D, setWant3D] = useState<boolean | undefined>(undefined);
   const heading = useRef<HTMLHeadingElement>(null);
   const moved = useRef(false);
   const st = stations[index]!;
   const last = index === stations.length - 1;
 
-  useEffect(() => setIndex(fromHash(stations)), [stations]);
+  useEffect(() => {
+    setIndex(fromHash(stations));
+    setReady(true);
+  }, [stations]);
 
   const shown = useMemo(() => resolveStation(st, tries[st.id]), [st, tries]);
 
@@ -54,14 +65,15 @@ export default function GuidedPath({ stations, scenes }: Props) {
     if (moved.current) heading.current?.focus();
   }, [st.id, last]);
 
-  // the plot renderer is a separate chunk, fetched once after the page is open
+  // the plot renderer is a separate chunk, fetched once after the page is open (a plot station, or a stage station's panel)
+  const plot = shown.kind === 'plot' ? shown : shown.kind === 'stage' ? shown.panel : undefined;
   useEffect(() => {
-    if (shown.kind !== 'plot') return;
+    if (!plot) return;
     let dead = false;
     setFailed(false);
     import('../../lib/visual/plots')
       .then(({ renderPlot }) => {
-        if (!dead) setSvg(renderPlot(shown.plot, shown.params, st.alt).svg);
+        if (!dead) setSvg(renderPlot(plot.plot, plot.params, st.alt).svg);
       })
       .catch(() => !dead && setFailed(true));
     return () => {
@@ -143,8 +155,44 @@ export default function GuidedPath({ stations, scenes }: Props) {
 
       <div className="lp-body">
         <div className="lp-visual" data-testid="lp-visual" data-kind={shown.kind}>
-          {scene ? (
-            <Scene key="lp-scene" spec={scene} initialLive={want3D} onLiveChange={setWant3D} />
+          {!ready && shown.kind !== 'plot' ? (
+            <p className="lp-wait" role="status">
+              Drawing the picture...
+            </p>
+          ) : scene ? (
+            <Scene
+              key="lp-scene"
+              spec={scene}
+              initialLive={want3D === true}
+              auto3D={want3D === undefined}
+              onLiveChange={setWant3D}
+            />
+          ) : shown.kind === 'stage' ? (
+            <>
+              <StageView
+                key="lp-stage"
+                scene={shown.scene}
+                params={shown.params}
+                camera={shown.camera}
+                badge={st.badge}
+                alt={st.alt}
+                resetKey={st.id}
+                initialLive={want3D === true}
+                auto3D={want3D === undefined}
+                onLiveChange={setWant3D}
+              />
+              {shown.panel && (
+                <figure className="lp-panel">
+                  <figcaption className="lp-panel-cap">The same idea as a flat plot</figcaption>
+                  {svg ? (
+                    // markup produced by plots.ts from numbers and escaped labels
+                    <div className="lp-panel-svg" dangerouslySetInnerHTML={{ __html: svg }} />
+                  ) : (
+                    <p className="lp-wait">{failed ? 'The plot could not load.' : 'Drawing the plot...'}</p>
+                  )}
+                </figure>
+              )}
+            </>
           ) : (
             <figure className="lp-plot">
               <div className="lp-plot-head">
@@ -172,6 +220,17 @@ export default function GuidedPath({ stations, scenes }: Props) {
           {st.sentences.map((x, i) => (
             <p key={i}>{x}</p>
           ))}
+
+          {st.read && (
+            <div className="lp-read">
+              <p className="lp-read-head">How to read the picture</p>
+              <ul>
+                {st.read.map((x, i) => (
+                  <li key={i}>{x}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {tr.kind === 'slider' ? (
             <div className="lp-try">
