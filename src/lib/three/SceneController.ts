@@ -283,6 +283,18 @@ export class SceneController {
     this.scene.add(ambient, sun);
   }
 
+  /**
+   * Soft ambient light plus a light that rides on the camera, so the side of an atom facing the reader is always lit however
+   * the view is turned. Lit materials (MeshStandardMaterial) are black without a light.
+   */
+  addHeadlight(): void {
+    const ambient = new AmbientLight(0xffffff, 1.1);
+    const head = new DirectionalLight(0xffffff, 1.9);
+    head.position.set(1, 1.5, 2);
+    this.camera.add(head);
+    this.scene.add(ambient, this.camera);
+  }
+
   /** One draw call for many spheres. */
   addInstancedSpheres(
     positions: readonly [number, number, number][],

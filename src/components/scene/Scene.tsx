@@ -1,5 +1,8 @@
 // Scene island (M12.2): the flat SVG projection first (no three.js on load), a "View in 3D" button that loads the renderer
 // on demand, camera presets, keyboard rotation, reset view and step controls. D-058: only one live canvas per page.
+// With `auto3D` (the guided path, D-106) the island opens the free 3D view by itself once it is on the page, when the browser
+// can draw WebGL and the reader has not asked for reduced motion; otherwise the flat view stays and can be turned by dragging
+// or with the arrow keys.
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import Badge from '../ui/Badge';
 import { claimCanvas } from '../../lib/scene/canvasSlot';
@@ -7,7 +10,7 @@ import { projectScene, rotateCamera } from '../../lib/scene/project';
 import { resolveScene } from '../../lib/scene/resolve';
 import type { Camera, SceneSpec } from '../../lib/scene/spec';
 import { projectionToSvg } from '../../lib/scene/svg';
-import { hasWebGL } from '../../lib/three/capabilities';
+import { hasWebGL, prefersReducedMotion, shouldStart3D } from '../../lib/three/capabilities';
 import type { SpecScene } from '../../lib/three/SpecScene';
 import './scene.css';
 
@@ -16,6 +19,8 @@ interface Props {
   spec: SceneSpec;
   /** Start with the 3D view open (the guided path keeps one canvas across its scene stations). */
   initialLive?: boolean;
+  /** Open the 3D view by itself after mounting when WebGL exists and reduced motion is off (shouldStart3D). */
+  auto3D?: boolean;
   /** Called when the reader opens or closes the 3D view. */
   onLiveChange?: (live: boolean) => void;
 }
@@ -28,13 +33,18 @@ const css = (name: string, fallback: string): string => {
   }
 };
 const never = (): undefined => undefined;
+const NO_WEBGL =
+  'This browser cannot draw 3D, so the flat view stays. You can still turn it by dragging or with the arrow keys.';
+/** Degrees the flat view turns per pixel of drag. */
+const DRAG_DEG = 0.5;
 
-export default function Scene({ spec, initialLive = false, onLiveChange }: Props) {
+export default function Scene({ spec, initialLive = false, auto3D = false, onLiveChange }: Props) {
   const uid = useId().replace(/:/g, '');
   const steps = spec.steps ?? [];
   const [step, setStep] = useState(steps.length ? 0 : -1);
   const [camera, setCamera] = useState<Camera | undefined>(undefined);
-  const [live, setLive] = useState(initialLive);
+  // always mount flat (the server render and the first client render match); the effect below opens 3D when asked
+  const [live, setLive] = useState(false);
   const [loading, setLoading] = useState(false);
   const [note, setNote] = useState('');
   const host = useRef<HTMLDivElement>(null);
@@ -64,7 +74,34 @@ export default function Scene({ spec, initialLive = false, onLiveChange }: Props
     setCamera(undefined);
   }, [spec.id, camKey]);
 
-  useEffect(() => onLiveChange?.(live), [live]);
+  // open the 3D view by itself, once, when the caller asked for it and the browser allows it
+  useEffect(() => {
+    if (!initialLive && !auto3D) return;
+    const webgl = hasWebGL();
+    if (!webgl) {
+      setNote(NO_WEBGL);
+      return;
+    }
+    if (
+      shouldStart3D({
+        webgl,
+        reducedMotion: prefersReducedMotion(),
+        visible: true,
+        userRequested: initialLive,
+      })
+    )
+      setLive(true);
+  }, []);
+
+  // report real changes only: the first, flat render is not the reader closing the 3D view
+  const reported = useRef(false);
+  useEffect(() => {
+    if (!reported.current) {
+      reported.current = true;
+      return;
+    }
+    onLiveChange?.(live);
+  }, [live]);
 
   const draw = useCallback(
     (reset: boolean) => {
@@ -125,9 +162,7 @@ export default function Scene({ spec, initialLive = false, onLiveChange }: Props
 
   const open3D = () => {
     if (!hasWebGL()) {
-      setNote(
-        'This browser cannot draw 3D, so the flat view stays. You can still turn it with the arrow keys.',
-      );
+      setNote(NO_WEBGL);
       return;
     }
     setNote('');
@@ -140,6 +175,26 @@ export default function Scene({ spec, initialLive = false, onLiveChange }: Props
   const reset = () => {
     setCamera(undefined);
     if (ctl.current) ctl.current.setCamera(resolved.camera, resolved.extent, lattice);
+  };
+  const zoom = (f: number) => ctl.current?.zoomView(f);
+
+  // the flat view turns under a drag too, so it never behaves like a still picture
+  const drag = useRef<{ x: number; y: number; cam: Camera } | null>(null);
+  const onFlatDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0) return;
+    drag.current = { x: e.clientX, y: e.clientY, cam };
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  };
+  const onFlatMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const d = drag.current;
+    if (!d) return;
+    const dx = e.clientX - d.x;
+    const dy = e.clientY - d.y;
+    if (Math.abs(dx) + Math.abs(dy) < 2) return;
+    setCamera(rotateCamera(d.cam, lattice, -dx * DRAG_DEG, dy * DRAG_DEG)); // same sense as the 3D drag
+  };
+  const onFlatUp = () => {
+    drag.current = null;
   };
   const onFlatKey = (e: React.KeyboardEvent) => {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
@@ -171,9 +226,13 @@ export default function Scene({ spec, initialLive = false, onLiveChange }: Props
           className="scene-stage scene-flat"
           tabIndex={0}
           role="group"
-          aria-label="Flat view. Arrow keys turn the picture, R resets it."
+          aria-label="Flat view. Drag or use the arrow keys to turn the picture, R resets it."
           data-view={typeof cam === 'string' ? cam : `${cam.azimuth} ${cam.elevation}`}
           onKeyDown={onFlatKey}
+          onPointerDown={onFlatDown}
+          onPointerMove={onFlatMove}
+          onPointerUp={onFlatUp}
+          onPointerCancel={onFlatUp}
           // generated from numbers and escaped labels by projectionToSvg
           dangerouslySetInnerHTML={{ __html: flat }}
         />
@@ -198,10 +257,26 @@ export default function Scene({ spec, initialLive = false, onLiveChange }: Props
             {c === 'iso' ? 'Isometric' : `Along ${c}`}
           </button>
         ))}
+        {live && (
+          <>
+            <button type="button" className="btn" onClick={() => zoom(1 / 1.25)}>
+              Zoom in
+            </button>
+            <button type="button" className="btn" onClick={() => zoom(1.25)}>
+              Zoom out
+            </button>
+          </>
+        )}
         <button type="button" className="btn" onClick={reset}>
           Reset view
         </button>
       </div>
+      {live && !loading && (
+        <p className="scene-help">
+          Drag to turn it any way. Scroll or pinch to zoom. Right-drag or Shift-drag to move it. With the
+          picture focused: arrow keys turn, plus and minus zoom, W A S D move, R resets.
+        </p>
+      )}
       {note && (
         <p className="scene-status" role="status">
           {note}

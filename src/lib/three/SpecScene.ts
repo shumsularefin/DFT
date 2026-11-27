@@ -46,6 +46,8 @@ export class SpecScene extends ViewScene {
 
   constructor(container: HTMLElement, options?: ControllerOptions) {
     super(container, options);
+    // atoms use a lit material; without a light they render as black discs
+    this.addHeadlight();
   }
 
   /** Draw (or redraw, for a new step) a resolved scene. Keeps the camera unless `resetCamera` is set. */

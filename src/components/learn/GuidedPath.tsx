@@ -1,6 +1,7 @@
 // Guided path (M12.4): one station at a time. A station is one picture (a scene preset or a plot), three short sentences,
 // one thing to try and a link to the full topic. One Scene island is reused for every scene station, so at most one WebGL
-// canvas exists on the page (D-058), and it exists only after the reader presses "View in 3D".
+// canvas exists on the page (D-058). A scene station opens the free 3D view by itself (D-106); plot stations load no
+// three.js. If the reader goes back to the flat view, later stations stay flat until they press "View in 3D" again.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { markComplete, markVisited } from '../../stores/progress';
 import { resolveStation, topicHref, type Station } from '../../lib/learn/stations';
@@ -33,7 +34,8 @@ export default function GuidedPath({ stations, scenes }: Props) {
   const [tries, setTries] = useState<Record<string, number>>({});
   const [svg, setSvg] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
-  const [want3D, setWant3D] = useState(false);
+  // undefined: the reader has not chosen yet, so scene stations open 3D by themselves
+  const [want3D, setWant3D] = useState<boolean | undefined>(undefined);
   const heading = useRef<HTMLHeadingElement>(null);
   const moved = useRef(false);
   const st = stations[index]!;
@@ -144,7 +146,13 @@ export default function GuidedPath({ stations, scenes }: Props) {
       <div className="lp-body">
         <div className="lp-visual" data-testid="lp-visual" data-kind={shown.kind}>
           {scene ? (
-            <Scene key="lp-scene" spec={scene} initialLive={want3D} onLiveChange={setWant3D} />
+            <Scene
+              key="lp-scene"
+              spec={scene}
+              initialLive={want3D === true}
+              auto3D={want3D === undefined}
+              onLiveChange={setWant3D}
+            />
           ) : (
             <figure className="lp-plot">
               <div className="lp-plot-head">

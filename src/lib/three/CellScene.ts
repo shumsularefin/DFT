@@ -61,6 +61,8 @@ export class CellScene extends ViewScene {
 
   constructor(container: HTMLElement, options?: ControllerOptions) {
     super(container, options);
+    // atoms use a lit material; without a light they render as black discs
+    this.addHeadlight();
   }
 
   /** Draw the structure. Positions are centred on the middle of the block so orbiting turns about it. */
