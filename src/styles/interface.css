@@ -360,6 +360,17 @@ main .container {
 .ref-page > :not(.ref-scroll) {
   max-width: 48rem;
 }
+/* Changelog: each list of entries fills the column as a grid of readable-width entries, so the page has no
+   empty right half on wide screens. Headings and the intro keep the prose measure. */
+.changelog > ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 30rem), 1fr));
+  column-gap: var(--space-7);
+  max-width: none;
+}
+.changelog > ul > li p {
+  margin-top: 0;
+}
 /* Short reading pages (About, Privacy) set their sections in two columns on wide screens, so the
    right half of the page is not empty. Title and lede span both columns. */
 @media (min-width: 90rem) {
