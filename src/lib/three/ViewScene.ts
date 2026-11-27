@@ -65,7 +65,7 @@ export class ViewScene extends SceneController {
     c.setAttribute('role', 'group');
     c.setAttribute(
       'aria-label',
-      '3D view. Drag to turn, scroll to zoom, right-drag or Shift-drag to move. Arrow keys rotate, plus and minus zoom, W A S D move, R resets the view. The names of the points are listed as text on the page.',
+      '3D view. Arrow keys rotate, plus and minus zoom, W A S D move, R resets the view. Drag to turn, scroll to zoom, right-drag or Shift-drag to move. The names of the points are listed as text on the page.',
     );
     this.keyHandler = (e) => {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
@@ -134,10 +134,20 @@ export class ViewScene extends SceneController {
 
   private moveCamera(p: Vector3, target: Vector3 = this.target): void {
     const t = target.clone();
+    const c = this.controls;
+    // a drag or wheel leaves damping inertia in OrbitControls; spend it now so it cannot nudge the view after a reset
+    const damp = c?.enableDamping ?? false;
+    if (c) {
+      c.enableDamping = false;
+      c.update();
+    }
     this.camera.position.copy(p);
     this.target.copy(t);
     this.camera.lookAt(t);
-    this.controls?.update();
+    if (c) {
+      c.update();
+      c.enableDamping = damp;
+    }
     this.writeCamera();
     this.requestRender();
   }
