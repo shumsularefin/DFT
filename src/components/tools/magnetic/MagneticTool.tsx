@@ -15,6 +15,7 @@ import {
   whyThisCell,
 } from '../../../lib/magnetism/export';
 import { STARTING_MOMENT_GUIDANCE } from '../../../lib/magnetism/magmom';
+import { MP_MAGMOM_NOTES, MP_U_NOTES, mpLdau, mpMagmom } from '../../../lib/vasp/mpDefaults';
 import {
   bondStatistics,
   configurationFromClass,
@@ -86,6 +87,7 @@ export default function MagneticTool() {
   const [cells, setCells] = useState(false);
   const [ldauOn, setLdauOn] = useState(false);
   const [ldau, setLdau] = useState<Record<string, { l: string; u: string; j: string }>>({});
+  const [ldauMsg, setLdauMsg] = useState('');
   const [split, setSplit] = useState(false);
   const [signs, setSigns] = useState<number[]>([]);
   const [siteMags, setSiteMags] = useState<string[]>([]);
@@ -416,6 +418,20 @@ export default function MagneticTool() {
                   No transition-metal element was found. Tick the element you want to order.
                 </p>
               )}
+              {elements.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const m = mpMagmom(elements);
+                    setMags((cur) => ({
+                      ...cur,
+                      ...Object.fromEntries(elements.map((el) => [el, m[el]!.toFixed(1)])),
+                    }));
+                  }}
+                >
+                  Fill Materials Project starting moments
+                </button>
+              )}
               {elements.map((el) => (
                 <div key={el} className="mg-field">
                   <label htmlFor={`mg-mag-${el}`}>Starting moment for {el} (μB)</label>
@@ -437,9 +453,16 @@ export default function MagneticTool() {
                     </li>
                   ))}
                 </ul>
+                <ul>
+                  {MP_MAGMOM_NOTES.map((g) => (
+                    <li key={g.text}>
+                      {g.text} <span className="mg-src">({g.source})</span>
+                    </li>
+                  ))}
+                </ul>
                 <p>
-                  The tool does not fill a number in for you. Type the value you want. The starting moments
-                  only seed the calculation: check the final moments in OUTCAR.
+                  Type the value you want, or fill the Materials Project values and change them. The starting
+                  moments only seed the calculation: check the final moments in OUTCAR.
                 </p>
               </details>
               <h2 id="mg-cell">3. Cell policy</h2>
@@ -485,7 +508,47 @@ export default function MagneticTool() {
                       ))}
                     </div>
                   ))}
-                {ldauOn && <p className="mg-note">Type your own values. None is suggested here.</p>}
+                {ldauOn && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const mp = mpLdau(allElements);
+                        setLdauMsg(
+                          !mp.applies
+                            ? 'The Materials Project uses +U only in oxides and fluorides; this cell has neither O nor F, so nothing was filled.'
+                            : mp.withU.length
+                              ? `Filled the Materials Project U for ${mp.withU.join(', ')}.`
+                              : 'No ticked element is in the Materials Project U table (Co, Cr, Fe, Mn, Mo, Ni, V, W).',
+                        );
+                        if (mp.applies)
+                          setLdau((d) => ({
+                            ...d,
+                            ...Object.fromEntries(
+                              elements.filter((el) => mp.withU.includes(el)).map((el) => [el, mp.rows[el]!]),
+                            ),
+                          }));
+                      }}
+                    >
+                      Fill Materials Project U values
+                    </button>
+                    {ldauMsg && (
+                      <p className="mg-note" role="status">
+                        {ldauMsg}
+                      </p>
+                    )}
+                    <ul className="mg-note">
+                      {MP_U_NOTES.map((g) => (
+                        <li key={g.text}>
+                          {g.text} <span className="mg-src">({g.source})</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="mg-note">
+                      Type your own values, or fill the Materials Project ones and change them.
+                    </p>
+                  </>
+                )}
               </fieldset>
             </>
           )}

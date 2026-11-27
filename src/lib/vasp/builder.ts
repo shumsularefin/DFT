@@ -168,7 +168,15 @@ export interface ShareState {
   spacing: number;
   /** POSCAR text, only when it is at most SHARE_STRUCTURE_LIMIT characters. */
   poscar?: string;
+  /** A typed N1 x N2 x N3 mesh that replaces the KSPACING mesh (the Input Builder's meshOverride, D-108, Q-073). */
+  mesh?: [number, number, number];
 }
+/** Largest subdivision a shared mesh may carry; anything larger is treated as a malformed link. */
+export const SHARE_MESH_MAX = 200;
+const isMesh = (x: unknown): x is [number, number, number] =>
+  Array.isArray(x) &&
+  x.length === 3 &&
+  x.every((n) => typeof n === 'number' && Number.isInteger(n) && n >= 1 && n <= SHARE_MESH_MAX);
 export const SHARE_STRUCTURE_LIMIT = 2048;
 const SYSTEMS: SystemType[] = ['metal', 'semiconductor', 'insulator', 'slab', 'molecule', 'unknown'];
 const VERSIONS: VaspVersion[] = ['5.4', '6.3', '6.4'];
@@ -219,6 +227,7 @@ export function decodeShare(fragment: string): ShareState | null {
   if (r.enmax !== undefined && !(typeof r.enmax === 'number' && Number.isFinite(r.enmax))) return null;
   if (r.version !== undefined && !VERSIONS.includes(r.version as VaspVersion)) return null;
   if (r.poscar !== undefined && !(isStr(r.poscar) && r.poscar.length <= SHARE_STRUCTURE_LIMIT)) return null;
+  if (r.mesh !== undefined && !isMesh(r.mesh)) return null;
   return {
     preset: r.preset,
     variant: r.variant,
@@ -229,6 +238,9 @@ export function decodeShare(fragment: string): ShareState | null {
     kpMode: r.kpMode as ShareState['kpMode'],
     spacing: r.spacing,
     ...(r.poscar !== undefined ? { poscar: r.poscar } : {}),
+    ...(r.mesh !== undefined
+      ? { mesh: [...(r.mesh as [number, number, number])] as [number, number, number] }
+      : {}),
   };
 }
 

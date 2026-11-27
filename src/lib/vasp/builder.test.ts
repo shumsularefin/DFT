@@ -12,6 +12,7 @@ import {
   magmomFromSpecies,
   potcarLabels,
   removeEntry,
+  SHARE_MESH_MAX,
   SHARE_STRUCTURE_LIMIT,
   suggestEncut,
   unfilled,
@@ -140,6 +141,19 @@ describe('share links', () => {
     expect(decodeShare(encodeShare(big))?.poscar).toBeUndefined();
     const ok = { ...st, poscar: 'x'.repeat(SHARE_STRUCTURE_LIMIT) };
     expect(decodeShare(encodeShare(ok))?.poscar).toHaveLength(SHARE_STRUCTURE_LIMIT);
+  });
+  it('keeps a typed k-mesh (Q-073) and rejects a bad one', () => {
+    const m = { ...st, mesh: [6, 6, 1] as [number, number, number] };
+    expect(decodeShare(encodeShare(m))).toEqual(m);
+    for (const bad of [
+      [6, 6],
+      [6, 0, 1],
+      [6, 6, 1.5],
+      [6, 6, SHARE_MESH_MAX + 1],
+      ['6', 6, 1],
+    ])
+      expect(decodeShare(encodeShare({ ...st, mesh: bad as never }))).toBeNull();
+    expect(decodeShare(encodeShare(st))?.mesh).toBeUndefined();
   });
   it('rejects malformed fragments', () => {
     for (const f of ['', '#', 'x=1', 's=!!!', 's=' + btoa('{"a":1}'), 's=' + btoa('not json')])

@@ -6,6 +6,7 @@ import type { Issue, ValidateContext } from './validate';
 import type { ParsedKpoints } from './kpoints';
 import type { Structure, Vec3 } from '../crystal/types';
 import wf from '../../../scripts/__generated__/workflow-handbook.json';
+import presetsJson from '../../data/incar-presets.json';
 
 const inc = (t: string) => parseIncar(t).entries;
 const cubic: Structure['lattice'] = [
@@ -26,6 +27,15 @@ const mk = (species: string[], lattice = cubic): Structure => ({
 const rep = (el: string, n: number) => Array<string>(n).fill(el);
 const si2 = mk(['Si', 'Si']);
 const fe4o8 = mk([...rep('Fe', 4), ...rep('O', 8)]);
+/** Two Si atoms, the first fixed (F F F) and the second free (T T T). */
+const si2Sel: Structure = {
+  ...si2,
+  selective: [
+    [false, false, false],
+    [true, true, true],
+  ],
+};
+const relax = 'NSW = 50\nIBRION = 2\nISIF = 2';
 const mesh = (n: number, centering: 'gamma' | 'monkhorst-pack' = 'gamma'): ParsedKpoints => ({
   kind: 'mesh',
   centering,
@@ -232,13 +242,41 @@ const CASES: Case[] = [
     { incar: inc('ISIF = 2'), systemType: 'slab' },
     { incar: inc('ISIF = 2\nLDIPOL = .TRUE.\nIDIPOL = 3'), systemType: 'slab' },
   ),
+  c(
+    'V036',
+    'warn',
+    { incar: inc('IMAGES = 3\nIBRION = 2\nEDIFFG = -0.01') },
+    { incar: inc('IMAGES = 3\nIBRION = 1\nEDIFFG = -0.01') },
+  ),
+  c(
+    'V037',
+    'error',
+    { incar: inc('IOPT = 3\nIBRION = 1') },
+    { incar: inc('IOPT = 3\nIBRION = 3\nPOTIM = 0') },
+  ),
+  c(
+    'V038',
+    'warn',
+    { incar: inc('IMAGES = 3\nIBRION = 1') },
+    { incar: inc('IMAGES = 3\nIBRION = 1\nEDIFFG = -0.03') },
+  ),
+  c('V039', 'error', { incar: inc('IMAGES = 3'), cores: 16 }, { incar: inc('IMAGES = 4'), cores: 16 }),
+  c('V040', 'warn', { incar: inc('IMAGES = 3\nISIF = 3') }, { incar: inc('IMAGES = 3\nISIF = 2') }),
+  c('V041', 'info', { incar: inc('LCLIMB = .TRUE.') }, { incar: inc('IMAGES = 3') }),
+  c('V042', 'info', { incar: inc('NSW = 0'), structure: si2Sel }, { incar: inc(relax), structure: si2Sel }),
+  c(
+    'V043',
+    'info',
+    { incar: inc(relax), structure: si2, systemType: 'slab' },
+    { incar: inc(relax), structure: si2Sel, systemType: 'slab' },
+  ),
 ];
 
 describe('rule table', () => {
-  it('has 35 unique, sorted, sourced rules', () => {
-    expect(ALL_RULES).toHaveLength(35);
+  it('has 43 unique, sorted, sourced rules', () => {
+    expect(ALL_RULES).toHaveLength(43);
     expect(ALL_RULES.map((r) => r.id)).toEqual(
-      Array.from({ length: 35 }, (_, i) => `V${String(i + 1).padStart(3, '0')}`),
+      Array.from({ length: 43 }, (_, i) => `V${String(i + 1).padStart(3, '0')}`),
     );
     for (const r of ALL_RULES) {
       expect(r.source.length, r.id).toBeGreaterThan(0);
@@ -368,6 +406,7 @@ describe('engine', () => {
         'index',
         'ionic',
         'magnetism',
+        'neb',
         'parallel',
         'restart',
         'smearing',
@@ -431,5 +470,54 @@ describe('false positives on the author handbook INCARs', () => {
     );
     if (process.env.PRINT_FP) console.log(lines.join('\n'));
     expect(Array.isArray(lines)).toBe(true);
+  });
+});
+
+describe('the NEB preset passes its own rules (D-111)', () => {
+  const presets = (
+    presetsJson as {
+      presets: {
+        id: string;
+        variants: { id: string; entries: { name: string; value: string; placeholder?: string }[] }[];
+      }[];
+    }
+  ).presets;
+  const neb = presets.find((p) => p.id === 'neb')!;
+  it.each(neb.variants.map((v) => ({ id: v.id, v })))(
+    '$id: no error or warning, 8 cores over 4 images',
+    ({ v }) => {
+      const filled = v.entries.map((e) => ({
+        name: e.name,
+        value:
+          e.name === 'IMAGES' ? '4' : e.name === 'ENCUT' ? '520' : e.name === 'MAGMOM' ? '2*1.0' : e.value,
+      }));
+      const out = validate({
+        incar: filled,
+        structure: si2,
+        cores: 8,
+        systemType: 'semiconductor',
+        enmaxEv: 400,
+      });
+      const nebIds = ['V036', 'V037', 'V038', 'V039', 'V040'];
+      expect(out.filter((i) => nebIds.includes(i.rule)).map(formatIssue)).toEqual([]);
+      expect(out.filter((i) => i.severity === 'error').map(formatIssue)).toEqual([]);
+      expect(out.some((i) => i.rule === 'V041')).toBe(v.id === 'vtst-ci');
+    },
+  );
+});
+
+describe('selective dynamics (D-111, Q-071)', () => {
+  it('V042 fires for IBRION = -1 even with NSW > 0, and not without flags', () => {
+    expect(ids({ incar: inc('NSW = 50\nIBRION = -1'), structure: si2Sel }, 'V042')).toHaveLength(1);
+    expect(ids({ incar: inc('NSW = 0'), structure: si2 }, 'V042')).toHaveLength(0);
+  });
+  it('V042 warns when every coordinate is fixed in a relaxation', () => {
+    const allF: Structure = { ...si2, selective: si2.species.map(() => [false, false, false] as const) };
+    const hit = ids({ incar: inc(relax), structure: allF }, 'V042');
+    expect(hit.map((i) => i.severity)).toEqual(['warn']);
+  });
+  it('V043 stays quiet outside a slab and for a static run', () => {
+    expect(ids({ incar: inc(relax), structure: si2, systemType: 'semiconductor' }, 'V043')).toHaveLength(0);
+    expect(ids({ incar: inc('NSW = 0'), structure: si2, systemType: 'slab' }, 'V043')).toHaveLength(0);
   });
 });

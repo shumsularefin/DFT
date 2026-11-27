@@ -7,6 +7,10 @@ All notable changes to the DFT Handbook are listed here. The format follows
 
 ### Added
 
+- Input Builder climbing-image NEB preset, from the VTST documentation and Henkelman et al. 2000, with a plain VASP NEB variant, the tags IMAGES, SPRING, LCLIMB and IOPT, and NEB rules V036 to V041 (D-111).
+- Materials Project U values and starting moments as labelled, editable fills in the Input Builder and the Magnetic tool, with their sources and the fits that disagree (D-111).
+- Selective-dynamics rules V042 and V043: flags that cannot act, every coordinate fixed, and a slab relaxation with no fixed layers (D-111).
+- Input Builder share links keep a typed k-mesh (D-111).
 - A Workflow section at `/workflow/`: the author's VASP protocol as a path to follow, from a CIF file to every property, with one page per step (folder, files in and out, INCAR, commands, checks, checklist, links to the theory and tools), a map, a project layout and a version and revisions list. `docs/WORKFLOW_GUIDE.md` explains how to change it (D-110).
 - The Input Builder opens a task from a link (`?preset=relax&variant=default`), and the relaxation task gains a fixed-volume variant for E-V scans.
 - The VASPkit page holds the Workflow Handbook's full command map; output files, troubleshooting, common errors and other calculations gain the rows they were missing.

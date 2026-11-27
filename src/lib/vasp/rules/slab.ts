@@ -1,5 +1,8 @@
 // V034, V035: slab settings the Material Builder checked before D-108 moved its INCAR and KPOINTS steps here.
+// V042, V043: selective dynamics (D-111, Q-071).
 // @source S-041, S-042, S-066
+// @source S-019 (VASP wiki POSCAR, oldid 37632: the T/F flags decide which coordinates may change during a
+//   relaxation or MD; IBRION, oldid 37190: IBRION = -1, the default for NSW = 0, does not move the ions)
 import { setTag } from './helpers';
 import type { Rule } from './types';
 
@@ -40,6 +43,53 @@ export const slabRules: Rule[] = [
             label: 'Add LDIPOL = .TRUE. and IDIPOL = 3',
             apply: (incar) => setTag(setTag(incar, 'LDIPOL', '.TRUE.'), 'IDIPOL', '3'),
           },
+        },
+      ];
+    },
+  },
+  {
+    id: 'V042',
+    title: 'Selective-dynamics flags that cannot take effect',
+    severity: 'info',
+    source: ['S-019'],
+    vasp: 'all versions',
+    check: (ctx, v) => {
+      const sel = ctx.structure?.selective;
+      if (!sel || sel.length === 0) return [];
+      const nsw = v.num('NSW') ?? 0;
+      if (nsw <= 0 || v.num('IBRION') === -1)
+        return [
+          {
+            why: `The POSCAR fixes coordinates with Selective dynamics, but ${nsw <= 0 ? `NSW = ${nsw}${v.has('NSW') ? '' : ' (the default)'}` : 'IBRION = -1'} means the ions never move, so the T and F flags change nothing. They only act in a relaxation or molecular dynamics.`,
+          },
+        ];
+      if (sel.every((f) => !f[0] && !f[1] && !f[2]))
+        return [
+          {
+            severity: 'warn',
+            why: 'Every coordinate in the POSCAR is flagged F, so the relaxation has nothing to move and stops at the starting structure. Mark the atoms that should relax with T.',
+          },
+        ];
+      return [];
+    },
+  },
+  {
+    id: 'V043',
+    title: 'Slab relaxation with every atom free',
+    severity: 'info',
+    source: ['S-042', 'S-019'],
+    vasp: 'all versions',
+    check: (ctx, v) => {
+      if (ctx.systemType !== 'slab' || !ctx.structure) return [];
+      const ib = v.num('IBRION');
+      if ((v.num('NSW') ?? 0) <= 0 || ib === undefined || ib < 1 || ib > 3) return [];
+      const sel = ctx.structure.selective;
+      if (sel && sel.some((f) => !f[0] || !f[1] || !f[2])) return [];
+      return [
+        {
+          why: 'Every atom of this slab may move. The handbook fixes the bottom layers of a slab with Selective dynamics (F F F) and relaxes the rest. Leave every atom free only if that is what you intend.',
+          whyDetail:
+            'Add the line "Selective dynamics" after the atom counts in POSCAR and three T or F flags after each position: T may move, F stays put. The flags refer to direct coordinates. Keep ISIF = 2 so the cell and the vacuum do not change.',
         },
       ];
     },

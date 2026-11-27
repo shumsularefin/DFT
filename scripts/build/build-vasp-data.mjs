@@ -77,6 +77,36 @@ if (!mdRecipe) throw new Error('Field Handbook recipe r-md not found');
 const md = entriesOf(mdRecipe.incar);
 
 const H = ['S-019', 'S-041', 'S-042'];
+/** The handbook relaxation block turned into an NEB band: cell fixed, a force criterion, the NEB tags (D-111). */
+function nebEntries(optimiser) {
+  const base = withPlaceholders(relax, ['ENCUT', 'MAGMOM'])
+    .filter((e) => !['IBRION', 'POTIM', 'SYSTEM'].includes(e.name))
+    .map((e) => {
+      if (e.name === 'ISIF')
+        return { name: 'ISIF', value: '2', comment: 'ions only; NEB cannot change the cell' };
+      if (e.name === 'NSW') return { name: 'NSW', value: '100' };
+      if (e.name === 'EDIFFG')
+        return {
+          name: 'EDIFFG',
+          value: '-0.01',
+          comment: 'force criterion (VTST); the handbook gives -0.01 to -0.05',
+        };
+      return e;
+    });
+  return [
+    { name: 'SYSTEM', value: 'NEB' },
+    ...base,
+    {
+      name: 'IMAGES',
+      value: '1',
+      placeholder: '<number of images between the end points>',
+      comment: 'cores must be a multiple of this',
+    },
+    { name: 'SPRING', value: '-5', comment: 'negative switches nudging on; -5 is the default' },
+    ...optimiser,
+  ];
+}
+
 const v = (id, title, entries, extra = {}) => ({ id, title, requires: [], ...extra, entries });
 
 const presets = [
@@ -365,6 +395,57 @@ const presets = [
     ],
   },
   {
+    // D-111: climbing-image NEB from the VASP wiki (S-019), the VTST documentation (S-086) and the papers that
+    // define the method (S-087, S-088, S-089). Built on the handbook relaxation block, cell fixed.
+    id: 'neb',
+    title: 'Transition state: climbing-image NEB',
+    summary:
+      'Finds the minimum energy path between two relaxed states and the saddle point (the barrier) on it.',
+    protocolStage: null,
+    fragment: false,
+    sources: ['S-019', 'S-041', 'S-086', 'S-087', 'S-088', 'S-089'],
+    notes: [
+      'Relax the initial and final states first, with the same ENCUT, k-mesh and POTCAR you use for the band (VASP wiki).',
+      'For N images make N + 2 folders 00 to N+1 (two digits). The relaxed initial state goes in 00, the final state in the last folder, and the interpolated images in between. INCAR, KPOINTS and POTCAR stay in the parent folder (VASP wiki).',
+      'Interpolate the images between the end points; the image-dependent pair potential (IDPP) gives a better first path than straight lines (Smidstrup et al. 2014).',
+      'Use as few images as you can: the VASP wiki suggests starting with one and adding more once it converges. Henkelman et al. (2000) call 4 to 20 typical and use 8.',
+      'The number of cores must be a multiple of IMAGES (VASP wiki).',
+      'The climbing image (LCLIMB) and IOPT are not in standard VASP: they need VASP compiled with the VTST code. Without it, use the plain NEB variant.',
+      'Converge the band with plain NEB first, then switch the climbing image on: Henkelman et al. turn it on after a few NEB iterations, and the VTST page advises the same.',
+      'Use a force criterion (negative EDIFFG): the NEB forces are not the gradient of an energy, so only force-based optimisers work (Sheppard et al. 2008; VTST).',
+      'Keep ISIF = 2. NEB in VASP cannot change the cell, so it cannot follow a structural phase transition (VASP wiki).',
+    ],
+    variants: [
+      v(
+        'vtst-ci',
+        'Climbing image with the VTST optimisers (needs VTST)',
+        nebEntries([
+          { name: 'IBRION', value: '3', comment: 'with POTIM = 0: switches the VASP optimiser off for IOPT' },
+          { name: 'POTIM', value: '0' },
+          {
+            name: 'IOPT',
+            value: '3',
+            comment: 'VTST: 3 quick-min (beginner friendly), 1 L-BFGS, 7 FIRE',
+          },
+          { name: 'LCLIMB', value: '.TRUE.', comment: 'climbing image; .FALSE. for a first plain NEB run' },
+        ]),
+        { requires: ['POSCAR in each image folder 00 to N+1', 'POTCAR', 'KPOINTS', 'VASP built with VTST'] },
+      ),
+      v(
+        'plain',
+        'Plain NEB, standard VASP (no climbing image)',
+        nebEntries([
+          {
+            name: 'IBRION',
+            value: '1',
+            comment: 'RMM-DIIS; 3 (quick-min) also works, 2 (CG) usually fails here',
+          },
+        ]),
+        { requires: ['POSCAR in each image folder 00 to N+1', 'POTCAR', 'KPOINTS'] },
+      ),
+    ],
+  },
+  {
     id: 'elastic',
     title: 'Elastic constants',
     summary: 'Step 4 of the protocol: finite distortions with IBRION = 6 and ISIF = 3.',
@@ -523,6 +604,8 @@ const presets = [
 ];
 /** Presets taken from the Field Handbook alone: their tags count as field-handbook content, not workflow. */
 const FIELD_PRESETS = new Set(['aimd-nvt']);
+/** Presets built from web sources (D-111): using a tag there does not make it handbook content. */
+const WEB_PRESETS = new Set(['neb']);
 
 // ---------------------------------------------------------------------------------------------------------------
 // Tags
@@ -735,6 +818,43 @@ const T = [
     'Too large makes relaxations oscillate or fail with ZBRENT errors.',
     ['IBRION', 'NFREE'],
     'POTIM',
+  ],
+  // D-111: the NEB tags. Not in the handbooks; their text comes from the VASP wiki and VTST pages (NEB_WEB below).
+  [
+    'IMAGES',
+    'neb',
+    'int',
+    'The number of images between the two fixed end points of a nudged elastic band. VASP runs them side by side.',
+    'The core count must be a multiple of IMAGES. More images cost more and rarely help: start small.',
+    ['SPRING', 'LCLIMB', 'IBRION'],
+    null,
+  ],
+  [
+    'SPRING',
+    'neb',
+    'real',
+    'The spring constant between the images. A negative value (the default -5) switches the nudged elastic band on.',
+    'SPRING = 0 lets each image move only perpendicular to the path. Very large values slow convergence.',
+    ['IMAGES'],
+    null,
+  ],
+  [
+    'LCLIMB',
+    'neb',
+    'bool',
+    'Turns the highest-energy image into a climbing image, which moves up to the saddle point (VTST code only).',
+    'Standard VASP ignores it. Switched on too early, before the band has settled, it can climb to the wrong maximum.',
+    ['IMAGES', 'IOPT'],
+    null,
+  ],
+  [
+    'IOPT',
+    'neb',
+    'int',
+    'Chooses a VTST optimiser for NEB and dimer runs: 1 L-BFGS, 2 CG, 3 quick-min, 4 steepest descent, 7 FIRE.',
+    'It only works with IBRION = 3 and POTIM = 0, which switch the built-in VASP optimiser off. Standard VASP ignores it.',
+    ['IBRION', 'POTIM', 'LCLIMB'],
+    null,
   ],
   [
     'NFREE',
@@ -1215,6 +1335,36 @@ const T = [
   ],
 ];
 
+/** Facts for tags the handbooks do not cover, read on the cited pages on 2026-11-27 (D-111). */
+const NEB_WEB = {
+  IMAGES: {
+    default: 'None: IMAGES must be set for a NEB run (VASP wiki, Nudged elastic bands).',
+    typical:
+      'As few as possible; start with 1 and add more once it converges (VASP wiki). 4 to 20 is typical (Henkelman et al. 2000).',
+    why: 'Sets how finely the path between the two end points is sampled. N images need N + 2 folders 00 to N+1.',
+    sources: ['S-019', 'S-087'],
+  },
+  SPRING: {
+    default: '-5 (VASP wiki, SPRING); a negative value activates the NEB method.',
+    typical: '-5. The VASP wiki calls the default reliable.',
+    why: 'The springs keep the images spread along the path; nudging removes their pull perpendicular to it.',
+    sources: ['S-019'],
+  },
+  LCLIMB: {
+    default: '.TRUE. in the VTST code (VTST NEB page). Not a standard VASP tag.',
+    typical: '.TRUE. after a first plain NEB run has settled the band.',
+    why: 'Plain NEB only brackets the saddle point between two images; the climbing image lands on it, so the barrier is exact.',
+    sources: ['S-086', 'S-087'],
+  },
+  IOPT: {
+    default: '0: use the optimiser chosen by IBRION (VTST optimizers page). Not a standard VASP tag.',
+    typical:
+      '3 (quick-min) to start; 1 (L-BFGS) or 7 (FIRE) are faster near convergence (Sheppard et al. 2008).',
+    why: 'NEB forces are not the gradient of an energy, so the optimiser must use forces only. IOPT picks such an optimiser.',
+    sources: ['S-086', 'S-088'],
+  },
+};
+
 const dictByKey = new Map(wf.dictionary.map((d) => [d.tags.join('/'), d]));
 const fieldBy = (n) => field.TAGS.find((t) => t.name.split(' / ').includes(n));
 const nameSet = new Set(T.map((t) => t[0]));
@@ -1227,7 +1377,8 @@ for (const p of presets)
       if (!usage.has(e.name)) usage.set(e.name, new Set());
       usage.get(e.name).add(p.id);
     }
-const usedByWorkflowPreset = (n) => [...(usage.get(n) ?? [])].some((id) => !FIELD_PRESETS.has(id));
+const usedByWorkflowPreset = (n) =>
+  [...(usage.get(n) ?? [])].some((id) => !FIELD_PRESETS.has(id) && !WEB_PRESETS.has(id));
 const usedByFieldPreset = (n) => [...(usage.get(n) ?? [])].some((id) => FIELD_PRESETS.has(id));
 for (const [n] of usage) if (!nameSet.has(n)) throw new Error(`preset uses tag ${n} that has no tag entry`);
 
@@ -1280,6 +1431,27 @@ const tags = T.map(([name, group, type, beginner, breaks, related, key]) => {
     f && f.fixed && !(f.name.includes('/') && name !== f.name.split(' / ')[0])
       ? f.fixed.map((c) => ({ was: strip(c.was), now: strip(c.now) }))
       : [];
+  const w = NEB_WEB[name];
+  if (w) {
+    return {
+      name,
+      group,
+      type,
+      default: w.default,
+      typical: w.typical,
+      vaspVersion: '6.x',
+      summary: { beginner, intermediate: beginner },
+      why: w.why,
+      breaks,
+      tasks: [...(usage.get(name) ?? [])].sort(),
+      related,
+      handbook: null,
+      sources: w.sources,
+      fromHandbook: [],
+      readOn: '2026-11-27',
+      notes: 'Not in the handbooks. Read on the cited VASP wiki and VTST pages (D-111).',
+    };
+  }
   return {
     name,
     group,

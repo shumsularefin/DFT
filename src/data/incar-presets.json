@@ -1215,6 +1215,285 @@
    ]
   },
   {
+   "id": "neb",
+   "title": "Transition state: climbing-image NEB",
+   "summary": "Finds the minimum energy path between two relaxed states and the saddle point (the barrier) on it.",
+   "protocolStage": null,
+   "fragment": false,
+   "sources": [
+    "S-019",
+    "S-041",
+    "S-086",
+    "S-087",
+    "S-088",
+    "S-089"
+   ],
+   "notes": [
+    "Relax the initial and final states first, with the same ENCUT, k-mesh and POTCAR you use for the band (VASP wiki).",
+    "For N images make N + 2 folders 00 to N+1 (two digits). The relaxed initial state goes in 00, the final state in the last folder, and the interpolated images in between. INCAR, KPOINTS and POTCAR stay in the parent folder (VASP wiki).",
+    "Interpolate the images between the end points; the image-dependent pair potential (IDPP) gives a better first path than straight lines (Smidstrup et al. 2014).",
+    "Use as few images as you can: the VASP wiki suggests starting with one and adding more once it converges. Henkelman et al. (2000) call 4 to 20 typical and use 8.",
+    "The number of cores must be a multiple of IMAGES (VASP wiki).",
+    "The climbing image (LCLIMB) and IOPT are not in standard VASP: they need VASP compiled with the VTST code. Without it, use the plain NEB variant.",
+    "Converge the band with plain NEB first, then switch the climbing image on: Henkelman et al. turn it on after a few NEB iterations, and the VTST page advises the same.",
+    "Use a force criterion (negative EDIFFG): the NEB forces are not the gradient of an energy, so only force-based optimisers work (Sheppard et al. 2008; VTST).",
+    "Keep ISIF = 2. NEB in VASP cannot change the cell, so it cannot follow a structural phase transition (VASP wiki)."
+   ],
+   "variants": [
+    {
+     "id": "vtst-ci",
+     "title": "Climbing image with the VTST optimisers (needs VTST)",
+     "requires": [
+      "POSCAR in each image folder 00 to N+1",
+      "POTCAR",
+      "KPOINTS",
+      "VASP built with VTST"
+     ],
+     "entries": [
+      {
+       "name": "SYSTEM",
+       "value": "NEB"
+      },
+      {
+       "name": "PREC",
+       "value": "Accurate"
+      },
+      {
+       "name": "ENCUT",
+       "value": "520",
+       "comment": "1.3 × largest ENMAX (grep ENMAX POTCAR)",
+       "placeholder": "<1.3 x largest ENMAX in your POTCAR>"
+      },
+      {
+       "name": "EDIFF",
+       "value": "1E-6",
+       "comment": "1E-7 to 1E-8 when EDIFFG = -0.001"
+      },
+      {
+       "name": "ALGO",
+       "value": "Normal"
+      },
+      {
+       "name": "NELM",
+       "value": "120"
+      },
+      {
+       "name": "NELMIN",
+       "value": "6"
+      },
+      {
+       "name": "ISMEAR",
+       "value": "0",
+       "comment": "metals: ISMEAR = 1, SIGMA = 0.1-0.2"
+      },
+      {
+       "name": "SIGMA",
+       "value": "0.05"
+      },
+      {
+       "name": "LREAL",
+       "value": ".FALSE.",
+       "comment": "Auto for cells above ~20 atoms"
+      },
+      {
+       "name": "LASPH",
+       "value": ".TRUE.",
+       "comment": "d/f elements"
+      },
+      {
+       "name": "ISPIN",
+       "value": "2"
+      },
+      {
+       "name": "MAGMOM",
+       "value": "2*5.0 4*0.6",
+       "comment": "one entry per atom, POSCAR order",
+       "placeholder": "<one value per atom, in POSCAR order>"
+      },
+      {
+       "name": "LMAXMIX",
+       "value": "4",
+       "comment": "d elements (6 for f)"
+      },
+      {
+       "name": "ISIF",
+       "value": "2",
+       "comment": "ions only; NEB cannot change the cell"
+      },
+      {
+       "name": "NSW",
+       "value": "100"
+      },
+      {
+       "name": "EDIFFG",
+       "value": "-0.01",
+       "comment": "force criterion (VTST); the handbook gives -0.01 to -0.05"
+      },
+      {
+       "name": "LWAVE",
+       "value": ".TRUE."
+      },
+      {
+       "name": "LCHARG",
+       "value": ".TRUE."
+      },
+      {
+       "name": "NCORE",
+       "value": "4"
+      },
+      {
+       "name": "IMAGES",
+       "value": "1",
+       "placeholder": "<number of images between the end points>",
+       "comment": "cores must be a multiple of this"
+      },
+      {
+       "name": "SPRING",
+       "value": "-5",
+       "comment": "negative switches nudging on; -5 is the default"
+      },
+      {
+       "name": "IBRION",
+       "value": "3",
+       "comment": "with POTIM = 0: switches the VASP optimiser off for IOPT"
+      },
+      {
+       "name": "POTIM",
+       "value": "0"
+      },
+      {
+       "name": "IOPT",
+       "value": "3",
+       "comment": "VTST: 3 quick-min (beginner friendly), 1 L-BFGS, 7 FIRE"
+      },
+      {
+       "name": "LCLIMB",
+       "value": ".TRUE.",
+       "comment": "climbing image; .FALSE. for a first plain NEB run"
+      }
+     ]
+    },
+    {
+     "id": "plain",
+     "title": "Plain NEB, standard VASP (no climbing image)",
+     "requires": [
+      "POSCAR in each image folder 00 to N+1",
+      "POTCAR",
+      "KPOINTS"
+     ],
+     "entries": [
+      {
+       "name": "SYSTEM",
+       "value": "NEB"
+      },
+      {
+       "name": "PREC",
+       "value": "Accurate"
+      },
+      {
+       "name": "ENCUT",
+       "value": "520",
+       "comment": "1.3 × largest ENMAX (grep ENMAX POTCAR)",
+       "placeholder": "<1.3 x largest ENMAX in your POTCAR>"
+      },
+      {
+       "name": "EDIFF",
+       "value": "1E-6",
+       "comment": "1E-7 to 1E-8 when EDIFFG = -0.001"
+      },
+      {
+       "name": "ALGO",
+       "value": "Normal"
+      },
+      {
+       "name": "NELM",
+       "value": "120"
+      },
+      {
+       "name": "NELMIN",
+       "value": "6"
+      },
+      {
+       "name": "ISMEAR",
+       "value": "0",
+       "comment": "metals: ISMEAR = 1, SIGMA = 0.1-0.2"
+      },
+      {
+       "name": "SIGMA",
+       "value": "0.05"
+      },
+      {
+       "name": "LREAL",
+       "value": ".FALSE.",
+       "comment": "Auto for cells above ~20 atoms"
+      },
+      {
+       "name": "LASPH",
+       "value": ".TRUE.",
+       "comment": "d/f elements"
+      },
+      {
+       "name": "ISPIN",
+       "value": "2"
+      },
+      {
+       "name": "MAGMOM",
+       "value": "2*5.0 4*0.6",
+       "comment": "one entry per atom, POSCAR order",
+       "placeholder": "<one value per atom, in POSCAR order>"
+      },
+      {
+       "name": "LMAXMIX",
+       "value": "4",
+       "comment": "d elements (6 for f)"
+      },
+      {
+       "name": "ISIF",
+       "value": "2",
+       "comment": "ions only; NEB cannot change the cell"
+      },
+      {
+       "name": "NSW",
+       "value": "100"
+      },
+      {
+       "name": "EDIFFG",
+       "value": "-0.01",
+       "comment": "force criterion (VTST); the handbook gives -0.01 to -0.05"
+      },
+      {
+       "name": "LWAVE",
+       "value": ".TRUE."
+      },
+      {
+       "name": "LCHARG",
+       "value": ".TRUE."
+      },
+      {
+       "name": "NCORE",
+       "value": "4"
+      },
+      {
+       "name": "IMAGES",
+       "value": "1",
+       "placeholder": "<number of images between the end points>",
+       "comment": "cores must be a multiple of this"
+      },
+      {
+       "name": "SPRING",
+       "value": "-5",
+       "comment": "negative switches nudging on; -5 is the default"
+      },
+      {
+       "name": "IBRION",
+       "value": "1",
+       "comment": "RMM-DIIS; 3 (quick-min) also works, 2 (CG) usually fails here"
+      }
+     ]
+    }
+   ]
+  },
+  {
    "id": "elastic",
    "title": "Elastic constants",
    "summary": "Step 4 of the protocol: finite distortions with IBRION = 6 and ISIF = 3.",

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { speciesOrder } from '../../../lib/vasp/builder';
+import { MP_MAGMOM_NOTES, MP_U_NOTES, mpLdau, mpMagmom } from '../../../lib/vasp/mpDefaults';
 import { GROUPS, TAGS, tagByName } from './TagCard';
 import { useBuilder } from './store';
 
@@ -118,9 +119,7 @@ export default function SettingsStep() {
       </div>
       <div className="ib-row">
         <div className="ib-field">
-          <label htmlFor="ib-custom">
-            Or type a tag the database does not list (for example IMAGES for NEB)
-          </label>
+          <label htmlFor="ib-custom">Or type a tag the database does not list</label>
           <input
             id="ib-custom"
             value={custom}
@@ -150,6 +149,18 @@ export default function SettingsStep() {
         <fieldset className="ib-fieldset">
           <legend>MAGMOM helper: one starting moment per species</legend>
           <p className="ib-small">Species order is the POSCAR order: {order.join(', ')}.</p>
+          <p>
+            <button
+              type="button"
+              onClick={() => {
+                const m = mpMagmom(order);
+                s.set('magmom', Object.fromEntries(order.map((sp) => [sp, m[sp]!.toFixed(1)])));
+              }}
+            >
+              Fill Materials Project starting moments
+            </button>
+          </p>
+          <SuggestionNotes notes={MP_MAGMOM_NOTES} />
           {order.map((sp) => (
             <div className="ib-field" key={sp}>
               <label htmlFor={`ib-mag-${sp}`}>Moment for {sp} (Bohr magnetons)</label>
@@ -171,6 +182,8 @@ export default function SettingsStep() {
             LDAUL: 2 for d, 3 for f, -1 for none. U and J are in eV. One value per species in POSCAR order:{' '}
             {order.join(', ')}.
           </p>
+          <MpLdauButton order={order} />
+          <SuggestionNotes notes={MP_U_NOTES} />
           {order.map((sp) => {
             const row = s.ldau[sp] ?? { l: '', u: '', j: '' };
             const upd = (k: 'l' | 'u' | 'j', v: string) =>
@@ -213,6 +226,58 @@ export default function SettingsStep() {
         </fieldset>
       )}
     </section>
+  );
+}
+
+/** Fills the rows with the Materials Project values when O or F is present; says why not otherwise (D-111). */
+function MpLdauButton({ order }: { order: string[] }) {
+  const s = useBuilder();
+  const mp = mpLdau(order);
+  const [msg, setMsg] = useState('');
+  return (
+    <>
+      <p>
+        <button
+          type="button"
+          onClick={() => {
+            if (!mp.applies) {
+              setMsg(
+                'The Materials Project uses +U only in oxides and fluorides; this structure has neither O nor F, so no value was filled.',
+              );
+              return;
+            }
+            s.set('ldau', mp.rows);
+            setMsg(
+              mp.withU.length
+                ? `Filled U for ${mp.withU.join(', ')}; the other species get LDAUL = -1 and U = 0. Press Write to put them in the INCAR.`
+                : 'No species here is in the Materials Project U table (Co, Cr, Fe, Mn, Mo, Ni, V, W), so every U is 0.',
+            );
+          }}
+        >
+          Fill Materials Project U values
+        </button>
+      </p>
+      {msg && (
+        <p className="ib-small" role="status">
+          {msg}
+        </p>
+      )}
+    </>
+  );
+}
+
+function SuggestionNotes({ notes }: { notes: readonly { text: string; source: string }[] }) {
+  return (
+    <details>
+      <summary>Where these values come from</summary>
+      <ul className="ib-small">
+        {notes.map((n) => (
+          <li key={n.text}>
+            {n.text} ({n.source})
+          </li>
+        ))}
+      </ul>
+    </details>
   );
 }
 

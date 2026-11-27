@@ -32,6 +32,7 @@
     "dos",
     "elastic",
     "hybrid",
+    "neb",
     "optics",
     "phonon-dfpt",
     "phonon-finite-displacement",
@@ -84,6 +85,7 @@
     "dos",
     "elastic",
     "hybrid",
+    "neb",
     "optics",
     "phonon-dfpt",
     "phonon-finite-displacement",
@@ -130,6 +132,7 @@
     "dos",
     "elastic",
     "hybrid",
+    "neb",
     "optics",
     "phonon-dfpt",
     "phonon-finite-displacement",
@@ -169,6 +172,7 @@
    "why": "Negative (force) criteria are more reliable. EDIFF should be at least 10× smaller than any energy-based EDIFFG.",
    "breaks": "A positive value stops on energy change, which can end a relaxation too early. EDIFF should be at least 10 times smaller than any energy-based EDIFFG.",
    "tasks": [
+    "neb",
     "relax"
    ],
    "related": [
@@ -214,6 +218,7 @@
     "dftu",
     "dos",
     "mbj",
+    "neb",
     "optics",
     "relax",
     "static"
@@ -251,6 +256,7 @@
    "breaks": "Too small can end the electronic loop too early and give poor forces.",
    "tasks": [
     "aimd-nvt",
+    "neb",
     "relax"
    ],
    "related": [
@@ -320,6 +326,7 @@
     "elastic",
     "hybrid",
     "mbj",
+    "neb",
     "optics",
     "r2scan",
     "relax",
@@ -366,6 +373,7 @@
     "elastic",
     "hybrid",
     "mbj",
+    "neb",
     "optics",
     "phonon-dfpt",
     "phonon-finite-displacement",
@@ -420,6 +428,7 @@
     "elastic",
     "hybrid",
     "mbj",
+    "neb",
     "optics",
     "phonon-dfpt",
     "phonon-finite-displacement",
@@ -464,6 +473,7 @@
     "dftu",
     "dos",
     "elastic",
+    "neb",
     "optics",
     "phonon-dfpt",
     "phonon-finite-displacement",
@@ -515,6 +525,7 @@
     "dftu",
     "dos",
     "elastic",
+    "neb",
     "optics",
     "relax",
     "soc",
@@ -813,6 +824,7 @@
     "aimd-nvt",
     "dielectric",
     "elastic",
+    "neb",
     "phonon-dfpt",
     "relax"
    ],
@@ -851,6 +863,7 @@
    "tasks": [
     "aimd-nvt",
     "elastic",
+    "neb",
     "relax"
    ],
    "related": [
@@ -900,6 +913,7 @@
     "elastic",
     "hybrid",
     "mbj",
+    "neb",
     "optics",
     "phonon-dfpt",
     "phonon-finite-displacement",
@@ -945,6 +959,7 @@
    "tasks": [
     "aimd-nvt",
     "elastic",
+    "neb",
     "relax"
    ],
    "related": [
@@ -962,6 +977,122 @@
     "workflow"
    ],
    "notes": "Minimum VASP version is not stated in the handbooks and has not been checked."
+  },
+  {
+   "name": "IMAGES",
+   "group": "neb",
+   "type": "int",
+   "default": "None: IMAGES must be set for a NEB run (VASP wiki, Nudged elastic bands).",
+   "typical": "As few as possible; start with 1 and add more once it converges (VASP wiki). 4 to 20 is typical (Henkelman et al. 2000).",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "The number of images between the two fixed end points of a nudged elastic band. VASP runs them side by side.",
+    "intermediate": "The number of images between the two fixed end points of a nudged elastic band. VASP runs them side by side."
+   },
+   "why": "Sets how finely the path between the two end points is sampled. N images need N + 2 folders 00 to N+1.",
+   "breaks": "The core count must be a multiple of IMAGES. More images cost more and rarely help: start small.",
+   "tasks": [
+    "neb"
+   ],
+   "related": [
+    "SPRING",
+    "LCLIMB",
+    "IBRION"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019",
+    "S-087"
+   ],
+   "fromHandbook": [],
+   "readOn": "2026-11-27",
+   "notes": "Not in the handbooks. Read on the cited VASP wiki and VTST pages (D-111)."
+  },
+  {
+   "name": "SPRING",
+   "group": "neb",
+   "type": "real",
+   "default": "-5 (VASP wiki, SPRING); a negative value activates the NEB method.",
+   "typical": "-5. The VASP wiki calls the default reliable.",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "The spring constant between the images. A negative value (the default -5) switches the nudged elastic band on.",
+    "intermediate": "The spring constant between the images. A negative value (the default -5) switches the nudged elastic band on."
+   },
+   "why": "The springs keep the images spread along the path; nudging removes their pull perpendicular to it.",
+   "breaks": "SPRING = 0 lets each image move only perpendicular to the path. Very large values slow convergence.",
+   "tasks": [
+    "neb"
+   ],
+   "related": [
+    "IMAGES"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-019"
+   ],
+   "fromHandbook": [],
+   "readOn": "2026-11-27",
+   "notes": "Not in the handbooks. Read on the cited VASP wiki and VTST pages (D-111)."
+  },
+  {
+   "name": "LCLIMB",
+   "group": "neb",
+   "type": "bool",
+   "default": ".TRUE. in the VTST code (VTST NEB page). Not a standard VASP tag.",
+   "typical": ".TRUE. after a first plain NEB run has settled the band.",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Turns the highest-energy image into a climbing image, which moves up to the saddle point (VTST code only).",
+    "intermediate": "Turns the highest-energy image into a climbing image, which moves up to the saddle point (VTST code only)."
+   },
+   "why": "Plain NEB only brackets the saddle point between two images; the climbing image lands on it, so the barrier is exact.",
+   "breaks": "Standard VASP ignores it. Switched on too early, before the band has settled, it can climb to the wrong maximum.",
+   "tasks": [
+    "neb"
+   ],
+   "related": [
+    "IMAGES",
+    "IOPT"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-086",
+    "S-087"
+   ],
+   "fromHandbook": [],
+   "readOn": "2026-11-27",
+   "notes": "Not in the handbooks. Read on the cited VASP wiki and VTST pages (D-111)."
+  },
+  {
+   "name": "IOPT",
+   "group": "neb",
+   "type": "int",
+   "default": "0: use the optimiser chosen by IBRION (VTST optimizers page). Not a standard VASP tag.",
+   "typical": "3 (quick-min) to start; 1 (L-BFGS) or 7 (FIRE) are faster near convergence (Sheppard et al. 2008).",
+   "vaspVersion": "6.x",
+   "summary": {
+    "beginner": "Chooses a VTST optimiser for NEB and dimer runs: 1 L-BFGS, 2 CG, 3 quick-min, 4 steepest descent, 7 FIRE.",
+    "intermediate": "Chooses a VTST optimiser for NEB and dimer runs: 1 L-BFGS, 2 CG, 3 quick-min, 4 steepest descent, 7 FIRE."
+   },
+   "why": "NEB forces are not the gradient of an energy, so the optimiser must use forces only. IOPT picks such an optimiser.",
+   "breaks": "It only works with IBRION = 3 and POTIM = 0, which switch the built-in VASP optimiser off. Standard VASP ignores it.",
+   "tasks": [
+    "neb"
+   ],
+   "related": [
+    "IBRION",
+    "POTIM",
+    "LCLIMB"
+   ],
+   "handbook": null,
+   "sources": [
+    "S-086",
+    "S-088"
+   ],
+   "fromHandbook": [],
+   "readOn": "2026-11-27",
+   "notes": "Not in the handbooks. Read on the cited VASP wiki and VTST pages (D-111)."
   },
   {
    "name": "NFREE",
@@ -1015,6 +1146,7 @@
     "dielectric",
     "dos",
     "elastic",
+    "neb",
     "phonon-dfpt",
     "phonon-finite-displacement",
     "relax",
@@ -1096,6 +1228,7 @@
     "elastic",
     "hybrid",
     "mbj",
+    "neb",
     "phonon-dfpt",
     "phonon-finite-displacement",
     "r2scan",
@@ -1133,6 +1266,7 @@
    "tasks": [
     "dftu",
     "elastic",
+    "neb",
     "optics",
     "relax",
     "soc"
@@ -1318,6 +1452,7 @@
    "tasks": [
     "band",
     "dos",
+    "neb",
     "relax",
     "static"
    ],
@@ -1404,6 +1539,7 @@
     "dielectric",
     "dos",
     "elastic",
+    "neb",
     "optics",
     "phonon-dfpt",
     "phonon-finite-displacement",
@@ -1447,6 +1583,7 @@
     "dielectric",
     "dos",
     "elastic",
+    "neb",
     "optics",
     "phonon-dfpt",
     "phonon-finite-displacement",
@@ -2538,6 +2675,7 @@
     "band",
     "dos",
     "elastic",
+    "neb",
     "relax",
     "static"
    ],
