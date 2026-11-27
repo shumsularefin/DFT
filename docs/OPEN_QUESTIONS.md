@@ -62,6 +62,7 @@ Anything unverified goes here instead of being guessed. Format: ID, question, wh
 | Q-056 | open | builder |
 | Q-057 | open | builder |
 | Q-058 | open | author |
+| Q-064 | open | builder |
 
 ## Release triage (M11.3)
 
@@ -285,3 +286,6 @@ The work order asked for a textbook source for n, k, alpha, R, L and sigma from 
 
 ## Q-058. Near-zero level for the acoustic modes in the phonon check
 `ACOUSTIC_NEAR_ZERO_CM1 = 5` in `src/lib/vasp/phonons.ts` decides when one of the three lowest Gamma modes counts as near zero (review check POST-PHONON-ACOUSTIC, Heuristic). S-042 says only that a small imaginary acoustic dip of "a few cm^-1" is numerical noise; 5 is the builder's reading of that phrase, not a sourced value. The imaginary-mode check (POST-PHONON-IMAG) does not use it: it flags every f/i mode outside the three lowest. **Close:** the author confirms 5 cm^-1 or gives the level to use. **Owner: author.**
+
+## Q-064. What VASP does with a MAGMOM list of the wrong length
+`06-vasp-files/incar.mdx` said that VASP pads a short `MAGMOM` list, citing S-041, which does not say so; `05-practical-choices/spin-and-magnetism.mdx` says the count must equal the number of atoms and that a wrong count is an error. S-042 supports the second reading (the count must equal NIONS, and its error index lists the message that the MAGMOM count does not match NIONS), so both pages now say that, citing S-042. The VASP wiki page MAGMOM (S-065) could not be reached from the builder session (M16, 2026-11-27) to check whether some versions or input forms behave differently. **Close:** a builder reads the VASP wiki page MAGMOM and confirms the behaviour for a list that is too short and one that is too long, or the author confirms it from a run. **Owner: builder.**
