@@ -206,6 +206,18 @@ test.describe('progress page data controls', () => {
     }
   });
 
+  test('the mastery map fits its width without a sideways scrollbar', async ({ page }) => {
+    await page.goto('/progress/');
+    await ready(page);
+    const fits = () =>
+      page
+        .locator('[data-map-scroll]')
+        .evaluate((el) => el.scrollWidth <= el.clientWidth && el.querySelector('svg')!.clientWidth > 0);
+    await expect.poll(fits).toBe(true);
+    await page.setViewportSize({ width: 1100, height: 800 });
+    await expect.poll(fits).toBe(true);
+  });
+
   test('the map filter narrows both the map and the list', async ({ page }) => {
     await page.goto('/progress/');
     await ready(page);
