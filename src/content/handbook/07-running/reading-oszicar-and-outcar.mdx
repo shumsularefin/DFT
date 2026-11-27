@@ -1,5 +1,28 @@
 ---
 id: reading-oszicar-and-outcar
+stage:
+  scene: m07-oszicar
+  states:
+    - id: loops
+      section: why
+      params: { sample: oszicar-relax-spin, ediff: -2, upto: 3 }
+      caption: 'A sample spin-polarised relaxation: each tube is one electronic loop, its height the log of dE, falling toward the EDIFF plane. Both loops end below 1E-2.'
+    - id: tighter
+      section: intuition
+      params: { sample: oszicar-relax-spin, ediff: -3, upto: 3 }
+      caption: 'Tighten EDIFF to 1E-3 and the first loop ends above the plane (outlined): by that standard its energy is not converged. That is the first question to ask of a log.'
+    - id: tail
+      section: lab
+      params: { sample: oszicar-nospin, ediff: -1, upto: 1 }
+      caption: 'Read a log as tail -f shows it: play the step bar to add the ionic steps of the sample without spin one at a time.'
+    - id: all-steps
+      section: what-changes
+      params: { sample: oszicar-nospin, ediff: -1, upto: 3 }
+      caption: 'All three ionic steps: later loops start lower and take fewer steps. With EDIFF = 1E-1 the first loop still ends above the plane.'
+    - id: stuck
+      section: mistakes
+      params: { sample: oszicar-stuck, ediff: -4 }
+      caption: 'A loop that never converges: dE jumps up and down and ends far above EDIFF. A finished job with a log like this is not a converged result.'
 title: Reading OSZICAR and OUTCAR
 module: 7
 order: 4

@@ -1,5 +1,32 @@
 ---
 id: incar
+stage:
+  scene: m06-incar
+  states:
+    - id: encut
+      section: why
+      params: { tag: encut, encut: 400 }
+      caption: 'ENCUT as a sphere in reciprocal space: every dot is a plane wave kept for Si at 400 eV. Drag ENCUT and watch the sphere and the count in the readout grow.'
+    - id: spins
+      section: intuition
+      params: { tag: ispin, ispin: '2', magmom: 3, order: ferro }
+      caption: 'ISPIN = 2 with MAGMOM = 2*3.0 on bcc Fe: one starting moment per atom. Switch the order to antiferromagnetic and the centre atoms flip (open arrows).'
+    - id: smearing
+      section: in-vasp
+      params: { tag: ismear, ismear: gaussian, sigma: 0.05 }
+      caption: 'ISMEAR and SIGMA as an occupation surface over level energy and SIGMA. The tube is the SIGMA you set: a narrow step at 0.05 eV. Slide SIGMA to widen it.'
+    - id: high-cut
+      section: what-changes
+      params: { tag: encut, encut: 650 }
+      caption: 'A higher ENCUT keeps more plane waves: the count grows as ENCUT to the power 3/2, which is where the longer run and the extra memory come from.'
+    - id: no-spin
+      section: mistakes
+      params: { tag: ispin, ispin: '1', magmom: 3 }
+      caption: 'ISPIN = 1 with a MAGMOM line: the run is not spin polarised, so the moments are simply not used. Set ISPIN = 2 to bring them back.'
+    - id: mp-overshoot
+      section: check
+      params: { tag: ismear, ismear: mp1, sigma: 0.2 }
+      caption: 'Methfessel-Paxton, ISMEAR = 1: the occupation surface rises above 1 and dips below 0 near the Fermi level. The readouts give how far.'
 title: INCAR, the instruction file
 module: 6
 order: 3

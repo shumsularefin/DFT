@@ -1,5 +1,29 @@
 ---
 id: poscar
+stage:
+  scene: m06-poscar
+  states:
+    - id: species
+      section: why
+      params: { file: si, line: species }
+      caption: 'Si diamond, drawn from the topic example file. Lines 6 and 7 name the element and count two atoms; turn the cell around and find both of them.'
+    - id: vectors
+      section: intuition
+      params: { file: si, line: lattice }
+      camera: iso
+      caption: 'Lines 3 to 5 are the arrows a1, a2 and a3 that span the cell. Rotate it: these three short vectors make a slanted box, not a cube.'
+    - id: position
+      section: math
+      params: { file: si, line: positions }
+      caption: 'The last atom line, 0.25 0.25 0.25, is walked along the tube as 0.25 a1 + 0.25 a2 + 0.25 a3. Pick another file to see the same sum in other cells.'
+    - id: scaling
+      section: what-changes
+      params: { file: mg, line: scale, scale: 1.1 }
+      caption: 'The scaling factor raised by 10 percent: every length grows together and the volume by 1.1 cubed. The dashed cell is the value in the file; drag the slider both ways.'
+    - id: misread
+      section: mistakes
+      params: { file: nacl, line: keyword, reading: misread }
+      caption: 'NaCl with its Direct numbers read as Cartesian: all eight atoms crowd within 1 Angstrom of the origin, the case where VASP warns that ions are too close. Switch Coordinates back to Direct.'
 title: POSCAR, the structure file
 module: 6
 order: 1
