@@ -153,6 +153,14 @@ export class Viewer3D {
   get info() {
     return this.renderer?.info;
   }
+  /**
+   * The distance at which a perspective camera shows what the view shows now. Equal to the camera distance in perspective;
+   * in orthographic projection a zoom changes the frustum, not the distance, so this follows the zoom instead (M16.4:
+   * readouts and tests that measure "how far" keep one meaning in both projections).
+   */
+  get apparentDistance(): number {
+    return this.useOrtho ? this.orthoHalf / Math.tan((FOV * Math.PI) / 360) : this.state.dist;
+  }
 
   /** Create the renderer and attach input and observers. */
   start(): void {

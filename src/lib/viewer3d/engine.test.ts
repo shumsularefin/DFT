@@ -190,6 +190,20 @@ describe('Viewer3D', () => {
     expect(v.state.dist).toBeCloseTo(d, 9);
   });
 
+  it('reports the apparent distance in both projections, and an orthographic zoom changes it', () => {
+    const { v } = setup({ reduced: true });
+    v.setFrame(cube);
+    const d = v.state.dist;
+    expect(v.apparentDistance).toBeCloseTo(d, 9);
+    v.setOrtho(true);
+    expect(v.apparentDistance).toBeCloseTo(d, 9);
+    v.zoom(0.5);
+    expect(v.state.dist).toBeCloseTo(d, 9); // the camera does not move in orthographic projection
+    expect(v.apparentDistance).toBeCloseTo(d * 0.5, 6);
+    v.reset(false);
+    expect(v.apparentDistance).toBeCloseTo(d, 6);
+  });
+
   it('hides and shows layer groups and lists them in order', () => {
     const { v } = setup({ reduced: true });
     v.setFrame(cube, ['text']);
