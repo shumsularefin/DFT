@@ -40,7 +40,7 @@ summary: How to run a band structure (ICHARG = 11 on a line-mode path, or KPOINT
 concepts: [band-structure-analysis]
 requires: [dos-analysis, k-points]
 vaspTags: [ICHARG, NBANDS, LORBIT, ISPIN, ISMEAR, KPOINTS_OPT, LMAXMIX]
-sources: [S-005, S-006, S-019, S-020, S-031, S-034, S-036, S-041, S-042, S-050, S-088, S-089, S-091]
+sources: [S-005, S-006, S-019, S-020, S-031, S-034, S-036, S-041, S-042, S-050, S-174, S-175, S-091]
 status: draft
 updated: 2026-11-27
 ---
@@ -102,9 +102,9 @@ Two cautions. First, $k$ must be a Cartesian distance in $\text{\AA}^{-1}$ that 
 
 <Level min="pro">
 
-The Kohn-Sham gap is not the fundamental gap. Even the exact functional would miss it by the derivative discontinuity of the exchange-correlation potential, and semilocal functionals add self-interaction error on top; both push the gap down <Cite id="S-089" />. This is why PBE gaps are typically too small and why the band dispersion is often more trustworthy than the absolute gap.
+The Kohn-Sham gap is not the fundamental gap. Even the exact functional would miss it by the derivative discontinuity of the exchange-correlation potential, and semilocal functionals add self-interaction error on top; both push the gap down <Cite id="S-175" />. This is why PBE gaps are typically too small and why the band dispersion is often more trustworthy than the absolute gap.
 
-**Band unfolding.** A supercell (for a defect, an alloy or a slab) folds the bands of the primitive cell back into its smaller Brillouin zone, so the plot fills with lines. Unfolding projects each supercell state onto the primitive-cell k-points and gives a spectral weight $P_{\mathbf K}(\mathbf k_i) = \sum_n \lvert\langle \mathbf K m \mid \mathbf k_i n\rangle\rvert^2$, the "effective band structure" <Cite id="S-088" />. VASPKIT tasks 281 and 282 prepare the k-points and write the unfolded data <Cite id="S-042" />.
+**Band unfolding.** A supercell (for a defect, an alloy or a slab) folds the bands of the primitive cell back into its smaller Brillouin zone, so the plot fills with lines. Unfolding projects each supercell state onto the primitive-cell k-points and gives a spectral weight $P_{\mathbf K}(\mathbf k_i) = \sum_n \lvert\langle \mathbf K m \mid \mathbf k_i n\rangle\rvert^2$, the "effective band structure" <Cite id="S-174" />. VASPKIT tasks 281 and 282 prepare the k-points and write the unfolded data <Cite id="S-042" />.
 
 </Level>
 
@@ -235,8 +235,8 @@ Cause: semilocal functionals underestimate gaps. Fix: say which functional gave 
 - VASP wiki pages EIGENVAL, ICHARG, NBANDS, KPOINTS_OPT, LORBIT and PROCAR, by page name <Cite id="S-019" />.
 - Hinuma and co-workers on standardized cells and band paths <Cite id="S-006" />, and Setyawan and Curtarolo for the older convention <Cite id="S-005" />.
 - Ashcroft and Mermin on effective masses and semiclassical dynamics <Cite id="S-036" />.
-- Popescu and Zunger on unfolding supercell bands <Cite id="S-088" />.
-- Perdew and Levy, and Sham and Schluter, on why Kohn-Sham gaps are too small <Cite id="S-089" />.
+- Popescu and Zunger on unfolding supercell bands <Cite id="S-174" />.
+- Perdew and Levy, and Sham and Schluter, on why Kohn-Sham gaps are too small <Cite id="S-175" />.
 - The [k-path tool](/tools/kpath/) on this site for paths and cells.
 
 </GoDeeper>

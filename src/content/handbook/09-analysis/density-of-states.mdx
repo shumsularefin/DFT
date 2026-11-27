@@ -40,7 +40,7 @@ summary: How VASP builds the total and projected DOS (NEDOS, EMIN, EMAX, tetrahe
 concepts: [dos-analysis]
 requires: [dft-energies-forces, smearing]
 vaspTags: [LORBIT, NEDOS, EMIN, EMAX, ISMEAR, SIGMA, ISPIN, ICHARG, RWIGS]
-sources: [S-017, S-019, S-020, S-034, S-041, S-042, S-085]
+sources: [S-017, S-019, S-020, S-034, S-041, S-042, S-171]
 status: draft
 updated: 2026-11-27
 ---
@@ -49,7 +49,7 @@ updated: 2026-11-27
 
 The <Term id="density-of-states">density of states</Term> (DOS) counts how many electron states the crystal has at each energy. One plot answers several first questions about a material: is it a metal (states at the <Term id="fermi-level">Fermi level</Term>) or an insulator (a gap around it), which elements and orbitals form the top of the valence band and the bottom of the conduction band, whether two species hybridize, and how strongly the spin channels split in a magnet <Cite id="S-042" />.
 
-The <Term id="projected-dos">projected DOS</Term> goes further: it splits the total into atoms and orbitals, which is how you tell an oxygen-p peak from a metal-d peak, count d electrons, or compute the <Term id="d-band-center">d-band center</Term> that catalysis papers quote <Cite id="S-085" />. Each of these numbers depends on settings that are easy to leave at a poor default <Cite id="S-041" />.
+The <Term id="projected-dos">projected DOS</Term> goes further: it splits the total into atoms and orbitals, which is how you tell an oxygen-p peak from a metal-d peak, count d electrons, or compute the <Term id="d-band-center">d-band center</Term> that catalysis papers quote <Cite id="S-171" />. Each of these numbers depends on settings that are easy to leave at a poor default <Cite id="S-041" />.
 
 </Why>
 
@@ -98,7 +98,7 @@ The total $m$ equals the difference of the two integrated-DOS columns at $E_F$, 
 
 <Level min="pro">
 
-**The d-band center.** In the model of Hammer and Norskov, the first moment of the d-projected DOS of a surface atom tracks how strongly it binds adsorbates: a center closer to $E_F$ means stronger binding on transition-metal surfaces <Cite id="S-085" />.
+**The d-band center.** In the model of Hammer and Norskov, the first moment of the d-projected DOS of a surface atom tracks how strongly it binds adsorbates: a center closer to $E_F$ means stronger binding on transition-metal surfaces <Cite id="S-171" />.
 
 $$\varepsilon_d = \frac{\int E\,g_d(E)\,dE}{\int g_d(E)\,dE}$$
 
@@ -219,7 +219,7 @@ Cause: the projection spheres leave space between atoms uncounted. Fix: nothing 
 
 - VASP wiki pages DOSCAR, LORBIT, NEDOS, EMIN, EMAX, RWIGS and ISMEAR, by page name <Cite id="S-019" />.
 - Blochl, Jepsen and Andersen on the improved tetrahedron method <Cite id="S-017" />.
-- Hammer and Norskov on the d-band model of surface reactivity <Cite id="S-085" />.
+- Hammer and Norskov on the d-band model of surface reactivity <Cite id="S-171" />.
 - The Field Handbook entries DOSCAR, LORBIT and NEDOS <Cite id="S-041" />, and the Workflow Handbook DOS step <Cite id="S-042" />.
 
 </GoDeeper>

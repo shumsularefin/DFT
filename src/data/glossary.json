@@ -651,7 +651,7 @@
     "short": "The average energy of the d states of an atom, the first moment of its d-projected density of states; on transition-metal surfaces it tracks how strongly adsorbates bind.",
     "level": "pro",
     "sources": [
-      "S-085"
+      "S-171"
     ]
   },
   {
@@ -669,8 +669,8 @@
     "short": "A number between 0 and 1 at each point in space; values near 1 mark localized electron pairs such as bonds and lone pairs, and 0.5 is the value of a uniform electron gas.",
     "level": "intermediate",
     "sources": [
-      "S-086",
-      "S-087"
+      "S-172",
+      "S-173"
     ]
   },
   {

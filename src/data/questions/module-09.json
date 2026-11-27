@@ -867,7 +867,7 @@
     "difficulty": 1.5,
     "level": "pro",
     "sources": [
-      "S-085",
+      "S-171",
       "S-042"
     ],
     "visual": {
@@ -1421,8 +1421,8 @@
     "difficulty": 1,
     "level": "intermediate",
     "sources": [
-      "S-086",
-      "S-087"
+      "S-172",
+      "S-173"
     ],
     "visual": {
       "scene": "fcc",

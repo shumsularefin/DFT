@@ -40,7 +40,7 @@ summary: How CHGCAR stores the density (rho times cell volume, x fastest, a magn
 concepts: [charge-density-analysis]
 requires: [dft-energies-forces]
 vaspTags: [LCHARG, ISPIN, LELF, LPARD, IBAND, EINT, NBMOD, KPUSE, LSEPB, LSEPK, LAECHG, NGXF]
-sources: [S-019, S-029, S-030, S-041, S-042, S-043, S-084, S-086, S-087, S-094]
+sources: [S-019, S-029, S-030, S-041, S-042, S-043, S-084, S-172, S-173, S-094]
 status: draft
 updated: 2026-11-27
 ---
@@ -63,7 +63,7 @@ Four derived pictures do most of the work:
 
 - **<Term id="charge-density-difference">Charge density difference</Term>.** Subtract the densities of the separated parts from the density of the whole, on the same grid. Red and blue lobes then show where bonding added and removed charge <Cite id="S-042" />.
 - **Spin density.** The second block of a spin-polarized `CHGCAR` is $\rho_\uparrow - \rho_\downarrow$: it shows the shape of the magnetic orbitals (a d lobe on a metal, a p lobe on a ligand) <Cite id="S-041" />.
-- **<Term id="electron-localization-function">ELF</Term>.** A number between 0 and 1 that asks how much the electrons at a point behave like a localized pair. Values near 1 mark bonds, lone pairs and shells; about 0.5 is what a uniform electron gas gives, so metallic regions sit near 0.5; low values separate the localized regions <Cite id="S-086" /> <Cite id="S-087" />.
+- **<Term id="electron-localization-function">ELF</Term>.** A number between 0 and 1 that asks how much the electrons at a point behave like a localized pair. Values near 1 mark bonds, lone pairs and shells; about 0.5 is what a uniform electron gas gives, so metallic regions sit near 0.5; low values separate the localized regions <Cite id="S-172" /> <Cite id="S-173" />.
 - **Band-decomposed density** (`PARCHG`). The density of only some bands or of an energy window: a defect state, the bands that form the VBM, or the filled states just below $E_F$ that a simple model of an STM image uses <Cite id="S-041" /> <Cite id="S-094" />.
 
 </Intuition>
@@ -96,7 +96,7 @@ with $A$ the area of the cell face. $A\,\bar\rho$ is a line density in $e/\text{
 
 <Level min="pro">
 
-**The ELF.** In the form used for solids (closed shell, Hartree atomic units) <Cite id="S-086" /> <Cite id="S-087" />:
+**The ELF.** In the form used for solids (closed shell, Hartree atomic units) <Cite id="S-172" /> <Cite id="S-173" />:
 
 $$\text{ELF} = \frac{1}{1 + \left(t_P/t_{\text{HEG}}\right)^2}, \quad t_P = \tfrac12\sum_i \lvert\nabla\psi_i\rvert^2 - \frac{\lvert\nabla\rho\rvert^2}{8\rho}, \quad t_{\text{HEG}} = \tfrac{3}{10}(3\pi^2)^{2/3}\rho^{5/3}$$
 
@@ -217,7 +217,7 @@ Cause: the SCF ran with `LWAVE = .FALSE.`, so there are no wavefunctions to deco
 <GoDeeper>
 
 - VASP wiki pages CHGCAR, LOCPOT, LELF, LPARD, NBMOD, EINT and LAECHG, by page name <Cite id="S-019" />.
-- Becke and Edgecombe on the ELF <Cite id="S-086" />, and Savin and co-workers on reading it in solids <Cite id="S-087" />.
+- Becke and Edgecombe on the ELF <Cite id="S-172" />, and Savin and co-workers on reading it in solids <Cite id="S-173" />.
 - Tersoff and Hamann on the simplest model of an STM image <Cite id="S-094" />.
 - Henkelman and co-workers on Bader analysis <Cite id="S-029" /> <Cite id="S-084" />, and [the Bader topic](/handbook/12-properties/bader-charges/).
 - Momma and Izumi on VESTA <Cite id="S-043" />; Lorensen and Cline on isosurfaces <Cite id="S-030" />.

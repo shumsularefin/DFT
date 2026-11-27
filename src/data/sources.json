@@ -712,7 +712,7 @@
     "notes": "Added in M16. Values are quoted to the precision commonly cited, labelled as literature on the page"
   },
   {
-    "id": "S-085",
+    "id": "S-171",
     "citation": "B. Hammer, J. K. Norskov, \"Electronic factors determining the reactivity of metal surfaces\", Surf. Sci. 343, 211-220 (1995); B. Hammer, J. K. Norskov, \"Why gold is the noblest of all the metals\", Nature 376, 238-240 (1995)",
     "usedFor": "d-band model: the d-band center as the first moment of the d-projected DOS and its link to adsorption strength (M16, DOS page)",
     "access": "paywalled",
@@ -720,15 +720,15 @@
     "notes": "Only the definition and the qualitative trend are used; the integration window convention is left to the user and must be reported"
   },
   {
-    "id": "S-086",
+    "id": "S-172",
     "citation": "A. D. Becke, K. E. Edgecombe, \"A simple measure of electron localization in atomic and molecular systems\", J. Chem. Phys. 92, 5397-5403 (1990)",
     "usedFor": "Definition of the electron localization function (M16, charge density page)",
     "access": "paywalled",
     "status": "cited-from-memory",
-    "notes": "The closed-shell form shown on the page follows S-087"
+    "notes": "The closed-shell form shown on the page follows S-173"
   },
   {
-    "id": "S-087",
+    "id": "S-173",
     "citation": "A. Savin, O. Jepsen, J. Flad, O. K. Andersen, H. Preuss, H. G. von Schnering, \"Electron localization in solid-state structures of the elements: the diamond structure\", Angew. Chem. Int. Ed. Engl. 31, 187-188 (1992); A. Savin, R. Nesper, S. Wengert, T. F. Fassler, \"ELF: The electron localization function\", Angew. Chem. Int. Ed. Engl. 36, 1808-1832 (1997)",
     "usedFor": "ELF in solids, the kinetic-energy form and the value 0.5 for the uniform electron gas (M16, charge density page)",
     "access": "paywalled",
@@ -736,7 +736,7 @@
     "notes": "The limits ELF = 1 (single orbital pair) and 0.5 (uniform gas) follow directly from the formula on the page"
   },
   {
-    "id": "S-088",
+    "id": "S-174",
     "citation": "V. Popescu, A. Zunger, \"Extracting E versus k effective band structure from supercell calculations on alloys and impurities\", Phys. Rev. B 85, 085201 (2012)",
     "usedFor": "Band unfolding and the spectral weight of supercell states (M16, band structure page)",
     "access": "paywalled",
@@ -744,7 +744,7 @@
     "notes": "Concept only; the VASPKIT commands come from S-042"
   },
   {
-    "id": "S-089",
+    "id": "S-175",
     "citation": "J. P. Perdew, M. Levy, \"Physical content of the exact Kohn-Sham orbital energies: band gaps and derivative discontinuities\", Phys. Rev. Lett. 51, 1884 (1983); L. J. Sham, M. Schluter, \"Density-functional theory of the energy gap\", Phys. Rev. Lett. 51, 1888 (1983)",
     "usedFor": "Why Kohn-Sham gaps differ from fundamental gaps (M16, band structure page)",
     "access": "paywalled",
