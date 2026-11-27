@@ -10,6 +10,7 @@ import {
   type MpIndex,
   type SortKey,
 } from '../../../lib/mp/query';
+import '../../../styles/tools.css';
 import './studio.css';
 
 export default function StudioTool() {
@@ -104,53 +105,69 @@ export default function StudioTool() {
     URL.revokeObjectURL(url);
   }
 
+  const presets: { label: string; on: boolean; apply: () => void }[] = [
+    {
+      label: 'Beginner-friendly (<= 10 sites, stable)',
+      on: maxSites === '10' && onlyStable && includeEl === '',
+      apply: () => {
+        setMaxSites('10');
+        setOnlyStable(true);
+        setIncludeEl('');
+      },
+    },
+    {
+      label: 'Stable oxides',
+      on: includeEl === 'O' && onlyStable && maxSites === '',
+      apply: () => {
+        setIncludeEl('O');
+        setOnlyStable(true);
+        setMaxSites('');
+      },
+    },
+    {
+      label: 'Magnetic candidates',
+      on: onlyMagnetic && includeEl === '' && !onlyStable,
+      apply: () => {
+        setOnlyMagnetic(true);
+        setIncludeEl('');
+        setOnlyStable(false);
+      },
+    },
+  ];
+
   return (
     <div className="st-root" data-tool-id="studio">
-      {loadErr && <p role="alert">{loadErr}</p>}
+      <header className="page-h tool-head">
+        <div>
+          <h1>Materials Screening</h1>
+          <p>
+            Filter candidate materials locally in your browser by chemistry, hull stability, band gap, cell
+            size and magnetism, then open any entry&apos;s feasibility check and starter VASP project card.
+          </p>
+        </div>
+      </header>
+
+      {loadErr && (
+        <p className="notice" role="alert">
+          {loadErr}
+        </p>
+      )}
 
       {manifest?.synthetic && (
-        <div className="st-banner" role="status">
+        <div className="notice st-banner" role="status">
           <strong>Synthetic demo data:</strong> {manifest.attribution}
         </div>
       )}
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+      <div className="row st-pills">
+        {presets.map((p) => (
+          <button key={p.label} type="button" className={`pill${p.on ? ' on' : ''}`} onClick={p.apply}>
+            Preset: {p.label}
+          </button>
+        ))}
         <button
           type="button"
-          className="st-btn"
-          onClick={() => {
-            setMaxSites('10');
-            setOnlyStable(true);
-            setIncludeEl('');
-          }}
-        >
-          Preset: Beginner-friendly (&lt;= 10 sites, stable)
-        </button>
-        <button
-          type="button"
-          className="st-btn"
-          onClick={() => {
-            setIncludeEl('O');
-            setOnlyStable(true);
-            setMaxSites('');
-          }}
-        >
-          Preset: Stable oxides
-        </button>
-        <button
-          type="button"
-          className="st-btn"
-          onClick={() => {
-            setOnlyMagnetic(true);
-            setIncludeEl('');
-            setOnlyStable(false);
-          }}
-        >
-          Preset: Magnetic candidates
-        </button>
-        <button
-          type="button"
-          className="st-btn"
+          className="pill"
           onClick={() => {
             setText('');
             setIncludeEl('');
@@ -163,9 +180,16 @@ export default function StudioTool() {
         >
           Clear filters
         </button>
+        <span className="st-spacer" />
+        <button type="button" className="btn" onClick={exportCsv} disabled={matchedIndices.length === 0}>
+          <svg className="st-ico" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 4v11m0 0 4-4m-4 4-4-4M5 19h14" />
+          </svg>
+          Export selection CSV
+        </button>
       </div>
 
-      <div className="st-filters" role="region" aria-label="Material filters">
+      <div className="card st-filters" role="region" aria-label="Material filters">
         <label className="st-field">
           <span>Formula or ID</span>
           <input value={text} onChange={(e) => setText(e.target.value)} placeholder="e.g. SrTiO3 or mp-..." />
@@ -212,125 +236,151 @@ export default function StudioTool() {
             <option value="formula_pretty">Formula</option>
           </select>
         </label>
-        <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-          <input type="checkbox" checked={onlyStable} onChange={(e) => setOnlyStable(e.target.checked)} />
-          On hull (stable)
-        </label>
-        <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-          <input type="checkbox" checked={onlyMagnetic} onChange={(e) => setOnlyMagnetic(e.target.checked)} />
-          Magnetic only
-        </label>
+        <div className="st-checks">
+          <label>
+            <input type="checkbox" checked={onlyStable} onChange={(e) => setOnlyStable(e.target.checked)} />
+            On hull (stable)
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={onlyMagnetic}
+              onChange={(e) => setOnlyMagnetic(e.target.checked)}
+            />
+            Magnetic only
+          </label>
+        </div>
       </div>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '0.5rem',
-        }}
-      >
-        <span>
-          Showing {visibleRows.length} of {matchedIndices.length} matching material(s)
-          {index ? ` (${index.count} total in dataset)` : ''}
-        </span>
-        <button type="button" className="st-btn" onClick={exportCsv} disabled={matchedIndices.length === 0}>
-          Export selection CSV
-        </button>
-      </div>
+      <p className="st-count">
+        Showing {visibleRows.length} of {matchedIndices.length} matching material(s)
+        {index ? ` (${index.count} total in dataset)` : ''}
+      </p>
 
-      <div className="st-table-wrap">
-        <table className="st-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Formula</th>
-              <th>Space group</th>
-              <th>Sites</th>
-              <th>E_hull (eV/at)</th>
-              <th>Gap (eV, PBE)</th>
-              <th>Mag</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {visibleRows.map((r) => (
-              <tr key={r.material_id}>
-                <td>
-                  <code>{r.material_id}</code>
-                </td>
-                <td>
-                  <strong>{r.formula_pretty}</strong>
-                </td>
-                <td>
-                  {r.spacegroup.symbol} ({r.spacegroup.crystalSystem})
-                </td>
-                <td>{r.nsites}</td>
-                <td>{r.energy_above_hull.toFixed(3)}</td>
-                <td>{r.band_gap.toFixed(2)}</td>
-                <td>{r.is_magnetic ? (r.ordering ?? 'Mag') : 'NM'}</td>
-                <td>
-                  <button type="button" className="st-btn" onClick={() => setSelectedId(r.material_id)}>
-                    Inspect
-                  </button>
-                </td>
+      <div className="split st-split">
+        <div className="card st-table-card">
+          <table className="st-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Formula</th>
+                <th>Space group</th>
+                <th>Sites</th>
+                <th>E_hull (eV/at)</th>
+                <th>Gap (eV, PBE)</th>
+                <th>Mag</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {visibleRows.map((r) => (
+                <tr
+                  key={r.material_id}
+                  className={r.material_id === selectedId ? 'on' : undefined}
+                  onClick={() => setSelectedId(r.material_id)}
+                >
+                  <td>{r.material_id}</td>
+                  <td className="st-formula">{r.formula_pretty}</td>
+                  <td>
+                    {r.spacegroup.symbol} ({r.spacegroup.crystalSystem})
+                  </td>
+                  <td>{r.nsites}</td>
+                  <td>{r.energy_above_hull.toFixed(3)}</td>
+                  <td>{r.band_gap.toFixed(2)}</td>
+                  <td>{r.is_magnetic ? (r.ordering ?? 'Mag') : 'NM'}</td>
+                  <td>
+                    <button
+                      type="button"
+                      className="btn btn-ghost st-inspect"
+                      aria-pressed={r.material_id === selectedId}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedId(r.material_id);
+                      }}
+                    >
+                      Inspect
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {index && visibleRows.length === 0 && (
+            <p className="ph st-empty">No material matches these filters.</p>
+          )}
+        </div>
+
+        {selectedRow ? (
+          <section className="card st-card" aria-label={`Details for ${selectedRow.formula_pretty}`}>
+            <h2 className="card-h">
+              {selectedRow.formula_pretty} <code>{selectedRow.material_id}</code>
+            </h2>
+            <div className="row st-badges">
+              {selectedRow.is_stable && <Badge variant="verified" />}
+              <span className="badge st-tag">{selectedRow.spacegroup.crystalSystem}</span>
+              <span className="badge st-tag">
+                {selectedRow.is_magnetic ? (selectedRow.ordering ?? 'Magnetic') : 'Non-magnetic'}
+              </span>
+              <span className="badge st-tag">PBE</span>
+            </div>
+            <dl className="grid g3 st-stats">
+              <div>
+                <dt>Space group</dt>
+                <dd>{selectedRow.spacegroup.symbol}</dd>
+              </div>
+              <div>
+                <dt>Sites</dt>
+                <dd>{selectedRow.nsites}</dd>
+              </div>
+              <div>
+                <dt>Volume (A^3)</dt>
+                <dd>{selectedRow.volume.toFixed(2)}</dd>
+              </div>
+              <div>
+                <dt>Density (g/cm^3)</dt>
+                <dd>{selectedRow.density.toFixed(2)}</dd>
+              </div>
+              <div>
+                <dt>E_hull (eV/atom)</dt>
+                <dd>{selectedRow.energy_above_hull.toFixed(4)}</dd>
+              </div>
+              <div>
+                <dt>Band gap (eV)</dt>
+                <dd>{selectedRow.band_gap.toFixed(3)}</dd>
+              </div>
+            </dl>
+            <p className="notice st-caveat">
+              PBE-level caveat: standard PBE underestimates experimental gaps and overestimates lattice
+              constants by 1 to 2 %, S-042.
+            </p>
+            <div className="stack st-actions">
+              <a className="btn btn-primary" href={`/studio/project/#${selectedRow.material_id}`}>
+                Feasibility &amp; First-Project Card
+              </a>
+              {looksLikePerovskite(selectedRow.formula_pretty, selectedRow.nsites) && (
+                <a className="btn" href="/tools/tolerance-factor/">
+                  Check perovskite tolerance factors
+                </a>
+              )}
+              <a className="btn" href="/tools/input-builder/">
+                Open Input Builder
+              </a>
+            </div>
+          </section>
+        ) : (
+          <section className="card st-card" aria-label="Inspector">
+            <h2 className="card-h">Inspector</h2>
+            <p className="ph st-ph">Select a material in the table to see its details and starter project.</p>
+          </section>
+        )}
       </div>
 
-      {selectedRow && (
-        <section className="st-card" aria-label={`Details for ${selectedRow.formula_pretty}`}>
-          <h2>
-            {selectedRow.formula_pretty} (<code>{selectedRow.material_id}</code>){' '}
-            {selectedRow.is_stable && <Badge variant="verified" />}
-          </h2>
-          <p>
-            Space group: <strong>{selectedRow.spacegroup.symbol}</strong> (
-            {selectedRow.spacegroup.crystalSystem}), {selectedRow.nsites} sites, volume{' '}
-            {selectedRow.volume.toFixed(2)} A^3, density {selectedRow.density.toFixed(2)} g/cm^3.
-          </p>
-          <p>
-            E_hull: {selectedRow.energy_above_hull.toFixed(4)} eV/atom | Band gap:{' '}
-            {selectedRow.band_gap.toFixed(3)} eV (PBE-level caveat: standard PBE underestimates experimental
-            gaps and overestimates lattice constants by 1 to 2 %, S-042).
-          </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-            <a
-              className="st-btn"
-              href={`/studio/project/#${selectedRow.material_id}`}
-              style={{ display: 'inline-flex', alignItems: 'center' }}
-            >
-              Feasibility &amp; First-Project Card
-            </a>
-            {looksLikePerovskite(selectedRow.formula_pretty, selectedRow.nsites) && (
-              <a
-                className="st-btn"
-                href="/tools/tolerance-factor/"
-                style={{ display: 'inline-flex', alignItems: 'center' }}
-              >
-                Check perovskite tolerance factors
-              </a>
-            )}
-            <a
-              className="st-btn"
-              href="/tools/input-builder/"
-              style={{ display: 'inline-flex', alignItems: 'center' }}
-            >
-              Open Input Builder
-            </a>
-          </div>
-        </section>
-      )}
-
-      <details>
+      <details className="card st-details">
         <summary>Why there is no ML column yet</summary>
-        <p style={{ fontSize: 'var(--step--1)', color: 'var(--text-muted)' }}>
+        <p>
           The index schema reserves an optional <code>ml_e_above_hull</code> field (currently null and
           hidden). No machine-learning model is trained or served on Spark hosting, and showing an unvalidated
-          ML prediction would break this site's honesty rules.
+          ML prediction would break this site&apos;s honesty rules.
         </p>
       </details>
 

@@ -27,6 +27,7 @@ import {
   type LnCnPolicy,
 } from '../../../lib/perovskite/urlState';
 import ToleranceMaps from './ToleranceMaps';
+import '../../../styles/tools.css';
 import './tolerance-factor.css';
 
 const SHANNON_ELEMENTS = new Set(SHANNON_ENTRIES.map((e) => e.el));
@@ -228,294 +229,321 @@ export default function ToleranceFactorTool() {
 
   return (
     <div className="tf-root" data-tool-id="tolerance-factor">
-      <div className="tf-presets" role="group" aria-label="Example perovskite compositions">
-        <span>Examples:</span>
-        {PRESETS.map((p) => (
-          <button
-            key={p.id}
-            type="button"
-            className="tf-preset-btn"
-            onClick={() => {
-              setState(p.state);
-              setPickerTarget(null);
-            }}
-          >
-            {p.label}
-          </button>
-        ))}
-        <label className="tf-field" style={{ marginLeft: 'auto' }}>
-          <span>Radius set</span>
-          <select
-            aria-label="Radius set"
-            value={state.kind}
-            onChange={(e) => setState((prev) => ({ ...prev, kind: e.target.value as RadiusKind }))}
-          >
-            <option value="ionic">Effective ionic (Shannon 1976)</option>
-            <option value="crystal">Crystal (Shannon 1976)</option>
-          </select>
-        </label>
-      </div>
-
-      {showLnPolicy && (
-        <div className="tf-policy" role="region" aria-label="Rare-earth A-site coordination policy">
-          <strong>Rare-earth A-site CN policy (D-028):</strong>
-          <span>
-            Shannon lists CN 12 for only 4 of 15 lanthanides (La, Ce, Nd, Sm). Choose how Ln3+ / Y3+ A-site
-            coordination is selected:
-          </span>
-          <label className="tf-field">
-            <span className="sr-only">A-site coordination policy</span>
-            <select
-              aria-label="A-site coordination policy"
-              value={state.lnPolicy}
-              onChange={(e) => applyLnPolicy(e.target.value as LnCnPolicy)}
-            >
-              <option value="cn12">Strict CN XII (missing ions left blank)</option>
-              <option value="cn9">Uniform CN IX (available for all Ln3+ and Y3+)</option>
-              <option value="cn8">Uniform CN VIII (available for all Ln3+ and Y3+)</option>
-              <option value="highest">Highest listed CN up to XII (Bartel rule)</option>
-            </select>
-          </label>
+      <header className="page-h tool-head">
+        <div>
+          <h1>Perovskite tolerance-factor explorer</h1>
+          <p>
+            Choose A, B and X ions (including mixed sites) to inspect their exact Shannon 1976 radii and
+            compute the Goldschmidt tolerance factor t, octahedral factor mu and Bartel tolerance factor tau.
+            Missing radii are reported honestly rather than guessed.
+          </p>
         </div>
-      )}
+        <div className="row">
+          <button type="button" className="btn" onClick={copyShareLink}>
+            {copied ? 'Link copied' : 'Copy shareable link'}
+          </button>
+        </div>
+      </header>
+      <div className="split left tf-split">
+        <div className="card tool-inputs tf-inputs">
+          <h2 className="card-h">Inputs</h2>
+          <div className="tf-presets" role="group" aria-label="Example perovskite compositions">
+            <span className="sr-only">Examples:</span>
+            {PRESETS.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                className="pill"
+                onClick={() => {
+                  setState(p.state);
+                  setPickerTarget(null);
+                }}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+          <div className="tf-presets">
+            <label className="tf-field tf-radius">
+              <span>Radius set</span>
+              <select
+                aria-label="Radius set"
+                value={state.kind}
+                onChange={(e) => setState((prev) => ({ ...prev, kind: e.target.value as RadiusKind }))}
+              >
+                <option value="ionic">Effective ionic (Shannon 1976)</option>
+                <option value="crystal">Crystal (Shannon 1976)</option>
+              </select>
+            </label>
+          </div>
 
-      <div className="tf-sites">
-        {(['A', 'B', 'X'] as const).map((site) => {
-          const siteTitle =
-            site === 'A'
-              ? 'A site (large cation, default CN XII)'
-              : site === 'B'
-                ? 'B site (octahedral cation, default CN VI)'
-                : 'X site (anion, default CN VI)';
-          const occs = state[site];
-          return (
-            <section key={site} className="tf-site" aria-label={`${site} site`}>
-              <div className="tf-site-head">
-                <h2>{siteTitle}</h2>
-                {site !== 'X' && (
-                  <button type="button" className="tf-preset-btn" onClick={() => toggleSecondOccupant(site)}>
-                    {occs.length > 1 ? 'Single occupant' : 'Add second occupant'}
-                  </button>
-                )}
-              </div>
+          {showLnPolicy && (
+            <div className="tf-policy" role="region" aria-label="Rare-earth A-site coordination policy">
+              <strong>Rare-earth A-site CN policy (D-028):</strong>
+              <span>
+                Shannon lists CN 12 for only 4 of 15 lanthanides (La, Ce, Nd, Sm). Choose how Ln3+ / Y3+
+                A-site coordination is selected:
+              </span>
+              <label className="tf-field">
+                <span className="sr-only">A-site coordination policy</span>
+                <select
+                  aria-label="A-site coordination policy"
+                  value={state.lnPolicy}
+                  onChange={(e) => applyLnPolicy(e.target.value as LnCnPolicy)}
+                >
+                  <option value="cn12">Strict CN XII (missing ions left blank)</option>
+                  <option value="cn9">Uniform CN IX (available for all Ln3+ and Y3+)</option>
+                  <option value="cn8">Uniform CN VIII (available for all Ln3+ and Y3+)</option>
+                  <option value="highest">Highest listed CN up to XII (Bartel rule)</option>
+                </select>
+              </label>
+            </div>
+          )}
 
-              {occs.map((occ, idx) => {
-                const oxList = oxidationStates(occ.el);
-                const cnList = coordinations(occ.el, occ.ox);
-                const spList = spins(occ.el, occ.ox, occ.cn, occ.geometry ?? null).filter(
-                  (s): s is Spin => s !== null,
-                );
-                const cnVal = `${occ.cn}:${occ.geometry ?? ''}`;
-                const hasCnInList = cnList.some(
-                  (c) => c.cn === occ.cn && (c.geometry ?? null) === (occ.geometry ?? null),
-                );
-                return (
-                  <div key={`${site}-${idx}`} className="tf-occ">
-                    <div className="tf-row">
+          <div className="tf-sites">
+            {(['A', 'B', 'X'] as const).map((site) => {
+              const siteTitle =
+                site === 'A'
+                  ? 'A site (large cation, default CN XII)'
+                  : site === 'B'
+                    ? 'B site (octahedral cation, default CN VI)'
+                    : 'X site (anion, default CN VI)';
+              const occs = state[site];
+              return (
+                <section key={site} className="tf-site" aria-label={`${site} site`}>
+                  <div className="tf-site-head">
+                    <h2>{siteTitle}</h2>
+                    {site !== 'X' && (
                       <button
                         type="button"
-                        className="tf-el-btn"
-                        aria-label={`${occ.el}: pick element for ${site} site occupant ${idx + 1}`}
-                        onClick={() =>
-                          setPickerTarget((cur) =>
-                            cur && cur.site === site && cur.index === idx ? null : { site, index: idx },
-                          )
-                        }
+                        className="tf-preset-btn"
+                        onClick={() => toggleSecondOccupant(site)}
                       >
-                        {occ.el}
+                        {occs.length > 1 ? 'Single occupant' : 'Add second occupant'}
                       </button>
-
-                      <label className="tf-field">
-                        <span>Oxidation</span>
-                        <select
-                          aria-label={`${site} occupant ${idx + 1} oxidation state`}
-                          value={occ.ox}
-                          onChange={(e) => updateOccupant(site, idx, { ox: Number(e.target.value) })}
-                        >
-                          {(oxList.includes(occ.ox) ? oxList : [...oxList, occ.ox].sort((a, b) => a - b)).map(
-                            (ox) => (
-                              <option key={ox} value={ox}>
-                                {ox > 0 ? `+${ox}` : String(ox)}
-                              </option>
-                            ),
-                          )}
-                        </select>
-                      </label>
-
-                      <label className="tf-field">
-                        <span>CN</span>
-                        <select
-                          aria-label={`${site} occupant ${idx + 1} coordination`}
-                          value={cnVal}
-                          onChange={(e) => {
-                            const [cnS, geoS] = e.target.value.split(':');
-                            const patch: Partial<Occupant> = { cn: Number(cnS) };
-                            if (geoS === 'SQ' || geoS === 'PY') patch.geometry = geoS as Geometry;
-                            else patch.geometry = null;
-                            updateOccupant(site, idx, patch);
-                          }}
-                        >
-                          {!hasCnInList && (
-                            <option value={cnVal}>
-                              {coordinationLabel(occ.cn, occ.geometry ?? null)} (not listed)
-                            </option>
-                          )}
-                          {cnList.map((c) => {
-                            const key = `${c.cn}:${c.geometry ?? ''}`;
-                            return (
-                              <option key={key} value={key}>
-                                {coordinationLabel(c.cn, c.geometry)}
-                              </option>
-                            );
-                          })}
-                        </select>
-                      </label>
-
-                      {spList.length > 0 && (
-                        <label className="tf-field">
-                          <span>Spin</span>
-                          <select
-                            aria-label={`${site} occupant ${idx + 1} spin state`}
-                            value={occ.spin ?? spList[0]}
-                            onChange={(e) => updateOccupant(site, idx, { spin: e.target.value as Spin })}
-                          >
-                            {spList.map((sp) => (
-                              <option key={sp} value={sp}>
-                                {sp === 'HS' ? 'High spin (HS)' : 'Low spin (LS)'}
-                              </option>
-                            ))}
-                          </select>
-                        </label>
-                      )}
-
-                      {occs.length > 1 && idx === 0 && (
-                        <label className="tf-field">
-                          <span>Fraction</span>
-                          <input
-                            type="number"
-                            aria-label={`${site} occupant 1 fraction`}
-                            min={0.05}
-                            max={0.95}
-                            step={0.05}
-                            value={occ.fraction}
-                            onChange={(e) => setSecondFraction(site, Number(e.target.value))}
-                          />
-                        </label>
-                      )}
-                      {occs.length > 1 && idx === 1 && (
-                        <span className="tf-source-line">Fraction: {occ.fraction.toFixed(2)}</span>
-                      )}
-                    </div>
-
-                    <p className="tf-source-line">{sourceLine(occ, state.kind)}</p>
+                    )}
                   </div>
-                );
-              })}
+
+                  {occs.map((occ, idx) => {
+                    const oxList = oxidationStates(occ.el);
+                    const cnList = coordinations(occ.el, occ.ox);
+                    const spList = spins(occ.el, occ.ox, occ.cn, occ.geometry ?? null).filter(
+                      (s): s is Spin => s !== null,
+                    );
+                    const cnVal = `${occ.cn}:${occ.geometry ?? ''}`;
+                    const hasCnInList = cnList.some(
+                      (c) => c.cn === occ.cn && (c.geometry ?? null) === (occ.geometry ?? null),
+                    );
+                    return (
+                      <div key={`${site}-${idx}`} className="tf-occ">
+                        <div className="tf-row">
+                          <button
+                            type="button"
+                            className="tf-el-btn"
+                            aria-label={`${occ.el}: pick element for ${site} site occupant ${idx + 1}`}
+                            onClick={() =>
+                              setPickerTarget((cur) =>
+                                cur && cur.site === site && cur.index === idx ? null : { site, index: idx },
+                              )
+                            }
+                          >
+                            {occ.el}
+                          </button>
+
+                          <label className="tf-field">
+                            <span>Oxidation</span>
+                            <select
+                              aria-label={`${site} occupant ${idx + 1} oxidation state`}
+                              value={occ.ox}
+                              onChange={(e) => updateOccupant(site, idx, { ox: Number(e.target.value) })}
+                            >
+                              {(oxList.includes(occ.ox)
+                                ? oxList
+                                : [...oxList, occ.ox].sort((a, b) => a - b)
+                              ).map((ox) => (
+                                <option key={ox} value={ox}>
+                                  {ox > 0 ? `+${ox}` : String(ox)}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+
+                          <label className="tf-field">
+                            <span>CN</span>
+                            <select
+                              aria-label={`${site} occupant ${idx + 1} coordination`}
+                              value={cnVal}
+                              onChange={(e) => {
+                                const [cnS, geoS] = e.target.value.split(':');
+                                const patch: Partial<Occupant> = { cn: Number(cnS) };
+                                if (geoS === 'SQ' || geoS === 'PY') patch.geometry = geoS as Geometry;
+                                else patch.geometry = null;
+                                updateOccupant(site, idx, patch);
+                              }}
+                            >
+                              {!hasCnInList && (
+                                <option value={cnVal}>
+                                  {coordinationLabel(occ.cn, occ.geometry ?? null)} (not listed)
+                                </option>
+                              )}
+                              {cnList.map((c) => {
+                                const key = `${c.cn}:${c.geometry ?? ''}`;
+                                return (
+                                  <option key={key} value={key}>
+                                    {coordinationLabel(c.cn, c.geometry)}
+                                  </option>
+                                );
+                              })}
+                            </select>
+                          </label>
+
+                          {spList.length > 0 && (
+                            <label className="tf-field">
+                              <span>Spin</span>
+                              <select
+                                aria-label={`${site} occupant ${idx + 1} spin state`}
+                                value={occ.spin ?? spList[0]}
+                                onChange={(e) => updateOccupant(site, idx, { spin: e.target.value as Spin })}
+                              >
+                                {spList.map((sp) => (
+                                  <option key={sp} value={sp}>
+                                    {sp === 'HS' ? 'High spin (HS)' : 'Low spin (LS)'}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                          )}
+
+                          {occs.length > 1 && idx === 0 && (
+                            <label className="tf-field">
+                              <span>Fraction</span>
+                              <input
+                                type="number"
+                                aria-label={`${site} occupant 1 fraction`}
+                                min={0.05}
+                                max={0.95}
+                                step={0.05}
+                                value={occ.fraction}
+                                onChange={(e) => setSecondFraction(site, Number(e.target.value))}
+                              />
+                            </label>
+                          )}
+                          {occs.length > 1 && idx === 1 && (
+                            <span className="tf-source-line">Fraction: {occ.fraction.toFixed(2)}</span>
+                          )}
+                        </div>
+
+                        <p className="tf-source-line">{sourceLine(occ, state.kind)}</p>
+                      </div>
+                    );
+                  })}
+                </section>
+              );
+            })}
+          </div>
+
+          {evalRes.checks.length > 0 && (
+            <section aria-label="Checks and warnings" className="notice tf-checkbox">
+              <h3>Checks and warnings</h3>
+              <ul className="tf-checks">
+                {evalRes.checks.map((c, i) => (
+                  <li key={`${c.id}-${i}`} className={`tf-check tf-check-${c.level}`}>
+                    <strong>[{c.level.toUpperCase()}]</strong> {c.message}
+                  </li>
+                ))}
+              </ul>
             </section>
-          );
-        })}
-      </div>
-
-      {pickerTarget && (
-        <PeriodicTable
-          selected={state[pickerTarget.site][pickerTarget.index]?.el ?? null}
-          highlighted={SHANNON_ELEMENTS}
-          label={`Choose element for ${pickerTarget.site} site`}
-          onSelect={(sym) => selectElement(pickerTarget.site, pickerTarget.index, sym)}
-        />
-      )}
-
-      <section aria-label="Tolerance factor results">
-        <div className="tf-results">
-          <div className="tf-card" data-factor="t">
-            <div>
-              <Badge variant="heuristic" /> <strong>Goldschmidt t</strong>
-            </div>
-            <p className="tf-metric">{f ? f.t.toFixed(4) : 'Not available'}</p>
-            <p>
-              Measures how well the A cation fits the cavity between corner-sharing BX6 octahedra (near 1.0
-              cubic, 0.8 to 1.0 tilted, above 1 hexagonal).
-            </p>
-            <details>
-              <summary>Formula (S-002)</summary>
-              <p className="tf-source-line">t = (rA + rX) / (sqrt(2) * (rB + rX))</p>
-            </details>
-          </div>
-
-          <div className="tf-card" data-factor="mu">
-            <div>
-              <Badge variant="heuristic" /> <strong>Octahedral factor mu</strong>
-            </div>
-            <p className="tf-metric">{f ? f.mu.toFixed(4) : 'Not available'}</p>
-            <p>
-              Checks whether the B cation is large enough to sit stably inside a BX6 octahedron (radius-ratio
-              window 0.414 to 0.732, S-022).
-            </p>
-            <details>
-              <summary>Formula (S-022)</summary>
-              <p className="tf-source-line">mu = rB / rX</p>
-            </details>
-          </div>
-
-          <div className="tf-card" data-factor="tau">
-            <div>
-              <Badge variant="heuristic" /> <strong>Bartel tau</strong>
-            </div>
-            <p className="tf-metric">
-              {f ? (f.tau.ok ? f.tau.value.toFixed(4) : 'Undefined') : 'Not available'}
-            </p>
-            <p>
-              {f && f.tau.ok
-                ? f.tau.predictsPerovskite
-                  ? `Below ${TAU_THRESHOLD}: predicts perovskite formability (S-003).`
-                  : `At or above ${TAU_THRESHOLD}: predicts non-perovskite (S-003).`
-                : 'Requires valid radii with rA != rB.'}
-            </p>
-            <details>
-              <summary>Formula (S-003)</summary>
-              <p className="tf-source-line">tau = rX/rB - nA * (nA - (rA/rB) / ln(rA/rB))</p>
-              <p className="tf-source-line">{TAU_STATUS.note}</p>
-            </details>
-          </div>
+          )}
         </div>
-      </section>
+        <div className="stack tool-results">
+          {pickerTarget && (
+            <div className="card tool-card">
+              <PeriodicTable
+                selected={state[pickerTarget.site][pickerTarget.index]?.el ?? null}
+                highlighted={SHANNON_ELEMENTS}
+                label={`Choose element for ${pickerTarget.site} site`}
+                onSelect={(sym) => selectElement(pickerTarget.site, pickerTarget.index, sym)}
+              />
+            </div>
+          )}
 
-      <p className="tf-honesty">
-        Tolerance factors are rules of thumb. They do not guarantee that a compound exists or is stable.
-      </p>
+          <section aria-label="Tolerance factor results">
+            <div className="grid g3 tf-results">
+              <div className="tile tf-card" data-factor="t">
+                <div>
+                  <Badge variant="heuristic" /> <strong>Goldschmidt t</strong>
+                </div>
+                <p className="tf-metric v">{f ? f.t.toFixed(4) : 'Not available'}</p>
+                <p>
+                  Measures how well the A cation fits the cavity between corner-sharing BX6 octahedra (near
+                  1.0 cubic, 0.8 to 1.0 tilted, above 1 hexagonal).
+                </p>
+                <details>
+                  <summary>Formula (S-002)</summary>
+                  <p className="tf-source-line">t = (rA + rX) / (sqrt(2) * (rB + rX))</p>
+                </details>
+              </div>
 
-      <div className="tf-actions">
-        <button type="button" className="tf-preset-btn" onClick={copyShareLink}>
-          {copied ? 'Link copied' : 'Copy shareable link'}
-        </button>
-        {evalRes.checks.some((c) => c.action === 'swap-a-b') && (
-          <button type="button" className="tf-preset-btn" onClick={swapAB}>
-            Swap A and B sites
-          </button>
-        )}
+              <div className="tile tf-card" data-factor="mu">
+                <div>
+                  <Badge variant="heuristic" /> <strong>Octahedral factor mu</strong>
+                </div>
+                <p className="tf-metric v">{f ? f.mu.toFixed(4) : 'Not available'}</p>
+                <p>
+                  Checks whether the B cation is large enough to sit stably inside a BX6 octahedron
+                  (radius-ratio window 0.414 to 0.732, S-022).
+                </p>
+                <details>
+                  <summary>Formula (S-022)</summary>
+                  <p className="tf-source-line">mu = rB / rX</p>
+                </details>
+              </div>
+
+              <div className="tile tf-card" data-factor="tau">
+                <div>
+                  <Badge variant="heuristic" /> <strong>Bartel tau</strong>
+                </div>
+                <p className="tf-metric v">
+                  {f ? (f.tau.ok ? f.tau.value.toFixed(4) : 'Undefined') : 'Not available'}
+                </p>
+                <p>
+                  {f && f.tau.ok
+                    ? f.tau.predictsPerovskite
+                      ? `Below ${TAU_THRESHOLD}: predicts perovskite formability (S-003).`
+                      : `At or above ${TAU_THRESHOLD}: predicts non-perovskite (S-003).`
+                    : 'Requires valid radii with rA != rB.'}
+                </p>
+                <details>
+                  <summary>Formula (S-003)</summary>
+                  <p className="tf-source-line">tau = rX/rB - nA * (nA - (rA/rB) / ln(rA/rB))</p>
+                  <p className="tf-source-line">{TAU_STATUS.note}</p>
+                </details>
+              </div>
+            </div>
+          </section>
+
+          <p className="notice tf-honesty">
+            Tolerance factors are rules of thumb. They do not guarantee that a compound exists or is stable.
+          </p>
+
+          {evalRes.checks.some((c) => c.action === 'swap-a-b') && (
+            <div className="tf-actions">
+              <button type="button" className="btn" onClick={swapAB}>
+                Swap A and B sites
+              </button>
+            </div>
+          )}
+
+          <ToleranceMaps
+            A={state.A}
+            B={state.B}
+            X={state.X}
+            kind={state.kind}
+            lnPolicy={state.lnPolicy}
+            evalRes={evalRes}
+          />
+        </div>
       </div>
-
-      <ToleranceMaps
-        A={state.A}
-        B={state.B}
-        X={state.X}
-        kind={state.kind}
-        lnPolicy={state.lnPolicy}
-        evalRes={evalRes}
-      />
-
-      {evalRes.checks.length > 0 && (
-        <section aria-label="Checks and warnings">
-          <h2>Checks and warnings</h2>
-          <ul className="tf-checks">
-            {evalRes.checks.map((c, i) => (
-              <li key={`${c.id}-${i}`} className={`tf-check tf-check-${c.level}`}>
-                <strong>[{c.level.toUpperCase()}]</strong> {c.message}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
     </div>
   );
 }

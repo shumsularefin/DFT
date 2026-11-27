@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { zipSync, strToU8 } from 'fflate';
-import { buildFiles, potcarLabels } from '../../../lib/vasp/builder';
+import { potcarLabels } from '../../../lib/vasp/builder';
 import {
   POTCAR_NOTE,
   jobScript,
@@ -10,7 +10,7 @@ import {
   type Launcher,
   type Scheduler,
 } from '../../../lib/vasp/jobscript';
-import { canDownload, issuesOf, kpointsOf, presetOf, shareOf, useBuilder } from './store';
+import { canDownload, filesOf, issuesOf, kpointsOf, shareOf, useBuilder } from './store';
 import { copyText, downloadBlob } from './hooks';
 
 export default function JobStep() {
@@ -23,17 +23,7 @@ export default function JobStep() {
   const setJob = (patch: Partial<typeof job>) => s.set('job', { ...job, ...patch });
   const num = (v: string) => Math.max(1, Math.floor(Number(v) || 1));
 
-  const files = () =>
-    s.structure
-      ? buildFiles({
-          structure: s.structure,
-          entries: s.entries,
-          kpoints: kpointsOf(s).text,
-          job,
-          presetTitle: presetOf(s.presetId).title,
-          vaspVersion: s.version,
-        })
-      : [];
+  const files = () => (s.structure ? filesOf(s) : []);
 
   const say = (t: string) => setMsg(t);
   const one = (name: string) => {
