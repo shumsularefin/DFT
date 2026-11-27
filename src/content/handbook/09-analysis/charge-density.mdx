@@ -3,26 +3,35 @@ id: charge-density
 title: Charge density and volumetric files
 module: 9
 order: 5
-summary: How VASP stores electron density in CHGCAR (rho times cell volume in x-fastest order), how to inspect isosurfaces and 2D slices, and how spin magnetization is stored.
+summary: How CHGCAR stores the density (rho times cell volume, x fastest, a magnetization block for ISPIN = 2), and how to make difference densities, spin densities, ELF maps, band-decomposed densities and planar averages, and view them honestly.
 concepts: [charge-density-analysis]
 requires: [dft-energies-forces]
-vaspTags: [LCHARG, ISPIN]
-sources: [S-019, S-030, S-042, S-043]
+vaspTags: [LCHARG, ISPIN, LELF, LPARD, IBAND, EINT, NBMOD, KPUSE, LSEPB, LSEPK, LAECHG, NGXF]
+sources: [S-019, S-029, S-030, S-041, S-042, S-043, S-084, S-086, S-087, S-094]
 status: draft
-updated: 2026-11-24
+updated: 2026-11-27
 ---
 
 <Why>
 
-Real-space charge density `CHGCAR` shows where electrons actually sit in the crystal: covalent bonds between atoms, lone pairs, charge transfer across an interface, and (for `ISPIN = 2`) where the spin magnetization is localized <Cite id="S-042" />.
+The <Term id="electron-density">electron density</Term> is the central quantity of DFT, and `CHGCAR` hands it to you on a 3D grid. Looked at the right way it shows covalent bonds, lone pairs, charge moving from a metal to an adsorbate, where a defect's extra electron sits, and (for `ISPIN = 2`) which atoms carry the <Term id="magnetization-density">magnetization</Term> <Cite id="S-042" />.
+
+Looked at naively it shows almost nothing: the total density is dominated by near-spherical atoms, and the chemistry hides in small changes on top of them. That is why the useful plots are differences, spin densities, localization functions and partial densities, each made with its own recipe <Cite id="S-042" />.
 
 </Why>
 
 <Intuition>
 
-`CHGCAR` starts with the `POSCAR` crystal structure, followed by a blank line, the 3D FFT grid dimensions `NGXF NGYF NGZF`, and the volumetric values written with `x` varying fastest (Fortran order).
+Think of `CHGCAR` as a fog sampled at every point of a fine 3D grid. An **isosurface** is the skin of all points where the fog has one chosen thickness; a **slice** is a colour map of the fog on one plane <Cite id="S-030" />. Both pictures depend on the level or colour scale you choose, so the choice is part of the result.
 
-One crucial VASP convention: the numbers in `CHGCAR` are stored as $\rho(\mathbf r) \times V_{\text{cell}}$, not $\rho(\mathbf r)$ directly. That means averaging all grid numbers gives the total number of valence electrons in the cell, and dividing each grid value by $V_{\text{cell}}$ gives the physical electron density in $e/\text{\AA}^3$ <Cite id="S-042" />. When `ISPIN = 2`, `CHGCAR` writes a second grid block for the magnetization density $m(\mathbf r) \times V_{\text{cell}}$.
+**One unit convention to remember.** The numbers in `CHGCAR` are $\rho(\mathbf r)$ times the cell volume, not $\rho(\mathbf r)$. Their average over the grid is the number of valence electrons; dividing a value by $V_{\text{cell}}$ in $\text{\AA}^3$ gives $e/\text{\AA}^3$ <Cite id="S-041" />. The grid holds the pseudo valence density plus compensation charge, not the all-electron density near the nuclei <Cite id="S-041" />.
+
+Four derived pictures do most of the work:
+
+- **<Term id="charge-density-difference">Charge density difference</Term>.** Subtract the densities of the separated parts from the density of the whole, on the same grid. Red and blue lobes then show where bonding added and removed charge <Cite id="S-042" />.
+- **Spin density.** The second block of a spin-polarized `CHGCAR` is $\rho_\uparrow - \rho_\downarrow$: it shows the shape of the magnetic orbitals (a d lobe on a metal, a p lobe on a ligand) <Cite id="S-041" />.
+- **<Term id="electron-localization-function">ELF</Term>.** A number between 0 and 1 that asks how much the electrons at a point behave like a localized pair. Values near 1 mark bonds, lone pairs and shells; about 0.5 is what a uniform electron gas gives, so metallic regions sit near 0.5; low values separate the localized regions <Cite id="S-086" /> <Cite id="S-087" />.
+- **Band-decomposed density** (`PARCHG`). The density of only some bands or of an energy window: a defect state, the bands that form the VBM, or the filled states just below $E_F$ that a simple model of an STM image uses <Cite id="S-041" /> <Cite id="S-094" />.
 
 </Intuition>
 
@@ -30,49 +39,154 @@ One crucial VASP convention: the numbers in `CHGCAR` are stored as $\rho(\mathbf
 
 <TheMath>
 
-For a grid of $N_{\text{grid}} = N_x N_y N_z$ points storing $g_{ijk} = \rho(\mathbf r_{ijk})\,V_{\text{cell}}$:
+For a grid of $N_{\text{grid}} = N_x N_y N_z$ points holding $g_{ijk} = \rho(\mathbf r_{ijk})\,V_{\text{cell}}$, the integral $\int \rho\,dV \approx (V_{\text{cell}}/N_{\text{grid}})\sum \rho_{ijk}$ becomes <Cite id="S-041" />:
 
-$$N_{\text{electrons}} = \frac{1}{N_{\text{grid}}}\sum_{i,j,k} g_{ijk}, \qquad \rho(\mathbf r_{ijk}) = \frac{g_{ijk}}{V_{\text{cell}}}$$
+$$N_{\text{el}} = \frac{1}{N_{\text{grid}}}\sum_{i,j,k} g_{ijk}, \qquad \rho(\mathbf r_{ijk}) = \frac{g_{ijk}}{V_{\text{cell}}}$$
 
-Isosurfaces at a chosen threshold $\rho_0$ are extracted on the 3D grid using marching-cubes / tetrahedral triangulation <Cite id="S-030" />.
+The same average over the magnetization block gives the total moment in $\mu_B$, and the spin channels are $\rho_\uparrow = (\rho + m)/2$, $\rho_\downarrow = (\rho - m)/2$.
+
+**Difference density** for a system AB made of parts A and B, all on the same cell and FFT grid, with A and B frozen at their positions in AB <Cite id="S-042" />:
+
+$$\Delta\rho(\mathbf r) = \rho_{AB}(\mathbf r) - \rho_A(\mathbf r) - \rho_B(\mathbf r)$$
+
+It integrates to zero when no electrons are added or removed: charge only moves.
+
+<Level min="intermediate">
+
+**Planar average.** For a slab or interface along $z$, average each plane of the grid:
+
+$$\bar\rho(z_k) = \frac{1}{N_x N_y}\sum_{i,j} \rho(\mathbf r_{ijk}), \qquad \Delta Q(z) = \int_0^{z} A\,\Delta\bar\rho(z')\,dz'$$
+
+with $A$ the area of the cell face. $A\,\bar\rho$ is a line density in $e/\text{\AA}$, and $\Delta Q(z)$ is the charge that has moved across the plane at $z$, a common way to put a number on charge transfer at an interface. VASPKIT tasks 426 and 427 make planar and macroscopic averages of `LOCPOT` <Cite id="S-042" />; the same averaging applies to a density file.
+
+</Level>
+
+<Level min="pro">
+
+**The ELF.** In the form used for solids (closed shell, Hartree atomic units) <Cite id="S-086" /> <Cite id="S-087" />:
+
+$$\text{ELF} = \frac{1}{1 + \left(t_P/t_{\text{HEG}}\right)^2}, \quad t_P = \tfrac12\sum_i \lvert\nabla\psi_i\rvert^2 - \frac{\lvert\nabla\rho\rvert^2}{8\rho}, \quad t_{\text{HEG}} = \tfrac{3}{10}(3\pi^2)^{2/3}\rho^{5/3}$$
+
+$t_P$ is the kinetic energy density in excess of a single orbital's (the Pauli part). Where one orbital pair dominates, $t_P \to 0$ and ELF tends to 1; in a uniform gas $t_P = t_{\text{HEG}}$ and ELF is exactly 0.5. ELF is a ratio, so it carries no unit and is not scaled by the volume. VASP builds it from the valence pseudo-wavefunctions, so regions close to the cores do not show the shell structure an all-electron ELF would.
+
+</Level>
 
 </TheMath>
 
 <InVasp>
 
-- Set `LCHARG = .TRUE.` to write `CHGCAR` (default is `.TRUE.`, though many relaxations set `LCHARG = .FALSE.` to save disk space) <Cite id="S-019" />.
-- `LOCPOT` uses the exact same 3D grid layout as `CHGCAR`, except its values are electrostatic potential in eV and are **not** multiplied by $V_{\text{cell}}$ <Cite id="S-043" />.
+**The layout of `CHGCAR`** <Cite id="S-041" /> <Cite id="S-019" />:
+
+| Part             | Contents                                                                                 |
+| ---------------- | ---------------------------------------------------------------------------------------- |
+| Header           | The structure in `POSCAR` format: comment, scale, lattice, species, counts, positions    |
+| Blank line, grid | The fine FFT grid `NGXF NGYF NGZF`                                                       |
+| Values           | $\rho V_{\text{cell}}$ at every grid point, x fastest, then y, then z, 5 values per line |
+| Augmentation     | PAW one-centre occupancies, needed to restart from the file                              |
+| `ISPIN = 2`      | A second grid line and data set: the magnetization $(\rho_\uparrow - \rho_\downarrow)V$  |
+| Non-collinear    | Four data sets: total, then $m_x$, $m_y$, $m_z$                                          |
+
+`CHG` has the same structure with fewer digits and no augmentation part: fine for pictures, not for restarts or Bader analysis. `LOCPOT` uses the same grid layout but holds a potential in eV that is **not** multiplied by the volume <Cite id="S-041" />.
+
+**Charge density difference, step by step** <Cite id="S-042" />:
+
+1. Relax the combined system AB, then run a static SCF on it.
+2. Cut the relaxed structure into A and B. Run a static SCF of each **at its position in the relaxed AB**, in the same cell. Do not relax the parts.
+3. Use the same `ENCUT`, `PREC`, `POTCAR`s, k-mesh and spin setting, and the same fine grid: copy `NGXF`, `NGYF`, `NGZF` from the AB `OUTCAR` into the A and B INCARs.
+4. Subtract: VASPKIT task 314 reads the three `CHGCAR` files and writes `CHGDIFF.vasp`. Plot a positive and a negative isosurface at the same absolute level.
+
+**Spin density.** VASPKIT tasks 311 to 313 split a spin-polarized `CHGCAR` into total, spin, and up and down densities <Cite id="S-042" />.
+
+**ELF.** Add `LELF = .TRUE.` to a static run; VASP writes `ELFCAR` in the `CHGCAR` layout <Cite id="S-041" /> <Cite id="S-019" />.
+
+**Band-decomposed density.** Run the SCF with `LWAVE = .TRUE.`, then restart from its `WAVECAR` with `LPARD` <Cite id="S-041" /> <Cite id="S-019" />:
+
+<VaspFile
+  name="INCAR"
+  code={`SYSTEM = band-decomposed density
+ISTART = 1
+LPARD  = .TRUE.
+IBAND  = 4 5
+KPUSE  = 1
+LSEPB  = .TRUE.
+LSEPK  = .FALSE.
+NSW    = 0
+LWAVE  = .FALSE.
+LCHARG = .FALSE.`}
+  annotations={{
+    2: 'read the converged WAVECAR',
+    3: 'write PARCHG files',
+    4: 'bands 4 and 5 (for example the VBM and the CBM of a small cell)',
+    5: 'use only the first k-point; leave out to use all',
+    6: 'one file per band, PARCHG.nb.*',
+    7: 'do not split by k-point',
+  }}
+/>
+
+- **An energy window instead of bands.** Replace `IBAND` by an energy window such as `EINT = -0.5 0.0` (an example, in eV) with `NBMOD = -3`, which reads `EINT` relative to $E_F$; this is the usual input for a simulated STM image <Cite id="S-019" /> <Cite id="S-094" />. Check the `LPARD`, `NBMOD` and `EINT` pages for your VASP version.
+- **All-electron density for Bader.** `LAECHG = .TRUE.` writes `AECCAR0` (core) and `AECCAR2` (valence); their sum is the reference for the zero-flux surfaces. See [the Bader topic](/handbook/12-properties/bader-charges/) <Cite id="S-041" /> <Cite id="S-084" />.
+- **Viewing in VESTA.** Open `CHGCAR`, `CHGDIFF.vasp`, `ELFCAR` or `PARCHG` directly, set the isosurface level, and report it. Programs differ in whether they divide by the volume for you, so check which unit your viewer shows before you quote a level <Cite id="S-043" />. For difference densities use two surfaces of opposite sign at the same absolute level; for ELF, which runs from 0 to 1, say which level you drew and why.
 
 </InVasp>
 
 <WhatChanges>
 
-| File / block                 | Quantity stored                                      | Divide by $V_{\text{cell}}$?     |
-| ---------------------------- | ---------------------------------------------------- | -------------------------------- |
-| `CHGCAR` block 1             | $(\rho_\uparrow + \rho_\downarrow)\,V_{\text{cell}}$ | Yes, to get $e/\text{\AA}^3$     |
-| `CHGCAR` block 2 (`ISPIN=2`) | $(\rho_\uparrow - \rho_\downarrow)\,V_{\text{cell}}$ | Yes, to get $\mu_B/\text{\AA}^3$ |
-| `LOCPOT`                     | Local electrostatic potential (eV)                   | No <Cite id="S-043" />           |
+| File or block                  | Quantity stored                                      | Divide by $V_{\text{cell}}$?        |
+| ------------------------------ | ---------------------------------------------------- | ----------------------------------- |
+| `CHGCAR` block 1               | $(\rho_\uparrow + \rho_\downarrow)\,V_{\text{cell}}$ | Yes, to get $e/\text{\AA}^3$        |
+| `CHGCAR` block 2 (`ISPIN = 2`) | $(\rho_\uparrow - \rho_\downarrow)\,V_{\text{cell}}$ | Yes, to get $\mu_B/\text{\AA}^3$    |
+| `CHG`                          | As `CHGCAR`, fewer digits, no augmentation part      | Yes                                 |
+| `PARCHG`                       | Density of the chosen bands or energy window         | Yes (same layout as the density)    |
+| `ELFCAR`                       | ELF, between 0 and 1                                 | No, it has no unit                  |
+| `LOCPOT`                       | Local potential in eV                                | No                                  |
+| `AECCAR0` plus `AECCAR2`       | Core plus valence all-electron density               | Yes; the sum is the Bader reference |
 
-Why remember the $V_{\text{cell}}$ factor: forgetting to divide by volume makes densities look 100 times too large on typical cells.
+Why remember the volume factor: without it every density is too large by the cell volume in cubic angstrom, tens to thousands for common cells. Why the same grid for differences: points must line up one to one, or the subtraction is meaningless. What happens if you skip these checks: a picture of an artefact.
 
 </WhatChanges>
 
 <Mistakes>
 
-<Callout variant="mistake" title="Reading CHGCAR in C order (z fastest) instead of Fortran order (x fastest)">
+<Callout variant="mistake" title="Reading the grid in the wrong order">
 
-Swapping axis order distorts every non-cubic cell and shifts atoms away from their density peaks. Always index as `ix + nx * (iy + ny * iz)` <Cite id="S-019" />.
+Cause: z-fastest (C order) indexing. Non-cubic cells come out distorted and atoms sit off their density peaks. Fix: index as `ix + nx * (iy + ny * iz)`, x fastest <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="A difference density from mismatched runs">
+
+Cause: fragments relaxed on their own, a different cell, or a different FFT grid. The subtraction then shows the change in geometry or grid, not bonding. Fix: freeze A and B at their positions in AB, keep the cell, and copy `NGXF`, `NGYF` and `NGZF` <Cite id="S-042" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Using CHG, or CHGCAR alone, for Bader charges">
+
+Cause: `CHG` lacks precision and augmentation data, and `CHGCAR` lacks the core density. Fix: `LAECHG = .TRUE.`, sum `AECCAR0` and `AECCAR2` as the reference, integrate `CHGCAR` <Cite id="S-041" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Letting the isosurface level tell the story">
+
+Cause: a low level makes every bond look covalent, a high one hides it. Fix: state the level, use the same level when comparing systems, and back the picture with a number (Bader charges, a planar-averaged $\Delta Q$) <Cite id="S-043" />.
+
+</Callout>
+
+<Callout variant="mistake" title="Running LPARD without a WAVECAR">
+
+Cause: the SCF ran with `LWAVE = .FALSE.`, so there are no wavefunctions to decompose. Fix: rerun the SCF with `LWAVE = .TRUE.` and start the `LPARD` run from it <Cite id="S-041" />.
 
 </Callout>
 
 </Mistakes>
 
-<Check ids={['q-m9-17', 'q-m9-18', 'q-m9-19', 'q-m9-20']} />
+<Check ids={['q-m9-17', 'q-m9-18', 'q-m9-19', 'q-m9-20', 'q-m9-25', 'q-m9-26', 'q-m9-32']} />
 
 <GoDeeper>
 
-- VASP wiki pages `CHGCAR` and `LOCPOT` <Cite id="S-019" />.
-- Lorensen and Cline, Marching Cubes <Cite id="S-030" />.
-- The author's VASP Field Handbook on volumetric files <Cite id="S-042" />.
+- VASP wiki pages CHGCAR, LOCPOT, LELF, LPARD, NBMOD, EINT and LAECHG, by page name <Cite id="S-019" />.
+- Becke and Edgecombe on the ELF <Cite id="S-086" />, and Savin and co-workers on reading it in solids <Cite id="S-087" />.
+- Tersoff and Hamann on the simplest model of an STM image <Cite id="S-094" />.
+- Henkelman and co-workers on Bader analysis <Cite id="S-029" /> <Cite id="S-084" />, and [the Bader topic](/handbook/12-properties/bader-charges/).
+- Momma and Izumi on VESTA <Cite id="S-043" />; Lorensen and Cline on isosurfaces <Cite id="S-030" />.
 
 </GoDeeper>
