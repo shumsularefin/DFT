@@ -49,8 +49,8 @@ Not fixed: the k-path table caption clips at its scroll edge at 360 px (minor); 
 | `npm run contrast` | pass, both themes |
 | Shell, palette, a11y-csp e2e | 109 passed |
 | Guided path and scenes e2e | 34 passed |
-| Full e2e | see below |
+| Full e2e | 650 passed, 12 skipped, 0 failed |
 
 ### Full e2e run
 
-Pending at the time of writing; the PR description carries the result.
+`npx playwright test --trace off` on the merged branch (desktop and mobile-360 projects): 650 passed, 12 skipped, 0 failed, 6.7 minutes. CI was green on every check at `dfa296a`.
